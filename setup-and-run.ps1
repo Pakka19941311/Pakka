@@ -48,6 +48,38 @@ function Install-PortableNode {
     return @((Join-Path $nodeFolder "node.exe"), (Join-Path $nodeFolder "npm.cmd"))
 }
 
+function Wait-ForLocalServer {
+    param(
+        [Parameter(Mandatory=$true)]$Process,
+        [int]$Port = 4173,
+        [int]$TimeoutSeconds = 20
+    )
+
+    $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
+    while ((Get-Date) -lt $deadline) {
+        if ($Process.HasExited) {
+            throw "The local game server stopped before it became ready (exit code $($Process.ExitCode))."
+        }
+
+        $client = $null
+        try {
+            $client = New-Object Net.Sockets.TcpClient
+            $async = $client.BeginConnect("127.0.0.1", $Port, $null, $null)
+            if ($async.AsyncWaitHandle.WaitOne(300)) {
+                $client.EndConnect($async)
+                $client.Close()
+                return
+            }
+        } catch {
+        } finally {
+            if ($client) { $client.Close() }
+        }
+        Start-Sleep -Milliseconds 200
+    }
+
+    throw "The local game server did not start on port $Port within $TimeoutSeconds seconds."
+}
+
 try {
     Set-Location $root
     $systemNode = Find-CompatibleSystemNode
@@ -86,8 +118,20 @@ try {
         throw "Build completed but dist\index.html was not created."
     }
 
-    Write-Host "Build complete. Starting game..." -ForegroundColor Green
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root "server.ps1")
+    # Use Vite's own production preview server instead of the old custom PowerShell HTTP server.
+    # Modern browsers may cancel speculative requests; Vite handles those disconnects correctly.
+    Write-Host "Build complete. Starting game server..." -ForegroundColor Green
+    $previewArgs = @("run", "preview", "--", "--host", "127.0.0.1", "--port", "4173", "--strictPort")
+    $preview = Start-Process -FilePath $npmCmd -ArgumentList $previewArgs -NoNewWindow -PassThru
+
+    Wait-ForLocalServer -Process $preview -Port 4173 -TimeoutSeconds 20
+
+    $gameUrl = "http://localhost:4173/"
+    Write-Host ("Varendor is running at {0}" -f $gameUrl) -ForegroundColor Green
+    Write-Host "Keep this window open while playing. Close it or press Ctrl+C to stop the server." -ForegroundColor DarkGray
+    Start-Process $gameUrl
+
+    Wait-Process -Id $preview.Id
 }
 catch {
     Write-Host ""
