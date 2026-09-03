@@ -98,6 +98,12 @@ try {
     $nodeDir = Split-Path -Parent $nodeExe
     $env:PATH = "$nodeDir;$env:PATH"
 
+    # This is a standalone project, not an npm workspace. Some PCs have a global
+    # npm workspace setting in user .npmrc/environment, which makes `npm ci` fail
+    # with "No workspaces found!". Force standalone mode for every launcher run.
+    $env:npm_config_workspaces = "false"
+    Remove-Item Env:npm_config_workspace -ErrorAction SilentlyContinue
+
     # A failed npm ci can leave a partial node_modules directory. Only trust our marker.
     if (-not (Test-Path $depsMarker)) {
         if (Test-Path (Join-Path $root "node_modules")) {
@@ -105,13 +111,13 @@ try {
             Remove-Item (Join-Path $root "node_modules") -Recurse -Force
         }
         Write-Host "Installing game dependencies. This is only needed the first successful time..." -ForegroundColor Yellow
-        & $npmCmd ci
+        & $npmCmd ci --workspaces=false
         if ($LASTEXITCODE -ne 0) { throw "npm ci failed with exit code $LASTEXITCODE" }
         New-Item -ItemType File -Path $depsMarker -Force | Out-Null
     }
 
     Write-Host "Building Varendor..." -ForegroundColor Yellow
-    & $npmCmd run build
+    & $npmCmd run build --workspaces=false
     if ($LASTEXITCODE -ne 0) { throw "Game build failed with exit code $LASTEXITCODE" }
 
     if (-not (Test-Path (Join-Path $root "dist\index.html"))) {
@@ -121,7 +127,7 @@ try {
     # Use Vite's own production preview server instead of the old custom PowerShell HTTP server.
     # Modern browsers may cancel speculative requests; Vite handles those disconnects correctly.
     Write-Host "Build complete. Starting game server..." -ForegroundColor Green
-    $previewArgs = @("run", "preview", "--", "--host", "127.0.0.1", "--port", "4173", "--strictPort")
+    $previewArgs = @("run", "preview", "--workspaces=false", "--", "--host", "127.0.0.1", "--port", "4173", "--strictPort")
     $preview = Start-Process -FilePath $npmCmd -ArgumentList $previewArgs -NoNewWindow -PassThru
 
     Wait-ForLocalServer -Process $preview -Port 4173 -TimeoutSeconds 20
