@@ -3,12 +3,15 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 test('browser client uses Babylon.js and TypeScript entrypoint', async () => {
-  const [html, source, pkg] = await Promise.all([
+  const [html, bootstrap, source, pkg] = await Promise.all([
     readFile(new URL('../index.html', import.meta.url), 'utf8'),
+    readFile(new URL('../src/bootstrap.ts', import.meta.url), 'utf8'),
     readFile(new URL('../src/main.ts', import.meta.url), 'utf8'),
     readFile(new URL('../package.json', import.meta.url), 'utf8').then(JSON.parse),
   ]);
-  assert.match(html, /src\/main\.ts/);
+  assert.match(html, /src\/bootstrap\.ts/);
+  assert.match(bootstrap, /presentation\/visual-guardrails/);
+  assert.match(bootstrap, /\.\/main/);
   assert.match(source, /from '@babylonjs\/core'/);
   assert.match(source, /LocalGameGateway/);
   assert.equal(pkg.dependencies.three, undefined);
@@ -100,4 +103,12 @@ test('consumable hotbar is stack-aware and uses persisted configurable bindings'
   assert.match(source, /player\.inventory\.splice\(index, 1\)/);
   assert.match(bindings, /DEFAULT_CONSUMABLE_BINDINGS/);
   assert.match(hotbarStyles, /\.skill-button:disabled/);
+});
+
+test('presentation guardrails suppress the prototype combat glow without touching combat logic', async () => {
+  const guardrails = await readFile(new URL('../src/presentation/visual-guardrails.ts', import.meta.url), 'utf8');
+  assert.match(guardrails, /selected-target/);
+  assert.match(guardrails, /impact-/);
+  assert.match(guardrails, /mesh\.setEnabled\(false\)/);
+  assert.match(guardrails, /material\.alpha = 0\.48/);
 });
