@@ -15,19 +15,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Create source package
-        run: |
-          mkdir -p artifact
-          zip -r artifact/Varendor_Phase12_Test.zip . \
-            -x '.git/*' \
-            -x 'node_modules/*' \
-            -x 'dist/*' \
-            -x 'artifact/*'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
 
-      - name: Upload test package
+      - name: Install dependencies
+        run: npm ci --workspaces=false
+
+      - name: Verify tests
+        run: npm test
+
+      - name: Build production client
+        run: npm run build --workspaces=false
+
+      - name: Create full test package
+        run: |
+          mkdir -p artifact/package
+          rsync -a ./ artifact/package/ \
+            --exclude '.git' \
+            --exclude 'node_modules' \
+            --exclude 'artifact'
+          cd artifact/package
+          zip -r ../Varendor_Phase12_FULL_TEST.zip .
+
+      - name: Upload full test package
         uses: actions/upload-artifact@v4
         with:
-          name: Varendor-Phase12-Test
-          path: artifact/Varendor_Phase12_Test.zip
+          name: Varendor-Phase12-FULL-TEST
+          path: artifact/Varendor_Phase12_FULL_TEST.zip
           if-no-files-found: error
           retention-days: 7
