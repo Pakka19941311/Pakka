@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { CombatControl } from '../src/controls/combat-controller.ts';
+import { CharacterMotor, smoothAngle } from '../src/controls/character-motor.ts';
 import { movementAxesFromPressed } from '../src/controls/input-controller.ts';
 import {
   cameraRelativeDirection,
@@ -95,4 +96,46 @@ test('clicking another monster replaces the combat target immediately', () => {
     canBasicAttack: true,
     canUseSkill: () => true,
   }), { kind: 'attack', targetId: second.uid, skillIndex: null });
+});
+
+test('character motor softens direction changes without delaying first movement', () => {
+  const motor = new CharacterMotor();
+  const first = motor.step({ x: 0, z: 1 }, 6, 1 / 60);
+  assert.ok(first.dz > 0);
+  const turn = motor.step({ x: 1, z: 0 }, 6, 1 / 60);
+  assert.ok(turn.dx > 0);
+  assert.ok(turn.dz > 0);
+  assert.ok(smoothAngle(Math.PI - 0.1, -Math.PI + 0.1, 12, 1 / 60) > Math.PI - 0.1);
+});
+
+test('jump is grounded, uses gravity and rejects double jump', () => {
+  const motor = new CharacterMotor();
+  assert.equal(motor.requestJump(), true);
+  assert.equal(motor.requestJump(), false);
+  let peak = 0;
+  let step;
+  for (let frame = 0; frame < 180; frame += 1) {
+    step = motor.step({ x: 0, z: 0 }, 6, 1 / 60);
+    peak = Math.max(peak, step.height);
+  }
+  assert.ok(peak > 1);
+  assert.equal(step.grounded, true);
+  assert.equal(step.height, 0);
+  assert.equal(motor.requestJump(), true);
+});
+
+test('the same explicit click attacks at ranged distance but approaches in melee', () => {
+  const target = { uid: 'wolf-range', alive: true, x: 8, z: 0 };
+  const input = {
+    player: { x: 0, z: 0 }, target,
+    skillRange: () => 2.6,
+    canBasicAttack: true,
+    canUseSkill: () => true,
+  };
+  const melee = new CombatControl();
+  melee.engageBasic(target.uid);
+  assert.equal(melee.plan({ ...input, basicRange: 2.6 }).kind, 'approach');
+  const ranged = new CombatControl();
+  ranged.engageBasic(target.uid);
+  assert.equal(ranged.plan({ ...input, basicRange: 12 }).kind, 'attack');
 });

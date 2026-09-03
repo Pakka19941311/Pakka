@@ -34,6 +34,7 @@ export class PlayerInputController {
   private orbitX = 0;
   private orbitY = 0;
   private zoom = 0;
+  private jumpQueued = false;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -69,6 +70,12 @@ export class PlayerInputController {
     return delta;
   }
 
+  consumeJump(): boolean {
+    const queued = this.jumpQueued;
+    this.jumpQueued = false;
+    return queued;
+  }
+
   get isOrbitingCamera(): boolean {
     return this.orbitPointerId !== null;
   }
@@ -87,6 +94,11 @@ export class PlayerInputController {
 
   private readonly onKeyDown = (event: KeyboardEvent): void => {
     if (isTypingTarget(event.target)) return;
+    if (event.code === 'Space') {
+      event.preventDefault();
+      if (!event.repeat) this.jumpQueued = true;
+      return;
+    }
     if ([...FORWARD_CODES, ...BACKWARD_CODES, ...LEFT_CODES, ...RIGHT_CODES].includes(event.code)) {
       event.preventDefault();
       this.pressed.add(event.code);

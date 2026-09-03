@@ -42,6 +42,7 @@ import {
 import { addOrStackItem, applyExperience, equipmentSlot, resolveEnhancement } from './core/gameplay-session';
 import { LocalGameGateway } from './network/game-gateway';
 import { CombatControl } from './controls/combat-controller';
+import { CharacterMotor, smoothAngle } from './controls/character-motor';
 import { PlayerInputController } from './controls/input-controller';
 import { TargetingController } from './controls/targeting-controller';
 import { ThirdPersonCameraController } from './controls/third-person-camera';
@@ -168,6 +169,8 @@ type Entity = {
   attackCd: number;
   status: Statuses;
   root: TransformNode | null;
+  baseY?: number;
+  pickVolume?: Mesh;
   animations: AnimationGroup[];
   actionType?: string;
   label?: Mesh;
@@ -273,6 +276,7 @@ const state = {
 
 const targeting = new TargetingController<Entity>();
 const combatControl = new CombatControl();
+const playerMotor = new CharacterMotor();
 
 const emptyStats: CombatStats = {
   str: 0, dex: 0, int: 0, vit: 0, spi: 0, atkMin: 0, atkMax: 0, matk: 0,
@@ -394,6 +398,11 @@ targetIndicator.material = targetIndicatorMaterial;
 targetIndicator.isPickable = false;
 targetIndicator.setEnabled(false);
 
+const pickVolumeMaterial = new StandardMaterial('combat-pick-volume-material', scene);
+pickVolumeMaterial.alpha = 0.001;
+pickVolumeMaterial.disableLighting = true;
+pickVolumeMaterial.disableColorWrite = true;
+
 const characterAssets = new Map<string, AssetContainer>();
 const monsterAssets = new Map<string, AssetContainer>();
 const worldAssets = new Map<string, AssetContainer>();
@@ -495,14 +504,34 @@ function createEntityModel(entity: Entity): void {
   entity.animations = instance.animations;
   entity.root.position.set(entity.x, 0, entity.z);
   normalizeHeight(entity.root, entity.targetHeight);
+  entity.baseY = entity.root.position.y;
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
     mesh.metadata = { entity };
     mesh.isPickable = true;
   });
+  if (entity.kind === 'monster') {
+    const radius = entity.boss === 'big' ? 1.75 : entity.boss === 'mini' ? 1.25 : Math.max(0.72, entity.targetHeight * 0.42);
+    const height = entity.targetHeight + radius * 1.45;
+    const volume = MeshBuilder.CreateCapsule(`pick-volume-${entity.uid}`, { height, radius, tessellation: 12 }, scene);
+    volume.position.set(entity.x, height * 0.5, entity.z);
+    volume.material = pickVolumeMaterial;
+    volume.metadata = { entity, combatPickVolume: true };
+    volume.isPickable = true;
+    entity.pickVolume = volume;
+  }
   setEntityAction(entity, 'idle');
   if (entity.kind === 'monster') addNameplate(entity);
   if (entity.kind === 'npc') addNpcLabel(entity);
+}
+
+function syncEntityTransform(entity: Entity, verticalOffset = 0): void {
+  entity.root?.position.set(entity.x, (entity.baseY ?? entity.root.position.y) + verticalOffset, entity.z);
+  if (entity.pickVolume) {
+    entity.pickVolume.position.x = entity.x;
+    entity.pickVolume.position.z = entity.z;
+    entity.pickVolume.position.y = entity.targetHeight * 0.5 + verticalOffset;
+  }
 }
 
 function labelMaterial(entity: Entity, height = 96): { material: StandardMaterial; texture: DynamicTexture } {
@@ -719,12 +748,16 @@ function spawnMonster(id: string, x: number, z: number, delay = 0): Entity {
   });
   createEntityModel(entity);
   entity.root?.setEnabled(entity.alive);
+  entity.pickVolume?.setEnabled(entity.alive);
   state.entities.push(entity);
   return entity;
 }
 
 function spawnEntities(): void {
-  state.entities.forEach((entity) => entity.root?.dispose(false, true));
+  state.entities.forEach((entity) => {
+    entity.pickVolume?.dispose(false, true);
+    entity.root?.dispose(false, true);
+  });
   state.entities.length = 0;
   const classDef = CLASSES_MAP[player.classId];
   const playerEntity = makeEntity({ kind: 'player', model: classDef.model, x: player.x, z: player.z, targetHeight: 2.05 });
@@ -785,6 +818,7 @@ async function startGame(load: boolean): Promise<void> {
     spawnEntities();
     targeting.clear();
     combatControl.cancelPursuit();
+    playerMotor.reset();
     state.moveTarget = null;
     state.interactionTarget = null;
     cameraControl.snap({ x: player.x, y: 0, z: player.z });
@@ -844,31 +878,26 @@ function resetPlayerControl(clearTarget = false): void {
   state.moveTarget = null;
   state.interactionTarget = null;
   combatControl.cancelPursuit();
+  playerMotor.reset();
   if (clearTarget) {
     targeting.clear();
+    setTargetOutline(outlinedTarget, false);
+    outlinedTarget = null;
     targetIndicator.setEnabled(false);
   }
 }
 
-function applyPlayerMovement(hero: Entity, direction: Readonly<{ x: number; z: number }>, dt: number): boolean {
-  const length = Math.hypot(direction.x, direction.z);
-  if (length < 0.0001) return false;
-  const x = direction.x / length;
-  const z = direction.z / length;
-  player.x += x * player.stats.speed * dt;
-  player.z += z * player.stats.speed * dt;
+function enforcePlayerBoundary(): void {
   if (player.x > 13 && player.level < 10) {
     player.x = 12.9;
     state.moveTarget = null;
     combatControl.cancelPursuit();
+    playerMotor.stopPlanar();
     if (!state.gateWarn) {
       toast('Чёрный лес откроется на 10 уровне', 'bad');
       state.gateWarn = 3;
     }
   }
-  rotateTowards(hero, player.x + x, player.z + z);
-  setEntityAction(hero, 'walk');
-  return true;
 }
 
 let movementSequence = 0;
@@ -890,8 +919,23 @@ function syncMovementIntent(direction: Readonly<{ x: number; z: number }> | null
   }
 }
 
+let outlinedTarget: Entity | null = null;
+function setTargetOutline(entity: Entity | null, enabled: boolean): void {
+  entity?.root?.getChildMeshes().forEach((mesh) => {
+    if (mesh === entity.label) return;
+    mesh.renderOutline = enabled;
+    mesh.outlineColor = new Color3(0.95, 0.2, 0.08);
+    mesh.outlineWidth = 0.035;
+  });
+}
+
 function updateTargetIndicator(): void {
   const target = targeting.validate();
+  if (outlinedTarget !== target) {
+    setTargetOutline(outlinedTarget, false);
+    outlinedTarget = target;
+    setTargetOutline(outlinedTarget, true);
+  }
   if (!target) {
     targetIndicator.setEnabled(false);
     return;
@@ -925,14 +969,14 @@ function update(dt: number): void {
     canUseSkill: (index) => player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
   });
 
-  let moved = false;
+  let desiredDirection: Readonly<{ x: number; z: number }> = { x: 0, z: 0 };
+  let maxMoveDistance = Infinity;
   if (manualMovement) {
     state.moveTarget = null;
     state.interactionTarget = null;
     combatControl.cancelPursuit();
-    const direction = cameraControl.movementDirection(axes);
-    moved = applyPlayerMovement(hero, direction, dt);
-    syncMovementIntent(direction, dt);
+    desiredDirection = cameraControl.movementDirection(axes);
+    syncMovementIntent(desiredDirection, dt);
   } else {
     syncMovementIntent(null, dt);
     const destination = combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
@@ -942,12 +986,25 @@ function update(dt: number): void {
       const distance = Math.hypot(dx, dz);
       if (distance < 0.18) {
         if (combatDecision.kind !== 'approach') state.moveTarget = null;
-      } else moved = applyPlayerMovement(hero, { x: dx, z: dz }, Math.min(dt, distance / player.stats.speed));
+      } else {
+        desiredDirection = { x: dx, z: dz };
+        maxMoveDistance = distance;
+      }
     }
-    if (!moved && combatDecision.kind === 'attack') performAttack(combatDecision.skillIndex);
+    if (combatDecision.kind === 'attack') performAttack(combatDecision.skillIndex);
   }
 
-  if (!moved && hero.actionType === 'walk') setEntityAction(hero, 'idle');
+  if (inputControl.consumeJump()) playerMotor.requestJump();
+  const motion = playerMotor.step(desiredDirection, player.stats.speed, dt, maxMoveDistance);
+  player.x += motion.dx;
+  player.z += motion.dz;
+  enforcePlayerBoundary();
+  const moved = Math.hypot(motion.dx, motion.dz) > 0.001;
+  if (moved && hero.root) {
+    const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
+    hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
+    setEntityAction(hero, 'walk');
+  } else if (hero.actionType === 'walk') setEntityAction(hero, 'idle');
   if (state.interactionTarget && Math.hypot(state.interactionTarget.x - player.x, state.interactionTarget.z - player.z) < 3.2) {
     const npc = state.interactionTarget;
     state.interactionTarget = null;
@@ -956,7 +1013,7 @@ function update(dt: number): void {
   }
   hero.x = player.x;
   hero.z = player.z;
-  hero.root?.position.set(player.x, hero.root.position.y, player.z);
+  syncEntityTransform(hero, motion.height);
   state.entities.filter((entity) => entity.kind === 'monster').forEach((entity) => updateMonster(entity, dt));
   state.entities.filter((entity) => entity.kind === 'summon').forEach((entity) => updateSummon(entity, dt));
   state.effects.forEach((effect) => effect.update(dt));
@@ -977,8 +1034,9 @@ function updateMonster(entity: Entity, dt: number): void {
       entity.phase = 1;
       entity.x = entity.homeX ?? entity.x;
       entity.z = entity.homeZ ?? entity.z;
-      entity.root?.position.set(entity.x, entity.root.position.y, entity.z);
+      syncEntityTransform(entity);
       entity.root?.setEnabled(true);
+      entity.pickVolume?.setEnabled(true);
       refreshNameplate(entity);
       setEntityAction(entity, 'idle');
       if (entity.boss === 'big') {
@@ -1003,7 +1061,7 @@ function updateMonster(entity: Entity, dt: number): void {
       const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
       entity.x += (dx / distance) * speed * dt;
       entity.z += (dz / distance) * speed * dt;
-      entity.root?.position.set(entity.x, entity.root.position.y, entity.z);
+      syncEntityTransform(entity);
       rotateTowards(entity, player.x, player.z);
       setEntityAction(entity, 'walk');
     } else if (entity.attackCd <= 0) {
@@ -1018,7 +1076,7 @@ function updateMonster(entity: Entity, dt: number): void {
   } else if (Math.hypot(entity.x - (entity.homeX ?? entity.x), entity.z - (entity.homeZ ?? entity.z)) > 7) {
     entity.x += ((entity.homeX ?? entity.x) - entity.x) * dt * 0.35;
     entity.z += ((entity.homeZ ?? entity.z) - entity.z) * dt * 0.35;
-    entity.root?.position.set(entity.x, entity.root.position.y, entity.z);
+    syncEntityTransform(entity);
     setEntityAction(entity, 'walk');
   } else setEntityAction(entity, 'idle');
   if (entity.status.dot && Math.random() < dt) damageMonster(entity, Math.max(2, Math.round(player.stats.matk * 0.08)), false, false);
@@ -1124,7 +1182,7 @@ function performAttack(skillIndex: number | null): void {
     if (skill?.knock && target.root) {
       const dx = target.x - player.x; const dz = target.z - player.z; const distance = Math.max(0.001, Math.hypot(dx, dz));
       target.x += (dx / distance) * skill.knock; target.z += (dz / distance) * skill.knock;
-      target.root.position.set(target.x, target.root.position.y, target.z);
+      syncEntityTransform(target);
     }
     if (skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
     if (skill?.summon) summonSkeleton();
@@ -1210,6 +1268,7 @@ function damageMonster(entity: Entity, damage: number, critical = true, showEffe
 
 function killMonster(entity: Entity): void {
   entity.alive = false;
+  entity.pickVolume?.setEnabled(false);
   setEntityAction(entity, 'death', true);
   window.setTimeout(() => entity.root?.setEnabled(false), 650);
   const definition = MONSTERS_MAP[entity.id ?? 'wolf'];
@@ -1277,7 +1336,7 @@ function updateSummon(summon: Entity, dt: number): void {
   const dx = target.x - summon.x; const dz = target.z - summon.z; const distance = Math.hypot(dx, dz);
   if (distance > 1.8) {
     summon.x += (dx / distance) * 3.6 * dt; summon.z += (dz / distance) * 3.6 * dt;
-    summon.root?.position.set(summon.x, summon.root.position.y, summon.z);
+    syncEntityTransform(summon);
     rotateTowards(summon, target.x, target.z); setEntityAction(summon, 'walk');
   } else if (summon.attackCd <= 0) {
     summon.attackCd = 1.25; rotateTowards(summon, target.x, target.z); setEntityAction(summon, 'attack', true);
