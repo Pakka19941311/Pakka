@@ -8,18 +8,19 @@ type CreateTorusArgs = Parameters<typeof originalCreateTorus>;
 
 const createTorusWithGuardrails = ((...args: CreateTorusArgs) => {
   const [name, options, scene] = args;
+  const safeOptions = options ?? {};
   const isTargetMarker = name === 'selected-target';
   const isImpactRing = name.startsWith('impact-');
 
   const tunedOptions = isTargetMarker
-    ? { ...options, thickness: Math.min(options.thickness ?? 0.09, 0.026) }
+    ? { ...safeOptions, thickness: Math.min(safeOptions.thickness ?? 0.09, 0.026) }
     : isImpactRing
       ? {
-        ...options,
-        diameter: Math.min(options.diameter ?? 0.45, 0.26),
-        thickness: Math.min(options.thickness ?? 0.07, 0.016),
+        ...safeOptions,
+        diameter: Math.min(safeOptions.diameter ?? 0.45, 0.26),
+        thickness: Math.min(safeOptions.thickness ?? 0.07, 0.016),
       }
-      : options;
+      : safeOptions;
 
   const mesh = originalCreateTorus(name, tunedOptions, scene);
 
