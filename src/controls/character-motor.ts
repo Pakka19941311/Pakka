@@ -37,12 +37,22 @@ export class CharacterMotor {
     const length = Math.hypot(direction.x, direction.z);
     const inputX = length > 0.0001 ? direction.x / length : 0;
     const inputZ = length > 0.0001 ? direction.z / length : 0;
-    const blend = response(length > 0.0001 ? 19 : 30, dt);
+    const hasInput = length > 0.0001;
+
+    const currentSpeed = Math.hypot(this.velocityX, this.velocityZ);
+    const currentDirX = currentSpeed > 0.0001 ? this.velocityX / currentSpeed : 0;
+    const currentDirZ = currentSpeed > 0.0001 ? this.velocityZ / currentSpeed : 0;
+    const directionDot = hasInput ? currentDirX * inputX + currentDirZ * inputZ : 1;
+    const reversing = hasInput && currentSpeed > 0.25 && directionDot < -0.2;
+
+    // Smoother acceleration/deceleration than the prototype while keeping WASD responsive.
+    const velocityResponse = hasInput ? (reversing ? 14.5 : 11.5) : 17.5;
+    const blend = response(velocityResponse, dt);
     this.velocityX += (inputX * maxSpeed - this.velocityX) * blend;
     this.velocityZ += (inputZ * maxSpeed - this.velocityZ) * blend;
 
-    if (length > 0.0001) {
-      const facingBlend = response(14, dt);
+    if (hasInput) {
+      const facingBlend = response(reversing ? 11.5 : 8.5, dt);
       this.facingX += (inputX - this.facingX) * facingBlend;
       this.facingZ += (inputZ - this.facingZ) * facingBlend;
       const facingLength = Math.hypot(this.facingX, this.facingZ);
