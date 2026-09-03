@@ -6,20 +6,27 @@ $tools = Join-Path $root ".tools"
 $nodeExe = $null
 $npmCmd = $null
 
-function Find-SystemNode {
+function Find-CompatibleSystemNode {
     $node = Get-Command node.exe -ErrorAction SilentlyContinue
     $npm = Get-Command npm.cmd -ErrorAction SilentlyContinue
-    if ($node -and $npm) {
-        return @($node.Source, $npm.Source)
-    }
+    if (-not $node -or -not $npm) { return $null }
+
+    try {
+        $versionText = (& $node.Source -p "process.versions.node").Trim()
+        $version = [Version]$versionText
+        if ($version.Major -ge 22 -or ($version.Major -eq 20 -and $version.Minor -ge 19)) {
+            return @($node.Source, $npm.Source)
+        }
+        Write-Host ("Installed Node.js {0} is too old for this build. A portable LTS copy will be used." -f $versionText) -ForegroundColor Yellow
+    } catch { }
     return $null
 }
 
 function Install-PortableNode {
     if (-not (Test-Path $tools)) { New-Item -ItemType Directory -Path $tools | Out-Null }
 
-    Write-Host "Node.js is not installed. Preparing a portable copy..." -ForegroundColor Yellow
-    $index = Invoke-RestMethod -Uri "https://nodejs.org/dist/index.json" -UseBasicParsing
+    Write-Host "Preparing portable Node.js..." -ForegroundColor Yellow
+    $index = Invoke-RestMethod -Uri "https://nodejs.org/dist/index.json"
     $release = $index | Where-Object { $_.lts -and ($_.files -contains "win-x64-zip") } | Select-Object -First 1
     if (-not $release) { throw "Could not find a compatible Node.js LTS release." }
 
@@ -30,7 +37,7 @@ function Install-PortableNode {
 
     if (-not (Test-Path (Join-Path $nodeFolder "node.exe"))) {
         $url = "https://nodejs.org/dist/$version/$folderName.zip"
-        Write-Host ("Downloading Node.js {0}..." -f $version) -ForegroundColor Yellow
+        Write-Host ("Downloading Node.js {0}. This happens only once..." -f $version) -ForegroundColor Yellow
         Invoke-WebRequest -Uri $url -OutFile $zipPath -UseBasicParsing
         if (Test-Path $nodeFolder) { Remove-Item $nodeFolder -Recurse -Force }
         Expand-Archive -Path $zipPath -DestinationPath $tools -Force
@@ -42,7 +49,7 @@ function Install-PortableNode {
 
 try {
     Set-Location $root
-    $systemNode = Find-SystemNode
+    $systemNode = Find-CompatibleSystemNode
     if ($systemNode) {
         $nodeExe = $systemNode[0]
         $npmCmd = $systemNode[1]
@@ -71,8 +78,8 @@ try {
     & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root "server.ps1")
 }
 catch {
-    Write-Host "" 
-    Write-Host "VAR ΕNDOR START FAILED" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "VARENDOR START FAILED" -ForegroundColor Red
     Write-Host $_.Exception.Message -ForegroundColor Red
     Write-Host ""
     Write-Host "Take a screenshot of this window and send it to ChatGPT." -ForegroundColor Yellow
