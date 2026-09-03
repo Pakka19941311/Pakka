@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
-test('browser client uses Babylon.js and TypeScript entrypoint', async () => {
+test('browser client uses Babylon.js and TypeScript bootstrap', async () => {
   const [html, bootstrap, source, pkg] = await Promise.all([
     readFile(new URL('../index.html', import.meta.url), 'utf8'),
     readFile(new URL('../src/bootstrap.ts', import.meta.url), 'utf8'),
@@ -10,8 +10,7 @@ test('browser client uses Babylon.js and TypeScript entrypoint', async () => {
     readFile(new URL('../package.json', import.meta.url), 'utf8').then(JSON.parse),
   ]);
   assert.match(html, /src\/bootstrap\.ts/);
-  assert.match(bootstrap, /presentation\/visual-guardrails/);
-  assert.match(bootstrap, /\.\/main/);
+  assert.match(bootstrap, /import '\.\/main'/);
   assert.match(source, /from '@babylonjs\/core'/);
   assert.match(source, /LocalGameGateway/);
   assert.equal(pkg.dependencies.three, undefined);
@@ -105,10 +104,22 @@ test('consumable hotbar is stack-aware and uses persisted configurable bindings'
   assert.match(hotbarStyles, /\.skill-button:disabled/);
 });
 
-test('presentation guardrails suppress the prototype combat glow without touching combat logic', async () => {
-  const guardrails = await readFile(new URL('../src/presentation/visual-guardrails.ts', import.meta.url), 'utf8');
-  assert.match(guardrails, /selected-target/);
-  assert.match(guardrails, /impact-/);
-  assert.match(guardrails, /mesh\.setEnabled\(false\)/);
-  assert.match(guardrails, /material\.alpha = 0\.48/);
+
+
+test('phase 1.2 world correction uses daylight, homogeneous patrol camps and restrained hit feedback', async () => {
+  const [source, data] = await Promise.all([
+    readFile(new URL('../src/main.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/data/game-data.ts', import.meta.url), 'utf8'),
+  ]);
+  assert.match(source, /worldTime = 12\.5/);
+  assert.match(source, /spawnMonsterCamp\('wolf'/);
+  assert.match(source, /entity\.patrol\?\.length/);
+  assert.match(source, /createSmithy/);
+  assert.match(source, /greenfall-keep/);
+  assert.match(source, /greenfall-south-gate/);
+  assert.match(source, /selected-target-anchor/);
+  assert.doesNotMatch(source, /CreateTorus\(`impact-/);
+  assert.match(source, /player\.classId === 'mage' \? 'arcane'/);
+  assert.match(source, /Math\.pow\(0\.68, hop\)/);
+  assert.match(data, /Цепная молния[^\n]*chain:5/);
 });

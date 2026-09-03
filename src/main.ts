@@ -190,6 +190,11 @@ type Entity = {
   labelTexture?: DynamicTexture;
   ambientBrain?: AmbientNpcBrain;
   ambientActivity?: AmbientWaypoint['activity'];
+  patrol?: Array<{ x: number; z: number }>;
+  patrolIndex?: number;
+  patrolPause?: number;
+  groupId?: string;
+  npcActionTimer?: number;
 };
 type Settings = {
   quality: 'low' | 'medium' | 'high' | 'ultra';
@@ -280,7 +285,7 @@ const state = {
   interactionTarget: null as Entity | null,
   entities: [] as Entity[],
   effects: [] as Array<{ update: (dt: number) => void; dead?: boolean }>,
-  worldTime: 19.35,
+  worldTime: 12.5,
   selectedItem: null as number | null,
   quest: 0,
   kills: 0,
@@ -336,32 +341,32 @@ const canvas = q<HTMLCanvasElement>('#game-canvas');
 const inputControl = new PlayerInputController(canvas);
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false }, true);
 const scene = new Scene(engine);
-scene.clearColor = new Color4(0.035, 0.055, 0.065, 1);
+scene.clearColor = new Color4(0.46, 0.66, 0.76, 1);
 scene.fogMode = Scene.FOGMODE_EXP2;
-scene.fogColor = new Color3(0.045, 0.075, 0.08);
-scene.fogDensity = 0.018;
-scene.ambientColor = new Color3(0.25, 0.28, 0.3);
+scene.fogColor = new Color3(0.48, 0.66, 0.71);
+scene.fogDensity = 0.0065;
+scene.ambientColor = new Color3(0.56, 0.58, 0.54);
 
 const camera = new ArcRotateCamera('third-person-camera', -Math.PI / 2, 1.06, 10.5, new Vector3(0, 1, 0), scene);
 camera.panningSensibility = 0;
 const cameraControl = new ThirdPersonCameraController(camera);
 
-const hemi = new HemisphericLight('ashen-sky', new Vector3(0.25, 1, 0.15), scene);
-hemi.intensity = 0.78;
-hemi.diffuse = new Color3(0.45, 0.58, 0.7);
-hemi.groundColor = new Color3(0.12, 0.08, 0.06);
-const moon = new DirectionalLight('moon', new Vector3(0.35, -1, 0.22), scene);
-moon.position = new Vector3(-20, 34, -12);
-moon.intensity = 2.15;
-moon.diffuse = new Color3(0.58, 0.74, 0.88);
+const hemi = new HemisphericLight('day-sky', new Vector3(0.18, 1, -0.08), scene);
+hemi.intensity = 1.2;
+hemi.diffuse = new Color3(0.94, 0.97, 1);
+hemi.groundColor = new Color3(0.42, 0.38, 0.3);
+const moon = new DirectionalLight('sun', new Vector3(-0.38, -1, 0.24), scene);
+moon.position = new Vector3(24, 42, -18);
+moon.intensity = 2.65;
+moon.diffuse = new Color3(1, 0.94, 0.78);
 const shadows = new ShadowGenerator(2048, moon);
 shadows.useBlurExponentialShadowMap = true;
-shadows.blurKernel = 24;
-const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 32 });
-glow.intensity = 0.35;
+shadows.blurKernel = 18;
+const glow = new GlowLayer('day-glow', scene, { blurKernelSize: 24 });
+glow.intensity = 0.16;
 
 const groundMaterial = new StandardMaterial('ground-material', scene);
-groundMaterial.diffuseColor = new Color3(0.12, 0.17, 0.13);
+groundMaterial.diffuseColor = new Color3(0.31, 0.46, 0.32);
 groundMaterial.specularColor = new Color3(0.02, 0.02, 0.02);
 const ground = MeshBuilder.CreateGround('ground', { width: 105, height: 90, subdivisions: 55, updatable: true }, scene);
 ground.material = groundMaterial;
@@ -385,7 +390,7 @@ if (groundPositions) {
 }
 
 const roadMaterial = new StandardMaterial('road-material', scene);
-roadMaterial.diffuseColor = new Color3(0.29, 0.25, 0.18);
+roadMaterial.diffuseColor = new Color3(0.48, 0.41, 0.29);
 roadMaterial.specularColor = Color3.Black();
 function road(x: number, z: number, width: number, depth: number, rotation = 0) {
   const mesh = MeshBuilder.CreateGround(`road-${x}-${z}`, { width, height: depth }, scene);
@@ -407,14 +412,9 @@ safeRing.position.set(-7, 0.07, -5);
 safeRing.material = safeMaterial;
 safeRing.isPickable = false;
 
-const targetIndicatorMaterial = new StandardMaterial('selected-target-material', scene);
-targetIndicatorMaterial.emissiveColor = new Color3(0.95, 0.18, 0.08);
-targetIndicatorMaterial.diffuseColor = new Color3(0.3, 0.02, 0.01);
-targetIndicatorMaterial.alpha = 0.9;
-const targetIndicator = MeshBuilder.CreateTorus('selected-target', { diameter: 2.35, thickness: 0.09, tessellation: 72 }, scene);
-targetIndicator.position.y = 0.1;
-targetIndicator.material = targetIndicatorMaterial;
-targetIndicator.isPickable = false;
+// Selection is communicated by the target HUD/nameplate. The previous emissive
+// torus + mesh outline could expose oversized hidden model geometry as a giant red blob.
+const targetIndicator = new TransformNode('selected-target-anchor', scene);
 targetIndicator.setEnabled(false);
 
 const pickVolumeMaterial = new StandardMaterial('combat-pick-volume-material', scene);
@@ -677,18 +677,106 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
   return instance.root;
 }
 
-function buildTown(x: number, z: number, scale: number): void {
-  for (let index = 0; index < 7; index += 1) {
-    const angle = (index / 7) * Math.PI * 2;
-    const radius = 5 * scale;
-    worldModel('wall-block', x + Math.cos(angle) * radius, z + Math.sin(angle) * radius, 1.5 * scale, -angle, 0xb0a999);
+const townMaterials = new Map<number, StandardMaterial>();
+function townMaterial(color: number): StandardMaterial {
+  const existing = townMaterials.get(color);
+  if (existing) return existing;
+  const material = new StandardMaterial(`town-material-${color.toString(16)}`, scene);
+  material.diffuseColor = Color3.FromHexString(`#${color.toString(16).padStart(6, '0')}`);
+  material.specularColor = new Color3(0.04, 0.04, 0.035);
+  material.roughness = 0.92;
+  townMaterials.set(color, material);
+  return material;
+}
+
+function townBox(name: string, x: number, y: number, z: number, width: number, height: number, depth: number, color: number, collider = true): Mesh {
+  const mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
+  mesh.position.set(x, y, z);
+  mesh.material = townMaterial(color);
+  mesh.receiveShadows = true;
+  shadows.addShadowCaster(mesh, true);
+  mesh.isPickable = false;
+  if (collider) collisionWorld.addBox(x, z, width * 0.5, depth * 0.5, 0);
+  return mesh;
+}
+
+function townCylinder(name: string, x: number, y: number, z: number, diameter: number, height: number, color: number, tessellation = 10, collider = true): Mesh {
+  const mesh = MeshBuilder.CreateCylinder(name, { diameter, height, tessellation }, scene);
+  mesh.position.set(x, y, z);
+  mesh.material = townMaterial(color);
+  mesh.receiveShadows = true;
+  shadows.addShadowCaster(mesh, true);
+  mesh.isPickable = false;
+  if (collider) collisionWorld.addCircle(x, z, diameter * 0.46);
+  return mesh;
+}
+
+function createBuilding(name: string, x: number, z: number, width: number, depth: number, height: number, wallColor: number, roofColor: number): void {
+  townBox(`${name}-body`, x, height * 0.5, z, width, height, depth, wallColor);
+  const roof = MeshBuilder.CreateCylinder(`${name}-roof`, {
+    height: 1.55,
+    diameterTop: 0.25,
+    diameterBottom: Math.max(width, depth) * 1.18,
+    tessellation: 4,
+  }, scene);
+  roof.position.set(x, height + 0.7, z);
+  roof.rotation.y = Math.PI / 4;
+  roof.scaling.z = Math.max(0.72, depth / Math.max(width, depth));
+  roof.material = townMaterial(roofColor);
+  roof.receiveShadows = true;
+  shadows.addShadowCaster(roof, true);
+  roof.isPickable = false;
+  townBox(`${name}-door`, x, 1.05, z - depth * 0.505, 1.1, 2.1, 0.16, 0x4b3526, false);
+  townBox(`${name}-window-a`, x - width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
+  townBox(`${name}-window-b`, x + width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
+}
+
+function createWatchTower(name: string, x: number, z: number, scale = 1): void {
+  townCylinder(`${name}-tower`, x, 2.45 * scale, z, 3.25 * scale, 4.9 * scale, 0x7f7768, 10);
+  townCylinder(`${name}-top`, x, 5.02 * scale, z, 4.05 * scale, 0.38 * scale, 0x5f594f, 10, false);
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (index / 8) * Math.PI * 2;
+    townBox(`${name}-merlon-${index}`, x + Math.cos(angle) * 1.63 * scale, 5.45 * scale, z + Math.sin(angle) * 1.63 * scale, 0.48 * scale, 0.8 * scale, 0.48 * scale, 0x70695d, false);
   }
-  worldModel('wall-arch', x, z + 5 * scale, 1.8 * scale, 0, 0xb0a999);
-  worldModel('roof-high', x - 2 * scale, z - scale, 2 * scale, 0.2, 0x8c6c61);
-  worldModel('roof', x + 2.5 * scale, z - 1.4 * scale, 1.7 * scale, -0.2, 0x79524a);
-  worldModel('fountain-round', x, z, 1.5 * scale);
-  worldModel('stall-red', x + 3 * scale, z + 2 * scale, 1.2 * scale, -1);
-  worldModel('cart', x - 3 * scale, z + 1.5 * scale, 1.1 * scale, 0.5);
+}
+
+function createGate(name: string, x: number, z: number, width = 7): void {
+  createWatchTower(`${name}-left`, x - width * 0.58, z, 0.92);
+  createWatchTower(`${name}-right`, x + width * 0.58, z, 0.92);
+  townBox(`${name}-beam`, x, 4.2, z, width * 0.72, 1.0, 1.05, 0x71695d, false);
+  townBox(`${name}-door-left`, x - 1.05, 1.55, z + 0.05, 1.9, 3.1, 0.22, 0x563723, false);
+  townBox(`${name}-door-right`, x + 1.05, 1.55, z + 0.05, 1.9, 3.1, 0.22, 0x563723, false);
+}
+
+function createSmithy(x: number, z: number): void {
+  townBox('smithy-floor', x, 0.08, z, 5.8, 0.16, 4.4, 0x746b5d, false);
+  townBox('smithy-back', x, 1.3, z + 1.85, 5.8, 2.6, 0.35, 0x685f52);
+  townBox('smithy-awning', x, 2.55, z + 0.1, 5.6, 0.24, 3.2, 0x6e3f2c, false);
+  townBox('smithy-anvil-base', x + 0.8, 0.38, z - 0.15, 0.65, 0.75, 0.7, 0x3b4244, false);
+  townBox('smithy-anvil-top', x + 0.8, 0.86, z - 0.15, 1.35, 0.28, 0.62, 0x4f595c, false);
+  townCylinder('smithy-brazier', x - 1.1, 0.5, z - 0.25, 1.15, 0.65, 0x3d3630, 12, false);
+  const flame = MeshBuilder.CreateCylinder('smithy-brazier-flame', { height: 0.8, diameterTop: 0.08, diameterBottom: 0.72, tessellation: 10 }, scene);
+  flame.position.set(x - 1.1, 1.08, z - 0.25);
+  const flameMaterial = new StandardMaterial('smithy-brazier-flame-material', scene);
+  flameMaterial.emissiveColor = new Color3(1, 0.28, 0.035);
+  flameMaterial.diffuseColor = new Color3(0.9, 0.18, 0.02);
+  flameMaterial.alpha = 0.82;
+  flame.material = flameMaterial;
+  flame.isPickable = false;
+  const light = new PointLight('smithy-brazier-light', new Vector3(x - 1.1, 1.7, z - 0.25), scene);
+  light.diffuse = new Color3(1, 0.42, 0.12);
+  light.intensity = 1.15;
+  light.range = 5.5;
+}
+
+function buildTown(x: number, z: number, scale: number): void {
+  // Asterhold reads as a fortified keep instead of a ring of placeholder roof cubes.
+  createBuilding('asterhold-keep', x, z, 8.5 * scale, 6.4 * scale, 4.3 * scale, 0x8a8273, 0x59473f);
+  createGate('asterhold-gate', x, z - 7.2 * scale, 7.5 * scale);
+  createWatchTower('asterhold-nw', x - 6.4 * scale, z + 4.9 * scale, scale);
+  createWatchTower('asterhold-ne', x + 6.4 * scale, z + 4.9 * scale, scale);
+  createBuilding('asterhold-tavern', x - 7.8 * scale, z - 1.4 * scale, 5.7 * scale, 4.4 * scale, 3.0 * scale, 0x92785e, 0x6f4036);
+  createBuilding('asterhold-barracks', x + 7.8 * scale, z - 1.4 * scale, 5.8 * scale, 4.5 * scale, 3.2 * scale, 0x81796d, 0x4e5355);
 }
 
 function createBonfire(x: number, z: number): void {
@@ -737,42 +825,54 @@ function createBonfire(x: number, z: number): void {
 }
 
 function buildStarterSettlement(x: number, z: number): void {
-  road(x, z, 4.2, 22);
-  road(x, z - 0.5, 20, 3.8);
-  road(x + 6.3, z + 1.6, 8, 3.1, -0.18);
-  road(x - 6.2, z + 1.2, 8, 3.1, 0.16);
+  // Readable road hierarchy: south gate -> civic square -> keep.
+  road(x, z - 4.8, 4.4, 20);
+  road(x, z, 20, 4.4);
+  road(x - 6.5, z + 0.2, 7.5, 3.2, 0.05);
+  road(x + 6.5, z + 0.2, 7.5, 3.2, -0.05);
 
-  for (const offset of [-7.5, -3.5, 0.5, 4.5]) {
-    worldModel('wall-block', x - 11, z + offset, 1.55, Math.PI / 2, 0x817c72);
-    worldModel('wall-block', x + 11, z + offset, 1.55, Math.PI / 2, 0x817c72);
+  // Outer fortification and four real watch towers.
+  createWatchTower('greenfall-sw', x - 10.2, z - 8.2, 0.86);
+  createWatchTower('greenfall-se', x + 10.2, z - 8.2, 0.86);
+  createWatchTower('greenfall-nw', x - 10.2, z + 8.2, 0.86);
+  createWatchTower('greenfall-ne', x + 10.2, z + 8.2, 0.86);
+  createGate('greenfall-south-gate', x, z - 10.2, 6.8);
+  for (const offset of [-6.6, -2.2, 2.2, 6.6]) {
+    townBox(`greenfall-west-wall-${offset}`, x - 10.2, 1.35, z + offset, 0.65, 2.7, 3.6, 0x81796c);
+    townBox(`greenfall-east-wall-${offset}`, x + 10.2, 1.35, z + offset, 0.65, 2.7, 3.6, 0x81796c);
   }
-  for (const offset of [-8, -4, 4, 8]) worldModel('wall-block', x + offset, z + 9, 1.55, 0, 0x817c72);
-  worldModel('wall-arch', x, z - 10.5, 2.25, 0, 0x9b927e);
-  worldModel('pillar-stone', x - 3, z - 10.4, 1.15, 0, 0x77776f);
-  worldModel('pillar-stone', x + 3, z - 10.4, 1.15, 0, 0x77776f);
-
-  worldModel('roof-high', x - 7.2, z + 6, 1.85, 0.08, 0x78605a);
-  worldModel('roof', x + 6.8, z + 5.7, 1.75, -0.12, 0x74514a);
-  worldModel('roof', x - 8.2, z + 0.8, 1.55, 0.16, 0x6b4d46);
-  worldModel('stall', x - 7.1, z - 0.6, 1.25, Math.PI / 2, 0x83634d);
-  worldModel('cart', x - 5.7, z - 2.6, 1.05, -0.25, 0x72533d);
-
-  worldModel('stall-red', x + 7.2, z + 1, 1.35, -Math.PI / 2, 0x8e5e53);
-  worldModel('stall', x + 7.5, z - 2.2, 1.2, -Math.PI / 2, 0x776658);
-  worldModel('cart', x + 5.5, z + 3.2, 1.05, 0.55, 0x72533d);
-  for (const offset of [-2.8, 0, 2.8]) {
-    worldModel('fence', x + 9.8, z + offset, 1, Math.PI / 2, 0x777168);
-    worldModel(offset ? 'fence' : 'fence-broken', x - 9.8, z + offset, 1, Math.PI / 2, 0x777168);
+  for (const offset of [-6.4, -2.1, 2.1, 6.4]) {
+    if (Math.abs(offset) < 3) continue;
+    townBox(`greenfall-north-wall-${offset}`, x + offset, 1.35, z + 8.2, 3.6, 2.7, 0.65, 0x81796c);
   }
 
-  createBonfire(x, z);
-  for (const [lx, lz] of [[x - 3.2, z - 3.2], [x + 3.2, z - 3.2], [x - 3.2, z + 3.2], [x + 3.2, z + 3.2]]) {
-    const lantern = worldModel('lantern', lx, lz, 1.3);
+  // Northern keep: actual civic focus with a visible entrance.
+  createBuilding('greenfall-keep', x, z + 5.0, 8.4, 5.2, 3.9, 0x978d7d, 0x5c4a42);
+  townBox('greenfall-keep-steps', x, 0.24, z + 1.95, 3.4, 0.48, 1.5, 0x8a8172, false);
+  createWatchTower('greenfall-keep-left', x - 5.0, z + 5.7, 0.72);
+  createWatchTower('greenfall-keep-right', x + 5.0, z + 5.7, 0.72);
+
+  // West quarter: tavern and working forge.
+  createBuilding('greenfall-tavern', x - 6.0, z + 0.4, 6.0, 4.6, 3.0, 0x9a7b5e, 0x754335);
+  townBox('greenfall-tavern-sign', x - 3.0, 2.3, z - 0.8, 0.18, 1.2, 1.05, 0x6a4326, false);
+  createSmithy(x - 6.4, z - 0.2);
+
+  // East quarter: market + storehouse. No black placeholder roofs.
+  createBuilding('greenfall-storehouse', x + 6.1, z + 2.3, 5.2, 4.0, 2.8, 0x8d806c, 0x625046);
+  worldModel('stall-red', x + 6.3, z - 0.2, 1.15, -Math.PI / 2, 0x9b6656);
+  worldModel('stall', x + 6.1, z - 3.0, 1.05, -Math.PI / 2, 0x826b57);
+  worldModel('cart', x + 4.7, z - 1.7, 0.95, 0.35, 0x72533d);
+
+  // Central social square.
+  createBonfire(x, z - 0.4);
+  worldModel('fountain-round', x + 3.0, z + 1.2, 0.9, 0, 0x9b9a8d);
+  for (const [lx, lz] of [[x - 3.4, z - 3.6], [x + 3.4, z - 3.6], [x - 3.4, z + 2.8], [x + 3.4, z + 2.8]]) {
+    const lantern = worldModel('lantern', lx, lz, 1.25);
     if (lantern) {
       const light = new PointLight(`settlement-light-${lx}-${lz}`, new Vector3(0, 2.5, 0), scene);
-      light.diffuse = new Color3(1, 0.4, 0.1);
-      light.intensity = 1.8;
-      light.range = 7;
+      light.diffuse = new Color3(1, 0.55, 0.2);
+      light.intensity = 0.6;
+      light.range = 5.5;
       light.parent = lantern;
     }
   }
@@ -913,36 +1013,73 @@ function spawnAmbientResident(
   waypoints: readonly AmbientWaypoint[],
   seed: number,
 ): Entity {
-  const spawn = collisionWorld.findNearestFree({ x, z }, 0.38);
+  const safeWaypoints = waypoints.map((waypoint) => {
+    const free = collisionWorld.findNearestFree(waypoint, 0.34);
+    return { ...waypoint, x: free.x, z: free.z };
+  });
+  const spawn = collisionWorld.findNearestFree({ x, z }, 0.34);
   const entity = makeEntity({
     kind: 'ambient', name, model, x: spawn.x, z: spawn.z, targetHeight: 1.92,
-    tint: 0xb9aa98, ambientBrain: new AmbientNpcBrain(waypoints, seed),
+    tint: 0xb9aa98, ambientBrain: new AmbientNpcBrain(safeWaypoints, seed),
   });
   createEntityModel(entity);
-  rotateTowards(entity, waypoints[0].x, waypoints[0].z);
+  rotateTowards(entity, safeWaypoints[0].x, safeWaypoints[0].z);
   state.entities.push(entity);
   return entity;
 }
 
+function spawnTowerGuard(name: string, x: number, z: number, elevation: number, lookX: number, lookZ: number): void {
+  const entity = makeEntity({ kind: 'ambient', name, model: 'Ranger', x, z, targetHeight: 1.92, tint: 0xa9a18f });
+  createEntityModel(entity);
+  entity.baseY = (entity.baseY ?? 0) + elevation;
+  if (entity.root) entity.root.position.y = entity.baseY;
+  rotateTowards(entity, lookX, lookZ);
+  state.entities.push(entity);
+}
+
 function spawnAmbientResidents(): void {
-  spawnAmbientResident('Поселенец', 'Ranger', -5.2, -9.1, [
-    { x: -5.1, z: -5.2, activity: 'warm' }, { x: -2.2, z: -4.1, activity: 'trade' }, { x: -5.2, z: -9.1, activity: 'talk' },
+  // Routes are deliberately kept on the civic square and road corridors.
+  spawnAmbientResident('Поселенец', 'Ranger', -5.2, -9.0, [
+    { x: -5.2, z: -8.6, activity: 'guard' }, { x: -5.2, z: -5.6, activity: 'warm' }, { x: -3.8, z: -3.8, activity: 'trade' },
   ], 1);
-  spawnAmbientResident('Подмастерье', 'Warrior', -11.5, -6.5, [
-    { x: -11.8, z: -4.8, activity: 'work' }, { x: -9.7, z: -7.2, activity: 'talk' },
+  spawnAmbientResident('Подмастерье', 'Warrior', -12.0, -6.8, [
+    { x: -11.7, z: -5.2, activity: 'work' }, { x: -9.8, z: -5.0, activity: 'talk' }, { x: -11.5, z: -7.3, activity: 'work' },
   ], 2);
-  spawnAmbientResident('Дозорный', 'Warrior', -10.2, -12.7, [
-    { x: -10.2, z: -12.7, activity: 'guard' }, { x: -4.1, z: -12.7, activity: 'guard' },
+  spawnAmbientResident('Дозорный', 'Warrior', -9.8, -12.4, [
+    { x: -10.0, z: -12.4, activity: 'guard' }, { x: -4.0, z: -12.4, activity: 'guard' }, { x: -7.0, z: -9.3, activity: 'talk' },
   ], 3);
-  spawnAmbientResident('Жительница', 'Monk', -3.5, -0.4, [
-    { x: -2.5, z: -2.3, activity: 'trade' }, { x: -5, z: -1.1, activity: 'talk' }, { x: -5.2, z: -5, activity: 'warm' },
+  spawnAmbientResident('Жительница', 'Monk', -3.2, -5.2, [
+    { x: -3.0, z: -4.8, activity: 'trade' }, { x: -6.8, z: -5.4, activity: 'warm' }, { x: -4.0, z: -1.8, activity: 'talk' },
   ], 4);
-  spawnAmbientResident('Грузчик', 'Rogue', -1.8, -7.1, [
-    { x: -2, z: -6.8, activity: 'work' }, { x: 0.2, z: -2.2, activity: 'trade' }, { x: -4.2, z: -8.8, activity: 'talk' },
+  spawnAmbientResident('Грузчик', 'Rogue', -1.6, -7.4, [
+    { x: -1.6, z: -7.0, activity: 'work' }, { x: -1.3, z: -4.0, activity: 'trade' }, { x: -4.2, z: -4.0, activity: 'talk' },
   ], 5);
-  spawnAmbientResident('Странник', 'Wizard', -9.2, -1.7, [
-    { x: -8.9, z: -1.7, activity: 'talk' }, { x: -8.8, z: -5, activity: 'warm' }, { x: -7, z: -9.2, activity: 'guard' },
+  spawnAmbientResident('Странник', 'Wizard', -8.4, -8.0, [
+    { x: -8.2, z: -8.0, activity: 'guard' }, { x: -7.0, z: -5.4, activity: 'warm' }, { x: -7.0, z: -1.5, activity: 'talk' },
   ], 6);
+  spawnAmbientResident('Постоялец', 'Rogue', -12.0, -2.2, [
+    { x: -11.5, z: -2.2, activity: 'talk' }, { x: -8.6, z: -2.0, activity: 'trade' }, { x: -7.2, z: -5.3, activity: 'warm' },
+  ], 7);
+
+  // Two visible guards on the south watch towers.
+  spawnTowerGuard('Лучник западной башни', -17.2, -13.2, 4.35, -7, -18);
+  spawnTowerGuard('Лучник восточной башни', 3.2, -13.2, 4.35, -7, -18);
+}
+
+function spawnMonsterCamp(id: string, centerX: number, centerZ: number, count: number, spread: number, patrolRadius: number): void {
+  for (let index = 0; index < count; index += 1) {
+    const angle = (index / count) * Math.PI * 2 + rand(-0.22, 0.22);
+    const radius = rand(spread * 0.35, spread);
+    const entity = spawnMonster(id, centerX + Math.cos(angle) * radius, centerZ + Math.sin(angle) * radius);
+    entity.groupId = `${id}-${centerX}-${centerZ}`;
+    entity.patrol = [0, 1, 2].map((step) => {
+      const patrolAngle = angle + step * (Math.PI * 2 / 3);
+      const point = { x: centerX + Math.cos(patrolAngle) * patrolRadius, z: centerZ + Math.sin(patrolAngle) * patrolRadius };
+      return collisionWorld.findNearestFree(point, entityCollisionRadius(entity));
+    });
+    entity.patrolIndex = index % entity.patrol.length;
+    entity.patrolPause = rand(0.25, 1.4);
+  }
 }
 
 function spawnEntities(): void {
@@ -958,25 +1095,33 @@ function spawnEntities(): void {
   const playerEntity = makeEntity({ kind: 'player', model: classDef.model, x: player.x, z: player.z, targetHeight: 2.05 });
   createEntityModel(playerEntity);
   state.entities.push(playerEntity);
+
   const npcs: Array<[string, string, number, number, string, number, number]> = [
-    ['Староста Роэн', 'Warrior', -7, -1.2, 'elder', -7, -5],
-    ['Кузнец Бран', 'Warrior', -12.1, -4.1, 'smith', -14.2, -4.2],
-    ['Торговка Эльза', 'Ranger', -1.9, -3.8, 'shop', 0.2, -4],
-    ['Проводник Каэль', 'Wizard', -7, -12.5, 'teleport', -7, -8.5],
+    ['Староста Роэн', 'Warrior', -7, -0.2, 'elder', -7, 3.6],
+    ['Кузнец Бран', 'Warrior', -12.7, -5.0, 'smith', -12.6, -5.2],
+    ['Торговка Эльза', 'Ranger', -1.4, -5.1, 'shop', -0.7, -4.0],
+    ['Проводник Каэль', 'Wizard', -7, -13.0, 'teleport', -7, -8.8],
   ];
   npcs.forEach(([name, model, x, z, role, lookX, lookZ]) => {
-    const entity = makeEntity({ kind: 'npc', name, model, x, z, role, targetHeight: 2 });
+    const spawn = collisionWorld.findNearestFree({ x, z }, 0.5);
+    const entity = makeEntity({ kind: 'npc', name, model, x: spawn.x, z: spawn.z, role, targetHeight: 2 });
     createEntityModel(entity);
     rotateTowards(entity, lookX, lookZ);
     state.entities.push(entity);
   });
   spawnAmbientResidents();
-  const types = ['wolf', 'exile', 'spider', 'undead', 'bat', 'cultist', 'miner', 'wraith'];
-  for (let index = 0; index < 36; index += 1) {
-    const forest = index >= 17;
-    spawnMonster(types[index % types.length], forest ? rand(13, 34) : rand(1, 17), forest ? rand(4, 24) : rand(-2, 15));
-  }
-  spawnMonster('mini', 26, 5, state.bossTimers.mini);
+
+  // Homogeneous camps are separated spatially; mobs no longer spawn as a mixed pile.
+  spawnMonsterCamp('wolf', 5, -2, 6, 3.6, 4.2);
+  spawnMonsterCamp('exile', 7, 9, 5, 3.2, 4.0);
+  spawnMonsterCamp('spider', 16, 1, 5, 3.4, 4.1);
+  spawnMonsterCamp('undead', 15, 13, 5, 3.7, 4.5);
+  spawnMonsterCamp('bat', 23, 7, 4, 3.1, 4.2);
+  spawnMonsterCamp('cultist', 26, 17, 4, 3.3, 4.3);
+  spawnMonsterCamp('miner', 34, 20, 4, 3.5, 4.0);
+  spawnMonsterCamp('wraith', 39, 12, 4, 3.4, 4.4);
+
+  spawnMonster('mini', 28, 6, state.bossTimers.mini);
   spawnMonster('big', 39, 32, state.bossTimers.big);
 }
 
@@ -1096,7 +1241,10 @@ function moveEntityWithCollision(entity: Entity, dx: number, dz: number, avoidSt
 }
 
 function attackRange(): number {
-  return CLASSES_MAP[player.classId].ranged ? 12 : 2.6;
+  if (player.classId === 'ranger') return 12.5;
+  if (player.classId === 'mage') return 8.5;
+  if (player.classId === 'necro') return 9.5;
+  return 2.6;
 }
 
 function resetPlayerControl(clearTarget = false): void {
@@ -1146,12 +1294,10 @@ function syncMovementIntent(direction: Readonly<{ x: number; z: number }> | null
 
 let outlinedTarget: Entity | null = null;
 function setTargetOutline(entity: Entity | null, enabled: boolean): void {
-  entity?.root?.getChildMeshes().forEach((mesh) => {
-    if (mesh === entity.label) return;
-    mesh.renderOutline = enabled;
-    mesh.outlineColor = new Color3(0.95, 0.2, 0.08);
-    mesh.outlineWidth = 0.035;
-  });
+  // Never outline imported character meshes: some GLTFs contain helper geometry whose
+  // silhouette is many times larger than the visible monster. That caused the red blob.
+  entity?.root?.getChildMeshes().forEach((mesh) => { mesh.renderOutline = false; });
+  void enabled;
 }
 
 function updateTargetIndicator(): void {
@@ -1159,21 +1305,14 @@ function updateTargetIndicator(): void {
   if (outlinedTarget !== target) {
     setTargetOutline(outlinedTarget, false);
     outlinedTarget = target;
-    setTargetOutline(outlinedTarget, true);
+    setTargetOutline(outlinedTarget, false);
   }
-  if (!target) {
-    targetIndicator.setEnabled(false);
-    return;
-  }
-  targetIndicator.setEnabled(true);
-  targetIndicator.position.set(target.x, 0.1, target.z);
-  const scale = target.boss === 'big' ? 2.2 : target.boss === 'mini' ? 1.55 : 1;
-  targetIndicator.scaling.setAll(scale * (1 + Math.sin(performance.now() * 0.006) * 0.035));
+  targetIndicator.setEnabled(false);
 }
 
 function update(dt: number): void {
   if (!state.started || state.paused) return;
-  state.worldTime = (state.worldTime + dt * 0.035) % 24;
+  state.worldTime = 12.5; // current vertical slice is intentionally locked to readable daylight
   state.gateWarn = Math.max(0, state.gateWarn - dt);
   const hero = playerEntity();
   player.attackCd = Math.max(0, player.attackCd - dt);
@@ -1243,6 +1382,7 @@ function update(dt: number): void {
   syncEntityTransform(hero, motion.height);
   state.entities.filter((entity) => entity.kind === 'monster').forEach((entity) => updateMonster(entity, dt));
   state.entities.filter((entity) => entity.kind === 'summon').forEach((entity) => updateSummon(entity, dt));
+  state.entities.filter((entity) => entity.kind === 'npc').forEach((entity) => updateTownNpc(entity, dt));
   state.entities.filter((entity) => entity.kind === 'ambient').forEach((entity) => updateAmbientResident(entity, dt));
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
@@ -1291,6 +1431,7 @@ function updateMonster(entity: Entity, dt: number): void {
       const safeSpawn = collisionWorld.findNearestFree(entity, entityCollisionRadius(entity));
       entity.x = safeSpawn.x;
       entity.z = safeSpawn.z;
+      entity.patrolPause = rand(0.2, 1.2);
       restoreEntityAfterRespawn(entity);
       if (entity.boss === 'big') {
         toast('Печать древнего владыки разрушена…');
@@ -1324,6 +1465,23 @@ function updateMonster(entity: Entity, dt: number): void {
         }
       }, 280);
     }
+  } else if (entity.patrol?.length) {
+    entity.patrolPause = Math.max(0, (entity.patrolPause ?? 0) - dt);
+    const index = entity.patrolIndex ?? 0;
+    const waypoint = entity.patrol[index % entity.patrol.length];
+    const pdx = waypoint.x - entity.x;
+    const pdz = waypoint.z - entity.z;
+    const patrolDistance = Math.hypot(pdx, pdz);
+    if (patrolDistance < 0.55) {
+      entity.patrolIndex = (index + 1) % entity.patrol.length;
+      entity.patrolPause = rand(0.8, 2.4);
+      setEntityAction(entity, 'idle');
+    } else if ((entity.patrolPause ?? 0) <= 0) {
+      const speed = monsterMovementSpeed(Boolean(entity.boss)) * 0.42;
+      const moved = moveEntityWithCollision(entity, (pdx / patrolDistance) * speed * dt, (pdz / patrolDistance) * speed * dt, true);
+      rotateTowardsSmooth(entity, waypoint.x, waypoint.z, dt);
+      setEntityAction(entity, moved ? 'walk' : 'idle');
+    } else setEntityAction(entity, 'idle');
   } else if (Math.hypot(entity.x - (entity.homeX ?? entity.x), entity.z - (entity.homeZ ?? entity.z)) > 7) {
     const homeX = entity.homeX ?? entity.x;
     const homeZ = entity.homeZ ?? entity.z;
@@ -1414,19 +1572,30 @@ function performAttack(skillIndex: number | null): void {
   playSfx(skill?.fx ?? 'attack');
   const magic = player.classId === 'mage' || player.classId === 'necro';
   const base = magic ? player.stats.matk : rand(player.stats.atkMin, player.stats.atkMax);
-  const multiplier = skill?.mul ?? 1;
+  const multiplier = skill?.mul ?? (player.classId === 'mage' ? 0.68 : player.classId === 'necro' ? 0.76 : 1);
   const critical = Math.random() < player.stats.crit / 100;
   const damage = Math.max(1, Math.round(base * multiplier * (critical ? classCombatProfile(player.classId, player.level, player.stats).critMultiplier : 1)));
   void gateway.send({ type: 'attack', entityId: target.uid, skillIndex });
-  spawnAttackEffect(skill?.fx ?? (ranged ? 'arrow' : 'slash'), hero, target, () => {
+  const basicFx = player.classId === 'mage' ? 'arcane' : player.classId === 'necro' ? 'bone' : ranged ? 'arrow' : 'slash';
+  spawnAttackEffect(skill?.fx ?? basicFx, hero, target, () => {
     let victims = [target];
     if (skill?.aoe) victims = state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0));
     victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
     if (skill?.chain) {
-      state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && entity !== target)
-        .sort((a, b) => Math.hypot(a.x - target.x, a.z - target.z) - Math.hypot(b.x - target.x, b.z - target.z))
-        .slice(0, skill.chain - 1)
-        .forEach((entity) => { spawnAttackEffect('lightning', target, entity); damageMonster(entity, Math.round(damage * 0.68), false); });
+      const struck = new Set<string>([target.uid]);
+      let chainFrom = target;
+      for (let hop = 1; hop < skill.chain; hop += 1) {
+        const next = state.entities
+          .filter((entity) => entity.kind === 'monster' && entity.alive && !struck.has(entity.uid)
+            && Math.hypot(entity.x - chainFrom.x, entity.z - chainFrom.z) <= 7.2)
+          .sort((a, b) => Math.hypot(a.x - chainFrom.x, a.z - chainFrom.z) - Math.hypot(b.x - chainFrom.x, b.z - chainFrom.z))[0];
+        if (!next) break;
+        struck.add(next.uid);
+        const chainDamage = Math.max(1, Math.round(damage * Math.pow(0.68, hop)));
+        const previous = chainFrom;
+        spawnAttackEffect('lightning', previous, next, () => damageMonster(next, chainDamage, false, false));
+        chainFrom = next;
+      }
     }
     if (skill?.dot) target.status.dot = skill.dot;
     if (skill?.slow) target.status.slow = skill.slow;
@@ -1446,13 +1615,13 @@ function entityWorldPosition(entity: Entity, height = 1.4): Vector3 {
 
 function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () => void): void {
   const colors: Record<string, Color3> = {
-    fire: new Color3(1, 0.2, 0.04), ice: new Color3(0.25, 0.75, 1), arrow: new Color3(0.8, 0.7, 0.45),
+    fire: new Color3(1, 0.2, 0.04), ice: new Color3(0.25, 0.75, 1), arrow: new Color3(0.8, 0.7, 0.45), arcane: new Color3(0.46, 0.64, 1),
     bone: new Color3(0.85, 0.82, 0.7), drain: new Color3(0.15, 0.9, 0.55), curse: new Color3(0.52, 0.12, 0.9),
     lightning: new Color3(0.35, 0.75, 1), poison: new Color3(0.35, 0.85, 0.2), slash: new Color3(0.9, 0.65, 0.25),
   };
   const start = entityWorldPosition(from);
   const end = entityWorldPosition(to);
-  const projectile = MeshBuilder.CreateSphere(`effect-${type}-${uid()}`, { diameter: type === 'arrow' ? 0.14 : 0.32, segments: 8 }, scene);
+  const projectile = MeshBuilder.CreateSphere(`effect-${type}-${uid()}`, { diameter: type === 'arrow' ? 0.12 : type === 'arcane' ? 0.22 : 0.28, segments: 8 }, scene);
   const material = new StandardMaterial(`effect-material-${uid()}`, scene);
   material.emissiveColor = colors[type] ?? colors.slash;
   material.disableLighting = true;
@@ -1476,20 +1645,21 @@ function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () =>
 }
 
 function impactEffect(position: Vector3, color: Color3): void {
-  const ring = MeshBuilder.CreateTorus(`impact-${uid()}`, { diameter: 0.45, thickness: 0.07, tessellation: 20 }, scene);
+  // Compact contact spark only. No torus, expanding decal or emissive surface.
+  const spark = MeshBuilder.CreateSphere(`impact-${uid()}`, { diameter: 0.12, segments: 6 }, scene);
   const material = new StandardMaterial(`impact-material-${uid()}`, scene);
-  material.emissiveColor = color;
-  material.alpha = 0.9;
-  material.disableLighting = true;
-  ring.material = material;
-  ring.position.copyFrom(position);
-  ring.isPickable = false;
+  material.emissiveColor = color.scale(0.55);
+  material.diffuseColor = color.scale(0.35);
+  material.alpha = 0.58;
+  spark.material = material;
+  spark.position.copyFrom(position);
+  spark.isPickable = false;
   let life = 0;
   state.effects.push({ update(dt) {
     life += dt;
-    ring.scaling.setAll(1 + life * 7);
-    material.alpha = Math.max(0, 0.9 - life * 2.6);
-    if (life > 0.38) { this.dead = true; ring.dispose(false, true); }
+    spark.scaling.setAll(1 + life * 2.4);
+    material.alpha = Math.max(0, 0.58 - life * 4.8);
+    if (life > 0.12) { this.dead = true; spark.dispose(false, true); }
   } });
 }
 
@@ -1595,12 +1765,26 @@ function updateSummon(summon: Entity, dt: number): void {
 }
 
 const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: number; z: number }>> = {
-  warm: { x: -7, z: -5 },
-  trade: { x: 0.2, z: -4 },
-  work: { x: -14.2, z: -4.2 },
+  warm: { x: -7, z: -5.4 },
+  trade: { x: -1.0, z: -4.2 },
+  work: { x: -12.6, z: -5.2 },
   guard: { x: -7, z: -15.5 },
-  talk: { x: -7, z: -3.2 },
+  talk: { x: -7, z: -1.0 },
 };
+
+function updateTownNpc(entity: Entity, dt: number): void {
+  if (entity.role !== 'smith') return;
+  const anvil = { x: -12.6, z: -5.2 };
+  rotateTowardsSmooth(entity, anvil.x, anvil.z, dt);
+  entity.npcActionTimer = (entity.npcActionTimer ?? 0.5) - dt;
+  if (entity.npcActionTimer <= 0) {
+    setEntityAction(entity, 'attack', true);
+    entity.npcActionTimer = rand(1.7, 2.6);
+    window.setTimeout(() => {
+      if (entity.alive && entity.role === 'smith' && entity.actionType === 'attack') setEntityAction(entity, 'idle');
+    }, 620);
+  }
+}
 
 function updateAmbientResident(entity: Entity, dt: number): void {
   const decision = entity.ambientBrain?.update(dt, entity);
@@ -1612,6 +1796,13 @@ function updateAmbientResident(entity: Entity, dt: number): void {
     const distance = Math.max(0.0001, Math.hypot(dx, dz));
     const step = Math.min(distance, 1.15 * dt);
     const moved = moveEntityWithCollision(entity, (dx / distance) * step, (dz / distance) * step, true);
+    if (!moved) {
+      const free = collisionWorld.findNearestFree(decision.waypoint, 0.34);
+      const fdx = free.x - entity.x;
+      const fdz = free.z - entity.z;
+      const freeDistance = Math.max(0.0001, Math.hypot(fdx, fdz));
+      moveEntityWithCollision(entity, (fdx / freeDistance) * Math.min(freeDistance, 0.72 * dt), (fdz / freeDistance) * Math.min(freeDistance, 0.72 * dt), true);
+    }
     rotateTowardsSmooth(entity, decision.waypoint.x, decision.waypoint.z, dt);
     setEntityAction(entity, moved ? 'walk' : 'idle');
     return;

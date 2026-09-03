@@ -1,19 +1,17 @@
-# Local polish queue
+# Local polish queue — Phase 1.2 applied
 
-The following user-visible fixes are deliberately handled outside Work so Work time is reserved for structural changes:
+User playtest on 2026-09-03 exposed structural presentation/world issues rather than isolated cosmetic bugs.
 
-- character locomotion smoothing;
-- third-person camera response smoothing;
-- launcher isolation from global npm workspace settings;
-- less synchronized ambient NPC behaviour;
-- reduced collision snagging around static props;
-- giant emissive target/impact glow suppressed at bootstrap; target marker reduced to a restrained thin indicator.
+Applied in Phase 1.2:
+- removed imported-mesh red outline/torus hit blobs;
+- locked the current vertical slice to readable daytime lighting;
+- rebuilt Greenfall around a gate, walls, keep, watch towers, tavern, market and working smithy;
+- removed the broken black roof placeholders from the authored settlement path;
+- created homogeneous monster camps distributed across the field;
+- added idle patrol routes for ordinary monsters;
+- moved residents to safe road/civic routes and added collision recovery;
+- made Bran face/work the anvil beside a brazier;
+- separated Ranger and Mage basic ranged identity;
+- made Chain Lightning hop through up to five nearby enemies with diminishing damage.
 
-## Next local-test focus
-- camera/movement feel after softer response;
-- whether collision still snags at dense prop corners;
-- whether ambient residents feel less synchronized;
-- verify combat no longer produces the large orange/red impact blob.
-
-## Reserved for Work / v0.5
-See `WORK_V05_QUALITY_VERTICAL_SLICE.md` for monster lifecycle, AI/navigation, combat timing, animation pipeline and art-quality rebuild.
+Next Work-owned stage remains v0.5: higher-quality art assets, authored animation retargeting, navmesh/pathfinding, richer enemy state machines and final environment art pass.
