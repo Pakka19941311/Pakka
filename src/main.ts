@@ -35,11 +35,16 @@ import {
   enhancementCanDestroy,
   enhancementChance,
   enhancementStatMultiplier,
+  monsterMovementSpeed,
   statsAtLevel,
   xpNeeded,
 } from './core/game-rules';
 import { addOrStackItem, applyExperience, equipmentSlot, resolveEnhancement } from './core/gameplay-session';
 import { LocalGameGateway } from './network/game-gateway';
+import { CombatControl } from './controls/combat-controller';
+import { PlayerInputController } from './controls/input-controller';
+import { TargetingController } from './controls/targeting-controller';
+import { ThirdPersonCameraController } from './controls/third-person-camera';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -250,8 +255,8 @@ const state = {
   starting: false,
   paused: false,
   selectedClass: 'knight',
-  target: null as Entity | null,
   moveTarget: null as { x: number; z: number } | null,
+  interactionTarget: null as Entity | null,
   entities: [] as Entity[],
   effects: [] as Array<{ update: (dt: number) => void; dead?: boolean }>,
   worldTime: 19.35,
@@ -265,6 +270,9 @@ const state = {
   bossTimers: { mini: 0, big: 0 },
   playerBuffs: { guard: 0, vanish: 0 },
 };
+
+const targeting = new TargetingController<Entity>();
+const combatControl = new CombatControl();
 
 const emptyStats: CombatStats = {
   str: 0, dex: 0, int: 0, vit: 0, spi: 0, atkMin: 0, atkMax: 0, matk: 0,
@@ -302,6 +310,7 @@ void gateway.load().then((save) => {
 });
 
 const canvas = q<HTMLCanvasElement>('#game-canvas');
+const inputControl = new PlayerInputController(canvas);
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false }, true);
 const scene = new Scene(engine);
 scene.clearColor = new Color4(0.035, 0.055, 0.065, 1);
@@ -310,16 +319,9 @@ scene.fogColor = new Color3(0.045, 0.075, 0.08);
 scene.fogDensity = 0.018;
 scene.ambientColor = new Color3(0.25, 0.28, 0.3);
 
-const camera = new ArcRotateCamera('isometric-camera', -Math.PI * 0.72, 1.02, 26, new Vector3(0, 1, 0), scene);
-camera.lowerRadiusLimit = 18;
-camera.upperRadiusLimit = 34;
-camera.lowerBetaLimit = 0.72;
-camera.upperBetaLimit = 1.18;
-camera.wheelDeltaPercentage = 0.025;
+const camera = new ArcRotateCamera('third-person-camera', -Math.PI / 2, 1.06, 10.5, new Vector3(0, 1, 0), scene);
 camera.panningSensibility = 0;
-camera.attachControl(canvas, true);
-camera.inputs.removeByType('ArcRotateCameraPointersInput');
-camera.inputs.removeByType('ArcRotateCameraKeyboardMoveInput');
+const cameraControl = new ThirdPersonCameraController(camera);
 
 const hemi = new HemisphericLight('ashen-sky', new Vector3(0.25, 1, 0.15), scene);
 hemi.intensity = 0.78;
@@ -381,6 +383,16 @@ const safeRing = MeshBuilder.CreateTorus('safe-zone', { diameter: 15.5, thicknes
 safeRing.position.set(-8, 0.07, -5);
 safeRing.material = safeMaterial;
 safeRing.isPickable = false;
+
+const targetIndicatorMaterial = new StandardMaterial('selected-target-material', scene);
+targetIndicatorMaterial.emissiveColor = new Color3(0.95, 0.18, 0.08);
+targetIndicatorMaterial.diffuseColor = new Color3(0.3, 0.02, 0.01);
+targetIndicatorMaterial.alpha = 0.9;
+const targetIndicator = MeshBuilder.CreateTorus('selected-target', { diameter: 2.35, thickness: 0.09, tessellation: 72 }, scene);
+targetIndicator.position.y = 0.1;
+targetIndicator.material = targetIndicatorMaterial;
+targetIndicator.isPickable = false;
+targetIndicator.setEnabled(false);
 
 const characterAssets = new Map<string, AssetContainer>();
 const monsterAssets = new Map<string, AssetContainer>();
@@ -771,6 +783,11 @@ async function startGame(load: boolean): Promise<void> {
     await loadAssets();
     if (!state.started) buildWorld();
     spawnEntities();
+    targeting.clear();
+    combatControl.cancelPursuit();
+    state.moveTarget = null;
+    state.interactionTarget = null;
+    cameraControl.snap({ x: player.x, y: 0, z: player.z });
     applySettings();
     q('#loading').classList.add('hidden');
     q('#hud').classList.remove('hidden');
@@ -780,7 +797,7 @@ async function startGame(load: boolean): Promise<void> {
     updateQuest();
     updateHud();
     log(`Добро пожаловать в Варендор, ${player.name}.`, 'system');
-    log('ЛКМ — путь и цель. Space — атака. 1–4 — навыки.', 'system');
+    log('WASD — движение. ПКМ — камера. Колесо — приближение. ЛКМ — путь, цель и атака.', 'system');
     canvas.focus();
     saveGame();
   } catch (error) {
@@ -809,7 +826,7 @@ function buildHotbar(): void {
   const hotbar = q<HTMLElement>('#hotbar');
   hotbar.innerHTML = '';
   classDef.skills.forEach((skill, index) => hotbar.insertAdjacentHTML('beforeend', `<button class="skill-button" data-skill="${index}"><span class="key">${index + 1}</span><span class="symbol">${skill.icon}</span><small>${skill.name}</small><i class="cooldown"></i></button>`));
-  hotbar.insertAdjacentHTML('beforeend', '<button class="skill-button" data-attack><span class="key">Space</span><span class="symbol">⚔</span><small>Обычная атака</small></button>');
+  hotbar.insertAdjacentHTML('beforeend', '<button class="skill-button" data-attack><span class="key">ЛКМ</span><span class="symbol">⚔</span><small>Обычная атака</small></button>');
   qa<HTMLButtonElement>('[data-skill]').forEach((button) => { button.onclick = () => castSkill(Number(button.dataset.skill)); });
   q<HTMLButtonElement>('[data-attack]').onclick = basicAttack;
 }
@@ -819,48 +836,132 @@ function rotateTowards(entity: Entity, targetX: number, targetZ: number): void {
   entity.root.rotation.y = Math.atan2(targetX - entity.x, targetZ - entity.z);
 }
 
+function attackRange(): number {
+  return CLASSES_MAP[player.classId].ranged ? 12 : 2.6;
+}
+
+function resetPlayerControl(clearTarget = false): void {
+  state.moveTarget = null;
+  state.interactionTarget = null;
+  combatControl.cancelPursuit();
+  if (clearTarget) {
+    targeting.clear();
+    targetIndicator.setEnabled(false);
+  }
+}
+
+function applyPlayerMovement(hero: Entity, direction: Readonly<{ x: number; z: number }>, dt: number): boolean {
+  const length = Math.hypot(direction.x, direction.z);
+  if (length < 0.0001) return false;
+  const x = direction.x / length;
+  const z = direction.z / length;
+  player.x += x * player.stats.speed * dt;
+  player.z += z * player.stats.speed * dt;
+  if (player.x > 13 && player.level < 10) {
+    player.x = 12.9;
+    state.moveTarget = null;
+    combatControl.cancelPursuit();
+    if (!state.gateWarn) {
+      toast('Чёрный лес откроется на 10 уровне', 'bad');
+      state.gateWarn = 3;
+    }
+  }
+  rotateTowards(hero, player.x + x, player.z + z);
+  setEntityAction(hero, 'walk');
+  return true;
+}
+
+let movementSequence = 0;
+let movementIntentCooldown = 0;
+let wasMovingManually = false;
+function syncMovementIntent(direction: Readonly<{ x: number; z: number }> | null, dt: number): void {
+  movementIntentCooldown = Math.max(0, movementIntentCooldown - dt);
+  if (direction) {
+    if (!wasMovingManually || movementIntentCooldown <= 0) {
+      movementSequence += 1;
+      void gateway.send({ type: 'move-intent', x: direction.x, z: direction.z, sequence: movementSequence });
+      movementIntentCooldown = 0.12;
+    }
+    wasMovingManually = true;
+  } else if (wasMovingManually) {
+    movementSequence += 1;
+    void gateway.send({ type: 'move-intent', x: 0, z: 0, sequence: movementSequence });
+    wasMovingManually = false;
+  }
+}
+
+function updateTargetIndicator(): void {
+  const target = targeting.validate();
+  if (!target) {
+    targetIndicator.setEnabled(false);
+    return;
+  }
+  targetIndicator.setEnabled(true);
+  targetIndicator.position.set(target.x, 0.1, target.z);
+  const scale = target.boss === 'big' ? 2.2 : target.boss === 'mini' ? 1.55 : 1;
+  targetIndicator.scaling.setAll(scale * (1 + Math.sin(performance.now() * 0.006) * 0.035));
+}
+
 function update(dt: number): void {
   if (!state.started || state.paused) return;
   state.worldTime = (state.worldTime + dt * 0.035) % 24;
   state.gateWarn = Math.max(0, state.gateWarn - dt);
   const hero = playerEntity();
-  if (state.moveTarget) {
-    const dx = state.moveTarget.x - player.x;
-    const dz = state.moveTarget.z - player.z;
-    const distance = Math.hypot(dx, dz);
-    if (distance < 0.18) {
-      state.moveTarget = null;
-      setEntityAction(hero, 'idle');
-    } else {
-      const speed = player.stats.speed;
-      player.x += (dx / distance) * speed * dt;
-      player.z += (dz / distance) * speed * dt;
-      if (player.x > 13 && player.level < 10) {
-        player.x = 12.9;
-        state.moveTarget = null;
-        if (!state.gateWarn) {
-          toast('Чёрный лес откроется на 10 уровне', 'bad');
-          state.gateWarn = 3;
-        }
-      }
-      rotateTowards(hero, state.moveTarget?.x ?? player.x, state.moveTarget?.z ?? player.z);
-      setEntityAction(hero, 'walk');
-    }
-  }
-  hero.x = player.x;
-  hero.z = player.z;
-  hero.root?.position.set(player.x, hero.root.position.y, player.z);
   player.attackCd = Math.max(0, player.attackCd - dt);
   player.cooldowns = player.cooldowns.map((value) => Math.max(0, value - dt));
   state.playerBuffs.guard = Math.max(0, state.playerBuffs.guard - dt);
   state.playerBuffs.vanish = Math.max(0, state.playerBuffs.vanish - dt);
   player.mp = Math.min(player.maxMp, player.mp + player.maxMp * 0.022 * dt);
+
+  const target = targeting.validate();
+  const axes = inputControl.movementAxes();
+  const manualMovement = Math.hypot(axes.forward, axes.strafe) > 0.0001;
+  const combatDecision = combatControl.plan({
+    player,
+    target,
+    basicRange: attackRange(),
+    skillRange: () => attackRange(),
+    canBasicAttack: player.attackCd <= 0,
+    canUseSkill: (index) => player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
+  });
+
+  let moved = false;
+  if (manualMovement) {
+    state.moveTarget = null;
+    state.interactionTarget = null;
+    combatControl.cancelPursuit();
+    const direction = cameraControl.movementDirection(axes);
+    moved = applyPlayerMovement(hero, direction, dt);
+    syncMovementIntent(direction, dt);
+  } else {
+    syncMovementIntent(null, dt);
+    const destination = combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
+    if (destination) {
+      const dx = destination.x - player.x;
+      const dz = destination.z - player.z;
+      const distance = Math.hypot(dx, dz);
+      if (distance < 0.18) {
+        if (combatDecision.kind !== 'approach') state.moveTarget = null;
+      } else moved = applyPlayerMovement(hero, { x: dx, z: dz }, Math.min(dt, distance / player.stats.speed));
+    }
+    if (!moved && combatDecision.kind === 'attack') performAttack(combatDecision.skillIndex);
+  }
+
+  if (!moved && hero.actionType === 'walk') setEntityAction(hero, 'idle');
+  if (state.interactionTarget && Math.hypot(state.interactionTarget.x - player.x, state.interactionTarget.z - player.z) < 3.2) {
+    const npc = state.interactionTarget;
+    state.interactionTarget = null;
+    state.moveTarget = null;
+    interactNpc(npc);
+  }
+  hero.x = player.x;
+  hero.z = player.z;
+  hero.root?.position.set(player.x, hero.root.position.y, player.z);
   state.entities.filter((entity) => entity.kind === 'monster').forEach((entity) => updateMonster(entity, dt));
   state.entities.filter((entity) => entity.kind === 'summon').forEach((entity) => updateSummon(entity, dt));
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
-  const target = new Vector3(player.x, 1, player.z);
-  camera.target = Vector3.Lerp(camera.target, target, 1 - Math.pow(0.001, dt));
+  updateTargetIndicator();
   state.bossTimers.mini = Math.max(0, state.bossTimers.mini - dt);
   state.bossTimers.big = Math.max(0, state.bossTimers.big - dt);
   updateHud();
@@ -899,7 +1000,7 @@ function updateMonster(entity: Entity, dt: number): void {
   if (!safe && distance < 9) {
     if (entity.status.stun) setEntityAction(entity, 'idle');
     else if (distance > 1.65) {
-      const speed = (entity.boss ? 2.1 : 2.7) * (entity.status.slow ? 0.45 : 1);
+      const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
       entity.x += (dx / distance) * speed * dt;
       entity.z += (dz / distance) * speed * dt;
       entity.root?.position.set(entity.x, entity.root.position.y, entity.z);
@@ -935,24 +1036,33 @@ function hurtPlayer(value: number): void {
 function die(): void {
   player.dead = true;
   player.hp = 0;
+  resetPlayerControl(true);
   state.paused = true;
   const loss = Math.floor(player.xp * 0.05);
   player.xp = Math.max(0, player.xp - loss);
   confirmBox('Вы пали', `Потеряно ${loss} опыта текущего уровня. Уровень и предметы сохранены.`, () => {
     player.x = -7; player.z = -4; player.hp = player.maxHp; player.mp = player.maxMp; player.dead = false;
-    playerEntity().root?.setEnabled(true); state.paused = false; closeConfirm(); toast('Вы возродились в Гринфолле'); saveGame();
+    playerEntity().root?.setEnabled(true); cameraControl.snap({ x: player.x, y: 0, z: player.z });
+    state.paused = false; closeConfirm(); toast('Вы возродились в Гринфолле'); saveGame();
   }, false);
 }
 
-function basicAttack(): void { attackWith(null); }
+function basicAttack(): void {
+  const target = targeting.validate();
+  if (!target) return toast('Выберите живую цель', 'bad');
+  state.moveTarget = null;
+  state.interactionTarget = null;
+  combatControl.engageBasic(target.uid);
+}
+
 function castSkill(index: number): void {
   const skill = CLASSES_MAP[player.classId].skills[index];
   if (!skill) return;
   if (player.cooldowns[index] > 0) return toast('Навык ещё восстанавливается', 'bad');
   if (player.mp < skill.cost) return toast(`Недостаточно: ${CLASSES_MAP[player.classId].resource}`, 'bad');
-  player.mp -= skill.cost;
-  player.cooldowns[index] = skill.cd;
   if (skill.buff) {
+    player.mp -= skill.cost;
+    player.cooldowns[index] = skill.cd;
     state.playerBuffs[skill.buff as 'guard' | 'vanish'] = skill.buff === 'guard' ? 7 : 4;
     toast(skill.buff === 'guard' ? 'Последний рубеж: входящий урон снижен' : 'Вы растворяетесь в сумраке');
     impactEffect(entityWorldPosition(playerEntity()), Color3.FromHexString(skill.buff === 'guard' ? '#d3ad63' : '#7b46a8'));
@@ -960,32 +1070,37 @@ function castSkill(index: number): void {
     return;
   }
   if (skill.summon) {
+    player.mp -= skill.cost;
+    player.cooldowns[index] = skill.cd;
     summonSkeleton();
     void gateway.send({ type: 'attack', entityId: 'summon', skillIndex: index });
     return;
   }
-  attackWith(skill, index);
+  const target = targeting.validate();
+  if (!target) return toast('Выберите живую цель', 'bad');
+  state.moveTarget = null;
+  state.interactionTarget = null;
+  combatControl.queueSkill(target.uid, index);
 }
 
-function attackWith(skill: SkillDef | null, skillIndex: number | null = null): void {
-  const target = state.target;
-  if (!target?.alive) return toast('Выберите живую цель', 'bad');
+function performAttack(skillIndex: number | null): void {
+  const target = targeting.validate();
+  if (!target) return combatControl.cancelPursuit();
+  const skill = skillIndex === null ? null : CLASSES_MAP[player.classId].skills[skillIndex];
+  if (skillIndex !== null) {
+    if (!skill || player.cooldowns[skillIndex] > 0 || player.mp < skill.cost) return;
+    player.mp -= skill.cost;
+    player.cooldowns[skillIndex] = skill.cd;
+  } else if (player.attackCd > 0) return;
   const ranged = CLASSES_MAP[player.classId].ranged;
-  const range = ranged ? 12 : 2.6;
-  const distance = Math.hypot(target.x - player.x, target.z - player.z);
-  if (distance > range) {
-    state.moveTarget = {
-      x: target.x + ((player.x - target.x) / distance) * (ranged ? 8 : 1.6),
-      z: target.z + ((player.z - target.z) / distance) * (ranged ? 8 : 1.6),
-    };
-    return toast('Приближаемся к цели');
-  }
-  if (!skill && player.attackCd > 0) return;
   player.attackCd = classCombatProfile(player.classId, player.level, player.stats).attackInterval;
-  state.moveTarget = null;
+  combatControl.completeAttack(skillIndex);
   const hero = playerEntity();
   rotateTowards(hero, target.x, target.z);
   setEntityAction(hero, 'attack', true);
+  window.setTimeout(() => {
+    if (!player.dead && hero.actionType === 'attack') setEntityAction(hero, 'idle');
+  }, 460);
   playSfx(skill?.fx ?? 'attack');
   const magic = player.classId === 'mage' || player.classId === 'necro';
   const base = magic ? player.stats.matk : rand(player.stats.atkMin, player.stats.atkMax);
@@ -1107,7 +1222,8 @@ function killMonster(entity: Entity): void {
   player.gold += gold;
   log(`${definition.name} повержен: +${definition.xp} опыта, +${gold} золота.`, 'combat');
   definition.drops.forEach(([id, chance]) => { if (Math.random() < chance) addItem(id); });
-  if (state.target === entity) state.target = null;
+  combatControl.targetRemoved(entity.uid);
+  if (targeting.isSelected(entity)) targeting.clear();
   if (state.quest === 1 && state.kills >= 8) state.quest = 2;
   if (state.quest === 2 && definition.boss === 'mini') state.quest = 3;
   if (state.quest === 3 && definition.boss === 'big') state.quest = 4;
@@ -1241,13 +1357,14 @@ function updateHud(): void {
   q('#potion-count').textContent = String(countItem('potion'));
   q('#ether-count').textContent = String(countItem('ether'));
   const targetFrame = q('#target-frame');
-  if (state.target?.alive) {
+  const target = targeting.validate();
+  if (target) {
     targetFrame.classList.remove('hidden');
-    q('#target-name').textContent = state.target.name ?? '';
-    q('#target-meta').textContent = `ур. ${state.target.level}`;
-    q('#boss-mark').textContent = state.target.boss ? '☠' : '';
-    (q<HTMLElement>('#target-fill')).style.width = `${clamp((state.target.hp ?? 0) / Math.max(1, state.target.maxHp ?? 1), 0, 1) * 100}%`;
-    q('#target-hp').textContent = `${Math.max(0, Math.ceil(state.target.hp ?? 0))} / ${state.target.maxHp}`;
+    q('#target-name').textContent = target.name ?? '';
+    q('#target-meta').textContent = `ур. ${target.level} · ${combatControl.isEngagedWith(target.uid) ? 'атака' : 'выбрана'}`;
+    q('#boss-mark').textContent = target.boss ? '☠' : '';
+    (q<HTMLElement>('#target-fill')).style.width = `${clamp((target.hp ?? 0) / Math.max(1, target.maxHp ?? 1), 0, 1) * 100}%`;
+    q('#target-hp').textContent = `${Math.max(0, Math.ceil(target.hp ?? 0))} / ${target.maxHp}`;
   } else targetFrame.classList.add('hidden');
   q('#zone').textContent = zoneAt(player.x, player.z).name;
   const hours = Math.floor(state.worldTime);
@@ -1305,13 +1422,10 @@ function updateQuest(): void {
   (q<HTMLElement>('#quest-progress')).style.width = `${clamp(current[2], 0, 1) * 100}%`;
 }
 
-const keys: Record<string, boolean> = {};
 window.addEventListener('keydown', (event) => {
-  if ((event.target as Element)?.matches('input,select')) return;
-  keys[event.key.toLowerCase()] = true;
+  if ((event.target as Element)?.matches('input, textarea, select, [contenteditable="true"]')) return;
   if (!state.started) return;
   if (['1', '2', '3', '4'].includes(event.key)) castSkill(Number(event.key) - 1);
-  if (event.code === 'Space') { event.preventDefault(); basicAttack(); }
   const key = event.key.toLowerCase();
   if (key === 'i') openWindow('inventory');
   if (key === 'c') openWindow('character');
@@ -1322,10 +1436,9 @@ window.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') openWindow('settings');
   if (event.key === 'Enter') q<HTMLInputElement>('#chat').focus();
 });
-window.addEventListener('keyup', (event) => { keys[event.key.toLowerCase()] = false; });
 
 canvas.addEventListener('pointerdown', (event) => {
-  if (!state.started || state.paused) return;
+  if (event.button !== 0 || !state.started || state.paused) return;
   const pick = scene.pick(event.offsetX, event.offsetY, (mesh) => mesh.isPickable);
   if (!pick?.hit || !pick.pickedPoint) return;
   let mesh: AbstractMesh | null = pick.pickedMesh;
@@ -1336,17 +1449,28 @@ canvas.addEventListener('pointerdown', (event) => {
   }
   if (entity) {
     if (entity.kind === 'monster') {
-      state.target = entity; state.moveTarget = null;
+      targeting.select(entity);
+      combatControl.engageBasic(entity.uid);
+      state.moveTarget = null;
+      state.interactionTarget = null;
       void gateway.send({ type: 'target', entityId: entity.uid });
       return;
     }
-    if (entity.kind === 'npc' && Math.hypot(entity.x - player.x, entity.z - player.z) < 3.2) {
-      interactNpc(entity); return;
+    if (entity.kind === 'npc') {
+      combatControl.cancelPursuit();
+      const distance = Math.hypot(entity.x - player.x, entity.z - player.z);
+      if (distance < 3.2) interactNpc(entity);
+      else {
+        state.interactionTarget = entity;
+        state.moveTarget = { x: entity.x, z: entity.z };
+      }
+      return;
     }
   }
   if ((pick.pickedMesh?.metadata as { ground?: boolean } | null)?.ground) {
     state.moveTarget = { x: pick.pickedPoint.x, z: pick.pickedPoint.z };
-    state.target = null;
+    state.interactionTarget = null;
+    combatControl.cancelPursuit();
     void gateway.send({ type: 'move', x: pick.pickedPoint.x, z: pick.pickedPoint.z });
   }
 });
@@ -1457,7 +1581,7 @@ function renderMap(): void {
 
 function renderSettings(): void {
   const s = state.settings;
-  q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid"><section><h3>Графика</h3><div class="setting"><label>Качество<select id="quality"><option value="low">Низкое</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div><div class="setting"><label>Динамические тени <input type="checkbox" id="shadows" ${s.shadows ? 'checked' : ''}></label></div><div class="setting"><label>Свечение и магические эффекты <input type="checkbox" id="bloom" ${s.bloom ? 'checked' : ''}></label></div><div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div><div class="setting"><label>Дрожание камеры <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div></section><section><h3>Звук и интерфейс</h3>${[['music', 'Музыка'], ['sfx', 'Эффекты'], ['ui', 'Интерфейс']].map(([id, name]) => `<div class="setting"><label>${name}<b id="${id}-value">${Math.round((s[id as keyof Settings] as number) * 100)}%</b></label><input type="range" min="0" max="100" value="${(s[id as keyof Settings] as number) * 100}" data-volume="${id}"></div>`).join('')}<h3>Управление</h3><div class="stat-row"><span>Движение</span><b>ЛКМ / WASD</b></div><div class="stat-row"><span>Обычная атака</span><b>Space</b></div><div class="stat-row"><span>Навыки</span><b>1–4</b></div><button class="gold-btn" id="save-settings">Применить</button></section></div>`;
+  q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid"><section><h3>Графика</h3><div class="setting"><label>Качество<select id="quality"><option value="low">Низкое</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div><div class="setting"><label>Динамические тени <input type="checkbox" id="shadows" ${s.shadows ? 'checked' : ''}></label></div><div class="setting"><label>Свечение и магические эффекты <input type="checkbox" id="bloom" ${s.bloom ? 'checked' : ''}></label></div><div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div><div class="setting"><label>Дрожание камеры <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div></section><section><h3>Звук и интерфейс</h3>${[['music', 'Музыка'], ['sfx', 'Эффекты'], ['ui', 'Интерфейс']].map(([id, name]) => `<div class="setting"><label>${name}<b id="${id}-value">${Math.round((s[id as keyof Settings] as number) * 100)}%</b></label><input type="range" min="0" max="100" value="${(s[id as keyof Settings] as number) * 100}" data-volume="${id}"></div>`).join('')}<h3>Управление</h3><div class="stat-row"><span>Движение</span><b>WASD / ЛКМ по земле</b></div><div class="stat-row"><span>Камера</span><b>ПКМ + мышь / колесо</b></div><div class="stat-row"><span>Цель и атака</span><b>ЛКМ по монстру</b></div><div class="stat-row"><span>Навыки</span><b>1–4</b></div><button class="gold-btn" id="save-settings">Применить</button></section></div>`;
   bindTabs(); q<HTMLSelectElement>('#quality').value = s.quality;
   qa<HTMLInputElement>('[data-volume]').forEach((input) => { input.oninput = () => { q(`#${input.dataset.volume}-value`).textContent = `${input.value}%`; }; });
   q<HTMLButtonElement>('#save-settings').onclick = () => {
@@ -1494,7 +1618,7 @@ function openTeleport(): void {
   openWindow('character');
   const points: Array<[string, number, number, number, number]> = [['Астерхолд', -27, -19, 0, 1], ['Гринфолл', -7, -4, 25, 1], ['Чёрный лес', 21, 9, 90, 10], ['Вход в шахту', 35, 27, 150, 10]];
   q('#window-content').innerHTML = `<h2>Проводник Каэль</h2><p>Путь сохраняет цену. Бесплатен только переход в столицу. Чёрный лес открывается на 10 уровне.</p><div class="shop-grid">${points.map((point) => `<div class="shop-item"><b>${point[0]}</b><span>◈ ${point[3]} · ур. ${point[4]}</span><button class="dark-btn" data-tp="${point.slice(1).join(',')}" data-destination="${point[0]}">Отправиться</button></div>`).join('')}</div>`;
-  qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; state.moveTarget = null; void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
+  qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
 
 function openForge(): void { openWindow('character'); renderForge(); }
@@ -1527,7 +1651,7 @@ function consumeItem(id: string): boolean { const index = player.inventory.findI
 function useItem(id: string): void {
   if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); toast('Здоровье восстановлено'); }
   else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
-  else if (id === 'teleport' && consumeItem(id)) { player.x = -7; player.z = -4; toast('Камень возвращает вас в Гринфолл'); }
+  else if (id === 'teleport' && consumeItem(id)) { player.x = -7; player.z = -4; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
   updateHud(); saveGame();
 }
 
@@ -1572,12 +1696,14 @@ window.addEventListener('resize', () => engine.resize());
 let saveTimer = 0;
 engine.runRenderLoop(() => {
   const dt = Math.min(engine.getDeltaTime() / 1000, 0.04);
+  if (state.started) {
+    cameraControl.orbit(inputControl.consumeCameraOrbit());
+    cameraControl.zoom(inputControl.consumeZoom());
+  }
   if (state.started && !state.paused) {
-    const dx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
-    const dz = (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
-    if (dx || dz) { const length = Math.hypot(dx, dz); state.moveTarget = { x: player.x + (dx / length) * 2, z: player.z + (dz / length) * 2 }; }
     update(dt); saveTimer += dt; if (saveTimer > 8) { saveGame(); saveTimer = 0; }
   }
+  if (state.started) cameraControl.update(dt, { x: player.x, y: 0, z: player.z });
   scene.render();
 });
 
@@ -1585,8 +1711,15 @@ engine.runRenderLoop(() => {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.3.0',
-    getState: () => ({ started: state.started, entities: state.entities.length, assetsLoaded, player: { level: player.level, hp: player.hp, inventory: player.inventory.length } }),
+    version: '0.4.0-phase1',
+    getState: () => ({
+      started: state.started,
+      entities: state.entities.length,
+      assetsLoaded,
+      camera: cameraControl.state,
+      selectedTarget: targeting.selected?.uid ?? null,
+      player: { level: player.level, hp: player.hp, inventory: player.inventory.length, x: player.x, z: player.z },
+    }),
   },
   enumerable: false,
 });

@@ -77,3 +77,22 @@ test('ground movement cancellation stops pursuit without inventing a new target'
     canUseSkill: () => true,
   }), { kind: 'idle' });
 });
+
+test('clicking another monster replaces the combat target immediately', () => {
+  const combat = new CombatControl();
+  const targeting = new TargetingController();
+  const first = { uid: 'wolf-a', alive: true, x: 1, z: 0 };
+  const second = { uid: 'wolf-b', alive: true, x: 2, z: 0 };
+  targeting.select(first);
+  combat.engageBasic(first.uid);
+  targeting.select(second);
+  combat.engageBasic(second.uid);
+  assert.deepEqual(combat.plan({
+    player: { x: 0, z: 0 },
+    target: targeting.selected,
+    basicRange: 2.6,
+    skillRange: () => 2.6,
+    canBasicAttack: true,
+    canUseSkill: () => true,
+  }), { kind: 'attack', targetId: second.uid, skillIndex: null });
+});

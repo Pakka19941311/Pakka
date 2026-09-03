@@ -149,6 +149,10 @@ export function bossRespawnSeconds(kind: 'mini' | 'big', random = Math.random): 
   );
 }
 
+export function monsterMovementSpeed(isBoss: boolean): number {
+  return isBoss ? 1.9 : 2.25;
+}
+
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }

@@ -96,7 +96,7 @@ export class ThirdPersonCameraController {
       playerPosition.z + viewForward.z * 2.15,
     );
     Vector3.LerpToRef(this.focus, wantedFocus, smoothFactor(11, dt), this.focus);
-    this.camera.setTarget(this.focus);
+    this.camera.target.copyFrom(this.focus);
   }
 
   snap(playerPosition: Readonly<{ x: number; y: number; z: number }>): void {
@@ -109,7 +109,7 @@ export class ThirdPersonCameraController {
       playerPosition.y + 1.35,
       playerPosition.z + viewForward.z * 2.15,
     );
-    this.camera.setTarget(this.focus);
+    this.camera.target.copyFrom(this.focus);
   }
 
   get state(): ThirdPersonCameraState {

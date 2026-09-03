@@ -35,3 +35,22 @@ test('Windows one-click launch and every production build enforce the stable pip
   assert.match(setup, /npmCmd.*preview/);
   assert.match(pkg.scripts.build, /verify:assets/);
 });
+
+test('phase-one controls are modular and Space is no longer bound to normal attack', async () => {
+  const [source, camera, input, targeting, combat] = await Promise.all([
+    readFile(new URL('../src/main.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/controls/third-person-camera.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/controls/input-controller.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/controls/targeting-controller.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/controls/combat-controller.ts', import.meta.url), 'utf8'),
+  ]);
+  assert.match(source, /new ThirdPersonCameraController/);
+  assert.match(source, /new PlayerInputController/);
+  assert.match(source, /targeting\.select\(entity\)/);
+  assert.match(source, /combatControl\.engageBasic\(entity\.uid\)/);
+  assert.doesNotMatch(source, /event\.code\s*===\s*['"]Space['"][^\n]*basicAttack/);
+  assert.match(camera, /cameraRelativeDirection/);
+  assert.match(input, /movementAxesFromPressed/);
+  assert.match(targeting, /class TargetingController/);
+  assert.match(combat, /class CombatControl/);
+});

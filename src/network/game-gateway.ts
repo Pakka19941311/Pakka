@@ -1,5 +1,6 @@
 export type GameCommand =
   | { type: 'move'; x: number; z: number }
+  | { type: 'move-intent'; x: number; z: number; sequence: number }
   | { type: 'target'; entityId: string }
   | { type: 'attack'; entityId: string; skillIndex: number | null }
   | { type: 'equip'; itemUid: string; slot: string }

@@ -18,8 +18,9 @@ test('local persistence can be replaced without changing game systems', async ()
   await gateway.save({ player: { level: 7 }, inventory: ['fang'] });
   assert.deepEqual(await gateway.load(), { player: { level: 7 }, inventory: ['fang'] });
   await gateway.send({ type: 'move', x: 3, z: 4 });
+  await gateway.send({ type: 'move-intent', x: 0, z: 1, sequence: 1 });
   await gateway.send({ type: 'attack', entityId: 'wolf-1', skillIndex: 0 });
-  assert.equal(gateway.commandLog.length, 2);
+  assert.equal(gateway.commandLog.length, 3);
   await gateway.clear();
   assert.equal(await gateway.load(), null);
 });

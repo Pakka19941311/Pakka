@@ -9,6 +9,7 @@ import {
   enhancementCanDestroy,
   enhancementChance,
   enhancementStatMultiplier,
+  monsterMovementSpeed,
   statsAtLevel,
   xpNeeded,
 } from '../src/core/game-rules.ts';
@@ -83,4 +84,12 @@ test('class combat profiles preserve role, crit and movement differences', () =>
   assert.ok(assassin.movementSpeed > ranger.movementSpeed);
   assert.ok(assassin.critChance > knight.critChance);
   assert.equal(assassin.critMultiplier, 1.65);
+});
+
+test('ordinary monsters remain clearly slower than every player class', () => {
+  const slowestPlayer = Math.min(...Object.entries(CLASSES).map(([id, classDef]) => (
+    classCombatProfile(id, 1, classDef.stats).movementSpeed
+  )));
+  assert.ok(monsterMovementSpeed(false) < slowestPlayer);
+  assert.ok(monsterMovementSpeed(true) < monsterMovementSpeed(false));
 });
