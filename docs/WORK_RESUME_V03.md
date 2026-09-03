@@ -33,3 +33,11 @@ Finish v0.3 as a stable checkpoint:
 - Target a checkpoint about every 15–20 minutes.
 - If the Work limit is approaching, stop starting new work, verify the current state and commit it first.
 - After stable v0.3 is completed, stop. Wait for the separate v0.4 specification.
+
+## Completion — 2026-09-03
+
+- v0.3 closure is complete; no v0.4 redesign work was started.
+- Production build now fails if a GLB/glTF references a missing, empty, remote, or out-of-tree asset.
+- Runtime smoke recursively requests the complete production model/texture tree over HTTP.
+- Final automated result: typecheck passed, 17/17 tests passed, 30 models and 21 external asset references verified, production runtime passed.
+- Actual Windows/browser validation remains documented separately in `QA_REPORT_v0.3.md`.

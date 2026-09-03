@@ -18,6 +18,17 @@ let serverOutput = '';
 server.stdout.on('data', (chunk) => { serverOutput += chunk; });
 server.stderr.on('data', (chunk) => { serverOutput += chunk; });
 
+async function listFiles(directory, relative = '') {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const childRelative = path.join(relative, entry.name);
+    if (entry.isDirectory()) files.push(...await listFiles(path.join(directory, entry.name), childRelative));
+    else files.push(childRelative);
+  }
+  return files;
+}
+
 try {
   let response;
   for (let attempt = 0; attempt < 40; attempt += 1) {
@@ -34,14 +45,14 @@ try {
     const asset = await fetch(`${base}${reference}`);
     assert.ok(asset.ok, `HTTP asset failed: ${reference}`);
   }
-  for (const directory of ['assets/models/characters', 'assets/models/monsters-glb', 'assets/models/world']) {
-    const localDirectory = path.join(process.cwd(), 'dist', directory);
-    for (const entry of await readdir(localDirectory)) {
-      if (!/\.(gltf|glb)$/i.test(entry)) continue;
-      const asset = await fetch(`${base}/${directory}/${entry}`);
-      assert.ok(asset.ok, `Model failed over HTTP: ${entry}`);
-      assert.ok((await asset.arrayBuffer()).byteLength > 4_000, `Model response is empty: ${entry}`);
-    }
+  const modelRoot = path.join(process.cwd(), 'dist/assets/models');
+  for (const entry of await listFiles(modelRoot)) {
+    const browserPath = entry.split(path.sep).map(encodeURIComponent).join('/');
+    const asset = await fetch(`${base}/assets/models/${browserPath}`);
+    assert.ok(asset.ok, `Runtime asset failed over HTTP: ${entry}`);
+    const bytes = (await asset.arrayBuffer()).byteLength;
+    assert.ok(bytes > 0, `Runtime asset is empty: ${entry}`);
+    if (/\.(gltf|glb)$/iu.test(entry)) assert.ok(bytes > 4_000, `Model response is unexpectedly small: ${entry}`);
   }
   const bundle = await readFile(path.join(process.cwd(), 'dist', references.find((value) => value.endsWith('.js')).slice(1)), 'utf8');
   assert.match(bundle, /__VARENDOR_QA__/);
