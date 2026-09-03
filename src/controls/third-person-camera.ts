@@ -65,8 +65,8 @@ export class ThirdPersonCameraController {
 
   orbit(delta: Readonly<{ x: number; y: number }>): void {
     this.desired = clampThirdPersonCameraState({
-      yaw: this.desired.yaw - delta.x * 0.006,
-      pitch: this.desired.pitch - delta.y * 0.0045,
+      yaw: this.desired.yaw - delta.x * 0.0048,
+      pitch: this.desired.pitch - delta.y * 0.0038,
       distance: this.desired.distance,
     });
   }
@@ -74,7 +74,7 @@ export class ThirdPersonCameraController {
   zoom(wheelDelta: number): void {
     this.desired = clampThirdPersonCameraState({
       ...this.desired,
-      distance: this.desired.distance + wheelDelta * 0.008,
+      distance: this.desired.distance + wheelDelta * 0.0065,
     });
   }
 
@@ -83,8 +83,9 @@ export class ThirdPersonCameraController {
   }
 
   update(dt: number, playerPosition: Readonly<{ x: number; y: number; z: number }>): void {
-    const rotationBlend = smoothFactor(8.5, dt);
-    const distanceBlend = smoothFactor(7.5, dt);
+    // Lower response values deliberately remove the sharp prototype-like follow behaviour.
+    const rotationBlend = smoothFactor(5.4, dt);
+    const distanceBlend = smoothFactor(5.8, dt);
     this.camera.alpha = lerpAngle(this.camera.alpha, this.desired.yaw, rotationBlend);
     this.camera.beta += (this.desired.pitch - this.camera.beta) * rotationBlend;
     this.camera.radius += (this.desired.distance - this.camera.radius) * distanceBlend;
@@ -95,7 +96,7 @@ export class ThirdPersonCameraController {
       playerPosition.y + 1.35,
       playerPosition.z + viewForward.z * 2.15,
     );
-    Vector3.LerpToRef(this.focus, wantedFocus, smoothFactor(7, dt), this.focus);
+    Vector3.LerpToRef(this.focus, wantedFocus, smoothFactor(5.2, dt), this.focus);
     this.camera.target.copyFrom(this.focus);
   }
 
