@@ -1,0 +1,33 @@
+name: Package Phase 1.2 Test
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create source package
+        run: |
+          mkdir -p artifact
+          zip -r artifact/Varendor_Phase12_Test.zip . \
+            -x '.git/*' \
+            -x 'node_modules/*' \
+            -x 'dist/*' \
+            -x 'artifact/*'
+
+      - name: Upload test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Varendor-Phase12-Test
+          path: artifact/Varendor_Phase12_Test.zip
+          if-no-files-found: error
+          retention-days: 7
