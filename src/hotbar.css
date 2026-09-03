@@ -1,0 +1,11 @@
+.quick-items .skill-button {
+  width: 62px;
+  height: 58px;
+}
+
+.skill-button:disabled,
+.skill-button:disabled:hover {
+  cursor: not-allowed;
+  filter: grayscale(1) brightness(.45);
+  border-color: #3b3730;
+}

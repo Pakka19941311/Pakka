@@ -86,3 +86,18 @@ test('Greenfall is an authored settlement with oriented and ambient residents', 
   assert.match(source, /entity\.kind === 'ambient'/);
   assert.match(ambient, /'idle' \| 'walk' \| 'activity'/);
 });
+
+test('consumable hotbar is stack-aware and uses persisted configurable bindings', async () => {
+  const [source, bindings, hotbarStyles] = await Promise.all([
+    readFile(new URL('../src/main.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/controls/action-bindings.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/hotbar.css', import.meta.url), 'utf8'),
+  ]);
+  assert.match(source, /keybinds: ConsumableBindings/);
+  assert.match(source, /consumableActionForCode\(state\.settings\.keybinds, event\.code\)/);
+  assert.match(source, /potionButton\.disabled = potionCount <= 0/);
+  assert.match(source, /s\.keybinds = normalizeConsumableBindings\(requestedBindings\)/);
+  assert.match(source, /player\.inventory\.splice\(index, 1\)/);
+  assert.match(bindings, /DEFAULT_CONSUMABLE_BINDINGS/);
+  assert.match(hotbarStyles, /\.skill-button:disabled/);
+});

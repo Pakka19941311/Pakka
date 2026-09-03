@@ -1,4 +1,5 @@
 import './styles.css';
+import './hotbar.css';
 import '@babylonjs/loaders/glTF';
 import {
   AbstractMesh,
@@ -50,6 +51,13 @@ import { ThirdPersonCameraController } from './controls/third-person-camera';
 import { CollisionWorld } from './world/collision-world';
 import { AmbientNpcBrain } from './world/ambient-npc';
 import type { AmbientWaypoint } from './world/ambient-npc';
+import {
+  CONSUMABLE_KEY_OPTIONS,
+  consumableActionForCode,
+  keyLabel,
+  normalizeConsumableBindings,
+} from './controls/action-bindings';
+import type { ConsumableBindings } from './controls/action-bindings';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -192,6 +200,7 @@ type Settings = {
   music: number;
   sfx: number;
   ui: number;
+  keybinds: ConsumableBindings;
 };
 type PlayerSave = {
   schema: 1;
@@ -253,13 +262,13 @@ app.innerHTML = `
  <section class="boss-timers glass"><div class="eyebrow">Владыки региона</div><div class="timer"><span>Кровавый Оборотень</span><b id="mini-timer">жив</b></div><div class="timer"><span>Хозяин Гнилого Леса</span><b id="big-timer">жив</b></div></section>
  <section class="combat-log glass"><div class="messages" id="messages"></div><div class="chat-input"><input id="chat" placeholder="Enter — общий чат"><button id="send-chat">›</button></div></section>
  <div class="bottom-cluster"><div class="hotbar glass" id="hotbar"></div><nav class="menu glass"><button class="menu-button" data-window="character"><span>C</span><small>Герой</small></button><button class="menu-button" data-window="inventory"><span>I</span><small>Сумка</small></button><button class="menu-button" data-window="skills"><span>K</span><small>Навыки</small></button><button class="menu-button" data-window="map"><span>M</span><small>Карта</small></button><button class="menu-button" data-window="settings"><span>Esc</span><small>Настройки</small></button></nav></div>
- <div class="quick-items glass"><button class="skill-button" id="potion"><span class="key">Q</span><span class="symbol">♥</span><small>Зелье <b id="potion-count">0</b></small></button><button class="skill-button" id="ether"><span class="key">E</span><span class="symbol">◆</span><small>Эфир <b id="ether-count">0</b></small></button></div>
+ <div class="quick-items glass" aria-label="Быстрые расходники"><button class="skill-button" id="potion"><span class="key" id="potion-key">Q</span><span class="symbol">♥</span><small>Зелье <b id="potion-count">0</b></small></button><button class="skill-button" id="ether"><span class="key" id="ether-key">E</span><span class="symbol">◆</span><small>Эфир <b id="ether-count">0</b></small></button></div>
  <div class="notice-stack" id="notices"></div><div class="damage-layer" id="damage-layer"></div>
 </div><div id="modal-root"></div><div id="confirm-root"></div>`;
 
 const settings: Settings = {
   quality: 'high', shadows: true, bloom: true, damage: true, screenShake: true,
-  music: 0.3, sfx: 0.75, ui: 0.7,
+  music: 0.3, sfx: 0.75, ui: 0.7, keybinds: normalizeConsumableBindings(),
 };
 
 const state = {
@@ -996,6 +1005,7 @@ async function startGame(load: boolean): Promise<void> {
         state.bossKills = save.bossKills ?? 0;
         state.lootBuffer = save.lootBuffer ?? [];
         Object.assign(state.settings, save.settings ?? {});
+        state.settings.keybinds = normalizeConsumableBindings(state.settings.keybinds);
         const elapsed = Math.max(0, (Date.now() - (save.savedAt ?? Date.now())) / 1000);
         state.bossTimers.mini = Math.max(0, (save.bossTimers?.mini ?? 0) - elapsed);
         state.bossTimers.big = Math.max(0, (save.bossTimers?.big ?? 0) - elapsed);
@@ -1685,8 +1695,18 @@ function updateHud(): void {
   (q<HTMLElement>('#xp-fill')).style.width = `${clamp(player.xp / Math.max(1, xpNeeded(player.level)), 0, 1) * 100}%`;
   q('#hp-text').textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
   q('#mp-text').textContent = `${Math.ceil(player.mp)} / ${player.maxMp}`;
-  q('#potion-count').textContent = String(countItem('potion'));
-  q('#ether-count').textContent = String(countItem('ether'));
+  const potionCount = countItem('potion');
+  const etherCount = countItem('ether');
+  q('#potion-count').textContent = String(potionCount);
+  q('#ether-count').textContent = String(etherCount);
+  q('#potion-key').textContent = keyLabel(state.settings.keybinds.potion);
+  q('#ether-key').textContent = keyLabel(state.settings.keybinds.ether);
+  const potionButton = q<HTMLButtonElement>('#potion');
+  const etherButton = q<HTMLButtonElement>('#ether');
+  potionButton.disabled = potionCount <= 0;
+  etherButton.disabled = etherCount <= 0;
+  potionButton.title = `Багровое зелье · ${keyLabel(state.settings.keybinds.potion)}`;
+  etherButton.title = `Эфирное зелье · ${keyLabel(state.settings.keybinds.ether)}`;
   const targetFrame = q('#target-frame');
   const target = targeting.validate();
   if (target) {
@@ -1757,13 +1777,16 @@ window.addEventListener('keydown', (event) => {
   if ((event.target as Element)?.matches('input, textarea, select, [contenteditable="true"]')) return;
   if (!state.started) return;
   if (['1', '2', '3', '4'].includes(event.key)) castSkill(Number(event.key) - 1);
+  const consumableAction = consumableActionForCode(state.settings.keybinds, event.code);
+  if (consumableAction) {
+    event.preventDefault();
+    useItem(consumableAction);
+  }
   const key = event.key.toLowerCase();
   if (key === 'i') openWindow('inventory');
   if (key === 'c') openWindow('character');
   if (key === 'k') openWindow('skills');
   if (key === 'm') openWindow('map');
-  if (key === 'q') useItem('potion');
-  if (key === 'e') useItem('ether');
   if (event.key === 'Escape') openWindow('settings');
   if (event.key === 'Enter') q<HTMLInputElement>('#chat').focus();
 });
@@ -1912,14 +1935,26 @@ function renderMap(): void {
 
 function renderSettings(): void {
   const s = state.settings;
-  q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid"><section><h3>Графика</h3><div class="setting"><label>Качество<select id="quality"><option value="low">Низкое</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div><div class="setting"><label>Динамические тени <input type="checkbox" id="shadows" ${s.shadows ? 'checked' : ''}></label></div><div class="setting"><label>Свечение и магические эффекты <input type="checkbox" id="bloom" ${s.bloom ? 'checked' : ''}></label></div><div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div><div class="setting"><label>Дрожание камеры <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div></section><section><h3>Звук и интерфейс</h3>${[['music', 'Музыка'], ['sfx', 'Эффекты'], ['ui', 'Интерфейс']].map(([id, name]) => `<div class="setting"><label>${name}<b id="${id}-value">${Math.round((s[id as keyof Settings] as number) * 100)}%</b></label><input type="range" min="0" max="100" value="${(s[id as keyof Settings] as number) * 100}" data-volume="${id}"></div>`).join('')}<h3>Управление</h3><div class="stat-row"><span>Движение</span><b>WASD / ЛКМ по земле</b></div><div class="stat-row"><span>Камера</span><b>ПКМ + мышь / колесо</b></div><div class="stat-row"><span>Цель и атака</span><b>ЛКМ по монстру</b></div><div class="stat-row"><span>Навыки</span><b>1–4</b></div><button class="gold-btn" id="save-settings">Применить</button></section></div>`;
+  const bindingOptions = (selected: string): string => CONSUMABLE_KEY_OPTIONS
+    .map((option) => `<option value="${option.code}" ${option.code === selected ? 'selected' : ''}>${option.label}</option>`)
+    .join('');
+  q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid"><section><h3>Графика</h3><div class="setting"><label>Качество<select id="quality"><option value="low">Низкое</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div><div class="setting"><label>Динамические тени <input type="checkbox" id="shadows" ${s.shadows ? 'checked' : ''}></label></div><div class="setting"><label>Свечение и магические эффекты <input type="checkbox" id="bloom" ${s.bloom ? 'checked' : ''}></label></div><div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div><div class="setting"><label>Дрожание камеры <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div></section><section><h3>Звук и интерфейс</h3>${[['music', 'Музыка'], ['sfx', 'Эффекты'], ['ui', 'Интерфейс']].map(([id, name]) => `<div class="setting"><label>${name}<b id="${id}-value">${Math.round((s[id as keyof Settings] as number) * 100)}%</b></label><input type="range" min="0" max="100" value="${(s[id as keyof Settings] as number) * 100}" data-volume="${id}"></div>`).join('')}<h3>Управление</h3><div class="stat-row"><span>Движение</span><b>WASD / ЛКМ по земле</b></div><div class="stat-row"><span>Прыжок</span><b>Space</b></div><div class="stat-row"><span>Камера</span><b>ПКМ + мышь / колесо</b></div><div class="stat-row"><span>Цель и атака</span><b>ЛКМ по монстру</b></div><div class="stat-row"><span>Навыки</span><b>1–4</b></div><div class="setting"><label>Зелье здоровья<select id="potion-binding">${bindingOptions(s.keybinds.potion)}</select></label></div><div class="setting"><label>Зелье ресурса<select id="ether-binding">${bindingOptions(s.keybinds.ether)}</select></label></div><button class="gold-btn" id="save-settings">Применить</button></section></div>`;
   bindTabs(); q<HTMLSelectElement>('#quality').value = s.quality;
   qa<HTMLInputElement>('[data-volume]').forEach((input) => { input.oninput = () => { q(`#${input.dataset.volume}-value`).textContent = `${input.value}%`; }; });
   q<HTMLButtonElement>('#save-settings').onclick = () => {
+    const requestedBindings = {
+      potion: q<HTMLSelectElement>('#potion-binding').value,
+      ether: q<HTMLSelectElement>('#ether-binding').value,
+    };
+    if (requestedBindings.potion === requestedBindings.ether) {
+      toast('Для расходников нужны разные клавиши', 'bad');
+      return;
+    }
     s.quality = q<HTMLSelectElement>('#quality').value as Settings['quality']; s.shadows = q<HTMLInputElement>('#shadows').checked;
     s.bloom = q<HTMLInputElement>('#bloom').checked; s.damage = q<HTMLInputElement>('#damage').checked; s.screenShake = q<HTMLInputElement>('#shake').checked;
+    s.keybinds = normalizeConsumableBindings(requestedBindings);
     qa<HTMLInputElement>('[data-volume]').forEach((input) => { (s as unknown as Record<string, number>)[input.dataset.volume ?? 'ui'] = Number(input.value) / 100; });
-    applySettings(); saveGame(); toast('Настройки применены'); closeWindow();
+    applySettings(); updateHud(); saveGame(); toast('Настройки применены'); closeWindow();
   };
 }
 
