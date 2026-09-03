@@ -1,0 +1,21 @@
+{
+  "name": "varendor-ashen-frontier",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "dependencies": {
+    "@babylonjs/core": "8.26.1",
+    "@babylonjs/loaders": "8.26.1",
+    "three": "0.180.0",
+    "typescript": "5.9.2"
+  },
+  "devDependencies": {
+    "fbx2gltf": "^0.9.7-p1",
+    "vite": "7.1.3"
+  }
+}
