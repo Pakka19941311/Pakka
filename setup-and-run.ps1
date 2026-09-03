@@ -5,6 +5,7 @@ $root = $PSScriptRoot
 $tools = Join-Path $root ".tools"
 $nodeExe = $null
 $npmCmd = $null
+$depsMarker = Join-Path $root ".varendor-deps-ok"
 
 function Find-CompatibleSystemNode {
     $node = Get-Command node.exe -ErrorAction SilentlyContinue
@@ -60,10 +61,21 @@ try {
         $npmCmd = $portable[1]
     }
 
-    if (-not (Test-Path (Join-Path $root "node_modules"))) {
-        Write-Host "Installing game dependencies. This is only needed the first time..." -ForegroundColor Yellow
+    # npm lifecycle scripts (including esbuild install.js) call `node` by name.
+    # When using portable Node, its directory must be on PATH for child processes.
+    $nodeDir = Split-Path -Parent $nodeExe
+    $env:PATH = "$nodeDir;$env:PATH"
+
+    # A failed npm ci can leave a partial node_modules directory. Only trust our marker.
+    if (-not (Test-Path $depsMarker)) {
+        if (Test-Path (Join-Path $root "node_modules")) {
+            Write-Host "Removing incomplete dependency installation from a previous attempt..." -ForegroundColor Yellow
+            Remove-Item (Join-Path $root "node_modules") -Recurse -Force
+        }
+        Write-Host "Installing game dependencies. This is only needed the first successful time..." -ForegroundColor Yellow
         & $npmCmd ci
         if ($LASTEXITCODE -ne 0) { throw "npm ci failed with exit code $LASTEXITCODE" }
+        New-Item -ItemType File -Path $depsMarker -Force | Out-Null
     }
 
     Write-Host "Building Varendor..." -ForegroundColor Yellow
