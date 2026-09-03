@@ -2268,7 +2268,7 @@ engine.runRenderLoop(() => {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.4.0-phase1',
+    version: '0.4.0-phase1.2',
     getState: () => ({
       started: state.started,
       entities: state.entities.length,
