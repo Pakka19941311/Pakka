@@ -48,6 +48,8 @@ import { PlayerInputController } from './controls/input-controller';
 import { TargetingController } from './controls/targeting-controller';
 import { ThirdPersonCameraController } from './controls/third-person-camera';
 import { CollisionWorld } from './world/collision-world';
+import { AmbientNpcBrain } from './world/ambient-npc';
+import type { AmbientWaypoint } from './world/ambient-npc';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -148,7 +150,7 @@ type Player = {
 type Statuses = { dot?: number; slow?: number; stun?: number };
 type Entity = {
   uid: string;
-  kind: 'player' | 'npc' | 'monster' | 'summon';
+  kind: 'player' | 'npc' | 'ambient' | 'monster' | 'summon';
   id?: string;
   name?: string;
   model: string;
@@ -178,6 +180,8 @@ type Entity = {
   actionType?: string;
   label?: Mesh;
   labelTexture?: DynamicTexture;
+  ambientBrain?: AmbientNpcBrain;
+  ambientActivity?: AmbientWaypoint['activity'];
 };
 type Settings = {
   quality: 'low' | 'medium' | 'high' | 'ultra';
@@ -217,7 +221,9 @@ const WORLD_MODELS = [
   'tree', 'tree-crooked', 'tree-high', 'tree-high-crooked', 'rock-large', 'rock-wide',
   'lantern', 'fence', 'fence-broken', 'cart', 'stall', 'stall-red', 'wall-arch',
   'wall-block', 'wall-corner', 'wall-door', 'roof', 'roof-high', 'fountain-round',
+  'pillar-stone', 'planks',
 ] as const;
+const GREENFALL_SPAWN = Object.freeze({ x: -7, z: -11 });
 
 function q<T extends Element>(selector: string): T {
   const value = document.querySelector<T>(selector);
@@ -287,7 +293,7 @@ const emptyStats: CombatStats = {
   def: 0, mdef: 0, crit: 0, accuracy: 0, evasion: 0, speed: 6.2,
 };
 let player: Player = {
-  name: 'Странник', classId: 'knight', level: 1, xp: 0, gold: 320, x: -7, z: -4,
+  name: 'Странник', classId: 'knight', level: 1, xp: 0, gold: 320, x: GREENFALL_SPAWN.x, z: GREENFALL_SPAWN.z,
   hp: 1, mp: 1, maxHp: 1, maxMp: 1, stats: { ...emptyStats }, inventory: [],
   equipment: {}, cooldowns: [0, 0, 0, 0], attackCd: 0, dead: false,
 };
@@ -386,9 +392,9 @@ road(28, 15, 35, 3.2, -0.43);
 
 const safeMaterial = new StandardMaterial('safe-zone-material', scene);
 safeMaterial.emissiveColor = new Color3(0.66, 0.48, 0.18);
-safeMaterial.alpha = 0.42;
-const safeRing = MeshBuilder.CreateTorus('safe-zone', { diameter: 15.5, thickness: 0.08, tessellation: 96 }, scene);
-safeRing.position.set(-8, 0.07, -5);
+safeMaterial.alpha = 0.1;
+const safeRing = MeshBuilder.CreateTorus('safe-zone', { diameter: 24, thickness: 0.07, tessellation: 128 }, scene);
+safeRing.position.set(-7, 0.07, -5);
 safeRing.material = safeMaterial;
 safeRing.isPickable = false;
 
@@ -507,7 +513,7 @@ function setEntityAction(entity: Entity, action: 'idle' | 'walk' | 'attack' | 'd
 }
 
 function createEntityModel(entity: Entity): void {
-  const container = entity.kind === 'player' || entity.kind === 'npc'
+  const container = entity.kind === 'player' || entity.kind === 'npc' || entity.kind === 'ambient'
     ? characterAssets.get(entity.model)
     : monsterAssets.get(entity.model);
   if (!container) throw new Error(`Asset not loaded: ${entity.model}`);
@@ -521,15 +527,17 @@ function createEntityModel(entity: Entity): void {
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
     mesh.metadata = { entity };
-    mesh.isPickable = true;
+    mesh.isPickable = entity.kind === 'monster' || entity.kind === 'npc';
   });
-  if (entity.kind === 'monster') {
-    const radius = entity.boss === 'big' ? 1.75 : entity.boss === 'mini' ? 1.25 : Math.max(0.72, entity.targetHeight * 0.42);
+  if (entity.kind === 'monster' || entity.kind === 'npc') {
+    const radius = entity.kind === 'npc'
+      ? 0.62
+      : entity.boss === 'big' ? 1.75 : entity.boss === 'mini' ? 1.25 : Math.max(0.72, entity.targetHeight * 0.42);
     const height = entity.targetHeight + radius * 1.45;
     const volume = MeshBuilder.CreateCapsule(`pick-volume-${entity.uid}`, { height, radius, tessellation: 12 }, scene);
     volume.position.set(entity.x, height * 0.5, entity.z);
     volume.material = pickVolumeMaterial;
-    volume.metadata = { entity, combatPickVolume: true };
+    volume.metadata = { entity, combatPickVolume: entity.kind === 'monster' };
     volume.isPickable = true;
     entity.pickVolume = volume;
   }
@@ -618,7 +626,7 @@ function refreshNameplate(entity: Entity): void {
 
 const CIRCLE_COLLIDERS: Record<string, number> = {
   tree: 0.5, 'tree-crooked': 0.62, 'tree-high': 0.48, 'tree-high-crooked': 0.58,
-  'rock-large': 0.9, 'rock-wide': 1.05, lantern: 0.2, 'fountain-round': 1.2,
+  'rock-large': 0.9, 'rock-wide': 1.05, lantern: 0.2, 'fountain-round': 1.2, 'pillar-stone': 0.42,
 };
 const BOX_COLLIDERS: Record<string, readonly [number, number]> = {
   roof: [1.5, 1.25], 'roof-high': [1.65, 1.4], stall: [1.2, 0.75], 'stall-red': [1.2, 0.75],
@@ -674,22 +682,109 @@ function buildTown(x: number, z: number, scale: number): void {
   worldModel('cart', x - 3 * scale, z + 1.5 * scale, 1.1 * scale, 0.5);
 }
 
+function createBonfire(x: number, z: number): void {
+  for (let index = 0; index < 7; index += 1) {
+    const angle = (index / 7) * Math.PI * 2;
+    worldModel('rock-wide', x + Math.cos(angle) * 1.05, z + Math.sin(angle) * 1.05, 0.28, angle, 0x77736b);
+  }
+  worldModel('planks', x, z, 0.78, Math.PI / 4, 0x5f3823);
+  worldModel('planks', x, z, 0.72, -Math.PI / 4, 0x704027);
+  collisionWorld.addCircle(x, z, 1.15);
+
+  const flames: Mesh[] = [];
+  const colors = [new Color3(1, 0.16, 0.01), new Color3(1, 0.48, 0.03), new Color3(1, 0.78, 0.18)];
+  colors.forEach((color, index) => {
+    const flame = MeshBuilder.CreateCylinder(`bonfire-flame-${index}`, {
+      height: 1.3 - index * 0.18,
+      diameterTop: 0.04,
+      diameterBottom: 0.72 - index * 0.13,
+      tessellation: 12,
+    }, scene);
+    const material = new StandardMaterial(`bonfire-flame-material-${index}`, scene);
+    material.emissiveColor = color;
+    material.diffuseColor = color.scale(0.7);
+    material.alpha = 0.82;
+    material.disableLighting = true;
+    flame.material = material;
+    flame.position.set(x + (index - 1) * 0.18, 0.78 + index * 0.08, z + (index % 2 ? 0.12 : -0.08));
+    flame.isPickable = false;
+    glow.addIncludedOnlyMesh(flame);
+    flames.push(flame);
+  });
+  const fireLight = new PointLight('greenfall-bonfire-light', new Vector3(x, 2.2, z), scene);
+  fireLight.diffuse = new Color3(1, 0.32, 0.06);
+  fireLight.intensity = 5.2;
+  fireLight.range = 15;
+  let fireTime = 0;
+  scene.onBeforeRenderObservable.add(() => {
+    fireTime += engine.getDeltaTime() / 1000;
+    flames.forEach((flame, index) => {
+      flame.scaling.y = 0.88 + Math.sin(fireTime * (5.5 + index) + index * 1.7) * 0.14;
+      flame.rotation.y += 0.012 * (index % 2 ? 1 : -1);
+      flame.position.x = x + (index - 1) * 0.18 + Math.sin(fireTime * 3.1 + index) * 0.06;
+    });
+    fireLight.intensity = 4.8 + Math.sin(fireTime * 8.4) * 0.55;
+  });
+}
+
+function buildStarterSettlement(x: number, z: number): void {
+  road(x, z, 4.2, 22);
+  road(x, z - 0.5, 20, 3.8);
+  road(x + 6.3, z + 1.6, 8, 3.1, -0.18);
+  road(x - 6.2, z + 1.2, 8, 3.1, 0.16);
+
+  for (const offset of [-7.5, -3.5, 0.5, 4.5]) {
+    worldModel('wall-block', x - 11, z + offset, 1.55, Math.PI / 2, 0x817c72);
+    worldModel('wall-block', x + 11, z + offset, 1.55, Math.PI / 2, 0x817c72);
+  }
+  for (const offset of [-8, -4, 4, 8]) worldModel('wall-block', x + offset, z + 9, 1.55, 0, 0x817c72);
+  worldModel('wall-arch', x, z - 10.5, 2.25, 0, 0x9b927e);
+  worldModel('pillar-stone', x - 3, z - 10.4, 1.15, 0, 0x77776f);
+  worldModel('pillar-stone', x + 3, z - 10.4, 1.15, 0, 0x77776f);
+
+  worldModel('roof-high', x - 7.2, z + 6, 1.85, 0.08, 0x78605a);
+  worldModel('roof', x + 6.8, z + 5.7, 1.75, -0.12, 0x74514a);
+  worldModel('roof', x - 8.2, z + 0.8, 1.55, 0.16, 0x6b4d46);
+  worldModel('stall', x - 7.1, z - 0.6, 1.25, Math.PI / 2, 0x83634d);
+  worldModel('cart', x - 5.7, z - 2.6, 1.05, -0.25, 0x72533d);
+
+  worldModel('stall-red', x + 7.2, z + 1, 1.35, -Math.PI / 2, 0x8e5e53);
+  worldModel('stall', x + 7.5, z - 2.2, 1.2, -Math.PI / 2, 0x776658);
+  worldModel('cart', x + 5.5, z + 3.2, 1.05, 0.55, 0x72533d);
+  for (const offset of [-2.8, 0, 2.8]) {
+    worldModel('fence', x + 9.8, z + offset, 1, Math.PI / 2, 0x777168);
+    worldModel(offset ? 'fence' : 'fence-broken', x - 9.8, z + offset, 1, Math.PI / 2, 0x777168);
+  }
+
+  createBonfire(x, z);
+  for (const [lx, lz] of [[x - 3.2, z - 3.2], [x + 3.2, z - 3.2], [x - 3.2, z + 3.2], [x + 3.2, z + 3.2]]) {
+    const lantern = worldModel('lantern', lx, lz, 1.3);
+    if (lantern) {
+      const light = new PointLight(`settlement-light-${lx}-${lz}`, new Vector3(0, 2.5, 0), scene);
+      light.diffuse = new Color3(1, 0.4, 0.1);
+      light.intensity = 1.8;
+      light.range = 7;
+      light.parent = lantern;
+    }
+  }
+}
+
 function buildWorld(): void {
   collisionWorld.clear();
   for (let index = 0; index < 52; index += 1) {
     const forest = index > 24;
     const x = forest ? rand(12, 47) : rand(-43, 25);
     const z = forest ? rand(5, 36) : rand(-31, 19);
-    if (Math.hypot(x + 8, z + 5) < 10) continue;
+    if (Math.hypot(x + 7, z + 5) < 16) continue;
     worldModel(WORLD_MODELS[index % 4], x, z, rand(1.1, 2.2), rand(0, Math.PI * 2), forest ? 0x879b83 : 0x9aa38c);
   }
   for (let index = 0; index < 22; index += 1) {
     worldModel(index % 2 ? 'rock-large' : 'rock-wide', rand(-46, 48), rand(-35, 37), rand(0.7, 1.7), rand(0, Math.PI * 2), 0x8b918b);
   }
   buildTown(-27, -19, 1.5);
-  buildTown(-7, -5, 1);
+  buildStarterSettlement(-7, -5);
   for (let index = 0; index < 8; index += 1) worldModel(index % 3 ? 'fence' : 'fence-broken', -14 + index * 2.2, -7 + index * 0.22, 1, 0);
-  for (const [x, z] of [[-10, -4], [-4, -7], [-25, -16], [-30, -22], [19, 7], [35, 25]]) {
+  for (const [x, z] of [[-25, -16], [-30, -22], [19, 7], [35, 25]]) {
     const lantern = worldModel('lantern', x, z, 1.4);
     if (lantern) {
       const light = new PointLight(`fire-${x}-${z}`, new Vector3(0, 2.6, 0), scene);
@@ -717,7 +812,7 @@ function newPlayer(): void {
   const classDef = CLASSES_MAP[state.selectedClass];
   player = {
     name: q<HTMLInputElement>('#name-field').value.trim() || 'Странник', classId: state.selectedClass,
-    level: 1, xp: 0, gold: 320, x: -7, z: -4, hp: 1, mp: 1, maxHp: 1, maxMp: 1,
+    level: 1, xp: 0, gold: 320, x: GREENFALL_SPAWN.x, z: GREENFALL_SPAWN.z, hp: 1, mp: 1, maxHp: 1, maxMp: 1,
     stats: { ...emptyStats }, inventory: [makeItem('potion', 0, 6), makeItem('ether', 0, 4), makeItem('scroll', 0, 4), makeItem('teleport')],
     equipment: { weapon: makeItem(classDef.weapon), chest: makeItem(classDef.armor) },
     cooldowns: [0, 0, 0, 0], attackCd: 0, dead: false,
@@ -801,6 +896,46 @@ function spawnMonster(id: string, x: number, z: number, delay = 0): Entity {
   return entity;
 }
 
+function spawnAmbientResident(
+  name: string,
+  model: string,
+  x: number,
+  z: number,
+  waypoints: readonly AmbientWaypoint[],
+  seed: number,
+): Entity {
+  const spawn = collisionWorld.findNearestFree({ x, z }, 0.38);
+  const entity = makeEntity({
+    kind: 'ambient', name, model, x: spawn.x, z: spawn.z, targetHeight: 1.92,
+    tint: 0xb9aa98, ambientBrain: new AmbientNpcBrain(waypoints, seed),
+  });
+  createEntityModel(entity);
+  rotateTowards(entity, waypoints[0].x, waypoints[0].z);
+  state.entities.push(entity);
+  return entity;
+}
+
+function spawnAmbientResidents(): void {
+  spawnAmbientResident('Поселенец', 'Ranger', -5.2, -9.1, [
+    { x: -5.1, z: -5.2, activity: 'warm' }, { x: -2.2, z: -4.1, activity: 'trade' }, { x: -5.2, z: -9.1, activity: 'talk' },
+  ], 1);
+  spawnAmbientResident('Подмастерье', 'Warrior', -11.5, -6.5, [
+    { x: -11.8, z: -4.8, activity: 'work' }, { x: -9.7, z: -7.2, activity: 'talk' },
+  ], 2);
+  spawnAmbientResident('Дозорный', 'Warrior', -10.2, -12.7, [
+    { x: -10.2, z: -12.7, activity: 'guard' }, { x: -4.1, z: -12.7, activity: 'guard' },
+  ], 3);
+  spawnAmbientResident('Жительница', 'Monk', -3.5, -0.4, [
+    { x: -2.5, z: -2.3, activity: 'trade' }, { x: -5, z: -1.1, activity: 'talk' }, { x: -5.2, z: -5, activity: 'warm' },
+  ], 4);
+  spawnAmbientResident('Грузчик', 'Rogue', -1.8, -7.1, [
+    { x: -2, z: -6.8, activity: 'work' }, { x: 0.2, z: -2.2, activity: 'trade' }, { x: -4.2, z: -8.8, activity: 'talk' },
+  ], 5);
+  spawnAmbientResident('Странник', 'Wizard', -9.2, -1.7, [
+    { x: -8.9, z: -1.7, activity: 'talk' }, { x: -8.8, z: -5, activity: 'warm' }, { x: -7, z: -9.2, activity: 'guard' },
+  ], 6);
+}
+
 function spawnEntities(): void {
   state.entities.forEach((entity) => {
     entity.pickVolume?.dispose(false, true);
@@ -814,15 +949,19 @@ function spawnEntities(): void {
   const playerEntity = makeEntity({ kind: 'player', model: classDef.model, x: player.x, z: player.z, targetHeight: 2.05 });
   createEntityModel(playerEntity);
   state.entities.push(playerEntity);
-  const npcs: Array<[string, string, number, number, string]> = [
-    ['Староста Роэн', 'Warrior', -7, -2.5, 'elder'], ['Кузнец Бран', 'Warrior', -10, -6, 'smith'],
-    ['Торговка Эльза', 'Ranger', -4.8, -5, 'shop'], ['Проводник Каэль', 'Wizard', -7.5, -8, 'teleport'],
+  const npcs: Array<[string, string, number, number, string, number, number]> = [
+    ['Староста Роэн', 'Warrior', -7, -1.2, 'elder', -7, -5],
+    ['Кузнец Бран', 'Warrior', -12.1, -4.1, 'smith', -14.2, -4.2],
+    ['Торговка Эльза', 'Ranger', -1.9, -3.8, 'shop', 0.2, -4],
+    ['Проводник Каэль', 'Wizard', -7, -12.5, 'teleport', -7, -8.5],
   ];
-  npcs.forEach(([name, model, x, z, role]) => {
+  npcs.forEach(([name, model, x, z, role, lookX, lookZ]) => {
     const entity = makeEntity({ kind: 'npc', name, model, x, z, role, targetHeight: 2 });
     createEntityModel(entity);
+    rotateTowards(entity, lookX, lookZ);
     state.entities.push(entity);
   });
+  spawnAmbientResidents();
   const types = ['wolf', 'exile', 'spider', 'undead', 'bat', 'cultist', 'miner', 'wraith'];
   for (let index = 0; index < 36; index += 1) {
     const forest = index >= 17;
@@ -900,7 +1039,7 @@ q<HTMLButtonElement>('#continue').onclick = () => { void startGame(true); };
 
 function zoneAt(x: number, z: number) {
   if (Math.hypot(x + 27, z + 19) < 9) return LOCATIONS_LIST[0];
-  if (Math.hypot(x + 7, z + 5) < 7.8) return LOCATIONS_LIST[1];
+  if (Math.hypot(x + 7, z + 5) < 12.2) return LOCATIONS_LIST[1];
   if (x > 32 && z > 24) return LOCATIONS_LIST[4];
   if (x > 13) return LOCATIONS_LIST[3];
   return LOCATIONS_LIST[2];
@@ -1094,6 +1233,7 @@ function update(dt: number): void {
   syncEntityTransform(hero, motion.height);
   state.entities.filter((entity) => entity.kind === 'monster').forEach((entity) => updateMonster(entity, dt));
   state.entities.filter((entity) => entity.kind === 'summon').forEach((entity) => updateSummon(entity, dt));
+  state.entities.filter((entity) => entity.kind === 'ambient').forEach((entity) => updateAmbientResident(entity, dt));
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
   updateTargetIndicator();
@@ -1201,7 +1341,7 @@ function die(): void {
   const loss = Math.floor(player.xp * 0.05);
   player.xp = Math.max(0, player.xp - loss);
   confirmBox('Вы пали', `Потеряно ${loss} опыта текущего уровня. Уровень и предметы сохранены.`, () => {
-    player.x = -7; player.z = -4; player.hp = player.maxHp; player.mp = player.maxMp; player.dead = false;
+    player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; player.hp = player.maxHp; player.mp = player.maxMp; player.dead = false;
     playerEntity().root?.setEnabled(true); cameraControl.snap({ x: player.x, y: 0, z: player.z });
     state.paused = false; closeConfirm(); toast('Вы возродились в Гринфолле'); saveGame();
   }, false);
@@ -1442,6 +1582,38 @@ function updateSummon(summon: Entity, dt: number): void {
     summon.attackCd = 1.25; rotateTowards(summon, target.x, target.z); setEntityAction(summon, 'attack', true);
     damageMonster(target, Math.max(5, Math.round(player.stats.matk * 0.3)), false);
   }
+}
+
+const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: number; z: number }>> = {
+  warm: { x: -7, z: -5 },
+  trade: { x: 0.2, z: -4 },
+  work: { x: -14.2, z: -4.2 },
+  guard: { x: -7, z: -15.5 },
+  talk: { x: -7, z: -3.2 },
+};
+
+function updateAmbientResident(entity: Entity, dt: number): void {
+  const decision = entity.ambientBrain?.update(dt, entity);
+  if (!decision) return;
+  entity.ambientActivity = decision.waypoint.activity;
+  if (decision.state === 'walk') {
+    const dx = decision.waypoint.x - entity.x;
+    const dz = decision.waypoint.z - entity.z;
+    const distance = Math.max(0.0001, Math.hypot(dx, dz));
+    const step = Math.min(distance, 1.15 * dt);
+    const moved = moveEntityWithCollision(entity, (dx / distance) * step, (dz / distance) * step, true);
+    rotateTowardsSmooth(entity, decision.waypoint.x, decision.waypoint.z, dt);
+    setEntityAction(entity, moved ? 'walk' : 'idle');
+    return;
+  }
+  const look = AMBIENT_ACTIVITY_LOOK[decision.waypoint.activity];
+  rotateTowardsSmooth(entity, look.x, look.z, dt);
+  if (decision.state === 'activity' && decision.changed && decision.waypoint.activity === 'work') {
+    setEntityAction(entity, 'attack', true);
+    window.setTimeout(() => {
+      if (entity.alive && entity.actionType === 'attack') setEntityAction(entity, 'idle');
+    }, 620);
+  } else if (entity.actionType === 'walk') setEntityAction(entity, 'idle');
 }
 
 function projectEntity(entity: Entity): { x: number; y: number } {
@@ -1775,7 +1947,7 @@ function openShop(): void {
 
 function openTeleport(): void {
   openWindow('character');
-  const points: Array<[string, number, number, number, number]> = [['Астерхолд', -27, -19, 0, 1], ['Гринфолл', -7, -4, 25, 1], ['Чёрный лес', 21, 9, 90, 10], ['Вход в шахту', 35, 27, 150, 10]];
+  const points: Array<[string, number, number, number, number]> = [['Астерхолд', -27, -19, 0, 1], ['Гринфолл', GREENFALL_SPAWN.x, GREENFALL_SPAWN.z, 25, 1], ['Чёрный лес', 21, 9, 90, 10], ['Вход в шахту', 35, 27, 150, 10]];
   q('#window-content').innerHTML = `<h2>Проводник Каэль</h2><p>Путь сохраняет цену. Бесплатен только переход в столицу. Чёрный лес открывается на 10 уровне.</p><div class="shop-grid">${points.map((point) => `<div class="shop-item"><b>${point[0]}</b><span>◈ ${point[3]} · ур. ${point[4]}</span><button class="dark-btn" data-tp="${point.slice(1).join(',')}" data-destination="${point[0]}">Отправиться</button></div>`).join('')}</div>`;
   qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
@@ -1810,7 +1982,7 @@ function consumeItem(id: string): boolean { const index = player.inventory.findI
 function useItem(id: string): void {
   if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); toast('Здоровье восстановлено'); }
   else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
-  else if (id === 'teleport' && consumeItem(id)) { player.x = -7; player.z = -4; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
+  else if (id === 'teleport' && consumeItem(id)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
   updateHud(); saveGame();
 }
 
