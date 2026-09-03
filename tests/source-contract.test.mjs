@@ -59,3 +59,17 @@ test('phase-one controls are modular and Space is no longer bound to normal atta
   assert.match(targeting, /class TargetingController/);
   assert.match(combat, /class CombatControl/);
 });
+
+test('phase 1.1 restores respawn transforms and applies lightweight world collision', async () => {
+  const [source, collision] = await Promise.all([
+    readFile(new URL('../src/main.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../src/world/collision-world.ts', import.meta.url), 'utf8'),
+  ]);
+  assert.match(source, /collisionWorld\.resolve/);
+  assert.match(source, /registerWorldCollider/);
+  assert.match(source, /restoreEntityAfterRespawn/);
+  assert.match(source, /animation\.reset\(\)/);
+  assert.match(source, /root\.scaling\.copyFrom\(entity\.baseScale/);
+  assert.match(source, /source instanceof PBRMaterial/);
+  assert.match(collision, /findNearestFree/);
+});

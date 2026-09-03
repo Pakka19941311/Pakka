@@ -15,6 +15,7 @@ import {
   Matrix,
   Mesh,
   MeshBuilder,
+  PBRMaterial,
   PointLight,
   Scene,
   SceneLoader,
@@ -46,6 +47,7 @@ import { CharacterMotor, smoothAngle } from './controls/character-motor';
 import { PlayerInputController } from './controls/input-controller';
 import { TargetingController } from './controls/targeting-controller';
 import { ThirdPersonCameraController } from './controls/third-person-camera';
+import { CollisionWorld } from './world/collision-world';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -170,6 +172,7 @@ type Entity = {
   status: Statuses;
   root: TransformNode | null;
   baseY?: number;
+  baseScale?: Vector3;
   pickVolume?: Mesh;
   animations: AnimationGroup[];
   actionType?: string;
@@ -277,6 +280,7 @@ const state = {
 const targeting = new TargetingController<Entity>();
 const combatControl = new CombatControl();
 const playerMotor = new CharacterMotor();
+const collisionWorld = new CollisionWorld();
 
 const emptyStats: CombatStats = {
   str: 0, dex: 0, int: 0, vit: 0, spi: 0, atkMin: 0, atkMax: 0, matk: 0,
@@ -451,16 +455,24 @@ function instantiateContainer(container: AssetContainer, name: string): { root: 
 }
 
 function tintMeshes(root: TransformNode, tint?: number): void {
+  const tintColor = tint == null ? null : Color3.FromHexString(`#${tint.toString(16).padStart(6, '0')}`);
   root.getChildMeshes().forEach((mesh) => {
     mesh.receiveShadows = true;
     shadows.addShadowCaster(mesh, true);
-    if (tint == null) return;
     const source = mesh.material;
-    if (!(source instanceof StandardMaterial)) return;
-    const material = source.clone(`${source.name}-${root.name}`);
-    const color = Color3.FromHexString(`#${tint.toString(16).padStart(6, '0')}`);
-    material.diffuseColor = material.diffuseColor.multiply(color);
-    mesh.material = material;
+    if (source instanceof StandardMaterial) {
+      if (tintColor) source.diffuseColor = source.diffuseColor.multiply(tintColor);
+      if (!source.diffuseTexture && source.diffuseColor.toLuminance() < 0.02) {
+        source.diffuseColor = tintColor?.scale(0.42) ?? new Color3(0.32, 0.32, 0.32);
+      }
+    } else if (source instanceof PBRMaterial) {
+      if (tintColor) source.albedoColor = source.albedoColor.multiply(tintColor);
+      if (!source.albedoTexture && source.albedoColor.toLuminance() < 0.02) {
+        source.albedoColor = tintColor?.scale(0.42) ?? new Color3(0.32, 0.32, 0.32);
+      }
+      source.metallic = Math.min(source.metallic ?? 0, 0.35);
+      source.roughness = Math.max(source.roughness ?? 0.6, 0.55);
+    }
   });
 }
 
@@ -505,6 +517,7 @@ function createEntityModel(entity: Entity): void {
   entity.root.position.set(entity.x, 0, entity.z);
   normalizeHeight(entity.root, entity.targetHeight);
   entity.baseY = entity.root.position.y;
+  entity.baseScale = entity.root.scaling.clone();
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
     mesh.metadata = { entity };
@@ -603,6 +616,37 @@ function refreshNameplate(entity: Entity): void {
   entity.labelTexture.update();
 }
 
+const CIRCLE_COLLIDERS: Record<string, number> = {
+  tree: 0.5, 'tree-crooked': 0.62, 'tree-high': 0.48, 'tree-high-crooked': 0.58,
+  'rock-large': 0.9, 'rock-wide': 1.05, lantern: 0.2, 'fountain-round': 1.2,
+};
+const BOX_COLLIDERS: Record<string, readonly [number, number]> = {
+  roof: [1.5, 1.25], 'roof-high': [1.65, 1.4], stall: [1.2, 0.75], 'stall-red': [1.2, 0.75],
+  cart: [1.2, 0.58], 'wall-block': [0.85, 0.3], 'wall-corner': [0.8, 0.8],
+  'wall-door': [1.15, 0.35], fence: [1.1, 0.16], 'fence-broken': [1.05, 0.16],
+};
+
+function registerWorldCollider(name: string, x: number, z: number, scale: number, rotation: number): void {
+  const circle = CIRCLE_COLLIDERS[name];
+  if (circle) collisionWorld.addCircle(x, z, circle * scale);
+  const box = BOX_COLLIDERS[name];
+  if (box) collisionWorld.addBox(x, z, box[0] * scale, box[1] * scale, rotation);
+  if (name === 'wall-arch') {
+    const side = 1.15 * scale;
+    const cosine = Math.cos(rotation);
+    const sine = Math.sin(rotation);
+    for (const direction of [-1, 1]) {
+      collisionWorld.addBox(
+        x + cosine * side * direction,
+        z - sine * side * direction,
+        0.36 * scale,
+        0.42 * scale,
+        rotation,
+      );
+    }
+  }
+}
+
 function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0, tint?: number): TransformNode | null {
   const container = worldAssets.get(name);
   if (!container) return null;
@@ -612,6 +656,7 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
   instance.root.scaling.setAll(scale);
   tintMeshes(instance.root, tint);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
+  registerWorldCollider(name, x, z, scale, rotation);
   return instance.root;
 }
 
@@ -630,6 +675,7 @@ function buildTown(x: number, z: number, scale: number): void {
 }
 
 function buildWorld(): void {
+  collisionWorld.clear();
   for (let index = 0; index < 52; index += 1) {
     const forest = index > 24;
     const x = forest ? rand(12, 47) : rand(-43, 25);
@@ -740,10 +786,12 @@ function makeEntity(input: Partial<Entity> & Pick<Entity, 'kind' | 'model' | 'x'
 function spawnMonster(id: string, x: number, z: number, delay = 0): Entity {
   const definition = MONSTERS_MAP[id];
   const targetHeight = definition.boss === 'big' ? 4.6 : definition.boss === 'mini' ? 3.4 : id === 'bat' ? 1.4 : 1.9;
+  const actorRadius = definition.boss === 'big' ? 1.2 : definition.boss === 'mini' ? 0.9 : 0.42;
+  const spawn = collisionWorld.findNearestFree({ x, z }, actorRadius);
   const entity = makeEntity({
     kind: 'monster', id, name: definition.name, model: definition.model, level: definition.level,
     boss: definition.boss, hp: definition.hp, maxHp: definition.hp, atk: definition.atk,
-    baseAtk: definition.atk, phase: 1, x, z, homeX: x, homeZ: z, tint: definition.tint,
+    baseAtk: definition.atk, phase: 1, x: spawn.x, z: spawn.z, homeX: spawn.x, homeZ: spawn.z, tint: definition.tint,
     targetHeight, alive: delay <= 0, respawn: delay,
   });
   createEntityModel(entity);
@@ -759,6 +807,9 @@ function spawnEntities(): void {
     entity.root?.dispose(false, true);
   });
   state.entities.length = 0;
+  const safeSpawn = collisionWorld.findNearestFree({ x: player.x, z: player.z }, 0.46);
+  player.x = safeSpawn.x;
+  player.z = safeSpawn.z;
   const classDef = CLASSES_MAP[player.classId];
   const playerEntity = makeEntity({ kind: 'player', model: classDef.model, x: player.x, z: player.z, targetHeight: 2.05 });
   createEntityModel(playerEntity);
@@ -868,6 +919,31 @@ function buildHotbar(): void {
 function rotateTowards(entity: Entity, targetX: number, targetZ: number): void {
   if (!entity.root) return;
   entity.root.rotation.y = Math.atan2(targetX - entity.x, targetZ - entity.z);
+}
+
+function rotateTowardsSmooth(entity: Entity, targetX: number, targetZ: number, dt: number): void {
+  if (!entity.root) return;
+  const desired = Math.atan2(targetX - entity.x, targetZ - entity.z);
+  entity.root.rotation.y = smoothAngle(entity.root.rotation.y, desired, 9, dt);
+}
+
+function entityCollisionRadius(entity: Entity): number {
+  if (entity.boss === 'big') return 1.2;
+  if (entity.boss === 'mini') return 0.9;
+  return entity.kind === 'player' ? 0.46 : 0.42;
+}
+
+function moveEntityWithCollision(entity: Entity, dx: number, dz: number, avoidStuck = false): boolean {
+  const from = { x: entity.x, z: entity.z };
+  let resolved = collisionWorld.resolve(from, { x: dx, z: dz }, entityCollisionRadius(entity));
+  if (avoidStuck && resolved.blocked && Math.hypot(resolved.x - from.x, resolved.z - from.z) < 0.0001) {
+    const direction = entity.uid.charCodeAt(entity.uid.length - 1) % 2 ? 1 : -1;
+    resolved = collisionWorld.resolve(from, { x: -dz * direction, z: dx * direction }, entityCollisionRadius(entity));
+  }
+  entity.x = resolved.x;
+  entity.z = resolved.z;
+  syncEntityTransform(entity);
+  return Math.hypot(entity.x - from.x, entity.z - from.z) > 0.0001;
 }
 
 function attackRange(): number {
@@ -996,10 +1072,12 @@ function update(dt: number): void {
 
   if (inputControl.consumeJump()) playerMotor.requestJump();
   const motion = playerMotor.step(desiredDirection, player.stats.speed, dt, maxMoveDistance);
-  player.x += motion.dx;
-  player.z += motion.dz;
+  const resolvedPlayer = collisionWorld.resolve(player, { x: motion.dx, z: motion.dz }, 0.46);
+  player.x = resolvedPlayer.x;
+  player.z = resolvedPlayer.z;
+  if (resolvedPlayer.blocked && Math.hypot(resolvedPlayer.x - hero.x, resolvedPlayer.z - hero.z) < 0.0001) playerMotor.stopPlanar();
   enforcePlayerBoundary();
-  const moved = Math.hypot(motion.dx, motion.dz) > 0.001;
+  const moved = Math.hypot(player.x - hero.x, player.z - hero.z) > 0.001;
   if (moved && hero.root) {
     const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
     hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
@@ -1024,6 +1102,32 @@ function update(dt: number): void {
   updateHud();
 }
 
+function restoreEntityAfterRespawn(entity: Entity): void {
+  entity.status = {};
+  entity.attackCd = rand(0.25, 0.8);
+  entity.animations.forEach((animation) => {
+    animation.stop();
+    animation.reset();
+  });
+  if (entity.root) {
+    entity.root.scaling.copyFrom(entity.baseScale ?? Vector3.One());
+    entity.root.rotation.x = 0;
+    entity.root.rotation.z = 0;
+    entity.root.setEnabled(true);
+    entity.root.getChildMeshes().forEach((mesh) => {
+      mesh.setEnabled(true);
+      mesh.isVisible = true;
+      if (mesh !== entity.label) mesh.visibility = 1;
+      mesh.renderOutline = false;
+    });
+  }
+  entity.actionType = undefined;
+  entity.pickVolume?.setEnabled(true);
+  syncEntityTransform(entity);
+  refreshNameplate(entity);
+  setEntityAction(entity, 'idle');
+}
+
 function updateMonster(entity: Entity, dt: number): void {
   if (!entity.alive) {
     entity.respawn -= dt;
@@ -1034,11 +1138,10 @@ function updateMonster(entity: Entity, dt: number): void {
       entity.phase = 1;
       entity.x = entity.homeX ?? entity.x;
       entity.z = entity.homeZ ?? entity.z;
-      syncEntityTransform(entity);
-      entity.root?.setEnabled(true);
-      entity.pickVolume?.setEnabled(true);
-      refreshNameplate(entity);
-      setEntityAction(entity, 'idle');
+      const safeSpawn = collisionWorld.findNearestFree(entity, entityCollisionRadius(entity));
+      entity.x = safeSpawn.x;
+      entity.z = safeSpawn.z;
+      restoreEntityAfterRespawn(entity);
       if (entity.boss === 'big') {
         toast('Печать древнего владыки разрушена…');
         log('Регион: Хозяин Гнилого Леса пробудился.', 'combat');
@@ -1059,11 +1162,9 @@ function updateMonster(entity: Entity, dt: number): void {
     if (entity.status.stun) setEntityAction(entity, 'idle');
     else if (distance > 1.65) {
       const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
-      entity.x += (dx / distance) * speed * dt;
-      entity.z += (dz / distance) * speed * dt;
-      syncEntityTransform(entity);
-      rotateTowards(entity, player.x, player.z);
-      setEntityAction(entity, 'walk');
+      const moved = moveEntityWithCollision(entity, (dx / distance) * speed * dt, (dz / distance) * speed * dt, true);
+      rotateTowardsSmooth(entity, player.x, player.z, dt);
+      setEntityAction(entity, moved ? 'walk' : 'idle');
     } else if (entity.attackCd <= 0) {
       setEntityAction(entity, 'attack', true);
       entity.attackCd = entity.boss ? 1.45 : 2.05;
@@ -1074,10 +1175,11 @@ function updateMonster(entity: Entity, dt: number): void {
       }, 280);
     }
   } else if (Math.hypot(entity.x - (entity.homeX ?? entity.x), entity.z - (entity.homeZ ?? entity.z)) > 7) {
-    entity.x += ((entity.homeX ?? entity.x) - entity.x) * dt * 0.35;
-    entity.z += ((entity.homeZ ?? entity.z) - entity.z) * dt * 0.35;
-    syncEntityTransform(entity);
-    setEntityAction(entity, 'walk');
+    const homeX = entity.homeX ?? entity.x;
+    const homeZ = entity.homeZ ?? entity.z;
+    const moved = moveEntityWithCollision(entity, (homeX - entity.x) * dt * 0.35, (homeZ - entity.z) * dt * 0.35, true);
+    rotateTowardsSmooth(entity, homeX, homeZ, dt);
+    setEntityAction(entity, moved ? 'walk' : 'idle');
   } else setEntityAction(entity, 'idle');
   if (entity.status.dot && Math.random() < dt) damageMonster(entity, Math.max(2, Math.round(player.stats.matk * 0.08)), false, false);
 }
@@ -1181,8 +1283,7 @@ function performAttack(skillIndex: number | null): void {
     if (skill?.stun) target.status.stun = skill.stun;
     if (skill?.knock && target.root) {
       const dx = target.x - player.x; const dz = target.z - player.z; const distance = Math.max(0.001, Math.hypot(dx, dz));
-      target.x += (dx / distance) * skill.knock; target.z += (dz / distance) * skill.knock;
-      syncEntityTransform(target);
+      moveEntityWithCollision(target, (dx / distance) * skill.knock, (dz / distance) * skill.knock, true);
     }
     if (skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
     if (skill?.summon) summonSkeleton();
@@ -1335,9 +1436,8 @@ function updateSummon(summon: Entity, dt: number): void {
   if (!target) return setEntityAction(summon, 'idle');
   const dx = target.x - summon.x; const dz = target.z - summon.z; const distance = Math.hypot(dx, dz);
   if (distance > 1.8) {
-    summon.x += (dx / distance) * 3.6 * dt; summon.z += (dz / distance) * 3.6 * dt;
-    syncEntityTransform(summon);
-    rotateTowards(summon, target.x, target.z); setEntityAction(summon, 'walk');
+    const moved = moveEntityWithCollision(summon, (dx / distance) * 3.6 * dt, (dz / distance) * 3.6 * dt, true);
+    rotateTowardsSmooth(summon, target.x, target.z, dt); setEntityAction(summon, moved ? 'walk' : 'idle');
   } else if (summon.attackCd <= 0) {
     summon.attackCd = 1.25; rotateTowards(summon, target.x, target.z); setEntityAction(summon, 'attack', true);
     damageMonster(target, Math.max(5, Math.round(player.stats.matk * 0.3)), false);
