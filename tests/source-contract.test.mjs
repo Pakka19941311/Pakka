@@ -49,6 +49,9 @@ test('phase-one controls are modular and Space is no longer bound to normal atta
   assert.match(source, /targeting\.select\(entity\)/);
   assert.match(source, /combatControl\.engageBasic\(entity\.uid\)/);
   assert.doesNotMatch(source, /event\.code\s*===\s*['"]Space['"][^\n]*basicAttack/);
+  assert.match(source, /function die\(\)[\s\S]*?resetPlayerControl\(true\)[\s\S]*?cameraControl\.snap/);
+  assert.match(source, /entity\.kind === 'npc'[\s\S]*?state\.interactionTarget = entity/);
+  assert.match(source, /type: 'move-intent'[\s\S]*?sequence: movementSequence/);
   assert.match(camera, /cameraRelativeDirection/);
   assert.match(input, /movementAxesFromPressed/);
   assert.match(targeting, /class TargetingController/);

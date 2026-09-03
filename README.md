@@ -2,7 +2,7 @@
 
 Основной репозиторий браузерной 3D RPG.
 
-Текущая стабильная сборка: **Varendor: Ashen Frontier v0.3**. Игровой клиент находится в корне репозитория, собран на Babylon.js, TypeScript и Vite. В релизном ZIP готовая папка `dist` запускается через `RUN_WINDOWS.bat` без установки Node.js.
+Текущее состояние: **Varendor v0.4 — Phase 1 завершён**. Игровой клиент находится в корне репозитория, собран на Babylon.js, TypeScript и Vite. Стабильная v0.3 сохранена отдельной контрольной веткой; Phase 2 ещё не начинался.
 
 ## Роли
 
@@ -18,7 +18,8 @@ ChatGPT/Work — Lead Game Developer, Game Systems Designer, Technical Architect
 - `docs/TECHNICAL_BIBLE.md` — архитектура и технический стек.
 - `docs/ROADMAP.md` — порядок разработки.
 - `docs/DECISIONS.md` — журнал принятых решений.
-- `docs/QA_REPORT_v0.3.md` — результаты сборки и проверок текущей версии.
+- `docs/QA_REPORT_v0.3.md` — результаты закрытия стабильной v0.3.
+- `docs/QA_REPORT_v0.4_PHASE1.md` — проверки third-person camera/input/combat foundation.
 
 ## Главный принцип
 
