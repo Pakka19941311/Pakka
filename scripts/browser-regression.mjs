@@ -60,15 +60,22 @@ try {
   await page.waitForTimeout(4000);
   await page.screenshot({ path: `${reportDir}/${label}-greenfall.png` });
   await page.evaluate(() => { window.__FRAME_PROBE__.enabled = true; });
-  await page.waitForTimeout(8000);
+  await page.waitForFunction(() => window.__FRAME_PROBE__.frames.length >= 12, {}, { timeout: 90000 });
   const sample = await page.evaluate(() => { window.__FRAME_PROBE__.enabled = false; return window.__FRAME_PROBE__; });
   const ordered = sample.frames.sort((a, b) => a - b);
   const mean = values => values.reduce((a, b) => a + b, 0) / Math.max(1, values.length);
   report.performance = { samples: ordered.length, averageMs: mean(ordered), p95Ms: ordered[Math.floor(ordered.length * 0.95)],
     p99Ms: ordered[Math.floor(ordered.length * 0.99)], averageDrawCalls: mean(sample.draws),
     diagnostics: await page.evaluate(() => window.__VARENDOR_QA__.getPerformance?.() ?? null) };
-  assert.ok(ordered.length >= 8, 'scene stalled during sample');
+  assert.ok(ordered.length >= 12, 'render-loop liveness failed');
   if (!baseline) {
+    // The runner has no gaming GPU. Record High above, then test controls on a documented low profile.
+    await page.keyboard.press('Escape');
+    await page.locator('#quality').selectOption('low');
+    await page.locator('#resolution-scale').selectOption('0.5');
+    await page.locator('#save-settings').click();
+    report.interactionProfile = 'Low / 50% scale / shadows off (software GPU)';
+    await page.waitForTimeout(1200);
     const state = () => page.evaluate(() => window.__VARENDOR_QA__.getState());
     const actors = () => page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
     const heroBefore = (await actors()).find(e => e.kind === 'player');

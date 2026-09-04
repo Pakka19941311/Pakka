@@ -2586,7 +2586,7 @@ function renderSettings(): void {
       ${range('contrast', 'Контраст', Math.round(s.contrast * 100), 80, 145, 1, '%')}
       ${range('saturation', 'Насыщенность', Math.round(s.saturation * 100), 50, 130, 1, '%')}
       ${range('fog', 'Плотность тумана', Math.round(s.fog * 100), 0, 160, 5, '%')}
-      <p class="settings-note">Текущее окно: ${window.innerWidth}×${window.innerHeight}, pixel ratio ${window.devicePixelRatio.toFixed(2)}. Полноэкранный режим включается только по нажатию.</p>
+      <p class="settings-note">Окно: ${window.innerWidth}×${window.innerHeight}. 3D: ${engine.getRenderWidth()}×${engine.getRenderHeight()}. Профиль ограничивает число пикселей; при перегрузке масштаб 3D адаптируется до 65%. Текст/UI не уменьшается. Полный экран — только по нажатию.</p>
     </section>
     <section><h3>Камера и управление</h3>
       ${range('mouse-sensitivity', 'Чувствительность мыши', Math.round(s.mouseSensitivity * 100), 25, 250, 5, '%')}
@@ -2808,6 +2808,7 @@ engine.runRenderLoop(() => {
   }
   if (state.started) cameraControl.update(dt, { x: player.x, y: 0, z: player.z });
   const beforeRender = performance.now();
+  engine._drawCalls.fetchNewFrame();
   scene.render();
   if (state.started && !state.paused) {
     frameTelemetry.record(engine.getDeltaTime(), beforeRender - start, performance.now() - beforeRender);

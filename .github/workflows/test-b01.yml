@@ -25,7 +25,7 @@ jobs:
           npm test
           npm run build
           npm run smoke
-          if rg '__VARENDOR_FIXTURE__' dist/assets/*.js; then exit 1; fi
+          node --input-type=module -e "import{readdirSync,readFileSync}from'node:fs';for(const file of readdirSync('dist/assets').filter(f=>f.endsWith('.js')))if(readFileSync('dist/assets/'+file,'utf8').includes('__VARENDOR_FIXTURE__'))throw Error('Test fixture leaked into production');"
       - name: Save production build for Windows validation
         uses: actions/upload-artifact@v4
         with:
