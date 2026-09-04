@@ -97,14 +97,26 @@ try {
     const state = () => page.evaluate(() => window.__VARENDOR_QA__.getState());
     const actors = () => page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
     const heroBefore = (await actors()).find(e => e.kind === 'player');
-    await page.keyboard.down('d'); await page.waitForTimeout(550); await page.keyboard.up('d');
+    await page.keyboard.down('d');
+    try {
+      await page.waitForFunction(({ x, z }) => {
+        const player = window.__VARENDOR_QA__.getState().player;
+        return Math.hypot(player.x - x, player.z - z) > 0.3;
+      }, heroBefore, { timeout: 15000 });
+    } finally { await page.keyboard.up('d'); }
     await page.waitForTimeout(200);
     const heroAfter = (await actors()).find(e => e.kind === 'player');
     assert.ok(Math.hypot(heroAfter.x - heroBefore.x, heroAfter.z - heroBefore.z) > 0.25, 'WASD did not move');
     check('WASD produces movement', { distance: Math.hypot(heroAfter.x - heroBefore.x, heroAfter.z - heroBefore.z) });
-    await page.keyboard.down('w'); await page.keyboard.down('d'); await page.waitForTimeout(400);
-    await page.keyboard.up('w'); await page.keyboard.up('d');
-    check('diagonal keys accepted');
+    const diagonalStart = (await state()).player;
+    await page.keyboard.down('w'); await page.keyboard.down('d');
+    try {
+      await page.waitForFunction(({ x, z }) => {
+        const player = window.__VARENDOR_QA__.getState().player;
+        return Math.hypot(player.x - x, player.z - z) > 0.3;
+      }, diagonalStart, { timeout: 15000 });
+    } finally { await page.keyboard.up('w'); await page.keyboard.up('d'); }
+    check('diagonal keys produce movement');
     const cameraBefore = (await state()).camera;
     await page.mouse.move(650, 330); await page.mouse.down({ button: 'right' });
     await page.mouse.move(710, 345, { steps: 8 }); await page.mouse.up({ button: 'right' });
