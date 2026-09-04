@@ -73,6 +73,7 @@ import { createPbrSurface, repairImportedMaterial } from './rendering/realism-ma
 import { MonsterLifecycle } from './core/monster-lifecycle';
 import { qualityPreset } from './rendering/quality-presets';
 import { WorldSectorGrid } from './world/world-sectors';
+import { AttackTimeline, combatTimings } from './combat/attack-timeline';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -1750,11 +1751,14 @@ function updateMonster(entity: Entity, dt: number): void {
     if (entity.attackCd <= 0) {
       setEntityAction(entity, 'attack', true);
       entity.attackCd = entity.boss ? 1.45 : 2.05;
-      window.setTimeout(() => {
+      const generation = entity.visualGeneration;
+      queueAttackTimeline(new AttackTimeline(combatTimings('monster')), () => {
         if (entity.alive && Math.hypot(player.x - entity.x, player.z - entity.z) < 2.3) {
           hurtPlayer(Math.max(1, Math.round((entity.atk ?? 1) - player.stats.def * 0.2)));
         }
-      }, 280);
+      }, () => {
+        if (entity.alive && entity.visualGeneration === generation && entity.actionType === 'attack') setEntityAction(entity, 'idle');
+      });
     }
   } else if (decision.intent === 'return') {
     const moved = moveEntityAlongNavigation(entity, { x: homeX, z: homeZ }, monsterMovementSpeed(Boolean(entity.boss)) * 0.9, dt, entityCollisionRadius(entity));
@@ -1849,9 +1853,6 @@ function performAttack(skillIndex: number | null): void {
   const hero = playerEntity();
   rotateTowards(hero, target.x, target.z);
   setEntityAction(hero, 'attack', true);
-  window.setTimeout(() => {
-    if (!player.dead && hero.actionType === 'attack') setEntityAction(hero, 'idle');
-  }, 460);
   playSfx(skill?.fx ?? 'attack');
   gameAudio.play(ranged ? 'swordClash' : 'swordSwing', ranged ? 0.34 : 0.7, 0.94 + Math.random() * 0.12);
   const magic = player.classId === 'mage' || player.classId === 'necro';
@@ -1860,26 +1861,43 @@ function performAttack(skillIndex: number | null): void {
   const critical = Math.random() < player.stats.crit / 100;
   const damage = Math.max(1, Math.round(base * multiplier * (critical ? classCombatProfile(player.classId, player.level, player.stats).critMultiplier : 1)));
   void gateway.send({ type: 'attack', entityId: target.uid, skillIndex });
-  spawnAttackEffect(skill?.fx ?? (ranged ? 'arrow' : 'slash'), hero, target, () => {
-    let victims = [target];
-    if (skill?.aoe) victims = state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0));
-    victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
-    if (skill?.chain) {
-      state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && entity !== target)
-        .sort((a, b) => Math.hypot(a.x - target.x, a.z - target.z) - Math.hypot(b.x - target.x, b.z - target.z))
-        .slice(0, skill.chain - 1)
-        .forEach((entity) => { spawnAttackEffect('lightning', target, entity); damageMonster(entity, Math.round(damage * 0.68), false); });
-    }
-    if (skill?.dot) target.status.dot = skill.dot;
-    if (skill?.slow) target.status.slow = skill.slow;
-    if (skill?.stun) target.status.stun = skill.stun;
-    if (skill?.knock && target.root) {
-      const dx = target.x - player.x; const dz = target.z - player.z; const distance = Math.max(0.001, Math.hypot(dx, dz));
-      moveEntityWithCollision(target, (dx / distance) * skill.knock, (dz / distance) * skill.knock, true);
-    }
-    if (skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
-    if (skill?.summon) summonSkeleton();
+  const attackKind = magic ? 'spell' : ranged ? 'ranged' : 'melee';
+  queueAttackTimeline(new AttackTimeline(combatTimings(attackKind)), () => {
+    if (!target.alive || player.dead) return;
+    spawnAttackEffect(skill?.fx ?? (ranged ? 'arrow' : 'slash'), hero, target, () => {
+      let victims = [target];
+      if (skill?.aoe) victims = state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0));
+      victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
+      if (skill?.chain) {
+        state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && entity !== target)
+          .sort((a, b) => Math.hypot(a.x - target.x, a.z - target.z) - Math.hypot(b.x - target.x, b.z - target.z))
+          .slice(0, skill.chain - 1)
+          .forEach((entity) => { spawnAttackEffect('lightning', target, entity); damageMonster(entity, Math.round(damage * 0.68), false); });
+      }
+      if (skill?.dot) target.status.dot = skill.dot;
+      if (skill?.slow) target.status.slow = skill.slow;
+      if (skill?.stun) target.status.stun = skill.stun;
+      if (skill?.knock && target.root) {
+        const dx = target.x - player.x; const dz = target.z - player.z; const distance = Math.max(0.001, Math.hypot(dx, dz));
+        moveEntityWithCollision(target, (dx / distance) * skill.knock, (dz / distance) * skill.knock, true);
+      }
+      if (skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
+      if (skill?.summon) summonSkeleton();
+    });
+  }, () => {
+    if (!player.dead && hero.actionType === 'attack') setEntityAction(hero, 'idle');
   });
+}
+
+function queueAttackTimeline(timeline: AttackTimeline, onImpact: () => void, onComplete?: () => void): void {
+  state.effects.push({ update(dt) {
+    const events = timeline.tick(dt);
+    if (events.includes('impact')) onImpact();
+    if (events.includes('complete')) {
+      onComplete?.();
+      this.dead = true;
+    }
+  } });
 }
 
 function entityWorldPosition(entity: Entity, height = 1.4): Vector3 {
@@ -1893,21 +1911,26 @@ function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () =>
     lightning: new Color3(0.35, 0.75, 1), poison: new Color3(0.35, 0.85, 0.2), slash: new Color3(0.9, 0.65, 0.25),
   };
   const start = entityWorldPosition(from);
-  const end = entityWorldPosition(to);
+  let end = entityWorldPosition(to);
   const projectile = MeshBuilder.CreateSphere(`effect-${type}-${uid()}`, { diameter: type === 'arrow' ? 0.14 : 0.32, segments: 8 }, scene);
   const material = new StandardMaterial(`effect-material-${uid()}`, scene);
   material.emissiveColor = colors[type] ?? colors.slash;
   material.disableLighting = true;
   projectile.material = material;
   projectile.position.copyFrom(start);
+  if (type === 'arrow') {
+    projectile.scaling.z = 4.2;
+    projectile.lookAt(end);
+  }
   projectile.isPickable = false;
   glow.addIncludedOnlyMesh(projectile);
   let life = 0;
   const duration = type === 'slash' ? 0.18 : 0.28;
   state.effects.push({ update(dt) {
     life += dt;
+    end = entityWorldPosition(to);
     projectile.position.copyFrom(Vector3.Lerp(start, end, clamp(life / duration, 0, 1)));
-    projectile.scaling.setAll(1 + Math.sin(life * 30) * 0.22);
+    if (type !== 'arrow') projectile.scaling.setAll(1 + Math.sin(life * 30) * 0.16);
     if (life >= duration) {
       this.dead = true;
       projectile.dispose(false, true);
@@ -1954,15 +1977,38 @@ function damageMonster(entity: Entity, damage: number, critical = true, showEffe
     }
   }
   refreshNameplate(entity);
+  playHitReaction(entity);
   damageNumber(entity, `${critical ? 'КРИТ ' : ''}−${damage}`, critical ? '#ffd36b' : '#f1e9da', critical);
   if (showEffect) impactEffect(entityWorldPosition(entity), Color3.FromHexString(`#${(entity.tint ?? 0xaa6655).toString(16).padStart(6, '0')}`));
   gameAudio.play('monsterHit', entity.boss ? 0.7 : 0.38, 0.88 + Math.random() * 0.2);
   if ((entity.hp ?? 0) <= 0) killMonster(entity);
 }
 
+function playHitReaction(entity: Entity): void {
+  const root = entity.root;
+  const baseScale = entity.baseScale?.clone();
+  const generation = entity.visualGeneration;
+  if (!root || !baseScale) return;
+  let life = 0;
+  state.effects.push({ update(dt) {
+    if (!entity.alive || entity.root !== root || entity.visualGeneration !== generation || root.isDisposed()) {
+      this.dead = true;
+      return;
+    }
+    life += dt;
+    const pulse = Math.sin(Math.min(1, life / 0.18) * Math.PI);
+    root.scaling.set(baseScale.x * (1 - pulse * 0.055), baseScale.y * (1 + pulse * 0.08), baseScale.z * (1 - pulse * 0.055));
+    if (life >= 0.18) {
+      root.scaling.copyFrom(baseScale);
+      this.dead = true;
+    }
+  } });
+}
+
 function killMonster(entity: Entity): void {
   if (!entity.alive) return;
   entity.alive = false;
+  if (entity.root && entity.baseScale) entity.root.scaling.copyFrom(entity.baseScale);
   entity.pickVolume?.setEnabled(false);
   setEntityAction(entity, 'death', true);
   gameAudio.play('monsterDeath', entity.boss ? 0.9 : 0.52, entity.boss ? 0.75 : 0.92 + Math.random() * 0.12);
