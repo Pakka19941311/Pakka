@@ -36,9 +36,9 @@ export const MONSTERS = {
 export const EQUIP_SLOTS=['head','neck','chest','gloves','weapon','offhand','ring1','ring2','ear1','ear2','belt','boots'];
 export const SLOT_NAMES={head:'Голова',neck:'Ожерелье',chest:'Нагрудник',gloves:'Перчатки',weapon:'Оружие',offhand:'Щит / фокус',ring1:'Кольцо I',ring2:'Кольцо II',ear1:'Серьга I',ear2:'Серьга II',belt:'Пояс',boots:'Обувь'};
 export const LOCATIONS=[
-  {name:'Астерхолд',level:'Столица',desc:'Последний бастион живых.',x:-28,z:-20,kind:'safe'},
+  {name:'Астерхолд',level:'Столица',desc:'Последний бастион живых.',x:-108,z:-82,kind:'safe'},
   {name:'Гринфолл',level:'1–10',desc:'Пограничная деревня.',x:-7,z:-5,kind:'safe'},
-  {name:'Пепельный рубеж',level:'1–10',desc:'Открытые земли изгнанников.',x:10,z:7,kind:'field'},
-  {name:'Чёрный лес',level:'10–20',desc:'Лес, который помнит мёртвых.',x:27,z:14,kind:'field'},
-  {name:'Заброшенная шахта',level:'Подземелье',desc:'Логово древнего владыки.',x:38,z:31,kind:'dungeon'}
+  {name:'Пепельный рубеж',level:'1–10',desc:'Открытые земли изгнанников.',x:42,z:22,kind:'field'},
+  {name:'Чёрный лес',level:'10–20',desc:'Лес, который помнит мёртвых.',x:94,z:44,kind:'field'},
+  {name:'Заброшенная шахта',level:'Подземелье',desc:'Логово древнего владыки.',x:136,z:101,kind:'dungeon'}
 ];

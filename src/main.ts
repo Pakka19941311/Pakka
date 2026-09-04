@@ -67,6 +67,7 @@ import { GameAudio } from './audio/game-audio';
 import { createPbrSurface, repairImportedMaterial } from './rendering/realism-materials';
 import { MonsterLifecycle } from './core/monster-lifecycle';
 import { qualityPreset } from './rendering/quality-presets';
+import { WorldSectorGrid } from './world/world-sectors';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -426,7 +427,7 @@ const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 32 });
 glow.intensity = 0.35;
 
 const groundMaterial = createPbrSurface(scene, 'forest_ground_06', 18, 0.96);
-const ground = MeshBuilder.CreateGround('ground', { width: 105, height: 90, subdivisions: 55, updatable: true }, scene);
+const ground = MeshBuilder.CreateGround('ground', { width: 320, height: 280, subdivisions: 140, updatable: true }, scene);
 ground.material = groundMaterial;
 ground.receiveShadows = true;
 ground.metadata = { ground: true };
@@ -435,7 +436,10 @@ if (groundPositions) {
   for (let index = 0; index < groundPositions.length; index += 3) {
     const x = groundPositions[index];
     const z = groundPositions[index + 2];
-    groundPositions[index + 1] = (Math.sin(x * 0.37) + Math.cos(z * 0.29) + Math.sin((x + z) * 0.17)) * 0.13;
+    const macro = Math.sin(x * 0.025) * 1.3 + Math.cos(z * 0.031) * 1.1 + Math.sin((x + z) * 0.018) * 0.8;
+    const detail = (Math.sin(x * 0.31) + Math.cos(z * 0.27)) * 0.11;
+    const townFlatten = Math.max(0, 1 - Math.hypot(x + 7, z + 5) / 30);
+    groundPositions[index + 1] = (macro * 0.42 + detail) * (1 - townFlatten * 0.9);
   }
   ground.updateVerticesData(VertexBuffer.PositionKind, groundPositions);
   const indices = ground.getIndices();
@@ -459,10 +463,12 @@ function road(x: number, z: number, width: number, depth: number, rotation = 0) 
   mesh.material = roadMaterial;
   mesh.receiveShadows = true;
   mesh.isPickable = false;
+  assignWorldSector(mesh, x, z);
 }
-road(-15, -9, 35, 4, 0.12);
-road(7, 1, 31, 3.8, -0.25);
-road(28, 15, 35, 3.2, -0.43);
+function roadBetween(ax: number, az: number, bx: number, bz: number, width = 4): void {
+  const dx = bx - ax; const dz = bz - az;
+  road((ax + bx) * 0.5, (az + bz) * 0.5, Math.hypot(dx, dz), width, -Math.atan2(dz, dx));
+}
 
 const safeMaterial = new StandardMaterial('safe-zone-material', scene);
 safeMaterial.emissiveColor = new Color3(0.66, 0.48, 0.18);
@@ -500,6 +506,24 @@ const characterAssets = new Map<string, AssetContainer>();
 const monsterAssets = new Map<string, AssetContainer>();
 const worldAssets = new Map<string, AssetContainer>();
 const realismAssets = new Map<RealismModel, AssetContainer>();
+const sectorGrid = new WorldSectorGrid(48);
+const sectorNodes = new Map<string, TransformNode>();
+let sectorVisibilityCooldown = 0;
+function sectorParent(x: number, z: number): TransformNode {
+  const key = sectorGrid.keyAt(x, z);
+  let node = sectorNodes.get(key);
+  if (!node) { node = new TransformNode(`world-sector-${key}`, scene); sectorNodes.set(key, node); }
+  return node;
+}
+function assignWorldSector(node: TransformNode | Mesh, x: number, z: number): void { node.parent = sectorParent(x, z); }
+function updateWorldSectorVisibility(dt: number): void {
+  sectorVisibilityCooldown -= dt;
+  if (sectorVisibilityCooldown > 0) return;
+  sectorVisibilityCooldown = 0.45;
+  const distance = state.settings.quality === 'low' ? 74 : state.settings.quality === 'medium' ? 104 : state.settings.quality === 'high' ? 142 : 196;
+  const active = sectorGrid.activeKeysAround(player.x, player.z, distance);
+  sectorNodes.forEach((node, key) => node.setEnabled(active.has(key)));
+}
 
 async function loadContainer(directory: string, filename: string): Promise<AssetContainer> {
   return SceneLoader.LoadAssetContainerAsync(directory, filename, scene);
@@ -779,6 +803,7 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
   instance.root.position.set(x, 0, z);
   instance.root.rotation.y = rotation;
   instance.root.scaling.setAll(scale);
+  assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root, tint);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
   registerWorldCollider(name, x, z, scale, rotation);
@@ -792,6 +817,7 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   instance.root.position.set(x, 0, z);
   instance.root.rotation.y = rotation;
   normalizeHeight(instance.root, height);
+  assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
   const radius = name.includes('rock') || name.includes('boulder') ? height * 0.38 : height * 0.24;
@@ -813,6 +839,7 @@ function createPineTree(name: string, x: number, z: number, height: number, rota
   trunk.receiveShadows = true;
   shadows.addShadowCaster(trunk, true);
   trunk.isPickable = false;
+  assignWorldSector(trunk, x, z);
   for (let layer = 0; layer < 5; layer += 1) {
     const crown = MeshBuilder.CreateCylinder(`${name}-crown-${layer}`, {
       height: height * 0.3,
@@ -826,6 +853,7 @@ function createPineTree(name: string, x: number, z: number, height: number, rota
     crown.receiveShadows = true;
     shadows.addShadowCaster(crown, true);
     crown.isPickable = false;
+    assignWorldSector(crown, x, z);
   }
   collisionWorld.addCircle(x, z, height * 0.075 + 0.23);
 }
@@ -851,6 +879,7 @@ function townBox(name: string, x: number, y: number, z: number, width: number, h
   mesh.receiveShadows = true;
   shadows.addShadowCaster(mesh, true);
   mesh.isPickable = false;
+  assignWorldSector(mesh, x, z);
   if (collider) collisionWorld.addBox(x, z, width * 0.5, depth * 0.5, 0);
   return mesh;
 }
@@ -862,6 +891,7 @@ function townCylinder(name: string, x: number, y: number, z: number, diameter: n
   mesh.receiveShadows = true;
   shadows.addShadowCaster(mesh, true);
   mesh.isPickable = false;
+  assignWorldSector(mesh, x, z);
   if (collider) collisionWorld.addCircle(x, z, diameter * 0.46);
   return mesh;
 }
@@ -881,6 +911,7 @@ function createBuilding(name: string, x: number, z: number, width: number, depth
   roof.receiveShadows = true;
   shadows.addShadowCaster(roof, true);
   roof.isPickable = false;
+  assignWorldSector(roof, x, z);
   townBox(`${name}-door`, x, 1.05, z - depth * 0.505, 1.1, 2.1, 0.16, 0x4b3526, false);
   townBox(`${name}-window-a`, x - width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
   townBox(`${name}-window-b`, x + width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
@@ -1047,28 +1078,60 @@ function buildStarterSettlement(x: number, z: number): void {
   }
 }
 
+function buildRuinLandmark(x: number, z: number, scale = 1): void {
+  worldModel('wall-arch', x, z, 2.1 * scale, rand(0, Math.PI * 2), 0x777870);
+  for (let index = 0; index < 5; index += 1) {
+    const angle = index * 0.92 + 0.25;
+    worldModel(index % 2 ? 'wall-block' : 'pillar-stone', x + Math.cos(angle) * 4.3 * scale, z + Math.sin(angle) * 4.3 * scale, 1.3 * scale, -angle, 0x6d716c);
+  }
+  realismModel('gothic_statue', x + 1.4 * scale, z + 1.1 * scale, 3.6 * scale, Math.PI * 0.75);
+  realismModel('boulder_01', x - 3.5 * scale, z + 2.8 * scale, 2.1 * scale, 0.4);
+}
+
+function buildFrontierCamp(x: number, z: number, scale = 1): void {
+  worldModel('stall-red', x, z, 1.25 * scale, 0.25, 0x684b43);
+  worldModel('cart', x + 3.0 * scale, z + 1.3 * scale, 1.05 * scale, -0.55, 0x66513e);
+  for (let index = 0; index < 4; index += 1) worldModel(index === 2 ? 'fence-broken' : 'fence', x - 3.2 * scale + index * 2.15 * scale, z - 3.0 * scale, 1.05 * scale, 0);
+  realismModel('Barrel_01', x - 2.0 * scale, z + 1.2 * scale, 1.15 * scale, 0.2);
+  realismModel('wooden_crate_01', x + 1.7 * scale, z + 2.2 * scale, 1.1 * scale, -0.4);
+}
+
 function buildWorld(): void {
   collisionWorld.clear();
-  const treeCount = state.settings.foliage === 'low' ? 34 : state.settings.foliage === 'medium' ? 52 : 72;
+  roadBetween(-108, -82, -65, -55, 5.4);
+  roadBetween(-65, -55, -7, -15, 5.2);
+  roadBetween(-7, -15, -7, -5, 5.2);
+  roadBetween(-7, -5, 35, 18, 4.8);
+  roadBetween(35, 18, 70, 6, 4.2);
+  roadBetween(35, 18, 72, 52, 4.4);
+  roadBetween(72, 52, 104, 48, 4.0);
+  roadBetween(104, 48, 136, 101, 4.0);
+  roadBetween(70, 6, 112, 4, 3.5);
+  const treeCount = state.settings.foliage === 'low' ? 100 : state.settings.foliage === 'medium' ? 155 : 220;
   for (let index = 0; index < treeCount; index += 1) {
-    const forest = index > 24;
-    const x = forest ? rand(12, 47) : rand(-43, 25);
-    const z = forest ? rand(5, 36) : rand(-31, 19);
+    const forest = index > treeCount * 0.34;
+    const x = forest ? rand(50, 154) : rand(-145, 52);
+    const z = forest ? rand(-18, 126) : rand(-120, 64);
     if (Math.hypot(x + 7, z + 5) < 16) continue;
     createPineTree(`pine-${index}`, x, z, forest ? rand(6.5, 10.5) : rand(5.2, 8.2), rand(0, Math.PI * 2));
   }
-  for (let index = 0; index < 22; index += 1) {
-    const x = rand(-46, 48); const z = rand(-35, 37);
+  for (let index = 0; index < 70; index += 1) {
+    const x = rand(-150, 155); const z = rand(-128, 132);
     realismModel(index % 2 ? 'rock_09' : 'boulder_01', x, z, rand(1.2, 3.1), rand(0, Math.PI * 2));
   }
-  for (let index = 0; index < 12; index += 1) {
-    const x = rand(11, 47); const z = rand(5, 36);
+  for (let index = 0; index < 34; index += 1) {
+    const x = rand(45, 155); const z = rand(-18, 126);
     realismModel(index % 2 ? 'dead_tree_trunk' : 'tree_stump_01', x, z, rand(1.5, 3.8), rand(0, Math.PI * 2));
   }
-  buildTown(-27, -19, 1.5);
+  buildTown(-108, -82, 1.65);
   buildStarterSettlement(-7, -5);
+  buildFrontierCamp(34, 19, 1.1);
+  buildFrontierCamp(70, 4, 0.95);
+  buildRuinLandmark(69, 52, 1.15);
+  buildRuinLandmark(105, 49, 1.3);
+  buildRuinLandmark(132, 96, 1.4);
   for (let index = 0; index < 8; index += 1) worldModel(index % 3 ? 'fence' : 'fence-broken', -14 + index * 2.2, -7 + index * 0.22, 1, 0);
-  for (const [x, z] of [[-25, -16], [-30, -22], [19, 7], [35, 25]]) {
+  for (const [x, z] of [[-102, -77], [-114, -88], [35, 18], [72, 52], [104, 48], [133, 96]]) {
     const lantern = worldModel('lantern', x, z, 1.4);
     if (lantern) {
       const light = new PointLight(`fire-${x}-${z}`, new Vector3(0, 2.6, 0), scene);
@@ -1078,8 +1141,8 @@ function buildWorld(): void {
       light.parent = lantern;
     }
   }
-  worldModel('wall-arch', 39, 31, 3.2, Math.PI, 0x59605d);
-  for (let index = 0; index < 6; index += 1) realismModel('boulder_01', 35 + rand(0, 8), 27 + rand(0, 8), rand(2.2, 4.2), rand(0, Math.PI * 2));
+  worldModel('wall-arch', 136, 98, 3.2, Math.PI, 0x59605d);
+  for (let index = 0; index < 9; index += 1) realismModel('boulder_01', 130 + rand(0, 14), 94 + rand(0, 15), rand(2.2, 4.2), rand(0, Math.PI * 2));
 }
 
 function makeItem(id: string, plus = 0, count = 1): ItemInstance {
@@ -1324,10 +1387,10 @@ q<HTMLButtonElement>('#begin').onclick = () => { void startGame(false); };
 q<HTMLButtonElement>('#continue').onclick = () => { void startGame(true); };
 
 function zoneAt(x: number, z: number) {
-  if (Math.hypot(x + 27, z + 19) < 9) return LOCATIONS_LIST[0];
+  if (Math.hypot(x + 108, z + 82) < 16) return LOCATIONS_LIST[0];
   if (Math.hypot(x + 7, z + 5) < 12.2) return LOCATIONS_LIST[1];
-  if (x > 32 && z > 24) return LOCATIONS_LIST[4];
-  if (x > 13) return LOCATIONS_LIST[3];
+  if (x > 122 && z > 82) return LOCATIONS_LIST[4];
+  if (x > 58) return LOCATIONS_LIST[3];
   return LOCATIONS_LIST[2];
 }
 
@@ -1389,16 +1452,8 @@ function resetPlayerControl(clearTarget = false): void {
 }
 
 function enforcePlayerBoundary(): void {
-  if (player.x > 13 && player.level < 10) {
-    player.x = 12.9;
-    state.moveTarget = null;
-    combatControl.cancelPursuit();
-    playerMotor.stopPlanar();
-    if (!state.gateWarn) {
-      toast('Чёрный лес откроется на 10 уровне', 'bad');
-      state.gateWarn = 3;
-    }
-  }
+  player.x = clamp(player.x, -156, 156);
+  player.z = clamp(player.z, -136, 136);
 }
 
 let movementSequence = 0;
@@ -1525,6 +1580,7 @@ function update(dt: number): void {
   updateTargetIndicator();
   gameAudio.update(dt);
   gameAudio.setRegion(zoneAt(player.x, player.z).kind === 'safe');
+  updateWorldSectorVisibility(dt);
   state.bossTimers.mini = Math.max(0, state.bossTimers.mini - dt);
   state.bossTimers.big = Math.max(0, state.bossTimers.big - dt);
   updateHud();
@@ -2001,10 +2057,10 @@ function drawMinimap(): void {
   const gradient = context.createRadialGradient(214, 164, 15, 214, 164, 210);
   gradient.addColorStop(0, '#3c493a'); gradient.addColorStop(1, '#121a17');
   context.fillStyle = gradient; context.fillRect(0, 0, minimap.width, minimap.height);
-  const mapX = (x: number) => ((x + 52) / 104) * minimap.width;
-  const mapY = (z: number) => ((z + 45) / 90) * minimap.height;
+  const mapX = (x: number) => ((x + 160) / 320) * minimap.width;
+  const mapY = (z: number) => ((z + 140) / 280) * minimap.height;
   context.strokeStyle = '#847252'; context.lineWidth = 4; context.beginPath();
-  context.moveTo(mapX(-32), mapY(-22)); context.lineTo(mapX(-7), mapY(-5)); context.lineTo(mapX(14), mapY(5)); context.lineTo(mapX(40), mapY(31)); context.stroke();
+  context.moveTo(mapX(-108), mapY(-82)); context.lineTo(mapX(-7), mapY(-5)); context.lineTo(mapX(35), mapY(18)); context.lineTo(mapX(72), mapY(52)); context.lineTo(mapX(104), mapY(48)); context.lineTo(mapX(136), mapY(101)); context.stroke();
   for (const entity of state.entities) {
     if (entity.kind !== 'monster' || !entity.alive) continue;
     context.fillStyle = entity.boss ? '#ffb24f' : '#a93d3d';
@@ -2327,7 +2383,7 @@ function openShop(): void {
 
 function openTeleport(): void {
   openWindow('character');
-  const points: Array<[string, number, number, number, number]> = [['Астерхолд', -27, -19, 0, 1], ['Гринфолл', GREENFALL_SPAWN.x, GREENFALL_SPAWN.z, 25, 1], ['Чёрный лес', 21, 9, 90, 10], ['Вход в шахту', 35, 27, 150, 10]];
+  const points: Array<[string, number, number, number, number]> = [['Астерхолд', -108, -82, 0, 1], ['Гринфолл', GREENFALL_SPAWN.x, GREENFALL_SPAWN.z, 25, 1], ['Чёрный лес', 94, 44, 90, 10], ['Вход в шахту', 132, 94, 150, 10]];
   q('#window-content').innerHTML = `<h2>Проводник Каэль</h2><p>Путь сохраняет цену. Бесплатен только переход в столицу. Чёрный лес открывается на 10 уровне.</p><div class="shop-grid">${points.map((point) => `<div class="shop-item"><b>${point[0]}</b><span>◈ ${point[3]} · ур. ${point[4]}</span><button class="dark-btn" data-tp="${point.slice(1).join(',')}" data-destination="${point[0]}">Отправиться</button></div>`).join('')}</div>`;
   qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
