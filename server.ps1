@@ -1,3 +1,4 @@
+param([switch]$NoBrowser)
 $ErrorActionPreference = "Stop"
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot "dist"))
 $port = 4173
@@ -9,7 +10,7 @@ if (-not (Test-Path $root -PathType Container)) {
 
 $server = New-Object Net.Sockets.TcpListener([Net.IPAddress]::Loopback, $port)
 $server.Start()
-Start-Process ("http://localhost:{0}/" -f $port)
+if (-not $NoBrowser) { Start-Process ("http://localhost:{0}/" -f $port) }
 Write-Host ("Varendor is running at http://localhost:{0}/" -f $port) -ForegroundColor Yellow
 Write-Host "Close this window or press Ctrl+C to stop the game server."
 

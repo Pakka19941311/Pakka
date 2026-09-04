@@ -1,6 +1,6 @@
 {
   "name": "varendor-ashen-frontier",
-  "version": "0.5.0",
+  "version": "0.6.0-b01",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "verify:assets": "node scripts/verify-assets.mjs",
     "smoke": "node scripts/runtime-smoke.mjs",
+    "test:browser": "node scripts/browser-regression.mjs",
     "build": "npm run typecheck && npm run verify:assets && vite build",
     "preview": "vite preview --host 0.0.0.0"
   },

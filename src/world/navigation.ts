@@ -9,6 +9,37 @@ export type NavigationOptions = Readonly<{
 
 type GridNode = { x: number; z: number; score: number };
 
+/** Binary min-heap: never re-sort the entire frontier for every visited cell. */
+class Frontier {
+  private nodes: GridNode[] = [];
+  get length(): number { return this.nodes.length; }
+  push(node: GridNode): void {
+    let index = this.nodes.length;
+    this.nodes.push(node);
+    while (index > 0) {
+      const parent = (index - 1) >> 1;
+      if (this.nodes[parent].score <= node.score) break;
+      this.nodes[index] = this.nodes[parent]; index = parent;
+    }
+    this.nodes[index] = node;
+  }
+  pop(): GridNode {
+    const first = this.nodes[0];
+    const last = this.nodes.pop()!;
+    if (this.nodes.length) {
+      let index = 0;
+      while (index * 2 + 1 < this.nodes.length) {
+        let child = index * 2 + 1;
+        if (child + 1 < this.nodes.length && this.nodes[child + 1].score < this.nodes[child].score) child += 1;
+        if (this.nodes[child].score >= last.score) break;
+        this.nodes[index] = this.nodes[child]; index = child;
+      }
+      this.nodes[index] = last;
+    }
+    return first;
+  }
+}
+
 function segmentIsClear(world: CollisionWorld, from: Point2, to: Point2, actorRadius: number, sampleStep: number): boolean {
   const distance = Math.hypot(to.x - from.x, to.z - from.z);
   const samples = Math.max(1, Math.ceil(distance / sampleStep));
@@ -66,7 +97,8 @@ export function findNavigationPath(
   const key = (x: number, z: number) => `${x}:${z}`;
   const startKey = key(gridStart.x, gridStart.z);
   const goalKey = key(gridGoal.x, gridGoal.z);
-  const open: GridNode[] = [{ ...gridStart, score: 0 }];
+  const open = new Frontier();
+  open.push({ ...gridStart, score: 0 });
   const costs = new Map<string, number>([[startKey, 0]]);
   const previous = new Map<string, string>();
   const nodes = new Map<string, Readonly<{ x: number; z: number }>>([[startKey, gridStart]]);
@@ -74,8 +106,7 @@ export function findNavigationPath(
   const directions = [-1, 0, 1].flatMap((x) => [-1, 0, 1].map((z) => ({ x, z }))).filter(({ x, z }) => x || z);
 
   while (open.length && closed.size < maxVisited) {
-    open.sort((a, b) => a.score - b.score);
-    const current = open.shift()!;
+    const current = open.pop();
     const currentKey = key(current.x, current.z);
     if (closed.has(currentKey)) continue;
     if (currentKey === goalKey) {

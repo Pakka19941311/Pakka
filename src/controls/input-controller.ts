@@ -80,6 +80,13 @@ export class PlayerInputController {
     return this.orbitPointerId !== null;
   }
 
+  reset(): void {
+    this.pressed.clear();
+    if (this.orbitPointerId !== null && this.canvas.hasPointerCapture?.(this.orbitPointerId)) this.canvas.releasePointerCapture(this.orbitPointerId);
+    this.orbitPointerId = null;
+    this.orbitX = 0; this.orbitY = 0; this.zoom = 0; this.jumpQueued = false;
+  }
+
   dispose(): void {
     this.windowTarget.removeEventListener('keydown', this.onKeyDown);
     this.windowTarget.removeEventListener('keyup', this.onKeyUp);
@@ -110,8 +117,7 @@ export class PlayerInputController {
   };
 
   private readonly onBlur = (): void => {
-    this.pressed.clear();
-    this.orbitPointerId = null;
+    this.reset();
   };
 
   private readonly onPointerDown = (event: PointerEvent): void => {

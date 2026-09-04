@@ -7,7 +7,7 @@ const TEXTURE_ROOT = '/assets/textures/pbr/';
 export function createPbrSurface(scene: Scene, surface: PbrSurface, tiling: number, roughness = 0.9): PBRMaterial {
   const material = new PBRMaterial(`pbr-${surface}`, scene);
   const texture = (suffix: string, gammaSpace: boolean) => {
-    const value = new Texture(`${TEXTURE_ROOT}${surface}_${suffix}.jpg`, scene, true, false);
+    const value = new Texture(`${TEXTURE_ROOT}${surface}_${suffix}.jpg`, scene, false, false);
     value.uScale = tiling;
     value.vScale = tiling;
     value.gammaSpace = gammaSpace;
@@ -34,5 +34,5 @@ export function repairImportedMaterial(material: unknown, tint?: Color3): void {
   material.metallic = Math.min(material.metallic ?? 0, 0.38);
   material.roughness = Math.max(material.roughness ?? 0.55, 0.48);
   material.environmentIntensity = Math.max(material.environmentIntensity, 0.42);
-  material.backFaceCulling = false;
+  // Preserve glTF's doubleSided choice. Do not force every opaque surface two-sided.
 }

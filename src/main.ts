@@ -76,6 +76,9 @@ import { qualityPreset } from './rendering/quality-presets';
 import { WorldSectorGrid } from './world/world-sectors';
 import { AttackTimeline, combatTimings } from './combat/attack-timeline';
 import { resolveChainLightning } from './combat/chain-lightning';
+import { SimulationClock } from './core/simulation-clock';
+import { FrameTelemetry, ResolutionGovernor, renderScaling } from './rendering/frame-budget';
+import { ModelInstances } from './rendering/model-instances';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -201,6 +204,7 @@ type Entity = {
   attackCd: number;
   status: Statuses;
   root: TransformNode | null;
+  releaseVisual?: () => void;
   baseY?: number;
   baseScale?: Vector3;
   pickVolume?: Mesh;
@@ -294,9 +298,13 @@ const WORLD_MODELS = [
 ] as const;
 const GREENFALL_SPAWN = Object.freeze({ x: -7, z: -11 });
 
+const uiNodes = new Map<string, Element>();
 function q<T extends Element>(selector: string): T {
+  const cached = uiNodes.get(selector);
+  if (cached?.isConnected) return cached as T;
   const value = document.querySelector<T>(selector);
   if (!value) throw new Error(`Missing required UI node: ${selector}`);
+  uiNodes.set(selector, value);
   return value;
 }
 
@@ -325,6 +333,7 @@ app.innerHTML = `
  <div class="quick-items glass" aria-label="Быстрые расходники"><button class="skill-button" id="potion"><span class="key" id="potion-key">Q</span><span class="symbol">♥</span><small>Зелье <b id="potion-count">0</b></small></button><button class="skill-button" id="ether"><span class="key" id="ether-key">E</span><span class="symbol">◆</span><small>Эфир <b id="ether-count">0</b></small></button></div>
  <div class="notice-stack" id="notices"></div><div class="damage-layer" id="damage-layer"></div>
 </div><div id="modal-root"></div><div id="confirm-root"></div>`;
+q('#hud').insertAdjacentHTML('beforeend', '<output id="performance-readout" aria-label="Производительность">B01 · измерение FPS…</output>');
 
 function settingsDefaults(): Settings { return {
   quality: 'high', shadows: true, bloom: true, damage: true, screenShake: true,
@@ -443,8 +452,19 @@ moon.position = new Vector3(24, 42, -18);
 moon.intensity = 2.15;
 moon.diffuse = new Color3(1, 0.82, 0.61);
 const shadows = new ShadowGenerator(2048, moon);
-shadows.useBlurExponentialShadowMap = true;
-shadows.blurKernel = 24;
+shadows.usePercentageCloserFiltering = true;
+shadows.filteringQuality = ShadowGenerator.QUALITY_LOW;
+const shadowCasters = new Set<AbstractMesh>();
+const modelInstances = new ModelInstances();
+const frameTelemetry = new FrameTelemetry();
+const resolutionGovernor = new ResolutionGovernor();
+const simulationClock = new SimulationClock();
+let navigationBudget = 2;
+let hudTimer = 0;
+let minimapTimer = 0;
+let performanceTimer = 0;
+let lastTelemetry = frameTelemetry.snapshot();
+let lastRenderStats = { drawCalls: 0, activeMeshes: 0, renderWidth: 0, renderHeight: 0, shadowCasters: 0 };
 const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 32 });
 glow.intensity = 0.35;
 
@@ -545,6 +565,17 @@ function updateWorldSectorVisibility(dt: number): void {
   const distance = state.settings.quality === 'low' ? 74 : state.settings.quality === 'medium' ? 104 : state.settings.quality === 'high' ? 142 : 196;
   const active = sectorGrid.activeKeysAround(player.x, player.z, distance);
   sectorNodes.forEach((node, key) => node.setEnabled(active.has(key)));
+  const shadowMap = shadows.getShadowMap();
+  if (shadowMap) {
+    const radius = state.settings.quality === 'low' ? 24 : state.settings.quality === 'ultra' ? 65 : 45;
+    shadowMap.renderList = [...shadowCasters].filter(mesh => {
+      if (mesh.isDisposed()) { shadowCasters.delete(mesh); return false; }
+      if (!mesh.isEnabled()) return false;
+      mesh.computeWorldMatrix();
+      const bounds = mesh.getBoundingInfo().boundingSphere;
+      return Math.hypot(bounds.centerWorld.x - player.x, bounds.centerWorld.z - player.z) < radius + Math.min(bounds.radiusWorld, 12);
+    });
+  }
 }
 
 async function loadContainer(directory: string, filename: string): Promise<AssetContainer> {
@@ -595,26 +626,22 @@ async function loadAssets(): Promise<void> {
   assetsLoaded = true;
 }
 
-function instantiateContainer(container: AssetContainer, name: string): { root: TransformNode; animations: AnimationGroup[] } {
-  const entries = container.instantiateModelsToScene((sourceName) => `${name}-${sourceName}`, true);
-  const root = new TransformNode(name, scene);
-  for (const node of entries.rootNodes) node.parent = root;
-  return { root, animations: entries.animationGroups };
+function instantiateContainer(container: AssetContainer, name: string, tint?: number) {
+  return modelInstances.create(container, name, tint);
 }
 
 function tintMeshes(root: TransformNode, tint?: number): void {
-  const tintColor = tint == null ? null : Color3.FromHexString(`#${tint.toString(16).padStart(6, '0')}`);
+  void tint; // Variants are prepared once by ModelInstances, never multiplied per clone.
   root.getChildMeshes().forEach((mesh) => {
     mesh.receiveShadows = true;
-    shadows.addShadowCaster(mesh, true);
+    shadowCasters.add(mesh);
     const source = mesh.material;
     if (source instanceof StandardMaterial) {
-      if (tintColor) source.diffuseColor = source.diffuseColor.multiply(tintColor);
       if (!source.diffuseTexture && source.diffuseColor.toLuminance() < 0.02) {
-        source.diffuseColor = tintColor?.scale(0.42) ?? new Color3(0.32, 0.32, 0.32);
+        source.diffuseColor = new Color3(0.32, 0.32, 0.32);
       }
     } else if (source instanceof PBRMaterial) {
-      repairImportedMaterial(source, tintColor ?? undefined);
+      repairImportedMaterial(source);
     }
   });
 }
@@ -655,7 +682,8 @@ function createEntityModel(entity: Entity): void {
     ? characterAssets.get(entity.model)
     : monsterAssets.get(entity.model) ?? characterAssets.get(entity.model);
   if (!container) throw new Error(`Asset not loaded: ${entity.model}`);
-  const instance = instantiateContainer(container, entity.uid);
+  const instance = instantiateContainer(container, entity.uid, entity.tint);
+  entity.releaseVisual = instance.dispose;
   entity.root = instance.root;
   entity.animations = instance.animations;
   entity.animations.forEach((animation) => { animation.speedRatio = 1; });
@@ -687,17 +715,15 @@ function createEntityModel(entity: Entity): void {
 }
 
 function disposeEntityVisual(entity: Entity): void {
-  entity.animations.forEach((animation) => {
-    animation.stop();
-    animation.dispose();
-  });
-  entity.animations = [];
+  entity.root?.getChildMeshes().forEach(mesh => { shadowCasters.delete(mesh); shadows.removeShadowCaster(mesh); });
   entity.pickVolume?.dispose(false, false);
   entity.pickVolume = undefined;
-  entity.labelTexture?.dispose();
+  entity.label?.dispose(false, true); // Only this actor's dynamic label owns its texture.
   entity.labelTexture = undefined;
   entity.label = undefined;
-  entity.root?.dispose(false, true);
+  entity.releaseVisual?.();
+  entity.releaseVisual = undefined;
+  entity.animations = [];
   entity.root = null;
   entity.baseY = undefined;
   entity.baseScale = undefined;
@@ -752,6 +778,8 @@ function addNpcLabel(entity: Entity): void {
   plane.material = material;
   plane.parent = entity.root;
   plane.isPickable = false;
+  entity.label = plane;
+  entity.labelTexture = texture;
 }
 
 function addNameplate(entity: Entity): void {
@@ -821,7 +849,7 @@ function registerWorldCollider(name: string, x: number, z: number, scale: number
 function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0, tint?: number): TransformNode | null {
   const container = worldAssets.get(name);
   if (!container) return null;
-  const instance = instantiateContainer(container, `world-${name}-${uid()}`);
+  const instance = instantiateContainer(container, `world-${name}-${uid()}`, tint);
   instance.root.position.set(x, 0, z);
   instance.root.rotation.y = rotation;
   instance.root.scaling.setAll(scale);
@@ -852,7 +880,9 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
 function realismModelPart(partName: string, x: number, z: number, height: number, rotation = 0): TransformNode | null {
   const container = realismAssets.get('modular_fort_01');
   if (!container) return null;
-  const entries = container.instantiateModelsToScene((sourceName) => `fort-${uid()}-${sourceName}`, true);
+  const entries = container.instantiateModelsToScene((sourceName) => `fort-${uid()}-${sourceName}`, false, {
+    doNotInstantiate: true,
+  });
   const root = new TransformNode(`fort-part-${partName}-${uid()}`, scene);
   let retained = 0;
   for (const node of entries.rootNodes) {
@@ -892,29 +922,33 @@ const foliageMaterial = new PBRMaterial('forest-needle-material', scene);
 foliageMaterial.albedoColor = new Color3(0.055, 0.115, 0.078);
 foliageMaterial.roughness = 0.98;
 foliageMaterial.metallic = 0;
+let pineGeometry: { trunk: Mesh; crown: Mesh } | undefined;
 function createPineTree(name: string, x: number, z: number, height: number, rotation: number): void {
-  const trunk = MeshBuilder.CreateCylinder(`${name}-trunk`, { height: height * 0.62, diameterTop: height * 0.075, diameterBottom: height * 0.12, tessellation: 12 }, scene);
-  trunk.position.set(x, height * 0.31, z);
-  trunk.rotation.y = rotation;
-  trunk.material = barkMaterial;
-  trunk.receiveShadows = true;
-  shadows.addShadowCaster(trunk, true);
-  trunk.isPickable = false;
-  assignWorldSector(trunk, x, z);
-  for (let layer = 0; layer < 5; layer += 1) {
-    const crown = MeshBuilder.CreateCylinder(`${name}-crown-${layer}`, {
-      height: height * 0.3,
-      diameterTop: height * 0.02,
-      diameterBottom: height * (0.48 - layer * 0.055),
-      tessellation: 12,
-    }, scene);
-    crown.position.set(x, height * (0.48 + layer * 0.105), z);
-    crown.rotation.y = rotation + layer * 0.53;
-    crown.material = foliageMaterial;
-    crown.receiveShadows = true;
-    shadows.addShadowCaster(crown, true);
-    crown.isPickable = false;
-    assignWorldSector(crown, x, z);
+  if (!pineGeometry) {
+    const trunk = MeshBuilder.CreateCylinder('pine-source-trunk', { height: 0.62, diameterTop: 0.075, diameterBottom: 0.12, tessellation: 12 }, scene);
+    trunk.bakeTransformIntoVertices(Matrix.Translation(0, 0.31, 0));
+    trunk.material = barkMaterial;
+    const layers: Mesh[] = [];
+    for (let layer = 0; layer < 5; layer += 1) {
+      const crown = MeshBuilder.CreateCylinder(`pine-source-layer-${layer}`, { height: 0.3, diameterTop: 0.02, diameterBottom: 0.48 - layer * 0.055, tessellation: 12 }, scene);
+      crown.position.y = 0.48 + layer * 0.105;
+      crown.rotation.y = layer * 0.53;
+      crown.material = foliageMaterial;
+      layers.push(crown);
+    }
+    const crown = Mesh.MergeMeshes(layers, true, true)!;
+    crown.name = 'pine-source-crown';
+    pineGeometry = { trunk, crown };
+    for (const source of [trunk, crown]) {
+      source.isVisible = false; source.isPickable = false; source.receiveShadows = true;
+    }
+  }
+  for (const [part, source] of Object.entries(pineGeometry)) {
+    const mesh = source.createInstance(`${name}-${part}`);
+    mesh.position.set(x, 0, z); mesh.rotation.y = rotation; mesh.scaling.setAll(height);
+    mesh.isVisible = true; mesh.isPickable = false;
+    shadowCasters.add(mesh);
+    assignWorldSector(mesh, x, z);
   }
   collisionWorld.addCircle(x, z, height * 0.075 + 0.23);
 }
@@ -938,7 +972,7 @@ function townBox(name: string, x: number, y: number, z: number, width: number, h
     : /window|flame/i.test(name) ? townMaterial(color)
       : castleStoneMaterial;
   mesh.receiveShadows = true;
-  shadows.addShadowCaster(mesh, true);
+  shadowCasters.add(mesh);
   mesh.isPickable = false;
   assignWorldSector(mesh, x, z);
   if (collider) collisionWorld.addBox(x, z, width * 0.5, depth * 0.5, 0);
@@ -950,7 +984,7 @@ function townCylinder(name: string, x: number, y: number, z: number, diameter: n
   mesh.position.set(x, y, z);
   mesh.material = townMaterial(color);
   mesh.receiveShadows = true;
-  shadows.addShadowCaster(mesh, true);
+  shadowCasters.add(mesh);
   mesh.isPickable = false;
   assignWorldSector(mesh, x, z);
   if (collider) collisionWorld.addCircle(x, z, diameter * 0.46);
@@ -970,7 +1004,7 @@ function createBuilding(name: string, x: number, z: number, width: number, depth
   roof.scaling.z = Math.max(0.72, depth / Math.max(width, depth));
   roof.material = roofSlateMaterial;
   roof.receiveShadows = true;
-  shadows.addShadowCaster(roof, true);
+  shadowCasters.add(roof);
   roof.isPickable = false;
   assignWorldSector(roof, x, z);
   townBox(`${name}-door`, x, 1.05, z - depth * 0.505, 1.1, 2.1, 0.16, 0x4b3526, false);
@@ -1365,10 +1399,7 @@ function spawnAmbientResidents(): void {
 }
 
 function spawnEntities(): void {
-  state.entities.forEach((entity) => {
-    entity.pickVolume?.dispose(false, true);
-    entity.root?.dispose(false, true);
-  });
+  state.entities.forEach(disposeEntityVisual);
   state.entities.length = 0;
   const safeSpawn = collisionWorld.findNearestFree({ x: player.x, z: player.z }, 0.46);
   player.x = safeSpawn.x;
@@ -1446,6 +1477,7 @@ async function startGame(load: boolean): Promise<void> {
     q('#hud').classList.remove('hidden');
     state.started = true;
     state.paused = false;
+    skipFrameDelta = true;
     buildHotbar();
     updateQuest();
     updateHud();
@@ -1577,7 +1609,7 @@ function updateTargetIndicator(): void {
   targetIndicator.position.set(target.x, 0.03, target.z);
   const scale = target.boss === 'big' ? 2.2 : target.boss === 'mini' ? 1.55 : Math.max(0.85, target.targetHeight * 0.52);
   targetIndicator.scaling.setAll(scale);
-  targetIndicator.rotation.y += Math.min(engine.getDeltaTime() / 1000, 0.04) * 0.7;
+  targetIndicator.rotation.y += 0.7 / 60;
   targetIndicator.setEnabled(true);
 }
 
@@ -1652,19 +1684,19 @@ function update(dt: number): void {
   hero.x = player.x;
   hero.z = player.z;
   syncEntityTransform(hero, motion.height);
-  state.entities.filter((entity) => entity.kind === 'monster').forEach((entity) => updateMonster(entity, dt));
-  state.entities.filter((entity) => entity.kind === 'summon').forEach((entity) => updateSummon(entity, dt));
-  state.entities.filter((entity) => entity.kind === 'npc').forEach((entity) => updateTownNpc(entity, dt));
-  state.entities.filter((entity) => entity.kind === 'ambient').forEach((entity) => updateAmbientResident(entity, dt));
+  for (const entity of state.entities) {
+    if (entity.kind === 'monster') updateMonster(entity, dt);
+    else if (entity.kind === 'summon') updateSummon(entity, dt);
+    else if (entity.kind === 'npc') updateTownNpc(entity, dt);
+    else if (entity.kind === 'ambient') updateAmbientResident(entity, dt);
+  }
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
   updateTargetIndicator();
   gameAudio.update(dt);
   gameAudio.setRegion(zoneAt(player.x, player.z).kind === 'safe');
-  updateWorldSectorVisibility(dt);
   state.bossTimers.mini = Math.max(0, state.bossTimers.mini - dt);
   state.bossTimers.big = Math.max(0, state.bossTimers.big - dt);
-  updateHud();
 }
 
 function restoreEntityAfterRespawn(entity: Entity): void {
@@ -2121,7 +2153,7 @@ function summonSkeleton(): void {
   state.entities.push(summon);
   toast('Костяной страж служит вам 20 секунд');
   window.setTimeout(() => {
-    summon.root?.dispose(false, true);
+    disposeEntityVisual(summon);
     const index = state.entities.indexOf(summon);
     if (index >= 0) state.entities.splice(index, 1);
   }, 20_000);
@@ -2153,23 +2185,23 @@ const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: n
 
 function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: number; z: number }>, speed: number, dt: number, actorRadius = 0.4): boolean {
   entity.navCooldown = Math.max(0, (entity.navCooldown ?? 0) - dt);
-  const destinationChanged = Math.hypot((entity.navGoalX ?? Infinity) - destination.x, (entity.navGoalZ ?? Infinity) - destination.z) > 0.8;
-  if (destinationChanged || !entity.navPath?.length || entity.navCooldown <= 0) {
+  if (entity.navCooldown <= 0 && navigationBudget > 0) {
+    navigationBudget -= 1;
     entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius, cellSize: 1.05, margin: 9 });
     entity.navIndex = 0;
     entity.navGoalX = destination.x;
     entity.navGoalZ = destination.z;
     entity.navCooldown = entity.navPath.length ? (entity.kind === 'monster' ? 0.72 : 2.2) : 0.55;
   }
-  const waypoint = entity.navPath?.[entity.navIndex ?? 0];
+  let waypoint = entity.navPath?.[entity.navIndex ?? 0];
+  while (waypoint && Math.hypot(waypoint.x - entity.x, waypoint.z - entity.z) < 0.24) {
+    entity.navIndex = (entity.navIndex ?? 0) + 1;
+    waypoint = entity.navPath?.[entity.navIndex];
+  }
   if (!waypoint) return false;
   const dx = waypoint.x - entity.x;
   const dz = waypoint.z - entity.z;
   const distance = Math.max(0.0001, Math.hypot(dx, dz));
-  if (distance < 0.24) {
-    entity.navIndex = (entity.navIndex ?? 0) + 1;
-    return moveEntityAlongNavigation(entity, destination, speed, dt);
-  }
   let separationX = 0;
   let separationZ = 0;
   for (const neighbor of state.entities) {
@@ -2193,7 +2225,7 @@ function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: nu
   const step = Math.min(distance, speed * dt);
   const moved = moveEntityWithCollision(entity, (intentX / intentLength) * step, (intentZ / intentLength) * step, true);
   rotateTowardsSmooth(entity, waypoint.x, waypoint.z, dt);
-  if (!moved) entity.navCooldown = 0;
+  if (!moved) entity.navCooldown = Math.min(entity.navCooldown ?? 0.3, 0.3);
   return moved;
 }
 
@@ -2320,7 +2352,6 @@ function updateHud(): void {
     const cooldown = button.querySelector<HTMLElement>('.cooldown');
     if (cooldown) cooldown.textContent = player.cooldowns[index] > 0 ? player.cooldowns[index].toFixed(1) : '';
   });
-  drawMinimap();
 }
 
 function formatTimer(seconds: number): string {
@@ -2545,7 +2576,7 @@ function renderSettings(): void {
   q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid">
     <section><h3>Экран и графика</h3>
       <div class="setting"><label>Профиль качества<select id="quality"><option value="low">Производительность</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div>
-      <div class="setting"><label>Масштаб рендера<select id="resolution-scale"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option></select></label></div>
+      <div class="setting"><label>Масштаб рендера<select id="resolution-scale"><option value="0.5">50%</option><option value="0.65">65%</option><option value="0.75">75%</option><option value="0.82">82%</option><option value="1">100%</option><option value="1.1">110%</option><option value="1.25">125%</option></select></label></div>
       <div class="setting"><label>Качество текстур<select id="texture-quality"><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div>
       <div class="setting"><label>Тени<select id="shadow-quality"><option value="off">Выкл.</option><option value="low">Низкие</option><option value="high">Высокие</option><option value="ultra">Ультра</option></select></label></div>
       <div class="setting"><label>Плотность леса<select id="foliage"><option value="low">Низкая</option><option value="medium">Средняя</option><option value="high">Высокая</option></select></label></div>
@@ -2624,9 +2655,9 @@ function renderSettings(): void {
 }
 
 function applySettings(): void {
-  const deviceNative = 1 / Math.min(window.devicePixelRatio, 2);
-  const qualityFactor: Record<Settings['quality'], number> = { low: 1.45, medium: 1.18, high: deviceNative, ultra: deviceNative / 1.05 };
-  engine.setHardwareScalingLevel(qualityFactor[state.settings.quality] / state.settings.resolutionScale);
+  resolutionGovernor.reset();
+  applyRenderResolution();
+  sectorVisibilityCooldown = 0;
   shadows.setDarkness(0.28);
   moon.shadowEnabled = state.settings.shadows && state.settings.shadowQuality !== 'off';
   shadows.getShadowMap()?.resize(state.settings.shadowQuality === 'ultra' ? 4096 : state.settings.shadowQuality === 'high' ? 2048 : 1024);
@@ -2742,26 +2773,63 @@ function sendChat(): void { const input = q<HTMLInputElement>('#chat'); if (inpu
 q<HTMLButtonElement>('#send-chat').onclick = sendChat;
 q<HTMLInputElement>('#chat').onkeydown = (event) => { if (event.key === 'Enter') sendChat(); };
 
-window.addEventListener('resize', () => engine.resize());
+function applyRenderResolution(): void {
+  engine.setHardwareScalingLevel(renderScaling(window.innerWidth, window.innerHeight, window.devicePixelRatio,
+    state.settings.quality, state.settings.resolutionScale, resolutionGovernor.scale));
+  engine.resize();
+}
+window.addEventListener('resize', applyRenderResolution);
+let skipFrameDelta = false;
+document.addEventListener('visibilitychange', () => {
+  simulationClock.reset(); inputControl.reset(); playerMotor.stopPlanar();
+  skipFrameDelta = true;
+});
 let saveTimer = 0;
 engine.runRenderLoop(() => {
-  const dt = Math.min(engine.getDeltaTime() / 1000, 0.04);
+  if (document.hidden) { simulationClock.reset(); return; }
+  const elapsed = skipFrameDelta ? 0 : engine.getDeltaTime() / 1000;
+  skipFrameDelta = false;
+  const dt = Math.min(elapsed, 0.5);
+  const start = performance.now();
+  navigationBudget = 2;
   if (state.started) {
     cameraControl.orbit(inputControl.consumeCameraOrbit());
     cameraControl.zoom(inputControl.consumeZoom());
   }
   if (state.started && !state.paused) {
-    update(dt); saveTimer += dt; if (saveTimer > 8) { saveGame(); saveTimer = 0; }
+    simulationClock.advance(elapsed, step => { update(step); return !state.paused; });
+    saveTimer += dt; if (saveTimer > 8) { saveGame(); saveTimer = 0; }
+  } else simulationClock.reset();
+  if (state.started) {
+    updateWorldSectorVisibility(dt);
+    hudTimer += dt; minimapTimer += dt;
+    if (hudTimer >= 0.1) { hudTimer = 0; updateHud(); }
+    if (minimapTimer >= 0.2) { minimapTimer = 0; drawMinimap(); }
   }
   if (state.started) cameraControl.update(dt, { x: player.x, y: 0, z: player.z });
+  const beforeRender = performance.now();
   scene.render();
+  if (state.started && !state.paused) {
+    frameTelemetry.record(engine.getDeltaTime(), beforeRender - start, performance.now() - beforeRender);
+    if (resolutionGovernor.sample(dt)) applyRenderResolution();
+    performanceTimer += dt;
+    if (performanceTimer >= 1) {
+      performanceTimer = 0; lastTelemetry = frameTelemetry.snapshot();
+      lastRenderStats = { drawCalls: engine._drawCalls.current, activeMeshes: scene.getActiveMeshes().length,
+        renderWidth: engine.getRenderWidth(), renderHeight: engine.getRenderHeight(), shadowCasters: shadows.getShadowMap()?.renderList?.length ?? 0 };
+      q('#performance-readout').textContent = `${lastTelemetry.fps.toFixed(0)} FPS · p95 ${lastTelemetry.p95Ms.toFixed(0)} ms · ${lastRenderStats.renderWidth}×${lastRenderStats.renderHeight}`;
+    }
+  }
 });
 
 // Exposed only for deterministic smoke tests executed by the project's QA harness.
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.5.0-core-quality-test',
+    version: '0.6.0-b01-performance-test',
+    getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
+      materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
+      adaptiveScale: resolutionGovernor.scale, droppedSeconds: simulationClock.droppedSeconds }),
     getState: () => ({
       started: state.started,
       entities: state.entities.length,
@@ -2775,3 +2843,32 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
   },
   enumerable: false,
 });
+
+// Only compiled into the separate CI build. Never included in the downloadable game.
+if (__QA_BUILD__) {
+  const actors = () => state.entities.map(entity => {
+    const point = Vector3.Project(new Vector3(entity.x, entity.targetHeight * 0.55, entity.z), Matrix.Identity(),
+      scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
+    const meshes = entity.root?.getChildMeshes().filter(mesh => mesh.getTotalVertices() > 0) ?? [];
+    return { uid: entity.uid, id: entity.id, kind: entity.kind, model: entity.model, x: entity.x, z: entity.z,
+      screenX: point.x * canvas.clientWidth / engine.getRenderWidth(), screenY: point.y * canvas.clientHeight / engine.getRenderHeight(),
+      depth: point.z, hp: entity.hp, alive: entity.alive, generation: entity.visualGeneration, action: entity.actionType,
+      rootY: entity.root?.position.y, meshes: meshes.length, visible: meshes.some(mesh => mesh.isEnabled() && mesh.isVisible),
+      ready: meshes.every(mesh => mesh.isReady(true)), animations: entity.animations.length,
+      lifecycle: entity.lifecycle?.state, baseScale: entity.baseScale?.asArray(),
+      engaged: combatControl.isEngagedWith(entity.uid) };
+  });
+  Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
+    actors,
+    pause: (value: boolean) => { state.paused = value; simulationClock.reset(); skipFrameDelta = true; },
+    kill: (id: string) => { const entity = state.entities.find(e => e.uid === id); if (entity) killMonster(entity); },
+    lifecycleStep: (id: string, seconds: number) => { const entity = state.entities.find(e => e.uid === id); if (entity) updateMonster(entity, seconds); },
+    placePlayer: (x: number, z: number) => {
+      const point = collisionWorld.findNearestFree({ x, z }, 0.46);
+      player.x = point.x; player.z = point.z; resetPlayerControl(true);
+      const hero = playerEntity(); hero.x = player.x; hero.z = player.z; syncEntityTransform(hero);
+      cameraControl.snap({ x: player.x, y: 0, z: player.z }); sectorVisibilityCooldown = 0;
+    },
+    die: () => die(),
+  } });
+}

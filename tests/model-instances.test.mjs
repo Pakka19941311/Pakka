@@ -1,0 +1,38 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import { NullEngine, Scene, AssetContainer, MeshBuilder, PBRMaterial, MultiMaterial, Skeleton, Bone, Matrix, AnimationGroup } from '@babylonjs/core';
+import { ModelInstances } from '../src/rendering/model-instances.ts';
+
+test('fifty respawns preserve shared materials, template MultiMaterial links and independent rigs', () => {
+  const engine = new NullEngine(); const scene = new Scene(engine);
+  try {
+    const container = new AssetContainer(scene);
+    const mesh = MeshBuilder.CreateBox('test-template', {}, scene);
+    const pbr = new PBRMaterial('body', scene);
+    const multi = new MultiMaterial('parts', scene); multi.subMaterials = [pbr]; mesh.material = multi;
+    const skeleton = new Skeleton('rig', 'rig', scene);
+    new Bone('root', skeleton, null, Matrix.Identity()); mesh.skeleton = skeleton;
+    container.meshes = [mesh]; container.materials = [pbr]; container.multiMaterials = [multi];
+    container.skeletons = [skeleton]; container.animationGroups = [new AnimationGroup('idle', scene)];
+    container.removeAllFromScene();
+    const factory = new ModelInstances();
+    const survivor = factory.create(container, 'survivor', 0xccbbaa);
+    const survivorMesh = survivor.root.getChildMeshes()[0];
+    const material = survivorMesh.material;
+    const counts = () => [scene.meshes.length, scene.materials.length, scene.multiMaterials.length, scene.skeletons.length, scene.animationGroups.length];
+    const initial = counts();
+    for (let i = 0; i < 50; i++) {
+      const actor = factory.create(container, `respawn-${i}`, 0xccbbaa);
+      const child = actor.root.getChildMeshes()[0];
+      assert.equal(child.material, material);
+      assert.notEqual(child.skeleton, survivorMesh.skeleton);
+      child.scaling.setAll(2); child.position.x = 5;
+      actor.dispose(); actor.dispose();
+      assert.deepEqual(counts(), initial);
+      assert.equal(survivorMesh.isDisposed(), false);
+      assert.equal(multi.subMaterials[0], pbr);
+      assert.equal(mesh.scaling.x, 1); assert.equal(mesh.position.x, 0);
+    }
+    survivor.dispose(); container.dispose();
+  } finally { scene.dispose(); engine.dispose(); }
+});

@@ -24,23 +24,47 @@ function boxOverlap(point: Point2, actorRadius: number, obstacle: BoxObstacle): 
 
 export class CollisionWorld {
   private readonly obstacles: Obstacle[] = [];
+  private readonly cells = new Map<string, Obstacle[]>();
+  private readonly cellSize = 8;
+  candidateChecks = 0;
 
   clear(): void {
     this.obstacles.length = 0;
+    this.cells.clear();
+    this.candidateChecks = 0;
+  }
+
+  private insert(obstacle: Obstacle, extentX: number, extentZ: number): void {
+    this.obstacles.push(obstacle);
+    for (let x = Math.floor((obstacle.x - extentX) / this.cellSize); x <= Math.floor((obstacle.x + extentX) / this.cellSize); x += 1) {
+      for (let z = Math.floor((obstacle.z - extentZ) / this.cellSize); z <= Math.floor((obstacle.z + extentZ) / this.cellSize); z += 1) {
+        const key = `${x}:${z}`;
+        const bucket = this.cells.get(key);
+        if (bucket) bucket.push(obstacle); else this.cells.set(key, [obstacle]);
+      }
+    }
   }
 
   addCircle(x: number, z: number, radius: number): void {
-    if (radius > 0) this.obstacles.push({ kind: 'circle', x, z, radius });
+    if (radius > 0) this.insert({ kind: 'circle', x, z, radius }, radius, radius);
   }
 
   addBox(x: number, z: number, halfX: number, halfZ: number, rotation = 0): void {
-    if (halfX > 0 && halfZ > 0) this.obstacles.push({ kind: 'box', x, z, halfX, halfZ, rotation });
+    if (halfX > 0 && halfZ > 0) this.insert({ kind: 'box', x, z, halfX, halfZ, rotation },
+      Math.abs(Math.cos(rotation)) * halfX + Math.abs(Math.sin(rotation)) * halfZ,
+      Math.abs(Math.sin(rotation)) * halfX + Math.abs(Math.cos(rotation)) * halfZ);
   }
 
   isBlocked(point: Point2, actorRadius: number): boolean {
-    return this.obstacles.some((obstacle) => obstacle.kind === 'circle'
-      ? circleOverlap(point, actorRadius, obstacle)
-      : boxOverlap(point, actorRadius, obstacle));
+    for (let x = Math.floor((point.x - actorRadius) / this.cellSize); x <= Math.floor((point.x + actorRadius) / this.cellSize); x += 1) {
+      for (let z = Math.floor((point.z - actorRadius) / this.cellSize); z <= Math.floor((point.z + actorRadius) / this.cellSize); z += 1) {
+        for (const obstacle of this.cells.get(`${x}:${z}`) ?? []) {
+          this.candidateChecks += 1;
+          if (obstacle.kind === 'circle' ? circleOverlap(point, actorRadius, obstacle) : boxOverlap(point, actorRadius, obstacle)) return true;
+        }
+      }
+    }
+    return false;
   }
 
   resolve(from: Point2, delta: Point2, actorRadius: number): CollisionMove {

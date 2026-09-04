@@ -1,0 +1,147 @@
+name: B01 validation and Windows test build
+
+on:
+  push:
+    branches: [work/v06-commercial-rebuild]
+    paths-ignore: ['docs/**', PROJECT_RULES.md]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+      - name: Unit tests, production build, real asset lifecycle
+        run: |
+          npm ci
+          npm test
+          npm run build
+          npm run smoke
+          if rg '__VARENDOR_FIXTURE__' dist/assets/*.js; then exit 1; fi
+      - name: Save production build for Windows validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: production
+          path: |
+            dist
+            server.ps1
+            packaging/windows/RUN_VARENDOR.bat
+            packaging/windows/README_B01_RU.txt
+          retention-days: 14
+      - name: Prepare isolated browser regression build
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
+          VARENDOR_QA=1 npx vite build --outDir dist-qa
+          google-chrome --version
+      - name: Real WebGL gameplay and respawn smoke
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: npm run test:browser
+      - name: Check out unchanged baseline for comparison
+        uses: actions/checkout@v4
+        with:
+          ref: 4826f14733e5972784561a1c305a532c9df53e66
+          path: baseline
+      - name: Compare baseline on the same software-rendering runner
+        continue-on-error: true
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          npm ci --prefix baseline
+          npm run build --prefix baseline
+          node scripts/browser-regression.mjs baseline/dist baseline
+      - name: Save screenshots and machine-readable evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-evidence
+          path: qa-artifacts
+          retention-days: 30
+
+  windows-launcher:
+    needs: validate
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: production
+          path: build
+      - name: Test Windows PowerShell launcher and actual asset HTTP responses
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $process = Start-Process powershell.exe -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',"$pwd/build/server.ps1",'-NoBrowser' -PassThru
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 20; $attempt++) {
+              try { $page = Invoke-WebRequest http://localhost:4173/ -UseBasicParsing; $ready = $true; break } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $ready) { throw 'Windows launcher did not start' }
+            if ($page.Content -notmatch 'Varendor') { throw 'Wrong HTML' }
+            $scripts = [regex]::Matches($page.Content, 'src="([^"]+\.js)"')
+            if ($scripts.Count -eq 0) { throw 'No production entry script' }
+            foreach ($script in $scripts) {
+              $asset = Invoke-WebRequest ("http://localhost:4173" + $script.Groups[1].Value + '?launcher-test=1') -UseBasicParsing
+              if ($asset.Headers['Content-Type'] -notmatch 'javascript') { throw 'JS MIME is incorrect' }
+              if ($asset.Content.StartsWith('<!DOCTYPE')) { throw 'JS route returned HTML' }
+              if ($asset.RawContentLength -lt 1000) { throw 'Entry script truncated' }
+            }
+            $model = Get-ChildItem build/dist/assets/models -Recurse -Filter *.glb | Select-Object -First 1
+            $relative = $model.FullName.Substring((Resolve-Path build/dist).Path.Length).Replace('\','/')
+            $modelResponse = Invoke-WebRequest ("http://localhost:4173" + $relative) -UseBasicParsing
+            if ($modelResponse.RawContentLength -ne $model.Length) { throw 'GLB transfer length mismatch' }
+            Write-Host 'PASS Windows launcher: HTML, JS MIME, query routes, complete GLB'
+          } finally { if (-not $process.HasExited) { Stop-Process -Id $process.Id } }
+
+  package:
+    needs: [validate, windows-launcher]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: production
+          path: production
+      - uses: actions/download-artifact@v4
+        with:
+          name: browser-evidence
+          path: qa-artifacts
+      - name: Package verified Windows build
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA:0:8}"
+          stage="Varendor_B01_Windows_Test_${short_sha}"
+          mkdir "$stage"
+          cp -a production/dist "$stage/dist"
+          cp production/server.ps1 "$stage/"
+          cp production/packaging/windows/RUN_VARENDOR.bat "$stage/"
+          cp production/packaging/windows/README_B01_RU.txt "$stage/README_RU.txt"
+          printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
+          zip -q -9 -r "${stage}.zip" "$stage"
+          unzip -t "${stage}.zip" | tail -1
+          sha256sum "${stage}.zip" > "${stage}.zip.sha256"
+          stat -c '%n %s bytes' "${stage}.zip"
+          cat "${stage}.zip.sha256"
+          zip -q -r "B01_QA_${short_sha}.zip" qa-artifacts
+      - name: Publish immutable prerelease, never merge main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA:0:8}"
+          tag="v0.6-b01-test-${short_sha}"
+          gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
+            --title "Varendor B01 — Performance Test (${short_sha})" \
+            --notes "Тест первого блока коммерческого плана. Текущий стиль v0.5 сохранён. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. Следующий блок ждёт принятия пользователем. main не изменён. CI WebGL использует software GPU, результаты не являются FPS-прогнозом для вашего ПК." \
+            "Varendor_B01_Windows_Test_${short_sha}.zip" "Varendor_B01_Windows_Test_${short_sha}.zip.sha256" \
+            "B01_QA_${short_sha}.zip"

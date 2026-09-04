@@ -6,6 +6,7 @@ import process from 'node:process';
 import XMLHttpRequest from 'xhr2';
 import '@babylonjs/loaders/glTF/index.js';
 import { NullEngine, Scene, SceneLoader } from '@babylonjs/core';
+import { ModelInstances } from '../src/rendering/model-instances.ts';
 
 globalThis.XMLHttpRequest = XMLHttpRequest;
 
@@ -59,6 +60,7 @@ try {
   assert.match(bundle, /__VARENDOR_QA__/);
   const nullEngine = new NullEngine({ renderWidth: 800, renderHeight: 600 });
   const scene = new Scene(nullEngine);
+  const factory = new ModelInstances();
   const worldModels = (await readdir(path.join(process.cwd(), 'dist/assets/models/world')))
     .filter((file) => file.toLowerCase().endsWith('.glb'))
     .sort()
@@ -78,8 +80,8 @@ try {
     if (model.animated) assert.ok(container.animationGroups.length > 0, `Babylon produced no animations for ${model.file}`);
     const cycles = model.respawnCycles ?? 1;
     for (let cycle = 0; cycle < cycles; cycle += 1) {
-      const instance = container.instantiateModelsToScene((name) => `qa-${cycle}-${model.file}-${name}`, true);
-      const meshes = instance.rootNodes.flatMap((node) => node.getChildMeshes?.() ?? []);
+      const instance = factory.create(container, `qa-${cycle}-${model.file}`);
+      const meshes = instance.root.getChildMeshes();
       assert.ok(meshes.length > 0, `Babylon could not instantiate ${model.file} on cycle ${cycle + 1}`);
       for (const mesh of meshes) {
         mesh.setEnabled(true);
@@ -90,8 +92,8 @@ try {
         assert.ok(Number.isFinite(bounds.minimumWorld.x) && Number.isFinite(bounds.maximumWorld.y), `Invalid bounds in ${model.file}`);
         if (mesh.material && !mesh.material.getClassName?.().includes('Multi')) assert.equal(mesh.material.getScene?.(), scene, `Detached material reused in ${model.file}`);
       }
-      instance.animationGroups.forEach((group) => { group.speedRatio = 1; group.start(true); group.stop(); group.reset(); group.dispose(); });
-      instance.rootNodes.forEach((node) => node.dispose(false, true));
+      instance.animations.forEach((group) => { group.speedRatio = 1; group.start(true); group.stop(); group.reset(); });
+      instance.dispose();
     }
     container.dispose();
   }
