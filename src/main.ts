@@ -2761,10 +2761,12 @@ engine.runRenderLoop(() => {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.4.0-phase1',
+    version: '0.5.0-core-quality-test',
     getState: () => ({
       started: state.started,
       entities: state.entities.length,
+      monsters: state.entities.filter((entity) => entity.kind === 'monster').length,
+      activeMonsterStates: state.entities.filter((entity) => entity.kind === 'monster' && entity.alive).map((entity) => entity.aiState),
       assetsLoaded,
       camera: cameraControl.state,
       selectedTarget: targeting.selected?.uid ?? null,
