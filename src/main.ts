@@ -232,6 +232,7 @@ type Entity = {
   aiBrain?: MonsterAiBrain;
   aiState?: MonsterAiState;
   visualGeneration?: number;
+  normalizationKey?: string;
   lifecycle?: MonsterLifecycle;
 };
 type Settings = {
@@ -688,9 +689,17 @@ function createEntityModel(entity: Entity): void {
   entity.animations = instance.animations;
   entity.animations.forEach((animation) => { animation.speedRatio = 1; });
   entity.root.position.set(entity.x, 0, entity.z);
-  normalizeHeight(entity.root, entity.targetHeight);
-  entity.baseY = entity.root.position.y;
-  entity.baseScale = entity.root.scaling.clone();
+  const normalizationKey = `${entity.model}:${entity.targetHeight}`;
+  if (entity.normalizationKey === normalizationKey && entity.baseScale) {
+    // Never re-measure a skinned/animated bound on respawn: its pose may differ.
+    entity.root.scaling.copyFrom(entity.baseScale);
+    entity.root.position.y = entity.baseY ?? 0;
+  } else {
+    normalizeHeight(entity.root, entity.targetHeight);
+    entity.baseY = entity.root.position.y;
+    entity.baseScale = entity.root.scaling.clone();
+    entity.normalizationKey = normalizationKey;
+  }
   entity.visualGeneration = (entity.visualGeneration ?? 0) + 1;
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
@@ -725,8 +734,7 @@ function disposeEntityVisual(entity: Entity): void {
   entity.releaseVisual = undefined;
   entity.animations = [];
   entity.root = null;
-  entity.baseY = undefined;
-  entity.baseScale = undefined;
+  // Preserve canonical normalization across death; replacement models use a new key.
   entity.actionType = undefined;
 }
 

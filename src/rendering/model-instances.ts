@@ -30,6 +30,8 @@ export class ModelInstances {
 
   create(container: AssetContainer, name: string, tint?: number) {
     const entries = container.instantiateModelsToScene(source => `${name}-${source}`, false, { doNotInstantiate: true });
+    entries.animationGroups.forEach(group => { group.stop(); group.reset(); });
+    entries.skeletons.forEach(skeleton => skeleton.returnToRest());
     const root = new TransformNode(name, container.scene);
     for (const node of entries.rootNodes) node.parent = root;
     for (const mesh of root.getChildMeshes()) {
