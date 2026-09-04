@@ -94,12 +94,22 @@ try {
     const cameraAfter = (await state()).camera;
     assert.notEqual(cameraAfter.yaw, cameraBefore.yaw); assert.notEqual(cameraAfter.distance, cameraBefore.distance);
     check('RMB orbit and wheel zoom');
-    await page.keyboard.press('Space'); await page.waitForTimeout(180);
-    const jump = (await actors()).find(e => e.kind === 'player');
-    await page.waitForTimeout(1100);
-    const landed = (await actors()).find(e => e.kind === 'player');
-    assert.ok(jump.rootY > landed.rootY + 0.1, 'jump did not rise and land');
-    check('Space jump and landing');
+    // Observe before key-down: wall-clock sleeps can miss the entire jump on a slow software GPU.
+    await page.evaluate(() => {
+      const baseY = window.__VARENDOR_FIXTURE__.actors().find(e => e.kind === 'player').rootY;
+      window.__JUMP_PROBE__ = { baseY, peakY: baseY, landed: false };
+      const deadline = performance.now() + 20000;
+      const observe = () => {
+        const y = window.__VARENDOR_FIXTURE__.actors().find(e => e.kind === 'player').rootY;
+        const probe = window.__JUMP_PROBE__; probe.peakY = Math.max(probe.peakY, y);
+        probe.landed = probe.peakY > baseY + 0.1 && Math.abs(y - baseY) < 0.05;
+        if (!probe.landed && performance.now() < deadline) requestAnimationFrame(observe);
+      };
+      requestAnimationFrame(observe);
+    });
+    await page.keyboard.press('Space');
+    await page.waitForFunction(() => window.__JUMP_PROBE__.landed, {}, { timeout: 20000 });
+    check('Space jump and landing', await page.evaluate(() => window.__JUMP_PROBE__));
     await page.keyboard.press('i'); await page.locator('.close-window').waitFor();
     await page.screenshot({ path: `${reportDir}/b01-inventory.png` }); await page.locator('.close-window').click();
     await page.keyboard.press('Escape'); await page.locator('.close-window').waitFor();
