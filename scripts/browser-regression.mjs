@@ -66,7 +66,7 @@ try {
     requestAnimationFrame(frame);
   });
   page = await context.newPage(); page.setDefaultTimeout(30000);
-  page.on('pageerror', error => report.errors.push(error.message));
+  page.on('pageerror', error => report.errors.push(error.stack ?? error.message));
   page.on('console', message => { if (message.type() === 'error') report.errors.push(message.text()); });
   page.on('requestfailed', request => report.failedRequests.push({ url: request.url(), error: request.failure()?.errorText }));
   page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('/favicon.ico')) report.errors.push(`HTTP ${response.status()} ${response.url()}`); });

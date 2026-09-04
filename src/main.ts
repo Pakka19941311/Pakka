@@ -80,7 +80,7 @@ import { WorldSectorGrid } from './world/world-sectors';
 import { AttackTimeline, combatTimings } from './combat/attack-timeline';
 import { resolveChainLightning } from './combat/chain-lightning';
 import { SimulationClock } from './core/simulation-clock';
-import { FrameTelemetry, ResolutionGovernor, renderScaling } from './rendering/frame-budget';
+import { FrameTelemetry, ResolutionGovernor, renderScaling, effectiveRenderBudget } from './rendering/frame-budget';
 import { ModelInstances } from './rendering/model-instances';
 import { TerrainSurface } from './world/terrain-surface';
 import { createStaticPart } from './rendering/static-part';
@@ -602,7 +602,8 @@ function updateWorldSectorVisibility(dt: number): void {
   sectorNodes.forEach((node, key) => node.setEnabled(active.has(key)));
   const shadowMap = shadows.getShadowMap();
   if (shadowMap) {
-    const radius = state.settings.quality === 'low' ? 24 : state.settings.quality === 'ultra' ? 65 : 45;
+    const radius = (state.settings.quality === 'low' ? 24 : state.settings.quality === 'ultra' ? 65 : 45)
+      * (resolutionGovernor.detailStep >= 2 ? 0.65 : 1);
     shadowMap.renderList = [...shadowCasters].filter(mesh => {
       if (mesh.isDisposed()) { shadowCasters.delete(mesh); return false; }
       if (!mesh.isEnabled()) return false;
@@ -1528,7 +1529,6 @@ async function startGame(load: boolean): Promise<void> {
     q('#load-text').textContent = 'Подготавливаем изображение…';
     // Loaded GLTF data does not mean the shaders/post-processing are ready to display.
     await scene.whenReadyAsync();
-    if (state.settings.shadows) await shadows.forceCompilationAsync();
     await new Promise<void>(resolve => scene.onAfterRenderObservable.addOnce(() => resolve()));
     q('#loading').classList.add('hidden');
     q('#hud').classList.remove('hidden');
@@ -1732,6 +1732,9 @@ function update(dt: number): void {
   // Keep intent while sliding; repeatedly zeroing acceleration at a contact caused sticky walls.
   enforcePlayerBoundary();
   const moved = Math.hypot(player.x - hero.x, player.z - hero.z) > 0.001;
+  if (!manualMovement && resolvedPlayer.blocked && !moved) {
+    hero.navPath = undefined; hero.navCooldown = Math.max(hero.navCooldown ?? 0, 0.25);
+  }
   if (moved && hero.root) {
     const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
     hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
@@ -2728,17 +2731,25 @@ function renderSettings(): void {
   };
 }
 
+function applyRenderBudget(): void {
+  const budget = effectiveRenderBudget(state.settings.quality, state.settings.shadowQuality,
+    state.settings.antiAliasing, state.settings.bloom, resolutionGovernor.detailStep);
+  const map = shadows.getShadowMap();
+  if (map && map.getSize().width !== budget.shadowSize) map.resize(budget.shadowSize);
+  renderPipeline.samples = budget.samples;
+  renderPipeline.bloomEnabled = budget.bloom;
+  glow.isEnabled = budget.bloom;
+  sectorVisibilityCooldown = 0;
+}
+
 function applySettings(): void {
   resolutionGovernor.reset();
   applyRenderResolution();
   sectorVisibilityCooldown = 0;
   shadows.setDarkness(0.28);
   moon.shadowEnabled = state.settings.shadows && state.settings.shadowQuality !== 'off';
-  shadows.getShadowMap()?.resize(state.settings.shadowQuality === 'ultra' ? 4096 : state.settings.shadowQuality === 'high' ? 2048 : 1024);
-  glow.isEnabled = state.settings.bloom;
   renderPipeline.fxaaEnabled = state.settings.antiAliasing;
-  renderPipeline.samples = state.settings.antiAliasing && state.settings.quality === 'ultra' ? 4 : 1;
-  renderPipeline.bloomEnabled = state.settings.bloom;
+  applyRenderBudget();
   renderPipeline.bloomWeight = 0.12;
   renderPipeline.bloomThreshold = 0.86;
   scene.imageProcessingConfiguration.exposure = state.settings.exposure;
@@ -2894,7 +2905,7 @@ engine.runRenderLoop(() => {
   }
   if (state.started) cameraControl.update(dt, { x: player.x, y: terrain.supportAt(player.x, player.z), z: player.z });
   // Resizing clears the drawing buffer. It must happen BEFORE drawing, never after.
-  if (state.started && !state.paused && resolutionGovernor.sample(dt)) applyRenderResolution();
+  if (state.started && !state.paused && resolutionGovernor.sample(dt)) { applyRenderResolution(); applyRenderBudget(); }
   const beforeRender = performance.now();
   engine._drawCalls.fetchNewFrame();
   scene.render();
@@ -2917,7 +2928,9 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
     version: '0.6.0-b01-performance-test',
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
-      adaptiveScale: resolutionGovernor.scale, droppedSeconds: simulationClock.droppedSeconds,
+      adaptiveScale: resolutionGovernor.scale, adaptiveDetails: resolutionGovernor.detailStep,
+      msaaSamples: renderPipeline.samples, shadowSize: shadows.getShadowMap()?.getSize().width,
+      droppedSeconds: simulationClock.droppedSeconds,
       animationMs: sceneTimings.animationsTimeCounter.current,
       activeMeshEvaluationMs: sceneTimings.activeMeshesEvaluationTimeCounter.current,
       renderTargetsMs: sceneTimings.renderTargetsRenderTimeCounter.current,

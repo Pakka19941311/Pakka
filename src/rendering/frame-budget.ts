@@ -34,6 +34,7 @@ export function renderScaling(width: number, height: number, dpr: number, qualit
 
 export class ResolutionGovernor {
   scale = 1;
+  detailStep = 0;
   private seconds = 0;
   private count = 0;
   private recovery = 0;
@@ -44,12 +45,29 @@ export class ResolutionGovernor {
     const ms = this.seconds * 1000 / this.count;
     this.seconds = 0; this.count = 0;
     const before = this.scale;
-    if (ms > 25) { this.scale = Math.max(0.65, this.scale - 0.1); this.recovery = 0; }
+    const beforeDetails = this.detailStep;
+    if (ms > 25) {
+      this.scale = Math.max(0.65, this.scale - 0.1); this.recovery = 0;
+      if (ms > 40) this.detailStep = Math.min(2, this.detailStep + 1);
+    }
     else if (ms < 18) {
       this.recovery += 1;
-      if (this.recovery >= 3) { this.scale = Math.min(1, this.scale + 0.05); this.recovery = 0; }
+      if (this.recovery >= (this.scale < 1 ? 3 : 10)) {
+        if (this.scale < 1) this.scale = Math.min(1, this.scale + 0.05);
+        else this.detailStep = Math.max(0, this.detailStep - 1);
+        this.recovery = 0;
+      }
     } else this.recovery = 0;
-    return Math.abs(before - this.scale) > 0.001;
+    return Math.abs(before - this.scale) > 0.001 || beforeDetails !== this.detailStep;
   }
-  reset(): void { this.scale = 1; this.seconds = 0; this.count = 0; this.recovery = 0; }
+  reset(): void { this.scale = 1; this.detailStep = 0; this.seconds = 0; this.count = 0; this.recovery = 0; }
+}
+
+export function effectiveRenderBudget(quality: string, shadowQuality: string, antiAliasing: boolean, bloom: boolean, pressure: number) {
+  const requestedShadow = shadowQuality === 'ultra' ? 4096 : shadowQuality === 'high' ? 2048 : 1024;
+  return {
+    shadowSize: Math.min(requestedShadow, pressure >= 2 ? 1024 : pressure === 1 ? 2048 : 4096),
+    samples: antiAliasing && quality === 'ultra' && pressure === 0 ? 4 : 1,
+    bloom: bloom && pressure < 2,
+  };
 }

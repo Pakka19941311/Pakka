@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { SimulationClock } from '../src/core/simulation-clock.ts';
 import { CharacterMotor } from '../src/controls/character-motor.ts';
-import { FrameTelemetry, renderScaling, ResolutionGovernor } from '../src/rendering/frame-budget.ts';
+import { FrameTelemetry, renderScaling, ResolutionGovernor, effectiveRenderBudget } from '../src/rendering/frame-budget.ts';
 import { CollisionWorld } from '../src/world/collision-world.ts';
 
 test('movement covers equal distance at 60 FPS, 20 FPS and 4 FPS instead of slow motion', () => {
@@ -41,6 +41,17 @@ test('resolution governor adapts slowly, stays bounded and recovers with hystere
   for (let i = 0; i < 400; i++) governor.sample(1 / 60);
   assert.ok(governor.scale > 0.65 && governor.scale < 0.8);
   governor.reset(); assert.equal(governor.scale, 1);
+});
+
+test('sustained overload also sheds MSAA, large shadows and bloom, with slow recovery', () => {
+  const governor = new ResolutionGovernor();
+  assert.deepEqual(effectiveRenderBudget('ultra', 'ultra', true, true, governor.detailStep), { shadowSize: 4096, samples: 4, bloom: true });
+  for (let i = 0; i < 42; i++) governor.sample(0.1);
+  assert.equal(governor.detailStep, 2);
+  assert.deepEqual(effectiveRenderBudget('ultra', 'ultra', true, true, governor.detailStep), { shadowSize: 1024, samples: 1, bloom: false });
+  for (let i = 0; i < 120; i++) governor.sample(1 / 60);
+  assert.equal(governor.detailStep, 2, 'brief recovery must not oscillate render-target allocations');
+  governor.reset(); assert.equal(governor.detailStep, 0);
 });
 
 test('telemetry ring stays bounded and includes tail stalls, not only average FPS', () => {

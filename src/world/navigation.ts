@@ -92,8 +92,29 @@ export function findNavigationPath(
     z: Math.max(0, Math.min(depth, Math.round((point.z - minZ) / cellSize))),
   });
   const toWorld = (x: number, z: number): Point2 => ({ x: minX + x * cellSize, z: minZ + z * cellSize });
-  const gridStart = toGrid(start);
-  const gridGoal = toGrid(goal);
+  const endpointCell = (point: Point2) => {
+    const center = toGrid(point);
+    // A free click can round onto a blocked cell beside a wall. Find a connected
+    // free endpoint instead of exhausting the entire A* budget against that wall.
+    for (let ring = 0; ring <= 3; ring++) {
+      let best: { x: number; z: number } | null = null; let distance = Infinity;
+      for (let dx = -ring; dx <= ring; dx++) for (let dz = -ring; dz <= ring; dz++) {
+        if (Math.max(Math.abs(dx), Math.abs(dz)) !== ring) continue;
+        const x = center.x + dx, z = center.z + dz;
+        if (x < 0 || z < 0 || x > width || z > depth) continue;
+        const candidate = toWorld(x, z);
+        const gap = Math.hypot(candidate.x - point.x, candidate.z - point.z);
+        if (gap < distance && !world.isBlocked(candidate, actorRadius) && segmentIsClear(world, point, candidate, actorRadius, cellSize * 0.3)) {
+          best = { x, z }; distance = gap;
+        }
+      }
+      if (best) return best;
+    }
+    return null;
+  };
+  const gridStart = endpointCell(start);
+  const gridGoal = endpointCell(goal);
+  if (!gridStart || !gridGoal) return [];
   const key = (x: number, z: number) => `${x}:${z}`;
   const startKey = key(gridStart.x, gridStart.z);
   const goalKey = key(gridGoal.x, gridGoal.z);

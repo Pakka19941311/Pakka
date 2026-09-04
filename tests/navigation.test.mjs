@@ -31,3 +31,16 @@ test('navigation preserves an open gate between two wall segments', () => {
   const path = findNavigationPath(world, { x: 0, z: -4 }, { x: 0, z: 4 }, { actorRadius: 0.45 });
   assert.deepEqual(path, [{ x: 0, z: 4 }]);
 });
+
+test('a valid click beside a wall stays reachable when its grid cell rounds inside the wall', () => {
+  const world = new CollisionWorld(); world.addBox(0, 0, 1, 3);
+  for (const x of [1.47, 1.5, 1.6, 1.7]) for (const margin of [9, 10, 24]) {
+    const start = { x: -4, z: 0 }, goal = { x, z: 0 };
+    assert.equal(world.isBlocked(goal, 0.46), false);
+    const path = findNavigationPath(world, start, goal, { actorRadius: 0.46, cellSize: 0.85, margin });
+    assert.ok(path.length > 0, `false unreachable ${x}/${margin}`);
+    let cursor = start;
+    for (const point of path) { assert.equal(pathSegmentIsClear(world, cursor, point, 0.46), true); cursor = point; }
+    assert.deepEqual(path.at(-1), goal);
+  }
+});
