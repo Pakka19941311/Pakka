@@ -606,6 +606,7 @@ function updateWorldSectorVisibility(dt: number): void {
     shadowMap.renderList = [...shadowCasters].filter(mesh => {
       if (mesh.isDisposed()) { shadowCasters.delete(mesh); return false; }
       if (!mesh.isEnabled()) return false;
+      if (!mesh.subMeshes?.length || mesh.getTotalVertices() === 0) return false;
       mesh.computeWorldMatrix();
       const bounds = mesh.getBoundingInfo().boundingSphere;
       return Math.hypot(bounds.centerWorld.x - player.x, bounds.centerWorld.z - player.z) < radius + Math.min(bounds.radiusWorld, 12);
@@ -669,7 +670,7 @@ function tintMeshes(root: TransformNode, tint?: number): void {
   void tint; // Variants are prepared once by ModelInstances, never multiplied per clone.
   root.getChildMeshes().forEach((mesh) => {
     mesh.receiveShadows = true;
-    shadowCasters.add(mesh);
+    if (mesh.getTotalVertices() > 0 && mesh.subMeshes?.length) shadowCasters.add(mesh);
     const source = mesh.material;
     if (source instanceof StandardMaterial) {
       if (!source.diffuseTexture && source.diffuseColor.toLuminance() < 0.02) {
@@ -863,31 +864,31 @@ function refreshNameplate(entity: Entity): void {
   entity.labelTexture.update();
 }
 
-const CIRCLE_COLLIDERS: Record<string, number> = {
-  tree: 0.5, 'tree-crooked': 0.62, 'tree-high': 0.48, 'tree-high-crooked': 0.58,
-  'rock-large': 0.9, 'rock-wide': 1.05, lantern: 0.2, 'fountain-round': 1.2, 'pillar-stone': 0.42,
-};
-const BOX_COLLIDERS: Record<string, readonly [number, number]> = {
-  roof: [1.5, 1.25], 'roof-high': [1.65, 1.4], stall: [1.2, 0.75], 'stall-red': [1.2, 0.75],
-  cart: [1.2, 0.58], 'wall-block': [0.85, 0.3], 'wall-corner': [0.8, 0.8],
-  'wall-door': [1.15, 0.35], fence: [1.1, 0.16], 'fence-broken': [1.05, 0.16],
-};
+const ROUND_PROPS = new Set(['tree', 'tree-crooked', 'tree-high', 'tree-high-crooked',
+  'rock-large', 'rock-wide', 'lantern', 'fountain-round', 'pillar-stone']);
+const SOLID_PROPS = new Set(['stall', 'stall-red', 'cart', 'wall-block', 'wall-corner', 'wall-door', 'fence', 'fence-broken']);
 
-function registerWorldCollider(name: string, x: number, z: number, scale: number, rotation: number): void {
-  const circle = CIRCLE_COLLIDERS[name];
-  if (circle) collisionWorld.addCircle(x, z, circle * scale);
-  const box = BOX_COLLIDERS[name];
-  if (box) collisionWorld.addBox(x, z, box[0] * scale, box[1] * scale, rotation);
+function registerWorldCollider(name: string, root: TransformNode, x: number, z: number, rotation: number): void {
+  if (!ROUND_PROPS.has(name) && !SOLID_PROPS.has(name) && name !== 'wall-arch') return;
+  root.computeWorldMatrix(true);
+  root.getChildMeshes().forEach(mesh => mesh.computeWorldMatrix(true));
+  const { min, max } = root.getHierarchyBoundingVectors(true);
+  const halfX = (max.x - min.x) / 2, halfZ = (max.z - min.z) / 2;
+  const dx = (min.x + max.x) / 2 - x, dz = (min.z + max.z) / 2 - z;
+  const cx = x + dx * Math.cos(rotation) + dz * Math.sin(rotation);
+  const cz = z - dx * Math.sin(rotation) + dz * Math.cos(rotation);
+  if (ROUND_PROPS.has(name)) collisionWorld.addCircle(cx, cz, Math.max(0.07, Math.max(halfX, halfZ) * (name.startsWith('tree') ? 0.18 : 1)));
+  if (SOLID_PROPS.has(name)) collisionWorld.addBox(cx, cz, halfX, halfZ, rotation);
   if (name === 'wall-arch') {
-    const side = 1.15 * scale;
+    const side = halfX * 0.88;
     const cosine = Math.cos(rotation);
     const sine = Math.sin(rotation);
     for (const direction of [-1, 1]) {
       collisionWorld.addBox(
-        x + cosine * side * direction,
-        z - sine * side * direction,
-        0.36 * scale,
-        0.42 * scale,
+        cx + cosine * side * direction,
+        cz - sine * side * direction,
+        halfX * 0.12,
+        halfZ,
         rotation,
       );
     }
@@ -899,12 +900,12 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
   if (!container) return null;
   const instance = instantiateContainer(container, `world-${name}-${uid()}`, tint);
   instance.root.position.set(x, terrain.heightAt(x, z), z);
-  instance.root.rotation.y = rotation;
   instance.root.scaling.setAll(scale);
   assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root, tint);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
-  registerWorldCollider(name, x, z, scale, rotation);
+  registerWorldCollider(name, instance.root, x, z, rotation);
+  instance.root.rotation.y = rotation;
   return instance.root;
 }
 
@@ -913,16 +914,22 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   if (!container) return null;
   const instance = instantiateContainer(container, `realism-${name}-${uid()}`);
   instance.root.position.set(x, 0, z);
-  instance.root.rotation.y = rotation;
   normalizeHeight(instance.root, height);
+  instance.root.computeWorldMatrix(true);
+  instance.root.getChildMeshes().forEach(mesh => mesh.computeWorldMatrix(true));
+  const bounds = instance.root.getHierarchyBoundingVectors(true);
+  const halfX = (bounds.max.x - bounds.min.x) / 2, halfZ = (bounds.max.z - bounds.min.z) / 2;
+  const dx = (bounds.min.x + bounds.max.x) / 2 - x, dz = (bounds.min.z + bounds.max.z) / 2 - z;
+  const cx = x + dx * Math.cos(rotation) + dz * Math.sin(rotation);
+  const cz = z - dx * Math.sin(rotation) + dz * Math.cos(rotation);
+  instance.root.rotation.y = rotation;
   instance.root.position.y += terrain.heightAt(x, z);
   assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
-  const radius = name.includes('rock') || name.includes('boulder') ? height * 0.38 : height * 0.24;
-  if (name === 'large_castle_door') collisionWorld.addBox(x, z, height * 0.44, 0.3, rotation);
-  else if (name === 'Barrel_01' || name === 'wooden_crate_01' || name === 'gothic_statue') collisionWorld.addCircle(x, z, Math.max(0.34, radius));
-  else collisionWorld.addCircle(x, z, Math.max(0.3, radius));
+  if (name === 'Barrel_01') collisionWorld.addCircle(cx, cz, Math.max(halfX, halfZ));
+  else if (name === 'dead_tree_trunk' || name === 'tree_stump_01') collisionWorld.addCircle(cx, cz, Math.max(0.25, Math.min(halfX, halfZ) * 0.65));
+  else collisionWorld.addBox(cx, cz, halfX, halfZ, rotation);
   return instance.root;
 }
 
@@ -977,7 +984,7 @@ function createPineTree(name: string, x: number, z: number, height: number, rota
     shadowCasters.add(mesh);
     assignWorldSector(mesh, x, z);
   }
-  collisionWorld.addCircle(x, z, height * 0.075 + 0.23);
+  collisionWorld.addCircle(x, z, height * 0.06 + 0.03);
 }
 
 const townMaterials = new Map<number, StandardMaterial>();
@@ -1066,9 +1073,9 @@ function createSmithy(x: number, z: number): void {
   terrain.addPlatform(x, z, 5.8, 4.4, 0.16);
   townBox('smithy-back', x, 1.3, z + 1.85, 5.8, 2.6, 0.35, 0x685f52);
   townBox('smithy-awning', x, 2.55, z + 0.1, 5.6, 0.24, 3.2, 0x6e3f2c, false);
-  townBox('smithy-anvil-base', x + 0.8, 0.38, z - 0.15, 0.65, 0.75, 0.7, 0x3b4244, false);
+  townBox('smithy-anvil-base', x + 0.8, 0.38, z - 0.15, 0.65, 0.75, 0.7, 0x3b4244);
   townBox('smithy-anvil-top', x + 0.8, 0.86, z - 0.15, 1.35, 0.28, 0.62, 0x4f595c, false);
-  townCylinder('smithy-brazier', x - 1.1, 0.5, z - 0.25, 1.15, 0.65, 0x3d3630, 12, false);
+  townCylinder('smithy-brazier', x - 1.1, 0.5, z - 0.25, 1.15, 0.65, 0x3d3630, 12);
   const flame = MeshBuilder.CreateCylinder('smithy-brazier-flame', { height: 0.8, diameterTop: 0.08, diameterBottom: 0.72, tessellation: 10 }, scene);
   flame.position.set(x - 1.1, 1.08, z - 0.25);
   const flameMaterial = new StandardMaterial('smithy-brazier-flame-material', scene);
@@ -1452,12 +1459,13 @@ function spawnEntities(): void {
   state.entities.push(playerEntity);
   const npcs: Array<[string, string, number, number, string, number, number]> = [
     ['Староста Роэн', 'Warrior', -7, -2.6, 'elder', -7, -6.2],
-    ['Кузнец Бран', 'Warrior', -18.2, -11.4, 'smith', -16.4, -11.35],
+    ['Кузнец Бран', 'Warrior', -17.5, -12.6, 'smith', -16.4, -11.35],
     ['Торговка Эльза', 'Ranger', 0.3, -7.8, 'shop', 1.1, -8.5],
     ['Проводник Каэль', 'Wizard', -7, -20.0, 'teleport', -7, -16.5],
   ];
   npcs.forEach(([name, model, x, z, role, lookX, lookZ]) => {
-    const entity = makeEntity({ kind: 'npc', name, model, x, z, role, targetHeight: 2, npcActionTimer: role === 'smith' ? 1.2 : undefined });
+    const point = collisionWorld.findNearestFree({ x, z }, 0.42);
+    const entity = makeEntity({ kind: 'npc', name, model, ...point, role, targetHeight: 2, npcActionTimer: role === 'smith' ? 1.2 : undefined });
     createEntityModel(entity);
     rotateTowards(entity, lookX, lookZ);
     state.entities.push(entity);

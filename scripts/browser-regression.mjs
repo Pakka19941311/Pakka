@@ -73,7 +73,8 @@ try {
   const base = `http://127.0.0.1:${server.address().port}`;
   await page.goto(base);
   await page.locator('#begin').click();
-  await page.waitForFunction(() => window.__VARENDOR_QA__?.getState().started, { }, { timeout: 180000 });
+  await page.waitForFunction(() => window.__VARENDOR_QA__?.getState().started || document.querySelector('#load-text')?.textContent.startsWith('Не удалось'), { }, { timeout: 180000 });
+  assert.ok(await page.evaluate(() => window.__VARENDOR_QA__?.getState().started), `startup failed: ${report.errors.join('\n')}`);
   check('production assets start the real WebGL scene', await page.evaluate(() => window.__VARENDOR_QA__.getState()));
   await page.waitForTimeout(4000);
   await visibleWorldScreenshot(`${label}-greenfall`);
