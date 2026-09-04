@@ -1,5 +1,6 @@
 import './styles.css';
 import './hotbar.css';
+import './overhaul.css';
 import '@babylonjs/loaders/glTF';
 import {
   AbstractMesh,
@@ -8,6 +9,8 @@ import {
   AssetContainer,
   Color3,
   Color4,
+  ColorCurves,
+  DefaultRenderingPipeline,
   DirectionalLight,
   DynamicTexture,
   Engine,
@@ -17,6 +20,7 @@ import {
   Mesh,
   MeshBuilder,
   PBRMaterial,
+  PhotoDome,
   PointLight,
   Scene,
   SceneLoader,
@@ -58,6 +62,9 @@ import {
   normalizeConsumableBindings,
 } from './controls/action-bindings';
 import type { ConsumableBindings } from './controls/action-bindings';
+import { GameAudio } from './audio/game-audio';
+import { createPbrSurface, repairImportedMaterial } from './rendering/realism-materials';
+import { MonsterLifecycle } from './core/monster-lifecycle';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -190,16 +197,41 @@ type Entity = {
   labelTexture?: DynamicTexture;
   ambientBrain?: AmbientNpcBrain;
   ambientActivity?: AmbientWaypoint['activity'];
+  patrol?: Array<{ x: number; z: number }>;
+  patrolIndex?: number;
+  patrolPause?: number;
+  groupId?: string;
+  npcActionTimer?: number;
+  visualGeneration?: number;
+  lifecycle?: MonsterLifecycle;
 };
 type Settings = {
   quality: 'low' | 'medium' | 'high' | 'ultra';
+  resolutionScale: number;
+  antiAliasing: boolean;
+  textureQuality: 'medium' | 'high' | 'ultra';
+  shadowQuality: 'off' | 'low' | 'high' | 'ultra';
+  foliage: 'low' | 'medium' | 'high';
+  exposure: number;
+  contrast: number;
+  saturation: number;
+  fog: number;
+  fov: number;
+  mouseSensitivity: number;
+  zoomSensitivity: number;
+  cameraSmoothing: number;
+  invertCameraY: boolean;
+  uiScale: number;
   shadows: boolean;
   bloom: boolean;
   damage: boolean;
   screenShake: boolean;
+  master: number;
   music: number;
+  ambience: number;
   sfx: number;
   ui: number;
+  muteOnBlur: boolean;
   keybinds: ConsumableBindings;
 };
 type PlayerSave = {
@@ -226,6 +258,9 @@ const MONSTER_DIR = '/assets/models/monsters-glb/';
 const WORLD_DIR = '/assets/models/world/';
 const CHARACTER_MODELS = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'] as const;
 const MONSTER_MODELS = ['Skeleton', 'Slime', 'Bat', 'Dragon'] as const;
+const EXTRA_MONSTER_MODELS = ['Fox'] as const;
+const REALISM_MODELS = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'rock_09', 'tree_stump_01', 'wooden_crate_01'] as const;
+type RealismModel = typeof REALISM_MODELS[number];
 const WORLD_MODELS = [
   'tree', 'tree-crooked', 'tree-high', 'tree-high-crooked', 'rock-large', 'rock-wide',
   'lantern', 'fence', 'fence-broken', 'cart', 'stall', 'stall-red', 'wall-arch',
@@ -255,7 +290,7 @@ app.innerHTML = `
 <div class="loading hidden" id="loading"><div class="loading-box"><h1>VARENDOR</h1><div class="loadbar"><i id="load-fill"></i></div><p id="load-text">Пробуждаем древний мир…</p></div></div>
 <div class="start-screen" id="start-screen"><div class="start-content"><h1 class="logo">VARENDOR<span>ASHEN FRONTIER</span></h1><div class="eyebrow">Выберите судьбу</div><div class="class-picker" id="class-picker"></div><div class="start-actions"><input class="name-field" id="name-field" maxlength="16" value="Странник" aria-label="Имя персонажа"><button class="gold-btn" id="begin">ВОЙТИ В МИР</button><button class="dark-btn hidden" id="continue">ПРОДОЛЖИТЬ</button></div></div></div>
 <div class="hud hidden" id="hud">
- <section class="player-frame glass"><div class="portrait" id="portrait">V</div><div><div class="identity"><b id="player-name">Странник</b><span id="player-class">ур. 1</span><span class="coins">◈ <i id="gold">0</i></span></div><div class="bar"><i id="hp-fill"></i><span id="hp-text"></span></div><div class="bar mana"><i id="mp-fill"></i><span id="mp-text"></span></div><div class="bar xp"><i id="xp-fill"></i></div></div></section>
+ <section class="player-frame glass"><div class="portrait" id="portrait">V</div><div><div class="identity"><b id="player-name">Странник</b><span id="player-class">ур. 1</span><span class="coins">◈ <i id="gold">0</i></span></div><div class="bar"><i id="hp-fill"></i><span id="hp-text"></span></div><div class="bar mana"><i id="mp-fill"></i><span id="mp-text"></span></div><div class="bar xp"><i id="xp-fill"></i><span id="xp-text"></span></div></div></section>
  <section class="target-frame glass hidden" id="target-frame"><div><span class="boss-mark" id="boss-mark"></span><span class="target-name" id="target-name"></span><span class="target-meta" id="target-meta"></span></div><div class="bar"><i id="target-fill"></i><span id="target-hp"></span></div></section>
  <section class="minimap-wrap glass"><canvas class="minimap" id="minimap" width="428" height="328"></canvas><span class="clock" id="clock">19:21</span><div class="zone" id="zone">Гринфолл</div></section>
  <section class="tracker glass"><div class="eyebrow">Путь странника</div><h3 id="quest-title">Голос границы</h3><p id="quest-text">Поговорите со старостой Гринфолла.</p><div class="progress"><i id="quest-progress"></i></div></section>
@@ -266,10 +301,15 @@ app.innerHTML = `
  <div class="notice-stack" id="notices"></div><div class="damage-layer" id="damage-layer"></div>
 </div><div id="modal-root"></div><div id="confirm-root"></div>`;
 
-const settings: Settings = {
+function settingsDefaults(): Settings { return {
   quality: 'high', shadows: true, bloom: true, damage: true, screenShake: true,
-  music: 0.3, sfx: 0.75, ui: 0.7, keybinds: normalizeConsumableBindings(),
-};
+  resolutionScale: 1, antiAliasing: true, textureQuality: 'high', shadowQuality: 'high', foliage: 'high',
+  exposure: 1, contrast: 1.16, saturation: 0.92, fog: 1, fov: 0.82,
+  mouseSensitivity: 1, zoomSensitivity: 1, cameraSmoothing: 1, invertCameraY: false, uiScale: 1,
+  master: 0.8, music: 0.3, ambience: 0.55, sfx: 0.75, ui: 0.7, muteOnBlur: true,
+  keybinds: normalizeConsumableBindings(),
+}; }
+const settings: Settings = settingsDefaults();
 
 const state = {
   started: false,
@@ -307,9 +347,9 @@ let player: Player = {
   equipment: {}, cooldowns: [0, 0, 0, 0], attackCd: 0, dead: false,
 };
 
+const gameAudio = new GameAudio(settings);
+
 const gateway = new LocalGameGateway<PlayerSave>('varendor_reborn_v03', window.localStorage, ['varendor_reborn_v02']);
-let audioContext: AudioContext | null = null;
-let ambientGain: GainNode | null = null;
 let assetsLoaded = false;
 
 Object.entries(CLASSES_MAP).forEach(([id, classDef]) => {
@@ -336,33 +376,50 @@ const canvas = q<HTMLCanvasElement>('#game-canvas');
 const inputControl = new PlayerInputController(canvas);
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false }, true);
 const scene = new Scene(engine);
-scene.clearColor = new Color4(0.035, 0.055, 0.065, 1);
+scene.clearColor = new Color4(0.055, 0.065, 0.07, 1);
 scene.fogMode = Scene.FOGMODE_EXP2;
-scene.fogColor = new Color3(0.045, 0.075, 0.08);
-scene.fogDensity = 0.018;
-scene.ambientColor = new Color3(0.25, 0.28, 0.3);
+scene.fogColor = new Color3(0.18, 0.22, 0.23);
+scene.fogDensity = 0.008;
+scene.ambientColor = new Color3(0.32, 0.34, 0.31);
+scene.imageProcessingConfiguration.exposure = 1;
+scene.imageProcessingConfiguration.contrast = 1.16;
+scene.imageProcessingConfiguration.toneMappingEnabled = true;
+scene.imageProcessingConfiguration.vignetteEnabled = true;
+scene.imageProcessingConfiguration.vignetteWeight = 1.3;
+scene.imageProcessingConfiguration.vignetteStretch = 0.3;
+
+const sky = new PhotoDome('ashen-frontier-sky', '/assets/textures/pbr/dark_autumn_forest_2k.jpg', {
+  resolution: 32,
+  size: 260,
+}, scene);
+sky.mesh.isPickable = false;
 
 const camera = new ArcRotateCamera('third-person-camera', -Math.PI / 2, 1.06, 10.5, new Vector3(0, 1, 0), scene);
 camera.panningSensibility = 0;
 const cameraControl = new ThirdPersonCameraController(camera);
+const renderPipeline = new DefaultRenderingPipeline('realism-pipeline', true, scene, [camera]);
+renderPipeline.samples = 2;
+renderPipeline.fxaaEnabled = true;
+renderPipeline.imageProcessingEnabled = true;
+const colorCurves = new ColorCurves();
+scene.imageProcessingConfiguration.colorCurves = colorCurves;
+scene.imageProcessingConfiguration.colorCurvesEnabled = true;
 
-const hemi = new HemisphericLight('ashen-sky', new Vector3(0.25, 1, 0.15), scene);
-hemi.intensity = 0.78;
-hemi.diffuse = new Color3(0.45, 0.58, 0.7);
-hemi.groundColor = new Color3(0.12, 0.08, 0.06);
-const moon = new DirectionalLight('moon', new Vector3(0.35, -1, 0.22), scene);
-moon.position = new Vector3(-20, 34, -12);
+const hemi = new HemisphericLight('day-sky', new Vector3(0.18, 1, -0.08), scene);
+hemi.intensity = 0.82;
+hemi.diffuse = new Color3(0.74, 0.8, 0.84);
+hemi.groundColor = new Color3(0.2, 0.18, 0.14);
+const moon = new DirectionalLight('sun', new Vector3(-0.38, -1, 0.24), scene);
+moon.position = new Vector3(24, 42, -18);
 moon.intensity = 2.15;
-moon.diffuse = new Color3(0.58, 0.74, 0.88);
+moon.diffuse = new Color3(1, 0.82, 0.61);
 const shadows = new ShadowGenerator(2048, moon);
 shadows.useBlurExponentialShadowMap = true;
 shadows.blurKernel = 24;
 const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 32 });
 glow.intensity = 0.35;
 
-const groundMaterial = new StandardMaterial('ground-material', scene);
-groundMaterial.diffuseColor = new Color3(0.12, 0.17, 0.13);
-groundMaterial.specularColor = new Color3(0.02, 0.02, 0.02);
+const groundMaterial = createPbrSurface(scene, 'forest_ground_06', 18, 0.96);
 const ground = MeshBuilder.CreateGround('ground', { width: 105, height: 90, subdivisions: 55, updatable: true }, scene);
 ground.material = groundMaterial;
 ground.receiveShadows = true;
@@ -384,9 +441,11 @@ if (groundPositions) {
   ground.refreshBoundingInfo();
 }
 
-const roadMaterial = new StandardMaterial('road-material', scene);
-roadMaterial.diffuseColor = new Color3(0.29, 0.25, 0.18);
-roadMaterial.specularColor = Color3.Black();
+const roadMaterial = createPbrSurface(scene, 'cobblestone_floor_001', 8, 0.92);
+const castleStoneMaterial = createPbrSurface(scene, 'castle_wall_slates', 2.4, 0.88);
+const medievalWoodMaterial = createPbrSurface(scene, 'medieval_wood', 2.2, 0.86);
+const roofSlateMaterial = createPbrSurface(scene, 'roof_slates_02', 2.8, 0.9);
+const barkMaterial = createPbrSurface(scene, 'pine_bark', 2.6, 0.96);
 function road(x: number, z: number, width: number, depth: number, rotation = 0) {
   const mesh = MeshBuilder.CreateGround(`road-${x}-${z}`, { width, height: depth }, scene);
   mesh.position.set(x, 0.045, z);
@@ -407,14 +466,23 @@ safeRing.position.set(-7, 0.07, -5);
 safeRing.material = safeMaterial;
 safeRing.isPickable = false;
 
-const targetIndicatorMaterial = new StandardMaterial('selected-target-material', scene);
-targetIndicatorMaterial.emissiveColor = new Color3(0.95, 0.18, 0.08);
-targetIndicatorMaterial.diffuseColor = new Color3(0.3, 0.02, 0.01);
-targetIndicatorMaterial.alpha = 0.9;
-const targetIndicator = MeshBuilder.CreateTorus('selected-target', { diameter: 2.35, thickness: 0.09, tessellation: 72 }, scene);
-targetIndicator.position.y = 0.1;
-targetIndicator.material = targetIndicatorMaterial;
-targetIndicator.isPickable = false;
+const targetIndicator = new TransformNode('selected-target-anchor', scene);
+const targetRingMaterial = new StandardMaterial('selected-target-ring-material', scene);
+targetRingMaterial.emissiveColor = new Color3(0.82, 0.13, 0.08);
+targetRingMaterial.diffuseColor = new Color3(0.25, 0.02, 0.01);
+targetRingMaterial.alpha = 0.88;
+targetRingMaterial.disableLighting = true;
+const targetRingOuter = MeshBuilder.CreateTorus('selected-target-ring', { diameter: 2.1, thickness: 0.065, tessellation: 72 }, scene);
+targetRingOuter.rotation.x = 0;
+targetRingOuter.position.y = 0.08;
+targetRingOuter.parent = targetIndicator;
+targetRingOuter.material = targetRingMaterial;
+targetRingOuter.isPickable = false;
+const targetChevron = MeshBuilder.CreateTorus('selected-target-chevron', { diameter: 1.7, thickness: 0.035, tessellation: 64 }, scene);
+targetChevron.position.y = 0.075;
+targetChevron.parent = targetIndicator;
+targetChevron.material = targetRingMaterial;
+targetChevron.isPickable = false;
 targetIndicator.setEnabled(false);
 
 const pickVolumeMaterial = new StandardMaterial('combat-pick-volume-material', scene);
@@ -425,6 +493,7 @@ pickVolumeMaterial.disableColorWrite = true;
 const characterAssets = new Map<string, AssetContainer>();
 const monsterAssets = new Map<string, AssetContainer>();
 const worldAssets = new Map<string, AssetContainer>();
+const realismAssets = new Map<RealismModel, AssetContainer>();
 
 async function loadContainer(directory: string, filename: string): Promise<AssetContainer> {
   return SceneLoader.LoadAssetContainerAsync(directory, filename, scene);
@@ -434,7 +503,7 @@ async function loadAssets(): Promise<void> {
   if (assetsLoaded) return;
   const tasks: Array<Promise<void>> = [];
   let loaded = 0;
-  const total = CHARACTER_MODELS.length + MONSTER_MODELS.length + WORLD_MODELS.length;
+  const total = CHARACTER_MODELS.length + MONSTER_MODELS.length + EXTRA_MONSTER_MODELS.length + WORLD_MODELS.length + REALISM_MODELS.length;
   const progress = (label: string) => {
     loaded += 1;
     (q<HTMLElement>('#load-fill')).style.width = `${Math.round((loaded / total) * 100)}%`;
@@ -452,10 +521,22 @@ async function loadAssets(): Promise<void> {
       progress(`Пробуждаем: ${name}`);
     }));
   }
+  for (const name of EXTRA_MONSTER_MODELS) {
+    tasks.push(loadContainer(MONSTER_DIR, `${name}.glb`).then((container) => {
+      monsterAssets.set(name, container);
+      progress(`Пробуждаем: ${name}`);
+    }));
+  }
   for (const name of WORLD_MODELS) {
     tasks.push(loadContainer(WORLD_DIR, `${name}.glb`).then((container) => {
       worldAssets.set(name, container);
       progress('Возводим Пепельный рубеж');
+    }));
+  }
+  for (const name of REALISM_MODELS) {
+    tasks.push(loadContainer(`/assets/models/realism/${name}/`, `${name}_1k.gltf`).then((container) => {
+      realismAssets.set(name, container);
+      progress('Детализируем мир');
     }));
   }
   await Promise.all(tasks);
@@ -481,12 +562,7 @@ function tintMeshes(root: TransformNode, tint?: number): void {
         source.diffuseColor = tintColor?.scale(0.42) ?? new Color3(0.32, 0.32, 0.32);
       }
     } else if (source instanceof PBRMaterial) {
-      if (tintColor) source.albedoColor = source.albedoColor.multiply(tintColor);
-      if (!source.albedoTexture && source.albedoColor.toLuminance() < 0.02) {
-        source.albedoColor = tintColor?.scale(0.42) ?? new Color3(0.32, 0.32, 0.32);
-      }
-      source.metallic = Math.min(source.metallic ?? 0, 0.35);
-      source.roughness = Math.max(source.roughness ?? 0.6, 0.55);
+      repairImportedMaterial(source, tintColor ?? undefined);
     }
   });
 }
@@ -522,17 +598,20 @@ function setEntityAction(entity: Entity, action: 'idle' | 'walk' | 'attack' | 'd
 }
 
 function createEntityModel(entity: Entity): void {
-  const container = entity.kind === 'player' || entity.kind === 'npc' || entity.kind === 'ambient'
+  const wantsCharacter = entity.kind === 'player' || entity.kind === 'npc' || entity.kind === 'ambient';
+  const container = wantsCharacter
     ? characterAssets.get(entity.model)
-    : monsterAssets.get(entity.model);
+    : monsterAssets.get(entity.model) ?? characterAssets.get(entity.model);
   if (!container) throw new Error(`Asset not loaded: ${entity.model}`);
   const instance = instantiateContainer(container, entity.uid);
   entity.root = instance.root;
   entity.animations = instance.animations;
+  entity.animations.forEach((animation) => { animation.speedRatio = 1; });
   entity.root.position.set(entity.x, 0, entity.z);
   normalizeHeight(entity.root, entity.targetHeight);
   entity.baseY = entity.root.position.y;
   entity.baseScale = entity.root.scaling.clone();
+  entity.visualGeneration = (entity.visualGeneration ?? 0) + 1;
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
     mesh.metadata = { entity };
@@ -553,6 +632,29 @@ function createEntityModel(entity: Entity): void {
   setEntityAction(entity, 'idle');
   if (entity.kind === 'monster') addNameplate(entity);
   if (entity.kind === 'npc') addNpcLabel(entity);
+}
+
+function disposeEntityVisual(entity: Entity): void {
+  entity.animations.forEach((animation) => {
+    animation.stop();
+    animation.dispose();
+  });
+  entity.animations = [];
+  entity.pickVolume?.dispose(false, false);
+  entity.pickVolume = undefined;
+  entity.labelTexture?.dispose();
+  entity.labelTexture = undefined;
+  entity.label = undefined;
+  entity.root?.dispose(false, true);
+  entity.root = null;
+  entity.baseY = undefined;
+  entity.baseScale = undefined;
+  entity.actionType = undefined;
+}
+
+function recreateEntityVisual(entity: Entity): void {
+  disposeEntityVisual(entity);
+  createEntityModel(entity);
 }
 
 function syncEntityTransform(entity: Entity, verticalOffset = 0): void {
@@ -677,18 +779,156 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
   return instance.root;
 }
 
-function buildTown(x: number, z: number, scale: number): void {
-  for (let index = 0; index < 7; index += 1) {
-    const angle = (index / 7) * Math.PI * 2;
-    const radius = 5 * scale;
-    worldModel('wall-block', x + Math.cos(angle) * radius, z + Math.sin(angle) * radius, 1.5 * scale, -angle, 0xb0a999);
+function realismModel(name: RealismModel, x: number, z: number, height: number, rotation = 0): TransformNode | null {
+  const container = realismAssets.get(name);
+  if (!container) return null;
+  const instance = instantiateContainer(container, `realism-${name}-${uid()}`);
+  instance.root.position.set(x, 0, z);
+  instance.root.rotation.y = rotation;
+  normalizeHeight(instance.root, height);
+  tintMeshes(instance.root);
+  instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
+  const radius = name.includes('rock') || name.includes('boulder') ? height * 0.38 : height * 0.24;
+  if (name === 'large_castle_door') collisionWorld.addBox(x, z, height * 0.44, 0.3, rotation);
+  else if (name === 'Barrel_01' || name === 'wooden_crate_01' || name === 'gothic_statue') collisionWorld.addCircle(x, z, Math.max(0.34, radius));
+  else collisionWorld.addCircle(x, z, Math.max(0.3, radius));
+  return instance.root;
+}
+
+const foliageMaterial = new PBRMaterial('forest-needle-material', scene);
+foliageMaterial.albedoColor = new Color3(0.055, 0.115, 0.078);
+foliageMaterial.roughness = 0.98;
+foliageMaterial.metallic = 0;
+function createPineTree(name: string, x: number, z: number, height: number, rotation: number): void {
+  const trunk = MeshBuilder.CreateCylinder(`${name}-trunk`, { height: height * 0.62, diameterTop: height * 0.075, diameterBottom: height * 0.12, tessellation: 12 }, scene);
+  trunk.position.set(x, height * 0.31, z);
+  trunk.rotation.y = rotation;
+  trunk.material = barkMaterial;
+  trunk.receiveShadows = true;
+  shadows.addShadowCaster(trunk, true);
+  trunk.isPickable = false;
+  for (let layer = 0; layer < 5; layer += 1) {
+    const crown = MeshBuilder.CreateCylinder(`${name}-crown-${layer}`, {
+      height: height * 0.3,
+      diameterTop: height * 0.02,
+      diameterBottom: height * (0.48 - layer * 0.055),
+      tessellation: 12,
+    }, scene);
+    crown.position.set(x, height * (0.48 + layer * 0.105), z);
+    crown.rotation.y = rotation + layer * 0.53;
+    crown.material = foliageMaterial;
+    crown.receiveShadows = true;
+    shadows.addShadowCaster(crown, true);
+    crown.isPickable = false;
   }
-  worldModel('wall-arch', x, z + 5 * scale, 1.8 * scale, 0, 0xb0a999);
-  worldModel('roof-high', x - 2 * scale, z - scale, 2 * scale, 0.2, 0x8c6c61);
-  worldModel('roof', x + 2.5 * scale, z - 1.4 * scale, 1.7 * scale, -0.2, 0x79524a);
-  worldModel('fountain-round', x, z, 1.5 * scale);
-  worldModel('stall-red', x + 3 * scale, z + 2 * scale, 1.2 * scale, -1);
-  worldModel('cart', x - 3 * scale, z + 1.5 * scale, 1.1 * scale, 0.5);
+  collisionWorld.addCircle(x, z, height * 0.075 + 0.23);
+}
+
+const townMaterials = new Map<number, StandardMaterial>();
+function townMaterial(color: number): StandardMaterial {
+  const existing = townMaterials.get(color);
+  if (existing) return existing;
+  const material = new StandardMaterial(`town-material-${color.toString(16)}`, scene);
+  material.diffuseColor = Color3.FromHexString(`#${color.toString(16).padStart(6, '0')}`);
+  material.specularColor = new Color3(0.04, 0.04, 0.035);
+  material.roughness = 0.92;
+  townMaterials.set(color, material);
+  return material;
+}
+
+function townBox(name: string, x: number, y: number, z: number, width: number, height: number, depth: number, color: number, collider = true): Mesh {
+  const mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
+  mesh.position.set(x, y, z);
+  mesh.material = /door|sign|beam|awning|plank/i.test(name) ? medievalWoodMaterial
+    : /window|flame/i.test(name) ? townMaterial(color)
+      : castleStoneMaterial;
+  mesh.receiveShadows = true;
+  shadows.addShadowCaster(mesh, true);
+  mesh.isPickable = false;
+  if (collider) collisionWorld.addBox(x, z, width * 0.5, depth * 0.5, 0);
+  return mesh;
+}
+
+function townCylinder(name: string, x: number, y: number, z: number, diameter: number, height: number, color: number, tessellation = 10, collider = true): Mesh {
+  const mesh = MeshBuilder.CreateCylinder(name, { diameter, height, tessellation }, scene);
+  mesh.position.set(x, y, z);
+  mesh.material = townMaterial(color);
+  mesh.receiveShadows = true;
+  shadows.addShadowCaster(mesh, true);
+  mesh.isPickable = false;
+  if (collider) collisionWorld.addCircle(x, z, diameter * 0.46);
+  return mesh;
+}
+
+function createBuilding(name: string, x: number, z: number, width: number, depth: number, height: number, wallColor: number, roofColor: number): void {
+  townBox(`${name}-body`, x, height * 0.5, z, width, height, depth, wallColor);
+  const roof = MeshBuilder.CreateCylinder(`${name}-roof`, {
+    height: 1.55,
+    diameterTop: 0.25,
+    diameterBottom: Math.max(width, depth) * 1.18,
+    tessellation: 4,
+  }, scene);
+  roof.position.set(x, height + 0.7, z);
+  roof.rotation.y = Math.PI / 4;
+  roof.scaling.z = Math.max(0.72, depth / Math.max(width, depth));
+  roof.material = roofSlateMaterial;
+  roof.receiveShadows = true;
+  shadows.addShadowCaster(roof, true);
+  roof.isPickable = false;
+  townBox(`${name}-door`, x, 1.05, z - depth * 0.505, 1.1, 2.1, 0.16, 0x4b3526, false);
+  townBox(`${name}-window-a`, x - width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
+  townBox(`${name}-window-b`, x + width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
+}
+
+function createWatchTower(name: string, x: number, z: number, scale = 1): void {
+  townCylinder(`${name}-tower`, x, 2.45 * scale, z, 3.25 * scale, 4.9 * scale, 0x7f7768, 10);
+  townCylinder(`${name}-top`, x, 5.02 * scale, z, 4.05 * scale, 0.38 * scale, 0x5f594f, 10, false);
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (index / 8) * Math.PI * 2;
+    townBox(`${name}-merlon-${index}`, x + Math.cos(angle) * 1.63 * scale, 5.45 * scale, z + Math.sin(angle) * 1.63 * scale, 0.48 * scale, 0.8 * scale, 0.48 * scale, 0x70695d, false);
+  }
+}
+
+function createGate(name: string, x: number, z: number, width = 7): void {
+  createWatchTower(`${name}-left`, x - width * 0.58, z, 0.92);
+  createWatchTower(`${name}-right`, x + width * 0.58, z, 0.92);
+  townBox(`${name}-beam`, x, 4.2, z, width * 0.72, 1.0, 1.05, 0x71695d, false);
+  townBox(`${name}-door-left`, x - 1.05, 1.55, z + 0.05, 1.9, 3.1, 0.22, 0x563723, false);
+  townBox(`${name}-door-right`, x + 1.05, 1.55, z + 0.05, 1.9, 3.1, 0.22, 0x563723, false);
+}
+
+function createSmithy(x: number, z: number): void {
+  townBox('smithy-floor', x, 0.08, z, 5.8, 0.16, 4.4, 0x746b5d, false);
+  townBox('smithy-back', x, 1.3, z + 1.85, 5.8, 2.6, 0.35, 0x685f52);
+  townBox('smithy-awning', x, 2.55, z + 0.1, 5.6, 0.24, 3.2, 0x6e3f2c, false);
+  townBox('smithy-anvil-base', x + 0.8, 0.38, z - 0.15, 0.65, 0.75, 0.7, 0x3b4244, false);
+  townBox('smithy-anvil-top', x + 0.8, 0.86, z - 0.15, 1.35, 0.28, 0.62, 0x4f595c, false);
+  townCylinder('smithy-brazier', x - 1.1, 0.5, z - 0.25, 1.15, 0.65, 0x3d3630, 12, false);
+  const flame = MeshBuilder.CreateCylinder('smithy-brazier-flame', { height: 0.8, diameterTop: 0.08, diameterBottom: 0.72, tessellation: 10 }, scene);
+  flame.position.set(x - 1.1, 1.08, z - 0.25);
+  const flameMaterial = new StandardMaterial('smithy-brazier-flame-material', scene);
+  flameMaterial.emissiveColor = new Color3(1, 0.28, 0.035);
+  flameMaterial.diffuseColor = new Color3(0.9, 0.18, 0.02);
+  flameMaterial.alpha = 0.82;
+  flame.material = flameMaterial;
+  flame.isPickable = false;
+  const light = new PointLight('smithy-brazier-light', new Vector3(x - 1.1, 1.7, z - 0.25), scene);
+  light.diffuse = new Color3(1, 0.42, 0.12);
+  light.intensity = 1.15;
+  light.range = 5.5;
+}
+
+function buildTown(x: number, z: number, scale: number): void {
+  // Asterhold reads as a fortified keep instead of a ring of placeholder roof cubes.
+  createBuilding('asterhold-keep', x, z, 8.5 * scale, 6.4 * scale, 4.3 * scale, 0x8a8273, 0x59473f);
+  createGate('asterhold-gate', x, z - 7.2 * scale, 7.5 * scale);
+  createWatchTower('asterhold-nw', x - 6.4 * scale, z + 4.9 * scale, scale);
+  createWatchTower('asterhold-ne', x + 6.4 * scale, z + 4.9 * scale, scale);
+  createBuilding('asterhold-tavern', x - 7.8 * scale, z - 1.4 * scale, 5.7 * scale, 4.4 * scale, 3.0 * scale, 0x92785e, 0x6f4036);
+  createBuilding('asterhold-barracks', x + 7.8 * scale, z - 1.4 * scale, 5.8 * scale, 4.5 * scale, 3.2 * scale, 0x81796d, 0x4e5355);
+  realismModel('large_castle_door', x, z - 7.72 * scale, 4.7 * scale, Math.PI);
+  realismModel('gothic_statue', x, z + 4.2 * scale, 4.4 * scale, Math.PI);
+  for (const [bx, bz] of [[x - 7, z - 7], [x + 7, z - 7], [x - 9, z + 2]]) realismModel('Barrel_01', bx, bz, 1.2 * scale, rand(0, Math.PI * 2));
 }
 
 function createBonfire(x: number, z: number): void {
@@ -765,9 +1005,32 @@ function buildStarterSettlement(x: number, z: number): void {
     worldModel(offset ? 'fence' : 'fence-broken', x - 9.8, z + offset, 1, Math.PI / 2, 0x777168);
   }
 
-  createBonfire(x, z);
-  for (const [lx, lz] of [[x - 3.2, z - 3.2], [x + 3.2, z - 3.2], [x - 3.2, z + 3.2], [x + 3.2, z + 3.2]]) {
-    const lantern = worldModel('lantern', lx, lz, 1.3);
+  // Northern keep: actual civic focus with a visible entrance.
+  createBuilding('greenfall-keep', x, z + 5.0, 8.4, 5.2, 3.9, 0x978d7d, 0x5c4a42);
+  townBox('greenfall-keep-steps', x, 0.24, z + 1.95, 3.4, 0.48, 1.5, 0x8a8172, false);
+  createWatchTower('greenfall-keep-left', x - 5.0, z + 5.7, 0.72);
+  createWatchTower('greenfall-keep-right', x + 5.0, z + 5.7, 0.72);
+  realismModel('large_castle_door', x, z + 2.42, 3.6, 0);
+
+  // West quarter: tavern and working forge.
+  createBuilding('greenfall-tavern', x - 6.0, z + 0.4, 6.0, 4.6, 3.0, 0x9a7b5e, 0x754335);
+  townBox('greenfall-tavern-sign', x - 3.0, 2.3, z - 0.8, 0.18, 1.2, 1.05, 0x6a4326, false);
+  createSmithy(x - 6.4, z - 0.2);
+
+  // East quarter: market + storehouse. No black placeholder roofs.
+  createBuilding('greenfall-storehouse', x + 6.1, z + 2.3, 5.2, 4.0, 2.8, 0x8d806c, 0x625046);
+  worldModel('stall-red', x + 6.3, z - 0.2, 1.15, -Math.PI / 2, 0x9b6656);
+  worldModel('stall', x + 6.1, z - 3.0, 1.05, -Math.PI / 2, 0x826b57);
+  worldModel('cart', x + 4.7, z - 1.7, 0.95, 0.35, 0x72533d);
+  realismModel('wooden_crate_01', x + 8.2, z - 1.6, 1.15, 0.3);
+  realismModel('Barrel_01', x + 8.0, z - 3.4, 1.1, -0.15);
+  realismModel('wooden_crate_01', x - 8.4, z - 3.0, 0.9, -0.2);
+
+  // Central social square.
+  createBonfire(x, z - 0.4);
+  worldModel('fountain-round', x + 3.0, z + 1.2, 0.9, 0, 0x9b9a8d);
+  for (const [lx, lz] of [[x - 3.4, z - 3.6], [x + 3.4, z - 3.6], [x - 3.4, z + 2.8], [x + 3.4, z + 2.8]]) {
+    const lantern = worldModel('lantern', lx, lz, 1.25);
     if (lantern) {
       const light = new PointLight(`settlement-light-${lx}-${lz}`, new Vector3(0, 2.5, 0), scene);
       light.diffuse = new Color3(1, 0.4, 0.1);
@@ -780,15 +1043,21 @@ function buildStarterSettlement(x: number, z: number): void {
 
 function buildWorld(): void {
   collisionWorld.clear();
-  for (let index = 0; index < 52; index += 1) {
+  const treeCount = state.settings.foliage === 'low' ? 34 : state.settings.foliage === 'medium' ? 52 : 72;
+  for (let index = 0; index < treeCount; index += 1) {
     const forest = index > 24;
     const x = forest ? rand(12, 47) : rand(-43, 25);
     const z = forest ? rand(5, 36) : rand(-31, 19);
     if (Math.hypot(x + 7, z + 5) < 16) continue;
-    worldModel(WORLD_MODELS[index % 4], x, z, rand(1.1, 2.2), rand(0, Math.PI * 2), forest ? 0x879b83 : 0x9aa38c);
+    createPineTree(`pine-${index}`, x, z, forest ? rand(6.5, 10.5) : rand(5.2, 8.2), rand(0, Math.PI * 2));
   }
   for (let index = 0; index < 22; index += 1) {
-    worldModel(index % 2 ? 'rock-large' : 'rock-wide', rand(-46, 48), rand(-35, 37), rand(0.7, 1.7), rand(0, Math.PI * 2), 0x8b918b);
+    const x = rand(-46, 48); const z = rand(-35, 37);
+    realismModel(index % 2 ? 'rock_09' : 'boulder_01', x, z, rand(1.2, 3.1), rand(0, Math.PI * 2));
+  }
+  for (let index = 0; index < 12; index += 1) {
+    const x = rand(11, 47); const z = rand(5, 36);
+    realismModel(index % 2 ? 'dead_tree_trunk' : 'tree_stump_01', x, z, rand(1.5, 3.8), rand(0, Math.PI * 2));
   }
   buildTown(-27, -19, 1.5);
   buildStarterSettlement(-7, -5);
@@ -804,7 +1073,7 @@ function buildWorld(): void {
     }
   }
   worldModel('wall-arch', 39, 31, 3.2, Math.PI, 0x59605d);
-  for (let index = 0; index < 6; index += 1) worldModel('rock-large', 35 + rand(0, 8), 27 + rand(0, 8), rand(1.5, 2.4), rand(0, Math.PI * 2), 0x5f615d);
+  for (let index = 0; index < 6; index += 1) realismModel('boulder_01', 35 + rand(0, 8), 27 + rand(0, 8), rand(2.2, 4.2), rand(0, Math.PI * 2));
 }
 
 function makeItem(id: string, plus = 0, count = 1): ItemInstance {
@@ -897,6 +1166,7 @@ function spawnMonster(id: string, x: number, z: number, delay = 0): Entity {
     boss: definition.boss, hp: definition.hp, maxHp: definition.hp, atk: definition.atk,
     baseAtk: definition.atk, phase: 1, x: spawn.x, z: spawn.z, homeX: spawn.x, homeZ: spawn.z, tint: definition.tint,
     targetHeight, alive: delay <= 0, respawn: delay,
+    lifecycle: new MonsterLifecycle(delay),
   });
   createEntityModel(entity);
   entity.root?.setEnabled(entity.alive);
@@ -1146,12 +1416,10 @@ function syncMovementIntent(direction: Readonly<{ x: number; z: number }> | null
 
 let outlinedTarget: Entity | null = null;
 function setTargetOutline(entity: Entity | null, enabled: boolean): void {
-  entity?.root?.getChildMeshes().forEach((mesh) => {
-    if (mesh === entity.label) return;
-    mesh.renderOutline = enabled;
-    mesh.outlineColor = new Color3(0.95, 0.2, 0.08);
-    mesh.outlineWidth = 0.035;
-  });
+  // Imported GLTFs can contain oversized hidden helper meshes. Outlining those
+  // caused the giant red surface bug; the restrained ground marker is authoritative.
+  entity?.root?.getChildMeshes().forEach((mesh) => { mesh.renderOutline = false; });
+  void enabled;
 }
 
 function updateTargetIndicator(): void {
@@ -1165,10 +1433,11 @@ function updateTargetIndicator(): void {
     targetIndicator.setEnabled(false);
     return;
   }
+  targetIndicator.position.set(target.x, 0.03, target.z);
+  const scale = target.boss === 'big' ? 2.2 : target.boss === 'mini' ? 1.55 : Math.max(0.85, target.targetHeight * 0.52);
+  targetIndicator.scaling.setAll(scale);
+  targetIndicator.rotation.y += Math.min(engine.getDeltaTime() / 1000, 0.04) * 0.7;
   targetIndicator.setEnabled(true);
-  targetIndicator.position.set(target.x, 0.1, target.z);
-  const scale = target.boss === 'big' ? 2.2 : target.boss === 'mini' ? 1.55 : 1;
-  targetIndicator.scaling.setAll(scale * (1 + Math.sin(performance.now() * 0.006) * 0.035));
 }
 
 function update(dt: number): void {
@@ -1231,6 +1500,7 @@ function update(dt: number): void {
     const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
     hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
     setEntityAction(hero, 'walk');
+    gameAudio.footstep();
   } else if (hero.actionType === 'walk') setEntityAction(hero, 'idle');
   if (state.interactionTarget && Math.hypot(state.interactionTarget.x - player.x, state.interactionTarget.z - player.z) < 3.2) {
     const npc = state.interactionTarget;
@@ -1247,6 +1517,8 @@ function update(dt: number): void {
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
   updateTargetIndicator();
+  gameAudio.update(dt);
+  gameAudio.setRegion(zoneAt(player.x, player.z).kind === 'safe');
   state.bossTimers.mini = Math.max(0, state.bossTimers.mini - dt);
   state.bossTimers.big = Math.max(0, state.bossTimers.big - dt);
   updateHud();
@@ -1255,33 +1527,16 @@ function update(dt: number): void {
 function restoreEntityAfterRespawn(entity: Entity): void {
   entity.status = {};
   entity.attackCd = rand(0.25, 0.8);
-  entity.animations.forEach((animation) => {
-    animation.stop();
-    animation.reset();
-  });
-  if (entity.root) {
-    entity.root.scaling.copyFrom(entity.baseScale ?? Vector3.One());
-    entity.root.rotation.x = 0;
-    entity.root.rotation.z = 0;
-    entity.root.setEnabled(true);
-    entity.root.getChildMeshes().forEach((mesh) => {
-      mesh.setEnabled(true);
-      mesh.isVisible = true;
-      if (mesh !== entity.label) mesh.visibility = 1;
-      mesh.renderOutline = false;
-    });
-  }
-  entity.actionType = undefined;
-  entity.pickVolume?.setEnabled(true);
+  recreateEntityVisual(entity);
   syncEntityTransform(entity);
-  refreshNameplate(entity);
-  setEntityAction(entity, 'idle');
 }
 
 function updateMonster(entity: Entity, dt: number): void {
   if (!entity.alive) {
-    entity.respawn -= dt;
-    if (entity.respawn <= 0) {
+    const events = entity.lifecycle?.tick(dt) ?? [];
+    entity.respawn = entity.lifecycle?.remaining ?? Math.max(0, entity.respawn - dt);
+    if (events.includes('corpse-finished')) disposeEntityVisual(entity);
+    if (events.includes('respawn') || (!entity.lifecycle && entity.respawn <= 0)) {
       entity.alive = true;
       entity.hp = entity.maxHp;
       entity.atk = entity.baseAtk;
@@ -1291,6 +1546,8 @@ function updateMonster(entity: Entity, dt: number): void {
       const safeSpawn = collisionWorld.findNearestFree(entity, entityCollisionRadius(entity));
       entity.x = safeSpawn.x;
       entity.z = safeSpawn.z;
+      entity.patrolIndex = Math.floor(rand(0, Math.max(1, entity.patrol?.length ?? 1)));
+      entity.patrolPause = rand(0.35, 1.5);
       restoreEntityAfterRespawn(entity);
       if (entity.boss === 'big') {
         toast('Печать древнего владыки разрушена…');
@@ -1352,7 +1609,8 @@ function die(): void {
   player.xp = Math.max(0, player.xp - loss);
   confirmBox('Вы пали', `Потеряно ${loss} опыта текущего уровня. Уровень и предметы сохранены.`, () => {
     player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; player.hp = player.maxHp; player.mp = player.maxMp; player.dead = false;
-    playerEntity().root?.setEnabled(true); cameraControl.snap({ x: player.x, y: 0, z: player.z });
+    const hero = playerEntity(); hero.x = player.x; hero.z = player.z; recreateEntityVisual(hero);
+    playerMotor.reset(); cameraControl.snap({ x: player.x, y: 0, z: player.z });
     state.paused = false; closeConfirm(); toast('Вы возродились в Гринфолле'); saveGame();
   }, false);
 }
@@ -1412,6 +1670,7 @@ function performAttack(skillIndex: number | null): void {
     if (!player.dead && hero.actionType === 'attack') setEntityAction(hero, 'idle');
   }, 460);
   playSfx(skill?.fx ?? 'attack');
+  gameAudio.play(ranged ? 'swordClash' : 'swordSwing', ranged ? 0.34 : 0.7, 0.94 + Math.random() * 0.12);
   const magic = player.classId === 'mage' || player.classId === 'necro';
   const base = magic ? player.stats.matk : rand(player.stats.atkMin, player.stats.atkMax);
   const multiplier = skill?.mul ?? 1;
@@ -1514,16 +1773,20 @@ function damageMonster(entity: Entity, damage: number, critical = true, showEffe
   refreshNameplate(entity);
   damageNumber(entity, `${critical ? 'КРИТ ' : ''}−${damage}`, critical ? '#ffd36b' : '#f1e9da', critical);
   if (showEffect) impactEffect(entityWorldPosition(entity), Color3.FromHexString(`#${(entity.tint ?? 0xaa6655).toString(16).padStart(6, '0')}`));
+  gameAudio.play('monsterHit', entity.boss ? 0.7 : 0.38, 0.88 + Math.random() * 0.2);
   if ((entity.hp ?? 0) <= 0) killMonster(entity);
 }
 
 function killMonster(entity: Entity): void {
+  if (!entity.alive) return;
   entity.alive = false;
   entity.pickVolume?.setEnabled(false);
   setEntityAction(entity, 'death', true);
-  window.setTimeout(() => entity.root?.setEnabled(false), 650);
+  gameAudio.play('monsterDeath', entity.boss ? 0.9 : 0.52, entity.boss ? 0.75 : 0.92 + Math.random() * 0.12);
   const definition = MONSTERS_MAP[entity.id ?? 'wolf'];
   entity.respawn = definition.boss ? bossRespawnSeconds(definition.boss) : rand(28, 48);
+  entity.lifecycle ??= new MonsterLifecycle();
+  entity.lifecycle.kill(entity.respawn, 0.65);
   if (definition.boss) state.bossTimers[definition.boss] = entity.respawn;
   state.kills += 1;
   if (definition.boss) state.bossKills += 1;
@@ -1658,30 +1921,12 @@ function pulseScreen(color: string): void {
   window.setTimeout(() => overlay.remove(), 260);
 }
 
-function initAudio(): void {
-  if (audioContext) return;
-  audioContext = new AudioContext();
-  ambientGain = audioContext.createGain();
-  ambientGain.gain.value = state.settings.music * 0.018;
-  ambientGain.connect(audioContext.destination);
-  const oscillator = audioContext.createOscillator();
-  oscillator.type = 'sine';
-  oscillator.frequency.value = 55;
-  oscillator.connect(ambientGain);
-  oscillator.start();
-}
+function initAudio(): void { void gameAudio.unlock(); }
 
 function playSfx(type: string): void {
-  if (!audioContext || state.settings.sfx <= 0) return;
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  const frequencies: Record<string, number> = { attack: 140, slash: 180, fire: 320, ice: 520, lightning: 760, loot: 620 };
-  oscillator.type = type === 'lightning' ? 'sawtooth' : 'triangle';
-  oscillator.frequency.value = frequencies[type] ?? 240;
-  gain.gain.setValueAtTime(0.06 * state.settings.sfx, audioContext.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.18);
-  oscillator.connect(gain).connect(audioContext.destination);
-  oscillator.start(); oscillator.stop(audioContext.currentTime + 0.19);
+  if (type === 'loot') gameAudio.play('coin', 0.62, 1.05);
+  else if (type === 'attack' || type === 'slash') gameAudio.play('swordSwing', 0.48, 1);
+  else gameAudio.play('meleeImpact', 0.32, type === 'lightning' ? 1.35 : 1.02);
 }
 
 function updateHud(): void {
@@ -1695,6 +1940,7 @@ function updateHud(): void {
   (q<HTMLElement>('#xp-fill')).style.width = `${clamp(player.xp / Math.max(1, xpNeeded(player.level)), 0, 1) * 100}%`;
   q('#hp-text').textContent = `${Math.ceil(player.hp)} / ${player.maxHp}`;
   q('#mp-text').textContent = `${Math.ceil(player.mp)} / ${player.maxMp}`;
+  q('#xp-text').textContent = `EXP ${player.xp.toLocaleString('ru-RU')} / ${xpNeeded(player.level).toLocaleString('ru-RU')} · ${Math.floor(clamp(player.xp / Math.max(1, xpNeeded(player.level)), 0, 1) * 100)}%`;
   const potionCount = countItem('potion');
   const etherCount = countItem('ether');
   q('#potion-count').textContent = String(potionCount);
@@ -1705,6 +1951,8 @@ function updateHud(): void {
   const etherButton = q<HTMLButtonElement>('#ether');
   potionButton.disabled = potionCount <= 0;
   etherButton.disabled = etherCount <= 0;
+  potionButton.classList.toggle('disabled', potionCount <= 0);
+  etherButton.classList.toggle('disabled', etherCount <= 0);
   potionButton.title = `Багровое зелье · ${keyLabel(state.settings.keybinds.potion)}`;
   etherButton.title = `Эфирное зелье · ${keyLabel(state.settings.keybinds.ether)}`;
   const targetFrame = q('#target-frame');
@@ -1805,6 +2053,7 @@ canvas.addEventListener('pointerdown', (event) => {
     if (entity.kind === 'monster') {
       targeting.select(entity);
       combatControl.engageBasic(entity.uid);
+      gameAudio.play('monsterAggro', entity.boss ? 0.65 : 0.28, entity.boss ? 0.78 : 1.05);
       state.moveTarget = null;
       state.interactionTarget = null;
       void gateway.send({ type: 'target', entityId: entity.uid });
@@ -1869,7 +2118,7 @@ function formatItem(item: ItemInstance): string {
 }
 
 function renderInventory(selected = state.selectedItem): void {
-  q('#window-content').innerHTML = `<h2>Инвентарь</h2>${tabs('inventory')}<div class="inventory-layout"><div class="doll"><div class="doll-art"></div>${EQUIPMENT_SLOTS.map((slot) => `<button class="equip-slot ${player.equipment[slot] ? 'filled' : ''}" data-equip="${slot}" data-slot="${slot}">${player.equipment[slot] ? formatItem(player.equipment[slot] as ItemInstance) : SLOT_NAMES_MAP[slot]}</button>`).join('')}</div><div><div class="bag-head"><b>Сумка</b><span>${player.inventory.length} / ${INVENTORY_CAPACITY} · ◈ ${player.gold.toLocaleString()} ${state.lootBuffer.length ? `· Буфер: ${state.lootBuffer.length} <button class="dark-btn" id="collect-buffer">Забрать</button>` : ''}</span></div><div class="bag-grid">${player.inventory.map((item, index) => `<button class="item-card ${index === selected ? 'selected' : ''}" data-item="${index}">${formatItem(item)}</button>`).join('')}${Array(Math.max(0, INVENTORY_CAPACITY - player.inventory.length)).fill('<div class="item-card"></div>').join('')}</div><div class="item-details" id="item-details">Выберите предмет. Все вещи можно надевать с любого уровня.</div></div></div>`;
+  q('#window-content').innerHTML = `<h2>Инвентарь</h2>${tabs('inventory')}<div class="inventory-shell"><div class="paper-doll"><div class="doll-art"></div><div class="equipment-grid">${EQUIPMENT_SLOTS.map((slot) => `<button class="equip-slot ${player.equipment[slot] ? 'filled' : ''}" title="${SLOT_NAMES_MAP[slot]} — нажмите, чтобы снять" data-equip="${slot}" data-slot="${slot}">${player.equipment[slot] ? formatItem(player.equipment[slot] as ItemInstance) : `<span>${SLOT_NAMES_MAP[slot]}</span>`}</button>`).join('')}</div></div><div class="bag-panel"><div class="bag-toolbar"><b>ПОХОДНАЯ СУМКА</b><span>${player.inventory.length} / ${INVENTORY_CAPACITY} · ◈ ${player.gold.toLocaleString()} ${state.lootBuffer.length ? `· Буфер: ${state.lootBuffer.length} <button class="dark-btn" id="collect-buffer">Забрать</button>` : ''}</span></div><div class="bag-grid">${player.inventory.map((item, index) => `<button class="item-card ${index === selected ? 'selected' : ''}" title="${itemDef(item).name}${item.count > 1 ? ` ×${item.count}` : ''}" data-item="${index}">${formatItem(item)}</button>`).join('')}${Array(Math.max(0, INVENTORY_CAPACITY - player.inventory.length)).fill('<div class="empty-slot"></div>').join('')}</div><div class="item-details" id="item-details"><b>Сравнение экипировки</b><br>Выберите предмет. Характеристики покажут разницу с надетой вещью.</div></div></div>`;
   bindTabs();
   qa<HTMLButtonElement>('[data-item]').forEach((button) => { button.onclick = () => selectItem(Number(button.dataset.item)); });
   qa<HTMLButtonElement>('[data-equip]').forEach((button) => { button.onclick = () => unequip(button.dataset.equip ?? ''); });
@@ -1886,7 +2135,17 @@ function selectItem(index: number): void {
   if (definition.matk) parts.push(`Магическая атака +${definition.matk}`);
   if (definition.def) parts.push(`Защита +${definition.def}`);
   if (definition.mdef) parts.push(`Магическая защита +${definition.mdef}`);
-  const compare = definition.slot ? `<br><span style="color:#c4a876">Надето: ${current ? `${itemDef(current).name}${current.plus ? ` +${current.plus}` : ''}` : 'ничего'}</span>` : '';
+  const statKeys: Array<[keyof ItemDef, string]> = [['def', 'Защита'], ['mdef', 'Маг. защита'], ['hp', 'HP'], ['mp', 'MP'], ['matk', 'Маг. атака'], ['crit', 'Крит'], ['accuracy', 'Точность'], ['evasion', 'Уклонение'], ['speed', 'Скорость']];
+  const currentDef = current ? itemDef(current) : undefined;
+  const deltas = definition.slot ? statKeys.map(([key, label]) => {
+    const next = Number(definition[key] ?? 0); const equipped = Number(currentDef?.[key] ?? 0); const delta = next - equipped;
+    return next || equipped ? `<span class="${delta >= 0 ? 'compare-positive' : 'compare-negative'}">${label}: ${next || 0} (${delta >= 0 ? '+' : ''}${delta})</span>` : '';
+  }).filter(Boolean) : [];
+  if (definition.atk) {
+    const oldAtk = currentDef?.atk ?? [0, 0]; const deltaMin = definition.atk[0] - oldAtk[0]; const deltaMax = definition.atk[1] - oldAtk[1];
+    deltas.unshift(`<span class="${deltaMin + deltaMax >= 0 ? 'compare-positive' : 'compare-negative'}">Урон: ${definition.atk[0]}–${definition.atk[1]} (${deltaMin >= 0 ? '+' : ''}${deltaMin}/${deltaMax >= 0 ? '+' : ''}${deltaMax})</span>`);
+  }
+  const compare = definition.slot ? `<br><span style="color:#c4a876">Надето: ${current ? `${itemDef(current).name}${current.plus ? ` +${current.plus}` : ''}` : 'ничего'}</span>${deltas.length ? `<div class="stat-columns">${deltas.join('')}</div>` : ''}` : '';
   q('#item-details').innerHTML = `<b>${definition.name}${item.plus ? ` +${item.plus}` : ''}</b><br>${parts.join(' · ') || definition.desc || 'Ресурс мира'}${compare}<br><span style="color:#8f887c">Источник: ${definition.origin || 'Торговцы Варендора'}</span><div class="action-row">${definition.slot ? '<button class="gold-btn" id="equip-item">Надеть</button>' : ''}${definition.type === 'consumable' ? '<button class="gold-btn" id="use-item">Использовать</button>' : ''}<button class="dark-btn" id="sell-item">Продать за ${Math.floor(definition.value * 0.48)} ◈</button></div>`;
   const equip = document.querySelector<HTMLButtonElement>('#equip-item'); if (equip) equip.onclick = () => equipItem(index);
   const use = document.querySelector<HTMLButtonElement>('#use-item'); if (use) use.onclick = () => { useItem(item.id); renderInventory(); };
@@ -1938,9 +2197,51 @@ function renderSettings(): void {
   const bindingOptions = (selected: string): string => CONSUMABLE_KEY_OPTIONS
     .map((option) => `<option value="${option.code}" ${option.code === selected ? 'selected' : ''}>${option.label}</option>`)
     .join('');
-  q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid"><section><h3>Графика</h3><div class="setting"><label>Качество<select id="quality"><option value="low">Низкое</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div><div class="setting"><label>Динамические тени <input type="checkbox" id="shadows" ${s.shadows ? 'checked' : ''}></label></div><div class="setting"><label>Свечение и магические эффекты <input type="checkbox" id="bloom" ${s.bloom ? 'checked' : ''}></label></div><div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div><div class="setting"><label>Дрожание камеры <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div></section><section><h3>Звук и интерфейс</h3>${[['music', 'Музыка'], ['sfx', 'Эффекты'], ['ui', 'Интерфейс']].map(([id, name]) => `<div class="setting"><label>${name}<b id="${id}-value">${Math.round((s[id as keyof Settings] as number) * 100)}%</b></label><input type="range" min="0" max="100" value="${(s[id as keyof Settings] as number) * 100}" data-volume="${id}"></div>`).join('')}<h3>Управление</h3><div class="stat-row"><span>Движение</span><b>WASD / ЛКМ по земле</b></div><div class="stat-row"><span>Прыжок</span><b>Space</b></div><div class="stat-row"><span>Камера</span><b>ПКМ + мышь / колесо</b></div><div class="stat-row"><span>Цель и атака</span><b>ЛКМ по монстру</b></div><div class="stat-row"><span>Навыки</span><b>1–4</b></div><div class="setting"><label>Зелье здоровья<select id="potion-binding">${bindingOptions(s.keybinds.potion)}</select></label></div><div class="setting"><label>Зелье ресурса<select id="ether-binding">${bindingOptions(s.keybinds.ether)}</select></label></div><button class="gold-btn" id="save-settings">Применить</button></section></div>`;
+  const range = (id: string, label: string, value: number, min: number, max: number, step: number, suffix = '') => `<div class="setting"><label>${label}<b id="${id}-value">${value}${suffix}</b></label><input id="${id}" type="range" min="${min}" max="${max}" step="${step}" value="${value}" data-setting-range="${id}" data-suffix="${suffix}"></div>`;
+  q('#window-content').innerHTML = `<h2>Настройки</h2>${tabs('settings')}<div class="settings-grid">
+    <section><h3>Экран и графика</h3>
+      <div class="setting"><label>Профиль качества<select id="quality"><option value="low">Производительность</option><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div>
+      <div class="setting"><label>Масштаб рендера<select id="resolution-scale"><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option></select></label></div>
+      <div class="setting"><label>Качество текстур<select id="texture-quality"><option value="medium">Среднее</option><option value="high">Высокое</option><option value="ultra">Ультра</option></select></label></div>
+      <div class="setting"><label>Тени<select id="shadow-quality"><option value="off">Выкл.</option><option value="low">Низкие</option><option value="high">Высокие</option><option value="ultra">Ультра</option></select></label></div>
+      <div class="setting"><label>Плотность леса<select id="foliage"><option value="low">Низкая</option><option value="medium">Средняя</option><option value="high">Высокая</option></select></label></div>
+      <div class="setting"><label>Сглаживание <input type="checkbox" id="anti-aliasing" ${s.antiAliasing ? 'checked' : ''}></label></div>
+      <div class="setting"><label>Свечение <input type="checkbox" id="bloom" ${s.bloom ? 'checked' : ''}></label></div>
+      ${range('exposure', 'Яркость', Math.round(s.exposure * 100), 70, 135, 1, '%')}
+      ${range('contrast', 'Контраст', Math.round(s.contrast * 100), 80, 145, 1, '%')}
+      ${range('saturation', 'Насыщенность', Math.round(s.saturation * 100), 50, 130, 1, '%')}
+      ${range('fog', 'Плотность тумана', Math.round(s.fog * 100), 0, 160, 5, '%')}
+      <p class="settings-note">Текущее окно: ${window.innerWidth}×${window.innerHeight}, pixel ratio ${window.devicePixelRatio.toFixed(2)}. Полноэкранный режим включается только по нажатию.</p>
+    </section>
+    <section><h3>Камера и управление</h3>
+      ${range('mouse-sensitivity', 'Чувствительность мыши', Math.round(s.mouseSensitivity * 100), 25, 250, 5, '%')}
+      ${range('zoom-sensitivity', 'Скорость приближения', Math.round(s.zoomSensitivity * 100), 35, 220, 5, '%')}
+      ${range('camera-smoothing', 'Плавность камеры', Math.round(s.cameraSmoothing * 100), 55, 180, 5, '%')}
+      ${range('camera-fov', 'Поле зрения', Math.round(s.fov * 100), 65, 105, 1, '')}
+      ${range('ui-scale', 'Масштаб интерфейса', Math.round(s.uiScale * 100), 80, 125, 5, '%')}
+      <div class="setting"><label>Инвертировать вертикаль <input type="checkbox" id="invert-y" ${s.invertCameraY ? 'checked' : ''}></label></div>
+      <div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div>
+      <div class="setting"><label>Эффект получения урона <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div>
+      <div class="setting"><label>Зелье здоровья<select id="potion-binding">${bindingOptions(s.keybinds.potion)}</select></label></div>
+      <div class="setting"><label>Зелье ресурса<select id="ether-binding">${bindingOptions(s.keybinds.ether)}</select></label></div>
+      <div class="stat-row"><span>Движение / прыжок</span><b>WASD / Space</b></div><div class="stat-row"><span>Камера</span><b>ПКМ / колесо</b></div>
+    </section>
+    <section><h3>Звук</h3>
+      ${[['master', 'Общая громкость'], ['music', 'Фоновая музыка'], ['ambience', 'Природа и лес'], ['sfx', 'Бой и монстры'], ['ui', 'Интерфейс']].map(([id, name]) => range(id, name, Math.round((s[id as keyof Settings] as number) * 100), 0, 100, 1, '%')).join('')}
+      <div class="setting"><label>Приглушать вне окна <input type="checkbox" id="mute-on-blur" ${s.muteOnBlur ? 'checked' : ''}></label></div>
+      <h3>Режим отображения</h3><button class="dark-btn" id="fullscreen">Полный экран</button>
+      <div class="settings-actions"><button class="gold-btn" id="save-settings">Применить</button><button class="dark-btn" id="reset-settings">Сбросить</button></div>
+      <p class="settings-note">Изменение плотности леса применяется после следующего входа в мир. Остальные параметры — сразу.</p>
+    </section>
+  </div>`;
   bindTabs(); q<HTMLSelectElement>('#quality').value = s.quality;
-  qa<HTMLInputElement>('[data-volume]').forEach((input) => { input.oninput = () => { q(`#${input.dataset.volume}-value`).textContent = `${input.value}%`; }; });
+  q<HTMLSelectElement>('#resolution-scale').value = String(s.resolutionScale);
+  q<HTMLSelectElement>('#texture-quality').value = s.textureQuality;
+  q<HTMLSelectElement>('#shadow-quality').value = s.shadowQuality;
+  q<HTMLSelectElement>('#foliage').value = s.foliage;
+  qa<HTMLInputElement>('[data-setting-range]').forEach((input) => { input.oninput = () => { q(`#${input.id}-value`).textContent = `${input.value}${input.dataset.suffix ?? ''}`; }; });
+  q<HTMLButtonElement>('#fullscreen').onclick = () => { if (document.fullscreenElement) void document.exitFullscreen(); else void canvas.requestFullscreen(); };
+  q<HTMLButtonElement>('#reset-settings').onclick = () => { Object.assign(s, settingsDefaults()); renderSettings(); };
   q<HTMLButtonElement>('#save-settings').onclick = () => {
     const requestedBindings = {
       potion: q<HTMLSelectElement>('#potion-binding').value,
@@ -1950,21 +2251,44 @@ function renderSettings(): void {
       toast('Для расходников нужны разные клавиши', 'bad');
       return;
     }
-    s.quality = q<HTMLSelectElement>('#quality').value as Settings['quality']; s.shadows = q<HTMLInputElement>('#shadows').checked;
+    s.quality = q<HTMLSelectElement>('#quality').value as Settings['quality'];
+    s.resolutionScale = Number(q<HTMLSelectElement>('#resolution-scale').value);
+    s.textureQuality = q<HTMLSelectElement>('#texture-quality').value as Settings['textureQuality'];
+    s.shadowQuality = q<HTMLSelectElement>('#shadow-quality').value as Settings['shadowQuality'];
+    s.foliage = q<HTMLSelectElement>('#foliage').value as Settings['foliage'];
+    s.shadows = s.shadowQuality !== 'off'; s.antiAliasing = q<HTMLInputElement>('#anti-aliasing').checked;
     s.bloom = q<HTMLInputElement>('#bloom').checked; s.damage = q<HTMLInputElement>('#damage').checked; s.screenShake = q<HTMLInputElement>('#shake').checked;
+    s.exposure = Number(q<HTMLInputElement>('#exposure').value) / 100; s.contrast = Number(q<HTMLInputElement>('#contrast').value) / 100;
+    s.saturation = Number(q<HTMLInputElement>('#saturation').value) / 100; s.fog = Number(q<HTMLInputElement>('#fog').value) / 100;
+    s.mouseSensitivity = Number(q<HTMLInputElement>('#mouse-sensitivity').value) / 100; s.zoomSensitivity = Number(q<HTMLInputElement>('#zoom-sensitivity').value) / 100;
+    s.cameraSmoothing = Number(q<HTMLInputElement>('#camera-smoothing').value) / 100; s.fov = Number(q<HTMLInputElement>('#camera-fov').value) / 100;
+    s.uiScale = Number(q<HTMLInputElement>('#ui-scale').value) / 100; s.invertCameraY = q<HTMLInputElement>('#invert-y').checked;
+    s.muteOnBlur = q<HTMLInputElement>('#mute-on-blur').checked;
     s.keybinds = normalizeConsumableBindings(requestedBindings);
-    qa<HTMLInputElement>('[data-volume]').forEach((input) => { (s as unknown as Record<string, number>)[input.dataset.volume ?? 'ui'] = Number(input.value) / 100; });
+    for (const id of ['master', 'music', 'ambience', 'sfx', 'ui']) (s as unknown as Record<string, number>)[id] = Number(q<HTMLInputElement>(`#${id}`).value) / 100;
     applySettings(); updateHud(); saveGame(); toast('Настройки применены'); closeWindow();
   };
 }
 
 function applySettings(): void {
   const ratios: Record<Settings['quality'], number> = { low: 1.5, medium: 1.2, high: 1, ultra: 1 / Math.min(window.devicePixelRatio, 2) };
-  engine.setHardwareScalingLevel(ratios[state.settings.quality]);
+  engine.setHardwareScalingLevel(ratios[state.settings.quality] / state.settings.resolutionScale);
   shadows.setDarkness(0.28);
-  moon.shadowEnabled = state.settings.shadows;
+  moon.shadowEnabled = state.settings.shadows && state.settings.shadowQuality !== 'off';
+  shadows.getShadowMap()?.resize(state.settings.shadowQuality === 'ultra' ? 4096 : state.settings.shadowQuality === 'high' ? 2048 : 1024);
   glow.isEnabled = state.settings.bloom;
-  if (ambientGain) ambientGain.gain.value = state.settings.music * 0.018;
+  renderPipeline.fxaaEnabled = state.settings.antiAliasing;
+  renderPipeline.samples = state.settings.antiAliasing && state.settings.quality === 'ultra' ? 4 : 1;
+  scene.imageProcessingConfiguration.exposure = state.settings.exposure;
+  scene.imageProcessingConfiguration.contrast = state.settings.contrast;
+  colorCurves.globalSaturation = (state.settings.saturation - 1) * 100;
+  scene.fogDensity = 0.008 * state.settings.fog;
+  camera.fov = state.settings.fov;
+  cameraControl.configure({ mouseSensitivity: state.settings.mouseSensitivity, zoomSensitivity: state.settings.zoomSensitivity, smoothing: state.settings.cameraSmoothing, invertY: state.settings.invertCameraY });
+  const anisotropy = state.settings.textureQuality === 'ultra' ? 16 : state.settings.textureQuality === 'high' ? 8 : 4;
+  scene.textures.forEach((texture) => { texture.anisotropicFilteringLevel = anisotropy; });
+  document.documentElement.style.setProperty('--ui-scale', String(state.settings.uiScale));
+  gameAudio.apply(state.settings);
 }
 
 function openDialog(npc: Entity, text: string, actions: Array<{ label: string; action: () => void }>): void {
@@ -1999,6 +2323,7 @@ function attemptEnhance(slot: string): void {
   if (!countItem('scroll')) return toast('Нужен свиток улучшения', 'bad');
   const run = () => {
     consumeItem('scroll');
+    gameAudio.play('hammer', 0.72, 0.94 + Math.random() * 0.08);
     void gateway.send({ type: 'enhance', itemUid: item.uid, from: item.plus, to: item.plus + 1 });
     const outcome = resolveEnhancement(item.plus);
     if (outcome.kind === 'success') {
@@ -2015,8 +2340,8 @@ function attemptEnhance(slot: string): void {
 function countItem(id: string): number { return player.inventory.filter((item) => item.id === id).reduce((total, item) => total + item.count, 0); }
 function consumeItem(id: string): boolean { const index = player.inventory.findIndex((item) => item.id === id); if (index < 0) return false; player.inventory[index].count -= 1; if (player.inventory[index].count <= 0) player.inventory.splice(index, 1); return true; }
 function useItem(id: string): void {
-  if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); toast('Здоровье восстановлено'); }
-  else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
+  if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); }
+  else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
   else if (id === 'teleport' && consumeItem(id)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
   updateHud(); saveGame();
 }

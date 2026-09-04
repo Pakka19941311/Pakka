@@ -5,7 +5,8 @@ import process from 'node:process';
 
 const root = process.cwd();
 const characters = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'];
-const monsters = ['Skeleton', 'Slime', 'Bat', 'Dragon'];
+const monsters = ['Skeleton', 'Slime', 'Bat', 'Dragon', 'Fox'];
+const realism = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'rock_09', 'tree_stump_01', 'wooden_crate_01'];
 const worldDirectory = path.join(root, 'public/assets/models/world');
 const world = (await readdir(worldDirectory))
   .filter((filename) => filename.toLowerCase().endsWith('.glb'))
@@ -62,6 +63,14 @@ for (const name of characters) {
   await verifyExternalUris(source, filename);
 }
 
+for (const name of realism) {
+  const filename = path.join(root, 'public/assets/models/realism', name, `${name}_1k.gltf`);
+  const source = JSON.parse(await readFile(filename, 'utf8'));
+  assert.equal(source.asset?.version, '2.0', `${name} must be glTF 2.0`);
+  assert.ok(source.meshes?.length, `${name} must contain meshes`);
+  await verifyExternalUris(source, filename);
+}
+
 for (const [kind, names, directory] of [
   ['monster', monsters, 'public/assets/models/monsters-glb'],
   ['world', world, 'public/assets/models/world'],
@@ -78,4 +87,12 @@ for (const [kind, names, directory] of [
 }
 
 assert.ok(externalReferences > 0, 'Asset scan must discover referenced external files');
-console.log(`Verified ${characters.length} characters, ${monsters.length} monsters, ${world.length} world models and ${externalReferences} external asset references.`);
+for (const relative of [
+  'audio/music/dark-shrine.ogg', 'audio/music/town-in-ruins.ogg', 'audio/ambient/forest.mp3',
+  'audio/sfx/sword-swing.ogg', 'audio/sfx/melee-impact.ogg', 'audio/sfx/monster-aggro.ogg',
+  'audio/sfx/monster-hit.ogg', 'audio/sfx/monster-death.ogg', 'audio/sfx/potion.ogg',
+]) {
+  const filename = path.join(publicAssetsRoot, relative);
+  assert.ok((await stat(filename)).size > 4_000, `${relative} is missing or unexpectedly small`);
+}
+console.log(`Verified ${characters.length} characters, ${monsters.length} monsters, ${world.length} world models, ${realism.length} PBR props and ${externalReferences} external asset references.`);

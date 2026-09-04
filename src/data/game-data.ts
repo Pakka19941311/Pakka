@@ -21,15 +21,15 @@ export const ITEMS = {
 };
 
 export const MONSTERS = {
-  wolf:{name:'Костяной гончий',model:'Skeleton',level:1,hp:85,atk:10,xp:30,gold:[4,9],tint:0x78818b,scale:.55,drops:[['wolf_fang',.78],['potion',.12],['wolf_gloves',.035]]},
-  exile:{name:'Проклятый изгнанник',model:'Skeleton',level:2,hp:110,atk:13,xp:42,gold:[6,13],tint:0x9d6a54,scale:.72,drops:[['scroll',.08],['ash_belt',.025]]},
+  wolf:{name:'Пепельный гончий',model:'Fox',level:1,hp:85,atk:10,xp:30,gold:[4,9],tint:0x8b8478,scale:.55,drops:[['wolf_fang',.78],['potion',.12],['wolf_gloves',.035]]},
+  exile:{name:'Проклятый изгнанник',model:'Rogue',level:2,hp:110,atk:13,xp:42,gold:[6,13],tint:0x9d6a54,scale:.72,drops:[['scroll',.08],['ash_belt',.025]]},
   spider:{name:'Теневой слизень',model:'Slime',level:3,hp:125,atk:15,xp:54,gold:[7,15],tint:0x5b426d,scale:.62,drops:[['venom',.74],['ether',.11],['night_leather',.018]]},
   undead:{name:'Безымянный мертвец',model:'Skeleton',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0xb5ad95,scale:.78,drops:[['black_bone',.72],['scroll',.1],['grave_boots',.027]]},
   bat:{name:'Пещерный кровопийца',model:'Bat',level:5,hp:135,atk:21,xp:85,gold:[11,21],tint:0x642f38,scale:.72,drops:[['potion',.17],['fang_necklace',.018]]},
-  cultist:{name:'Сектант Пепла',model:'Skeleton',level:6,hp:190,atk:24,xp:105,gold:[14,26],tint:0xa54c43,scale:.82,drops:[['scroll',.13],['ember_ring',.022]]},
-  miner:{name:'Одержимый рудокоп',model:'Skeleton',level:7,hp:235,atk:27,xp:130,gold:[17,31],tint:0x99734d,scale:.9,drops:[['iron',.82],['fallen_helm',.018]]},
-  wraith:{name:'Болотный призрак',model:'Slime',level:8,hp:210,atk:31,xp:158,gold:[20,38],tint:0x4bc2a2,scale:.9,drops:[['ether',.19],['scroll',.14],['oracle_robe',.014]]},
-  mini:{name:'Кровавый Оборотень',model:'Skeleton',level:10,hp:1750,atk:43,xp:1100,gold:[180,290],tint:0xb52f32,scale:1.45,boss:'mini',drops:[['fallen_helm',.55],['fang_necklace',.65],['executioner',.22],['scroll',1]]},
+  cultist:{name:'Сектант Пепла',model:'Wizard',level:6,hp:190,atk:24,xp:105,gold:[14,26],tint:0xa54c43,scale:.82,drops:[['scroll',.13],['ember_ring',.022]]},
+  miner:{name:'Одержимый рудокоп',model:'Warrior',level:7,hp:235,atk:27,xp:130,gold:[17,31],tint:0x99734d,scale:.9,drops:[['iron',.82],['fallen_helm',.018]]},
+  wraith:{name:'Болотный призрак',model:'Monk',level:8,hp:210,atk:31,xp:158,gold:[20,38],tint:0x4bc2a2,scale:.9,drops:[['ether',.19],['scroll',.14],['oracle_robe',.014]]},
+  mini:{name:'Кровавый Оборотень',model:'Fox',level:10,hp:1750,atk:43,xp:1100,gold:[180,290],tint:0xb52f32,scale:1.45,boss:'mini',drops:[['fallen_helm',.55],['fang_necklace',.65],['executioner',.22],['scroll',1]]},
   big:{name:'Хозяин Гнилого Леса',model:'Dragon',level:14,hp:6200,atk:64,xp:3900,gold:[650,950],tint:0x477943,scale:1.45,boss:'big',drops:[['boss_seal',1],['rotten_root',.4],['dead_king_plate',.32],['sovereign_seal',.22],['scroll',1]]}
 };
 

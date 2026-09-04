@@ -46,6 +46,10 @@ export class ThirdPersonCameraController {
   private readonly camera: ArcRotateCamera;
   private desired: ThirdPersonCameraState;
   private readonly focus = new Vector3();
+  private mouseSensitivity = 1;
+  private zoomSensitivity = 1;
+  private smoothing = 1;
+  private invertY = false;
 
   constructor(camera: ArcRotateCamera) {
     this.camera = camera;
@@ -65,8 +69,8 @@ export class ThirdPersonCameraController {
 
   orbit(delta: Readonly<{ x: number; y: number }>): void {
     this.desired = clampThirdPersonCameraState({
-      yaw: this.desired.yaw - delta.x * 0.006,
-      pitch: this.desired.pitch - delta.y * 0.0045,
+      yaw: this.desired.yaw - delta.x * 0.0048 * this.mouseSensitivity,
+      pitch: this.desired.pitch - delta.y * 0.0038 * this.mouseSensitivity * (this.invertY ? -1 : 1),
       distance: this.desired.distance,
     });
   }
@@ -74,7 +78,7 @@ export class ThirdPersonCameraController {
   zoom(wheelDelta: number): void {
     this.desired = clampThirdPersonCameraState({
       ...this.desired,
-      distance: this.desired.distance + wheelDelta * 0.008,
+      distance: this.desired.distance + wheelDelta * 0.0065 * this.zoomSensitivity,
     });
   }
 
@@ -83,8 +87,9 @@ export class ThirdPersonCameraController {
   }
 
   update(dt: number, playerPosition: Readonly<{ x: number; y: number; z: number }>): void {
-    const rotationBlend = smoothFactor(8.5, dt);
-    const distanceBlend = smoothFactor(7.5, dt);
+    // Lower response values deliberately remove the sharp prototype-like follow behaviour.
+    const rotationBlend = smoothFactor(5.4 * this.smoothing, dt);
+    const distanceBlend = smoothFactor(5.8 * this.smoothing, dt);
     this.camera.alpha = lerpAngle(this.camera.alpha, this.desired.yaw, rotationBlend);
     this.camera.beta += (this.desired.pitch - this.camera.beta) * rotationBlend;
     this.camera.radius += (this.desired.distance - this.camera.radius) * distanceBlend;
@@ -95,7 +100,7 @@ export class ThirdPersonCameraController {
       playerPosition.y + 1.35,
       playerPosition.z + viewForward.z * 2.15,
     );
-    Vector3.LerpToRef(this.focus, wantedFocus, smoothFactor(7, dt), this.focus);
+    Vector3.LerpToRef(this.focus, wantedFocus, smoothFactor(5.2 * this.smoothing, dt), this.focus);
     this.camera.target.copyFrom(this.focus);
   }
 
@@ -114,5 +119,12 @@ export class ThirdPersonCameraController {
 
   get state(): ThirdPersonCameraState {
     return { ...this.desired };
+  }
+
+  configure(options: Readonly<{ mouseSensitivity: number; zoomSensitivity: number; smoothing: number; invertY: boolean }>): void {
+    this.mouseSensitivity = Math.max(0.25, Math.min(2.5, options.mouseSensitivity));
+    this.zoomSensitivity = Math.max(0.35, Math.min(2.2, options.zoomSensitivity));
+    this.smoothing = Math.max(0.55, Math.min(1.8, options.smoothing));
+    this.invertY = options.invertY;
   }
 }
