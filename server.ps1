@@ -42,7 +42,10 @@ try {
         $url = "/"
       }
 
-      $url = ($url -split "\\?")[0]
+      # Do not split on a regex here: a bad pattern can truncate every asset URL
+      # and make JS/CSS requests fall back to index.html (a blank browser page).
+      $queryIndex = $url.IndexOf('?')
+      if ($queryIndex -ge 0) { $url = $url.Substring(0, $queryIndex) }
       $cleanUrl = $url.TrimStart([char]47)
       $path = [System.Uri]::UnescapeDataString($cleanUrl)
       if ([string]::IsNullOrWhiteSpace($path)) { $path = "index.html" }

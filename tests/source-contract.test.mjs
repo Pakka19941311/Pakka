@@ -22,9 +22,10 @@ test('player-facing item data has no rarity classification', async () => {
 });
 
 test('Windows one-click launch and every production build enforce the stable pipeline', async () => {
-  const [launcher, setup, pkg] = await Promise.all([
+  const [launcher, setup, portableServer, pkg] = await Promise.all([
     readFile(new URL('../RUN_WINDOWS.bat', import.meta.url), 'utf8'),
     readFile(new URL('../setup-and-run.ps1', import.meta.url), 'utf8'),
+    readFile(new URL('../server.ps1', import.meta.url), 'utf8'),
     readFile(new URL('../package.json', import.meta.url), 'utf8').then(JSON.parse),
   ]);
   assert.match(launcher, /setup-and-run\.ps1/i);
@@ -33,6 +34,8 @@ test('Windows one-click launch and every production build enforce the stable pip
   assert.match(setup, /npmCmd\s+ci/);
   assert.match(setup, /npmCmd\s+run\s+build/);
   assert.match(setup, /npmCmd.*preview/);
+  assert.match(portableServer, /\.IndexOf\('\?'\)/);
+  assert.doesNotMatch(portableServer, /-split\s+["']\\\\\?["']/);
   assert.match(pkg.scripts.build, /verify:assets/);
 });
 
