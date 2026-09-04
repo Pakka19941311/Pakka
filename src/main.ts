@@ -2972,8 +2972,9 @@ if (__QA_BUILD__) {
     surface: (x: number, z: number) => ({ ground: terrain.heightAt(x, z), support: terrain.supportAt(x, z), blocked: collisionWorld.isBlocked({ x, z }, 0.46) }),
     world: () => ({ fortParts: scene.transformNodes.filter(node => node.name.startsWith('fort-part-') && !node.name.endsWith('-content')).length,
       groundTriangles: ground.getTotalIndices() / 3, roads: terrain.roads.length,
-      paths: [[{ x: -7, z: -11 }, { x: -7, z: -28 }], [{ x: -7, z: -11 }, { x: -7, z: -2.6 }],
-        [{ x: -7, z: -11 }, { x: -18.2, z: -11.4 }], [{ x: -7, z: -11 }, { x: 0.3, z: -7.8 }],
+      paths: [[{ x: -7, z: -11 }, { x: -7, z: -28 }],
+        ...state.entities.filter(e => e.kind === 'npc' && ['elder', 'smith', 'shop', 'teleport'].includes(e.role ?? ''))
+          .map(e => [{ x: -7, z: -11 }, { x: e.x, z: e.z }]),
         [{ x: -7, z: -28 }, { x: 30, z: 8 }]].map(([from, to]) => ({ from, to,
           path: findNavigationPath(collisionWorld, from, to, { actorRadius: 0.46, cellSize: 0.85, margin: 24 }) })) }),
     bounds: (id: string) => {

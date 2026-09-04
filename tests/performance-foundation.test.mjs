@@ -54,6 +54,13 @@ test('sustained overload also sheds MSAA, large shadows and bloom, with slow rec
   governor.reset(); assert.equal(governor.detailStep, 0);
 });
 
+test('severe overload uses one resize instead of repeatedly reallocating the drawing buffer', () => {
+  const governor = new ResolutionGovernor(); let changes = 0;
+  for (let i = 0; i < 200; i++) if (governor.sample(0.1)) changes++;
+  assert.equal(changes, 1);
+  assert.equal(governor.scale, 0.65); assert.equal(governor.detailStep, 2);
+});
+
 test('telemetry ring stays bounded and includes tail stalls, not only average FPS', () => {
   const telemetry = new FrameTelemetry();
   for (let i = 0; i < 1000; i++) telemetry.record(i % 10 ? 16 : 250, 2, 5);

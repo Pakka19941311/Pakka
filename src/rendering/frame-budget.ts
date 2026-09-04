@@ -46,7 +46,11 @@ export class ResolutionGovernor {
     this.seconds = 0; this.count = 0;
     const before = this.scale;
     const beforeDetails = this.detailStep;
-    if (ms > 25) {
+    if (ms > 50) {
+      // Severe overload: one buffer reallocation, not four costly intermediate resizes.
+      this.scale = 0.65; this.detailStep = 2; this.recovery = 0;
+    }
+    else if (ms > 25) {
       this.scale = Math.max(0.65, this.scale - 0.1); this.recovery = 0;
       if (ms > 40) this.detailStep = Math.min(2, this.detailStep + 1);
     }

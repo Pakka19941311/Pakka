@@ -78,10 +78,16 @@ try {
   check('production assets start the real WebGL scene', await page.evaluate(() => window.__VARENDOR_QA__.getState()));
   await page.waitForTimeout(4000);
   await visibleWorldScreenshot(`${label}-greenfall`);
+  // Fixed warm-up for BOTH revisions: separate startup/adaptation resizes from sustained rendering.
+  await page.evaluate(() => new Promise(resolve => {
+    let frames = 0;
+    const warm = () => { if (++frames >= 20) resolve(); else requestAnimationFrame(warm); };
+    requestAnimationFrame(warm);
+  }));
   const profiler = await context.newCDPSession(page);
   await profiler.send('Profiler.enable'); await profiler.send('Profiler.start');
   await page.evaluate(() => { window.__FRAME_PROBE__.enabled = true; });
-  await page.waitForFunction(() => window.__FRAME_PROBE__.frames.length >= 12, {}, { timeout: 90000 });
+  await page.waitForFunction(() => window.__FRAME_PROBE__.frames.length >= 48, {}, { timeout: 150000 });
   const sample = await page.evaluate(() => { window.__FRAME_PROBE__.enabled = false; return window.__FRAME_PROBE__; });
   const { profile } = await profiler.send('Profiler.stop');
   await writeFile(`${reportDir}/${label}.cpuprofile`, JSON.stringify(profile));
@@ -94,7 +100,8 @@ try {
   report.performance = { samples: ordered.length, averageMs: mean(ordered), p95Ms: ordered[Math.floor(ordered.length * 0.95)],
     p99Ms: ordered[Math.floor(ordered.length * 0.99)], averageDrawCalls: mean(sample.draws),
     diagnostics: await page.evaluate(() => window.__VARENDOR_QA__.getPerformance?.() ?? null) };
-  assert.ok(ordered.length >= 12, 'render-loop liveness failed');
+  report.performance.warmupFrames = 20;
+  assert.ok(ordered.length >= 48, 'render-loop liveness failed');
   if (!baseline) {
     // The runner has no gaming GPU. Record High above, then test controls on a documented low profile.
     await page.keyboard.press('Escape');
@@ -103,6 +110,18 @@ try {
     await page.locator('#save-settings').click();
     report.interactionProfile = 'Low / 50% scale / shadows off (software GPU)';
     await page.waitForTimeout(1200);
+    await page.evaluate(() => new Promise(resolve => {
+      let frames = 0;
+      const warm = () => { if (++frames >= 20) resolve(); else requestAnimationFrame(warm); };
+      requestAnimationFrame(warm);
+    }));
+    await page.evaluate(() => { window.__FRAME_PROBE__.frames = []; window.__FRAME_PROBE__.draws = []; window.__FRAME_PROBE__.enabled = true; });
+    await page.waitForFunction(() => window.__FRAME_PROBE__.frames.length >= 48, {}, { timeout: 90000 });
+    const lowSample = await page.evaluate(() => { window.__FRAME_PROBE__.enabled = false; return window.__FRAME_PROBE__; });
+    lowSample.frames.sort((a, b) => a - b);
+    report.interactionPerformance = { samples: lowSample.frames.length, averageMs: mean(lowSample.frames),
+      p95Ms: lowSample.frames[Math.floor(lowSample.frames.length * 0.95)], averageDrawCalls: mean(lowSample.draws),
+      diagnostics: await page.evaluate(() => window.__VARENDOR_QA__.getPerformance()) };
     const state = () => page.evaluate(() => window.__VARENDOR_QA__.getState());
     const actors = () => page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
     const world = await page.evaluate(() => window.__VARENDOR_FIXTURE__.world());
@@ -245,6 +264,10 @@ try {
     await page.waitForTimeout(1000);
     const clickTarget = (await actors()).find(e => e.uid === target.uid);
     assert.ok(clickTarget.depth > 0 && clickTarget.depth < 1);
+    const monsterBounds = await page.evaluate(id => window.__VARENDOR_FIXTURE__.bounds(id), target.uid);
+    assert.ok(monsterBounds.minY >= monsterBounds.supportY - 0.2 && monsterBounds.minY <= monsterBounds.supportY + 0.35,
+      `respawned ground monster buried/floating ${JSON.stringify(monsterBounds)}`);
+    check('respawned skinned monster feet meet the actual terrain', monsterBounds);
     await page.evaluate(() => window.__VARENDOR_FIXTURE__.pause(false));
     await page.mouse.click(clickTarget.screenX, clickTarget.screenY);
     await page.waitForFunction(id => window.__VARENDOR_QA__.getState().selectedTarget === id, target.uid);
