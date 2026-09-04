@@ -167,8 +167,27 @@ try {
     await page.waitForFunction(() => window.__VARENDOR_QA__?.getState().started, {}, { timeout: 180000 });
     const restored = (await state()).player;
     assert.equal(restored.level, saved.level); assert.equal(restored.inventory, saved.inventory);
-    check('save and continue preserve progress');
-    await page.screenshot({ path: `${reportDir}/b01-after-continue.png` });
+    check('save and continue preserve progress', { saved, restored });
+    // A successful state restore alone must not pass a black WebGL canvas.
+    let luminance = 0;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      const screenshot = await page.screenshot();
+      await writeFile(`${reportDir}/b01-after-continue.png`, screenshot);
+      luminance = await page.evaluate(async encoded => {
+        const image = new Image(); image.src = `data:image/png;base64,${encoded}`; await image.decode();
+        const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        // Center of the world, excluding HP/MP, side panels and bottom hotbar.
+        ctx.drawImage(image, image.width * 0.35, image.height * 0.2, image.width * 0.35, image.height * 0.5, 0, 0, 64, 64);
+        const pixels = ctx.getImageData(0, 0, 64, 64).data; let sum = 0;
+        for (let i = 0; i < pixels.length; i += 4) sum += (pixels[i] + pixels[i + 1] + pixels[i + 2]) / 3;
+        return sum / (64 * 64);
+      }, screenshot.toString('base64'));
+      if (luminance > 15) break;
+    }
+    assert.ok(luminance > 15, `continue restored data but the rendered world is black: ${luminance}`);
+    check('continue presents a non-black rendered world', { centerLuminance: luminance });
   }
   assert.deepEqual(report.errors.filter(error => !error.includes('favicon.ico') && !error.includes('404 (Not Found)')), []);
   assert.deepEqual(report.failedRequests, []);

@@ -1481,6 +1481,10 @@ async function startGame(load: boolean): Promise<void> {
     state.interactionTarget = null;
     cameraControl.snap({ x: player.x, y: 0, z: player.z });
     applySettings();
+    q('#load-text').textContent = 'Подготавливаем изображение…';
+    // Loaded GLTF data does not mean the shaders/post-processing are ready to display.
+    await scene.whenReadyAsync();
+    await new Promise<void>(resolve => scene.onAfterRenderObservable.addOnce(() => resolve()));
     q('#loading').classList.add('hidden');
     q('#hud').classList.remove('hidden');
     state.started = true;
