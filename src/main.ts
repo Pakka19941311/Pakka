@@ -2819,12 +2819,13 @@ engine.runRenderLoop(() => {
     if (minimapTimer >= 0.2) { minimapTimer = 0; drawMinimap(); }
   }
   if (state.started) cameraControl.update(dt, { x: player.x, y: 0, z: player.z });
+  // Resizing clears the drawing buffer. It must happen BEFORE drawing, never after.
+  if (state.started && !state.paused && resolutionGovernor.sample(dt)) applyRenderResolution();
   const beforeRender = performance.now();
   engine._drawCalls.fetchNewFrame();
   scene.render();
   if (state.started && !state.paused) {
     frameTelemetry.record(engine.getDeltaTime(), beforeRender - start, performance.now() - beforeRender);
-    if (resolutionGovernor.sample(dt)) applyRenderResolution();
     performanceTimer += dt;
     if (performanceTimer >= 1) {
       performanceTimer = 0; lastTelemetry = frameTelemetry.snapshot();

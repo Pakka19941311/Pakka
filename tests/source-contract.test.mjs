@@ -15,6 +15,13 @@ test('browser client uses Babylon.js and TypeScript entrypoint', async () => {
   assert.equal(pkg.dependencies['@babylonjs/core'], '8.26.1');
 });
 
+test('adaptive canvas resize happens before scene rendering so it cannot erase the completed frame', async () => {
+  const source = await readFile(new URL('../src/main.ts', import.meta.url), 'utf8');
+  const loop = source.slice(source.indexOf('engine.runRenderLoop(() =>'));
+  assert.ok(loop.indexOf('resolutionGovernor.sample(dt)') < loop.indexOf('scene.render()'));
+  assert.doesNotMatch(loop.slice(loop.indexOf('scene.render()'), loop.indexOf('// Exposed only')), /applyRenderResolution\(/);
+});
+
 test('player-facing item data has no rarity classification', async () => {
   const data = await readFile(new URL('../src/data/game-data.ts', import.meta.url), 'utf8');
   assert.doesNotMatch(data, /rare\s*:/i);
