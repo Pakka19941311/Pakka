@@ -7,6 +7,7 @@ import XMLHttpRequest from 'xhr2';
 import '@babylonjs/loaders/glTF/index.js';
 import { NullEngine, Scene, SceneLoader } from '@babylonjs/core';
 import { ModelInstances } from '../src/rendering/model-instances.ts';
+import { createStaticPart } from '../src/rendering/static-part.ts';
 
 globalThis.XMLHttpRequest = XMLHttpRequest;
 
@@ -77,6 +78,20 @@ try {
   for (const model of runtimeModels) {
     const container = await SceneLoader.LoadAssetContainerAsync(`${base}/assets/models/${model.directory}/`, model.file, scene);
     assert.ok(container.meshes.length > 0, `Babylon produced no meshes for ${model.file}`);
+    if (model.file.startsWith('modular_fort_01')) {
+      for (const part of ['wall_thin_gate_01', 'wall_thin_straight_01', 'wall_thin_corner_01', 'tower_round']) {
+        const instance = createStaticPart(container, part, `qa-fort-${part}`, 5);
+        instance.root.position.set(-7, 0, -22); instance.root.rotation.y = Math.PI / 2;
+        instance.root.computeWorldMatrix(true); instance.meshes.forEach(mesh => mesh.computeWorldMatrix(true));
+        const bounds = instance.root.getHierarchyBoundingVectors(true);
+        assert.ok(instance.meshes.length >= 1 && instance.meshes.every(mesh => mesh.name.includes(part)));
+        assert.ok(Math.abs((bounds.min.x + bounds.max.x) / 2 + 7) < 0.001, `fort X pivot ${part}`);
+        assert.ok(Math.abs((bounds.min.z + bounds.max.z) / 2 + 22) < 0.001, `fort Z pivot ${part}`);
+        assert.ok(Math.abs(bounds.min.y) < 0.001 && Math.abs(bounds.max.y - 5) < 0.001, `fort height ${part}`);
+        instance.root.dispose(false, false);
+      }
+      console.log('PASS real fort descendants: gate, wall, corner, tower; centered pivots after rotation');
+    }
     if (model.animated) assert.ok(container.animationGroups.length > 0, `Babylon produced no animations for ${model.file}`);
     const cycles = model.respawnCycles ?? 1;
     for (let cycle = 0; cycle < cycles; cycle += 1) {

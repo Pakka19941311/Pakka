@@ -63,8 +63,8 @@ test('spatial collision agrees with brute force for rotated boxes, circles and n
       world.addBox(x, z, r, h, angle);
       obstacles.push(p => {
         const dx = p.x - x; const dz = p.z - z;
-        const lx = dx * Math.cos(angle) + dz * Math.sin(angle);
-        const lz = -dx * Math.sin(angle) + dz * Math.cos(angle);
+        const lx = dx * Math.cos(angle) - dz * Math.sin(angle);
+        const lz = dx * Math.sin(angle) + dz * Math.cos(angle);
         return Math.hypot(lx - Math.max(-r, Math.min(r, lx)), lz - Math.max(-h, Math.min(h, lz))) < p.radius;
       });
     }

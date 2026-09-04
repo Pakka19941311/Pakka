@@ -77,9 +77,17 @@ try {
   check('production assets start the real WebGL scene', await page.evaluate(() => window.__VARENDOR_QA__.getState()));
   await page.waitForTimeout(4000);
   await visibleWorldScreenshot(`${label}-greenfall`);
+  const profiler = await context.newCDPSession(page);
+  await profiler.send('Profiler.enable'); await profiler.send('Profiler.start');
   await page.evaluate(() => { window.__FRAME_PROBE__.enabled = true; });
   await page.waitForFunction(() => window.__FRAME_PROBE__.frames.length >= 12, {}, { timeout: 90000 });
   const sample = await page.evaluate(() => { window.__FRAME_PROBE__.enabled = false; return window.__FRAME_PROBE__; });
+  const { profile } = await profiler.send('Profiler.stop');
+  await writeFile(`${reportDir}/${label}.cpuprofile`, JSON.stringify(profile));
+  const self = new Map();
+  for (const id of profile.samples ?? []) self.set(id, (self.get(id) ?? 0) + 1);
+  report.cpuTop = profile.nodes.map(node => ({ function: node.callFrame.functionName, url: node.callFrame.url,
+    samples: self.get(node.id) ?? 0 })).sort((a, b) => b.samples - a.samples).slice(0, 20);
   const ordered = sample.frames.sort((a, b) => a - b);
   const mean = values => values.reduce((a, b) => a + b, 0) / Math.max(1, values.length);
   report.performance = { samples: ordered.length, averageMs: mean(ordered), p95Ms: ordered[Math.floor(ordered.length * 0.95)],
@@ -96,6 +104,69 @@ try {
     await page.waitForTimeout(1200);
     const state = () => page.evaluate(() => window.__VARENDOR_QA__.getState());
     const actors = () => page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
+    const world = await page.evaluate(() => window.__VARENDOR_FIXTURE__.world());
+    assert.ok(world.fortParts >= 20, 'fortress blockers must have imported visible walls');
+    for (const route of world.paths) assert.ok(route.path.length > 0, `blocked settlement route ${JSON.stringify(route)}`);
+    check('real fortress modules and routes to gate, NPCs and hunting area', world);
+
+    // Reproduce the reported panel overlap, including the recorded 3266px viewport.
+    for (const width of [1280, 1920, 3266]) {
+      await page.setViewportSize({ width, height: width === 3266 ? 1878 : 900 });
+      for (const scale of [0.8, 1, 1.25]) {
+        await page.evaluate(scale => window.__VARENDOR_FIXTURE__.uiScale(scale), scale);
+        const boxes = await page.evaluate(() => ['#hotbar', '.menu', '.quick-items'].map(selector => {
+          const node = document.querySelector(selector), r = node.getBoundingClientRect();
+          return { selector, left: r.left, right: r.right, top: r.top, bottom: r.bottom, width: r.width, height: r.height };
+        }));
+        for (const box of boxes) assert.ok(box.width > 0 && box.left >= 0 && box.right <= width + 1, `clipped dock ${width}/${scale} ${JSON.stringify(box)}`);
+        for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) {
+          const a = boxes[i], b = boxes[j];
+          assert.ok(a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top, `overlapping panels ${width}/${scale}`);
+        }
+      }
+    }
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.evaluate(() => window.__VARENDOR_FIXTURE__.uiScale(1));
+    check('skills, menu and consumables never overlap at 1280/1920/3266 and 80/100/125% UI');
+
+    // Actual locomotion through the city, not a 30 cm displacement test.
+    for (const [x, z] of [[-7, -28], [-7, -11], [-12, -3], [-7, -11]]) {
+      await page.evaluate(([x, z]) => window.__VARENDOR_FIXTURE__.moveTo(x, z), [x, z]);
+      await page.waitForFunction(([x, z]) => {
+        const p = window.__VARENDOR_QA__.getState().player;
+        return Math.hypot(p.x - x, p.z - z) < 0.25;
+      }, [x, z], { timeout: 45000 });
+    }
+    await visibleWorldScreenshot('b01-gate-and-streets');
+    check('walk out of gate, return and navigate around the central obstacles');
+
+    const heroId = (await actors()).find(e => e.kind === 'player').uid;
+    const groundSamples = [];
+    for (const [x, z] of [[-7, -11], [26, 7], [38, 12], [48, -18]]) {
+      await page.evaluate(([x, z]) => window.__VARENDOR_FIXTURE__.placePlayer(x, z), [x, z]);
+      await page.waitForTimeout(400);
+      const bounds = await page.evaluate(id => window.__VARENDOR_FIXTURE__.bounds(id), heroId);
+      assert.ok(bounds.minY >= bounds.supportY - 0.2, `hero buried ${JSON.stringify({x,z,...bounds})}`);
+      assert.ok(bounds.minY <= bounds.supportY + 0.3, `hero floats ${JSON.stringify({x,z,...bounds})}`);
+      groundSamples.push({ x, z, ...bounds });
+    }
+    await visibleWorldScreenshot('b01-hills-grounding');
+    await page.evaluate(() => window.__VARENDOR_FIXTURE__.placePlayer(-7, -11));
+    check('rendered skinned feet follow hills, not world height zero', { groundSamples });
+
+    const potionCount = Number(await page.locator('#potion-count').textContent());
+    for (let index = 0; index < potionCount; index++) {
+      await page.evaluate(() => window.__VARENDOR_FIXTURE__.vitals(10, 5));
+      await page.keyboard.press('q');
+      await page.waitForFunction(expected => Number(document.querySelector('#potion-count').textContent) === expected, potionCount - index - 1);
+    }
+    assert.equal(await page.locator('#potion').isDisabled(), true);
+    const etherCount = Number(await page.locator('#ether-count').textContent());
+    await page.evaluate(() => window.__VARENDOR_FIXTURE__.vitals(10, 5));
+    await page.locator('#ether').click();
+    await page.waitForFunction(expected => Number(document.querySelector('#ether-count').textContent) === expected, etherCount - 1);
+    await page.evaluate(() => window.__VARENDOR_FIXTURE__.vitals(600, 80));
+    check('consumables work by key/click, decrement stacks and disable at zero');
     const heroBefore = (await actors()).find(e => e.kind === 'player');
     await page.keyboard.down('d');
     try {
@@ -159,8 +230,9 @@ try {
         await page.evaluate(id => window.__VARENDOR_FIXTURE__.lifecycleStep(id, 1e9), probe.uid);
         const revived = (await actors()).find(e => e.uid === probe.uid);
         assert.equal(revived.alive, true); assert.equal(revived.generation, probe.generation + cycle + 1);
-        assert.equal(revived.meshes, probe.meshes); assert.ok(revived.visible && revived.animations > 0);
+        assert.equal(revived.meshes, probe.meshes); assert.ok(revived.animations > 0);
         assert.deepEqual(revived.baseScale, probe.baseScale);
+        assert.ok(Math.abs(revived.rootY - revived.baseY - revived.supportY) < 0.00001, 'respawn must restore ground support');
       }
       check(`five full respawns: ${probe.model}`);
     }

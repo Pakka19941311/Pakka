@@ -48,7 +48,7 @@ jobs:
       - name: Check out unchanged baseline for comparison
         uses: actions/checkout@v4
         with:
-          ref: 4826f14733e5972784561a1c305a532c9df53e66
+          ref: 24176515f66aff84b3371890dc80e636e4ffb965
           path: baseline
       - name: Compare baseline on the same software-rendering runner
         continue-on-error: true

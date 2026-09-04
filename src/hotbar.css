@@ -9,3 +9,18 @@
   filter: grayscale(1) brightness(.45);
   border-color: #3b3730;
 }
+
+/* One layout owner prevents separate absolute panels from intersecting at any UI scale. */
+.hud .bottom-cluster {
+  left: 50%; bottom: 12px; width: max-content;
+  display: flex; align-items: flex-end; gap: 12px;
+  transform: translateX(-50%) scale(var(--dock-scale, 1));
+  transform-origin: bottom center;
+}
+.hud .bottom-cluster > .quick-items {
+  position: static; display: flex; zoom: 1;
+  flex: 0 0 auto;
+}
+.hud .bottom-cluster > .menu { display: grid; flex: 0 0 auto; }
+.hud .bottom-cluster > .hotbar { flex: 0 0 auto; }
+.hud .combat-log { bottom: calc(var(--dock-height, 82px) + 24px); }

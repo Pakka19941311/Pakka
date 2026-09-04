@@ -20,13 +20,16 @@ import {
   Matrix,
   Mesh,
   MeshBuilder,
+  MultiMaterial,
   PBRMaterial,
   PhotoDome,
   PointLight,
   Scene,
   SceneLoader,
+  SceneInstrumentation,
   ShadowGenerator,
   StandardMaterial,
+  SubMesh,
   Texture,
   TransformNode,
   Vector3,
@@ -79,6 +82,8 @@ import { resolveChainLightning } from './combat/chain-lightning';
 import { SimulationClock } from './core/simulation-clock';
 import { FrameTelemetry, ResolutionGovernor, renderScaling } from './rendering/frame-budget';
 import { ModelInstances } from './rendering/model-instances';
+import { TerrainSurface } from './world/terrain-surface';
+import { createStaticPart } from './rendering/static-part';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -233,6 +238,8 @@ type Entity = {
   aiState?: MonsterAiState;
   visualGeneration?: number;
   normalizationKey?: string;
+  visualActive?: boolean;
+  supportY?: number;
   lifecycle?: MonsterLifecycle;
 };
 type Settings = {
@@ -335,6 +342,7 @@ app.innerHTML = `
  <div class="notice-stack" id="notices"></div><div class="damage-layer" id="damage-layer"></div>
 </div><div id="modal-root"></div><div id="confirm-root"></div>`;
 q('#hud').insertAdjacentHTML('beforeend', '<output id="performance-readout" aria-label="Производительность">B01 · измерение FPS…</output>');
+q('.bottom-cluster').append(q('.quick-items'));
 
 function settingsDefaults(): Settings { return {
   quality: 'high', shadows: true, bloom: true, damage: true, screenShake: true,
@@ -371,6 +379,7 @@ const targeting = new TargetingController<Entity>();
 const combatControl = new CombatControl();
 const playerMotor = new CharacterMotor();
 const collisionWorld = new CollisionWorld();
+const terrain = new TerrainSurface();
 
 const emptyStats: CombatStats = {
   str: 0, dex: 0, int: 0, vit: 0, spi: 0, atkMin: 0, atkMax: 0, matk: 0,
@@ -411,6 +420,10 @@ const canvas = q<HTMLCanvasElement>('#game-canvas');
 const inputControl = new PlayerInputController(canvas);
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false }, true);
 const scene = new Scene(engine);
+// The client owns click picking. Hover/orbit must never initiate mesh picking.
+scene.skipPointerMovePicking = true;
+scene.skipPointerDownPicking = true;
+scene.skipPointerUpPicking = true;
 scene.clearColor = new Color4(0.055, 0.065, 0.07, 1);
 scene.fogMode = Scene.FOGMODE_EXP2;
 scene.fogColor = new Color3(0.18, 0.22, 0.23);
@@ -457,6 +470,11 @@ shadows.usePercentageCloserFiltering = true;
 shadows.filteringQuality = ShadowGenerator.QUALITY_LOW;
 const shadowCasters = new Set<AbstractMesh>();
 const modelInstances = new ModelInstances();
+const sceneTimings = new SceneInstrumentation(scene);
+sceneTimings.captureAnimationsTime = true;
+sceneTimings.captureActiveMeshesEvaluationTime = true;
+sceneTimings.captureRenderTargetsRenderTime = true;
+sceneTimings.captureRenderTime = true;
 const frameTelemetry = new FrameTelemetry();
 const resolutionGovernor = new ResolutionGovernor();
 const simulationClock = new SimulationClock();
@@ -466,51 +484,43 @@ let minimapTimer = 0;
 let performanceTimer = 0;
 let lastTelemetry = frameTelemetry.snapshot();
 let lastRenderStats = { drawCalls: 0, activeMeshes: 0, renderWidth: 0, renderHeight: 0, shadowCasters: 0 };
-const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 32 });
+const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 24, mainTextureRatio: 0.25 });
 glow.intensity = 0.35;
 
 const groundMaterial = createPbrSurface(scene, 'forest_ground_06', 18, 0.96);
-const ground = MeshBuilder.CreateGround('ground', { width: 320, height: 280, subdivisions: 140, updatable: true }, scene);
+const ground = new Mesh('ground', scene);
 ground.material = groundMaterial;
 ground.receiveShadows = true;
 ground.metadata = { ground: true };
-const groundPositions = ground.getVerticesData(VertexBuffer.PositionKind);
-if (groundPositions) {
-  for (let index = 0; index < groundPositions.length; index += 3) {
-    const x = groundPositions[index];
-    const z = groundPositions[index + 2];
-    const macro = Math.sin(x * 0.025) * 1.3 + Math.cos(z * 0.031) * 1.1 + Math.sin((x + z) * 0.018) * 0.8;
-    const detail = (Math.sin(x * 0.31) + Math.cos(z * 0.27)) * 0.11;
-    const townFlatten = Math.max(0, 1 - Math.hypot(x + 7, z + 5) / 30);
-    groundPositions[index + 1] = (macro * 0.42 + detail) * (1 - townFlatten * 0.9);
-  }
-  ground.updateVerticesData(VertexBuffer.PositionKind, groundPositions);
-  const indices = ground.getIndices();
-  if (indices) {
-    const normals = new Array<number>(groundPositions.length).fill(0);
-    VertexData.ComputeNormals(groundPositions, indices, normals);
-    ground.updateVerticesData(VertexBuffer.NormalKind, normals);
-  }
-  ground.refreshBoundingInfo();
-}
-
-const roadMaterial = createPbrSurface(scene, 'cobblestone_floor_001', 8, 0.92);
+const roadMaterial = createPbrSurface(scene, 'cobblestone_floor_001', 120, 0.92);
 const castleStoneMaterial = createPbrSurface(scene, 'castle_wall_slates', 2.4, 0.88);
 const medievalWoodMaterial = createPbrSurface(scene, 'medieval_wood', 2.2, 0.86);
 const roofSlateMaterial = createPbrSurface(scene, 'roof_slates_02', 2.8, 0.9);
 const barkMaterial = createPbrSurface(scene, 'pine_bark', 2.6, 0.96);
 function road(x: number, z: number, width: number, depth: number, rotation = 0) {
-  const mesh = MeshBuilder.CreateGround(`road-${x}-${z}`, { width, height: depth }, scene);
-  mesh.position.set(x, 0.045, z);
-  mesh.rotation.y = rotation;
-  mesh.material = roadMaterial;
-  mesh.receiveShadows = true;
-  mesh.isPickable = false;
-  assignWorldSector(mesh, x, z);
+  terrain.addRoad(x, z, width, depth, rotation);
 }
 function roadBetween(ax: number, az: number, bx: number, bz: number, width = 4): void {
   const dx = bx - ax; const dz = bz - az;
   road((ax + bx) * 0.5, (az + bz) * 0.5, Math.hypot(dx, dz), width, -Math.atan2(dz, dx));
+}
+
+function finishTerrain(): void {
+  const geometry = terrain.geometry();
+  const data = new VertexData();
+  data.positions = geometry.positions;
+  data.uvs = geometry.uvs;
+  data.indices = [...geometry.groundIndices, ...geometry.roadIndices];
+  data.normals = new Array<number>(data.positions.length).fill(0);
+  VertexData.ComputeNormals(data.positions, data.indices, data.normals);
+  data.applyToMesh(ground);
+  const surfaces = new MultiMaterial('terrain-surfaces', scene);
+  surfaces.subMaterials = [groundMaterial, roadMaterial];
+  ground.material = surfaces;
+  ground.releaseSubMeshes();
+  new SubMesh(0, 0, ground.getTotalVertices(), 0, geometry.groundIndices.length, ground);
+  new SubMesh(1, 0, ground.getTotalVertices(), geometry.groundIndices.length, geometry.roadIndices.length, ground);
+  ground.freezeWorldMatrix();
 }
 
 const safeMaterial = new StandardMaterial('safe-zone-material', scene);
@@ -552,6 +562,30 @@ const realismAssets = new Map<RealismModel, AssetContainer>();
 const sectorGrid = new WorldSectorGrid(48);
 const sectorNodes = new Map<string, TransformNode>();
 let sectorVisibilityCooldown = 0;
+let actorVisibilityCooldown = 0;
+function updateActorVisibility(dt: number): void {
+  actorVisibilityCooldown -= dt;
+  if (actorVisibilityCooldown > 0) return;
+  actorVisibilityCooldown = 0.2;
+  const radius = state.settings.quality === 'low' ? 48 : state.settings.quality === 'ultra' ? 110 : 76;
+  for (const entity of state.entities) {
+    if (entity.kind === 'player') continue;
+    const distance = Math.hypot(entity.x - player.x, entity.z - player.z);
+    const visible = distance < radius + (entity.visualActive ? 6 : 0) || targeting.isSelected(entity);
+    if (visible !== entity.visualActive) {
+      entity.visualActive = visible;
+      entity.root?.setEnabled(visible);
+      entity.pickVolume?.setEnabled(visible && entity.alive);
+      if (!visible) entity.animations.forEach(group => group.stop());
+      else {
+        const action = entity.actionType as 'walk' | 'idle' | 'attack' | 'death' | undefined;
+        entity.actionType = undefined;
+        setEntityAction(entity, entity.alive ? (action ?? 'idle') : 'death', !entity.alive);
+      }
+    }
+    entity.label?.setEnabled(visible && entity.alive && (distance < (entity.kind === 'npc' ? 24 : 18) || targeting.isSelected(entity)));
+  }
+}
 function sectorParent(x: number, z: number): TransformNode {
   const key = sectorGrid.keyAt(x, z);
   let node = sectorNodes.get(key);
@@ -661,6 +695,7 @@ function normalizeHeight(root: TransformNode, targetHeight: number): void {
 
 function setEntityAction(entity: Entity, action: 'idle' | 'walk' | 'attack' | 'death', once = false): void {
   if (entity.actionType === action && !once) return;
+  if (entity.visualActive === false) { entity.actionType = action; return; }
   const terms: Record<string, string[]> = {
     idle: ['idle', 'survey'], walk: ['walk', 'run', 'flying'],
     attack: ['sword_attack', 'dagger_attack', 'bow_shoot', 'attack', 'spell', 'shoot', 'cast'],
@@ -685,6 +720,7 @@ function createEntityModel(entity: Entity): void {
   if (!container) throw new Error(`Asset not loaded: ${entity.model}`);
   const instance = instantiateContainer(container, entity.uid, entity.tint);
   entity.releaseVisual = instance.dispose;
+  entity.visualActive = true;
   entity.root = instance.root;
   entity.animations = instance.animations;
   entity.animations.forEach((animation) => { animation.speedRatio = 1; });
@@ -704,7 +740,7 @@ function createEntityModel(entity: Entity): void {
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
     mesh.metadata = { entity };
-    mesh.isPickable = entity.kind === 'monster' || entity.kind === 'npc';
+    mesh.isPickable = false; // Capsules own actor picking, including skinned models.
   });
   if (entity.kind === 'monster' || entity.kind === 'npc') {
     const radius = entity.kind === 'npc'
@@ -712,15 +748,16 @@ function createEntityModel(entity: Entity): void {
       : entity.boss === 'big' ? 1.75 : entity.boss === 'mini' ? 1.25 : Math.max(0.72, entity.targetHeight * 0.42);
     const height = entity.targetHeight + radius * 1.45;
     const volume = MeshBuilder.CreateCapsule(`pick-volume-${entity.uid}`, { height, radius, tessellation: 12 }, scene);
-    volume.position.set(entity.x, height * 0.5, entity.z);
+    volume.position.set(entity.x, terrain.supportAt(entity.x, entity.z) + height * 0.5, entity.z);
     volume.material = pickVolumeMaterial;
-    volume.metadata = { entity, combatPickVolume: entity.kind === 'monster' };
+    volume.metadata = { entity, combatPickVolume: entity.kind === 'monster', centerY: height * 0.5 };
     volume.isPickable = true;
     entity.pickVolume = volume;
   }
   setEntityAction(entity, 'idle');
   if (entity.kind === 'monster') addNameplate(entity);
   if (entity.kind === 'npc') addNpcLabel(entity);
+  syncEntityTransform(entity);
 }
 
 function disposeEntityVisual(entity: Entity): void {
@@ -744,12 +781,15 @@ function recreateEntityVisual(entity: Entity): void {
 }
 
 function syncEntityTransform(entity: Entity, verticalOffset = 0): void {
-  entity.root?.position.set(entity.x, (entity.baseY ?? entity.root.position.y) + verticalOffset, entity.z);
+  const supportY = terrain.supportAt(entity.x, entity.z);
+  entity.supportY = supportY;
+  entity.root?.position.set(entity.x, supportY + (entity.baseY ?? 0) + verticalOffset, entity.z);
   if (entity.pickVolume) {
     entity.pickVolume.position.x = entity.x;
     entity.pickVolume.position.z = entity.z;
-    entity.pickVolume.position.y = entity.targetHeight * 0.5 + verticalOffset;
+    entity.pickVolume.position.y = supportY + entity.pickVolume.metadata.centerY + verticalOffset;
   }
+  entity.label?.position.set(entity.x, supportY + entity.targetHeight + 0.65 + verticalOffset, entity.z);
 }
 
 function labelMaterial(entity: Entity, height = 96): { material: StandardMaterial; texture: DynamicTexture } {
@@ -784,7 +824,7 @@ function addNpcLabel(entity: Entity): void {
   plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
   plane.position.y = entity.targetHeight + 0.8;
   plane.material = material;
-  plane.parent = entity.root;
+  // Labels stay in world units; parenting to a normalized rig scales them twice.
   plane.isPickable = false;
   entity.label = plane;
   entity.labelTexture = texture;
@@ -797,7 +837,7 @@ function addNameplate(entity: Entity): void {
   plane.billboardMode = Mesh.BILLBOARDMODE_ALL;
   plane.position.y = entity.targetHeight + 0.8;
   plane.material = material;
-  plane.parent = entity.root;
+  // Independent world-space label, kept in sync with ground support.
   plane.isPickable = false;
   entity.label = plane;
   entity.labelTexture = texture;
@@ -858,7 +898,7 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
   const container = worldAssets.get(name);
   if (!container) return null;
   const instance = instantiateContainer(container, `world-${name}-${uid()}`, tint);
-  instance.root.position.set(x, 0, z);
+  instance.root.position.set(x, terrain.heightAt(x, z), z);
   instance.root.rotation.y = rotation;
   instance.root.scaling.setAll(scale);
   assignWorldSector(instance.root, x, z);
@@ -875,6 +915,7 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   instance.root.position.set(x, 0, z);
   instance.root.rotation.y = rotation;
   normalizeHeight(instance.root, height);
+  instance.root.position.y += terrain.heightAt(x, z);
   assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
@@ -888,41 +929,19 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
 function realismModelPart(partName: string, x: number, z: number, height: number, rotation = 0): TransformNode | null {
   const container = realismAssets.get('modular_fort_01');
   if (!container) return null;
-  const entries = container.instantiateModelsToScene((sourceName) => `fort-${uid()}-${sourceName}`, false, {
-    doNotInstantiate: true,
-  });
-  const root = new TransformNode(`fort-part-${partName}-${uid()}`, scene);
-  let retained = 0;
-  for (const node of entries.rootNodes) {
-    if (node.name.toLowerCase().includes(partName.toLowerCase())) {
-      node.parent = root;
-      retained += 1;
-    } else {
-      node.dispose(false, false);
-    }
-  }
-  entries.animationGroups.forEach((animation) => animation.dispose());
-  if (!retained) {
-    root.dispose();
-    return null;
-  }
-  root.computeWorldMatrix(true);
-  root.getChildMeshes().forEach((mesh) => mesh.computeWorldMatrix(true));
-  const initial = root.getHierarchyBoundingVectors(true);
-  const sourceHeight = Math.max(0.001, initial.max.y - initial.min.y);
-  root.scaling.setAll(height / sourceHeight);
-  root.computeWorldMatrix(true);
-  root.getChildMeshes().forEach((mesh) => mesh.computeWorldMatrix(true));
-  const scaled = root.getHierarchyBoundingVectors(true);
-  root.position.set(
-    x - (scaled.min.x + scaled.max.x) * 0.5,
-    -scaled.min.y,
-    z - (scaled.min.z + scaled.max.z) * 0.5,
-  );
+  const { root, size } = createStaticPart(container, partName, `fort-part-${partName}-${uid()}`, height);
+  root.position.set(x, terrain.heightAt(x, z), z);
   root.rotation.y = rotation;
   assignWorldSector(root, x, z);
   tintMeshes(root);
   root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
+  // Colliders are registered only after a real visual exists, using that visual's bounds.
+  if (partName.includes('gate')) {
+    const offset = size.x * 0.41;
+    for (const side of [-1, 1]) collisionWorld.addBox(x + Math.cos(rotation) * offset * side,
+      z - Math.sin(rotation) * offset * side, size.x * 0.09, size.z * 0.5, rotation);
+  } else if (partName.includes('tower')) collisionWorld.addCircle(x, z, Math.min(size.x, size.z) * 0.44);
+  else collisionWorld.addBox(x, z, size.x * 0.5, size.z * 0.5, rotation);
   return root;
 }
 
@@ -953,7 +972,7 @@ function createPineTree(name: string, x: number, z: number, height: number, rota
   }
   for (const [part, source] of Object.entries(pineGeometry)) {
     const mesh = source.createInstance(`${name}-${part}`);
-    mesh.position.set(x, 0, z); mesh.rotation.y = rotation; mesh.scaling.setAll(height);
+    mesh.position.set(x, terrain.heightAt(x, z), z); mesh.rotation.y = rotation; mesh.scaling.setAll(height);
     mesh.isVisible = true; mesh.isPickable = false;
     shadowCasters.add(mesh);
     assignWorldSector(mesh, x, z);
@@ -1044,6 +1063,7 @@ function createGate(name: string, x: number, z: number, width = 7): void {
 
 function createSmithy(x: number, z: number): void {
   townBox('smithy-floor', x, 0.08, z, 5.8, 0.16, 4.4, 0x746b5d, false);
+  terrain.addPlatform(x, z, 5.8, 4.4, 0.16);
   townBox('smithy-back', x, 1.3, z + 1.85, 5.8, 2.6, 0.35, 0x685f52);
   townBox('smithy-awning', x, 2.55, z + 0.1, 5.6, 0.24, 3.2, 0x6e3f2c, false);
   townBox('smithy-anvil-base', x + 0.8, 0.38, z - 0.15, 0.65, 0.75, 0.7, 0x3b4244, false);
@@ -1144,16 +1164,10 @@ function buildStarterSettlement(x: number, z: number): void {
   realismModelPart('wall_thin_straight_01', x - 11.0, z - 17.0, 4.8, 0);
   realismModelPart('wall_thin_straight_01', x + 11.0, z - 17.0, 4.8, 0);
 
-  // Lightweight blockers follow the fortress footprint while preserving the open gate.
-  collisionWorld.addBox(x - 15.8, z - 3.5, 0.65, 13.5, 0);
-  collisionWorld.addBox(x + 15.8, z - 3.5, 0.65, 13.5, 0);
-  collisionWorld.addBox(x, z + 10.5, 15.8, 0.65, 0);
-  collisionWorld.addBox(x - 11.0, z - 17.0, 5.0, 0.65, 0);
-  collisionWorld.addBox(x + 11.0, z - 17.0, 5.0, 0.65, 0);
-
   // Raised northern keep, framed by real fort towers and a textured castle door.
   createBuilding('greenfall-keep', x, z + 6.0, 9.4, 6.2, 4.7, 0x978d7d, 0x5c4a42);
   townBox('greenfall-keep-steps', x, 0.24, z + 2.45, 3.8, 0.48, 1.5, 0x8a8172, false);
+  terrain.addPlatform(x, z + 2.45, 3.8, 1.5, 0.48);
   realismModelPart('tower_round', x - 6.0, z + 7.0, 7.0, 0);
   realismModelPart('tower_round', x + 6.0, z + 7.0, 7.0, 0);
   realismModel('large_castle_door', x, z + 2.9, 4.2, 0);
@@ -1210,29 +1224,42 @@ function buildFrontierCamp(x: number, z: number, scale = 1): void {
 
 function buildWorld(): void {
   collisionWorld.clear();
+  // Stable decoration positions across Continue, quality levels and character selection.
+  let seed = 314159;
+  const rand = (min: number, max: number) => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return min + seed / 4294967296 * (max - min);
+  };
   roadBetween(-108, -82, -65, -55, 5.4);
-  roadBetween(-65, -55, -7, -15, 5.2);
-  roadBetween(-7, -15, -7, -5, 5.2);
-  roadBetween(-7, -5, 35, 18, 4.8);
+  roadBetween(-65, -55, -7, -27, 5.2);
+  roadBetween(-7, -27, -7, -15, 5.2);
+  roadBetween(-7, -27, 20, -27, 4.8);
+  roadBetween(20, -27, 35, 18, 4.8);
   roadBetween(35, 18, 70, 6, 4.2);
   roadBetween(35, 18, 72, 52, 4.4);
   roadBetween(72, 52, 104, 48, 4.0);
   roadBetween(104, 48, 136, 101, 4.0);
   roadBetween(70, 6, 112, 4, 3.5);
-  const treeCount = state.settings.foliage === 'low' ? 100 : state.settings.foliage === 'medium' ? 155 : 220;
+  const reserved = (x: number, z: number, radius: number) =>
+    (Math.abs(x + 7) < 21 + radius && Math.abs(z + 8) < 23 + radius)
+    || (Math.abs(x + 108) < 26 + radius && Math.abs(z + 82) < 26 + radius)
+    || terrain.roadAt(x, z, radius + 1);
+  const treeCount = 220; // Quality changes rendering, never collision/world topology.
   for (let index = 0; index < treeCount; index += 1) {
     const forest = index > treeCount * 0.34;
     const x = forest ? rand(50, 154) : rand(-145, 52);
     const z = forest ? rand(-18, 126) : rand(-120, 64);
-    if (Math.hypot(x + 7, z + 5) < 16) continue;
+    if (reserved(x, z, 1)) continue;
     createPineTree(`pine-${index}`, x, z, forest ? rand(6.5, 10.5) : rand(5.2, 8.2), rand(0, Math.PI * 2));
   }
   for (let index = 0; index < 70; index += 1) {
     const x = rand(-150, 155); const z = rand(-128, 132);
+    if (reserved(x, z, 2.5)) continue;
     realismModel(index % 2 ? 'rock_09' : 'boulder_01', x, z, rand(1.2, 3.1), rand(0, Math.PI * 2));
   }
   for (let index = 0; index < 34; index += 1) {
     const x = rand(45, 155); const z = rand(-18, 126);
+    if (reserved(x, z, 1.5)) continue;
     realismModel(index % 2 ? 'dead_tree_trunk' : 'tree_stump_01', x, z, rand(1.5, 3.8), rand(0, Math.PI * 2));
   }
   buildTown(-108, -82, 1.65);
@@ -1242,7 +1269,7 @@ function buildWorld(): void {
   buildRuinLandmark(69, 52, 1.15);
   buildRuinLandmark(105, 49, 1.3);
   buildRuinLandmark(132, 96, 1.4);
-  for (let index = 0; index < 8; index += 1) worldModel(index % 3 ? 'fence' : 'fence-broken', -14 + index * 2.2, -7 + index * 0.22, 1, 0);
+  // The obsolete fence through the central square blocked the street and the bonfire.
   for (const [x, z] of [[-102, -77], [-114, -88], [35, 18], [72, 52], [104, 48], [133, 96]]) {
     const lantern = worldModel('lantern', x, z, 1.4);
     if (lantern) {
@@ -1255,6 +1282,13 @@ function buildWorld(): void {
   }
   worldModel('wall-arch', 136, 98, 3.2, Math.PI, 0x59605d);
   for (let index = 0; index < 9; index += 1) realismModel('boulder_01', 130 + rand(0, 14), 94 + rand(0, 15), rand(2.2, 4.2), rand(0, Math.PI * 2));
+  finishTerrain();
+  for (const node of sectorNodes.values()) {
+    node.computeWorldMatrix(true); node.freezeWorldMatrix();
+    node.getDescendants().forEach(child => {
+      if (child instanceof TransformNode) { child.computeWorldMatrix(true); child.freezeWorldMatrix(); }
+    });
+  }
 }
 
 function makeItem(id: string, plus = 0, count = 1): ItemInstance {
@@ -1481,9 +1515,12 @@ async function startGame(load: boolean): Promise<void> {
     state.interactionTarget = null;
     cameraControl.snap({ x: player.x, y: 0, z: player.z });
     applySettings();
+    updateActorVisibility(1);
+    updateWorldSectorVisibility(1);
     q('#load-text').textContent = 'Подготавливаем изображение…';
     // Loaded GLTF data does not mean the shaders/post-processing are ready to display.
     await scene.whenReadyAsync();
+    if (state.settings.shadows) await shadows.forceCompilationAsync();
     await new Promise<void>(resolve => scene.onAfterRenderObservable.addOnce(() => resolve()));
     q('#loading').classList.add('hidden');
     q('#hud').classList.remove('hidden');
@@ -1491,6 +1528,7 @@ async function startGame(load: boolean): Promise<void> {
     state.paused = false;
     skipFrameDelta = true;
     buildHotbar();
+    fitActionDock();
     updateQuest();
     updateHud();
     log(`Добро пожаловать в Варендор, ${player.name}.`, 'system');
@@ -1567,6 +1605,8 @@ function resetPlayerControl(clearTarget = false): void {
   state.interactionTarget = null;
   combatControl.cancelPursuit();
   playerMotor.reset();
+  const hero = state.entities.find(entity => entity.kind === 'player');
+  if (hero) { hero.navPath = undefined; hero.navCooldown = 0; }
   if (clearTarget) {
     targeting.clear();
     setTargetOutline(outlinedTarget, false);
@@ -1618,7 +1658,7 @@ function updateTargetIndicator(): void {
     targetIndicator.setEnabled(false);
     return;
   }
-  targetIndicator.position.set(target.x, 0.03, target.z);
+  targetIndicator.position.set(target.x, terrain.supportAt(target.x, target.z) + 0.03, target.z);
   const scale = target.boss === 'big' ? 2.2 : target.boss === 'mini' ? 1.55 : Math.max(0.85, target.targetHeight * 0.52);
   targetIndicator.scaling.setAll(scale);
   targetIndicator.rotation.y += 0.7 / 60;
@@ -1654,18 +1694,21 @@ function update(dt: number): void {
     state.moveTarget = null;
     state.interactionTarget = null;
     combatControl.cancelPursuit();
+    hero.navPath = undefined; hero.navCooldown = 0;
     desiredDirection = cameraControl.movementDirection(axes);
     syncMovementIntent(desiredDirection, dt);
   } else {
     syncMovementIntent(null, dt);
     const destination = combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
     if (destination) {
-      const dx = destination.x - player.x;
-      const dz = destination.z - player.z;
+      // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
+      const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
+      const dx = (waypoint?.x ?? player.x) - player.x;
+      const dz = (waypoint?.z ?? player.z) - player.z;
       const distance = Math.hypot(dx, dz);
-      if (distance < 0.18) {
+      if (Math.hypot(destination.x - player.x, destination.z - player.z) < 0.18) {
         if (combatDecision.kind !== 'approach') state.moveTarget = null;
-      } else {
+      } else if (waypoint) {
         desiredDirection = { x: dx, z: dz };
         maxMoveDistance = distance;
       }
@@ -1678,7 +1721,7 @@ function update(dt: number): void {
   const resolvedPlayer = collisionWorld.resolve(player, { x: motion.dx, z: motion.dz }, 0.46);
   player.x = resolvedPlayer.x;
   player.z = resolvedPlayer.z;
-  if (resolvedPlayer.blocked && Math.hypot(resolvedPlayer.x - hero.x, resolvedPlayer.z - hero.z) < 0.0001) playerMotor.stopPlanar();
+  // Keep intent while sliding; repeatedly zeroing acceleration at a contact caused sticky walls.
   enforcePlayerBoundary();
   const moved = Math.hypot(player.x - hero.x, player.z - hero.z) > 0.001;
   if (moved && hero.root) {
@@ -1764,7 +1807,7 @@ function updateMonster(entity: Entity, dt: number): void {
   const homeZ = entity.homeZ ?? entity.z;
   const homeDistance = Math.hypot(entity.x - homeX, entity.z - homeZ);
   const selected = targeting.isSelected(entity);
-  if (distance > 72 && !selected && homeDistance < 1.2) {
+  if (entity.visualActive === false && !selected) {
     if (entity.actionType === 'walk') setEntityAction(entity, 'idle');
     return;
   }
@@ -1962,7 +2005,7 @@ function queueAttackTimeline(timeline: AttackTimeline, onImpact: () => void, onC
 }
 
 function entityWorldPosition(entity: Entity, height = 1.4): Vector3 {
-  return new Vector3(entity.x, height, entity.z);
+  return new Vector3(entity.x, terrain.supportAt(entity.x, entity.z) + height, entity.z);
 }
 
 function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () => void): void {
@@ -2195,21 +2238,27 @@ const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: n
   talk: { x: -7, z: -5.0 },
 };
 
-function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: number; z: number }>, speed: number, dt: number, actorRadius = 0.4): boolean {
+function navigationWaypoint(entity: Entity, destination: Readonly<{ x: number; z: number }>, dt: number, actorRadius: number) {
   entity.navCooldown = Math.max(0, (entity.navCooldown ?? 0) - dt);
-  if (entity.navCooldown <= 0 && navigationBudget > 0) {
+  const goalMoved = Math.hypot((entity.navGoalX ?? Infinity) - destination.x, (entity.navGoalZ ?? Infinity) - destination.z) > 0.7;
+  if (entity.navCooldown <= 0 && (goalMoved || !entity.navPath?.length) && navigationBudget > 0) {
     navigationBudget -= 1;
-    entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius, cellSize: 1.05, margin: 9 });
+    entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius, cellSize: 0.85, margin: entity.kind === 'player' ? 24 : 10, maxVisited: 4500 });
     entity.navIndex = 0;
     entity.navGoalX = destination.x;
     entity.navGoalZ = destination.z;
-    entity.navCooldown = entity.navPath.length ? (entity.kind === 'monster' ? 0.72 : 2.2) : 0.55;
+    entity.navCooldown = entity.navPath.length ? (entity.kind === 'player' ? 0.18 : 0.65) : 1;
   }
   let waypoint = entity.navPath?.[entity.navIndex ?? 0];
-  while (waypoint && Math.hypot(waypoint.x - entity.x, waypoint.z - entity.z) < 0.24) {
+  while (waypoint && Math.hypot(waypoint.x - entity.x, waypoint.z - entity.z) < (entity.kind === 'player' ? 0.1 : 0.24)) {
     entity.navIndex = (entity.navIndex ?? 0) + 1;
     waypoint = entity.navPath?.[entity.navIndex];
   }
+  return waypoint;
+}
+
+function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: number; z: number }>, speed: number, dt: number, actorRadius = 0.4): boolean {
+  const waypoint = navigationWaypoint(entity, destination, dt, actorRadius);
   if (!waypoint) return false;
   const dx = waypoint.x - entity.x;
   const dz = waypoint.z - entity.z;
@@ -2237,11 +2286,12 @@ function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: nu
   const step = Math.min(distance, speed * dt);
   const moved = moveEntityWithCollision(entity, (intentX / intentLength) * step, (intentZ / intentLength) * step, true);
   rotateTowardsSmooth(entity, waypoint.x, waypoint.z, dt);
-  if (!moved) entity.navCooldown = Math.min(entity.navCooldown ?? 0.3, 0.3);
+  if (!moved) { entity.navPath = undefined; entity.navCooldown = Math.max(entity.navCooldown ?? 0, 0.3); }
   return moved;
 }
 
 function updateTownNpc(entity: Entity, dt: number): void {
+  if (entity.visualActive === false) return;
   if (entity.role !== 'smith') return;
   rotateTowardsSmooth(entity, -16.4, -11.35, dt);
   entity.npcActionTimer = (entity.npcActionTimer ?? 0) - dt;
@@ -2257,6 +2307,7 @@ function updateTownNpc(entity: Entity, dt: number): void {
 }
 
 function updateAmbientResident(entity: Entity, dt: number): void {
+  if (entity.visualActive === false) return;
   const decision = entity.ambientBrain?.update(dt, entity);
   if (!decision) return;
   entity.ambientActivity = decision.waypoint.activity;
@@ -2428,9 +2479,12 @@ window.addEventListener('keydown', (event) => {
 
 canvas.addEventListener('pointerdown', (event) => {
   if (event.button !== 0 || !state.started || state.paused) return;
-  const pick = scene.pick(event.offsetX, event.offsetY, (mesh) => mesh.isPickable);
-  if (!pick?.hit || !pick.pickedPoint) return;
-  let mesh: AbstractMesh | null = pick.pickedMesh;
+  const pick = scene.pick(event.offsetX, event.offsetY, mesh => mesh.isPickable && Boolean(mesh.metadata?.entity?.alive))
+    ?? null;
+  const hit = pick?.hit ? pick : scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
+  if (!hit?.hit || !hit.pickedPoint) return;
+  const hero = playerEntity(); hero.navPath = undefined; hero.navCooldown = 0;
+  let mesh: AbstractMesh | null = hit.pickedMesh;
   let entity: Entity | undefined;
   while (mesh && !entity) {
     entity = (mesh.metadata as { entity?: Entity } | null)?.entity;
@@ -2457,11 +2511,11 @@ canvas.addEventListener('pointerdown', (event) => {
       return;
     }
   }
-  if ((pick.pickedMesh?.metadata as { ground?: boolean } | null)?.ground) {
-    state.moveTarget = { x: pick.pickedPoint.x, z: pick.pickedPoint.z };
+  if ((hit.pickedMesh?.metadata as { ground?: boolean } | null)?.ground) {
+    state.moveTarget = collisionWorld.findNearestFree({ x: hit.pickedPoint.x, z: hit.pickedPoint.z }, 0.46);
     state.interactionTarget = null;
     combatControl.cancelPursuit();
-    void gateway.send({ type: 'move', x: pick.pickedPoint.x, z: pick.pickedPoint.z });
+    void gateway.send({ type: 'move', x: hit.pickedPoint.x, z: hit.pickedPoint.z });
   }
 });
 
@@ -2690,6 +2744,7 @@ function applySettings(): void {
   const anisotropy = state.settings.textureQuality === 'ultra' ? 16 : state.settings.textureQuality === 'high' ? 8 : 4;
   scene.textures.forEach((texture) => { texture.anisotropicFilteringLevel = anisotropy; });
   document.documentElement.style.setProperty('--ui-scale', String(state.settings.uiScale));
+  fitActionDock();
   gameAudio.apply(state.settings);
 }
 
@@ -2772,7 +2827,9 @@ function log(message: string, type = ''): void {
   entry.className = type ? `msg-${type}` : '';
   const stamp = document.createElement('span'); stamp.textContent = `[${time}] `;
   entry.append(stamp, document.createTextNode(message));
-  const messages = q<HTMLElement>('#messages'); messages.append(entry); messages.scrollTop = messages.scrollHeight;
+  const messages = q<HTMLElement>('#messages'); messages.append(entry);
+  while (messages.childElementCount > 80) messages.firstElementChild?.remove();
+  messages.scrollTop = messages.scrollHeight;
 }
 function toast(message: string, type = ''): void {
   const node = document.createElement('div'); node.className = `toast ${type}`; node.textContent = message; q('#notices').append(node); window.setTimeout(() => node.remove(), 3200);
@@ -2789,6 +2846,14 @@ function applyRenderResolution(): void {
   engine.setHardwareScalingLevel(renderScaling(window.innerWidth, window.innerHeight, window.devicePixelRatio,
     state.settings.quality, state.settings.resolutionScale, resolutionGovernor.scale));
   engine.resize();
+  fitActionDock();
+}
+function fitActionDock(): void {
+  const dock = q<HTMLElement>('.bottom-cluster');
+  if (!dock.offsetWidth) return;
+  const scale = Math.min(state.settings.uiScale, (window.innerWidth - 32) / dock.offsetWidth);
+  document.documentElement.style.setProperty('--dock-scale', String(scale));
+  document.documentElement.style.setProperty('--dock-height', `${dock.offsetHeight * scale}px`);
 }
 window.addEventListener('resize', applyRenderResolution);
 let skipFrameDelta = false;
@@ -2805,6 +2870,7 @@ engine.runRenderLoop(() => {
   const start = performance.now();
   navigationBudget = 2;
   if (state.started) {
+    updateActorVisibility(dt);
     cameraControl.orbit(inputControl.consumeCameraOrbit());
     cameraControl.zoom(inputControl.consumeZoom());
   }
@@ -2818,7 +2884,7 @@ engine.runRenderLoop(() => {
     if (hudTimer >= 0.1) { hudTimer = 0; updateHud(); }
     if (minimapTimer >= 0.2) { minimapTimer = 0; drawMinimap(); }
   }
-  if (state.started) cameraControl.update(dt, { x: player.x, y: 0, z: player.z });
+  if (state.started) cameraControl.update(dt, { x: player.x, y: terrain.supportAt(player.x, player.z), z: player.z });
   // Resizing clears the drawing buffer. It must happen BEFORE drawing, never after.
   if (state.started && !state.paused && resolutionGovernor.sample(dt)) applyRenderResolution();
   const beforeRender = performance.now();
@@ -2843,7 +2909,13 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
     version: '0.6.0-b01-performance-test',
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
-      adaptiveScale: resolutionGovernor.scale, droppedSeconds: simulationClock.droppedSeconds }),
+      adaptiveScale: resolutionGovernor.scale, droppedSeconds: simulationClock.droppedSeconds,
+      animationMs: sceneTimings.animationsTimeCounter.current,
+      activeMeshEvaluationMs: sceneTimings.activeMeshesEvaluationTimeCounter.current,
+      renderTargetsMs: sceneTimings.renderTargetsRenderTimeCounter.current,
+      mainRenderMs: sceneTimings.renderTimeCounter.current,
+      activeAnimatables: scene.animatables.length, renderer: engine.getGlInfo().renderer, settings: { ...state.settings },
+    }),
     getState: () => ({
       started: state.started,
       entities: state.entities.length,
@@ -2861,19 +2933,40 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
 // Only compiled into the separate CI build. Never included in the downloadable game.
 if (__QA_BUILD__) {
   const actors = () => state.entities.map(entity => {
-    const point = Vector3.Project(new Vector3(entity.x, entity.targetHeight * 0.55, entity.z), Matrix.Identity(),
+    const point = Vector3.Project(entityWorldPosition(entity, entity.targetHeight * 0.55), Matrix.Identity(),
       scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
     const meshes = entity.root?.getChildMeshes().filter(mesh => mesh.getTotalVertices() > 0) ?? [];
     return { uid: entity.uid, id: entity.id, kind: entity.kind, model: entity.model, x: entity.x, z: entity.z,
       screenX: point.x * canvas.clientWidth / engine.getRenderWidth(), screenY: point.y * canvas.clientHeight / engine.getRenderHeight(),
       depth: point.z, hp: entity.hp, alive: entity.alive, generation: entity.visualGeneration, action: entity.actionType,
-      rootY: entity.root?.position.y, meshes: meshes.length, visible: meshes.some(mesh => mesh.isEnabled() && mesh.isVisible),
+      rootY: entity.root?.position.y, supportY: terrain.supportAt(entity.x, entity.z), baseY: entity.baseY,
+      labelY: entity.label?.position.y, pickY: entity.pickVolume?.position.y,
+      meshes: meshes.length, visible: meshes.some(mesh => mesh.isEnabled() && mesh.isVisible),
       ready: meshes.every(mesh => mesh.isReady(true)), animations: entity.animations.length,
       lifecycle: entity.lifecycle?.state, baseScale: entity.baseScale?.asArray(),
       engaged: combatControl.isEngagedWith(entity.uid) };
   });
   Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
     actors,
+    surface: (x: number, z: number) => ({ ground: terrain.heightAt(x, z), support: terrain.supportAt(x, z), blocked: collisionWorld.isBlocked({ x, z }, 0.46) }),
+    world: () => ({ fortParts: scene.transformNodes.filter(node => node.name.startsWith('fort-part-') && !node.name.endsWith('-content')).length,
+      groundTriangles: ground.getTotalIndices() / 3, roads: terrain.roads.length,
+      paths: [[{ x: -7, z: -11 }, { x: -7, z: -28 }], [{ x: -7, z: -11 }, { x: -7, z: -2.6 }],
+        [{ x: -7, z: -11 }, { x: -18.2, z: -11.4 }], [{ x: -7, z: -11 }, { x: 0.3, z: -7.8 }],
+        [{ x: -7, z: -28 }, { x: 30, z: 8 }]].map(([from, to]) => ({ from, to,
+          path: findNavigationPath(collisionWorld, from, to, { actorRadius: 0.46, cellSize: 0.85, margin: 24 }) })) }),
+    bounds: (id: string) => {
+      const entity = state.entities.find(e => e.uid === id);
+      if (!entity?.root) return null;
+      const meshes = entity.root.getChildMeshes().filter(mesh => mesh.getTotalVertices() > 0 && mesh.isVisible);
+      meshes.forEach(mesh => { mesh.computeWorldMatrix(true); if (mesh instanceof Mesh) mesh.refreshBoundingInfo(true, true); });
+      return { minY: Math.min(...meshes.map(mesh => mesh.getBoundingInfo().boundingBox.minimumWorld.y)),
+        maxY: Math.max(...meshes.map(mesh => mesh.getBoundingInfo().boundingBox.maximumWorld.y)),
+        supportY: terrain.supportAt(entity.x, entity.z), rootY: entity.root.position.y };
+    },
+    uiScale: (scale: number) => { state.settings.uiScale = scale; document.documentElement.style.setProperty('--ui-scale', String(scale)); fitActionDock(); },
+    moveTo: (x: number, z: number) => { resetPlayerControl(true); state.moveTarget = collisionWorld.findNearestFree({ x, z }, 0.46); },
+    vitals: (hp: number, mp: number) => { player.hp = hp; player.mp = mp; updateHud(); },
     pause: (value: boolean) => { state.paused = value; simulationClock.reset(); skipFrameDelta = true; },
     kill: (id: string) => { const entity = state.entities.find(e => e.uid === id); if (entity) killMonster(entity); },
     lifecycleStep: (id: string, seconds: number) => { const entity = state.entities.find(e => e.uid === id); if (entity) updateMonster(entity, seconds); },
@@ -2881,7 +2974,7 @@ if (__QA_BUILD__) {
       const point = collisionWorld.findNearestFree({ x, z }, 0.46);
       player.x = point.x; player.z = point.z; resetPlayerControl(true);
       const hero = playerEntity(); hero.x = player.x; hero.z = player.z; syncEntityTransform(hero);
-      cameraControl.snap({ x: player.x, y: 0, z: player.z }); sectorVisibilityCooldown = 0;
+      cameraControl.snap({ x: player.x, y: terrain.supportAt(player.x, player.z), z: player.z }); sectorVisibilityCooldown = 0; actorVisibilityCooldown = 0;
     },
     die: () => die(),
   } });

@@ -11,8 +11,8 @@ function circleOverlap(point: Point2, actorRadius: number, obstacle: CircleObsta
 }
 
 function boxOverlap(point: Point2, actorRadius: number, obstacle: BoxObstacle): boolean {
-  const cosine = Math.cos(-obstacle.rotation);
-  const sine = Math.sin(-obstacle.rotation);
+  const cosine = Math.cos(obstacle.rotation);
+  const sine = Math.sin(obstacle.rotation);
   const dx = point.x - obstacle.x;
   const dz = point.z - obstacle.z;
   const localX = dx * cosine - dz * sine;
@@ -68,21 +68,59 @@ export class CollisionWorld {
   }
 
   resolve(from: Point2, delta: Point2, actorRadius: number): CollisionMove {
-    const full = { x: from.x + delta.x, z: from.z + delta.z };
-    if (!this.isBlocked(full, actorRadius)) return { ...full, blocked: false };
-
-    const xOnly = { x: full.x, z: from.z };
-    const zOnly = { x: from.x, z: full.z };
-    const canX = !this.isBlocked(xOnly, actorRadius);
-    const canZ = !this.isBlocked(zOnly, actorRadius);
-    if (canX && canZ) {
-      return Math.abs(delta.x) >= Math.abs(delta.z)
-        ? { ...xOnly, blocked: true }
-        : { ...zOnly, blocked: true };
+    const embedded = this.isBlocked(from, actorRadius);
+    let point = embedded ? this.depenetrate(from, actorRadius) : { ...from };
+    let blocked = embedded;
+    // Swept substeps prevent crossing thin fences after a long frame or knockback.
+    const steps = Math.max(1, Math.ceil(Math.hypot(delta.x, delta.z) / Math.max(0.1, actorRadius * 0.5)));
+    for (let step = 0; step < steps; step++) {
+      const candidate = { x: point.x + delta.x / steps, z: point.z + delta.z / steps };
+      if (!this.isBlocked(candidate, actorRadius)) { point = candidate; continue; }
+      blocked = true;
+      const slid = this.depenetrate(candidate, actorRadius);
+      if (!this.isBlocked(slid, actorRadius)) point = slid;
     }
-    if (canX) return { ...xOnly, blocked: true };
-    if (canZ) return { ...zOnly, blocked: true };
-    return { ...from, blocked: true };
+    return { ...point, blocked };
+  }
+
+  private depenetrate(start: Point2, radius: number): { x: number; z: number } {
+    const point = { ...start };
+    for (let iteration = 0; iteration < 8; iteration++) {
+      let pushed = false;
+      const candidates = new Set<Obstacle>();
+      for (let x = Math.floor((point.x - radius) / this.cellSize); x <= Math.floor((point.x + radius) / this.cellSize); x++) {
+        for (let z = Math.floor((point.z - radius) / this.cellSize); z <= Math.floor((point.z + radius) / this.cellSize); z++) {
+          for (const obstacle of this.cells.get(`${x}:${z}`) ?? []) candidates.add(obstacle);
+        }
+      }
+      for (const obstacle of candidates) {
+        const dx = point.x - obstacle.x; const dz = point.z - obstacle.z;
+        if (obstacle.kind === 'circle') {
+          const length = Math.hypot(dx, dz); const depth = radius + obstacle.radius - length;
+          if (depth <= 0) continue;
+          const nx = length > 1e-8 ? dx / length : 1; const nz = length > 1e-8 ? dz / length : 0;
+          point.x += nx * (depth + 1e-5); point.z += nz * (depth + 1e-5); pushed = true;
+        } else {
+          const cos = Math.cos(obstacle.rotation); const sin = Math.sin(obstacle.rotation);
+          const x = dx * cos - dz * sin; const z = dx * sin + dz * cos;
+          const ox = x - Math.max(-obstacle.halfX, Math.min(obstacle.halfX, x));
+          const oz = z - Math.max(-obstacle.halfZ, Math.min(obstacle.halfZ, z));
+          const length = Math.hypot(ox, oz);
+          if (length >= radius) continue;
+          let px: number; let pz: number;
+          if (length > 1e-8) {
+            const depth = radius - length + 1e-5; px = ox / length * depth; pz = oz / length * depth;
+          } else if (obstacle.halfX - Math.abs(x) < obstacle.halfZ - Math.abs(z)) {
+            px = (Math.sign(x) || 1) * (obstacle.halfX - Math.abs(x) + radius + 1e-5); pz = 0;
+          } else {
+            pz = (Math.sign(z) || 1) * (obstacle.halfZ - Math.abs(z) + radius + 1e-5); px = 0;
+          }
+          point.x += px * cos + pz * sin; point.z += -px * sin + pz * cos; pushed = true;
+        }
+      }
+      if (!pushed) break;
+    }
+    return point;
   }
 
   findNearestFree(point: Point2, actorRadius: number): Point2 {
