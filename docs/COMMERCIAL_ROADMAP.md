@@ -1,7 +1,7 @@
 # VARENDOR — утверждённый рабочий план
 
 Зафиксирован 2026-09-04 по согласованной Commercial Product Rebuild стратегии.
-Текущий блок: **B01 — Performance Rescue**, в работе.
+Текущий блок: **B01 — Performance Rescue**, `awaiting_user_test`.
 Следующие блоки закрыты до пользовательского теста и явного принятия B01.
 
 ## Неподвижные правила
@@ -54,7 +54,7 @@
 
 | Блок | Состояние | Commit / сборка | Решение пользователя |
 |---|---|---|---|
-| B01 | in_progress | — | — |
+| B01 | awaiting_user_test | `24176515f66aff84b3371890dc80e636e4ffb965` / [Windows ZIP](https://github.com/Pakka19941311/Pakka/releases/download/v0.6-b01-test-24176515/Varendor_B01_Windows_Test_24176515.zip), [QA](B01_VALIDATION.md) | Ожидается; B02 НЕ начат |
 
 ## Коммерческие ограничения
 
