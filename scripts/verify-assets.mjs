@@ -6,7 +6,7 @@ import process from 'node:process';
 const root = process.cwd();
 const characters = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'];
 const monsters = ['Skeleton', 'Slime', 'Bat', 'Dragon', 'Fox'];
-const realism = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'rock_09', 'tree_stump_01', 'wooden_crate_01'];
+const realism = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'modular_fort_01', 'rock_09', 'tree_stump_01', 'wooden_crate_01'];
 const worldDirectory = path.join(root, 'public/assets/models/world');
 const world = (await readdir(worldDirectory))
   .filter((filename) => filename.toLowerCase().endsWith('.glb'))

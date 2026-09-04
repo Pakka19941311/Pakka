@@ -262,7 +262,7 @@ const WORLD_DIR = '/assets/models/world/';
 const CHARACTER_MODELS = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'] as const;
 const MONSTER_MODELS = ['Skeleton', 'Slime', 'Bat', 'Dragon'] as const;
 const EXTRA_MONSTER_MODELS = ['Fox'] as const;
-const REALISM_MODELS = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'rock_09', 'tree_stump_01', 'wooden_crate_01'] as const;
+const REALISM_MODELS = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'modular_fort_01', 'rock_09', 'tree_stump_01', 'wooden_crate_01'] as const;
 type RealismModel = typeof REALISM_MODELS[number];
 const WORLD_MODELS = [
   'tree', 'tree-crooked', 'tree-high', 'tree-high-crooked', 'rock-large', 'rock-wide',
@@ -827,6 +827,45 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   return instance.root;
 }
 
+function realismModelPart(partName: string, x: number, z: number, height: number, rotation = 0): TransformNode | null {
+  const container = realismAssets.get('modular_fort_01');
+  if (!container) return null;
+  const entries = container.instantiateModelsToScene((sourceName) => `fort-${uid()}-${sourceName}`, true);
+  const root = new TransformNode(`fort-part-${partName}-${uid()}`, scene);
+  let retained = 0;
+  for (const node of entries.rootNodes) {
+    if (node.name.toLowerCase().includes(partName.toLowerCase())) {
+      node.parent = root;
+      retained += 1;
+    } else {
+      node.dispose(false, false);
+    }
+  }
+  entries.animationGroups.forEach((animation) => animation.dispose());
+  if (!retained) {
+    root.dispose();
+    return null;
+  }
+  root.computeWorldMatrix(true);
+  root.getChildMeshes().forEach((mesh) => mesh.computeWorldMatrix(true));
+  const initial = root.getHierarchyBoundingVectors(true);
+  const sourceHeight = Math.max(0.001, initial.max.y - initial.min.y);
+  root.scaling.setAll(height / sourceHeight);
+  root.computeWorldMatrix(true);
+  root.getChildMeshes().forEach((mesh) => mesh.computeWorldMatrix(true));
+  const scaled = root.getHierarchyBoundingVectors(true);
+  root.position.set(
+    x - (scaled.min.x + scaled.max.x) * 0.5,
+    -scaled.min.y,
+    z - (scaled.min.z + scaled.max.z) * 0.5,
+  );
+  root.rotation.y = rotation;
+  assignWorldSector(root, x, z);
+  tintMeshes(root);
+  root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
+  return root;
+}
+
 const foliageMaterial = new PBRMaterial('forest-needle-material', scene);
 foliageMaterial.albedoColor = new Color3(0.055, 0.115, 0.078);
 foliageMaterial.roughness = 0.98;
@@ -915,6 +954,11 @@ function createBuilding(name: string, x: number, z: number, width: number, depth
   townBox(`${name}-door`, x, 1.05, z - depth * 0.505, 1.1, 2.1, 0.16, 0x4b3526, false);
   townBox(`${name}-window-a`, x - width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
   townBox(`${name}-window-b`, x + width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
+  for (const offset of [-width * 0.43, width * 0.43]) {
+    townBox(`${name}-beam-${offset}`, x + offset, height * 0.55, z - depth * 0.525, 0.18, height * 0.88, 0.18, 0x4f3322, false);
+  }
+  townBox(`${name}-crossbeam`, x, height * 0.92, z - depth * 0.53, width * 0.9, 0.18, 0.18, 0x4f3322, false);
+  townBox(`${name}-chimney`, x + width * 0.3, height + 1.0, z + depth * 0.18, 0.72, 2.0, 0.72, 0x6c675e, false);
 }
 
 function createWatchTower(name: string, x: number, z: number, scale = 1): void {
@@ -1014,59 +1058,63 @@ function createBonfire(x: number, z: number): void {
 }
 
 function buildStarterSettlement(x: number, z: number): void {
-  road(x, z, 4.2, 22);
-  road(x, z - 0.5, 20, 3.8);
-  road(x + 6.3, z + 1.6, 8, 3.1, -0.18);
-  road(x - 6.2, z + 1.2, 8, 3.1, 0.16);
+  // Broad, readable hierarchy: gate -> main street -> central square -> keep.
+  road(x, z - 2.5, 5.2, 35);
+  road(x, z - 3.0, 27, 4.4);
+  road(x - 8.8, z + 3.0, 13, 3.5, 0.1);
+  road(x + 8.8, z + 3.0, 13, 3.5, -0.1);
 
-  for (const offset of [-7.5, -3.5, 0.5, 4.5]) {
-    worldModel('wall-block', x - 11, z + offset, 1.55, Math.PI / 2, 0x817c72);
-    worldModel('wall-block', x + 11, z + offset, 1.55, Math.PI / 2, 0x817c72);
+  // Production CC0 fort modules form a complete defensive silhouette.
+  realismModelPart('wall_thin_gate_01', x, z - 17.2, 5.6, 0);
+  realismModelPart('tower_round', x - 5.2, z - 17.1, 6.8, 0);
+  realismModelPart('tower_round', x + 5.2, z - 17.1, 6.8, 0);
+  for (const side of [-1, 1]) {
+    for (const offset of [-10.6, -3.4, 3.8]) {
+      realismModelPart('wall_thin_straight_01', x + side * 15.8, z + offset, 4.8, Math.PI / 2);
+    }
+    realismModelPart('wall_thin_corner_01', x + side * 15.8, z + 10.2, 5.0, side > 0 ? Math.PI : -Math.PI / 2);
+    realismModelPart('tower_round', x + side * 15.4, z + 10.0, 6.3, 0);
+    realismModelPart('wall_thin_straight_01', x + side * 10.5, z + 10.5, 4.8, 0);
+    realismModelPart('wall_thin_straight_01', x + side * 4.2, z + 10.5, 4.8, 0);
   }
-  for (const offset of [-8, -4, 4, 8]) worldModel('wall-block', x + offset, z + 9, 1.55, 0, 0x817c72);
-  worldModel('wall-arch', x, z - 10.5, 2.25, 0, 0x9b927e);
-  worldModel('pillar-stone', x - 3, z - 10.4, 1.15, 0, 0x77776f);
-  worldModel('pillar-stone', x + 3, z - 10.4, 1.15, 0, 0x77776f);
+  realismModelPart('wall_thin_straight_01', x - 11.0, z - 17.0, 4.8, 0);
+  realismModelPart('wall_thin_straight_01', x + 11.0, z - 17.0, 4.8, 0);
 
-  worldModel('roof-high', x - 7.2, z + 6, 1.85, 0.08, 0x78605a);
-  worldModel('roof', x + 6.8, z + 5.7, 1.75, -0.12, 0x74514a);
-  worldModel('roof', x - 8.2, z + 0.8, 1.55, 0.16, 0x6b4d46);
-  worldModel('stall', x - 7.1, z - 0.6, 1.25, Math.PI / 2, 0x83634d);
-  worldModel('cart', x - 5.7, z - 2.6, 1.05, -0.25, 0x72533d);
+  // Lightweight blockers follow the fortress footprint while preserving the open gate.
+  collisionWorld.addBox(x - 15.8, z - 3.5, 0.65, 13.5, 0);
+  collisionWorld.addBox(x + 15.8, z - 3.5, 0.65, 13.5, 0);
+  collisionWorld.addBox(x, z + 10.5, 15.8, 0.65, 0);
+  collisionWorld.addBox(x - 11.0, z - 17.0, 5.0, 0.65, 0);
+  collisionWorld.addBox(x + 11.0, z - 17.0, 5.0, 0.65, 0);
 
-  worldModel('stall-red', x + 7.2, z + 1, 1.35, -Math.PI / 2, 0x8e5e53);
-  worldModel('stall', x + 7.5, z - 2.2, 1.2, -Math.PI / 2, 0x776658);
-  worldModel('cart', x + 5.5, z + 3.2, 1.05, 0.55, 0x72533d);
-  for (const offset of [-2.8, 0, 2.8]) {
-    worldModel('fence', x + 9.8, z + offset, 1, Math.PI / 2, 0x777168);
-    worldModel(offset ? 'fence' : 'fence-broken', x - 9.8, z + offset, 1, Math.PI / 2, 0x777168);
-  }
+  // Raised northern keep, framed by real fort towers and a textured castle door.
+  createBuilding('greenfall-keep', x, z + 6.0, 9.4, 6.2, 4.7, 0x978d7d, 0x5c4a42);
+  townBox('greenfall-keep-steps', x, 0.24, z + 2.45, 3.8, 0.48, 1.5, 0x8a8172, false);
+  realismModelPart('tower_round', x - 6.0, z + 7.0, 7.0, 0);
+  realismModelPart('tower_round', x + 6.0, z + 7.0, 7.0, 0);
+  realismModel('large_castle_door', x, z + 2.9, 4.2, 0);
 
-  // Northern keep: actual civic focus with a visible entrance.
-  createBuilding('greenfall-keep', x, z + 5.0, 8.4, 5.2, 3.9, 0x978d7d, 0x5c4a42);
-  townBox('greenfall-keep-steps', x, 0.24, z + 1.95, 3.4, 0.48, 1.5, 0x8a8172, false);
-  createWatchTower('greenfall-keep-left', x - 5.0, z + 5.7, 0.72);
-  createWatchTower('greenfall-keep-right', x + 5.0, z + 5.7, 0.72);
-  realismModel('large_castle_door', x, z + 2.42, 3.6, 0);
+  // Western craft lane: tavern, working smithy, storage and delivery props.
+  createBuilding('greenfall-tavern', x - 9.4, z + 3.5, 6.7, 5.0, 3.4, 0x9a7b5e, 0x754335);
+  townBox('greenfall-tavern-sign', x - 5.95, 2.55, z + 1.9, 0.18, 1.25, 1.1, 0x6a4326, false);
+  createSmithy(x - 10.2, z - 6.2);
+  realismModel('wooden_crate_01', x - 13.0, z - 10.0, 1.05, -0.2);
+  realismModel('Barrel_01', x - 11.6, z - 10.2, 1.1, 0.25);
 
-  // West quarter: tavern and working forge.
-  createBuilding('greenfall-tavern', x - 6.0, z + 0.4, 6.0, 4.6, 3.0, 0x9a7b5e, 0x754335);
-  townBox('greenfall-tavern-sign', x - 3.0, 2.3, z - 0.8, 0.18, 1.2, 1.05, 0x6a4326, false);
-  createSmithy(x - 6.4, z - 0.2);
+  // Eastern market lane and storehouse form a distinct commercial quarter.
+  createBuilding('greenfall-storehouse', x + 10.0, z + 4.6, 6.4, 5.0, 3.2, 0x8d806c, 0x625046);
+  createBuilding('greenfall-home-east', x + 10.7, z - 10.0, 5.2, 4.2, 2.9, 0x8b8171, 0x564942);
+  worldModel('stall-red', x + 8.1, z - 3.5, 1.25, -Math.PI / 2, 0x9b6656);
+  worldModel('stall', x + 8.0, z - 6.3, 1.2, -Math.PI / 2, 0x826b57);
+  worldModel('cart', x + 11.1, z - 4.7, 1.0, 0.35, 0x72533d);
+  realismModel('wooden_crate_01', x + 12.8, z - 2.7, 1.15, 0.3);
+  realismModel('Barrel_01', x + 12.6, z - 6.9, 1.1, -0.15);
 
-  // East quarter: market + storehouse. No black placeholder roofs.
-  createBuilding('greenfall-storehouse', x + 6.1, z + 2.3, 5.2, 4.0, 2.8, 0x8d806c, 0x625046);
-  worldModel('stall-red', x + 6.3, z - 0.2, 1.15, -Math.PI / 2, 0x9b6656);
-  worldModel('stall', x + 6.1, z - 3.0, 1.05, -Math.PI / 2, 0x826b57);
-  worldModel('cart', x + 4.7, z - 1.7, 0.95, 0.35, 0x72533d);
-  realismModel('wooden_crate_01', x + 8.2, z - 1.6, 1.15, 0.3);
-  realismModel('Barrel_01', x + 8.0, z - 3.4, 1.1, -0.15);
-  realismModel('wooden_crate_01', x - 8.4, z - 3.0, 0.9, -0.2);
-
-  // Central social square.
-  createBonfire(x, z - 0.4);
-  worldModel('fountain-round', x + 3.0, z + 1.2, 0.9, 0, 0x9b9a8d);
-  for (const [lx, lz] of [[x - 3.4, z - 3.6], [x + 3.4, z - 3.6], [x - 3.4, z + 2.8], [x + 3.4, z + 2.8]]) {
+  // Central social square remains open and legible from the gate.
+  road(x, z - 1.0, 12.5, 11.0);
+  createBonfire(x, z - 1.2);
+  realismModel('gothic_statue', x + 4.0, z + 1.9, 3.4, -Math.PI / 2);
+  for (const [lx, lz] of [[x - 4.2, z - 5.2], [x + 4.2, z - 5.2], [x - 4.2, z + 2.9], [x + 4.2, z + 2.9]]) {
     const lantern = worldModel('lantern', lx, lz, 1.25);
     if (lantern) {
       const light = new PointLight(`settlement-light-${lx}-${lz}`, new Vector3(0, 2.5, 0), scene);

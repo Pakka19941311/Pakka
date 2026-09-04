@@ -17,6 +17,7 @@ const modelAssets = [
   'dead_tree_trunk',
   'gothic_statue',
   'large_castle_door',
+  'modular_fort_01',
   'rock_09',
   'tree_stump_01',
   'wooden_crate_01',
