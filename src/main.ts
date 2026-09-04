@@ -15,6 +15,7 @@ import {
   DynamicTexture,
   Engine,
   GlowLayer,
+  HDRCubeTexture,
   HemisphericLight,
   Matrix,
   Mesh,
@@ -65,6 +66,7 @@ import type { ConsumableBindings } from './controls/action-bindings';
 import { GameAudio } from './audio/game-audio';
 import { createPbrSurface, repairImportedMaterial } from './rendering/realism-materials';
 import { MonsterLifecycle } from './core/monster-lifecycle';
+import { qualityPreset } from './rendering/quality-presets';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -320,7 +322,7 @@ const state = {
   interactionTarget: null as Entity | null,
   entities: [] as Entity[],
   effects: [] as Array<{ update: (dt: number) => void; dead?: boolean }>,
-  worldTime: 19.35,
+  worldTime: 12.5,
   selectedItem: null as number | null,
   quest: 0,
   kills: 0,
@@ -393,6 +395,10 @@ const sky = new PhotoDome('ashen-frontier-sky', '/assets/textures/pbr/dark_autum
   size: 260,
 }, scene);
 sky.mesh.isPickable = false;
+const environment = new HDRCubeTexture('/assets/textures/pbr/dark_autumn_forest_1k.hdr', scene, 128, false, true, false, true);
+environment.rotationY = Math.PI * 0.18;
+scene.environmentTexture = environment;
+scene.environmentIntensity = 0.62;
 
 const camera = new ArcRotateCamera('third-person-camera', -Math.PI / 2, 1.06, 10.5, new Vector3(0, 1, 0), scene);
 camera.panningSensibility = 0;
@@ -1442,7 +1448,7 @@ function updateTargetIndicator(): void {
 
 function update(dt: number): void {
   if (!state.started || state.paused) return;
-  state.worldTime = (state.worldTime + dt * 0.035) % 24;
+  state.worldTime = 12.5;
   state.gateWarn = Math.max(0, state.gateWarn - dt);
   const hero = playerEntity();
   player.attackCd = Math.max(0, player.attackCd - dt);
@@ -2239,6 +2245,15 @@ function renderSettings(): void {
   q<HTMLSelectElement>('#texture-quality').value = s.textureQuality;
   q<HTMLSelectElement>('#shadow-quality').value = s.shadowQuality;
   q<HTMLSelectElement>('#foliage').value = s.foliage;
+  q<HTMLSelectElement>('#quality').onchange = () => {
+    const preset = qualityPreset(q<HTMLSelectElement>('#quality').value as Settings['quality']);
+    q<HTMLSelectElement>('#resolution-scale').value = String(preset.resolutionScale);
+    q<HTMLSelectElement>('#texture-quality').value = preset.textureQuality;
+    q<HTMLSelectElement>('#shadow-quality').value = preset.shadowQuality;
+    q<HTMLSelectElement>('#foliage').value = preset.foliage;
+    q<HTMLInputElement>('#anti-aliasing').checked = preset.antiAliasing;
+    q<HTMLInputElement>('#bloom').checked = preset.bloom;
+  };
   qa<HTMLInputElement>('[data-setting-range]').forEach((input) => { input.oninput = () => { q(`#${input.id}-value`).textContent = `${input.value}${input.dataset.suffix ?? ''}`; }; });
   q<HTMLButtonElement>('#fullscreen').onclick = () => { if (document.fullscreenElement) void document.exitFullscreen(); else void canvas.requestFullscreen(); };
   q<HTMLButtonElement>('#reset-settings').onclick = () => { Object.assign(s, settingsDefaults()); renderSettings(); };
@@ -2271,19 +2286,25 @@ function renderSettings(): void {
 }
 
 function applySettings(): void {
-  const ratios: Record<Settings['quality'], number> = { low: 1.5, medium: 1.2, high: 1, ultra: 1 / Math.min(window.devicePixelRatio, 2) };
-  engine.setHardwareScalingLevel(ratios[state.settings.quality] / state.settings.resolutionScale);
+  const deviceNative = 1 / Math.min(window.devicePixelRatio, 2);
+  const qualityFactor: Record<Settings['quality'], number> = { low: 1.45, medium: 1.18, high: deviceNative, ultra: deviceNative / 1.05 };
+  engine.setHardwareScalingLevel(qualityFactor[state.settings.quality] / state.settings.resolutionScale);
   shadows.setDarkness(0.28);
   moon.shadowEnabled = state.settings.shadows && state.settings.shadowQuality !== 'off';
   shadows.getShadowMap()?.resize(state.settings.shadowQuality === 'ultra' ? 4096 : state.settings.shadowQuality === 'high' ? 2048 : 1024);
   glow.isEnabled = state.settings.bloom;
   renderPipeline.fxaaEnabled = state.settings.antiAliasing;
   renderPipeline.samples = state.settings.antiAliasing && state.settings.quality === 'ultra' ? 4 : 1;
+  renderPipeline.bloomEnabled = state.settings.bloom;
+  renderPipeline.bloomWeight = 0.12;
+  renderPipeline.bloomThreshold = 0.86;
   scene.imageProcessingConfiguration.exposure = state.settings.exposure;
   scene.imageProcessingConfiguration.contrast = state.settings.contrast;
   colorCurves.globalSaturation = (state.settings.saturation - 1) * 100;
   scene.fogDensity = 0.008 * state.settings.fog;
+  scene.environmentIntensity = state.settings.quality === 'low' ? 0.38 : state.settings.quality === 'medium' ? 0.5 : 0.62;
   camera.fov = state.settings.fov;
+  camera.maxZ = qualityPreset(state.settings.quality).maxDistance;
   cameraControl.configure({ mouseSensitivity: state.settings.mouseSensitivity, zoomSensitivity: state.settings.zoomSensitivity, smoothing: state.settings.cameraSmoothing, invertY: state.settings.invertCameraY });
   const anisotropy = state.settings.textureQuality === 'ultra' ? 16 : state.settings.textureQuality === 'high' ? 8 : 4;
   scene.textures.forEach((texture) => { texture.anisotropicFilteringLevel = anisotropy; });
