@@ -38,6 +38,7 @@ import {
   INVENTORY_CAPACITY,
   baseVitals,
   bossRespawnSeconds,
+  classAttackRange,
   classCombatProfile,
   enhancementCanDestroy,
   enhancementChance,
@@ -74,6 +75,7 @@ import { MonsterLifecycle } from './core/monster-lifecycle';
 import { qualityPreset } from './rendering/quality-presets';
 import { WorldSectorGrid } from './world/world-sectors';
 import { AttackTimeline, combatTimings } from './combat/attack-timeline';
+import { resolveChainLightning } from './combat/chain-lightning';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -99,6 +101,8 @@ type SkillDef = {
   aoe?: number;
   slow?: number;
   chain?: number;
+  chainRadius?: number;
+  chainFalloff?: number;
   dot?: number;
   knock?: number;
   buff?: string;
@@ -1511,7 +1515,7 @@ function moveEntityWithCollision(entity: Entity, dx: number, dz: number, avoidSt
 }
 
 function attackRange(): number {
-  return CLASSES_MAP[player.classId].ranged ? 12 : 2.6;
+  return classAttackRange(player.classId);
 }
 
 function resetPlayerControl(clearTarget = false): void {
@@ -1865,14 +1869,27 @@ function performAttack(skillIndex: number | null): void {
   queueAttackTimeline(new AttackTimeline(combatTimings(attackKind)), () => {
     if (!target.alive || player.dead) return;
     spawnAttackEffect(skill?.fx ?? (ranged ? 'arrow' : 'slash'), hero, target, () => {
-      let victims = [target];
-      if (skill?.aoe) victims = state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0));
-      victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
       if (skill?.chain) {
-        state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && entity !== target)
-          .sort((a, b) => Math.hypot(a.x - target.x, a.z - target.z) - Math.hypot(b.x - target.x, b.z - target.z))
-          .slice(0, skill.chain - 1)
-          .forEach((entity) => { spawnAttackEffect('lightning', target, entity); damageMonster(entity, Math.round(damage * 0.68), false); });
+        const chainHits = resolveChainLightning(
+          target,
+          state.entities.filter((entity) => entity.kind === 'monster'),
+          { maxTargets: skill.chain, radius: skill.chainRadius ?? 6.5, falloff: skill.chainFalloff ?? 0.76 },
+        );
+        damageMonster(target, damage, critical);
+        const strikeJump = (index: number): void => {
+          const hit = chainHits[index];
+          if (!hit) return;
+          if (!hit.source || !hit.target.alive) return strikeJump(index + 1);
+          spawnAttackEffect('lightning', hit.source, hit.target, () => {
+            damageMonster(hit.target, Math.max(1, Math.round(damage * hit.multiplier)), false);
+            strikeJump(index + 1);
+          });
+        };
+        strikeJump(1);
+      } else {
+        let victims = [target];
+        if (skill?.aoe) victims = state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0));
+        victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
       }
       if (skill?.dot) target.status.dot = skill.dot;
       if (skill?.slow) target.status.slow = skill.slow;
@@ -1905,6 +1922,10 @@ function entityWorldPosition(entity: Entity, height = 1.4): Vector3 {
 }
 
 function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () => void): void {
+  if (type === 'lightning') {
+    spawnLightningArc(from, to, onHit);
+    return;
+  }
   const colors: Record<string, Color3> = {
     fire: new Color3(1, 0.2, 0.04), ice: new Color3(0.25, 0.75, 1), arrow: new Color3(0.8, 0.7, 0.45),
     bone: new Color3(0.85, 0.82, 0.7), drain: new Color3(0.15, 0.9, 0.55), curse: new Color3(0.52, 0.12, 0.9),
@@ -1936,6 +1957,40 @@ function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () =>
       projectile.dispose(false, true);
       onHit?.();
       impactEffect(end, material.emissiveColor);
+    }
+  } });
+}
+
+function spawnLightningArc(from: Entity, to: Entity, onHit?: () => void): void {
+  const start = entityWorldPosition(from);
+  const end = entityWorldPosition(to);
+  const direction = end.subtract(start);
+  const side = new Vector3(-direction.z, 0, direction.x).normalize();
+  const points: Vector3[] = [];
+  const segments = 9;
+  for (let index = 0; index <= segments; index += 1) {
+    const ratio = index / segments;
+    const point = Vector3.Lerp(start, end, ratio);
+    if (index > 0 && index < segments) {
+      const zigzag = (index % 2 ? 1 : -1) * (0.1 + Math.sin(index * 4.13) * 0.07);
+      point.addInPlace(side.scale(zigzag));
+      point.y += Math.sin(ratio * Math.PI) * 0.3 + Math.cos(index * 2.7) * 0.06;
+    }
+    points.push(point);
+  }
+  const bolt = MeshBuilder.CreateLines(`lightning-${uid()}`, { points }, scene);
+  bolt.color = new Color3(0.42, 0.78, 1);
+  bolt.alpha = 0.96;
+  bolt.isPickable = false;
+  let life = 0;
+  state.effects.push({ update(dt) {
+    life += dt;
+    bolt.alpha = Math.max(0, 1 - life / 0.14);
+    if (life >= 0.14) {
+      onHit?.();
+      impactEffect(entityWorldPosition(to), new Color3(0.36, 0.7, 1));
+      bolt.dispose();
+      this.dead = true;
     }
   } });
 }

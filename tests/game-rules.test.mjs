@@ -6,6 +6,7 @@ import {
   baseVitals,
   bossRespawnSeconds,
   classCombatProfile,
+  classAttackRange,
   enhancementCanDestroy,
   enhancementChance,
   enhancementStatMultiplier,
@@ -84,6 +85,15 @@ test('class combat profiles preserve role, crit and movement differences', () =>
   assert.ok(assassin.movementSpeed > ranger.movementSpeed);
   assert.ok(assassin.critChance > knight.critChance);
   assert.equal(assassin.critMultiplier, 1.65);
+});
+
+test('Ranger and Mage have distinct sustained ranged combat profiles', () => {
+  const ranger = classCombatProfile('ranger', 1, CLASSES.ranger.stats);
+  const mage = classCombatProfile('mage', 1, CLASSES.mage.stats);
+  assert.ok(ranger.attackInterval < mage.attackInterval);
+  assert.ok(ranger.accuracy > mage.accuracy);
+  assert.ok(classAttackRange('ranger') > classAttackRange('mage'));
+  assert.ok(classAttackRange('mage') > classAttackRange('knight'));
 });
 
 test('ordinary monsters remain clearly slower than every player class', () => {

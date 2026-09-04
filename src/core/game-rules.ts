@@ -97,13 +97,14 @@ export function classCombatProfile(classId: string, level: number, stats: BaseSt
     critDex: number;
     critCap: number;
     baseInterval: number;
+    speedCap: number;
   };
   const profiles: Record<string, StoredProfile> = {
-    knight: { critMultiplier: 1.5, movementSpeed: 95, critBase: 5, critDex: 0.1, critCap: 50, baseInterval: 1.15 },
-    mage: { critMultiplier: 1.5, movementSpeed: 100, critBase: 4, critDex: 0.07, critCap: 50, baseInterval: 1.4 },
-    assassin: { critMultiplier: 1.65, movementSpeed: 112, critBase: 10, critDex: 0.2, critCap: 60, baseInterval: 0.8 },
-    ranger: { critMultiplier: 1.55, movementSpeed: 108, critBase: 8, critDex: 0.17, critCap: 55, baseInterval: 1.25 },
-    necro: { critMultiplier: 1.5, movementSpeed: 98, critBase: 4, critDex: 0.08, critCap: 50, baseInterval: 1.45 },
+    knight: { critMultiplier: 1.5, movementSpeed: 95, critBase: 5, critDex: 0.1, critCap: 50, baseInterval: 1.15, speedCap: 0.3 },
+    mage: { critMultiplier: 1.5, movementSpeed: 100, critBase: 4, critDex: 0.07, critCap: 50, baseInterval: 1.5, speedCap: 0.22 },
+    assassin: { critMultiplier: 1.65, movementSpeed: 112, critBase: 10, critDex: 0.2, critCap: 60, baseInterval: 0.8, speedCap: 0.42 },
+    ranger: { critMultiplier: 1.55, movementSpeed: 108, critBase: 8, critDex: 0.17, critCap: 55, baseInterval: 1.02, speedCap: 0.35 },
+    necro: { critMultiplier: 1.5, movementSpeed: 98, critBase: 4, critDex: 0.08, critCap: 50, baseInterval: 1.45, speedCap: 0.24 },
   };
   const profile = profiles[classId] ?? profiles.knight;
   const physicalScaling = classId === 'knight'
@@ -125,7 +126,7 @@ export function classCombatProfile(classId: string, level: number, stats: BaseSt
       : classId === 'ranger'
         ? 78 + stats.dex * 1.8 + level * 0.15
         : 78 + stats.int * 1.45 + level * 0.15;
-  const speedMultiplier = 1 + (stats.dex / (stats.dex + 180)) * 0.45;
+  const speedMultiplier = 1 + Math.min(profile.speedCap, (stats.dex / (stats.dex + 180)) * 0.45);
   return {
     physicalScaling,
     magicScaling,
@@ -135,6 +136,13 @@ export function classCombatProfile(classId: string, level: number, stats: BaseSt
     movementSpeed: 6.2 * (profile.movementSpeed / 100),
     attackInterval: profile.baseInterval / speedMultiplier,
   };
+}
+
+export function classAttackRange(classId: string): number {
+  if (classId === 'ranger') return 13;
+  if (classId === 'mage') return 9.2;
+  if (classId === 'necro') return 9.8;
+  return 2.6;
 }
 
 export function enhancementCanDestroy(currentLevel: number): boolean {
