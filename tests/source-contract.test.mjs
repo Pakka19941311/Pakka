@@ -68,8 +68,8 @@ test('phase 1.1 restores respawn transforms and applies lightweight world collis
   assert.match(source, /collisionWorld\.resolve/);
   assert.match(source, /registerWorldCollider/);
   assert.match(source, /restoreEntityAfterRespawn/);
-  assert.match(source, /animation\.reset\(\)/);
-  assert.match(source, /root\.scaling\.copyFrom\(entity\.baseScale/);
+  assert.match(source, /recreateEntityVisual\(entity\)/);
+  assert.match(source, /entity\.visualGeneration/);
   assert.match(source, /source instanceof PBRMaterial/);
   assert.match(collision, /findNearestFree/);
 });

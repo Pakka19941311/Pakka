@@ -56,6 +56,7 @@ import { ThirdPersonCameraController } from './controls/third-person-camera';
 import { CollisionWorld } from './world/collision-world';
 import { AmbientNpcBrain } from './world/ambient-npc';
 import type { AmbientWaypoint } from './world/ambient-npc';
+import { findNavigationPath } from './world/navigation';
 import {
   CONSUMABLE_KEY_OPTIONS,
   consumableActionForCode,
@@ -205,6 +206,13 @@ type Entity = {
   patrolPause?: number;
   groupId?: string;
   npcActionTimer?: number;
+  npcActionRelease?: number;
+  moveSpeed?: number;
+  navPath?: Array<{ x: number; z: number }>;
+  navIndex?: number;
+  navGoalX?: number;
+  navGoalZ?: number;
+  navCooldown?: number;
   visualGeneration?: number;
   lifecycle?: MonsterLifecycle;
 };
@@ -1299,11 +1307,12 @@ function spawnAmbientResident(
   z: number,
   waypoints: readonly AmbientWaypoint[],
   seed: number,
+  moveSpeed: number,
 ): Entity {
   const spawn = collisionWorld.findNearestFree({ x, z }, 0.38);
   const entity = makeEntity({
     kind: 'ambient', name, model, x: spawn.x, z: spawn.z, targetHeight: 1.92,
-    tint: 0xb9aa98, ambientBrain: new AmbientNpcBrain(waypoints, seed),
+    tint: 0xb9aa98, ambientBrain: new AmbientNpcBrain(waypoints, seed), moveSpeed,
   });
   createEntityModel(entity);
   rotateTowards(entity, waypoints[0].x, waypoints[0].z);
@@ -1312,24 +1321,24 @@ function spawnAmbientResident(
 }
 
 function spawnAmbientResidents(): void {
-  spawnAmbientResident('Поселенец', 'Ranger', -5.2, -9.1, [
-    { x: -5.1, z: -5.2, activity: 'warm' }, { x: -2.2, z: -4.1, activity: 'trade' }, { x: -5.2, z: -9.1, activity: 'talk' },
-  ], 1);
-  spawnAmbientResident('Подмастерье', 'Warrior', -11.5, -6.5, [
-    { x: -11.8, z: -4.8, activity: 'work' }, { x: -9.7, z: -7.2, activity: 'talk' },
-  ], 2);
-  spawnAmbientResident('Дозорный', 'Warrior', -10.2, -12.7, [
-    { x: -10.2, z: -12.7, activity: 'guard' }, { x: -4.1, z: -12.7, activity: 'guard' },
-  ], 3);
-  spawnAmbientResident('Жительница', 'Monk', -3.5, -0.4, [
-    { x: -2.5, z: -2.3, activity: 'trade' }, { x: -5, z: -1.1, activity: 'talk' }, { x: -5.2, z: -5, activity: 'warm' },
-  ], 4);
-  spawnAmbientResident('Грузчик', 'Rogue', -1.8, -7.1, [
-    { x: -2, z: -6.8, activity: 'work' }, { x: 0.2, z: -2.2, activity: 'trade' }, { x: -4.2, z: -8.8, activity: 'talk' },
-  ], 5);
-  spawnAmbientResident('Странник', 'Wizard', -9.2, -1.7, [
-    { x: -8.9, z: -1.7, activity: 'talk' }, { x: -8.8, z: -5, activity: 'warm' }, { x: -7, z: -9.2, activity: 'guard' },
-  ], 6);
+  spawnAmbientResident('Поселенец', 'Ranger', -5.2, -14.1, [
+    { x: -7, z: -6.2, activity: 'warm' }, { x: 1.1, z: -8.5, activity: 'trade' }, { x: -5.2, z: -14.1, activity: 'talk' },
+  ], 1, 1.08);
+  spawnAmbientResident('Подмастерье', 'Warrior', -18.5, -12.8, [
+    { x: -17.2, z: -11.2, activity: 'work' }, { x: -12.5, z: -8.2, activity: 'talk' },
+  ], 2, 1.22);
+  spawnAmbientResident('Дозорный', 'Warrior', -12.2, -20.3, [
+    { x: -12.2, z: -20.3, activity: 'guard' }, { x: -1.8, z: -20.3, activity: 'guard' },
+  ], 3, 1.0);
+  spawnAmbientResident('Жительница', 'Monk', 3.4, -14.5, [
+    { x: 1.1, z: -8.5, activity: 'trade' }, { x: -4.2, z: -4.6, activity: 'talk' }, { x: -7, z: -6.2, activity: 'warm' },
+  ], 4, 0.94);
+  spawnAmbientResident('Грузчик', 'Rogue', 4.6, -11.5, [
+    { x: 3.0, z: -2.0, activity: 'work' }, { x: 1.1, z: -8.5, activity: 'trade' }, { x: -3.5, z: -12.0, activity: 'talk' },
+  ], 5, 1.34);
+  spawnAmbientResident('Странник', 'Wizard', -13.8, -3.5, [
+    { x: -13.8, z: -3.5, activity: 'talk' }, { x: -7, z: -6.2, activity: 'warm' }, { x: -7, z: -20.2, activity: 'guard' },
+  ], 6, 1.12);
 }
 
 function spawnEntities(): void {
@@ -1346,13 +1355,13 @@ function spawnEntities(): void {
   createEntityModel(playerEntity);
   state.entities.push(playerEntity);
   const npcs: Array<[string, string, number, number, string, number, number]> = [
-    ['Староста Роэн', 'Warrior', -7, -1.2, 'elder', -7, -5],
-    ['Кузнец Бран', 'Warrior', -12.1, -4.1, 'smith', -14.2, -4.2],
-    ['Торговка Эльза', 'Ranger', -1.9, -3.8, 'shop', 0.2, -4],
-    ['Проводник Каэль', 'Wizard', -7, -12.5, 'teleport', -7, -8.5],
+    ['Староста Роэн', 'Warrior', -7, -2.6, 'elder', -7, -6.2],
+    ['Кузнец Бран', 'Warrior', -18.2, -11.4, 'smith', -16.4, -11.35],
+    ['Торговка Эльза', 'Ranger', 0.3, -7.8, 'shop', 1.1, -8.5],
+    ['Проводник Каэль', 'Wizard', -7, -20.0, 'teleport', -7, -16.5],
   ];
   npcs.forEach(([name, model, x, z, role, lookX, lookZ]) => {
-    const entity = makeEntity({ kind: 'npc', name, model, x, z, role, targetHeight: 2 });
+    const entity = makeEntity({ kind: 'npc', name, model, x, z, role, targetHeight: 2, npcActionTimer: role === 'smith' ? 1.2 : undefined });
     createEntityModel(entity);
     rotateTowards(entity, lookX, lookZ);
     state.entities.push(entity);
@@ -1622,6 +1631,7 @@ function update(dt: number): void {
   syncEntityTransform(hero, motion.height);
   state.entities.filter((entity) => entity.kind === 'monster').forEach((entity) => updateMonster(entity, dt));
   state.entities.filter((entity) => entity.kind === 'summon').forEach((entity) => updateSummon(entity, dt));
+  state.entities.filter((entity) => entity.kind === 'npc').forEach((entity) => updateTownNpc(entity, dt));
   state.entities.filter((entity) => entity.kind === 'ambient').forEach((entity) => updateAmbientResident(entity, dt));
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
@@ -1968,27 +1978,80 @@ function updateSummon(summon: Entity, dt: number): void {
 }
 
 const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: number; z: number }>> = {
-  warm: { x: -7, z: -5 },
-  trade: { x: 0.2, z: -4 },
-  work: { x: -14.2, z: -4.2 },
-  guard: { x: -7, z: -15.5 },
-  talk: { x: -7, z: -3.2 },
+  warm: { x: -7, z: -6.2 },
+  trade: { x: 1.1, z: -8.5 },
+  work: { x: -16.4, z: -11.35 },
+  guard: { x: -7, z: -22.2 },
+  talk: { x: -7, z: -5.0 },
 };
+
+function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: number; z: number }>, speed: number, dt: number): boolean {
+  entity.navCooldown = Math.max(0, (entity.navCooldown ?? 0) - dt);
+  const destinationChanged = Math.hypot((entity.navGoalX ?? Infinity) - destination.x, (entity.navGoalZ ?? Infinity) - destination.z) > 0.8;
+  if (destinationChanged || !entity.navPath?.length || entity.navCooldown <= 0) {
+    entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius: 0.4, cellSize: 1.05, margin: 9 });
+    entity.navIndex = 0;
+    entity.navGoalX = destination.x;
+    entity.navGoalZ = destination.z;
+    entity.navCooldown = entity.navPath.length ? 2.2 : 0.55;
+  }
+  const waypoint = entity.navPath?.[entity.navIndex ?? 0];
+  if (!waypoint) return false;
+  const dx = waypoint.x - entity.x;
+  const dz = waypoint.z - entity.z;
+  const distance = Math.max(0.0001, Math.hypot(dx, dz));
+  if (distance < 0.24) {
+    entity.navIndex = (entity.navIndex ?? 0) + 1;
+    return moveEntityAlongNavigation(entity, destination, speed, dt);
+  }
+  let separationX = 0;
+  let separationZ = 0;
+  for (const neighbor of state.entities) {
+    if (neighbor === entity || (neighbor.kind !== 'ambient' && neighbor.kind !== 'npc')) continue;
+    const sx = entity.x - neighbor.x;
+    const sz = entity.z - neighbor.z;
+    const gap = Math.hypot(sx, sz);
+    if (gap > 0.001 && gap < 1.05) {
+      separationX += (sx / gap) * (1.05 - gap) * 0.8;
+      separationZ += (sz / gap) * (1.05 - gap) * 0.8;
+    }
+  }
+  const intentX = dx / distance + separationX;
+  const intentZ = dz / distance + separationZ;
+  const intentLength = Math.max(0.001, Math.hypot(intentX, intentZ));
+  const step = Math.min(distance, speed * dt);
+  const moved = moveEntityWithCollision(entity, (intentX / intentLength) * step, (intentZ / intentLength) * step, true);
+  rotateTowardsSmooth(entity, waypoint.x, waypoint.z, dt);
+  if (!moved) entity.navCooldown = 0;
+  return moved;
+}
+
+function updateTownNpc(entity: Entity, dt: number): void {
+  if (entity.role !== 'smith') return;
+  rotateTowardsSmooth(entity, -16.4, -11.35, dt);
+  entity.npcActionTimer = (entity.npcActionTimer ?? 0) - dt;
+  entity.npcActionRelease = Math.max(0, (entity.npcActionRelease ?? 0) - dt);
+  if (entity.npcActionTimer <= 0) {
+    setEntityAction(entity, 'attack', true);
+    gameAudio.play('hammer', 0.58, 0.94 + Math.random() * 0.1);
+    entity.npcActionRelease = 0.68;
+    entity.npcActionTimer = 3.1 + Math.random() * 1.5;
+  } else if (entity.actionType === 'attack' && entity.npcActionRelease <= 0) {
+    setEntityAction(entity, 'idle');
+  }
+}
 
 function updateAmbientResident(entity: Entity, dt: number): void {
   const decision = entity.ambientBrain?.update(dt, entity);
   if (!decision) return;
   entity.ambientActivity = decision.waypoint.activity;
   if (decision.state === 'walk') {
-    const dx = decision.waypoint.x - entity.x;
-    const dz = decision.waypoint.z - entity.z;
-    const distance = Math.max(0.0001, Math.hypot(dx, dz));
-    const step = Math.min(distance, 1.15 * dt);
-    const moved = moveEntityWithCollision(entity, (dx / distance) * step, (dz / distance) * step, true);
-    rotateTowardsSmooth(entity, decision.waypoint.x, decision.waypoint.z, dt);
+    const moved = moveEntityAlongNavigation(entity, decision.waypoint, entity.moveSpeed ?? 1.1, dt);
     setEntityAction(entity, moved ? 'walk' : 'idle');
     return;
   }
+  entity.navPath = undefined;
+  entity.navIndex = 0;
   const look = AMBIENT_ACTIVITY_LOOK[decision.waypoint.activity];
   rotateTowardsSmooth(entity, look.x, look.z, dt);
   if (decision.state === 'activity' && decision.changed && decision.waypoint.activity === 'work') {
