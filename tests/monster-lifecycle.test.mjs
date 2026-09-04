@@ -6,8 +6,11 @@ test('monster lifecycle survives repeated complete death and respawn cycles', ()
   const lifecycle = new MonsterLifecycle();
   for (let cycle = 1; cycle <= 5; cycle += 1) {
     assert.equal(lifecycle.state, 'alive');
-    assert.equal(lifecycle.kill(2, 0.5), true);
+    assert.equal(lifecycle.kill(2, 0.5, 0.4), true);
     assert.equal(lifecycle.kill(2, 0.5), false, 'dead monster cannot be killed twice');
+    assert.deepEqual(lifecycle.tick(0.39), []);
+    assert.deepEqual(lifecycle.tick(0.01), ['death-finished']);
+    assert.equal(lifecycle.state, 'corpse');
     assert.deepEqual(lifecycle.tick(0.49), []);
     assert.deepEqual(lifecycle.tick(0.01), ['corpse-finished']);
     assert.equal(lifecycle.state, 'despawned');

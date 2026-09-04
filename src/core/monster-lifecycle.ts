@@ -1,10 +1,11 @@
-export type MonsterLifecycleState = 'alive' | 'death' | 'despawned';
-export type MonsterLifecycleEvent = 'corpse-finished' | 'respawn';
+export type MonsterLifecycleState = 'alive' | 'death' | 'corpse' | 'despawned';
+export type MonsterLifecycleEvent = 'death-finished' | 'corpse-finished' | 'respawn';
 
 export class MonsterLifecycle {
   private stateValue: MonsterLifecycleState;
   private remainingValue: number;
   private respawnDelay = 0;
+  private corpseDuration = 0;
   private generationValue: number;
 
   constructor(initialDelay = 0) {
@@ -13,11 +14,12 @@ export class MonsterLifecycle {
     this.generationValue = initialDelay > 0 ? 0 : 1;
   }
 
-  kill(respawnDelay: number, corpseDuration = 0.65): boolean {
+  kill(respawnDelay: number, corpseDuration = 0.65, deathDuration = 0.42): boolean {
     if (this.stateValue !== 'alive') return false;
     this.stateValue = 'death';
-    this.remainingValue = Math.max(0, corpseDuration);
+    this.remainingValue = Math.max(0, deathDuration);
     this.respawnDelay = Math.max(0, respawnDelay);
+    this.corpseDuration = Math.max(0, corpseDuration);
     return true;
   }
 
@@ -26,6 +28,11 @@ export class MonsterLifecycle {
     this.remainingValue = Math.max(0, this.remainingValue - Math.max(0, dt));
     if (this.remainingValue > 1e-6) return [];
     if (this.stateValue === 'death') {
+      this.stateValue = 'corpse';
+      this.remainingValue = this.corpseDuration;
+      return ['death-finished'];
+    }
+    if (this.stateValue === 'corpse') {
       this.stateValue = 'despawned';
       this.remainingValue = this.respawnDelay;
       return ['corpse-finished'];

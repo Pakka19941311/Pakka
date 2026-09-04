@@ -57,6 +57,10 @@ import { CollisionWorld } from './world/collision-world';
 import { AmbientNpcBrain } from './world/ambient-npc';
 import type { AmbientWaypoint } from './world/ambient-npc';
 import { findNavigationPath } from './world/navigation';
+import { MonsterAiBrain } from './world/monster-ai';
+import type { MonsterAiState } from './world/monster-ai';
+import { SPAWN_REGIONS, patrolRouteInRegion, spawnPointInRegion } from './world/spawn-regions';
+import type { SpawnRegion } from './world/spawn-regions';
 import {
   CONSUMABLE_KEY_OPTIONS,
   consumableActionForCode,
@@ -213,6 +217,11 @@ type Entity = {
   navGoalX?: number;
   navGoalZ?: number;
   navCooldown?: number;
+  territoryId?: string;
+  aggroRadius?: number;
+  leashRadius?: number;
+  aiBrain?: MonsterAiBrain;
+  aiState?: MonsterAiState;
   visualGeneration?: number;
   lifecycle?: MonsterLifecycle;
 };
@@ -1281,7 +1290,7 @@ function makeEntity(input: Partial<Entity> & Pick<Entity, 'kind' | 'model' | 'x'
   };
 }
 
-function spawnMonster(id: string, x: number, z: number, delay = 0): Entity {
+function spawnMonster(id: string, x: number, z: number, delay = 0, region?: SpawnRegion, populationIndex = 0): Entity {
   const definition = MONSTERS_MAP[id];
   const targetHeight = definition.boss === 'big' ? 4.6 : definition.boss === 'mini' ? 3.4 : id === 'bat' ? 1.4 : 1.9;
   const actorRadius = definition.boss === 'big' ? 1.2 : definition.boss === 'mini' ? 0.9 : 0.42;
@@ -1292,6 +1301,15 @@ function spawnMonster(id: string, x: number, z: number, delay = 0): Entity {
     baseAtk: definition.atk, phase: 1, x: spawn.x, z: spawn.z, homeX: spawn.x, homeZ: spawn.z, tint: definition.tint,
     targetHeight, alive: delay <= 0, respawn: delay,
     lifecycle: new MonsterLifecycle(delay),
+    territoryId: region?.id,
+    aggroRadius: region?.aggroRadius ?? (definition.boss ? 11 : 9),
+    leashRadius: region?.leashRadius ?? (definition.boss ? 18 : 14),
+    patrol: region?.boss ? [] : region ? patrolRouteInRegion(region, spawn, populationIndex)
+      .map((point) => collisionWorld.findNearestFree(point, actorRadius)) : [],
+    patrolIndex: populationIndex % 3,
+    patrolPause: 0,
+    aiBrain: new MonsterAiBrain(x * 0.173 + z * 0.127 + populationIndex * 1.91),
+    aiState: delay > 0 ? 'despawn' : 'spawn',
   });
   createEntityModel(entity);
   entity.root?.setEnabled(entity.alive);
@@ -1367,13 +1385,13 @@ function spawnEntities(): void {
     state.entities.push(entity);
   });
   spawnAmbientResidents();
-  const types = ['wolf', 'exile', 'spider', 'undead', 'bat', 'cultist', 'miner', 'wraith'];
-  for (let index = 0; index < 36; index += 1) {
-    const forest = index >= 17;
-    spawnMonster(types[index % types.length], forest ? rand(13, 34) : rand(1, 17), forest ? rand(4, 24) : rand(-2, 15));
+  for (const region of SPAWN_REGIONS) {
+    for (let index = 0; index < region.population; index += 1) {
+      const point = spawnPointInRegion(region, index);
+      const delay = region.boss ? state.bossTimers[region.boss] : 0;
+      spawnMonster(region.monsterId, point.x, point.z, delay, region, index);
+    }
   }
-  spawnMonster('mini', 26, 5, state.bossTimers.mini);
-  spawnMonster('big', 39, 32, state.bossTimers.big);
 }
 
 function playerEntity(): Entity {
@@ -1445,7 +1463,7 @@ q<HTMLButtonElement>('#continue').onclick = () => { void startGame(true); };
 
 function zoneAt(x: number, z: number) {
   if (Math.hypot(x + 108, z + 82) < 16) return LOCATIONS_LIST[0];
-  if (Math.hypot(x + 7, z + 5) < 12.2) return LOCATIONS_LIST[1];
+  if (Math.hypot(x + 7, z + 5) < 20.5) return LOCATIONS_LIST[1];
   if (x > 122 && z > 82) return LOCATIONS_LIST[4];
   if (x > 58) return LOCATIONS_LIST[3];
   return LOCATIONS_LIST[2];
@@ -1655,6 +1673,10 @@ function updateMonster(entity: Entity, dt: number): void {
   if (!entity.alive) {
     const events = entity.lifecycle?.tick(dt) ?? [];
     entity.respawn = entity.lifecycle?.remaining ?? Math.max(0, entity.respawn - dt);
+    const lifecycleState = entity.lifecycle?.state;
+    entity.aiState = lifecycleState === 'death' ? 'dead' : lifecycleState === 'corpse' ? 'corpse' : 'despawn';
+    if (entity.aiState === 'corpse') entity.aiBrain?.forceLifecycle('corpse');
+    else if (entity.aiState === 'despawn') entity.aiBrain?.forceLifecycle('despawn');
     if (events.includes('corpse-finished')) disposeEntityVisual(entity);
     if (events.includes('respawn') || (!entity.lifecycle && entity.respawn <= 0)) {
       entity.alive = true;
@@ -1668,6 +1690,10 @@ function updateMonster(entity: Entity, dt: number): void {
       entity.z = safeSpawn.z;
       entity.patrolIndex = Math.floor(rand(0, Math.max(1, entity.patrol?.length ?? 1)));
       entity.patrolPause = rand(0.35, 1.5);
+      entity.navPath = undefined;
+      entity.navIndex = 0;
+      entity.aiBrain?.reset(entity.x * 0.173 + entity.z * 0.127 + (entity.visualGeneration ?? 0));
+      entity.aiState = 'spawn';
       restoreEntityAfterRespawn(entity);
       if (entity.boss === 'big') {
         toast('Печать древнего владыки разрушена…');
@@ -1685,14 +1711,43 @@ function updateMonster(entity: Entity, dt: number): void {
   const dz = player.z - entity.z;
   const distance = Math.hypot(dx, dz);
   const safe = zoneAt(player.x, player.z).kind === 'safe' || state.playerBuffs.vanish > 0;
-  if (!safe && distance < 9) {
-    if (entity.status.stun) setEntityAction(entity, 'idle');
-    else if (distance > 1.65) {
-      const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
-      const moved = moveEntityWithCollision(entity, (dx / distance) * speed * dt, (dz / distance) * speed * dt, true);
-      rotateTowardsSmooth(entity, player.x, player.z, dt);
-      setEntityAction(entity, moved ? 'walk' : 'idle');
-    } else if (entity.attackCd <= 0) {
+  const homeX = entity.homeX ?? entity.x;
+  const homeZ = entity.homeZ ?? entity.z;
+  const homeDistance = Math.hypot(entity.x - homeX, entity.z - homeZ);
+  const selected = targeting.isSelected(entity);
+  if (distance > 72 && !selected && homeDistance < 1.2) {
+    if (entity.actionType === 'walk') setEntityAction(entity, 'idle');
+    return;
+  }
+  const patrol = entity.patrol ?? [];
+  const patrolPoint = patrol[entity.patrolIndex ?? 0];
+  const atPatrolPoint = !patrolPoint || Math.hypot(patrolPoint.x - entity.x, patrolPoint.z - entity.z) < 0.55;
+  const decision = entity.aiBrain?.update({
+    dt,
+    alive: entity.alive,
+    playerSafe: safe,
+    playerDistance: distance,
+    homeDistance,
+    atPatrolPoint,
+    aggroRadius: entity.aggroRadius ?? 9,
+    leashRadius: entity.leashRadius ?? 14,
+    attackRange: 1.65,
+  });
+  if (!decision) return;
+  entity.aiState = decision.state;
+  if (decision.changed && decision.state === 'patrol' && patrol.length) {
+    entity.patrolIndex = ((entity.patrolIndex ?? 0) + 1) % patrol.length;
+  }
+  if (entity.status.stun) {
+    setEntityAction(entity, 'idle');
+  } else if (decision.intent === 'chase') {
+    const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
+    const moved = moveEntityAlongNavigation(entity, player, speed, dt, entityCollisionRadius(entity));
+    rotateTowardsSmooth(entity, player.x, player.z, dt);
+    setEntityAction(entity, moved ? 'walk' : 'idle');
+  } else if (decision.intent === 'attack') {
+    rotateTowardsSmooth(entity, player.x, player.z, dt);
+    if (entity.attackCd <= 0) {
       setEntityAction(entity, 'attack', true);
       entity.attackCd = entity.boss ? 1.45 : 2.05;
       window.setTimeout(() => {
@@ -1701,13 +1756,21 @@ function updateMonster(entity: Entity, dt: number): void {
         }
       }, 280);
     }
-  } else if (Math.hypot(entity.x - (entity.homeX ?? entity.x), entity.z - (entity.homeZ ?? entity.z)) > 7) {
-    const homeX = entity.homeX ?? entity.x;
-    const homeZ = entity.homeZ ?? entity.z;
-    const moved = moveEntityWithCollision(entity, (homeX - entity.x) * dt * 0.35, (homeZ - entity.z) * dt * 0.35, true);
+  } else if (decision.intent === 'return') {
+    const moved = moveEntityAlongNavigation(entity, { x: homeX, z: homeZ }, monsterMovementSpeed(Boolean(entity.boss)) * 0.9, dt, entityCollisionRadius(entity));
     rotateTowardsSmooth(entity, homeX, homeZ, dt);
     setEntityAction(entity, moved ? 'walk' : 'idle');
-  } else setEntityAction(entity, 'idle');
+  } else if (decision.intent === 'patrol' && patrol.length) {
+    const target = patrol[entity.patrolIndex ?? 0];
+    const speed = monsterMovementSpeed(Boolean(entity.boss)) * 0.46;
+    const moved = moveEntityAlongNavigation(entity, target, speed, dt, entityCollisionRadius(entity));
+    rotateTowardsSmooth(entity, target.x, target.z, dt);
+    setEntityAction(entity, moved ? 'walk' : 'idle');
+  } else {
+    entity.navPath = undefined;
+    entity.navIndex = 0;
+    setEntityAction(entity, 'idle');
+  }
   if (entity.status.dot && Math.random() < dt) damageMonster(entity, Math.max(2, Math.round(player.stats.matk * 0.08)), false, false);
 }
 
@@ -1907,6 +1970,8 @@ function killMonster(entity: Entity): void {
   entity.respawn = definition.boss ? bossRespawnSeconds(definition.boss) : rand(28, 48);
   entity.lifecycle ??= new MonsterLifecycle();
   entity.lifecycle.kill(entity.respawn, 0.65);
+  entity.aiState = 'dead';
+  entity.aiBrain?.forceLifecycle('dead');
   if (definition.boss) state.bossTimers[definition.boss] = entity.respawn;
   state.kills += 1;
   if (definition.boss) state.bossKills += 1;
@@ -1985,15 +2050,15 @@ const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: n
   talk: { x: -7, z: -5.0 },
 };
 
-function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: number; z: number }>, speed: number, dt: number): boolean {
+function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: number; z: number }>, speed: number, dt: number, actorRadius = 0.4): boolean {
   entity.navCooldown = Math.max(0, (entity.navCooldown ?? 0) - dt);
   const destinationChanged = Math.hypot((entity.navGoalX ?? Infinity) - destination.x, (entity.navGoalZ ?? Infinity) - destination.z) > 0.8;
   if (destinationChanged || !entity.navPath?.length || entity.navCooldown <= 0) {
-    entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius: 0.4, cellSize: 1.05, margin: 9 });
+    entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius, cellSize: 1.05, margin: 9 });
     entity.navIndex = 0;
     entity.navGoalX = destination.x;
     entity.navGoalZ = destination.z;
-    entity.navCooldown = entity.navPath.length ? 2.2 : 0.55;
+    entity.navCooldown = entity.navPath.length ? (entity.kind === 'monster' ? 0.72 : 2.2) : 0.55;
   }
   const waypoint = entity.navPath?.[entity.navIndex ?? 0];
   if (!waypoint) return false;
@@ -2007,13 +2072,18 @@ function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: nu
   let separationX = 0;
   let separationZ = 0;
   for (const neighbor of state.entities) {
-    if (neighbor === entity || (neighbor.kind !== 'ambient' && neighbor.kind !== 'npc')) continue;
+    if (neighbor === entity) continue;
+    const sharesCrowd = entity.kind === 'monster'
+      ? neighbor.kind === 'monster' && neighbor.alive
+      : neighbor.kind === 'ambient' || neighbor.kind === 'npc';
+    if (!sharesCrowd) continue;
     const sx = entity.x - neighbor.x;
     const sz = entity.z - neighbor.z;
     const gap = Math.hypot(sx, sz);
-    if (gap > 0.001 && gap < 1.05) {
-      separationX += (sx / gap) * (1.05 - gap) * 0.8;
-      separationZ += (sz / gap) * (1.05 - gap) * 0.8;
+    const desiredGap = actorRadius + entityCollisionRadius(neighbor) + 0.18;
+    if (gap > 0.001 && gap < desiredGap) {
+      separationX += (sx / gap) * (desiredGap - gap) * 0.85;
+      separationZ += (sz / gap) * (desiredGap - gap) * 0.85;
     }
   }
   const intentX = dx / distance + separationX;
