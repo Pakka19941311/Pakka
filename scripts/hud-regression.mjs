@@ -56,7 +56,7 @@ const count = async id => (await state()).inventory.inventory.filter(i=>i.id===i
 async function layout(name) {
  const result = await page.evaluate(()=>{
   const rect = selector => {const b=document.querySelector(selector).getBoundingClientRect();return {x:b.x,y:b.y,right:b.right,bottom:b.bottom,width:b.width,height:b.height};};
-  const names=['.player-frame','.actions-wrap','.menu','.quick-items','.minimap-wrap','.combat-log','#target-frame'];
+  const names=['.player-frame','.actions-wrap','.menu','.quick-items','.minimap-wrap','.region-info','.combat-log','#target-frame'];
   const boxes=Object.fromEntries(names.map(n=>[n,rect(n)]));
   const bag=document.querySelector('[data-inventory-window]');
   if(bag) boxes.bag=rect('[data-inventory-window]');
@@ -67,6 +67,8 @@ async function layout(name) {
   if(!b.width) continue;
   assert.ok(b.x>=-1 && b.y>=-1 && b.right<=result.width+1 && b.bottom<=result.height+1, `${name} ${key} offscreen ${JSON.stringify(b)}`);
  }
+ const side=['.minimap-wrap','.region-info','.combat-log'];
+ for(let i=0;i<side.length;i++) for(let j=i+1;j<side.length;j++) assert.ok(!intersects(result.boxes[side[i]],result.boxes[side[j]]),`${name} sidebar overlap`);
  const panels=['.player-frame','.actions-wrap','.menu','.quick-items'];
  for(let i=0;i<panels.length;i++) for(let j=i+1;j<panels.length;j++) assert.ok(!intersects(result.boxes[panels[i]],result.boxes[panels[j]]),`${name} overlapping ${panels[i]} ${panels[j]}`);
  if(result.boxes.bag) for(const panel of panels) assert.ok(!intersects(result.boxes.bag,result.boxes[panel]),`${name} bag covers ${panel}`);
@@ -105,7 +107,7 @@ try {
  await page.locator('#quick-rows').click();
  await configure(24,'potion','Shift+KeyR');
  await page.keyboard.press('Tab');await layout('four rows and compact bag');await shot('four-rows');
- for (const scale of [80,125,100]) {await setScale(scale);await page.keyboard.press('Tab');await layout(`four rows UI${scale}, inventory avoids dock`);}
+ for (const scale of [80,125,100]) {await setScale(scale);await page.keyboard.press('Tab');await layout(`four rows UI${scale}, inventory avoids dock`); if(scale===125) {await page.locator('.region-info summary').click(); await layout('expanded region information fits beside four rows at UI125'); await shot('four-rows-125'); await page.locator('.region-info summary').click();}}
  await page.keyboard.press('Tab');await page.locator('#quick-rows').click();
  assert.match(await page.locator('#quick-rows').textContent(),/•/);
  await page.reload();await page.locator('#continue').click();

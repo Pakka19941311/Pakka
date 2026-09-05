@@ -368,6 +368,10 @@ q('#hud').insertAdjacentHTML('beforeend', '<output id="performance-readout" aria
 q('.bottom-cluster').prepend(q('.player-frame'));
 q('.bottom-cluster').append(q('.quick-items'));
 q('#hud').insertAdjacentHTML('beforeend', '<section id="player-effects" aria-label="Действующие эффекты"></section>');
+q('#hud').insertAdjacentHTML('beforeend', '<aside class="left-rail"><details class="region-info"><summary>Задание и боссы</summary></details></aside>');
+q('.left-rail').prepend(q('.minimap-wrap'));
+q('.region-info').append(q('.tracker'), q('.boss-timers'));
+q('.left-rail').append(q('.combat-log'));
 q('#hotbar').insertAdjacentHTML('beforebegin', '<section class="actions-wrap"><div class="bar-tools"><span>Быстрые действия</span><button id="quick-rows" aria-expanded="false">4 ряда</button><button id="quick-edit" aria-pressed="false">Настроить</button></div></section>');
 q('.actions-wrap').append(q('#hotbar'));
 q('.actions-wrap').insertAdjacentHTML('beforeend', '<div id="quick-editor" class="hidden"><label>Действие<select id="quick-action"></select></label><label>Клавиша<select id="quick-key"></select></label><button id="quick-save">Назначить</button><button id="quick-cancel">Закрыть</button></div>');

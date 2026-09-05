@@ -17,3 +17,10 @@
 .hud .combat-log{max-height:calc(100vh - var(--dock-height,142px) - 360px)}
 .hud .glass{pointer-events:auto;background:rgba(32,36,42,var(--hud-opacity,.94))!important}
 .effect{background:rgba(32,36,42,var(--hud-opacity,.94))}
+/* The side rail shares the dock's reserved height; expanded objectives scroll internally. */
+.hud .left-rail{position:absolute;left:12px;top:12px;bottom:calc(var(--dock-height,154px) + 22px);width:290px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none}
+.hud .left-rail .minimap-wrap{position:static;flex:0 0 auto}
+.hud .region-info{width:290px;max-height:calc(100% - 287px);min-height:22px;flex:0 1 auto;overflow:auto;background:rgba(32,36,42,var(--hud-opacity,.94));border:1px solid #8c7353;pointer-events:auto;font-size:11px}
+.hud .region-info summary{padding:4px 7px;cursor:pointer;color:#dac49d;position:sticky;top:0;background:#20242a;z-index:1}
+.hud .region-info .tracker,.hud .region-info .boss-timers{position:static;width:auto;margin:0;padding:7px;border:0;box-shadow:none;display:block}
+.hud .left-rail .combat-log{position:static;flex:1 1 auto;margin-top:auto;min-height:100px;height:155px;max-height:155px;width:290px}
