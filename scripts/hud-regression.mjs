@@ -39,6 +39,7 @@ page.on('requestfailed', r => report.errors.push(`${r.url()}: ${r.failure()?.err
 page.on('response', r => { if (r.status() >= 400 && !r.url().endsWith('/favicon.ico')) report.errors.push(`HTTP ${r.status()} ${r.url()}`); });
 const check = (name, data = {}) => { report.checks.push({ name, ...data }); console.log('PASS', name); };
 const state = () => page.evaluate(() => window.__VARENDOR_QA__.getState());
+const settings = () => page.evaluate(() => window.__VARENDOR_QA__.getPerformance().settings);
 async function start() {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.locator('[data-class="knight"]').click(); await page.locator('#begin').click();
@@ -109,9 +110,9 @@ try {
  assert.match(await page.locator('#quick-rows').textContent(),/•/);
  await page.reload();await page.locator('#continue').click();
  await page.waitForFunction(()=>window.__VARENDOR_QA__?.getState().started,{}, {timeout:180000});
- assert.equal((await state()).settings.quickbar[24].action,'potion');
- assert.equal((await state()).settings.quickbar[24].key,'Shift+KeyR');
- assert.equal((await state()).settings.quickRows,2);
+ assert.equal((await settings()).quickbar[24].action,'potion');
+ assert.equal((await settings()).quickbar[24].key,'Shift+KeyR');
+ assert.equal((await settings()).quickRows,2);
  check('additional row assignment persists and remains signalled while collapsed');
  await page.locator('[data-log="loot"]').click();
  assert.equal(await page.locator('#messages>div:visible').count(),0);
@@ -127,7 +128,7 @@ try {
   await page.keyboard.press('q');assert.equal(await count('potion'),0);
   assert.equal(await page.locator('#potion-count').textContent(),'0');
   assert.equal(await page.locator('[data-quick="8"] .quick-count').textContent(),'0');
-  assert.equal((await state()).settings.quickbar[8].action,'potion');
+  assert.equal((await settings()).quickbar[8].action,'potion');
   await page.keyboard.press('q');assert.equal(await count('potion'),0);
   await page.evaluate(()=>window.__VARENDOR_FIXTURE__.hudRestock());
   await page.keyboard.press('Shift+r');assert.equal(await count('potion'),0);
