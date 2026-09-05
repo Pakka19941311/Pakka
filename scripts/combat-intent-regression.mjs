@@ -299,11 +299,10 @@ async function classScenarios(classId) {
     check('knight: a target escaping the sword reach cannot take delayed melee damage');
   } else {
     if (classId === 'mage') {
-      const cluster = await page.evaluate(() => window.__VARENDOR_FIXTURE__.combatCluster(5));
       // Frame this six-actor evidence scene through the actual camera controls.
-      // The fixture's collision-free fighting position does not guarantee a
-      // clear default camera ray behind it. A higher oblique view also separates
-      // the five arc endpoints; no production camera setting is changed.
+      // Configure the desired view before choosing the fixture position: its
+      // search validates this exact camera ray against the actual world, along
+      // with all five targets. No production camera setting is changed.
       await page.mouse.move(600, 350);
       for (let notch = 0; notch < 5; notch++) await page.mouse.wheel(0, 240);
       await page.mouse.down({ button: 'right' });
@@ -313,7 +312,18 @@ async function classScenarios(classId) {
         const camera = window.__VARENDOR_QA__.getState().camera;
         return camera.distance === 18 && Math.abs(camera.pitch - .72) < .001;
       });
+      const cluster = await page.evaluate(() => window.__VARENDOR_FIXTURE__.combatCluster(5));
+      await page.waitForFunction(() => window.__VARENDOR_QA__.getState().actualCamera.radius > 17.8);
       await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+      const beforeCastFraming = await page.evaluate(ids => {
+        const s = window.__VARENDOR_QA__.getState();
+        return { camera: s.actualCamera,
+          actors: window.__VARENDOR_FIXTURE__.actors().filter(a => a.kind === 'player' || ids.includes(a.uid))
+            .map(a => ({ uid: a.uid, x: a.screenX, y: a.screenY, depth: a.depth })) };
+      }, cluster.targetIds);
+      assert.equal(beforeCastFraming.actors.length, 6);
+      assert.ok(beforeCastFraming.actors.every(a => a.depth > 0 && a.depth < 1 && a.x > 140 && a.x < 1140 && a.y > 115 && a.y < 610),
+        `chain fixture did not prepare a clear camera view before casting: ${JSON.stringify(beforeCastFraming)}`);
       const realActors = await page.evaluate(ids => window.__VARENDOR_FIXTURE__.actors()
         .filter(a => a.kind === 'player' || ids.includes(a.uid))
         .map(a => ({ uid: a.uid, kind: a.kind, model: a.model, meshes: a.meshes, generation: a.generation })), cluster.targetIds);
@@ -347,7 +357,7 @@ async function classScenarios(classId) {
           actors: window.__VARENDOR_FIXTURE__.actors().filter(a => a.kind === 'player' || ids.includes(a.uid))
             .map(a => ({ uid: a.uid, x: a.screenX, y: a.screenY, depth: a.depth })) };
       }, cluster.targetIds);
-      await writeFile(path.join(reportDir, 'E-mage-chain-lightning.json'), JSON.stringify({ actors: realActors, arcs: chainArcs, damage: chainDamage, release: chainRelease, framing }, null, 2));
+      await writeFile(path.join(reportDir, 'E-mage-chain-lightning.json'), JSON.stringify({ actors: realActors, arcs: chainArcs, damage: chainDamage, release: chainRelease, beforeCastFraming, framing }, null, 2));
       assert.equal(framing.actors.length, 6);
       assert.ok(framing.actors.every(a => a.depth > 0 && a.depth < 1 && a.x > 140 && a.x < 1140 && a.y > 115 && a.y < 610),
         `chain evidence does not frame the player and five targets: ${JSON.stringify(framing)}`);

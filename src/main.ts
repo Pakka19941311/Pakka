@@ -3349,7 +3349,7 @@ if (__QA_BUILD__) {
     entity.status = {stun: 9999}; entity.navPath = undefined;
     syncEntityTransform(entity);
   };
-  const setupCombat = (options: {distance?: number; secondDistance?: number; hp?: number} = {}) => {
+  const setupCombat = (options: {distance?: number; secondDistance?: number; hp?: number; clusterView?: boolean} = {}) => {
     resetPlayerControl(true); inputControl.reset(); closeWindow(); closeConfirm();
     // Settle and dispose the previous scenario's transient effects through their
     // own cleanup path. No gameplay meshes or materials are silently abandoned.
@@ -3360,9 +3360,35 @@ if (__QA_BUILD__) {
     const candidates = state.entities.filter(e => e.kind === 'monster' && e.id === 'wolf').slice(0, options.secondDistance === undefined ? 1 : 2);
     if (!candidates.length) throw new Error('Real combat models unavailable');
     let origin: {x: number; z: number} | undefined;
-    for (let x = 20; x <= 50 && !origin; x += 3) for (let z = -48; z <= -30 && !origin; z += 3) {
+    for (let x = 20; x <= (options.clusterView ? 80 : 50) && !origin; x += 3) for (let z = options.clusterView ? -75 : -48; z <= -30 && !origin; z += 3) {
       const points = [{x, z}, {x, z: z + distance}, {x: x + 4, z: z + (options.secondDistance ?? 3)}];
       if (points.some(point => collisionWorld.isBlocked(point, 0.8))) continue;
+      if (options.clusterView) {
+        // This evidence scene needs a real open camera ray and five visible
+        // actors. A walkable point alone can sit immediately in front of a tree.
+        const support = terrain.supportAt(x, z);
+        const view = cameraControl.state;
+        const focus = new Vector3(x - Math.cos(view.yaw) * 2.15, support + 1.35, z - Math.sin(view.yaw) * 2.15);
+        const horizontal = view.distance * Math.sin(view.pitch);
+        const desired = new Vector3(focus.x + Math.cos(view.yaw) * horizontal,
+          focus.y + view.distance * Math.cos(view.pitch), focus.z + Math.sin(view.yaw) * horizontal);
+        const start = new Vector3(x, support + 1.25, z);
+        const rayLength = Vector3.Distance(start, desired);
+        if (collisionWorld.cameraDistance(start, desired) < rayLength - .01) continue;
+        let blockedView = false;
+        for (let d = .5; d <= rayLength; d += .5) {
+          const point = Vector3.Lerp(start, desired, d / rayLength);
+          if (point.y < terrain.heightAt(point.x, point.z) + .25) { blockedView = true; break; }
+        }
+        if (blockedView) continue;
+        const cluster = Array.from({length: 4}, (_, index) => ({x: x + Math.cos(index * Math.PI / 2) * 3.4,
+          z: z + distance + Math.sin(index * Math.PI / 2) * 3.4}));
+        const primaryY = terrain.supportAt(x, z + distance);
+        if (Math.abs(primaryY - support) > 1) continue;
+        if (cluster.some(point => collisionWorld.isBlocked(point, .8) || Math.abs(terrain.supportAt(point.x, point.z) - support) > 1
+          || !collisionWorld.hasLineOfSight({x, y: primaryY + 1, z: z + distance},
+            {x: point.x, y: terrain.supportAt(point.x, point.z) + 1, z: point.z}, .1))) continue;
+      }
       if (!collisionWorld.hasLineOfSight({x, y: terrain.supportAt(x,z)+1.3, z},
         {x, y: terrain.supportAt(x,z+distance)+1.3, z: z+distance}, .5)) continue;
       const route = findNavigationPath(collisionWorld, points[0], points[1], {actorRadius: .46, cellSize: .85, margin: 12});
@@ -3416,7 +3442,7 @@ if (__QA_BUILD__) {
     actors,
     combatSetup: setupCombat,
     combatCluster: (count = 5) => {
-      const first = setupCombat({distance: 6, hp:10000});
+      const first = setupCombat({distance: 6, hp:10000, clusterView:true});
       const primary = state.entities.find(e => e.uid === first.targetIds[0])!;
       const others = state.entities.filter(e => e.kind === 'monster' && e.id === 'wolf' && e !== primary).slice(0,Math.min(4,count-1));
       const chosen = [primary];
