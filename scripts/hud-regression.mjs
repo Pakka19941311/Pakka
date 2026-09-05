@@ -104,6 +104,7 @@ try {
  await page.locator('#quick-rows').click();
  await configure(24,'potion','Shift+KeyR');
  await page.keyboard.press('Tab');await layout('four rows and compact bag');await shot('four-rows');
+ for (const scale of [80,125,100]) {await setScale(scale);await page.keyboard.press('Tab');await layout(`four rows UI${scale}, inventory avoids dock`);}
  await page.keyboard.press('Tab');await page.locator('#quick-rows').click();
  assert.match(await page.locator('#quick-rows').textContent(),/•/);
  await page.reload();await page.locator('#continue').click();
@@ -148,7 +149,7 @@ try {
   await page.waitForFunction(()=>document.querySelector('[data-quick="0"] .cooldown').textContent.startsWith('5'));
   assert.match(await page.locator('[data-quick="0"]').getAttribute('title'),/Недостаточно ресурса|Перезарядка/);
   await page.evaluate(()=>window.__VARENDOR_FIXTURE__.die());
-  const dead=await count('potion');await page.keyboard.press('q');await page.locator('[data-quick="8"]').click();assert.equal(await count('potion'),dead);
+  const dead=await count('potion');await page.keyboard.press('q');const deadButton=await page.locator('[data-quick="8"]').boundingBox();await page.mouse.click(deadButton.x+deadButton.width/2,deadButton.y+deadButton.height/2);assert.equal(await count('potion'),dead);
   check('cooldown/resource reasons visible; death denies both consumable paths');
  }
  assert.deepEqual(report.errors,[]);report.passed=true;

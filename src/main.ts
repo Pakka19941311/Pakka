@@ -1601,6 +1601,7 @@ function buildHotbar(): void {
     return `<button class="skill-button${slot.action ? '' : ' empty-action'}" data-quick="${index}" ${skill ? `data-skill="${skillIndex}"` : slot.action === 'attack' ? 'data-attack' : ''} title="${name}" aria-label="${name}"><span class="key">${quickLabel(slot.key)}</span><span class="symbol">${icon}</span><b class="quick-count"></b><i class="cooldown"></i></button>`;
   }).join('');
   hotbar.dataset.rows = String(state.settings.quickRows);
+  hotbar.classList.toggle('editing', quickEditing);
   qa<HTMLButtonElement>('[data-quick]').forEach(button => { button.onclick = event => {
     const index = Number(button.dataset.quick);
     if (quickEditing) editQuickSlot(index); else if (event.detail < 2) runQuickAction(state.settings.quickbar![index].action);
@@ -1628,6 +1629,7 @@ q<HTMLButtonElement>('#quick-rows').onclick = () => {state.settings.quickRows = 
 q<HTMLButtonElement>('#quick-edit').onclick = () => {
   quickEditing = !quickEditing; q('#quick-edit').setAttribute('aria-pressed',String(quickEditing));
   q('#hotbar').classList.toggle('editing',quickEditing); q('#quick-editor').classList.add('hidden');
+  updateHud();
   if (quickEditing) toast('Выберите ячейку для назначения действия и клавиши');
 };
 q<HTMLButtonElement>('#quick-cancel').onclick = () => q('#quick-editor').classList.add('hidden');
@@ -2732,7 +2734,7 @@ function updateHud(): void {
     button.querySelector('.quick-count')!.textContent = consumable ? String(countItem(slot.action)) : '';
     const reason = player.dead ? 'Персонаж погиб' : skill && player.mp < skill.cost ? 'Недостаточно ресурса' : remaining > 0 ? `Перезарядка ${remaining.toFixed(1)} с` : consumable && countItem(slot.action) === 0 ? 'Нет в сумке' : '';
     button.classList.toggle('unavailable', Boolean(reason));
-    button.setAttribute('aria-disabled',String(Boolean(reason) || !slot.action));
+    button.setAttribute('aria-disabled',String(!quickEditing && (Boolean(reason) || !slot.action)));
     button.title = `${skill?.name ?? (({attack:'Обычная атака',potion:'Багровое зелье',ether:'Эфирное зелье',teleport:'Камень возвращения'} as Record<string,string>)[slot.action] ?? 'Пустой слот')} · ${quickLabel(slot.key) || 'Клик'}${skill ? ` · MP ${skill.cost}` : ''}${reason ? ` · ${reason}` : ''}`;
   });
   q('#player-effects').innerHTML = (Object.entries(state.playerBuffs) as Array<['guard'|'vanish',number]>).filter(([,seconds])=>seconds>0).map(([key,seconds])=>`<span class="effect" data-effect="${key}" title="${key === 'guard' ? 'Входящий урон снижен на 50%' : 'Незаметность для монстров'}">${key === 'guard' ? '◈ Последний рубеж' : '◌ Исчезновение'} <b>${seconds.toFixed(1)} с</b></span>`).join('');
@@ -2788,6 +2790,7 @@ window.addEventListener('keydown', (event) => {
     event.preventDefault();
     if (event.repeat) return;
     if (typing) { (event.target as HTMLElement).blur(); inputControl.reset(); return; }
+    if (quickEditing) { quickEditing = false; q('#quick-edit').setAttribute('aria-pressed','false'); q('#hotbar').classList.remove('editing'); q('#quick-editor').classList.add('hidden'); return; }
     if (confirmation?.cancel) { closeConfirm(); return; }
     if (inventoryPanel?.cancelInteraction()) return;
     if (state.activeWindow) closeWindow(); else openWindow('settings');
