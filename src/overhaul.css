@@ -12,3 +12,10 @@
 .glass{backdrop-filter:none}
 .grain{display:none}
 #performance-readout{position:absolute;left:50%;top:8px;transform:translateX(-50%);font:11px/1.4 monospace;color:#c5b99f;background:#080b0dcc;padding:4px 9px;border:1px solid #655239;pointer-events:none}
+
+/* Death leaves the world and read-only inventory available. */
+#confirm-root.death-notice { pointer-events: none; }
+#confirm-root.death-notice .modal-shade { display: none; }
+#confirm-root.death-notice .confirm-box { pointer-events: auto; top: 12px; transform: translateX(-50%); }
+
+#confirm-root > .modal-shade { z-index: 21; }

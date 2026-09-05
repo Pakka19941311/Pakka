@@ -29,6 +29,7 @@ function isTypingTarget(target: EventTarget | null): boolean {
 export class PlayerInputController {
   private readonly canvas: HTMLCanvasElement;
   private readonly windowTarget: Window;
+  private readonly keyboardAllowed: () => boolean;
   private readonly pressed = new Set<string>();
   private orbitPointerId: number | null = null;
   private orbitX = 0;
@@ -40,9 +41,11 @@ export class PlayerInputController {
   constructor(
     canvas: HTMLCanvasElement,
     windowTarget: Window = window,
+    keyboardAllowed: () => boolean = () => true,
   ) {
     this.canvas = canvas;
     this.windowTarget = windowTarget;
+    this.keyboardAllowed = keyboardAllowed;
     windowTarget.addEventListener('keydown', this.onKeyDown);
     windowTarget.addEventListener('keyup', this.onKeyUp);
     windowTarget.addEventListener('blur', this.onBlur);
@@ -107,7 +110,7 @@ export class PlayerInputController {
   }
 
   private readonly onKeyDown = (event: KeyboardEvent): void => {
-    if (isTypingTarget(event.target)) return;
+    if (!this.keyboardAllowed() || isTypingTarget(event.target)) return;
     if (event.code === 'Space') {
       event.preventDefault();
       if (!event.repeat) this.jumpQueued = true;
@@ -115,6 +118,8 @@ export class PlayerInputController {
     }
     if ([...FORWARD_CODES, ...BACKWARD_CODES, ...LEFT_CODES, ...RIGHT_CODES].includes(event.code)) {
       event.preventDefault();
+      // After focus/window/death reset, an old held key must be released before it can move again.
+      if (event.repeat && !this.pressed.has(event.code)) return;
       // Preserve the command edge even if key-down and key-up both arrive
       // during a slow frame; combat cancellation must not depend on held keys.
       if (!this.pressed.has(event.code)) this.movementStarted = true;

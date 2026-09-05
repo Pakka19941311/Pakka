@@ -82,3 +82,29 @@ test('a movement tap between frames preserves the combat-cancel command edge', a
     assert.equal(input.consumeMovementStart(), false);
   } finally { input.dispose(); if (previous) globalThis.HTMLElement = previous; else delete globalThis.HTMLElement; }
 });
+
+
+test('input reset drops pending commands and held autorepeat until a fresh press', async () => {
+  const { PlayerInputController } = await import('../src/controls/input-controller.ts');
+  const previous = globalThis.HTMLElement;
+  globalThis.HTMLElement = class {};
+  const canvas = new EventTarget(), windowTarget = new EventTarget();
+  const input = new PlayerInputController(canvas, windowTarget);
+  const key = (code, repeat = false) => {
+    const event = new Event('keydown', { cancelable: true });
+    Object.defineProperties(event, { code: { value: code }, repeat: { value: repeat } });
+    windowTarget.dispatchEvent(event);
+  };
+  try {
+    key('KeyW'); key('Space');
+    input.reset(); key('KeyW', true);
+    assert.deepEqual(input.movementAxes(), { forward: 0, strafe: 0 });
+    assert.equal(input.consumeMovementStart(), false);
+    assert.equal(input.consumeJump(), false);
+    key('KeyW');
+    assert.deepEqual(input.movementAxes(), { forward: 1, strafe: 0 });
+    assert.equal(input.consumeMovementStart(), true);
+    windowTarget.dispatchEvent(new Event('blur'));
+    assert.deepEqual(input.movementAxes(), { forward: 0, strafe: 0 });
+  } finally { input.dispose(); if (previous) globalThis.HTMLElement = previous; else delete globalThis.HTMLElement; }
+});

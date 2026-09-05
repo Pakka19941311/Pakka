@@ -34,3 +34,28 @@ test('dead, corpse and despawn lifecycle states are explicit', () => {
   brain.reset(7);
   assert.equal(brain.state, 'spawn');
 });
+
+test('unavailable nearby target leaves ordinary patrols running, including a safe last position', () => {
+  for (const playerSafe of [false, true]) {
+    const brain = new MonsterAiBrain(4);
+    const unavailable = { ...base, targetAvailable: false, playerSafe, playerDistance: 0.5 };
+    assert.equal(brain.update(unavailable).state, 'idle');
+    assert.equal(brain.update({ ...unavailable, dt: 5 }).intent, 'patrol');
+    assert.equal(brain.update({ ...unavailable, homeDistance: 3 }).intent, 'patrol');
+    assert.equal(brain.update({ ...unavailable, atPatrolPoint: true }).intent, 'none');
+    assert.equal(brain.update({ ...unavailable, dt: 5 }).intent, 'patrol');
+  }
+});
+
+test('losing an engaged target returns home once, resumes patrol and can acquire a respawned target', () => {
+  const brain = new MonsterAiBrain(2);
+  brain.update(base);
+  brain.update({ ...base, playerDistance: 7, homeDistance: 2 });
+  assert.equal(brain.update({ ...base, playerDistance: 1, homeDistance: 3 }).intent, 'attack');
+  const unavailable = { ...base, targetAvailable: false, playerDistance: 1 };
+  assert.equal(brain.update({ ...unavailable, homeDistance: 3 }).intent, 'return');
+  assert.equal(brain.update({ ...unavailable, homeDistance: 1 }).state, 'return');
+  assert.equal(brain.update({ ...unavailable, homeDistance: 0.2 }).state, 'idle');
+  assert.equal(brain.update({ ...unavailable, dt: 5 }).intent, 'patrol');
+  assert.equal(brain.update({ ...unavailable, targetAvailable: true }).intent, 'attack');
+});

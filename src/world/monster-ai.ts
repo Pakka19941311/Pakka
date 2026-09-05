@@ -5,6 +5,7 @@ export type MonsterAiInput = Readonly<{
   dt: number;
   alive: boolean;
   playerSafe: boolean;
+  targetAvailable?: boolean;
   playerDistance: number;
   homeDistance: number;
   atPatrolPoint: boolean;
@@ -38,12 +39,14 @@ export class MonsterAiBrain {
 
   update(input: MonsterAiInput): MonsterAiDecision {
     if (!input.alive) return this.transition('dead', 'none');
+    const targetAvailable = input.targetAvailable ?? true;
     const wasEngaged = this.stateValue === 'aggro' || this.stateValue === 'chase' || this.stateValue === 'attack';
     const mustReturn = input.homeDistance > input.leashRadius
       || this.stateValue === 'leash'
       || this.stateValue === 'return';
 
-    if (mustReturn || input.playerSafe) {
+    // An unavailable target must not freeze patrols, even if its last position is safe.
+    if (mustReturn || (targetAvailable && input.playerSafe)) {
       if (input.homeDistance > 0.55) {
         return this.transition(this.stateValue === 'leash' || this.stateValue === 'return' ? 'return' : 'leash', 'return');
       }
@@ -52,7 +55,7 @@ export class MonsterAiBrain {
     }
 
     const maintainsAggro = wasEngaged && input.playerDistance <= input.aggroRadius * 1.55;
-    if (input.playerDistance <= input.aggroRadius || maintainsAggro) {
+    if (targetAvailable && (input.playerDistance <= input.aggroRadius || maintainsAggro)) {
       if (!wasEngaged) return this.transition('aggro', input.playerDistance <= input.attackRange ? 'attack' : 'chase');
       if (input.playerDistance <= input.attackRange) return this.transition('attack', 'attack');
       return this.transition('chase', 'chase');

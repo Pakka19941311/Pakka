@@ -369,7 +369,10 @@ const settings: Settings = settingsDefaults();
 const state = {
   started: false,
   starting: false,
-  paused: false,
+  qaFrozen: false,
+  simulationSeconds: 0,
+  playerLife: 0,
+  activeWindow: null as string | null,
   selectedClass: 'knight',
   moveTarget: null as { x: number; z: number } | null,
   interactionTarget: null as Entity | null,
@@ -429,7 +432,7 @@ void gateway.load().then((save) => {
 });
 
 const canvas = q<HTMLCanvasElement>('#game-canvas');
-const inputControl = new PlayerInputController(canvas);
+const inputControl = new PlayerInputController(canvas, window, () => state.started && !player.dead && !confirmation?.cancel);
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false }, true);
 const scene = new Scene(engine);
 // The client owns click picking. Hover/orbit must never initiate mesh picking.
@@ -1532,7 +1535,7 @@ async function startGame(load: boolean): Promise<void> {
         player = save.player;
         player.cooldowns = [0, 0, 0, 0];
         player.attackCd = 0;
-        player.dead = false;
+        player.dead = Boolean(player.dead || player.hp <= 0);
         state.quest = save.quest ?? 0;
         state.kills = save.kills ?? 0;
         state.bossKills = save.bossKills ?? 0;
@@ -1565,7 +1568,8 @@ async function startGame(load: boolean): Promise<void> {
     q('#loading').classList.add('hidden');
     q('#hud').classList.remove('hidden');
     state.started = true;
-    state.paused = false;
+    state.qaFrozen = false;
+    if (player.dead) { setEntityAction(playerEntity(), 'death', true); showRespawn('Потеря опыта уже учтена в сохранении.'); }
     skipFrameDelta = true;
     buildHotbar();
     fitActionDock();
@@ -1757,7 +1761,8 @@ function updateTargetIndicator(): void {
 
 let qaMotionSample: (() => void) | undefined;
 function update(dt: number): void {
-  if (!state.started || state.paused) return;
+  if (!state.started || state.qaFrozen) return;
+  state.simulationSeconds += dt;
   rebuildCrowdCells();
   for (const entity of state.entities) {
     entity.previousX = entity.x; entity.previousZ = entity.z;
@@ -1771,96 +1776,98 @@ function update(dt: number): void {
   player.cooldowns = player.cooldowns.map((value) => Math.max(0, value - dt));
   state.playerBuffs.guard = Math.max(0, state.playerBuffs.guard - dt);
   state.playerBuffs.vanish = Math.max(0, state.playerBuffs.vanish - dt);
-  player.mp = Math.min(player.maxMp, player.mp + player.maxMp * 0.022 * dt);
+  if (!player.dead) player.mp = Math.min(player.maxMp, player.mp + player.maxMp * 0.022 * dt);
 
-  if (inputControl.consumeMovementStart()) {
-    cancelActorAttack(hero); combatControl.cancelPursuit();
-    state.moveTarget = null; state.interactionTarget = null;
-    hero.navPath = undefined; hero.navCooldown = 0;
-  }
-  const target = targeting.validate();
-  if (hero.activeAttack && (hero.activeAttack.target !== target || !target?.alive)) cancelActorAttack(hero);
-  if (inputControl.consumeJump() && playerMotor.requestJump()) {
-    cancelActorAttack(hero);
-    combatControl.cancelPursuit();
-  }
-  const axes = inputControl.movementAxes();
-  const manualMovement = Math.hypot(axes.forward, axes.strafe) > 0.0001;
-  const combatDecision = combatControl.plan({
-    player,
-    target,
-    basicRange: attackRange(),
-    skillRange: () => attackRange(),
-    canBasicAttack: player.attackCd <= 0 && !hero.activeAttack && playerMotor.grounded,
-    canUseSkill: (index) => !hero.activeAttack && playerMotor.grounded && player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
-  });
+  if (!player.dead) {
+    if (inputControl.consumeMovementStart()) {
+      cancelActorAttack(hero); combatControl.cancelPursuit();
+      state.moveTarget = null; state.interactionTarget = null;
+      hero.navPath = undefined; hero.navCooldown = 0;
+    }
+    const target = targeting.validate();
+    if (hero.activeAttack && (hero.activeAttack.target !== target || !target?.alive)) cancelActorAttack(hero);
+    if (inputControl.consumeJump() && playerMotor.requestJump()) {
+      cancelActorAttack(hero);
+      combatControl.cancelPursuit();
+    }
+    const axes = inputControl.movementAxes();
+    const manualMovement = Math.hypot(axes.forward, axes.strafe) > 0.0001;
+    const combatDecision = combatControl.plan({
+      player,
+      target,
+      basicRange: attackRange(),
+      skillRange: () => attackRange(),
+      canBasicAttack: player.attackCd <= 0 && !hero.activeAttack && playerMotor.grounded,
+      canUseSkill: (index) => !hero.activeAttack && playerMotor.grounded && player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
+    });
 
-  let desiredDirection: Readonly<{ x: number; z: number }> = { x: 0, z: 0 };
-  let maxMoveDistance = Infinity;
-  if (manualMovement) {
-    cancelActorAttack(hero);
-    state.moveTarget = null;
-    state.interactionTarget = null;
-    combatControl.cancelPursuit();
-    hero.navPath = undefined; hero.navCooldown = 0;
-    desiredDirection = cameraControl.movementDirection(axes);
-    syncMovementIntent(desiredDirection, dt);
-  } else {
-    syncMovementIntent(null, dt);
-    const destination = hero.activeAttack ? null : combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
-    if (destination) {
-      // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
-      const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
-      const dx = (waypoint?.x ?? player.x) - player.x;
-      const dz = (waypoint?.z ?? player.z) - player.z;
-      const distance = Math.hypot(dx, dz);
-      if (Math.hypot(destination.x - player.x, destination.z - player.z) < 0.18) {
-        if (combatDecision.kind !== 'approach') state.moveTarget = null;
-      } else if (waypoint) {
-        desiredDirection = { x: dx, z: dz };
-        maxMoveDistance = distance;
+    let desiredDirection: Readonly<{ x: number; z: number }> = { x: 0, z: 0 };
+    let maxMoveDistance = Infinity;
+    if (manualMovement) {
+      cancelActorAttack(hero);
+      state.moveTarget = null;
+      state.interactionTarget = null;
+      combatControl.cancelPursuit();
+      hero.navPath = undefined; hero.navCooldown = 0;
+      desiredDirection = cameraControl.movementDirection(axes);
+      syncMovementIntent(desiredDirection, dt);
+    } else {
+      syncMovementIntent(null, dt);
+      const destination = hero.activeAttack ? null : combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
+      if (destination) {
+        // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
+        const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
+        const dx = (waypoint?.x ?? player.x) - player.x;
+        const dz = (waypoint?.z ?? player.z) - player.z;
+        const distance = Math.hypot(dx, dz);
+        if (Math.hypot(destination.x - player.x, destination.z - player.z) < 0.18) {
+          if (combatDecision.kind !== 'approach') state.moveTarget = null;
+        } else if (waypoint) {
+          desiredDirection = { x: dx, z: dz };
+          maxMoveDistance = distance;
+        }
+      }
+      if ((combatDecision.kind === 'attack' || combatDecision.kind === 'wait') && target) {
+        playerMotor.stopPlanar();
+        rotateTowardsSmooth(hero, target.x, target.z, dt);
+        const desiredYaw = Math.atan2(target.x - player.x, target.z - player.z);
+        const facing = Math.cos(desiredYaw - (hero.root?.rotation.y ?? desiredYaw));
+        if (combatDecision.kind === 'attack' && facing > 0.97) performAttack(combatDecision.skillIndex);
       }
     }
-    if ((combatDecision.kind === 'attack' || combatDecision.kind === 'wait') && target) {
-      playerMotor.stopPlanar();
-      rotateTowardsSmooth(hero, target.x, target.z, dt);
-      const desiredYaw = Math.atan2(target.x - player.x, target.z - player.z);
-      const facing = Math.cos(desiredYaw - (hero.root?.rotation.y ?? desiredYaw));
-      if (combatDecision.kind === 'attack' && facing > 0.97) performAttack(combatDecision.skillIndex);
-    }
-  }
 
-  const motion = playerMotor.step(desiredDirection, player.stats.speed, dt, maxMoveDistance);
-  const actorDelta = restrictActorOverlap(hero, player, { x: motion.dx, z: motion.dz });
-  const resolvedPlayer = collisionWorld.resolve(player, actorDelta, 0.46);
-  player.x = resolvedPlayer.x;
-  player.z = resolvedPlayer.z;
-  // Keep intent while sliding; repeatedly zeroing acceleration at a contact caused sticky walls.
-  enforcePlayerBoundary();
-  const moved = Math.hypot(player.x - hero.x, player.z - hero.z) > 0.001;
-  if (!manualMovement && resolvedPlayer.blocked && !moved) {
-    hero.navPath = undefined; hero.navCooldown = Math.max(hero.navCooldown ?? 0, 0.25);
-  }
-  if (moved && hero.root) {
-    const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
-    hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
-    setEntityAction(hero, motion.grounded ? 'walk' : 'jump');
-  } else if (!motion.grounded) setEntityAction(hero, 'jump');
-  else if (hero.actionType === 'walk' || hero.actionType === 'jump') setEntityAction(hero, 'idle');
-  if (state.interactionTarget && Math.hypot(state.interactionTarget.x - player.x, state.interactionTarget.z - player.z) < 3.2) {
-    const npc = state.interactionTarget;
-    state.interactionTarget = null;
-    state.moveTarget = null;
-    interactNpc(npc);
-  }
-  hero.x = player.x;
-  hero.z = player.z;
-  syncEntityTransform(hero, motion.height);
-  const previousPhase = hero.motion?.phase ?? 0;
-  hero.motion?.advance(dt, Math.hypot(player.x - (hero.previousX ?? player.x), player.z - (hero.previousZ ?? player.z)));
-  const phase = hero.motion?.phase ?? 0;
-  if (motion.grounded && hero.actionType === 'walk' && moved
-    && [0.24, 0.75].some(contact => phase >= previousPhase ? previousPhase < contact && phase >= contact : previousPhase < contact || phase >= contact)) gameAudio.footstep();
+    const motion = playerMotor.step(desiredDirection, player.stats.speed, dt, maxMoveDistance);
+    const actorDelta = restrictActorOverlap(hero, player, { x: motion.dx, z: motion.dz });
+    const resolvedPlayer = collisionWorld.resolve(player, actorDelta, 0.46);
+    player.x = resolvedPlayer.x;
+    player.z = resolvedPlayer.z;
+    // Keep intent while sliding; repeatedly zeroing acceleration at a contact caused sticky walls.
+    enforcePlayerBoundary();
+    const moved = Math.hypot(player.x - hero.x, player.z - hero.z) > 0.001;
+    if (!manualMovement && resolvedPlayer.blocked && !moved) {
+      hero.navPath = undefined; hero.navCooldown = Math.max(hero.navCooldown ?? 0, 0.25);
+    }
+    if (moved && hero.root) {
+      const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
+      hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
+      setEntityAction(hero, motion.grounded ? 'walk' : 'jump');
+    } else if (!motion.grounded) setEntityAction(hero, 'jump');
+    else if (hero.actionType === 'walk' || hero.actionType === 'jump') setEntityAction(hero, 'idle');
+    if (state.interactionTarget && Math.hypot(state.interactionTarget.x - player.x, state.interactionTarget.z - player.z) < 3.2) {
+      const npc = state.interactionTarget;
+      state.interactionTarget = null;
+      state.moveTarget = null;
+      interactNpc(npc);
+    }
+    hero.x = player.x;
+    hero.z = player.z;
+    syncEntityTransform(hero, motion.height);
+    const previousPhase = hero.motion?.phase ?? 0;
+    hero.motion?.advance(dt, Math.hypot(player.x - (hero.previousX ?? player.x), player.z - (hero.previousZ ?? player.z)));
+    const phase = hero.motion?.phase ?? 0;
+    if (motion.grounded && hero.actionType === 'walk' && moved
+      && [0.24, 0.75].some(contact => phase >= previousPhase ? previousPhase < contact && phase >= contact : previousPhase < contact || phase >= contact)) gameAudio.footstep();
+  } else hero.motion?.advance(dt, 0);
   for (const entity of state.entities) {
     if (entity.kind === 'monster') updateMonster(entity, dt);
     else if (entity.kind === 'summon') updateSummon(entity, dt);
@@ -1943,6 +1950,7 @@ function updateMonster(entity: Entity, dt: number): void {
     dt,
     alive: entity.alive,
     playerSafe: safe,
+    targetAvailable: !player.dead,
     playerDistance: distance,
     homeDistance,
     atPatrolPoint,
@@ -1958,7 +1966,7 @@ function updateMonster(entity: Entity, dt: number): void {
   if (entity.status.stun) {
     cancelActorAttack(entity);
     setEntityAction(entity, 'idle');
-  } else if (entity.activeAttack && !safe && homeDistance < (entity.leashRadius ?? 14)) {
+  } else if (entity.activeAttack && !safe && !player.dead && homeDistance < (entity.leashRadius ?? 14)) {
     // Finish the committed swing; moving out of reach avoids its hit without
     // restarting chase/attack on every tick at the range boundary.
     rotateTowardsSmooth(entity, player.x, player.z, dt);
@@ -2015,21 +2023,34 @@ function hurtPlayer(value: number): void {
 }
 
 function die(): void {
+  if (player.dead) return;
   player.dead = true;
+  state.playerLife += 1;
   player.hp = 0;
   resetPlayerControl(true);
-  state.paused = true;
+  inputControl.reset();
+  closeWindow();
+  const hero = playerEntity();
+  hero.previousVerticalOffset = 0;
+  syncEntityTransform(hero, 0);
+  setEntityAction(hero, 'death', true);
   const loss = Math.floor(player.xp * 0.05);
   player.xp = Math.max(0, player.xp - loss);
-  confirmBox('Вы пали', `Потеряно ${loss} опыта текущего уровня. Уровень и предметы сохранены.`, () => {
+  showRespawn(`Потеряно ${loss} опыта текущего уровня. Уровень и предметы сохранены.`);
+  saveGame();
+}
+
+function showRespawn(message: string): void {
+  confirmBox('Вы пали', message, () => {
     player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; player.hp = player.maxHp; player.mp = player.maxMp; player.dead = false;
     const hero = playerEntity(); hero.x = player.x; hero.z = player.z; recreateEntityVisual(hero);
     playerMotor.reset(); cameraControl.snap({ x: player.x, y: 0, z: player.z });
-    state.paused = false; closeConfirm(); toast('Вы возродились в Гринфолле'); saveGame();
+    state.qaFrozen = false; closeConfirm(); toast('Вы возродились в Гринфолле'); saveGame();
   }, false);
 }
 
 function basicAttack(): void {
+  if (!state.started || player.dead) return;
   const target = targeting.validate();
   if (!target) return toast('Выберите живую цель', 'bad');
   inputControl.consumeMovementStart(); // This explicit command is newer than a released movement tap.
@@ -2039,6 +2060,7 @@ function basicAttack(): void {
 }
 
 function castSkill(index: number): void {
+  if (!state.started || player.dead) return;
   const skill = CLASSES_MAP[player.classId].skills[index];
   if (!skill) return;
   if (player.cooldowns[index] > 0) return toast('Навык ещё восстанавливается', 'bad');
@@ -2068,6 +2090,8 @@ function castSkill(index: number): void {
 }
 
 function performAttack(skillIndex: number | null): void {
+  if (player.dead) return;
+  const playerLife = state.playerLife;
   const target = targeting.validate();
   if (!target) return combatControl.cancelPursuit();
   const hero = playerEntity();
@@ -2130,8 +2154,8 @@ function performAttack(skillIndex: number | null): void {
         const dx = target.x - player.x; const dz = target.z - player.z; const distance = Math.max(0.001, Math.hypot(dx, dz));
         moveEntityWithCollision(target, (dx / distance) * skill.knock, (dz / distance) * skill.knock, true);
       }
-      if (skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
-      if (skill?.summon) summonSkeleton();
+      if (!player.dead && state.playerLife === playerLife && skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
+      if (!player.dead && state.playerLife === playerLife && skill?.summon) summonSkeleton();
     });
   }, () => {
     if (hero.attackToken === token) {
@@ -2320,7 +2344,7 @@ function gainXp(value: number): void {
   player.level = result.level;
   player.xp = result.xp;
   if (result.levelsGained > 0) {
-    recalculate(true);
+    recalculate(!player.dead);
     toast(`Достигнут уровень ${player.level}`);
     log(`Новый уровень: ${player.level}.`, 'loot');
   }
@@ -2354,6 +2378,7 @@ function summonSkeleton(): void {
 
 function updateSummon(summon: Entity, dt: number): void {
   summon.attackCd -= dt;
+  if (player.dead) return setEntityAction(summon, 'idle');
   const target = state.entities
     .filter((entity) => entity.kind === 'monster' && entity.alive)
     .sort((a, b) => Math.hypot(a.x - summon.x, a.z - summon.z) - Math.hypot(b.x - summon.x, b.z - summon.z))[0];
@@ -2598,25 +2623,40 @@ function updateQuest(): void {
 }
 
 window.addEventListener('keydown', (event) => {
-  if ((event.target as Element)?.matches('input, textarea, select, [contenteditable="true"]')) return;
   if (!state.started) return;
+  const typing = event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]');
+  if (event.code === 'Escape') {
+    event.preventDefault();
+    if (event.repeat) return;
+    if (typing) { (event.target as HTMLElement).blur(); inputControl.reset(); return; }
+    if (confirmation?.cancel) { closeConfirm(); return; }
+    if (state.activeWindow) closeWindow(); else openWindow('settings');
+    return;
+  }
+  if (typing) return;
+  const windows: Record<string, string> = { Tab: 'inventory', KeyI: 'inventory', KeyC: 'character', KeyK: 'skills', KeyM: 'map' };
+  const windowType = windows[event.code];
+  if (windowType) {
+    event.preventDefault();
+    if (!event.repeat && !confirmation?.cancel) {
+      if (state.activeWindow === windowType) closeWindow(); else openWindow(windowType);
+    }
+    return;
+  }
+  if (event.repeat || player.dead || confirmation) return;
   if (['1', '2', '3', '4'].includes(event.key)) castSkill(Number(event.key) - 1);
   const consumableAction = consumableActionForCode(state.settings.keybinds, event.code);
-  if (consumableAction) {
-    event.preventDefault();
-    useItem(consumableAction);
-  }
-  const key = event.key.toLowerCase();
-  if (key === 'i') openWindow('inventory');
-  if (key === 'c') openWindow('character');
-  if (key === 'k') openWindow('skills');
-  if (key === 'm') openWindow('map');
-  if (event.key === 'Escape') openWindow('settings');
+  if (consumableAction) { event.preventDefault(); useItem(consumableAction); }
   if (event.key === 'Enter') q<HTMLInputElement>('#chat').focus();
+});
+document.addEventListener('focusin', event => {
+  if (event.target instanceof Element && event.target.closest('input, textarea, select, [contenteditable="true"]')) {
+    inputControl.reset(); playerMotor.stopPlanar();
+  }
 });
 
 canvas.addEventListener('pointerdown', (event) => {
-  if (event.button !== 0 || !state.started || state.paused) return;
+  if (event.button !== 0 || !state.started || state.qaFrozen || player.dead || Boolean(confirmation)) return;
   const pick = scene.pick(event.offsetX, event.offsetY, mesh => mesh.isPickable && Boolean(mesh.metadata?.entity?.alive))
     ?? null;
   const hit = pick?.hit ? pick : scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
@@ -2662,6 +2702,7 @@ canvas.addEventListener('pointerdown', (event) => {
 });
 
 function interactNpc(npc: Entity): void {
+  if (!state.started || player.dead) return;
   void gateway.send({ type: 'npc', role: npc.role ?? '' });
   if (npc.role === 'elder') {
     state.quest = Math.max(1, state.quest); updateQuest();
@@ -2674,10 +2715,12 @@ function interactNpc(npc: Entity): void {
 
 function openWindow(type: string): void {
   if (!state.started) return;
-  state.paused = true;
+  if (confirmation?.cancel) closeConfirm();
+  state.activeWindow = type;
+  inputControl.reset(); playerMotor.stopPlanar();
   q('#modal-root').innerHTML = '<div class="modal-shade"></div><section class="window"><button class="close-window">×</button><div id="window-content"></div></section>';
-  q<HTMLButtonElement>('.close-window').onclick = closeWindow;
-  q<HTMLElement>('.modal-shade').onclick = closeWindow;
+  q<HTMLButtonElement>('#modal-root .close-window').onclick = closeWindow;
+  q<HTMLElement>('#modal-root .modal-shade').onclick = closeWindow;
   if (type === 'inventory') renderInventory();
   if (type === 'character') renderCharacter();
   if (type === 'skills') renderSkills();
@@ -2687,7 +2730,9 @@ function openWindow(type: string): void {
 }
 
 function closeWindow(): void {
-  state.paused = false; q('#modal-root').innerHTML = '';
+  if (confirmation?.cancel) closeConfirm();
+  state.activeWindow = null; inputControl.reset();
+  q('#modal-root').innerHTML = '';
   qa('[data-window]').forEach((button) => button.classList.remove('active')); canvas.focus();
 }
 
@@ -2703,15 +2748,15 @@ function formatItem(item: ItemInstance): string {
 function renderInventory(selected = state.selectedItem): void {
   q('#window-content').innerHTML = `<h2>Инвентарь</h2>${tabs('inventory')}<div class="inventory-shell"><div class="paper-doll"><div class="doll-art"></div><div class="equipment-grid">${EQUIPMENT_SLOTS.map((slot) => `<button class="equip-slot ${player.equipment[slot] ? 'filled' : ''}" title="${SLOT_NAMES_MAP[slot]} — нажмите, чтобы снять" data-equip="${slot}" data-slot="${slot}">${player.equipment[slot] ? formatItem(player.equipment[slot] as ItemInstance) : `<span>${SLOT_NAMES_MAP[slot]}</span>`}</button>`).join('')}</div></div><div class="bag-panel"><div class="bag-toolbar"><b>ПОХОДНАЯ СУМКА</b><span>${player.inventory.length} / ${INVENTORY_CAPACITY} · ◈ ${player.gold.toLocaleString()} ${state.lootBuffer.length ? `· Буфер: ${state.lootBuffer.length} <button class="dark-btn" id="collect-buffer">Забрать</button>` : ''}</span></div><div class="bag-grid">${player.inventory.map((item, index) => `<button class="item-card ${index === selected ? 'selected' : ''}" title="${itemDef(item).name}${item.count > 1 ? ` ×${item.count}` : ''}" data-item="${index}">${formatItem(item)}</button>`).join('')}${Array(Math.max(0, INVENTORY_CAPACITY - player.inventory.length)).fill('<div class="empty-slot"></div>').join('')}</div><div class="item-details" id="item-details"><b>Сравнение экипировки</b><br>Выберите предмет. Характеристики покажут разницу с надетой вещью.</div></div></div>`;
   bindTabs();
-  qa<HTMLButtonElement>('[data-item]').forEach((button) => { button.onclick = () => selectItem(Number(button.dataset.item)); });
+  qa<HTMLButtonElement>('[data-item]').forEach((button) => { const uid = player.inventory[Number(button.dataset.item)]?.uid; button.onclick = () => selectItem(player.inventory.findIndex(item => item.uid === uid)); });
   qa<HTMLButtonElement>('[data-equip]').forEach((button) => { button.onclick = () => unequip(button.dataset.equip ?? ''); });
   const collect = document.querySelector<HTMLButtonElement>('#collect-buffer');
-  if (collect) collect.onclick = () => { while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift() as ItemInstance); renderInventory(); saveGame(); };
+  if (collect) collect.onclick = () => { if (player.dead) return; while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift() as ItemInstance); renderInventory(); saveGame(); };
 }
 
 function selectItem(index: number): void {
   state.selectedItem = index; renderInventory(index);
-  const item = player.inventory[index]; const definition = itemDef(item); const parts: string[] = [];
+  const item = player.inventory[index]; if (!item) return; const definition = itemDef(item); const parts: string[] = [];
   const slot = definition.slot === 'ring' ? 'ring1' : definition.slot;
   const current = slot ? player.equipment[slot] : undefined;
   if (definition.atk) parts.push(`Урон ${definition.atk[0]}–${definition.atk[1]}`);
@@ -2730,13 +2775,14 @@ function selectItem(index: number): void {
   }
   const compare = definition.slot ? `<br><span style="color:#c4a876">Надето: ${current ? `${itemDef(current).name}${current.plus ? ` +${current.plus}` : ''}` : 'ничего'}</span>${deltas.length ? `<div class="stat-columns">${deltas.join('')}</div>` : ''}` : '';
   q('#item-details').innerHTML = `<b>${definition.name}${item.plus ? ` +${item.plus}` : ''}</b><br>${parts.join(' · ') || definition.desc || 'Ресурс мира'}${compare}<br><span style="color:#8f887c">Источник: ${definition.origin || 'Торговцы Варендора'}</span><div class="action-row">${definition.slot ? '<button class="gold-btn" id="equip-item">Надеть</button>' : ''}${definition.type === 'consumable' ? '<button class="gold-btn" id="use-item">Использовать</button>' : ''}<button class="dark-btn" id="sell-item">Продать за ${Math.floor(definition.value * 0.48)} ◈</button></div>`;
-  const equip = document.querySelector<HTMLButtonElement>('#equip-item'); if (equip) equip.onclick = () => equipItem(index);
+  const equip = document.querySelector<HTMLButtonElement>('#equip-item'); if (equip) equip.onclick = () => equipItem(player.inventory.findIndex(candidate => candidate.uid === item.uid));
   const use = document.querySelector<HTMLButtonElement>('#use-item'); if (use) use.onclick = () => { useItem(item.id); renderInventory(); };
-  q<HTMLButtonElement>('#sell-item').onclick = () => sellItem(index);
+  q<HTMLButtonElement>('#sell-item').onclick = () => sellItem(player.inventory.findIndex(candidate => candidate.uid === item.uid));
 }
 
 function equipItem(index: number): void {
-  const item = player.inventory[index]; const definition = itemDef(item); const itemSlot = definition.slot;
+  if (!state.started || player.dead) return;
+  const item = player.inventory[index]; if (!item) return; const definition = itemDef(item); const itemSlot = definition.slot;
   if (!itemSlot) return;
   const slot = equipmentSlot(itemSlot, player.equipment);
   if (player.equipment[slot]) player.inventory.push(player.equipment[slot] as ItemInstance);
@@ -2746,12 +2792,14 @@ function equipItem(index: number): void {
 }
 
 function unequip(slot: string): void {
+  if (!state.started || player.dead) return;
   const item = player.equipment[slot]; if (!item || player.inventory.length >= INVENTORY_CAPACITY) return;
   player.inventory.push(item); delete player.equipment[slot]; recalculate(); renderInventory(); saveGame();
 }
 
 function sellItem(index: number): void {
-  const item = player.inventory[index]; const definition = itemDef(item);
+  if (!state.started || player.dead) return;
+  const item = player.inventory[index]; if (!item) return; const definition = itemDef(item);
   player.gold += Math.floor(definition.value * 0.48) * item.count; player.inventory.splice(index, 1); state.selectedItem = null;
   renderInventory(); updateHud(); saveGame();
 }
@@ -2908,14 +2956,14 @@ function openShop(): void {
   openWindow('character');
   const stock: Array<[string, number]> = [['potion', 55], ['ether', 70], ['scroll', 240], ['teleport', 130]];
   q('#window-content').innerHTML = `<h2>Лавка Эльзы</h2><div class="npc-dialog"><div class="npc-portrait"></div><div><p>Боссовые вещи не продаются. За ними придётся идти в лес.</p><div class="shop-grid">${stock.map(([id, cost]) => `<div class="shop-item"><span class="big-icon">${ITEMS_MAP[id].icon}</span><b>${ITEMS_MAP[id].name}</b><span>◈ ${cost}</span><button class="dark-btn" data-buy="${id}" data-cost="${cost}">Купить</button></div>`).join('')}</div></div></div>`;
-  qa<HTMLButtonElement>('[data-buy]').forEach((button) => { button.onclick = () => { const cost = Number(button.dataset.cost); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; addItem(button.dataset.buy ?? 'potion'); updateHud(); saveGame(); }; });
+  qa<HTMLButtonElement>('[data-buy]').forEach((button) => { button.onclick = () => { if (player.dead) return; const cost = Number(button.dataset.cost); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; addItem(button.dataset.buy ?? 'potion'); updateHud(); saveGame(); }; });
 }
 
 function openTeleport(): void {
   openWindow('character');
   const points: Array<[string, number, number, number, number]> = [['Астерхолд', -108, -82, 0, 1], ['Гринфолл', GREENFALL_SPAWN.x, GREENFALL_SPAWN.z, 25, 1], ['Чёрный лес', 94, 44, 90, 10], ['Вход в шахту', 132, 94, 150, 10]];
   q('#window-content').innerHTML = `<h2>Проводник Каэль</h2><p>Путь сохраняет цену. Бесплатен только переход в столицу. Чёрный лес открывается на 10 уровне.</p><div class="shop-grid">${points.map((point) => `<div class="shop-item"><b>${point[0]}</b><span>◈ ${point[3]} · ур. ${point[4]}</span><button class="dark-btn" data-tp="${point.slice(1).join(',')}" data-destination="${point[0]}">Отправиться</button></div>`).join('')}</div>`;
-  qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
+  qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { if (player.dead) return; const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
 
 function openForge(): void { openWindow('character'); renderForge(); }
@@ -2926,10 +2974,14 @@ function renderForge(): void {
 }
 
 function attemptEnhance(slot: string): void {
+  if (!state.started || player.dead) return;
   const item = player.equipment[slot]; if (!item || item.plus >= 15) return;
   if (!countItem('scroll')) return toast('Нужен свиток улучшения', 'bad');
+  const expectedPlus = item.plus;
+  let completed = false;
   const run = () => {
-    consumeItem('scroll');
+    if (completed || player.dead || player.equipment[slot]?.uid !== item.uid || item.plus !== expectedPlus || !consumeItem('scroll')) return;
+    completed = true;
     gameAudio.play('hammer', 0.72, 0.94 + Math.random() * 0.08);
     void gateway.send({ type: 'enhance', itemUid: item.uid, from: item.plus, to: item.plus + 1 });
     const outcome = resolveEnhancement(item.plus);
@@ -2938,7 +2990,7 @@ function attemptEnhance(slot: string): void {
     } else if (outcome.kind === 'destroyed') {
       const name = itemDef(item).name; delete player.equipment[slot]; recalculate(); toast(`${name} уничтожен`, 'bad'); log(`Неудача: ${name} уничтожен при заточке.`, 'combat');
     }
-    closeConfirm(); renderForge(); saveGame();
+    closeConfirm(); if (state.activeWindow) renderForge(); saveGame();
   };
   if (enhancementCanDestroy(item.plus)) confirmBox('Рискованная заточка', `Шанс успеха ${Math.round(enhancementChance(item.plus) * 100)}%. <span class="danger-text">При неудаче предмет будет уничтожен.</span> Продолжить?`, run);
   else run();
@@ -2947,19 +2999,32 @@ function attemptEnhance(slot: string): void {
 function countItem(id: string): number { return player.inventory.filter((item) => item.id === id).reduce((total, item) => total + item.count, 0); }
 function consumeItem(id: string): boolean { const index = player.inventory.findIndex((item) => item.id === id); if (index < 0) return false; player.inventory[index].count -= 1; if (player.inventory[index].count <= 0) player.inventory.splice(index, 1); return true; }
 function useItem(id: string): void {
+  if (!state.started || player.dead) return;
   if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); }
   else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
   else if (id === 'teleport' && consumeItem(id)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
   updateHud(); saveGame();
 }
 
+let confirmation: { token: symbol; cancel: boolean } | null = null;
 function confirmBox(title: string, text: string, yes: () => void, cancel = true): void {
-  state.paused = true;
-  q('#confirm-root').innerHTML = `<div class="modal-shade"></div><div class="confirm-box glass"><h3>${title}</h3><p>${text}</p><div class="action-row" style="justify-content:center"><button class="gold-btn" id="confirm-yes">Продолжить</button>${cancel ? '<button class="dark-btn" id="confirm-no">Отмена</button>' : ''}</div></div>`;
-  q<HTMLButtonElement>('#confirm-yes').onclick = yes;
+  if (player.dead && cancel) return;
+  const token = Symbol('confirmation');
+  confirmation = { token, cancel };
+  inputControl.reset(); playerMotor.stopPlanar();
+  q('#confirm-root').classList.toggle('death-notice', !cancel);
+  q('#confirm-root').innerHTML = `<div class="modal-shade"></div><div class="confirm-box glass"><h3>${title}</h3><p>${text}</p><div class="action-row" style="justify-content:center"><button class="gold-btn" id="confirm-yes">${cancel ? 'Продолжить' : 'Возродиться'}</button>${cancel ? '<button class="dark-btn" id="confirm-no">Отмена</button>' : ''}</div></div>`;
+  q<HTMLButtonElement>('#confirm-yes').onclick = () => {
+    if (confirmation?.token !== token || (cancel && player.dead)) return;
+    closeConfirm();
+    yes();
+  };
   const no = document.querySelector<HTMLButtonElement>('#confirm-no'); if (no) no.onclick = closeConfirm;
 }
-function closeConfirm(): void { state.paused = false; q('#confirm-root').innerHTML = ''; }
+function closeConfirm(): void {
+  confirmation = null; inputControl.reset();
+  q('#confirm-root').innerHTML = ''; q('#confirm-root').classList.remove('death-notice');
+}
 
 function saveGame(): void {
   if (!state.started) return;
@@ -3039,8 +3104,8 @@ engine.runRenderLoop(() => {
     cameraControl.orbit(inputControl.consumeCameraOrbit());
     cameraControl.zoom(inputControl.consumeZoom());
   }
-  if (state.started && !state.paused) {
-    simulationClock.advance(elapsed, step => { update(step); return !state.paused; });
+  if (state.started && !state.qaFrozen) {
+    simulationClock.advance(elapsed, step => { update(step); return !state.qaFrozen; });
     saveTimer += dt; if (saveTimer > 8) { saveGame(); saveTimer = 0; }
   } else simulationClock.reset();
   if (state.started) {
@@ -3050,17 +3115,17 @@ engine.runRenderLoop(() => {
     if (minimapTimer >= 0.2) { minimapTimer = 0; drawMinimap(); }
   }
   if (state.started) {
-    presentActors(state.paused ? 1 : simulationClock.alpha);
+    presentActors(state.qaFrozen ? 1 : simulationClock.alpha);
     const root = playerEntity().root;
     const x = root?.position.x ?? player.x, z = root?.position.z ?? player.z;
     cameraControl.update(dt, { x, y: terrain.supportAt(x, z), z });
   }
   // Resizing clears the drawing buffer. It must happen BEFORE drawing, never after.
-  if (state.started && !state.paused && resolutionGovernor.sample(dt)) { applyRenderResolution(); applyRenderBudget(); }
+  if (state.started && !state.qaFrozen && resolutionGovernor.sample(dt)) { applyRenderResolution(); applyRenderBudget(); }
   const beforeRender = performance.now();
   engine._drawCalls.fetchNewFrame();
   scene.render();
-  if (state.started && !state.paused) {
+  if (state.started && !state.qaFrozen) {
     frameTelemetry.record(engine.getDeltaTime(), beforeRender - start, performance.now() - beforeRender);
     performanceTimer += dt;
     if (performanceTimer >= 1) {
@@ -3076,7 +3141,7 @@ engine.runRenderLoop(() => {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-motion-test',
+    version: '0.6.0-live-world-test',
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
       adaptiveScale: resolutionGovernor.scale, adaptiveDetails: resolutionGovernor.detailStep,
@@ -3090,13 +3155,16 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
     }),
     getState: () => ({
       started: state.started,
+      simulationSeconds: state.simulationSeconds,
+      activeWindow: state.activeWindow,
+      confirmation: confirmation ? { cancel: confirmation.cancel } : null,
       entities: state.entities.length,
       monsters: state.entities.filter((entity) => entity.kind === 'monster').length,
       activeMonsterStates: state.entities.filter((entity) => entity.kind === 'monster' && entity.alive).map((entity) => entity.aiState),
       assetsLoaded,
       camera: cameraControl.state,
       selectedTarget: targeting.selected?.uid ?? null,
-      player: { level: player.level, hp: player.hp, inventory: player.inventory.length, x: player.x, z: player.z },
+      player: { level: player.level, hp: player.hp, xp: player.xp, dead: player.dead, mp: player.mp, cooldowns: [...player.cooldowns], inventory: player.inventory.length, x: player.x, z: player.z },
     }),
   },
   enumerable: false,
@@ -3125,6 +3193,12 @@ if (__QA_BUILD__) {
   });
   Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
     actors,
+    playerSnapshot: () => structuredClone(player),
+    cooldowns: (values: number[]) => { player.cooldowns = values.slice(0, 4); },
+    prepareRespawn: (id: string) => {
+      const entity = state.entities.find(e => e.uid === id && !e.alive);
+      if (entity) { entity.lifecycle = new MonsterLifecycle(1); entity.respawn = 1; }
+    },
     recordMotion: (enabled: boolean) => {
       if (enabled) motionTrace.length = 0;
       qaMotionSample = enabled ? () => {
@@ -3156,7 +3230,7 @@ if (__QA_BUILD__) {
     uiScale: (scale: number) => { state.settings.uiScale = scale; document.documentElement.style.setProperty('--ui-scale', String(scale)); fitActionDock(); },
     moveTo: (x: number, z: number) => { resetPlayerControl(true); state.moveTarget = collisionWorld.findNearestFree({ x, z }, 0.46); },
     vitals: (hp: number, mp: number) => { player.hp = hp; player.mp = mp; updateHud(); },
-    pause: (value: boolean) => { state.paused = value; simulationClock.reset(); skipFrameDelta = true; },
+    pause: (value: boolean) => { state.qaFrozen = value; simulationClock.reset(); skipFrameDelta = true; },
     kill: (id: string) => { const entity = state.entities.find(e => e.uid === id); if (entity) killMonster(entity); },
     lifecycleStep: (id: string, seconds: number) => { const entity = state.entities.find(e => e.uid === id); if (entity) updateMonster(entity, seconds); },
     placePlayer: (x: number, z: number) => {
