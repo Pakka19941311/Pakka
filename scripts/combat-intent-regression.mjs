@@ -229,6 +229,7 @@ async function classScenarios(classId) {
   assert.equal(queued.intent.bufferedSkill?.skillIndex, 2);
   await page.evaluate(() => { const f = window.__VARENDOR_FIXTURE__; const cd = f.combatSnapshot().player.cooldowns; cd[1] = 10; f.cooldowns(cd); });
   await page.keyboard.press('2'); assert.equal((await snapshot()).intent.bufferedSkill?.skillIndex, 2);
+  assert.equal(await page.locator('#notices [data-group="combat"]').count(), 1, 'combat feedback accumulated over the fight');
   await step(2); s = await snapshot();
   assert.equal(events(s, 'release', 1).length, 0); assert.equal(events(s, 'release', 2).length, 1);
   const bufferedBegin = events(s, 'begin', 2)[0];
@@ -299,6 +300,20 @@ async function classScenarios(classId) {
   } else {
     if (classId === 'mage') {
       const cluster = await page.evaluate(() => window.__VARENDOR_FIXTURE__.combatCluster(5));
+      // Frame this six-actor evidence scene through the actual camera controls.
+      // The fixture's collision-free fighting position does not guarantee a
+      // clear default camera ray behind it. A higher oblique view also separates
+      // the five arc endpoints; no production camera setting is changed.
+      await page.mouse.move(600, 350);
+      for (let notch = 0; notch < 5; notch++) await page.mouse.wheel(0, 240);
+      await page.mouse.down({ button: 'right' });
+      await page.mouse.move(480, 450, { steps: 4 });
+      await page.mouse.up({ button: 'right' });
+      await page.waitForFunction(() => {
+        const camera = window.__VARENDOR_QA__.getState().camera;
+        return camera.distance === 18 && Math.abs(camera.pitch - .72) < .001;
+      });
+      await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
       const realActors = await page.evaluate(ids => window.__VARENDOR_FIXTURE__.actors()
         .filter(a => a.kind === 'player' || ids.includes(a.uid))
         .map(a => ({ uid: a.uid, kind: a.kind, model: a.model, meshes: a.meshes, generation: a.generation })), cluster.targetIds);
@@ -326,7 +341,16 @@ async function classScenarios(classId) {
       assert.ok(Math.abs(chainRelease[0].mpBefore - chainRelease[0].mpAfter - 48) < 1e-8);
       assert.equal(chainRelease[0].cooldownAfter, 12);
       await visibleScreenshot('E-mage-chain-lightning');
-      await writeFile(path.join(reportDir, 'E-mage-chain-lightning.json'), JSON.stringify({ actors: realActors, arcs: chainArcs, damage: chainDamage, release: chainRelease }, null, 2));
+      const framing = await page.evaluate(ids => {
+        const s = window.__VARENDOR_QA__.getState();
+        return { camera: s.camera, actualCamera: s.actualCamera,
+          actors: window.__VARENDOR_FIXTURE__.actors().filter(a => a.kind === 'player' || ids.includes(a.uid))
+            .map(a => ({ uid: a.uid, x: a.screenX, y: a.screenY, depth: a.depth })) };
+      }, cluster.targetIds);
+      await writeFile(path.join(reportDir, 'E-mage-chain-lightning.json'), JSON.stringify({ actors: realActors, arcs: chainArcs, damage: chainDamage, release: chainRelease, framing }, null, 2));
+      assert.equal(framing.actors.length, 6);
+      assert.ok(framing.actors.every(a => a.depth > 0 && a.depth < 1 && a.x > 140 && a.x < 1140 && a.y > 115 && a.y < 610),
+        `chain evidence does not frame the player and five targets: ${JSON.stringify(framing)}`);
       await step(1); s = await snapshot();
       assert.equal(s.events.filter(e => e.kind === 'damage').length, 5);
       assert.equal(events(s, 'release', null).length, 0);

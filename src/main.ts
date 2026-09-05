@@ -1818,7 +1818,7 @@ function update(dt: number): void {
       const skill = CLASSES_MAP[player.classId].skills[pendingSkill.skillIndex];
       if (!skill || player.mp < skill.cost || player.cooldowns[pendingSkill.skillIndex] > 0) {
         combatControl.discardQueuedSkill();
-        toast('Команда навыка отменена: ресурс или навык недоступен', 'bad');
+        combatToast('Команда навыка отменена: ресурс или навык недоступен', 'bad');
       }
     }
     const axes = inputControl.movementAxes();
@@ -1853,7 +1853,7 @@ function update(dt: number): void {
         } else pursuitStall += dt;
         if (pursuitStall >= 2.5) {
           resetPlayerControl();
-          toast('Цель недоступна: нет свободного пути', 'bad');
+          combatToast('Цель недоступна: нет свободного пути', 'bad');
         } else {
           // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
           const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
@@ -2093,7 +2093,7 @@ function showRespawn(message: string): void {
 function basicAttack(): void {
   if (!state.started || player.dead) return;
   const target = targeting.validate();
-  if (!target) return toast('Выберите живую цель', 'bad');
+  if (!target) return combatToast('Выберите живую цель', 'bad');
   inputControl.consumeMovementStart(); // This explicit command is newer than a released movement tap.
   state.moveTarget = null;
   state.interactionTarget = null;
@@ -2109,7 +2109,7 @@ function promoteReadySkill(now: number): void {
     const skill = CLASSES_MAP[player.classId].skills[intent.skillIndex];
     const valid = Boolean(skill && player.mp >= skill.cost && player.cooldowns[intent.skillIndex] <= 0
       && (intent.targetId === '@self' || target?.uid === intent.targetId));
-    if (!valid) toast('Команда навыка отменена: цель, ресурс или навык недоступен', 'bad');
+    if (!valid) combatToast('Команда навыка отменена: цель, ресурс или навык недоступен', 'bad');
     return valid;
   });
   if (promoted?.targetId === '@self') { combatControl.discardQueuedSkill(); releaseSelfSkill(promoted.skillIndex); }
@@ -2123,7 +2123,7 @@ function releaseSelfSkill(index: number): void {
   player.cooldowns[index] = skill.cd;
   if (skill.buff) {
     state.playerBuffs[skill.buff as 'guard' | 'vanish'] = skill.buff === 'guard' ? 7 : 4;
-    toast(skill.buff === 'guard' ? 'Последний рубеж: входящий урон снижен' : 'Вы растворяетесь в сумраке');
+    combatToast(skill.buff === 'guard' ? 'Последний рубеж: входящий урон снижен' : 'Вы растворяетесь в сумраке');
     impactEffect(entityWorldPosition(playerEntity()), Color3.FromHexString(skill.buff === 'guard' ? '#d3ad63' : '#7b46a8'));
   } else summonSkeleton();
   void gateway.send({ type: 'attack', entityId: skill.buff ? 'self' : 'summon', skillIndex: index });
@@ -2136,29 +2136,29 @@ function castSkill(index: number): void {
   if (!state.started || player.dead || confirmation) return;
   const skill = CLASSES_MAP[player.classId].skills[index];
   if (!skill) return;
-  if (player.mp < skill.cost) return toast(`Недостаточно: ${CLASSES_MAP[player.classId].resource}`, 'bad');
+  if (player.mp < skill.cost) return combatToast(`Недостаточно: ${CLASSES_MAP[player.classId].resource}`, 'bad');
   const hero = playerEntity();
   const target = targeting.validate();
   const self = Boolean(skill.buff || skill.summon);
-  if (!self && !target) return toast('Выберите живую цель', 'bad');
-  if (!playerMotor.grounded) return toast('Навык недоступен в прыжке', 'bad');
+  if (!self && !target) return combatToast('Выберите живую цель', 'bad');
+  if (!playerMotor.grounded) return combatToast('Навык недоступен в прыжке', 'bad');
   const attack = hero.activeAttack;
   if (attack) {
     const remaining = Math.max(0, (attack.endsAt ?? Infinity) - state.simulationSeconds);
-    if (!attack.impacted || remaining > SKILL_BUFFER_SECONDS) return toast('Дождитесь завершения удара', 'bad');
-    if (player.cooldowns[index] > remaining) return toast('Навык ещё восстанавливается', 'bad');
+    if (!attack.impacted || remaining > SKILL_BUFFER_SECONDS) return combatToast('Дождитесь завершения удара', 'bad');
+    if (player.cooldowns[index] > remaining) return combatToast('Навык ещё восстанавливается', 'bad');
     combatControl.bufferSkill(self ? '@self' : target!.uid, index, state.simulationSeconds);
-    toast(`Следом: ${skill.name}`);
+    combatToast(`Следом: ${skill.name}`);
     return;
   }
-  if (player.cooldowns[index] > 0) return toast('Навык ещё восстанавливается', 'bad');
+  if (player.cooldowns[index] > 0) return combatToast('Навык ещё восстанавливается', 'bad');
   if (self) { releaseSelfSkill(index); return; }
   inputControl.consumeMovementStart();
   state.moveTarget = null;
   state.interactionTarget = null;
   clearPursuitProgress();
   combatControl.queueSkill(target!.uid, index);
-  toast(Math.hypot(player.x - target!.x, player.z - target!.z) > attackRange() || !combatLineOfSight(hero, target!)
+  combatToast(Math.hypot(player.x - target!.x, player.z - target!.z) > attackRange() || !combatLineOfSight(hero, target!)
     ? `Подход: ${skill.name}` : `Подготовка: ${skill.name}`);
 }
 
@@ -2196,12 +2196,12 @@ function performAttack(skillIndex: number | null): void {
     if (Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + (ranged ? 0.05 : 0.25)
       || !combatLineOfSight(hero, target)) {
       cancelActorAttack(hero);
-      if (skillIndex !== null) toast('Навык прерван: цель вне досягаемости', 'bad');
+      if (skillIndex !== null) combatToast('Навык прерван: цель вне досягаемости', 'bad');
       return;
     }
     if (skillIndex !== null) {
       if (!skill || player.mp < skill.cost || player.cooldowns[skillIndex] > 0) {
-        cancelActorAttack(hero); toast('Навык прерван: ресурс или навык недоступен', 'bad'); return;
+        cancelActorAttack(hero); combatToast('Навык прерван: ресурс или навык недоступен', 'bad'); return;
       }
       const before = player.mp;
       player.mp -= skill.cost;
@@ -3182,8 +3182,12 @@ function log(message: string, type = ''): void {
   while (messages.childElementCount > 80) messages.firstElementChild?.remove();
   messages.scrollTop = messages.scrollHeight;
 }
-function toast(message: string, type = ''): void {
-  const node = document.createElement('div'); node.className = `toast ${type}`; node.textContent = message; q('#notices').append(node); window.setTimeout(() => node.remove(), 3200);
+function combatToast(message: string, type = ''): void { toast(message, type, 'combat'); }
+function toast(message: string, type = '', group = ''): void {
+  if (group) for (const previous of q('#notices').children) {
+    if (previous instanceof HTMLElement && previous.dataset.group === group) previous.remove();
+  }
+  const node = document.createElement('div'); node.className = `toast ${type}`; if (group) node.dataset.group = group; node.textContent = message; q('#notices').append(node); window.setTimeout(() => node.remove(), 3200);
 }
 
 qa<HTMLButtonElement>('[data-window]').forEach((button) => { button.onclick = () => openWindow(button.dataset.window ?? 'character'); });
@@ -3322,6 +3326,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
       activeMonsterStates: state.entities.filter((entity) => entity.kind === 'monster' && entity.alive).map((entity) => entity.aiState),
       assetsLoaded,
       camera: cameraControl.state,
+      actualCamera: {alpha: camera.alpha, beta: camera.beta, radius: camera.radius, position: camera.position.asArray(), target: camera.target.asArray()},
       selectedTarget: targeting.selected?.uid ?? null,
       combat: combatSnapshot(),
       player: { level: player.level, hp: player.hp, xp: player.xp, dead: player.dead, mp: player.mp, cooldowns: [...player.cooldowns], inventory: player.inventory.length, x: player.x, z: player.z },
@@ -3386,7 +3391,7 @@ if (__QA_BUILD__) {
     cameraControl.snap({x: player.x, y: terrain.supportAt(player.x,player.z), z: player.z});
     actorVisibilityCooldown = 0; sectorVisibilityCooldown = 0; updateActorVisibility(1); updateWorldSectorVisibility(1);
     presentActors(1); updateHud();
-    state.qaFrozen = true; simulationClock.reset(); skipFrameDelta = true; combatEvents.length = 0;
+    state.qaFrozen = true; simulationClock.reset(); skipFrameDelta = true; combatEvents.length = 0; q('#notices').replaceChildren();
     return {targetIds: [...fixtureTargetIds]};
   };
   const actors = () => state.entities.map(entity => {
