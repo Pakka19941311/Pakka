@@ -17,6 +17,7 @@ const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+    if (pathname === '/favicon.ico') { response.writeHead(204).end(); return; }
     const file = path.resolve(directory, `.${pathname === '/' ? '/index.html' : pathname}`);
     if (!file.startsWith(`${directory}${path.sep}`)) { response.writeHead(403).end(); return; }
     const bytes = await readFile(file);
@@ -46,6 +47,7 @@ try {
       } catch { probe.longTaskUnsupported = true; }
       let last = 0, nextSnapshot = 0;
       function sample(now) {
+        if (probe.enabled && now >= probe.deadline) { probe.enabled = false; probe.complete = true; probe.elapsed = now - probe.started; }
         if (probe.enabled) {
           if (last) probe.frames.push({ time: now, ms: now - last });
           if (now >= nextSnapshot) {
@@ -64,6 +66,7 @@ try {
     page.setDefaultTimeout(30000);
     page.on('pageerror', error => report.errors.push(`${scenario}: ${error.stack ?? error.message}`));
     page.on('console', message => { if (message.type() === 'error') report.errors.push(`${scenario}: ${message.text()}`); });
+    page.on('response', response => { if (response.status() >= 400) report.errors.push(`${scenario}: HTTP ${response.status()} ${response.url()}`); });
     page.on('requestfailed', request => report.errors.push(`${scenario}: ${request.url()} ${request.failure()?.errorText}`));
     await page.goto(`http://127.0.0.1:${server.address().port}`);
     await page.locator('#begin').click();
@@ -81,31 +84,31 @@ try {
     await profiler.send('Profiler.enable');
     await profiler.send('Profiler.setSamplingInterval', { interval: 1000 });
     await profiler.send('Profiler.start');
-    await page.evaluate(() => { window.__MOTION_PROFILE__.enabled = true; });
+    await page.evaluate(() => { const p = window.__MOTION_PROFILE__; p.enabled = true; p.started = performance.now(); p.deadline = p.started + 25000; });
     const started = Date.now();
     if (scenario === 'forward') await page.keyboard.down('KeyW');
     if (scenario === 'direction-orbit') {
       const sequence = [['KeyW'], ['KeyA'], ['KeyD'], ['KeyS'], ['KeyW', 'KeyD']];
-      for (const keys of sequence) {
-        const segmentStart = Date.now();
+      for (let segment = 0; segment < sequence.length; segment++) {
+        if (Date.now() - started >= 25000) break;
+        const keys = sequence[segment];
         for (const key of keys) await page.keyboard.down(key);
-        if (keys.length === 2) {
+        if (segment === 4) {
           await page.mouse.move(640, 310);
           await page.mouse.down({ button: 'right' });
-          for (const x of [700, 760, 700, 640, 580, 520, 580, 640]) {
-            await page.mouse.move(x, 310, { steps: 8 });
-            await page.waitForTimeout(250);
-          }
+          await page.mouse.move(710, 325);
+          await page.mouse.move(640, 310);
           await page.mouse.up({ button: 'right' });
         }
-        const segmentRemaining = 5000 - (Date.now() - segmentStart);
-        if (segmentRemaining > 0) await page.waitForTimeout(segmentRemaining);
+        const remaining = started + (segment + 1) * 5000 - Date.now();
+        if (remaining > 0) await page.waitForTimeout(remaining);
         for (const key of keys) await page.keyboard.up(key);
       }
     }
     const remaining = 25000 - (Date.now() - started);
     if (remaining > 0) await page.waitForTimeout(remaining);
     if (scenario === 'forward') await page.keyboard.up('KeyW');
+    await page.waitForFunction(() => window.__MOTION_PROFILE__.complete, {}, { timeout: 15000 });
     const sample = await page.evaluate(() => { window.__MOTION_PROFILE__.enabled = false; return window.__MOTION_PROFILE__; });
     const { profile } = await profiler.send('Profiler.stop');
     await writeFile(`${reportDir}/${scenario}.cpuprofile`, JSON.stringify(profile));
@@ -122,7 +125,7 @@ try {
     }
     const budgets = sample.snapshots.map(s => [s.performance.renderWidth, s.performance.renderHeight,
       s.performance.adaptiveScale, s.performance.adaptiveDetails, s.performance.msaaSamples, s.performance.shadowSize].join(':'));
-    const result = { scenario, wallSeconds: (Date.now() - started) / 1000, samples: ordered.length,
+    const result = { scenario, wallSeconds: sample.elapsed / 1000, requestedSeconds: 25, samples: ordered.length,
       averageMs, maxMs: ordered.at(-1), p95Ms: ordered[Math.min(ordered.length - 1, Math.floor(ordered.length * 0.95))],
       fps: 1000 / averageMs, over33ms: ordered.filter(ms => ms > 33.34).length,
       over50ms: ordered.filter(ms => ms > 50).length, over100ms: ordered.filter(ms => ms > 100).length,

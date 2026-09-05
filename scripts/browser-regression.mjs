@@ -15,6 +15,7 @@ const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 const server = createServer(async (request, response) => {
   try {
     const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+    if (pathname === '/favicon.ico') { response.writeHead(204).end(); return; }
     const file = path.resolve(directory, `.${pathname === '/' ? '/index.html' : pathname}`);
     if (!file.startsWith(`${directory}${path.sep}`)) { response.writeHead(403).end(); return; }
     const bytes = await readFile(file);
@@ -269,10 +270,23 @@ try {
       `respawned ground monster buried/floating ${JSON.stringify(monsterBounds)}`);
     check('respawned skinned monster feet meet the actual terrain', monsterBounds);
     await page.evaluate(() => window.__VARENDOR_FIXTURE__.pause(false));
+    await page.evaluate(() => window.__VARENDOR_FIXTURE__.recordMotion(true));
     await page.mouse.click(clickTarget.screenX, clickTarget.screenY);
     await page.waitForFunction(id => window.__VARENDOR_QA__.getState().selectedTarget === id, target.uid);
     await page.waitForFunction(({ id, hp }) => window.__VARENDOR_FIXTURE__.actors().find(e => e.uid === id)?.hp < hp, { id: target.uid, hp: target.hp }, { timeout: 30000 });
-    check('one LMB selects, approaches and attacks a real monster');
+    const attackTrace = await page.evaluate(() => { window.__VARENDOR_FIXTURE__.recordMotion(false); return window.__VARENDOR_FIXTURE__.motionTrace(); });
+    assert.ok(attackTrace.some(t => t.action === 'attack'), 'melee never entered committed attack');
+    const contactIndex = attackTrace.findIndex((t, i) => i > 0 && t.hp < attackTrace[i - 1].hp);
+    assert.ok(contactIndex > 0, 'no actual melee contact in simulation trace');
+    assert.equal(attackTrace[contactIndex].action, 'attack', 'melee damage detached from attack phase');
+    const gap = Math.hypot(attackTrace[contactIndex].x - attackTrace[contactIndex].targetX, attackTrace[contactIndex].z - attackTrace[contactIndex].targetZ);
+    assert.ok(gap > 1.1, 'hero and fox occupy the same body during the hit');
+    for (let i = 1; i < attackTrace.length; i++) {
+      const a = attackTrace[i - 1], b = attackTrace[i];
+      if (a.attackToken && a.attackToken === b.attackToken) assert.ok(Math.hypot(a.x - b.x, a.z - b.z) < 0.001, 'hero slides during committed melee');
+    }
+    await writeFile(`${reportDir}/melee-motion-trace.json`, JSON.stringify(attackTrace));
+    check('one LMB selects, approaches and attacks: contact frame, body spacing and stationary swing', { contactGap: gap });
     await visibleWorldScreenshot('b01-combat');
     await page.mouse.click(850, 470); await page.waitForTimeout(350);
     assert.equal((await actors()).find(e => e.uid === target.uid).engaged, false);
@@ -296,7 +310,39 @@ try {
     check('save and continue preserve progress', { saved, restored });
     await visibleWorldScreenshot('b01-after-continue');
   }
-  assert.deepEqual(report.errors.filter(error => !error.includes('favicon.ico') && !error.includes('404 (Not Found)')), []);
+  if (!baseline) {
+    for (const classId of ['mage', 'ranger']) {
+      const rangedContext = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
+      page = await rangedContext.newPage(); page.setDefaultTimeout(30000);
+      page.on('pageerror', error => report.errors.push(`${classId}: ${error.stack ?? error.message}`));
+      page.on('response', response => { if (response.status() >= 400) report.errors.push(`${classId}: HTTP ${response.status()} ${response.url()}`); });
+      await page.goto(base); await page.locator(`[data-class="${classId}"]`).click(); await page.locator('#begin').click();
+      await page.waitForFunction(() => window.__VARENDOR_QA__?.getState().started, {}, { timeout: 180000 });
+      await page.keyboard.press('Escape'); await page.locator('#quality').selectOption('low');
+      await page.locator('#resolution-scale').selectOption('0.5'); await page.locator('#save-settings').click();
+      await page.evaluate(() => window.__VARENDOR_FIXTURE__.pause(true));
+      const target = await page.evaluate(() => window.__VARENDOR_FIXTURE__.actors().find(e => e.model === 'Fox' && e.alive));
+      await page.evaluate(p => window.__VARENDOR_FIXTURE__.placePlayer(p.x, p.z - 7), target);
+      await page.waitForTimeout(800);
+      const click = await page.evaluate(id => window.__VARENDOR_FIXTURE__.actors().find(e => e.uid === id), target.uid);
+      await page.evaluate(() => { window.__VARENDOR_FIXTURE__.pause(false); window.__VARENDOR_FIXTURE__.recordMotion(true); });
+      await page.mouse.click(click.screenX, click.screenY);
+      await page.waitForFunction(({ id, hp }) => window.__VARENDOR_FIXTURE__.actors().find(e => e.uid === id)?.hp < hp,
+        { id: target.uid, hp: target.hp }, { timeout: 30000 });
+      const trace = await page.evaluate(() => { window.__VARENDOR_FIXTURE__.recordMotion(false); return window.__VARENDOR_FIXTURE__.motionTrace(); });
+      assert.ok(trace.some(t => t.action === 'attack' && Math.hypot(t.x - t.targetX, t.z - t.targetZ) > 2.5), `${classId} did not fire from ranged distance`);
+      assert.ok(trace.some(t => new RegExp(classId === 'mage' ? 'Spell1' : 'Bow_Shoot', 'i').test(t.clip ?? '')), `${classId} chose the wrong action clip`);
+      await writeFile(`${reportDir}/${classId}-motion-trace.json`, JSON.stringify(trace));
+      await visibleWorldScreenshot(`motion-${classId}-combat`);
+      await page.keyboard.down('s'); await page.waitForTimeout(500); await page.keyboard.up('s');
+      const afterCancel = await page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
+      assert.equal(afterCancel.find(e => e.uid === target.uid).engaged, false, `${classId} manual movement failed to cancel pursuit`);
+      assert.equal(afterCancel.find(e => e.kind === 'player').attack, null, `${classId} attack survived a movement cancellation`);
+      check(`${classId}: one-click ranged attack, correct casting clip, projectile damage and manual cancel`);
+      await rangedContext.close();
+    }
+  }
+  assert.deepEqual(report.errors, []);
   assert.deepEqual(report.failedRequests, []);
   report.passed = true;
 } catch (error) {

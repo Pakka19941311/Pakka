@@ -46,6 +46,10 @@ export class ThirdPersonCameraController {
   private readonly camera: ArcRotateCamera;
   private desired: ThirdPersonCameraState;
   private readonly focus = new Vector3();
+  private readonly wantedFocus = new Vector3();
+  private readonly wantedCamera = new Vector3();
+  private obstruction?: (focus: Vector3, camera: Vector3) => number;
+  private zoomDistance = 10.5;
   private mouseSensitivity = 1;
   private zoomSensitivity = 1;
   private smoothing = 1;
@@ -58,7 +62,8 @@ export class ThirdPersonCameraController {
       pitch: 1.06,
       distance: 10.5,
     });
-    camera.lowerRadiusLimit = THIRD_PERSON_CAMERA_LIMITS.minDistance;
+    // Input zoom still has its gameplay limit; obstruction recovery may move closer.
+    camera.lowerRadiusLimit = 1.1;
     camera.upperRadiusLimit = THIRD_PERSON_CAMERA_LIMITS.maxDistance;
     camera.lowerBetaLimit = THIRD_PERSON_CAMERA_LIMITS.minPitch;
     camera.upperBetaLimit = THIRD_PERSON_CAMERA_LIMITS.maxPitch;
@@ -87,27 +92,37 @@ export class ThirdPersonCameraController {
   }
 
   update(dt: number, playerPosition: Readonly<{ x: number; y: number; z: number }>): void {
-    // Lower response values deliberately remove the sharp prototype-like follow behaviour.
-    const rotationBlend = smoothFactor(5.4 * this.smoothing, dt);
-    const distanceBlend = smoothFactor(5.8 * this.smoothing, dt);
+    const rotationBlend = smoothFactor(16 * this.smoothing, dt);
+    const distanceBlend = smoothFactor(12 * this.smoothing, dt);
     this.camera.alpha = lerpAngle(this.camera.alpha, this.desired.yaw, rotationBlend);
     this.camera.beta += (this.desired.pitch - this.camera.beta) * rotationBlend;
-    this.camera.radius += (this.desired.distance - this.camera.radius) * distanceBlend;
+    this.zoomDistance += (this.desired.distance - this.zoomDistance) * distanceBlend;
 
     const viewForward = cameraRelativeDirection({ forward: 1, strafe: 0 }, this.camera.alpha);
-    const wantedFocus = new Vector3(
+    this.wantedFocus.set(
       playerPosition.x + viewForward.x * 2.15,
       playerPosition.y + 1.35,
       playerPosition.z + viewForward.z * 2.15,
     );
-    Vector3.LerpToRef(this.focus, wantedFocus, smoothFactor(5.2 * this.smoothing, dt), this.focus);
+    // The caller supplies the interpolated player pose. Adding a second long
+    // horizontal follow filter here made movement feel hundreds of milliseconds late.
+    this.focus.x = this.wantedFocus.x;
+    this.focus.z = this.wantedFocus.z;
+    this.focus.y += (this.wantedFocus.y - this.focus.y) * smoothFactor(18, dt);
     this.camera.target.copyFrom(this.focus);
+    const horizontal = this.zoomDistance * Math.sin(this.camera.beta);
+    this.wantedCamera.set(this.focus.x + Math.cos(this.camera.alpha) * horizontal,
+      this.focus.y + this.zoomDistance * Math.cos(this.camera.beta), this.focus.z + Math.sin(this.camera.alpha) * horizontal);
+    const allowed = this.obstruction ? this.obstruction(this.focus, this.wantedCamera) : this.zoomDistance;
+    const radius = Math.max(1.1, Math.min(this.zoomDistance, allowed));
+    this.camera.radius = radius < this.camera.radius ? radius : this.camera.radius + (radius - this.camera.radius) * smoothFactor(7, dt);
   }
 
   snap(playerPosition: Readonly<{ x: number; y: number; z: number }>): void {
     this.camera.alpha = this.desired.yaw;
     this.camera.beta = this.desired.pitch;
     this.camera.radius = this.desired.distance;
+    this.zoomDistance = this.desired.distance;
     const viewForward = cameraRelativeDirection({ forward: 1, strafe: 0 }, this.desired.yaw);
     this.focus.set(
       playerPosition.x + viewForward.x * 2.15,
@@ -120,6 +135,8 @@ export class ThirdPersonCameraController {
   get state(): ThirdPersonCameraState {
     return { ...this.desired };
   }
+
+  setObstructionProbe(probe: (focus: Vector3, camera: Vector3) => number): void { this.obstruction = probe; }
 
   configure(options: Readonly<{ mouseSensitivity: number; zoomSensitivity: number; smoothing: number; invertY: boolean }>): void {
     this.mouseSensitivity = Math.max(0.25, Math.min(2.5, options.mouseSensitivity));

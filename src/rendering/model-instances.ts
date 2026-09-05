@@ -15,9 +15,14 @@ export class ModelInstances {
     let material: Material;
     if (source instanceof MultiMaterial) {
       // Avoid Babylon 8.26 AssetContainer cloneMaterials mutating template subMaterials.
-      const multi = new MultiMaterial(name, source.getScene());
-      multi.subMaterials = source.subMaterials.map(child => child ? this.materialFor(child, tint) : null);
-      material = multi;
+      if (tint === undefined) {
+        for (const child of source.subMaterials) if (child) this.materialFor(child);
+        material = source;
+      } else {
+        const multi = new MultiMaterial(name, source.getScene());
+        multi.subMaterials = source.subMaterials.map(child => child ? this.materialFor(child, tint) : null);
+        material = multi;
+      }
     } else {
       material = tint === undefined ? source : source.clone(name) ?? source;
       const color = tint === undefined ? undefined : Color3.FromHexString(`#${tint.toString(16).padStart(6, '0')}`);
@@ -29,17 +34,23 @@ export class ModelInstances {
   }
 
   create(container: AssetContainer, name: string, tint?: number) {
-    const entries = container.instantiateModelsToScene(source => `${name}-${source}`, false, { doNotInstantiate: true });
+    const entries = container.instantiateModelsToScene(source => `${name}-${source}`, false,
+      { doNotInstantiate: container.animationGroups.length > 0 || container.skeletons.length > 0 || tint !== undefined });
     entries.animationGroups.forEach(group => { group.stop(); group.reset(); });
     entries.skeletons.forEach(skeleton => skeleton.returnToRest());
     const root = new TransformNode(name, container.scene);
-    for (const node of entries.rootNodes) node.parent = root;
+    const pose = entries.animationGroups.length ? new TransformNode(`${name}-pose`, container.scene) : root;
+    if (pose !== root) pose.parent = root;
+    for (const node of entries.rootNodes) node.parent = pose;
     for (const mesh of root.getChildMeshes()) {
-      if (mesh.material) mesh.material = this.materialFor(mesh.material, tint);
+      if (mesh.material) {
+        const material = this.materialFor(mesh.material, tint);
+        if (mesh.material !== material) mesh.material = material;
+      }
     }
     let disposed = false;
     return {
-      root, animations: entries.animationGroups,
+      root, pose, animations: entries.animationGroups,
       dispose: () => {
         if (disposed) return;
         disposed = true;

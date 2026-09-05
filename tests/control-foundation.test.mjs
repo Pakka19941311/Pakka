@@ -124,6 +124,20 @@ test('jump is grounded, uses gravity and rejects double jump', () => {
   assert.equal(motor.requestJump(), true);
 });
 
+test('a full reversal changes facing and completes the visual turn instead of locking to the old heading', () => {
+  const motor = new CharacterMotor();
+  for (let frame = 0; frame < 60; frame++) motor.step({ x: 0, z: 1 }, 6, 1 / 60);
+  let yaw = 0;
+  let step;
+  for (let frame = 0; frame < 12; frame++) {
+    step = motor.step({ x: 0, z: -1 }, 6, 1 / 60);
+    yaw = smoothAngle(yaw, Math.atan2(step.facingX, step.facingZ), 16, 1 / 60);
+  }
+  assert.ok(step.dz < 0, 'the body must move in the requested direction');
+  assert.ok(Math.cos(yaw) < -0.95, 'the visual heading must follow the reversal within 200 ms');
+  assert.ok(Math.abs(Math.sin(yaw)) < 0.2, 'the turn must settle without oscillation');
+});
+
 test('the same explicit click attacks at ranged distance but approaches in melee', () => {
   const target = { uid: 'wolf-range', alive: true, x: 8, z: 0 };
   const input = {

@@ -18,4 +18,6 @@ export class SimulationClock {
   }
 
   reset(): void { this.debt = 0; }
+
+  get alpha(): number { return Math.max(0, Math.min(1, this.debt / this.step)); }
 }

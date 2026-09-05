@@ -42,14 +42,11 @@ export class CharacterMotor {
     this.velocityZ += (inputZ * maxSpeed - this.velocityZ) * blend;
 
     if (length > 0.0001) {
-      const facingBlend = response(14, dt);
-      this.facingX += (inputX - this.facingX) * facingBlend;
-      this.facingZ += (inputZ - this.facingZ) * facingBlend;
-      const facingLength = Math.hypot(this.facingX, this.facingZ);
-      if (facingLength > 0.0001) {
-        this.facingX /= facingLength;
-        this.facingZ /= facingLength;
-      }
+      // The visual yaw already interpolates along the shortest arc in main.
+      // Normalizing a second vector lerp here locks exact 180-degree reversals:
+      // each small step remains positive and normalizes back to the old facing.
+      this.facingX = inputX;
+      this.facingZ = inputZ;
     }
 
     let dx = this.velocityX * dt;
@@ -96,4 +93,6 @@ export class CharacterMotor {
     this.velocityX = 0;
     this.velocityZ = 0;
   }
+
+  get grounded(): boolean { return this.onGround; }
 }

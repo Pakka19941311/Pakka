@@ -98,7 +98,9 @@ export class GameAudio {
 
   footstep(): void {
     if (this.stepCooldown > 0) return;
-    this.stepCooldown = 0.34;
+    // Foot contacts come from the actual locomotion phase; only suppress bursts
+    // when several contacts were crossed during one very slow rendered frame.
+    this.stepCooldown = 0.09;
     this.play('footstep', 0.38 + Math.random() * 0.12, 0.94 + Math.random() * 0.12);
   }
 

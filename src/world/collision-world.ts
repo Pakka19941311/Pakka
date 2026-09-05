@@ -1,7 +1,7 @@
 export type Point2 = Readonly<{ x: number; z: number }>;
 
-type CircleObstacle = Readonly<{ kind: 'circle'; x: number; z: number; radius: number }>;
-type BoxObstacle = Readonly<{ kind: 'box'; x: number; z: number; halfX: number; halfZ: number; rotation: number }>;
+type CircleObstacle = Readonly<{ kind: 'circle'; x: number; z: number; radius: number; bottom?: number; top?: number }>;
+type BoxObstacle = Readonly<{ kind: 'box'; x: number; z: number; halfX: number; halfZ: number; rotation: number; bottom?: number; top?: number }>;
 type Obstacle = CircleObstacle | BoxObstacle;
 
 export type CollisionMove = Readonly<{ x: number; z: number; blocked: boolean }>;
@@ -27,6 +27,7 @@ export class CollisionWorld {
   private readonly cells = new Map<string, Obstacle[]>();
   private readonly cellSize = 8;
   candidateChecks = 0;
+  private readonly cameraCandidates = new Set<Obstacle>();
 
   clear(): void {
     this.obstacles.length = 0;
@@ -45,12 +46,12 @@ export class CollisionWorld {
     }
   }
 
-  addCircle(x: number, z: number, radius: number): void {
-    if (radius > 0) this.insert({ kind: 'circle', x, z, radius }, radius, radius);
+  addCircle(x: number, z: number, radius: number, bottom?: number, top?: number): void {
+    if (radius > 0) this.insert({ kind: 'circle', x, z, radius, bottom, top }, radius, radius);
   }
 
-  addBox(x: number, z: number, halfX: number, halfZ: number, rotation = 0): void {
-    if (halfX > 0 && halfZ > 0) this.insert({ kind: 'box', x, z, halfX, halfZ, rotation },
+  addBox(x: number, z: number, halfX: number, halfZ: number, rotation = 0, bottom?: number, top?: number): void {
+    if (halfX > 0 && halfZ > 0) this.insert({ kind: 'box', x, z, halfX, halfZ, rotation, bottom, top },
       Math.abs(Math.cos(rotation)) * halfX + Math.abs(Math.sin(rotation)) * halfZ,
       Math.abs(Math.sin(rotation)) * halfX + Math.abs(Math.cos(rotation)) * halfZ);
   }
@@ -139,5 +140,49 @@ export class CollisionWorld {
 
   get size(): number {
     return this.obstacles.length;
+  }
+
+  /** Camera sphere sweep against only nearby, height-bounded static colliders.
+   * No scene traversal, triangle picking or new physics engine. */
+  cameraDistance(from: Point2 & { y: number }, to: Point2 & { y: number }, radius = 0.22): number {
+    const dx = to.x - from.x, dy = to.y - from.y, dz = to.z - from.z;
+    const length = Math.hypot(dx, dy, dz);
+    let closest = 1;
+    this.cameraCandidates.clear();
+    for (let x = Math.floor((Math.min(from.x, to.x) - radius) / this.cellSize); x <= Math.floor((Math.max(from.x, to.x) + radius) / this.cellSize); x++) {
+      for (let z = Math.floor((Math.min(from.z, to.z) - radius) / this.cellSize); z <= Math.floor((Math.max(from.z, to.z) + radius) / this.cellSize); z++) {
+        const bucket = this.cells.get(`${x}:${z}`);
+        if (bucket) for (const obstacle of bucket) this.cameraCandidates.add(obstacle);
+      }
+    }
+    for (const obstacle of this.cameraCandidates) {
+      if (obstacle.bottom === undefined || obstacle.top === undefined) continue;
+      let near = 0, far = closest;
+      const slab = (origin: number, direction: number, low: number, high: number): boolean => {
+        if (Math.abs(direction) < 1e-8) return origin >= low && origin <= high;
+        const a = (low - origin) / direction, b = (high - origin) / direction;
+        near = Math.max(near, Math.min(a, b)); far = Math.min(far, Math.max(a, b));
+        return near <= far;
+      };
+      if (!slab(from.y, dy, obstacle.bottom - radius, obstacle.top + radius)) continue;
+      if (obstacle.kind === 'circle') {
+        const sx = from.x - obstacle.x, sz = from.z - obstacle.z, r = obstacle.radius + radius;
+        const a = dx * dx + dz * dz, b = 2 * (sx * dx + sz * dz), c = sx * sx + sz * sz - r * r;
+        if (a < 1e-8) { if (c > 0) continue; }
+        else {
+          const discriminant = b * b - 4 * a * c;
+          if (discriminant < 0) continue;
+          near = Math.max(near, (-b - Math.sqrt(discriminant)) / (2 * a));
+          far = Math.min(far, (-b + Math.sqrt(discriminant)) / (2 * a));
+        }
+      } else {
+        const cosine = Math.cos(obstacle.rotation), sine = Math.sin(obstacle.rotation);
+        const sx = from.x - obstacle.x, sz = from.z - obstacle.z;
+        if (!slab(sx * cosine - sz * sine, dx * cosine - dz * sine, -obstacle.halfX - radius, obstacle.halfX + radius)) continue;
+        if (!slab(sx * sine + sz * cosine, dx * sine + dz * cosine, -obstacle.halfZ - radius, obstacle.halfZ + radius)) continue;
+      }
+      if (near <= far && far >= 0) closest = Math.max(0, near);
+    }
+    return length * closest;
   }
 }

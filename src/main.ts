@@ -54,6 +54,7 @@ import { addOrStackItem, applyExperience, equipmentSlot, resolveEnhancement } fr
 import { LocalGameGateway } from './network/game-gateway';
 import { CombatControl } from './controls/combat-controller';
 import { CharacterMotor, smoothAngle } from './controls/character-motor';
+import { slidePastActor } from './controls/actor-spacing';
 import { PlayerInputController } from './controls/input-controller';
 import { TargetingController } from './controls/targeting-controller';
 import { ThirdPersonCameraController } from './controls/third-person-camera';
@@ -82,6 +83,8 @@ import { resolveChainLightning } from './combat/chain-lightning';
 import { SimulationClock } from './core/simulation-clock';
 import { FrameTelemetry, ResolutionGovernor, renderScaling, effectiveRenderBudget } from './rendering/frame-budget';
 import { ModelInstances } from './rendering/model-instances';
+import { ActorAnimation } from './rendering/actor-animation';
+import type { ActorAction } from './rendering/actor-animation';
 import { TerrainSurface } from './world/terrain-surface';
 import { createStaticPart } from './rendering/static-part';
 
@@ -214,6 +217,15 @@ type Entity = {
   baseScale?: Vector3;
   pickVolume?: Mesh;
   animations: AnimationGroup[];
+  motion?: ActorAnimation;
+  nearby?: Entity[];
+  attackToken?: number;
+  activeAttack?: { token: number; target: Entity; impacted: boolean };
+  previousX?: number;
+  previousZ?: number;
+  previousSupportY?: number;
+  verticalOffset?: number;
+  previousVerticalOffset?: number;
   actionType?: string;
   label?: Mesh;
   labelTexture?: DynamicTexture;
@@ -576,12 +588,7 @@ function updateActorVisibility(dt: number): void {
       entity.visualActive = visible;
       entity.root?.setEnabled(visible);
       entity.pickVolume?.setEnabled(visible && entity.alive);
-      if (!visible) entity.animations.forEach(group => group.stop());
-      else {
-        const action = entity.actionType as 'walk' | 'idle' | 'attack' | 'death' | undefined;
-        entity.actionType = undefined;
-        setEntityAction(entity, entity.alive ? (action ?? 'idle') : 'death', !entity.alive);
-      }
+      entity.motion?.setVisible(visible);
     }
     entity.label?.setEnabled(visible && entity.alive && (distance < (entity.kind === 'npc' ? 24 : 18) || targeting.isSelected(entity)));
   }
@@ -695,23 +702,19 @@ function normalizeHeight(root: TransformNode, targetHeight: number): void {
   root.position.y -= corrected.min.y;
 }
 
-function setEntityAction(entity: Entity, action: 'idle' | 'walk' | 'attack' | 'death', once = false): void {
+function setEntityAction(entity: Entity, action: ActorAction, once = false): void {
+  if (entity.activeAttack && (action === 'idle' || action === 'walk')) return;
   if (entity.actionType === action && !once) return;
-  if (entity.visualActive === false) { entity.actionType = action; return; }
-  const terms: Record<string, string[]> = {
-    idle: ['idle', 'survey'], walk: ['walk', 'run', 'flying'],
-    attack: ['sword_attack', 'dagger_attack', 'bow_shoot', 'attack', 'spell', 'shoot', 'cast'],
-    death: ['death', 'die'],
-  };
-  const group = terms[action]
-    .map((term) => entity.animations.find((candidate) => candidate.name.toLowerCase().includes(term)))
-    .find(Boolean) ?? entity.animations[action === 'attack' ? 1 : 0];
-  if (!group) return;
-  entity.animations.forEach((candidate) => {
-    if (candidate !== group && candidate.isPlaying) candidate.stop();
-  });
-  group.start(!once, 1, group.from, group.to, false);
+  if (action === 'attack') entity.motion?.beginAttack();
+  else entity.motion?.request(action, once);
   entity.actionType = action;
+}
+
+function cancelActorAttack(entity: Entity): void {
+  if (!entity.activeAttack) return;
+  entity.attackToken = (entity.attackToken ?? 0) + 1;
+  entity.activeAttack = undefined;
+  setEntityAction(entity, 'idle', true);
 }
 
 function createEntityModel(entity: Entity): void {
@@ -739,6 +742,11 @@ function createEntityModel(entity: Entity): void {
     entity.normalizationKey = normalizationKey;
   }
   entity.visualGeneration = (entity.visualGeneration ?? 0) + 1;
+  entity.motion = new ActorAnimation(entity.model, entity.targetHeight, entity.animations, instance.pose,
+    entity.root.scaling.y, entity.kind === 'player');
+  entity.previousX = entity.x; entity.previousZ = entity.z;
+  entity.previousSupportY = terrain.supportAt(entity.x, entity.z);
+  entity.verticalOffset = 0; entity.previousVerticalOffset = 0;
   tintMeshes(entity.root, entity.tint);
   entity.root.getChildMeshes().forEach((mesh) => {
     mesh.metadata = { entity };
@@ -763,6 +771,7 @@ function createEntityModel(entity: Entity): void {
 }
 
 function disposeEntityVisual(entity: Entity): void {
+  cancelActorAttack(entity);
   entity.root?.getChildMeshes().forEach(mesh => { shadowCasters.delete(mesh); shadows.removeShadowCaster(mesh); });
   entity.pickVolume?.dispose(false, false);
   entity.pickVolume = undefined;
@@ -772,6 +781,7 @@ function disposeEntityVisual(entity: Entity): void {
   entity.releaseVisual?.();
   entity.releaseVisual = undefined;
   entity.animations = [];
+  entity.motion = undefined;
   entity.root = null;
   // Preserve canonical normalization across death; replacement models use a new key.
   entity.actionType = undefined;
@@ -785,6 +795,11 @@ function recreateEntityVisual(entity: Entity): void {
 function syncEntityTransform(entity: Entity, verticalOffset = 0): void {
   const supportY = terrain.supportAt(entity.x, entity.z);
   entity.supportY = supportY;
+  entity.verticalOffset = verticalOffset;
+  if (Math.hypot(entity.x - (entity.previousX ?? entity.x), entity.z - (entity.previousZ ?? entity.z)) > 3.5) {
+    entity.previousX = entity.x; entity.previousZ = entity.z;
+    entity.previousSupportY = supportY; entity.previousVerticalOffset = verticalOffset;
+  }
   entity.root?.position.set(entity.x, supportY + (entity.baseY ?? 0) + verticalOffset, entity.z);
   if (entity.pickVolume) {
     entity.pickVolume.position.x = entity.x;
@@ -792,6 +807,20 @@ function syncEntityTransform(entity: Entity, verticalOffset = 0): void {
     entity.pickVolume.position.y = supportY + entity.pickVolume.metadata.centerY + verticalOffset;
   }
   entity.label?.position.set(entity.x, supportY + entity.targetHeight + 0.65 + verticalOffset, entity.z);
+}
+
+function presentActors(alpha: number): void {
+  for (const entity of state.entities) {
+    if (!entity.root || entity.visualActive === false) continue;
+    const x = (entity.previousX ?? entity.x) + (entity.x - (entity.previousX ?? entity.x)) * alpha;
+    const z = (entity.previousZ ?? entity.z) + (entity.z - (entity.previousZ ?? entity.z)) * alpha;
+    const support = terrain.supportAt(x, z);
+    const jump = (entity.previousVerticalOffset ?? 0) + ((entity.verticalOffset ?? 0) - (entity.previousVerticalOffset ?? 0)) * alpha;
+    entity.root.position.set(x, support + (entity.baseY ?? 0) + jump, z);
+    entity.pickVolume?.position.set(x, support + entity.pickVolume.metadata.centerY + jump, z);
+    entity.label?.position.set(x, support + entity.targetHeight + 0.65 + jump, z);
+    entity.motion?.render();
+  }
 }
 
 function labelMaterial(entity: Entity, height = 96): { material: StandardMaterial; texture: DynamicTexture } {
@@ -878,8 +907,9 @@ function registerWorldCollider(name: string, root: TransformNode, x: number, z: 
   const dx = (min.x + max.x) / 2 - x, dz = (min.z + max.z) / 2 - z;
   const cx = x + dx * Math.cos(rotation) + dz * Math.sin(rotation);
   const cz = z - dx * Math.sin(rotation) + dz * Math.cos(rotation);
-  if (ROUND_PROPS.has(name)) collisionWorld.addCircle(cx, cz, Math.max(0.07, Math.max(halfX, halfZ) * (name.startsWith('tree') ? 0.18 : 1)));
-  if (SOLID_PROPS.has(name)) collisionWorld.addBox(cx, cz, halfX, halfZ, rotation);
+  const bottom = terrain.heightAt(cx, cz), top = bottom + max.y - min.y;
+  if (ROUND_PROPS.has(name)) collisionWorld.addCircle(cx, cz, Math.max(0.07, Math.max(halfX, halfZ) * (name.startsWith('tree') ? 0.18 : 1)), bottom, top);
+  if (SOLID_PROPS.has(name)) collisionWorld.addBox(cx, cz, halfX, halfZ, rotation, bottom, top);
   if (name === 'wall-arch') {
     const side = halfX * 0.88;
     const cosine = Math.cos(rotation);
@@ -928,9 +958,10 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
-  if (name === 'Barrel_01') collisionWorld.addCircle(cx, cz, Math.max(halfX, halfZ));
-  else if (name === 'dead_tree_trunk' || name === 'tree_stump_01') collisionWorld.addCircle(cx, cz, Math.max(0.25, Math.min(halfX, halfZ) * 0.65));
-  else collisionWorld.addBox(cx, cz, halfX, halfZ, rotation);
+  const bottom = terrain.heightAt(cx, cz), top = bottom + height;
+  if (name === 'Barrel_01') collisionWorld.addCircle(cx, cz, Math.max(halfX, halfZ), bottom, top);
+  else if (name === 'dead_tree_trunk' || name === 'tree_stump_01') collisionWorld.addCircle(cx, cz, Math.max(0.25, Math.min(halfX, halfZ) * 0.65), bottom, top);
+  else collisionWorld.addBox(cx, cz, halfX, halfZ, rotation, bottom, top);
   return instance.root;
 }
 
@@ -944,12 +975,13 @@ function realismModelPart(partName: string, x: number, z: number, height: number
   tintMeshes(root);
   root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
   // Colliders are registered only after a real visual exists, using that visual's bounds.
+  const bottom = terrain.heightAt(x, z), top = bottom + height;
   if (partName.includes('gate')) {
     const offset = size.x * 0.41;
     for (const side of [-1, 1]) collisionWorld.addBox(x + Math.cos(rotation) * offset * side,
-      z - Math.sin(rotation) * offset * side, size.x * 0.09, size.z * 0.5, rotation);
-  } else if (partName.includes('tower')) collisionWorld.addCircle(x, z, Math.min(size.x, size.z) * 0.44);
-  else collisionWorld.addBox(x, z, size.x * 0.5, size.z * 0.5, rotation);
+      z - Math.sin(rotation) * offset * side, size.x * 0.09, size.z * 0.5, rotation, bottom, top);
+  } else if (partName.includes('tower')) collisionWorld.addCircle(x, z, Math.min(size.x, size.z) * 0.44, bottom, top);
+  else collisionWorld.addBox(x, z, size.x * 0.5, size.z * 0.5, rotation, bottom, top);
   return root;
 }
 
@@ -985,7 +1017,7 @@ function createPineTree(name: string, x: number, z: number, height: number, rota
     shadowCasters.add(mesh);
     assignWorldSector(mesh, x, z);
   }
-  collisionWorld.addCircle(x, z, height * 0.06 + 0.03);
+  collisionWorld.addCircle(x, z, height * 0.06 + 0.03, terrain.heightAt(x, z), terrain.heightAt(x, z) + height);
 }
 
 const townMaterials = new Map<number, StandardMaterial>();
@@ -1591,12 +1623,59 @@ function entityCollisionRadius(entity: Entity): number {
   return entity.kind === 'player' ? 0.46 : 0.42;
 }
 
+function actorBodyRadius(entity: Entity): number {
+  if (entity.kind === 'player') return 0.46;
+  if (entity.boss === 'big') return 1.4;
+  if (entity.boss === 'mini') return 1;
+  return entity.model === 'Fox' ? Math.max(0.68, Math.min(1, entity.targetHeight * 0.6)) : 0.46;
+}
+
+function monsterReach(entity: Entity): number { return Math.max(1.65, actorBodyRadius(entity) + 0.64); }
+
+const crowdCells = new Map<number, Entity[]>();
+const usedCrowdCells: Entity[][] = [];
+function crowdKey(x: number, z: number): number { return (Math.floor(x / 10) + 64) * 128 + Math.floor(z / 10) + 64; }
+function rebuildCrowdCells(): void {
+  for (const bucket of usedCrowdCells) bucket.length = 0;
+  usedCrowdCells.length = 0;
+  for (const entity of state.entities) {
+    if (!entity.alive) continue;
+    const key = crowdKey(entity.x, entity.z);
+    let bucket = crowdCells.get(key);
+    if (!bucket) { bucket = []; crowdCells.set(key, bucket); }
+    if (!bucket.length) usedCrowdCells.push(bucket);
+    bucket.push(entity);
+  }
+}
+function nearbyActors(entity: Entity): Entity[] {
+  const result = entity.nearby ??= [];
+  result.length = 0;
+  const key = crowdKey(entity.x, entity.z);
+  for (let dx = -1; dx <= 1; dx++) for (let dz = -1; dz <= 1; dz++) {
+    const bucket = crowdCells.get(key + dx * 128 + dz);
+    if (bucket) for (const other of bucket) result.push(other);
+  }
+  return result;
+}
+
+function restrictActorOverlap(entity: Entity, from: Readonly<{ x: number; z: number }>, delta: Readonly<{ x: number; z: number }>) {
+  if (entity.kind !== 'player' && entity.kind !== 'monster' && entity.kind !== 'summon') return delta;
+  let result = delta;
+  for (const other of nearbyActors(entity)) {
+    if (other === entity || !other.alive || (other.kind !== 'player' && other.kind !== 'monster')) continue;
+    const radius = actorBodyRadius(entity) + actorBodyRadius(other);
+    if (Math.abs(other.x - from.x) > radius + Math.abs(result.x) || Math.abs(other.z - from.z) > radius + Math.abs(result.z)) continue;
+    result = slidePastActor(from, result, other, radius);
+  }
+  return result;
+}
+
 function moveEntityWithCollision(entity: Entity, dx: number, dz: number, avoidStuck = false): boolean {
   const from = { x: entity.x, z: entity.z };
-  let resolved = collisionWorld.resolve(from, { x: dx, z: dz }, entityCollisionRadius(entity));
+  let resolved = collisionWorld.resolve(from, restrictActorOverlap(entity, from, { x: dx, z: dz }), entityCollisionRadius(entity));
   if (avoidStuck && resolved.blocked && Math.hypot(resolved.x - from.x, resolved.z - from.z) < 0.0001) {
     const direction = entity.uid.charCodeAt(entity.uid.length - 1) % 2 ? 1 : -1;
-    resolved = collisionWorld.resolve(from, { x: -dz * direction, z: dx * direction }, entityCollisionRadius(entity));
+    resolved = collisionWorld.resolve(from, restrictActorOverlap(entity, from, { x: -dz * direction, z: dx * direction }), entityCollisionRadius(entity));
   }
   entity.x = resolved.x;
   entity.z = resolved.z;
@@ -1614,7 +1693,7 @@ function resetPlayerControl(clearTarget = false): void {
   combatControl.cancelPursuit();
   playerMotor.reset();
   const hero = state.entities.find(entity => entity.kind === 'player');
-  if (hero) { hero.navPath = undefined; hero.navCooldown = 0; }
+  if (hero) { cancelActorAttack(hero); hero.navPath = undefined; hero.navCooldown = 0; }
   if (clearTarget) {
     targeting.clear();
     setTargetOutline(outlinedTarget, false);
@@ -1673,8 +1752,15 @@ function updateTargetIndicator(): void {
   targetIndicator.setEnabled(true);
 }
 
+let qaMotionSample: (() => void) | undefined;
 function update(dt: number): void {
   if (!state.started || state.paused) return;
+  rebuildCrowdCells();
+  for (const entity of state.entities) {
+    entity.previousX = entity.x; entity.previousZ = entity.z;
+    entity.previousSupportY = entity.supportY;
+    entity.previousVerticalOffset = entity.verticalOffset;
+  }
   state.worldTime = 12.5;
   state.gateWarn = Math.max(0, state.gateWarn - dt);
   const hero = playerEntity();
@@ -1685,6 +1771,11 @@ function update(dt: number): void {
   player.mp = Math.min(player.maxMp, player.mp + player.maxMp * 0.022 * dt);
 
   const target = targeting.validate();
+  if (hero.activeAttack && (hero.activeAttack.target !== target || !target?.alive)) cancelActorAttack(hero);
+  if (inputControl.consumeJump() && playerMotor.requestJump()) {
+    cancelActorAttack(hero);
+    combatControl.cancelPursuit();
+  }
   const axes = inputControl.movementAxes();
   const manualMovement = Math.hypot(axes.forward, axes.strafe) > 0.0001;
   const combatDecision = combatControl.plan({
@@ -1692,13 +1783,14 @@ function update(dt: number): void {
     target,
     basicRange: attackRange(),
     skillRange: () => attackRange(),
-    canBasicAttack: player.attackCd <= 0,
-    canUseSkill: (index) => player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
+    canBasicAttack: player.attackCd <= 0 && !hero.activeAttack && playerMotor.grounded,
+    canUseSkill: (index) => !hero.activeAttack && playerMotor.grounded && player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
   });
 
   let desiredDirection: Readonly<{ x: number; z: number }> = { x: 0, z: 0 };
   let maxMoveDistance = Infinity;
   if (manualMovement) {
+    cancelActorAttack(hero);
     state.moveTarget = null;
     state.interactionTarget = null;
     combatControl.cancelPursuit();
@@ -1707,7 +1799,7 @@ function update(dt: number): void {
     syncMovementIntent(desiredDirection, dt);
   } else {
     syncMovementIntent(null, dt);
-    const destination = combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
+    const destination = hero.activeAttack ? null : combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
     if (destination) {
       // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
       const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
@@ -1721,12 +1813,18 @@ function update(dt: number): void {
         maxMoveDistance = distance;
       }
     }
-    if (combatDecision.kind === 'attack') performAttack(combatDecision.skillIndex);
+    if ((combatDecision.kind === 'attack' || combatDecision.kind === 'wait') && target) {
+      playerMotor.stopPlanar();
+      rotateTowardsSmooth(hero, target.x, target.z, dt);
+      const desiredYaw = Math.atan2(target.x - player.x, target.z - player.z);
+      const facing = Math.cos(desiredYaw - (hero.root?.rotation.y ?? desiredYaw));
+      if (combatDecision.kind === 'attack' && facing > 0.97) performAttack(combatDecision.skillIndex);
+    }
   }
 
-  if (inputControl.consumeJump()) playerMotor.requestJump();
   const motion = playerMotor.step(desiredDirection, player.stats.speed, dt, maxMoveDistance);
-  const resolvedPlayer = collisionWorld.resolve(player, { x: motion.dx, z: motion.dz }, 0.46);
+  const actorDelta = restrictActorOverlap(hero, player, { x: motion.dx, z: motion.dz });
+  const resolvedPlayer = collisionWorld.resolve(player, actorDelta, 0.46);
   player.x = resolvedPlayer.x;
   player.z = resolvedPlayer.z;
   // Keep intent while sliding; repeatedly zeroing acceleration at a contact caused sticky walls.
@@ -1738,9 +1836,9 @@ function update(dt: number): void {
   if (moved && hero.root) {
     const desiredAngle = Math.atan2(motion.facingX, motion.facingZ);
     hero.root.rotation.y = smoothAngle(hero.root.rotation.y, desiredAngle, 16, dt);
-    setEntityAction(hero, 'walk');
-    gameAudio.footstep();
-  } else if (hero.actionType === 'walk') setEntityAction(hero, 'idle');
+    setEntityAction(hero, motion.grounded ? 'walk' : 'jump');
+  } else if (!motion.grounded) setEntityAction(hero, 'jump');
+  else if (hero.actionType === 'walk' || hero.actionType === 'jump') setEntityAction(hero, 'idle');
   if (state.interactionTarget && Math.hypot(state.interactionTarget.x - player.x, state.interactionTarget.z - player.z) < 3.2) {
     const npc = state.interactionTarget;
     state.interactionTarget = null;
@@ -1750,11 +1848,17 @@ function update(dt: number): void {
   hero.x = player.x;
   hero.z = player.z;
   syncEntityTransform(hero, motion.height);
+  const previousPhase = hero.motion?.phase ?? 0;
+  hero.motion?.advance(dt, Math.hypot(player.x - (hero.previousX ?? player.x), player.z - (hero.previousZ ?? player.z)));
+  const phase = hero.motion?.phase ?? 0;
+  if (motion.grounded && hero.actionType === 'walk' && moved
+    && [0.24, 0.75].some(contact => phase >= previousPhase ? previousPhase < contact && phase >= contact : previousPhase < contact || phase >= contact)) gameAudio.footstep();
   for (const entity of state.entities) {
     if (entity.kind === 'monster') updateMonster(entity, dt);
     else if (entity.kind === 'summon') updateSummon(entity, dt);
     else if (entity.kind === 'npc') updateTownNpc(entity, dt);
     else if (entity.kind === 'ambient') updateAmbientResident(entity, dt);
+    if (entity !== hero) entity.motion?.advance(dt, Math.hypot(entity.x - (entity.previousX ?? entity.x), entity.z - (entity.previousZ ?? entity.z)));
   }
   state.effects.forEach((effect) => effect.update(dt));
   state.effects = state.effects.filter((effect) => !effect.dead);
@@ -1763,6 +1867,7 @@ function update(dt: number): void {
   gameAudio.setRegion(zoneAt(player.x, player.z).kind === 'safe');
   state.bossTimers.mini = Math.max(0, state.bossTimers.mini - dt);
   state.bossTimers.big = Math.max(0, state.bossTimers.big - dt);
+  if (__QA_BUILD__) qaMotionSample?.();
 }
 
 function restoreEntityAfterRespawn(entity: Entity): void {
@@ -1814,6 +1919,7 @@ function updateMonster(entity: Entity, dt: number): void {
   const dz = player.z - entity.z;
   const distance = Math.hypot(dx, dz);
   const safe = zoneAt(player.x, player.z).kind === 'safe' || state.playerBuffs.vanish > 0;
+  if (safe || player.dead) cancelActorAttack(entity);
   const homeX = entity.homeX ?? entity.x;
   const homeZ = entity.homeZ ?? entity.z;
   const homeDistance = Math.hypot(entity.x - homeX, entity.z - homeZ);
@@ -1834,7 +1940,7 @@ function updateMonster(entity: Entity, dt: number): void {
     atPatrolPoint,
     aggroRadius: entity.aggroRadius ?? 9,
     leashRadius: entity.leashRadius ?? 14,
-    attackRange: 1.65,
+    attackRange: monsterReach(entity),
   });
   if (!decision) return;
   entity.aiState = decision.state;
@@ -1842,7 +1948,12 @@ function updateMonster(entity: Entity, dt: number): void {
     entity.patrolIndex = ((entity.patrolIndex ?? 0) + 1) % patrol.length;
   }
   if (entity.status.stun) {
+    cancelActorAttack(entity);
     setEntityAction(entity, 'idle');
+  } else if (entity.activeAttack && !safe && homeDistance < (entity.leashRadius ?? 14)) {
+    // Finish the committed swing; moving out of reach avoids its hit without
+    // restarting chase/attack on every tick at the range boundary.
+    rotateTowardsSmooth(entity, player.x, player.z, dt);
   } else if (decision.intent === 'chase') {
     const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
     const moved = moveEntityAlongNavigation(entity, player, speed, dt, entityCollisionRadius(entity));
@@ -1851,18 +1962,24 @@ function updateMonster(entity: Entity, dt: number): void {
   } else if (decision.intent === 'attack') {
     rotateTowardsSmooth(entity, player.x, player.z, dt);
     if (entity.attackCd <= 0) {
-      setEntityAction(entity, 'attack', true);
+      const token = entity.attackToken = (entity.attackToken ?? 0) + 1;
+      entity.activeAttack = { token, target: playerEntity(), impacted: false };
+      const timings = entity.motion?.beginAttack() ?? combatTimings('monster');
+      entity.actionType = 'attack';
       entity.attackCd = entity.boss ? 1.45 : 2.05;
       const generation = entity.visualGeneration;
-      queueAttackTimeline(new AttackTimeline(combatTimings('monster')), () => {
-        if (entity.alive && Math.hypot(player.x - entity.x, player.z - entity.z) < 2.3) {
+      queueAttackTimeline(new AttackTimeline(timings), () => {
+        if (entity.alive && Math.hypot(player.x - entity.x, player.z - entity.z) < monsterReach(entity) + 0.25) {
           hurtPlayer(Math.max(1, Math.round((entity.atk ?? 1) - player.stats.def * 0.2)));
         }
       }, () => {
-        if (entity.alive && entity.visualGeneration === generation && entity.actionType === 'attack') setEntityAction(entity, 'idle');
-      });
+        if (entity.alive && entity.visualGeneration === generation && entity.attackToken === token) {
+          entity.activeAttack = undefined; setEntityAction(entity, 'idle');
+        }
+      }, () => entity.alive && entity.visualGeneration === generation && entity.attackToken === token && !player.dead);
     }
   } else if (decision.intent === 'return') {
+    cancelActorAttack(entity);
     const moved = moveEntityAlongNavigation(entity, { x: homeX, z: homeZ }, monsterMovementSpeed(Boolean(entity.boss)) * 0.9, dt, entityCollisionRadius(entity));
     rotateTowardsSmooth(entity, homeX, homeZ, dt);
     setEntityAction(entity, moved ? 'walk' : 'idle');
@@ -1943,6 +2060,8 @@ function castSkill(index: number): void {
 function performAttack(skillIndex: number | null): void {
   const target = targeting.validate();
   if (!target) return combatControl.cancelPursuit();
+  const hero = playerEntity();
+  if (hero.activeAttack || !playerMotor.grounded || Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + 0.05) return;
   const skill = skillIndex === null ? null : CLASSES_MAP[player.classId].skills[skillIndex];
   if (skillIndex !== null) {
     if (!skill || player.cooldowns[skillIndex] > 0 || player.mp < skill.cost) return;
@@ -1952,21 +2071,26 @@ function performAttack(skillIndex: number | null): void {
   const ranged = CLASSES_MAP[player.classId].ranged;
   player.attackCd = classCombatProfile(player.classId, player.level, player.stats).attackInterval;
   combatControl.completeAttack(skillIndex);
-  const hero = playerEntity();
-  rotateTowards(hero, target.x, target.z);
-  setEntityAction(hero, 'attack', true);
-  playSfx(skill?.fx ?? 'attack');
-  gameAudio.play(ranged ? 'swordClash' : 'swordSwing', ranged ? 0.34 : 0.7, 0.94 + Math.random() * 0.12);
+  playerMotor.stopPlanar();
+  const token = hero.attackToken = (hero.attackToken ?? 0) + 1;
+  hero.activeAttack = { token, target, impacted: false };
+  hero.actionType = 'attack';
+  const timings = hero.motion?.beginAttack(player.attackCd * 0.92) ?? combatTimings(ranged ? 'ranged' : 'melee');
+  const generation = target.visualGeneration;
   const magic = player.classId === 'mage' || player.classId === 'necro';
   const base = magic ? player.stats.matk : rand(player.stats.atkMin, player.stats.atkMax);
   const multiplier = skill?.mul ?? 1;
   const critical = Math.random() < player.stats.crit / 100;
   const damage = Math.max(1, Math.round(base * multiplier * (critical ? classCombatProfile(player.classId, player.level, player.stats).critMultiplier : 1)));
   void gateway.send({ type: 'attack', entityId: target.uid, skillIndex });
-  const attackKind = magic ? 'spell' : ranged ? 'ranged' : 'melee';
-  queueAttackTimeline(new AttackTimeline(combatTimings(attackKind)), () => {
+  queueAttackTimeline(new AttackTimeline(timings), () => {
     if (!target.alive || player.dead) return;
-    spawnAttackEffect(skill?.fx ?? (ranged ? 'arrow' : 'slash'), hero, target, () => {
+    if (hero.activeAttack) hero.activeAttack.impacted = true;
+    if (!ranged && Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + 0.25) return;
+    playSfx(skill?.fx ?? 'attack');
+    gameAudio.play(ranged ? 'swordClash' : 'swordSwing', ranged ? 0.34 : 0.7, 0.94 + Math.random() * 0.12);
+    spawnAttackEffect(skill?.fx ?? (magic ? 'fire' : ranged ? 'arrow' : 'slash'), hero, target, () => {
+      if (!target.alive || target.visualGeneration !== generation) return;
       if (skill?.chain) {
         const chainHits = resolveChainLightning(
           target,
@@ -2000,12 +2124,16 @@ function performAttack(skillIndex: number | null): void {
       if (skill?.summon) summonSkeleton();
     });
   }, () => {
-    if (!player.dead && hero.actionType === 'attack') setEntityAction(hero, 'idle');
-  });
+    if (hero.attackToken === token) {
+      hero.activeAttack = undefined;
+      if (!player.dead) setEntityAction(hero, 'idle');
+    }
+  }, () => !player.dead && hero.attackToken === token && target.alive && target.visualGeneration === generation);
 }
 
-function queueAttackTimeline(timeline: AttackTimeline, onImpact: () => void, onComplete?: () => void): void {
+function queueAttackTimeline(timeline: AttackTimeline, onImpact: () => void, onComplete?: () => void, valid?: () => boolean): void {
   state.effects.push({ update(dt) {
+    if (valid && !valid()) { onComplete?.(); this.dead = true; return; }
     const events = timeline.tick(dt);
     if (events.includes('impact')) onImpact();
     if (events.includes('complete')) {
@@ -2020,6 +2148,11 @@ function entityWorldPosition(entity: Entity, height = 1.4): Vector3 {
 }
 
 function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () => void): void {
+  if (type === 'slash') {
+    // A sword connects on its contact frame, not after a second projectile timer.
+    onHit?.();
+    return;
+  }
   if (type === 'lightning') {
     spawnLightningArc(from, to, onHit);
     return;
@@ -2138,28 +2271,12 @@ function damageMonster(entity: Entity, damage: number, critical = true, showEffe
 }
 
 function playHitReaction(entity: Entity): void {
-  const root = entity.root;
-  const baseScale = entity.baseScale?.clone();
-  const generation = entity.visualGeneration;
-  if (!root || !baseScale) return;
-  let life = 0;
-  state.effects.push({ update(dt) {
-    if (!entity.alive || entity.root !== root || entity.visualGeneration !== generation || root.isDisposed()) {
-      this.dead = true;
-      return;
-    }
-    life += dt;
-    const pulse = Math.sin(Math.min(1, life / 0.18) * Math.PI);
-    root.scaling.set(baseScale.x * (1 - pulse * 0.055), baseScale.y * (1 + pulse * 0.08), baseScale.z * (1 - pulse * 0.055));
-    if (life >= 0.18) {
-      root.scaling.copyFrom(baseScale);
-      this.dead = true;
-    }
-  } });
+  entity.motion?.reactToHit();
 }
 
 function killMonster(entity: Entity): void {
   if (!entity.alive) return;
+  cancelActorAttack(entity);
   entity.alive = false;
   if (entity.root && entity.baseScale) entity.root.scaling.copyFrom(entity.baseScale);
   entity.pickVolume?.setEnabled(false);
@@ -2276,7 +2393,7 @@ function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: nu
   const distance = Math.max(0.0001, Math.hypot(dx, dz));
   let separationX = 0;
   let separationZ = 0;
-  for (const neighbor of state.entities) {
+  for (const neighbor of nearbyActors(entity)) {
     if (neighbor === entity) continue;
     const sharesCrowd = entity.kind === 'monster'
       ? neighbor.kind === 'monster' && neighbor.alive
@@ -2285,7 +2402,7 @@ function moveEntityAlongNavigation(entity: Entity, destination: Readonly<{ x: nu
     const sx = entity.x - neighbor.x;
     const sz = entity.z - neighbor.z;
     const gap = Math.hypot(sx, sz);
-    const desiredGap = actorRadius + entityCollisionRadius(neighbor) + 0.18;
+    const desiredGap = actorBodyRadius(entity) + actorBodyRadius(neighbor) + 0.18;
     if (gap > 0.001 && gap < desiredGap) {
       separationX += (sx / gap) * (desiredGap - gap) * 0.85;
       separationZ += (sz / gap) * (desiredGap - gap) * 0.85;
@@ -2503,6 +2620,7 @@ canvas.addEventListener('pointerdown', (event) => {
   }
   if (entity) {
     if (entity.kind === 'monster') {
+      if (hero.activeAttack?.target !== entity) cancelActorAttack(hero);
       targeting.select(entity);
       combatControl.engageBasic(entity.uid);
       gameAudio.play('monsterAggro', entity.boss ? 0.65 : 0.28, entity.boss ? 0.78 : 1.05);
@@ -2512,6 +2630,7 @@ canvas.addEventListener('pointerdown', (event) => {
       return;
     }
     if (entity.kind === 'npc') {
+      cancelActorAttack(hero);
       combatControl.cancelPursuit();
       const distance = Math.hypot(entity.x - player.x, entity.z - player.z);
       if (distance < 3.2) interactNpc(entity);
@@ -2523,6 +2642,7 @@ canvas.addEventListener('pointerdown', (event) => {
     }
   }
   if ((hit.pickedMesh?.metadata as { ground?: boolean } | null)?.ground) {
+    cancelActorAttack(hero);
     state.moveTarget = collisionWorld.findNearestFree({ x: hit.pickedPoint.x, z: hit.pickedPoint.z }, 0.46);
     state.interactionTarget = null;
     combatControl.cancelPursuit();
@@ -2881,6 +3001,21 @@ document.addEventListener('visibilitychange', () => {
   skipFrameDelta = true;
 });
 let saveTimer = 0;
+const cameraProbeOrigin = new Vector3();
+cameraControl.setObstructionProbe((focus, desiredCamera) => {
+  const root = playerEntity().root;
+  const x = root?.position.x ?? player.x, z = root?.position.z ?? player.z;
+  cameraProbeOrigin.set(x, terrain.supportAt(x, z) + 1.25, z);
+  const length = Vector3.Distance(cameraProbeOrigin, desiredCamera);
+  let allowed = collisionWorld.cameraDistance(cameraProbeOrigin, desiredCamera);
+  for (let distance = 0.5; distance <= allowed; distance += 0.5) {
+    const t = distance / Math.max(0.001, length);
+    const sx = x + (desiredCamera.x - x) * t, sz = z + (desiredCamera.z - z) * t;
+    const y = cameraProbeOrigin.y + (desiredCamera.y - cameraProbeOrigin.y) * t;
+    if (y < terrain.heightAt(sx, sz) + 0.25) { allowed = Math.max(0, distance - 0.5); break; }
+  }
+  return Vector3.Distance(focus, desiredCamera) * allowed / Math.max(0.001, length);
+});
 engine.runRenderLoop(() => {
   if (document.hidden) { simulationClock.reset(); return; }
   const elapsed = skipFrameDelta ? 0 : engine.getDeltaTime() / 1000;
@@ -2903,7 +3038,12 @@ engine.runRenderLoop(() => {
     if (hudTimer >= 0.1) { hudTimer = 0; updateHud(); }
     if (minimapTimer >= 0.2) { minimapTimer = 0; drawMinimap(); }
   }
-  if (state.started) cameraControl.update(dt, { x: player.x, y: terrain.supportAt(player.x, player.z), z: player.z });
+  if (state.started) {
+    presentActors(state.paused ? 1 : simulationClock.alpha);
+    const root = playerEntity().root;
+    const x = root?.position.x ?? player.x, z = root?.position.z ?? player.z;
+    cameraControl.update(dt, { x, y: terrain.supportAt(x, z), z });
+  }
   // Resizing clears the drawing buffer. It must happen BEFORE drawing, never after.
   if (state.started && !state.paused && resolutionGovernor.sample(dt)) { applyRenderResolution(); applyRenderBudget(); }
   const beforeRender = performance.now();
@@ -2925,7 +3065,7 @@ engine.runRenderLoop(() => {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-b01-performance-test',
+    version: '0.6.0-motion-test',
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
       adaptiveScale: resolutionGovernor.scale, adaptiveDetails: resolutionGovernor.detailStep,
@@ -2953,6 +3093,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
 
 // Only compiled into the separate CI build. Never included in the downloadable game.
 if (__QA_BUILD__) {
+  const motionTrace: unknown[] = [];
   const actors = () => state.entities.map(entity => {
     const point = Vector3.Project(entityWorldPosition(entity, entity.targetHeight * 0.55), Matrix.Identity(),
       scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
@@ -2965,10 +3106,25 @@ if (__QA_BUILD__) {
       meshes: meshes.length, visible: meshes.some(mesh => mesh.isEnabled() && mesh.isVisible),
       ready: meshes.every(mesh => mesh.isReady(true)), animations: entity.animations.length,
       lifecycle: entity.lifecycle?.state, baseScale: entity.baseScale?.asArray(),
+      yaw: entity.root?.rotation.y, grounded: entity.kind === 'player' ? playerMotor.grounded : true,
+      attack: entity.activeAttack ? { token: entity.activeAttack.token, impacted: entity.activeAttack.impacted, target: entity.activeAttack.target.uid } : null,
+      motion: entity.motion ? { action: entity.motion.action, phase: entity.motion.phase, clip: entity.motion.clip,
+        starts: entity.motion.starts, activeGroups: entity.motion.activeGroups, playbackRate: entity.motion.playbackRate } : null,
       engaged: combatControl.isEngagedWith(entity.uid) };
   });
   Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
     actors,
+    recordMotion: (enabled: boolean) => {
+      if (enabled) motionTrace.length = 0;
+      qaMotionSample = enabled ? () => {
+        if (motionTrace.length >= 1800) return;
+        const hero = playerEntity(), target = targeting.selected;
+        motionTrace.push({ x: hero.x, z: hero.z, yaw: hero.root?.rotation.y, action: hero.motion?.action,
+          phase: hero.motion?.phase, clip: hero.motion?.clip, attackToken: hero.activeAttack?.token,
+          grounded: playerMotor.grounded, target: target?.uid, hp: target?.hp, targetX: target?.x, targetZ: target?.z });
+      } : undefined;
+    },
+    motionTrace: () => motionTrace,
     surface: (x: number, z: number) => ({ ground: terrain.heightAt(x, z), support: terrain.supportAt(x, z), blocked: collisionWorld.isBlocked({ x, z }, 0.46) }),
     world: () => ({ fortParts: scene.transformNodes.filter(node => node.name.startsWith('fort-part-') && !node.name.endsWith('-content')).length,
       groundTriangles: ground.getTotalIndices() / 3, roads: terrain.roads.length,

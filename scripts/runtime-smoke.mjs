@@ -8,6 +8,7 @@ import '@babylonjs/loaders/glTF/index.js';
 import { NullEngine, Scene, SceneLoader } from '@babylonjs/core';
 import { ModelInstances } from '../src/rendering/model-instances.ts';
 import { createStaticPart } from '../src/rendering/static-part.ts';
+import { ActorAnimation } from '../src/rendering/actor-animation.ts';
 
 globalThis.XMLHttpRequest = XMLHttpRequest;
 
@@ -107,7 +108,27 @@ try {
         assert.ok(Number.isFinite(bounds.minimumWorld.x) && Number.isFinite(bounds.maximumWorld.y), `Invalid bounds in ${model.file}`);
         if (mesh.material && !mesh.material.getClassName?.().includes('Multi')) assert.equal(mesh.material.getScene?.(), scene, `Detached material reused in ${model.file}`);
       }
-      instance.animations.forEach((group) => { group.speedRatio = 1; group.start(true); group.stop(); group.reset(); });
+      if (model.animated) {
+        const name = model.file.split('.')[0];
+        const actor = new ActorAnimation(name, 2.05, instance.animations, instance.pose, 1, model.directory === 'characters');
+        actor.advance(0.1); actor.render();
+        assert.ok(actor.clip, `Missing idle clip: ${name}`);
+        if (name === 'Bat' || name === 'Dragon') assert.match(actor.clip, /Flying/i, 'flying creature must not idle with its attack clip');
+        actor.request('walk'); actor.advance(0.1, 0.2); actor.render();
+        assert.ok(actor.clip, `Missing locomotion: ${name}`);
+        const starts = actor.starts, phase = actor.phase;
+        for (let tick = 0; tick < 30; tick++) actor.advance(1 / 60, 0);
+        actor.render();
+        assert.equal(actor.phase, phase, `Blocked actor cycles its feet: ${name}`);
+        assert.equal(actor.starts, starts, `Steady gait restarts: ${name}`);
+        assert.equal(actor.activeGroups, 1, `Multiple simultaneous clips: ${name}`);
+        const timings = actor.beginAttack(); actor.advance(timings.windup); actor.render();
+        assert.equal(actor.action, 'attack');
+        actor.request('death'); actor.advance(4); actor.render(); actor.request('idle');
+        assert.equal(actor.action, 'death'); assert.equal(actor.phase, 1);
+        assert.ok(Number.isFinite(instance.pose.rotation.z));
+        console.log(`PASS actor ${name} cycle ${cycle + 1}: gait, one active clip, attack and terminal death`);
+      }
       instance.dispose();
     }
     container.dispose();

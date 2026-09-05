@@ -1,4 +1,4 @@
-name: B01 validation and Windows test build
+name: Motion validation and Windows test build
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
     # Profiling-only checkpoints have their own job and must not republish accepted B01.
     if: ${{ !contains(github.event.head_commit.message, '[motion-profile]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,7 +41,7 @@ jobs:
       - name: Prepare isolated browser regression build
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
-          VARENDOR_QA=1 npx vite build --outDir dist-qa
+          VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
           google-chrome --version
       - name: Real WebGL gameplay and respawn smoke
         env:
@@ -50,22 +50,27 @@ jobs:
       - name: Check out unchanged baseline for comparison
         uses: actions/checkout@v4
         with:
-          ref: 24176515f66aff84b3371890dc80e636e4ffb965
+          ref: 752fb581bbddc4995270df797c58700fb62a8c34
           path: baseline
       - name: Compare baseline on the same software-rendering runner
-        continue-on-error: true
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
           npm ci --prefix baseline
-          npm run build --prefix baseline
-          node scripts/browser-regression.mjs baseline/dist baseline
+          cd baseline
+          VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
+          cd ..
+          node scripts/motion-profile.mjs baseline/dist-qa before
+          node scripts/motion-profile.mjs dist-qa after
       - name: Save screenshots and machine-readable evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: browser-evidence
-          path: qa-artifacts
+          path: |
+            qa-artifacts
+            dist-qa/assets/*.js.map
+            baseline/dist-qa/assets/*.js.map
           retention-days: 30
 
   windows-launcher:
@@ -122,7 +127,7 @@ jobs:
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          stage="Varendor_B01_Windows_Test_${short_sha}"
+          stage="Varendor_Motion_Windows_Test_${short_sha}"
           mkdir "$stage"
           cp -a production/dist "$stage/dist"
           cp production/server.ps1 "$stage/"
@@ -134,16 +139,16 @@ jobs:
           sha256sum "${stage}.zip" > "${stage}.zip.sha256"
           stat -c '%n %s bytes' "${stage}.zip"
           cat "${stage}.zip.sha256"
-          zip -q -r "B01_QA_${short_sha}.zip" qa-artifacts
+          zip -q -r "Motion_QA_${short_sha}.zip" qa-artifacts
       - name: Publish immutable prerelease, never merge main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          tag="v0.6-b01-test-${short_sha}"
+          tag="v0.6-motion-test-${short_sha}"
           gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
-            --title "Varendor B01 — Performance Test (${short_sha})" \
-            --notes "Тест первого блока коммерческого плана. Текущий стиль v0.5 сохранён. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. Следующий блок ждёт принятия пользователем. main не изменён. CI WebGL использует software GPU, результаты не являются FPS-прогнозом для вашего ПК." \
-            "Varendor_B01_Windows_Test_${short_sha}.zip" "Varendor_B01_Windows_Test_${short_sha}.zip.sha256" \
-            "B01_QA_${short_sha}.zip"
+            --title "Varendor — Motion / Combat Test (${short_sha})" \
+            --notes "Тест доработки текущего блока: отклик управления, фазы анимаций, ближний и дальний бой, контакт тел и камера у препятствий. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. Следующий блок ждёт принятия пользователем. main не изменён. CI WebGL использует software GPU, результаты не являются FPS-прогнозом для вашего ПК." \
+            "Varendor_Motion_Windows_Test_${short_sha}.zip" "Varendor_Motion_Windows_Test_${short_sha}.zip.sha256" \
+            "Motion_QA_${short_sha}.zip"
