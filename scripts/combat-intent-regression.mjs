@@ -147,9 +147,8 @@ async function productionScenario() {
 
 async function classScenarios(classId) {
   const context = await start(classId);
-  const first = await setup(undefined, 6);
+  const first = await setup(6, 6);
   const initial = await snapshot();
-  assert.ok(Math.hypot(target(initial, first.targetIds[0]).x - initial.player.x, target(initial, first.targetIds[0]).z - initial.player.z) > initial.range);
   // Each real class exercises the actual pick geometry once. Subsequent narrow
   // timing cases use the same selection handler in the isolated fixture.
   await page.evaluate(() => window.__VARENDOR_FIXTURE__.pause(false));
@@ -162,6 +161,8 @@ async function classScenarios(classId) {
   // before timing assertions: CDP latency must not decide whether basic windup
   // already started before the skill key reaches the page.
   await setup(undefined, 6);
+  const approach = await snapshot();
+  assert.ok(Math.hypot(target(approach, first.targetIds[0]).x - approach.player.x, target(approach, first.targetIds[0]).z - approach.player.z) > approach.range);
   await aim(first.targetIds[0]);
   await page.keyboard.press('1');
   let s = await until(s => s.events.some(e => e.kind === 'release' && e.skillIndex === 0), 12);
