@@ -35,6 +35,7 @@ export class PlayerInputController {
   private orbitY = 0;
   private zoom = 0;
   private jumpQueued = false;
+  private movementStarted = false;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -55,6 +56,12 @@ export class PlayerInputController {
 
   movementAxes(): MovementAxes {
     return movementAxesFromPressed(this.pressed);
+  }
+
+  consumeMovementStart(): boolean {
+    const started = this.movementStarted;
+    this.movementStarted = false;
+    return started;
   }
 
   consumeCameraOrbit(): Readonly<{ x: number; y: number }> {
@@ -84,7 +91,7 @@ export class PlayerInputController {
     this.pressed.clear();
     if (this.orbitPointerId !== null && this.canvas.hasPointerCapture?.(this.orbitPointerId)) this.canvas.releasePointerCapture(this.orbitPointerId);
     this.orbitPointerId = null;
-    this.orbitX = 0; this.orbitY = 0; this.zoom = 0; this.jumpQueued = false;
+    this.orbitX = 0; this.orbitY = 0; this.zoom = 0; this.jumpQueued = false; this.movementStarted = false;
   }
 
   dispose(): void {
@@ -108,6 +115,9 @@ export class PlayerInputController {
     }
     if ([...FORWARD_CODES, ...BACKWARD_CODES, ...LEFT_CODES, ...RIGHT_CODES].includes(event.code)) {
       event.preventDefault();
+      // Preserve the command edge even if key-down and key-up both arrive
+      // during a slow frame; combat cancellation must not depend on held keys.
+      if (!this.pressed.has(event.code)) this.movementStarted = true;
       this.pressed.add(event.code);
     }
   };

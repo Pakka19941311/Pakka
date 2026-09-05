@@ -47,6 +47,7 @@ jobs:
       - name: Real WebGL gameplay and respawn smoke
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
+          MOTION_RANGED_ONLY: ${{ contains(github.event.head_commit.message, '[input-edge-final]') && '1' || '0' }}
         run: npm run test:browser
       - name: Check out unchanged baseline for comparison
         if: ${{ !contains(github.event.head_commit.message, '[contact-final]') }}
@@ -75,6 +76,14 @@ jobs:
           run-id: 33963345742
           github-token: ${{ github.token }}
           path: qa-artifacts/profile-reference
+      - name: Include completed shared gameplay checks from 6e0d564c
+        if: ${{ contains(github.event.head_commit.message, '[input-edge-final]') }}
+        uses: actions/download-artifact@v4
+        with:
+          name: browser-evidence
+          run-id: 33964607324
+          github-token: ${{ github.token }}
+          path: qa-artifacts/gameplay-reference
       - name: Save screenshots and machine-readable evidence
         if: always()
         uses: actions/upload-artifact@v4

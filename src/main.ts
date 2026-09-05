@@ -1773,6 +1773,11 @@ function update(dt: number): void {
   state.playerBuffs.vanish = Math.max(0, state.playerBuffs.vanish - dt);
   player.mp = Math.min(player.maxMp, player.mp + player.maxMp * 0.022 * dt);
 
+  if (inputControl.consumeMovementStart()) {
+    cancelActorAttack(hero); combatControl.cancelPursuit();
+    state.moveTarget = null; state.interactionTarget = null;
+    hero.navPath = undefined; hero.navCooldown = 0;
+  }
   const target = targeting.validate();
   if (hero.activeAttack && (hero.activeAttack.target !== target || !target?.alive)) cancelActorAttack(hero);
   if (inputControl.consumeJump() && playerMotor.requestJump()) {
@@ -2027,6 +2032,7 @@ function die(): void {
 function basicAttack(): void {
   const target = targeting.validate();
   if (!target) return toast('Выберите живую цель', 'bad');
+  inputControl.consumeMovementStart(); // This explicit command is newer than a released movement tap.
   state.moveTarget = null;
   state.interactionTarget = null;
   combatControl.engageBasic(target.uid);
@@ -2055,6 +2061,7 @@ function castSkill(index: number): void {
   }
   const target = targeting.validate();
   if (!target) return toast('Выберите живую цель', 'bad');
+  inputControl.consumeMovementStart();
   state.moveTarget = null;
   state.interactionTarget = null;
   combatControl.queueSkill(target.uid, index);
@@ -2614,6 +2621,7 @@ canvas.addEventListener('pointerdown', (event) => {
     ?? null;
   const hit = pick?.hit ? pick : scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
   if (!hit?.hit || !hit.pickedPoint) return;
+  inputControl.consumeMovementStart(); // Preserve input order: the latest click owns the destination.
   const hero = playerEntity(); hero.navPath = undefined; hero.navCooldown = 0;
   let mesh: AbstractMesh | null = hit.pickedMesh;
   let entity: Entity | undefined;

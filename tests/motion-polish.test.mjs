@@ -65,3 +65,20 @@ test('Fox uses explicit attack/death presentation without walking during a hit o
     assert.match(a.clip, /Survey/); assert.ok(f.pose.rotation.z > 1.4); assert.equal(a.phase, 1);
   } finally { f.dispose(); }
 });
+
+test('a movement tap between frames preserves the combat-cancel command edge', async () => {
+  const { PlayerInputController } = await import('../src/controls/input-controller.ts');
+  const previous = globalThis.HTMLElement;
+  globalThis.HTMLElement = class {};
+  const canvas = new EventTarget(), windowTarget = new EventTarget();
+  const input = new PlayerInputController(canvas, windowTarget);
+  try {
+    for (const type of ['keydown', 'keyup']) {
+      const event = new Event(type, { cancelable: true });
+      Object.defineProperty(event, 'code', { value: 'KeyS' }); windowTarget.dispatchEvent(event);
+    }
+    assert.deepEqual(input.movementAxes(), { forward: 0, strafe: 0 });
+    assert.equal(input.consumeMovementStart(), true);
+    assert.equal(input.consumeMovementStart(), false);
+  } finally { input.dispose(); if (previous) globalThis.HTMLElement = previous; else delete globalThis.HTMLElement; }
+});

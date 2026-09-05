@@ -8,6 +8,7 @@ import { chromium } from 'playwright';
 const directory = path.resolve(process.argv[2] ?? 'dist-qa');
 const label = process.argv[3] ?? 'b01';
 const baseline = label === 'baseline';
+const rangedOnly = process.env.MOTION_RANGED_ONLY === '1';
 const reportDir = path.resolve('qa-artifacts');
 await mkdir(reportDir, { recursive: true });
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
@@ -48,6 +49,8 @@ async function visibleWorldScreenshot(name) {
   check(`visible world: ${name}`, { centerLuminance: luminance });
 }
 try {
+  const base = `http://127.0.0.1:${server.address().port}`;
+  if (!rangedOnly) {
   const context = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
   await context.addInitScript(() => {
     let seed = 314159; Math.random = () => ((seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0) / 4294967296);
@@ -71,7 +74,6 @@ try {
   page.on('console', message => { if (message.type() === 'error') report.errors.push(message.text()); });
   page.on('requestfailed', request => report.failedRequests.push({ url: request.url(), error: request.failure()?.errorText }));
   page.on('response', response => { if (response.status() >= 400 && !response.url().endsWith('/favicon.ico')) report.errors.push(`HTTP ${response.status()} ${response.url()}`); });
-  const base = `http://127.0.0.1:${server.address().port}`;
   await page.goto(base);
   await page.locator('#begin').click();
   await page.waitForFunction(() => window.__VARENDOR_QA__?.getState().started || document.querySelector('#load-text')?.textContent.startsWith('Не удалось'), { }, { timeout: 180000 });
@@ -310,6 +312,7 @@ try {
     check('save and continue preserve progress', { saved, restored });
     await visibleWorldScreenshot('b01-after-continue');
   }
+  }
   if (!baseline) {
     for (const classId of ['mage', 'ranger']) {
       const rangedContext = await browser.newContext({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
@@ -334,6 +337,12 @@ try {
       assert.ok(trace.some(t => new RegExp(classId === 'mage' ? 'Spell1' : 'Bow_Shoot', 'i').test(t.clip ?? '')), `${classId} chose the wrong action clip`);
       await writeFile(`${reportDir}/${classId}-motion-trace.json`, JSON.stringify(trace));
       await page.keyboard.down('s'); await page.waitForTimeout(500); await page.keyboard.up('s');
+      // A tap can occur wholly between software-GPU frames. Its command edge
+      // must survive release and be consumed by the next actual simulation tick.
+      await page.waitForFunction(id => {
+        const actors = window.__VARENDOR_FIXTURE__.actors();
+        return !actors.find(e => e.uid === id)?.engaged && !actors.find(e => e.kind === 'player').attack;
+      }, target.uid, { timeout: 15000 });
       const afterCancel = await page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
       assert.equal(afterCancel.find(e => e.uid === target.uid).engaged, false, `${classId} manual movement failed to cancel pursuit`);
       assert.equal(afterCancel.find(e => e.kind === 'player').attack, null, `${classId} attack survived a movement cancellation`);
