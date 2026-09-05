@@ -1,4 +1,4 @@
-name: Live world A validation and Windows test build
+name: Combat E validation and Windows test build
 
 on:
   push:
@@ -12,10 +12,10 @@ permissions:
 
 jobs:
   validate:
-    # Profiling-only checkpoints have their own job and must not republish accepted B01.
+    # Profiling-only checkpoints have their own job and must not publish a combat candidate.
     if: ${{ github.ref == 'refs/heads/work/v06-commercial-rebuild' && !contains(github.event.head_commit.message, '[motion-profile]') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -37,14 +37,20 @@ jobs:
             dist
             server.ps1
             packaging/windows/RUN_VARENDOR.bat
-            packaging/windows/README_A_RU.txt
+            packaging/windows/README_E_RU.txt
           retention-days: 14
       - name: Prepare isolated browser regression build
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
           google-chrome --version
-      - name: Block A live world, input, death and persistence regression
+      - name: Block E production combat and isolated class regressions
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          node scripts/combat-intent-regression.mjs dist production
+          node scripts/combat-intent-regression.mjs dist-qa
+      - name: Current SHA regression for accepted A world, input and death
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
@@ -112,32 +118,53 @@ jobs:
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          stage="Varendor_Live_World_Windows_Test_${short_sha}"
+          stage="Varendor_Combat_E_Windows_Test_${short_sha}"
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { readFileSync } from 'node:fs';
+          const expected = new Map([
+            ['E-production-combat-intent.json', 'E-production'],
+            ['E-combat-intent.json', 'E'],
+            ['A-production-live-world.json', 'A-production'],
+            ['A-live-world.json', 'A'],
+          ]);
+          for (const [file, block] of expected) {
+            const report = JSON.parse(readFileSync(`qa-artifacts/${file}`, 'utf8'));
+            assert.equal(report.block, block, `${file}: wrong block`);
+            assert.equal(report.sha, process.env.GITHUB_SHA, `${file}: wrong SHA`);
+            assert.equal(report.passed, true, `${file}: failed`);
+            assert.deepEqual(report.errors, [], `${file}: runtime errors`);
+            assert.ok(Array.isArray(report.checks) && report.checks.length > 0, `${file}: missing checks`);
+            console.log(`PASS evidence ${file}: ${report.checks.length} checks, SHA ${report.sha}`);
+          }
+          JS
           mkdir "$stage"
           cp -a production/dist "$stage/dist"
           cp production/server.ps1 "$stage/"
           cp production/packaging/windows/RUN_VARENDOR.bat "$stage/"
-          cp production/packaging/windows/README_A_RU.txt "$stage/README_RU.txt"
-          cp docs/LIVE_WORLD_QA.md "$stage/QA_REPORT_RU.md"
+          cp production/packaging/windows/README_E_RU.txt "$stage/README_RU.txt"
+          cp docs/COMBAT_INTENT_QA.md "$stage/QA_REPORT_RU.md"
           cp docs/BLOCK_SPEC_V2_RU.md "$stage/TZ_V2_RU.md"
-          cp qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
-          printf '\nCI выполнен успешно для %s: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
+          cp docs/ENHANCEMENT_BALANCE_V2.json "$stage/ENHANCEMENT_BALANCE_V2.json"
+          cp qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
+          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. E production/QA и регрессия A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия E.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
           printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
           zip -q -9 -r "${stage}.zip" "$stage"
           unzip -t "${stage}.zip" | tail -1
           sha256sum "${stage}.zip" > "${stage}.zip.sha256"
           stat -c '%n %s bytes' "${stage}.zip"
           cat "${stage}.zip.sha256"
-          zip -q -r "Live_World_QA_${short_sha}.zip" qa-artifacts
+          zip -q -r "Combat_E_QA_${short_sha}.zip" qa-artifacts
+          unzip -t "Combat_E_QA_${short_sha}.zip" | tail -1
       - name: Publish immutable prerelease, never merge main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          tag="v0.6-live-world-test-${short_sha}"
+          tag="v0.6-combat-e-test-${short_sha}"
           gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
-            --title "Varendor — Live World A Test (${short_sha})" \
-            --notes "Блок A: мир продолжает работу при игровых окнах, подтверждениях и смерти. Tab переключает текущую сумку. Новое оформление инвентаря и заточка V2 описаны в ТЗ и относятся к следующим блокам. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. Следующий блок ждёт принятия пользователем. main не изменён. CI WebGL использует software GPU, результаты не являются FPS-прогнозом для вашего ПК." \
-            "Varendor_Live_World_Windows_Test_${short_sha}.zip" "Varendor_Live_World_Windows_Test_${short_sha}.zip.sha256" \
-            "Live_World_QA_${short_sha}.zip"
+            --title "Varendor — Combat E Test (${short_sha})" \
+            --notes "Блок E: однокликовый бой, подход и однократный выпуск навыка, отмена и смена цели, буфер навыка 350 мс, существующие Knight/Ranger/Mage. Принятый живой мир A проверен на этом же SHA. Новый HUD, инвентарь и заточка V2 остаются следующими блоками. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. После выдачи — СТОП до пользовательского теста и принятия E. main не изменён. CI WebGL использует software GPU; сценарии E — Low/50%, результаты не являются FPS-прогнозом для игрового ПК." \
+            "Varendor_Combat_E_Windows_Test_${short_sha}.zip" "Varendor_Combat_E_Windows_Test_${short_sha}.zip.sha256" \
+            "Combat_E_QA_${short_sha}.zip"

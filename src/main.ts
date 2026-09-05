@@ -52,10 +52,11 @@ import {
 } from './core/game-rules';
 import { addOrStackItem, applyExperience, equipmentSlot, resolveEnhancement } from './core/gameplay-session';
 import { LocalGameGateway } from './network/game-gateway';
-import { CombatControl } from './controls/combat-controller';
+import { CombatControl, SKILL_BUFFER_SECONDS } from './controls/combat-controller';
 import { CharacterMotor, smoothAngle } from './controls/character-motor';
 import { slidePastActor } from './controls/actor-spacing';
 import { PlayerInputController } from './controls/input-controller';
+import { pickVisibleActor } from './controls/actor-picking';
 import { TargetingController } from './controls/targeting-controller';
 import { ThirdPersonCameraController } from './controls/third-person-camera';
 import { CollisionWorld } from './world/collision-world';
@@ -220,7 +221,7 @@ type Entity = {
   motion?: ActorAnimation;
   nearby?: Entity[];
   attackToken?: number;
-  activeAttack?: { token: number; target: Entity; impacted: boolean };
+  activeAttack?: { token: number; target: Entity; impacted: boolean; skillIndex?: number | null; endsAt?: number };
   previousX?: number;
   previousZ?: number;
   previousSupportY?: number;
@@ -923,7 +924,7 @@ function registerWorldCollider(name: string, root: TransformNode, x: number, z: 
         cz - sine * side * direction,
         halfX * 0.12,
         halfZ,
-        rotation,
+        rotation, bottom, top,
       );
     }
   }
@@ -1045,7 +1046,7 @@ function townBox(name: string, x: number, y: number, z: number, width: number, h
   shadowCasters.add(mesh);
   mesh.isPickable = false;
   assignWorldSector(mesh, x, z);
-  if (collider) collisionWorld.addBox(x, z, width * 0.5, depth * 0.5, 0);
+  if (collider) collisionWorld.addBox(x, z, width * 0.5, depth * 0.5, 0, y - height * 0.5, y + height * 0.5);
   return mesh;
 }
 
@@ -1057,7 +1058,7 @@ function townCylinder(name: string, x: number, y: number, z: number, diameter: n
   shadowCasters.add(mesh);
   mesh.isPickable = false;
   assignWorldSector(mesh, x, z);
-  if (collider) collisionWorld.addCircle(x, z, diameter * 0.46);
+  if (collider) collisionWorld.addCircle(x, z, diameter * 0.46, y - height * 0.5, y + height * 0.5);
   return mesh;
 }
 
@@ -1146,7 +1147,7 @@ function createBonfire(x: number, z: number): void {
   }
   worldModel('planks', x, z, 0.78, Math.PI / 4, 0x5f3823);
   worldModel('planks', x, z, 0.72, -Math.PI / 4, 0x704027);
-  collisionWorld.addCircle(x, z, 1.15);
+  collisionWorld.addCircle(x, z, 1.15, terrain.heightAt(x,z), terrain.heightAt(x,z) + 0.8);
 
   const flames: Mesh[] = [];
   const colors = [new Color3(1, 0.16, 0.01), new Color3(1, 0.48, 0.03), new Color3(1, 0.78, 0.18)];
@@ -1694,7 +1695,24 @@ function attackRange(): number {
   return classAttackRange(player.classId);
 }
 
+function combatLineOfSight(from: Entity, to: Entity): boolean {
+  const start = entityWorldPosition(from, Math.min(1.4, from.targetHeight * 0.65));
+  const end = entityWorldPosition(to, Math.min(1.4, to.targetHeight * 0.65));
+  if (!collisionWorld.hasLineOfSight(start, end, 0.04)) return false;
+  const length = Vector3.Distance(start, end);
+  for (let distance = 0.4; distance < length; distance += 0.4) {
+    const point = Vector3.Lerp(start, end, distance / length);
+    if (point.y < terrain.heightAt(point.x, point.z) + 0.06) return false;
+  }
+  return true;
+}
+
+let pursuitStall = 0;
+let pursuitProgress: { x: number; z: number } | null = null;
+function clearPursuitProgress(): void { pursuitStall = 0; pursuitProgress = null; }
+
 function resetPlayerControl(clearTarget = false): void {
+  clearPursuitProgress();
   state.moveTarget = null;
   state.interactionTarget = null;
   combatControl.cancelPursuit();
@@ -1760,6 +1778,7 @@ function updateTargetIndicator(): void {
 }
 
 let qaMotionSample: (() => void) | undefined;
+let qaCombatEvent: ((event: Record<string, unknown>) => void) | undefined;
 function update(dt: number): void {
   if (!state.started || state.qaFrozen) return;
   state.simulationSeconds += dt;
@@ -1779,6 +1798,7 @@ function update(dt: number): void {
   if (!player.dead) player.mp = Math.min(player.maxMp, player.mp + player.maxMp * 0.022 * dt);
 
   if (!player.dead) {
+    if (!hero.activeAttack) combatControl.expireBufferedSkill(state.simulationSeconds);
     if (inputControl.consumeMovementStart()) {
       cancelActorAttack(hero); combatControl.cancelPursuit();
       state.moveTarget = null; state.interactionTarget = null;
@@ -1789,14 +1809,26 @@ function update(dt: number): void {
     if (inputControl.consumeJump() && playerMotor.requestJump()) {
       cancelActorAttack(hero);
       combatControl.cancelPursuit();
+      state.moveTarget = null; state.interactionTarget = null;
+      hero.navPath = undefined;
+    }
+    promoteReadySkill(state.simulationSeconds);
+    const pendingSkill = combatControl.snapshot.skillIntent;
+    if (pendingSkill && !hero.activeAttack) {
+      const skill = CLASSES_MAP[player.classId].skills[pendingSkill.skillIndex];
+      if (!skill || player.mp < skill.cost || player.cooldowns[pendingSkill.skillIndex] > 0) {
+        combatControl.discardQueuedSkill();
+        toast('Команда навыка отменена: ресурс или навык недоступен', 'bad');
+      }
     }
     const axes = inputControl.movementAxes();
     const manualMovement = Math.hypot(axes.forward, axes.strafe) > 0.0001;
+    const clearAttackLine = !target || Math.hypot(player.x-target.x, player.z-target.z) > attackRange() || combatLineOfSight(hero,target);
     const combatDecision = combatControl.plan({
       player,
       target,
-      basicRange: attackRange(),
-      skillRange: () => attackRange(),
+      basicRange: clearAttackLine ? attackRange() : 0.1,
+      skillRange: () => clearAttackLine ? attackRange() : 0.1,
       canBasicAttack: player.attackCd <= 0 && !hero.activeAttack && playerMotor.grounded,
       canUseSkill: (index) => !hero.activeAttack && playerMotor.grounded && player.cooldowns[index] <= 0 && player.mp >= (CLASSES_MAP[player.classId].skills[index]?.cost ?? Infinity),
     });
@@ -1804,6 +1836,7 @@ function update(dt: number): void {
     let desiredDirection: Readonly<{ x: number; z: number }> = { x: 0, z: 0 };
     let maxMoveDistance = Infinity;
     if (manualMovement) {
+      clearPursuitProgress();
       cancelActorAttack(hero);
       state.moveTarget = null;
       state.interactionTarget = null;
@@ -1815,18 +1848,26 @@ function update(dt: number): void {
       syncMovementIntent(null, dt);
       const destination = hero.activeAttack ? null : combatDecision.kind === 'approach' ? combatDecision : state.moveTarget;
       if (destination) {
-        // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
-        const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
-        const dx = (waypoint?.x ?? player.x) - player.x;
-        const dz = (waypoint?.z ?? player.z) - player.z;
-        const distance = Math.hypot(dx, dz);
-        if (Math.hypot(destination.x - player.x, destination.z - player.z) < 0.18) {
-          if (combatDecision.kind !== 'approach') state.moveTarget = null;
-        } else if (waypoint) {
-          desiredDirection = { x: dx, z: dz };
-          maxMoveDistance = distance;
+        if (!pursuitProgress || Math.hypot(player.x - pursuitProgress.x, player.z - pursuitProgress.z) > 0.2) {
+          pursuitProgress = { x: player.x, z: player.z }; pursuitStall = 0;
+        } else pursuitStall += dt;
+        if (pursuitStall >= 2.5) {
+          resetPlayerControl();
+          toast('Цель недоступна: нет свободного пути', 'bad');
+        } else {
+          // The same obstacle-aware route serves ground clicks, NPC approach and pursuit.
+          const waypoint = navigationWaypoint(hero, destination, dt, 0.46);
+          const dx = (waypoint?.x ?? player.x) - player.x;
+          const dz = (waypoint?.z ?? player.z) - player.z;
+          const distance = Math.hypot(dx, dz);
+          if (Math.hypot(destination.x - player.x, destination.z - player.z) < 0.18) {
+            if (combatDecision.kind !== 'approach') state.moveTarget = null;
+          } else if (waypoint) {
+            desiredDirection = { x: dx, z: dz };
+            maxMoveDistance = distance;
+          }
         }
-      }
+      } else clearPursuitProgress();
       if ((combatDecision.kind === 'attack' || combatDecision.kind === 'wait') && target) {
         playerMotor.stopPlanar();
         rotateTowardsSmooth(hero, target.x, target.z, dt);
@@ -1970,7 +2011,7 @@ function updateMonster(entity: Entity, dt: number): void {
     // Finish the committed swing; moving out of reach avoids its hit without
     // restarting chase/attack on every tick at the range boundary.
     rotateTowardsSmooth(entity, player.x, player.z, dt);
-  } else if (decision.intent === 'chase') {
+  } else if (decision.intent === 'chase' || (decision.intent === 'attack' && !combatLineOfSight(entity, playerEntity()))) {
     const speed = monsterMovementSpeed(Boolean(entity.boss)) * (entity.status.slow ? 0.45 : 1);
     const moved = moveEntityAlongNavigation(entity, player, speed, dt, entityCollisionRadius(entity));
     rotateTowardsSmooth(entity, player.x, player.z, dt);
@@ -1985,7 +2026,7 @@ function updateMonster(entity: Entity, dt: number): void {
       entity.attackCd = entity.boss ? 1.45 : 2.05;
       const generation = entity.visualGeneration;
       queueAttackTimeline(new AttackTimeline(timings), () => {
-        if (entity.alive && Math.hypot(player.x - entity.x, player.z - entity.z) < monsterReach(entity) + 0.25) {
+        if (entity.alive && Math.hypot(player.x - entity.x, player.z - entity.z) < monsterReach(entity) + 0.25 && combatLineOfSight(entity, playerEntity())) {
           hurtPlayer(Math.max(1, Math.round((entity.atk ?? 1) - player.stats.def * 0.2)));
         }
       }, () => {
@@ -2056,37 +2097,69 @@ function basicAttack(): void {
   inputControl.consumeMovementStart(); // This explicit command is newer than a released movement tap.
   state.moveTarget = null;
   state.interactionTarget = null;
+  clearPursuitProgress();
   combatControl.engageBasic(target.uid);
 }
 
-function castSkill(index: number): void {
-  if (!state.started || player.dead) return;
+function promoteReadySkill(now: number): void {
+  const axes = inputControl.movementAxes();
+  if (player.dead || playerEntity().activeAttack || !playerMotor.grounded || Math.hypot(axes.forward, axes.strafe) > 0) return;
+  const target = targeting.validate();
+  const promoted = combatControl.promoteBufferedSkill(now, intent => {
+    const skill = CLASSES_MAP[player.classId].skills[intent.skillIndex];
+    const valid = Boolean(skill && player.mp >= skill.cost && player.cooldowns[intent.skillIndex] <= 0
+      && (intent.targetId === '@self' || target?.uid === intent.targetId));
+    if (!valid) toast('Команда навыка отменена: цель, ресурс или навык недоступен', 'bad');
+    return valid;
+  });
+  if (promoted?.targetId === '@self') { combatControl.discardQueuedSkill(); releaseSelfSkill(promoted.skillIndex); }
+}
+
+function releaseSelfSkill(index: number): void {
   const skill = CLASSES_MAP[player.classId].skills[index];
-  if (!skill) return;
-  if (player.cooldowns[index] > 0) return toast('Навык ещё восстанавливается', 'bad');
-  if (player.mp < skill.cost) return toast(`Недостаточно: ${CLASSES_MAP[player.classId].resource}`, 'bad');
+  if (player.dead || !skill || (!skill.buff && !skill.summon) || player.mp < skill.cost || player.cooldowns[index] > 0) return;
+  const before = player.mp;
+  player.mp -= skill.cost;
+  player.cooldowns[index] = skill.cd;
   if (skill.buff) {
-    player.mp -= skill.cost;
-    player.cooldowns[index] = skill.cd;
     state.playerBuffs[skill.buff as 'guard' | 'vanish'] = skill.buff === 'guard' ? 7 : 4;
     toast(skill.buff === 'guard' ? 'Последний рубеж: входящий урон снижен' : 'Вы растворяетесь в сумраке');
     impactEffect(entityWorldPosition(playerEntity()), Color3.FromHexString(skill.buff === 'guard' ? '#d3ad63' : '#7b46a8'));
-    void gateway.send({ type: 'attack', entityId: 'self', skillIndex: index });
-    return;
-  }
-  if (skill.summon) {
-    player.mp -= skill.cost;
-    player.cooldowns[index] = skill.cd;
-    summonSkeleton();
-    void gateway.send({ type: 'attack', entityId: 'summon', skillIndex: index });
-    return;
-  }
+  } else summonSkeleton();
+  void gateway.send({ type: 'attack', entityId: skill.buff ? 'self' : 'summon', skillIndex: index });
+  if (__QA_BUILD__) qaCombatEvent?.({kind: 'release', skillIndex: index, target: '@self', time: state.simulationSeconds,
+    mpBefore: before, mpAfter: player.mp, cooldownAfter: player.cooldowns[index]});
+  updateHud();
+}
+
+function castSkill(index: number): void {
+  if (!state.started || player.dead || confirmation) return;
+  const skill = CLASSES_MAP[player.classId].skills[index];
+  if (!skill) return;
+  if (player.mp < skill.cost) return toast(`Недостаточно: ${CLASSES_MAP[player.classId].resource}`, 'bad');
+  const hero = playerEntity();
   const target = targeting.validate();
-  if (!target) return toast('Выберите живую цель', 'bad');
+  const self = Boolean(skill.buff || skill.summon);
+  if (!self && !target) return toast('Выберите живую цель', 'bad');
+  if (!playerMotor.grounded) return toast('Навык недоступен в прыжке', 'bad');
+  const attack = hero.activeAttack;
+  if (attack) {
+    const remaining = Math.max(0, (attack.endsAt ?? Infinity) - state.simulationSeconds);
+    if (!attack.impacted || remaining > SKILL_BUFFER_SECONDS) return toast('Дождитесь завершения удара', 'bad');
+    if (player.cooldowns[index] > remaining) return toast('Навык ещё восстанавливается', 'bad');
+    combatControl.bufferSkill(self ? '@self' : target!.uid, index, state.simulationSeconds);
+    toast(`Следом: ${skill.name}`);
+    return;
+  }
+  if (player.cooldowns[index] > 0) return toast('Навык ещё восстанавливается', 'bad');
+  if (self) { releaseSelfSkill(index); return; }
   inputControl.consumeMovementStart();
   state.moveTarget = null;
   state.interactionTarget = null;
-  combatControl.queueSkill(target.uid, index);
+  clearPursuitProgress();
+  combatControl.queueSkill(target!.uid, index);
+  toast(Math.hypot(player.x - target!.x, player.z - target!.z) > attackRange() || !combatLineOfSight(hero, target!)
+    ? `Подход: ${skill.name}` : `Подготовка: ${skill.name}`);
 }
 
 function performAttack(skillIndex: number | null): void {
@@ -2095,35 +2168,52 @@ function performAttack(skillIndex: number | null): void {
   const target = targeting.validate();
   if (!target) return combatControl.cancelPursuit();
   const hero = playerEntity();
-  if (hero.activeAttack || !playerMotor.grounded || Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + 0.05) return;
+  if (hero.activeAttack || !playerMotor.grounded || Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + 0.05 || !combatLineOfSight(hero, target)) return;
   const skill = skillIndex === null ? null : CLASSES_MAP[player.classId].skills[skillIndex];
   if (skillIndex !== null) {
     if (!skill || player.cooldowns[skillIndex] > 0 || player.mp < skill.cost) return;
-    player.mp -= skill.cost;
-    player.cooldowns[skillIndex] = skill.cd;
   } else if (player.attackCd > 0) return;
   const ranged = CLASSES_MAP[player.classId].ranged;
-  player.attackCd = classCombatProfile(player.classId, player.level, player.stats).attackInterval;
+  player.attackCd = Math.max(player.attackCd, classCombatProfile(player.classId, player.level, player.stats).attackInterval);
   combatControl.completeAttack(skillIndex);
   playerMotor.stopPlanar();
   const token = hero.attackToken = (hero.attackToken ?? 0) + 1;
-  hero.activeAttack = { token, target, impacted: false };
+  hero.activeAttack = { token, target, impacted: false, skillIndex };
   hero.actionType = 'attack';
   const timings = hero.motion?.beginAttack(player.attackCd * 0.92) ?? combatTimings(ranged ? 'ranged' : 'melee');
+  hero.activeAttack.endsAt = state.simulationSeconds + timings.windup + timings.recovery;
   const generation = target.visualGeneration;
+  if (__QA_BUILD__) qaCombatEvent?.({kind: 'begin', skillIndex, target: target.uid, generation, time: state.simulationSeconds});
   const magic = player.classId === 'mage' || player.classId === 'necro';
   const base = magic ? player.stats.matk : rand(player.stats.atkMin, player.stats.atkMax);
   const multiplier = skill?.mul ?? 1;
   const critical = Math.random() < player.stats.crit / 100;
   const damage = Math.max(1, Math.round(base * multiplier * (critical ? classCombatProfile(player.classId, player.level, player.stats).critMultiplier : 1)));
-  void gateway.send({ type: 'attack', entityId: target.uid, skillIndex });
-  queueAttackTimeline(new AttackTimeline(timings), () => {
-    if (!target.alive || player.dead) return;
+  const timeline = new AttackTimeline(timings);
+  queueAttackTimeline(timeline, () => {
+    if (!target.alive || target.visualGeneration !== generation || player.dead) return;
+    // Both melee contact and ranged release revalidate the real target before spending.
+    if (Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + (ranged ? 0.05 : 0.25)
+      || !combatLineOfSight(hero, target)) {
+      cancelActorAttack(hero);
+      if (skillIndex !== null) toast('Навык прерван: цель вне досягаемости', 'bad');
+      return;
+    }
+    if (skillIndex !== null) {
+      if (!skill || player.mp < skill.cost || player.cooldowns[skillIndex] > 0) {
+        cancelActorAttack(hero); toast('Навык прерван: ресурс или навык недоступен', 'bad'); return;
+      }
+      const before = player.mp;
+      player.mp -= skill.cost;
+      player.cooldowns[skillIndex] = skill.cd;
+      if (__QA_BUILD__) qaCombatEvent?.({kind: 'release', skillIndex, target: target.uid, generation, time: state.simulationSeconds,
+        mpBefore: before, mpAfter: player.mp, cooldownAfter: player.cooldowns[skillIndex]});
+    } else if (__QA_BUILD__) qaCombatEvent?.({kind: 'release', skillIndex: null, target: target.uid, generation, time: state.simulationSeconds});
     if (hero.activeAttack) hero.activeAttack.impacted = true;
-    if (!ranged && Math.hypot(player.x - target.x, player.z - target.z) > attackRange() + 0.25) return;
-    playSfx(skill?.fx ?? 'attack');
-    gameAudio.play(ranged ? 'swordClash' : 'swordSwing', ranged ? 0.34 : 0.7, 0.94 + Math.random() * 0.12);
-    spawnAttackEffect(skill?.fx ?? (magic ? 'fire' : ranged ? 'arrow' : 'slash'), hero, target, () => {
+    void gateway.send({ type: 'attack', entityId: target.uid, skillIndex });
+    if (ranged) playSfx(skill?.fx ?? (magic ? 'fire' : 'arrow'));
+    else gameAudio.play('swordSwing', 0.7, 0.94 + Math.random() * 0.12);
+    const resolveHit = () => {
       if (!target.alive || target.visualGeneration !== generation) return;
       if (skill?.chain) {
         const chainHits = resolveChainLightning(
@@ -2131,12 +2221,16 @@ function performAttack(skillIndex: number | null): void {
           state.entities.filter((entity) => entity.kind === 'monster'),
           { maxTargets: skill.chain, radius: skill.chainRadius ?? 6.5, falloff: skill.chainFalloff ?? 0.76 },
         );
+        const generations = new Map(chainHits.map(hit => [hit.target.uid, hit.target.visualGeneration]));
         damageMonster(target, damage, critical);
         const strikeJump = (index: number): void => {
           const hit = chainHits[index];
           if (!hit) return;
-          if (!hit.source || !hit.target.alive) return strikeJump(index + 1);
+          if (!hit.source || !hit.target.alive || hit.target.visualGeneration !== generations.get(hit.target.uid)
+            || Math.hypot(hit.source.x - hit.target.x, hit.source.z - hit.target.z) > (skill.chainRadius ?? 6.5)
+            || !combatLineOfSight(hit.source, hit.target)) return;
           spawnAttackEffect('lightning', hit.source, hit.target, () => {
+            if (!hit.target.alive || hit.target.visualGeneration !== generations.get(hit.target.uid)) return;
             damageMonster(hit.target, Math.max(1, Math.round(damage * hit.multiplier)), false);
             strikeJump(index + 1);
           });
@@ -2144,23 +2238,30 @@ function performAttack(skillIndex: number | null): void {
         strikeJump(1);
       } else {
         let victims = [target];
-        if (skill?.aoe) victims = state.entities.filter((entity) => entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0));
+        if (skill?.aoe) victims = [target, ...state.entities.filter((entity) => entity !== target && entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0) && combatLineOfSight(target, entity))];
         victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
       }
-      if (skill?.dot) target.status.dot = skill.dot;
-      if (skill?.slow) target.status.slow = skill.slow;
-      if (skill?.stun) target.status.stun = skill.stun;
-      if (skill?.knock && target.root) {
+      if (target.alive && skill?.dot) target.status.dot = skill.dot;
+      if (target.alive && skill?.slow) target.status.slow = skill.slow;
+      if (target.alive && skill?.stun) target.status.stun = skill.stun;
+      if (target.alive && skill?.knock && target.root) {
         const dx = target.x - player.x; const dz = target.z - player.z; const distance = Math.max(0.001, Math.hypot(dx, dz));
         moveEntityWithCollision(target, (dx / distance) * skill.knock, (dz / distance) * skill.knock, true);
       }
       if (!player.dead && state.playerLife === playerLife && skill?.leech) player.hp = Math.min(player.maxHp, player.hp + Math.round(damage * skill.leech));
       if (!player.dead && state.playerLife === playerLife && skill?.summon) summonSkeleton();
-    });
+    };
+    if (!ranged) resolveHit();
+    else spawnAttackEffect(skill?.fx ?? (magic ? 'fire' : 'arrow'), hero, target, resolveHit, player.classId === 'ranger');
   }, () => {
     if (hero.attackToken === token) {
+      const completedAt = Math.min(state.simulationSeconds, hero.activeAttack?.endsAt ?? state.simulationSeconds);
       hero.activeAttack = undefined;
       if (!player.dead) setEntityAction(hero, 'idle');
+      // Promote at the natural completion edge, before a later fixed tick can
+      // expire a valid 350 ms buffer. Invalid/cancelled timelines never promote.
+      if (timeline.phase === 'complete' && target.alive && target.visualGeneration === generation && !player.dead) promoteReadySkill(completedAt);
+      else combatControl.expireBufferedSkill(state.simulationSeconds);
     }
   }, () => !player.dead && hero.attackToken === token && target.alive && target.visualGeneration === generation);
 }
@@ -2181,7 +2282,7 @@ function entityWorldPosition(entity: Entity, height = 1.4): Vector3 {
   return new Vector3(entity.x, terrain.supportAt(entity.x, entity.z) + height, entity.z);
 }
 
-function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () => void): void {
+function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () => void, physicalArrow = type === 'arrow'): void {
   if (type === 'slash') {
     // A sword connects on its contact frame, not after a second projectile timer.
     onHit?.();
@@ -2198,25 +2299,37 @@ function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () =>
   };
   const start = entityWorldPosition(from);
   let end = entityWorldPosition(to);
-  const projectile = MeshBuilder.CreateSphere(`effect-${type}-${uid()}`, { diameter: type === 'arrow' ? 0.14 : 0.32, segments: 8 }, scene);
+  let projectile: Mesh;
+  if (physicalArrow) {
+    const shaft = MeshBuilder.CreateCylinder('arrow-shaft', {height: 0.65, diameter: 0.045, tessellation: 6}, scene);
+    const tip = MeshBuilder.CreateCylinder('arrow-head', {height: 0.2, diameterBottom: 0.16, diameterTop: 0, tessellation: 4}, scene);
+    tip.position.y = 0.4;
+    projectile = Mesh.MergeMeshes([shaft, tip], true)!;
+    projectile.bakeTransformIntoVertices(Matrix.RotationX(Math.PI / 2));
+    projectile.name = `effect-arrow-${uid()}`;
+  } else projectile = MeshBuilder.CreateSphere(`effect-${type}-${uid()}`, { diameter: 0.32, segments: 8 }, scene);
+  const targetGeneration = to.visualGeneration;
   const material = new StandardMaterial(`effect-material-${uid()}`, scene);
   material.emissiveColor = colors[type] ?? colors.slash;
   material.disableLighting = true;
   projectile.material = material;
   projectile.position.copyFrom(start);
-  if (type === 'arrow') {
-    projectile.scaling.z = 4.2;
-    projectile.lookAt(end);
-  }
+  if (physicalArrow) projectile.lookAt(end);
   projectile.isPickable = false;
   glow.addIncludedOnlyMesh(projectile);
   let life = 0;
   const duration = type === 'slash' ? 0.18 : 0.28;
   state.effects.push({ update(dt) {
     life += dt;
+    if (!to.alive || to.visualGeneration !== targetGeneration) { this.dead = true; projectile.dispose(false, true); return; }
     end = entityWorldPosition(to);
-    projectile.position.copyFrom(Vector3.Lerp(start, end, clamp(life / duration, 0, 1)));
-    if (type !== 'arrow') projectile.scaling.setAll(1 + Math.sin(life * 30) * 0.16);
+    const next = Vector3.Lerp(start, end, clamp(life / duration, 0, 1));
+    if (!collisionWorld.hasLineOfSight(projectile.position, next, 0.025)
+      || next.y < terrain.heightAt(next.x, next.z) + 0.04) {
+      this.dead = true; projectile.dispose(false, true); return;
+    }
+    projectile.position.copyFrom(next);
+    if (physicalArrow) projectile.lookAt(end); else projectile.scaling.setAll(1 + Math.sin(life * 30) * 0.16);
     if (life >= duration) {
       this.dead = true;
       projectile.dispose(false, true);
@@ -2227,6 +2340,7 @@ function spawnAttackEffect(type: string, from: Entity, to: Entity, onHit?: () =>
 }
 
 function spawnLightningArc(from: Entity, to: Entity, onHit?: () => void): void {
+  if (__QA_BUILD__) qaCombatEvent?.({kind:'arc', source:from.uid, target:to.uid, time:state.simulationSeconds});
   const start = entityWorldPosition(from);
   const end = entityWorldPosition(to);
   const direction = end.subtract(start);
@@ -2247,13 +2361,13 @@ function spawnLightningArc(from: Entity, to: Entity, onHit?: () => void): void {
   bolt.color = new Color3(0.42, 0.78, 1);
   bolt.alpha = 0.96;
   bolt.isPickable = false;
+  onHit?.();
+  impactEffect(end, new Color3(0.36, 0.7, 1));
   let life = 0;
   state.effects.push({ update(dt) {
     life += dt;
     bolt.alpha = Math.max(0, 1 - life / 0.14);
     if (life >= 0.14) {
-      onHit?.();
-      impactEffect(entityWorldPosition(to), new Color3(0.36, 0.7, 1));
       bolt.dispose();
       this.dead = true;
     }
@@ -2280,6 +2394,7 @@ function impactEffect(position: Vector3, color: Color3): void {
 
 function damageMonster(entity: Entity, damage: number, critical = true, showEffect = true): void {
   if (!entity.alive) return;
+  if (__QA_BUILD__) qaCombatEvent?.({kind: 'damage', target: entity.uid, generation: entity.visualGeneration, damage, time: state.simulationSeconds});
   entity.hp = (entity.hp ?? 0) - damage;
   if (entity.boss === 'big') {
     const ratio = (entity.hp ?? 0) / Math.max(1, entity.maxHp ?? 1);
@@ -2404,7 +2519,7 @@ const AMBIENT_ACTIVITY_LOOK: Record<AmbientWaypoint['activity'], Readonly<{ x: n
 function navigationWaypoint(entity: Entity, destination: Readonly<{ x: number; z: number }>, dt: number, actorRadius: number) {
   entity.navCooldown = Math.max(0, (entity.navCooldown ?? 0) - dt);
   const goalMoved = Math.hypot((entity.navGoalX ?? Infinity) - destination.x, (entity.navGoalZ ?? Infinity) - destination.z) > 0.7;
-  if (entity.navCooldown <= 0 && (goalMoved || !entity.navPath?.length) && navigationBudget > 0) {
+  if (entity.navCooldown <= 0 && (goalMoved || !entity.navPath?.length || (entity.navIndex ?? 0) >= entity.navPath.length) && navigationBudget > 0) {
     navigationBudget -= 1;
     entity.navPath = findNavigationPath(collisionWorld, entity, destination, { actorRadius, cellSize: 0.85, margin: entity.kind === 'player' ? 24 : 10, maxVisited: 4500 });
     entity.navIndex = 0;
@@ -2562,7 +2677,14 @@ function updateHud(): void {
   if (target) {
     targetFrame.classList.remove('hidden');
     q('#target-name').textContent = target.name ?? '';
-    q('#target-meta').textContent = `ур. ${target.level} · ${combatControl.isEngagedWith(target.uid) ? 'атака' : 'выбрана'}`;
+    const intent = combatControl.snapshot;
+    const next = intent.bufferedSkill ?? intent.skillIntent;
+    const skillName = next ? CLASSES_MAP[player.classId].skills[next.skillIndex]?.name : null;
+    const active = playerEntity().activeAttack;
+    const action = next ? `${intent.bufferedSkill ? 'следом' : 'навык'}: ${skillName}`
+      : active ? active.impacted ? 'восстановление' : 'подготовка удара'
+      : combatControl.isEngagedWith(target.uid) ? 'обычная атака' : 'выбрана';
+    q('#target-meta').textContent = `ур. ${target.level} · ${action}`;
     q('#boss-mark').textContent = target.boss ? '☠' : '';
     (q<HTMLElement>('#target-fill')).style.width = `${clamp((target.hp ?? 0) / Math.max(1, target.maxHp ?? 1), 0, 1) * 100}%`;
     q('#target-hp').textContent = `${Math.max(0, Math.ceil(target.hp ?? 0))} / ${target.maxHp}`;
@@ -2655,13 +2777,32 @@ document.addEventListener('focusin', event => {
   }
 });
 
+function selectCombatTarget(entity: Entity, engage = true): void {
+  if (player.dead || entity.kind !== 'monster' || !entity.alive) return;
+  const hero = playerEntity();
+  if (hero.activeAttack?.target !== entity) cancelActorAttack(hero);
+  inputControl.consumeMovementStart();
+  clearPursuitProgress();
+  hero.navPath = undefined; hero.navCooldown = 0;
+  targeting.select(entity);
+  if (engage) combatControl.engageBasic(entity.uid); else combatControl.cancelPursuit();
+  state.moveTarget = null; state.interactionTarget = null;
+  void gateway.send({ type: 'target', entityId: entity.uid });
+}
+
 canvas.addEventListener('pointerdown', (event) => {
   if (event.button !== 0 || !state.started || state.qaFrozen || player.dead || Boolean(confirmation)) return;
-  const pick = scene.pick(event.offsetX, event.offsetY, mesh => mesh.isPickable && Boolean(mesh.metadata?.entity?.alive))
-    ?? null;
-  const hit = pick?.hit ? pick : scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
+  const pick = pickVisibleActor(scene, camera, event.offsetX, event.offsetY, mesh => {
+    const entity: Entity | undefined = mesh.metadata?.entity;
+    return Boolean(entity?.alive && (entity.kind === 'monster' || entity.kind === 'npc')
+      && entity.visualActive !== false && mesh !== entity.pickVolume);
+  });
+  // Exact actor geometry is still occluded by the actual static world.
+  const unobstructed = pick?.pickedPoint && collisionWorld.hasLineOfSight(camera.globalPosition, pick.pickedPoint, 0.01);
+  const hit = pick?.hit && unobstructed ? pick : scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
   if (!hit?.hit || !hit.pickedPoint) return;
   inputControl.consumeMovementStart(); // Preserve input order: the latest click owns the destination.
+  clearPursuitProgress();
   const hero = playerEntity(); hero.navPath = undefined; hero.navCooldown = 0;
   let mesh: AbstractMesh | null = hit.pickedMesh;
   let entity: Entity | undefined;
@@ -2671,13 +2812,8 @@ canvas.addEventListener('pointerdown', (event) => {
   }
   if (entity) {
     if (entity.kind === 'monster') {
-      if (hero.activeAttack?.target !== entity) cancelActorAttack(hero);
-      targeting.select(entity);
-      combatControl.engageBasic(entity.uid);
+      selectCombatTarget(entity);
       gameAudio.play('monsterAggro', entity.boss ? 0.65 : 0.28, entity.boss ? 0.78 : 1.05);
-      state.moveTarget = null;
-      state.interactionTarget = null;
-      void gateway.send({ type: 'target', entityId: entity.uid });
       return;
     }
     if (entity.kind === 'npc') {
@@ -3137,11 +3273,34 @@ engine.runRenderLoop(() => {
   }
 });
 
+function actorTargets() {
+  return state.entities.filter(entity => entity.kind === 'monster' || entity.kind === 'npc').map(entity => {
+    const point = Vector3.Project(entityWorldPosition(entity, entity.targetHeight * 0.55), Matrix.Identity(),
+      scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
+    return {uid: entity.uid, id: entity.id, kind: entity.kind, alive: entity.alive, x: entity.x, z: entity.z,
+      hp: entity.hp, generation: entity.visualGeneration, depth: point.z,
+      screenX: point.x * canvas.clientWidth / engine.getRenderWidth(), screenY: point.y * canvas.clientHeight / engine.getRenderHeight()};
+  });
+}
+
+function combatSnapshot() {
+  const attack = state.started ? playerEntity().activeAttack : null;
+  return {simulationSeconds: state.simulationSeconds, selectedTarget: targeting.selected?.uid ?? null,
+    range: attackRange(), intent: combatControl.snapshot,
+    player: {x: player.x, z: player.z, hp: player.hp, dead: player.dead, mp: player.mp, maxMp: player.maxMp,
+      cooldowns: [...player.cooldowns], attackCd: player.attackCd, life: state.playerLife},
+    attack: attack ? {token: attack.token, skillIndex: attack.skillIndex ?? null, impacted: attack.impacted,
+      target: attack.target.uid, remaining: Math.max(0, (attack.endsAt ?? state.simulationSeconds) - state.simulationSeconds)} : null,
+    targets: state.entities.filter(entity => entity.kind === 'monster').map(entity => ({uid: entity.uid,
+      generation: entity.visualGeneration, hp: entity.hp, x: entity.x, z: entity.z, alive: entity.alive}))};
+}
+
 // Exposed only for deterministic smoke tests executed by the project's QA harness.
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-live-world-test',
+    version: '0.6.0-combat-e-test',
+    actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
       adaptiveScale: resolutionGovernor.scale, adaptiveDetails: resolutionGovernor.detailStep,
@@ -3164,6 +3323,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
       assetsLoaded,
       camera: cameraControl.state,
       selectedTarget: targeting.selected?.uid ?? null,
+      combat: combatSnapshot(),
       player: { level: player.level, hp: player.hp, xp: player.xp, dead: player.dead, mp: player.mp, cooldowns: [...player.cooldowns], inventory: player.inventory.length, x: player.x, z: player.z },
     }),
   },
@@ -3173,6 +3333,62 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
 // Only compiled into the separate CI build. Never included in the downloadable game.
 if (__QA_BUILD__) {
   const motionTrace: unknown[] = [];
+  const combatEvents: Record<string, unknown>[] = [];
+  qaCombatEvent = event => { if (combatEvents.length < 1000) combatEvents.push(event); };
+  let fixtureTargetIds: string[] = [];
+  const moveCombatTarget = (id: string, x: number, z: number) => {
+    const entity = state.entities.find(e => e.uid === id);
+    if (!entity) throw new Error('Missing combat fixture actor');
+    entity.x = x; entity.z = z; entity.homeX = x; entity.homeZ = z;
+    entity.previousX = x; entity.previousZ = z;
+    entity.status = {stun: 9999}; entity.navPath = undefined;
+    syncEntityTransform(entity);
+  };
+  const setupCombat = (options: {distance?: number; secondDistance?: number; hp?: number} = {}) => {
+    resetPlayerControl(true); inputControl.reset(); closeWindow(); closeConfirm();
+    // Settle and dispose the previous scenario's transient effects through their
+    // own cleanup path. No gameplay meshes or materials are silently abandoned.
+    for (let pass = 0; pass < 12 && state.effects.length; pass++) {
+      state.effects.forEach(effect => effect.update(2)); state.effects = state.effects.filter(effect => !effect.dead);
+    }
+    const distance = options.distance ?? attackRange() + 5;
+    const candidates = state.entities.filter(e => e.kind === 'monster' && e.id === 'wolf').slice(0, options.secondDistance === undefined ? 1 : 2);
+    if (!candidates.length) throw new Error('Real combat models unavailable');
+    let origin: {x: number; z: number} | undefined;
+    for (let x = 20; x <= 50 && !origin; x += 3) for (let z = -48; z <= -30 && !origin; z += 3) {
+      const points = [{x, z}, {x, z: z + distance}, {x: x + 4, z: z + (options.secondDistance ?? 3)}];
+      if (points.some(point => collisionWorld.isBlocked(point, 0.8))) continue;
+      if (!collisionWorld.hasLineOfSight({x, y: terrain.supportAt(x,z)+1.3, z},
+        {x, y: terrain.supportAt(x,z+distance)+1.3, z: z+distance}, .5)) continue;
+      const route = findNavigationPath(collisionWorld, points[0], points[1], {actorRadius: .46, cellSize: .85, margin: 12});
+      if (route.length) origin = {x,z};
+    }
+    if (!origin) throw new Error('No real free combat fixture location');
+    for (const e of state.entities) if (e.kind === 'monster') {cancelActorAttack(e); e.status = {stun: 9999};}
+    player.dead = false; player.hp = player.maxHp; player.mp = player.maxMp; player.cooldowns = [0,0,0,0]; player.attackCd = 0;
+    state.playerBuffs.guard = 0; state.playerBuffs.vanish = 0;
+    player.x = origin.x; player.z = origin.z;
+    const hero = playerEntity(); hero.x = player.x; hero.z = player.z;
+    hero.previousX = hero.x; hero.previousZ = hero.z;
+    if (hero.motion?.action === 'death') recreateEntityVisual(hero);
+    if (hero.root) hero.root.rotation.y = 0;
+    syncEntityTransform(hero); setEntityAction(hero, 'idle', true);
+    candidates.forEach((entity,index) => {
+      if (!entity.alive) {entity.alive = true; recreateEntityVisual(entity);}
+      entity.lifecycle = new MonsterLifecycle(); entity.alive = true; entity.respawn = 0;
+      entity.hp = entity.maxHp = options.hp ?? 10000;
+      entity.root?.setEnabled(true); entity.pickVolume?.setEnabled(true);
+      moveCombatTarget(entity.uid, origin!.x + (index ? 4 : 0), origin!.z + (index ? options.secondDistance! : distance));
+      if (entity.root) entity.root.rotation.y = Math.PI;
+      setEntityAction(entity, 'idle', true);
+    });
+    fixtureTargetIds = candidates.map(e => e.uid);
+    cameraControl.snap({x: player.x, y: terrain.supportAt(player.x,player.z), z: player.z});
+    actorVisibilityCooldown = 0; sectorVisibilityCooldown = 0; updateActorVisibility(1); updateWorldSectorVisibility(1);
+    presentActors(1); updateHud();
+    state.qaFrozen = true; simulationClock.reset(); skipFrameDelta = true; combatEvents.length = 0;
+    return {targetIds: [...fixtureTargetIds]};
+  };
   const actors = () => state.entities.map(entity => {
     const point = Vector3.Project(entityWorldPosition(entity, entity.targetHeight * 0.55), Matrix.Identity(),
       scene.getTransformMatrix(), camera.viewport.toGlobal(engine.getRenderWidth(), engine.getRenderHeight()));
@@ -3193,6 +3409,62 @@ if (__QA_BUILD__) {
   });
   Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
     actors,
+    combatSetup: setupCombat,
+    combatCluster: (count = 5) => {
+      const first = setupCombat({distance: 6, hp:10000});
+      const primary = state.entities.find(e => e.uid === first.targetIds[0])!;
+      const others = state.entities.filter(e => e.kind === 'monster' && e.id === 'wolf' && e !== primary).slice(0,Math.min(4,count-1));
+      const chosen = [primary];
+      others.forEach((entity,index) => {
+        const angle = index * Math.PI/2;
+        const point = {x:primary.x+Math.cos(angle)*3.4,z:primary.z+Math.sin(angle)*3.4};
+        if(collisionWorld.isBlocked(point,.46)) throw new Error('Real cluster fixture obstructed');
+        if(!entity.alive) {entity.alive=true; recreateEntityVisual(entity);}
+        entity.hp=entity.maxHp=10000; entity.lifecycle=new MonsterLifecycle();
+        moveCombatTarget(entity.uid,point.x,point.z);
+        if(!combatLineOfSight(primary,entity)) throw new Error('Real cluster fixture lacks visibility');
+        chosen.push(entity);
+      });
+      fixtureTargetIds=chosen.map(e=>e.uid); actorVisibilityCooldown=0;updateActorVisibility(1);presentActors(1);
+      return {targetIds:[...fixtureTargetIds]};
+    },
+    combatSnapshot: () => ({...combatSnapshot(), events: structuredClone(combatEvents)}),
+    combatAim: (id: string, engage = true) => {
+      const entity = state.entities.find(e => e.uid === id);
+      if (entity) selectCombatTarget(entity, engage);
+    },
+    combatMoveTarget: moveCombatTarget,
+    combatVisible: (id: string) => {const target = state.entities.find(e => e.uid === id); return Boolean(target && combatLineOfSight(playerEntity(), target));},
+    combatStep: (seconds: number) => {
+      const frozen = state.qaFrozen; state.qaFrozen = false;
+      let remaining = Math.max(0, Math.min(seconds, 30));
+      while (remaining > 1e-9) {const dt = Math.min(1/60, remaining); navigationBudget = 2; update(dt); remaining -= dt;}
+      state.qaFrozen = frozen; simulationClock.reset(); skipFrameDelta = true;
+      presentActors(1); updateHud();
+    },
+    combatWallTest: () => {
+      const result = setupCombat({distance: 2.4, hp:10000});
+      const hero = playerEntity();
+      const target = state.entities.find(e => e.uid === result.targetIds[0])!;
+      let found = false;
+      // Locate the two free sides of an existing Greenfall wall; no fake collider.
+      for (let x=-28;x<14 && !found;x+=.5) for(let z=-28;z<12 && !found;z+=.5) {
+        for (const delta of [{x:2.4,z:0},{x:0,z:2.4}]) {
+          if (collisionWorld.isBlocked({x,z},.46) || collisionWorld.isBlocked({x:x+delta.x,z:z+delta.z},.46)) continue;
+          const from={x,y:terrain.supportAt(x,z)+1.3,z};
+          const to={x:x+delta.x,y:terrain.supportAt(x+delta.x,z+delta.z)+1.2,z:z+delta.z};
+          if (collisionWorld.hasLineOfSight(from,to,.04)) continue;
+          player.x=hero.x=x; player.z=hero.z=z;
+          hero.previousX=x; hero.previousZ=z; syncEntityTransform(hero);
+          moveCombatTarget(target.uid,to.x,to.z);
+          found=true; break;
+        }
+      }
+      if(!found) throw new Error('Existing wall test location unavailable');
+      if(hero.root) hero.root.rotation.y=Math.atan2(target.x-hero.x,target.z-hero.z);
+      cameraControl.snap({x:player.x,y:terrain.supportAt(player.x,player.z),z:player.z});
+      return {...result, blocked:!combatLineOfSight(hero,target)};
+    },
     playerSnapshot: () => structuredClone(player),
     cooldowns: (values: number[]) => { player.cooldowns = values.slice(0, 4); },
     prepareRespawn: (id: string) => {
