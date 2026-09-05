@@ -1,4 +1,4 @@
-name: Inventory C validation and Windows test build
+name: HUD B validation and Windows test build
 
 on:
   push:
@@ -37,13 +37,19 @@ jobs:
             dist
             server.ps1
             packaging/windows/RUN_VARENDOR.bat
-            packaging/windows/README_C_RU.txt
+            packaging/windows/README_B_RU.txt
           retention-days: 14
       - name: Prepare isolated browser regression build
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
           google-chrome --version
+      - name: Block B production HUD and isolated consumable regressions
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          node scripts/hud-regression.mjs dist production
+          node scripts/hud-regression.mjs dist-qa
       - name: Block C production inventory and isolated item regressions
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
@@ -124,11 +130,13 @@ jobs:
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          stage="Varendor_Inventory_C_Windows_Test_${short_sha}"
+          stage="Varendor_HUD_B_Windows_Test_${short_sha}"
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
           import { readFileSync } from 'node:fs';
           const expected = new Map([
+            ['B-production-hud.json', 'B-production'],
+            ['B-hud.json', 'B'],
             ['C-production-inventory.json', 'C-production'],
             ['C-inventory.json', 'C'],
             ['E-production-combat-intent.json', 'E-production'],
@@ -150,29 +158,29 @@ jobs:
           cp -a production/dist "$stage/dist"
           cp production/server.ps1 "$stage/"
           cp production/packaging/windows/RUN_VARENDOR.bat "$stage/"
-          cp production/packaging/windows/README_C_RU.txt "$stage/README_RU.txt"
-          cp docs/INVENTORY_QA.md "$stage/QA_REPORT_RU.md"
+          cp production/packaging/windows/README_B_RU.txt "$stage/README_RU.txt"
+          cp docs/HUD_QA.md "$stage/QA_REPORT_RU.md"
           cp docs/BLOCK_SPEC_V2_RU.md "$stage/TZ_V2_RU.md"
           cp docs/ENHANCEMENT_BALANCE_V2.json "$stage/ENHANCEMENT_BALANCE_V2.json"
-          cp qa-artifacts/C-inventory.json qa-artifacts/C-production-inventory.json qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
-          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. C production/QA и регрессии E/A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия C.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
+          cp qa-artifacts/B-hud.json qa-artifacts/B-production-hud.json qa-artifacts/C-inventory.json qa-artifacts/C-production-inventory.json qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
+          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. B production/QA и регрессии C/E/A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия B.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
           printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
           zip -q -9 -r "${stage}.zip" "$stage"
           unzip -t "${stage}.zip" | tail -1
           sha256sum "${stage}.zip" > "${stage}.zip.sha256"
           stat -c '%n %s bytes' "${stage}.zip"
           cat "${stage}.zip.sha256"
-          zip -q -r "Inventory_C_QA_${short_sha}.zip" qa-artifacts
-          unzip -t "Inventory_C_QA_${short_sha}.zip" | tail -1
+          zip -q -r "HUD_B_QA_${short_sha}.zip" qa-artifacts
+          unzip -t "HUD_B_QA_${short_sha}.zip" | tail -1
       - name: Publish immutable prerelease, never merge main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          tag="v0.6-inventory-c-test-${short_sha}"
+          tag="v0.6-hud-b-test-${short_sha}"
           gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
-            --title "Varendor — Inventory C Test (${short_sha})" \
-            --notes "Блок C: компактный инвентарь рядом с героем, Tab, 42 ячейки и 12 слотов экипировки, наведение и сравнение характеристик, двойной клик и перетаскивание. Полноэкранная подложка инвентаря убрана, мир продолжает жить. Принятые E и A проверены на этом же SHA. Новый HUD B и заточка V2 D остаются следующими блоками. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. После выдачи — СТОП до пользовательского теста и принятия C. main не изменён. CI WebGL использует software GPU; результаты не являются FPS-прогнозом для игрового ПК." \
-            "Varendor_Inventory_C_Windows_Test_${short_sha}.zip" "Varendor_Inventory_C_Windows_Test_${short_sha}.zip.sha256" \
-            "Inventory_C_QA_${short_sha}.zip"
+            --title "Varendor — HUD B Test (${short_sha})" \
+            --notes "Блок B: компактный HUD, HP/MP снизу, миникарта слева сверху, реальные эффекты, журнал с фильтрами, 2–4 ряда по 8 быстрых слотов, сохранение назначений и общий запас расходников. Регрессии C/E/A на этом же SHA. Новая заточка D ещё не внедрена. Windows: распаковать целиком и запустить RUN_VARENDOR.bat. СТОП до принятия B. main не изменён. CI software WebGL не является аппаратным FPS-тестом." \
+            "Varendor_HUD_B_Windows_Test_${short_sha}.zip" "Varendor_HUD_B_Windows_Test_${short_sha}.zip.sha256" \
+            "HUD_B_QA_${short_sha}.zip"

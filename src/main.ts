@@ -1,6 +1,9 @@
 import './styles.css';
 import './hotbar.css';
 import './overhaul.css';
+import './hud.css';
+import { normalizeQuickbar, QUICK_KEYS, quickKey, quickLabel } from './controls/quickbar';
+import type { QuickSlot, QuickAction } from './controls/quickbar';
 import '@babylonjs/loaders/glTF';
 import {
   AbstractMesh,
@@ -275,6 +278,10 @@ type Settings = {
   invertCameraY: boolean;
   uiScale: number;
   inventoryWindow?: InventoryPosition;
+  quickbar?: QuickSlot[];
+  quickRows?: number;
+  hudOpacity?: number;
+  textScale?: number;
   shadows: boolean;
   bloom: boolean;
   damage: boolean;
@@ -352,13 +359,18 @@ app.innerHTML = `
  <section class="minimap-wrap glass"><canvas class="minimap" id="minimap" width="428" height="328"></canvas><span class="clock" id="clock">19:21</span><div class="zone" id="zone">Гринфолл</div></section>
  <section class="tracker glass"><div class="eyebrow">Путь странника</div><h3 id="quest-title">Голос границы</h3><p id="quest-text">Поговорите со старостой Гринфолла.</p><div class="progress"><i id="quest-progress"></i></div></section>
  <section class="boss-timers glass"><div class="eyebrow">Владыки региона</div><div class="timer"><span>Кровавый Оборотень</span><b id="mini-timer">жив</b></div><div class="timer"><span>Хозяин Гнилого Леса</span><b id="big-timer">жив</b></div></section>
- <section class="combat-log glass"><div class="messages" id="messages"></div><div class="chat-input"><input id="chat" placeholder="Enter — общий чат"><button id="send-chat">›</button></div></section>
- <div class="bottom-cluster"><div class="hotbar glass" id="hotbar"></div><nav class="menu glass"><button class="menu-button" data-window="character"><span>C</span><small>Герой</small></button><button class="menu-button" data-window="inventory"><span>I</span><small>Сумка</small></button><button class="menu-button" data-window="skills"><span>K</span><small>Навыки</small></button><button class="menu-button" data-window="map"><span>M</span><small>Карта</small></button><button class="menu-button" data-window="settings"><span>Esc</span><small>Настройки</small></button></nav></div>
+ <section class="combat-log glass"><div class="log-filters" aria-label="Фильтр журнала"><button data-log="all" aria-pressed="true">Все</button><button data-log="combat">Бой</button><button data-log="loot">Добыча</button><button data-log="system">Система</button></div><div class="messages" id="messages"></div><div class="chat-input"><input id="chat" placeholder="Enter — локальная заметка"><button id="send-chat">›</button></div></section>
+ <div class="bottom-cluster"><div class="hotbar glass" id="hotbar"></div><nav class="menu glass"><button class="menu-button" data-window="character"><span>C</span><small>Герой</small></button><button class="menu-button" data-window="inventory"><span>Tab</span><small>Сумка</small></button><button class="menu-button" data-window="skills"><span>K</span><small>Навыки</small></button><button class="menu-button" data-window="map"><span>M</span><small>Карта</small></button><button class="menu-button" data-window="settings"><span>Esc</span><small>Настройки</small></button></nav></div>
  <div class="quick-items glass" aria-label="Быстрые расходники"><button class="skill-button" id="potion"><span class="key" id="potion-key">Q</span><span class="symbol">♥</span><small>Зелье <b id="potion-count">0</b></small></button><button class="skill-button" id="ether"><span class="key" id="ether-key">E</span><span class="symbol">◆</span><small>Эфир <b id="ether-count">0</b></small></button></div>
  <div class="notice-stack" id="notices"></div><div class="damage-layer" id="damage-layer"></div>
 </div><div id="modal-root"></div><div id="confirm-root"></div>`;
 q('#hud').insertAdjacentHTML('beforeend', '<output id="performance-readout" aria-label="Производительность">Motion · измерение FPS…</output>');
+q('.bottom-cluster').prepend(q('.player-frame'));
 q('.bottom-cluster').append(q('.quick-items'));
+q('#hud').insertAdjacentHTML('beforeend', '<section id="player-effects" aria-label="Действующие эффекты"></section>');
+q('#hotbar').insertAdjacentHTML('beforebegin', '<section class="actions-wrap"><div class="bar-tools"><span>Быстрые действия</span><button id="quick-rows" aria-expanded="false">4 ряда</button><button id="quick-edit" aria-pressed="false">Настроить</button></div></section>');
+q('.actions-wrap').append(q('#hotbar'));
+q('.actions-wrap').insertAdjacentHTML('beforeend', '<div id="quick-editor" class="hidden"><label>Действие<select id="quick-action"></select></label><label>Клавиша<select id="quick-key"></select></label><button id="quick-save">Назначить</button><button id="quick-cancel">Закрыть</button></div>');
 
 function settingsDefaults(): Settings { return {
   quality: 'high', shadows: true, bloom: true, damage: true, screenShake: true,
@@ -1575,15 +1587,56 @@ function zoneAt(x: number, z: number) {
   return LOCATIONS_LIST[2];
 }
 
+let quickEditing = false;
+let editedQuickSlot = 0;
 function buildHotbar(): void {
-  const classDef = CLASSES_MAP[player.classId];
+  state.settings.quickbar = normalizeQuickbar(state.settings.quickbar);
+  state.settings.quickRows = state.settings.quickRows === 4 ? 4 : 2;
   const hotbar = q<HTMLElement>('#hotbar');
-  hotbar.innerHTML = '';
-  classDef.skills.forEach((skill, index) => hotbar.insertAdjacentHTML('beforeend', `<button class="skill-button" data-skill="${index}"><span class="key">${index + 1}</span><span class="symbol">${skill.icon}</span><small>${skill.name}</small><i class="cooldown"></i></button>`));
-  hotbar.insertAdjacentHTML('beforeend', '<button class="skill-button" data-attack><span class="key">ЛКМ</span><span class="symbol">⚔</span><small>Обычная атака</small></button>');
-  qa<HTMLButtonElement>('[data-skill]').forEach((button) => { button.onclick = () => castSkill(Number(button.dataset.skill)); });
-  q<HTMLButtonElement>('[data-attack]').onclick = basicAttack;
+  hotbar.innerHTML = state.settings.quickbar.map((slot, index) => {
+    const skillIndex = slot.action.startsWith('skill:') ? Number(slot.action.slice(6)) : -1;
+    const skill = CLASSES_MAP[player.classId].skills[skillIndex];
+    const name = skill?.name ?? (({attack:'Обычная атака', potion:'Багровое зелье', ether:'Эфирное зелье', teleport:'Камень возвращения'} as Record<string,string>)[slot.action] ?? 'Пустой слот');
+    const icon = skill?.icon ?? (({attack:'⚔',potion:'♥',ether:'◆',teleport:'◇'} as Record<string,string>)[slot.action] ?? '');
+    return `<button class="skill-button${slot.action ? '' : ' empty-action'}" data-quick="${index}" ${skill ? `data-skill="${skillIndex}"` : slot.action === 'attack' ? 'data-attack' : ''} title="${name}" aria-label="${name}"><span class="key">${quickLabel(slot.key)}</span><span class="symbol">${icon}</span><b class="quick-count"></b><i class="cooldown"></i></button>`;
+  }).join('');
+  hotbar.dataset.rows = String(state.settings.quickRows);
+  qa<HTMLButtonElement>('[data-quick]').forEach(button => { button.onclick = event => {
+    const index = Number(button.dataset.quick);
+    if (quickEditing) editQuickSlot(index); else if (event.detail < 2) runQuickAction(state.settings.quickbar![index].action);
+  }; });
+  q('#quick-rows').textContent = state.settings.quickRows === 4 ? '2 ряда' : `4 ряда${state.settings.quickbar.slice(16).some(slot=>slot.action) ? ' •' : ''}`;
+  q('#quick-rows').setAttribute('aria-expanded', String(state.settings.quickRows === 4));
+  fitActionDock();
 }
+function runQuickAction(action: QuickAction): void {
+  if (player.dead || confirmation || quickEditing) return;
+  if (action.startsWith('skill:')) castSkill(Number(action.slice(6)));
+  else if (action === 'attack') basicAttack();
+  else if (action) useItem(action);
+}
+function editQuickSlot(index: number): void {
+  editedQuickSlot = index;
+  const actions = [['','Пустой слот'], ['attack','Обычная атака'], ['potion','Багровое зелье'], ['ether','Эфирное зелье'], ['teleport','Камень возвращения'], ...CLASSES_MAP[player.classId].skills.map((skill,i)=>[`skill:${i}`,skill.name])];
+  q('#quick-action').innerHTML = actions.map(([value,label])=>`<option value="${value}">${label}</option>`).join('');
+  q('#quick-key').innerHTML = QUICK_KEYS.map(key=>`<option value="${key}">${quickLabel(key) || 'Только клик'}</option>`).join('');
+  q<HTMLSelectElement>('#quick-action').value = state.settings.quickbar![index].action;
+  q<HTMLSelectElement>('#quick-key').value = state.settings.quickbar![index].key;
+  q('#quick-editor').classList.remove('hidden');
+}
+q<HTMLButtonElement>('#quick-rows').onclick = () => {state.settings.quickRows = state.settings.quickRows === 4 ? 2 : 4; buildHotbar(); updateHud(); inventoryPanel?.resize(); saveGame();};
+q<HTMLButtonElement>('#quick-edit').onclick = () => {
+  quickEditing = !quickEditing; q('#quick-edit').setAttribute('aria-pressed',String(quickEditing));
+  q('#hotbar').classList.toggle('editing',quickEditing); q('#quick-editor').classList.add('hidden');
+  if (quickEditing) toast('Выберите ячейку для назначения действия и клавиши');
+};
+q<HTMLButtonElement>('#quick-cancel').onclick = () => q('#quick-editor').classList.add('hidden');
+q<HTMLButtonElement>('#quick-save').onclick = () => {
+  const key = q<HTMLSelectElement>('#quick-key').value;
+  if (key && state.settings.quickbar!.some((slot,index)=>index !== editedQuickSlot && slot.key === key)) return toast('Эта клавиша уже назначена другой ячейке','bad');
+  state.settings.quickbar![editedQuickSlot] = {action:q<HTMLSelectElement>('#quick-action').value as QuickAction,key};
+  q('#quick-editor').classList.add('hidden'); buildHotbar(); updateHud(); saveGame();
+};
 
 function rotateTowards(entity: Entity, targetX: number, targetZ: number): void {
   if (!entity.root) return;
@@ -2640,8 +2693,8 @@ function updateHud(): void {
   q('#ether-key').textContent = keyLabel(state.settings.keybinds.ether);
   const potionButton = q<HTMLButtonElement>('#potion');
   const etherButton = q<HTMLButtonElement>('#ether');
-  potionButton.disabled = potionCount <= 0;
-  etherButton.disabled = etherCount <= 0;
+  potionButton.disabled = potionCount <= 0 || player.dead;
+  etherButton.disabled = etherCount <= 0 || player.dead;
   potionButton.classList.toggle('disabled', potionCount <= 0);
   etherButton.classList.toggle('disabled', etherCount <= 0);
   potionButton.title = `Багровое зелье · ${keyLabel(state.settings.keybinds.potion)}`;
@@ -2669,11 +2722,20 @@ function updateHud(): void {
   q('#clock').textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
   q('#mini-timer').textContent = formatTimer(state.bossTimers.mini);
   q('#big-timer').textContent = formatTimer(state.bossTimers.big);
-  qa<HTMLElement>('[data-skill]').forEach((button) => {
-    const index = Number(button.dataset.skill);
-    const cooldown = button.querySelector<HTMLElement>('.cooldown');
-    if (cooldown) cooldown.textContent = player.cooldowns[index] > 0 ? player.cooldowns[index].toFixed(1) : '';
+  qa<HTMLButtonElement>('[data-quick]').forEach(button => {
+    const slot = state.settings.quickbar?.[Number(button.dataset.quick)]; if (!slot) return;
+    const index = slot.action.startsWith('skill:') ? Number(slot.action.slice(6)) : -1;
+    const skill = CLASSES_MAP[player.classId].skills[index];
+    const remaining = skill ? player.cooldowns[index] ?? 0 : 0;
+    const consumable = ['potion','ether','teleport'].includes(slot.action);
+    button.querySelector('.cooldown')!.textContent = remaining > 0 ? remaining.toFixed(1) : '';
+    button.querySelector('.quick-count')!.textContent = consumable ? String(countItem(slot.action)) : '';
+    const reason = player.dead ? 'Персонаж погиб' : skill && player.mp < skill.cost ? 'Недостаточно ресурса' : remaining > 0 ? `Перезарядка ${remaining.toFixed(1)} с` : consumable && countItem(slot.action) === 0 ? 'Нет в сумке' : '';
+    button.classList.toggle('unavailable', Boolean(reason));
+    button.setAttribute('aria-disabled',String(Boolean(reason) || !slot.action));
+    button.title = `${skill?.name ?? (({attack:'Обычная атака',potion:'Багровое зелье',ether:'Эфирное зелье',teleport:'Камень возвращения'} as Record<string,string>)[slot.action] ?? 'Пустой слот')} · ${quickLabel(slot.key) || 'Клик'}${skill ? ` · MP ${skill.cost}` : ''}${reason ? ` · ${reason}` : ''}`;
   });
+  q('#player-effects').innerHTML = (Object.entries(state.playerBuffs) as Array<['guard'|'vanish',number]>).filter(([,seconds])=>seconds>0).map(([key,seconds])=>`<span class="effect" data-effect="${key}" title="${key === 'guard' ? 'Входящий урон снижен на 50%' : 'Незаметность для монстров'}">${key === 'guard' ? '◈ Последний рубеж' : '◌ Исчезновение'} <b>${seconds.toFixed(1)} с</b></span>`).join('');
   inventoryPanel?.refresh();
 }
 
@@ -2742,9 +2804,11 @@ window.addEventListener('keydown', (event) => {
     return;
   }
   if (event.repeat || player.dead || confirmation) return;
-  if (['1', '2', '3', '4'].includes(event.key)) castSkill(Number(event.key) - 1);
+  const binding = quickKey(event);
+  const slot = binding ? state.settings.quickbar?.find(slot => slot.key === binding) : null;
+  if (slot) { event.preventDefault(); runQuickAction(slot.action); return; }
   const consumableAction = consumableActionForCode(state.settings.keybinds, event.code);
-  if (consumableAction) { event.preventDefault(); useItem(consumableAction); }
+  if (consumableAction && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) { event.preventDefault(); useItem(consumableAction); }
   if (event.key === 'Enter') q<HTMLInputElement>('#chat').focus();
 });
 document.addEventListener('focusin', event => {
@@ -3087,6 +3151,8 @@ function renderSettings(): void {
       ${range('camera-smoothing', 'Плавность камеры', Math.round(s.cameraSmoothing * 100), 55, 180, 5, '%')}
       ${range('camera-fov', 'Поле зрения', Math.round(s.fov * 100), 65, 105, 1, '')}
       ${range('ui-scale', 'Масштаб интерфейса', Math.round(s.uiScale * 100), 80, 125, 5, '%')}
+      ${range('hud-opacity', 'Непрозрачность HUD', Math.round((s.hudOpacity ?? .94) * 100), 50, 100, 5, '%')}
+      ${range('hud-text-scale', 'Текст журнала', Math.round((s.textScale ?? 1) * 100), 100, 125, 5, '%')}
       <div class="setting"><label>Инвертировать вертикаль <input type="checkbox" id="invert-y" ${s.invertCameraY ? 'checked' : ''}></label></div>
       <div class="setting"><label>Цифры урона <input type="checkbox" id="damage" ${s.damage ? 'checked' : ''}></label></div>
       <div class="setting"><label>Эффект получения урона <input type="checkbox" id="shake" ${s.screenShake ? 'checked' : ''}></label></div>
@@ -3140,6 +3206,7 @@ function renderSettings(): void {
     s.saturation = Number(q<HTMLInputElement>('#saturation').value) / 100; s.fog = Number(q<HTMLInputElement>('#fog').value) / 100;
     s.mouseSensitivity = Number(q<HTMLInputElement>('#mouse-sensitivity').value) / 100; s.zoomSensitivity = Number(q<HTMLInputElement>('#zoom-sensitivity').value) / 100;
     s.cameraSmoothing = Number(q<HTMLInputElement>('#camera-smoothing').value) / 100; s.fov = Number(q<HTMLInputElement>('#camera-fov').value) / 100;
+    s.hudOpacity = Number(q<HTMLInputElement>('#hud-opacity').value) / 100; s.textScale = Number(q<HTMLInputElement>('#hud-text-scale').value) / 100;
     s.uiScale = Number(q<HTMLInputElement>('#ui-scale').value) / 100; s.invertCameraY = q<HTMLInputElement>('#invert-y').checked;
     s.muteOnBlur = q<HTMLInputElement>('#mute-on-blur').checked;
     s.keybinds = normalizeConsumableBindings(requestedBindings);
@@ -3243,8 +3310,8 @@ function consumeItem(id: string, reference?: ItemReference): boolean {
 }
 function useItem(id: string, reference?: ItemReference): void {
   if (!state.started || player.dead) return;
-  if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id, reference)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); }
-  else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id, reference)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
+  if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id, reference)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); log('Багровое зелье: здоровье восстановлено.', 'combat'); }
+  else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id, reference)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); log('Эфирное зелье: ресурс восстановлен.', 'combat'); }
   else if (id === 'teleport' && consumeItem(id, reference)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
   updateHud(); saveGame();
 }
@@ -3279,13 +3346,27 @@ function saveGame(): void {
   void gateway.save(save);
 }
 
-function log(message: string, type = ''): void {
+let logFilter = 'all';
+qa<HTMLButtonElement>('[data-log]').forEach(button => {button.onclick = () => {
+  logFilter = button.dataset.log!;
+  qa<HTMLButtonElement>('[data-log]').forEach(b=>b.setAttribute('aria-pressed',String(b === button)));
+  for (const entry of q('#messages').children) (entry as HTMLElement).hidden = logFilter !== 'all' && (entry as HTMLElement).dataset.kind !== logFilter;
+};});
+function log(message: string, type = 'system'): void {
+  const messages = q<HTMLElement>('#messages');
+  const last = messages.lastElementChild as HTMLElement | null;
+  if (last?.dataset.message === message && last.dataset.kind === type && Date.now() - Number(last.dataset.at) < 10000) {
+    const count = Number(last.dataset.count || 1) + 1; last.dataset.count = String(count); last.dataset.at = String(Date.now());
+    last.lastChild!.textContent = `${message} ×${count}`; return;
+  }
   const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   const entry = document.createElement('div');
   entry.className = type ? `msg-${type}` : '';
+  entry.dataset.kind = type; entry.dataset.message = message; entry.dataset.at = String(Date.now());
+  entry.hidden = logFilter !== 'all' && logFilter !== type;
   const stamp = document.createElement('span'); stamp.textContent = `[${time}] `;
   entry.append(stamp, document.createTextNode(message));
-  const messages = q<HTMLElement>('#messages'); messages.append(entry);
+  messages.append(entry);
   while (messages.childElementCount > 80) messages.firstElementChild?.remove();
   messages.scrollTop = messages.scrollHeight;
 }
@@ -3298,9 +3379,9 @@ function toast(message: string, type = '', group = ''): void {
 }
 
 qa<HTMLButtonElement>('[data-window]').forEach((button) => { button.onclick = () => openWindow(button.dataset.window ?? 'character'); });
-q<HTMLButtonElement>('#potion').onclick = () => useItem('potion');
-q<HTMLButtonElement>('#ether').onclick = () => useItem('ether');
-function sendChat(): void { const input = q<HTMLInputElement>('#chat'); if (input.value.trim()) log(`[Общий] ${player.name}: ${input.value.trim()}`); input.value = ''; input.blur(); canvas.focus(); }
+q<HTMLButtonElement>('#potion').onclick = event => {if(event.detail < 2) useItem('potion');};
+q<HTMLButtonElement>('#ether').onclick = event => {if(event.detail < 2) useItem('ether');};
+function sendChat(): void { const input = q<HTMLInputElement>('#chat'); if (input.value.trim()) log(`[Локально] ${player.name}: ${input.value.trim()}`, 'system'); input.value = ''; input.blur(); canvas.focus(); }
 q<HTMLButtonElement>('#send-chat').onclick = sendChat;
 q<HTMLInputElement>('#chat').onkeydown = (event) => { if (event.key === 'Enter') sendChat(); };
 
@@ -3316,6 +3397,8 @@ function fitActionDock(): void {
   const scale = Math.min(state.settings.uiScale, (window.innerWidth - 32) / dock.offsetWidth);
   document.documentElement.style.setProperty('--dock-scale', String(scale));
   document.documentElement.style.setProperty('--dock-height', `${dock.offsetHeight * scale}px`);
+  document.documentElement.style.setProperty('--hud-opacity', String(state.settings.hudOpacity ?? .94));
+  document.documentElement.style.setProperty('--hud-text-scale', String(state.settings.textScale ?? 1));
 }
 window.addEventListener('resize', applyRenderResolution);
 let skipFrameDelta = false;
@@ -3410,7 +3493,7 @@ function combatSnapshot() {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-inventory-c-test',
+    version: '0.6.0-hud-b-test',
     actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
@@ -3636,6 +3719,15 @@ if (__QA_BUILD__) {
       cameraControl.snap({x:player.x,y:terrain.supportAt(player.x,player.z),z:player.z});
       return {...result, blocked:!combatLineOfSight(hero,target)};
     },
+    hudSetup: (count = 1) => {
+      resetPlayerControl(true); closeWindow(); closeConfirm(); state.qaFrozen = true;
+      player.dead = false; player.hp = 1; player.mp = 1; player.cooldowns = [0,0,0,0];
+      player.inventory = player.inventory.filter(item=>!['potion','ether'].includes(item.id));
+      if (count > 0) {player.inventory.push(makeItem('potion',0,count),makeItem('ether',0,count));}
+      updateHud();
+    },
+    hudRestock: () => {addItem('potion',1); addItem('ether',1); updateHud();},
+    hudBuff: (seconds: number) => {state.playerBuffs.guard = seconds; updateHud();},
     playerSnapshot: () => structuredClone(player),
     cooldowns: (values: number[]) => { player.cooldowns = values.slice(0, 4); },
     prepareRespawn: (id: string) => {

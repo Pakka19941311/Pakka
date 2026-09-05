@@ -66,7 +66,7 @@ const GEAR_LAYOUT = [
 const PANEL_WIDTH = 392;
 const PANEL_HEIGHT = 564;
 const EDGE = 8;
-const DOCK_CLEARANCE = 96;
+const dockClearance = () => Math.max(96, (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dock-height')) || 0) + 24);
 
 // Original code-native silhouettes: item identity is legible at a 50 px cell size.
 const ICON_PATHS: Record<string, string> = {
@@ -380,7 +380,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
 
   function clampPosition() {
     const maxX = Math.max(EDGE, window.innerWidth - PANEL_WIDTH * scale - EDGE);
-    const maxY = Math.max(EDGE, window.innerHeight - PANEL_HEIGHT * scale - DOCK_CLEARANCE);
+    const maxY = Math.max(EDGE, window.innerHeight - PANEL_HEIGHT * scale - dockClearance());
     position.x = Math.max(EDGE, Math.min(position.x, maxX));
     position.y = Math.max(EDGE, Math.min(position.y, maxY));
     element.style.left = `${position.x}px`; element.style.top = `${position.y}px`;
@@ -388,7 +388,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
   function resize() {
     if (destroyed) return;
     const requestedScale = Math.max(.8, Math.min(1.25, options.read().scale ?? 1));
-    scale = Math.min(requestedScale, (window.innerWidth - EDGE * 2) / PANEL_WIDTH, (window.innerHeight - DOCK_CLEARANCE - EDGE) / PANEL_HEIGHT);
+    scale = Math.min(requestedScale, (window.innerWidth - EDGE * 2) / PANEL_WIDTH, (window.innerHeight - dockClearance() - EDGE) / PANEL_HEIGHT);
     scale = Math.max(.35, scale);
     element.style.transform = `scale(${scale})`;
     element.dataset.scale = String(scale);
