@@ -1,0 +1,43 @@
+name: Movement profiling before gameplay changes
+
+on:
+  push:
+    branches: [work/v06-commercial-rebuild]
+    paths:
+      - scripts/motion-profile.mjs
+      - .github/workflows/motion-profile.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+      - name: Build the existing game with its isolated test fixture
+        run: |
+          npm ci
+          npm run typecheck
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
+          VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
+          google-chrome --version
+      - name: Measure idle, continuous forward movement and direction changes
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: node scripts/motion-profile.mjs dist-qa before
+      - name: Keep raw frame samples, CPU profiles, console errors and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: motion-profile-before
+          path: |
+            qa-artifacts/motion-profile
+            dist-qa/assets/*.js.map
+          retention-days: 30

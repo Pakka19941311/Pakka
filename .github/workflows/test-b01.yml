@@ -3,7 +3,7 @@ name: B01 validation and Windows test build
 on:
   push:
     branches: [work/v06-commercial-rebuild]
-    paths-ignore: ['docs/**', PROJECT_RULES.md]
+    paths-ignore: ['docs/**', PROJECT_RULES.md, scripts/motion-profile.mjs, .github/workflows/motion-profile.yml]
   workflow_dispatch:
 
 permissions:
@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   validate:
+    # Profiling-only checkpoints have their own job and must not republish accepted B01.
+    if: ${{ !contains(github.event.head_commit.message, '[motion-profile]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
