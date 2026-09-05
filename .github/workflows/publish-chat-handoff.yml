@@ -1,0 +1,40 @@
+name: Publish chat handoff archive
+on:
+  push:
+    branches: [delivery/chat-handoff-20260905]
+    paths:
+      - .github/workflows/publish-chat-handoff.yml
+      - handoff/Varendor_Full_TZ_and_Chat_Handoff_2026-09-05.zip
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify existing archive and publish download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd handoff
+          python - <<'PY'
+          import hashlib, pathlib, zipfile
+          p = pathlib.Path('Varendor_Full_TZ_and_Chat_Handoff_2026-09-05.zip')
+          expected = '16ceb58af3cbef7fc8289e6c614c6a31dc77b391cb37c591c686c04e19ea214f'
+          actual = hashlib.sha256(p.read_bytes()).hexdigest()
+          assert actual == expected, (actual, expected)
+          assert p.stat().st_size == 4661549
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+          pathlib.Path(str(p)+'.sha256').write_text(actual+'  '+p.name+'\n')
+          print('Verified unchanged handoff ZIP', actual)
+          PY
+          tag='handoff-20260905-16ceb58a'
+          archive='Varendor_Full_TZ_and_Chat_Handoff_2026-09-05.zip'
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" --target "$GITHUB_SHA" --prerelease --title 'Varendor — Full specification and chat handoff' --notes 'Пакет передачи в новый чат: ТЗ на согласование, состояние проекта, расчёты и кадры референсов. Не игровая сборка. Игровая ветка остаётся на 999e90a5; main не изменён.'
+          fi
+          gh release upload "$tag" "$archive" "$archive.sha256"
