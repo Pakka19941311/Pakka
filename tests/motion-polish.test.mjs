@@ -50,7 +50,7 @@ test('foot phase follows actual travel and clip evaluation stays once per render
     a.setVisible(false); assert.equal(a.activeGroups, 0);
     a.setVisible(true); a.render(); assert.equal(a.activeGroups, 1);
     const timing = a.beginAttack(); a.advance(timing.windup); a.render();
-    assert.match(a.clip, /Sword_Attack/); assert.ok(Math.abs(a.phase - 0.42) < 0.001);
+    assert.match(a.clip, /Sword_Attack/); assert.ok(Math.abs(a.phase - 0.5) < 0.001);
     a.request('death'); a.advance(3); a.render(); a.request('walk');
     assert.equal(a.action, 'death'); assert.equal(a.phase, 1);
   } finally { f.dispose(); }

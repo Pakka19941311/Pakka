@@ -280,7 +280,7 @@ try {
     assert.ok(contactIndex > 0, 'no actual melee contact in simulation trace');
     assert.equal(attackTrace[contactIndex].action, 'attack', 'melee damage detached from attack phase');
     const gap = Math.hypot(attackTrace[contactIndex].x - attackTrace[contactIndex].targetX, attackTrace[contactIndex].z - attackTrace[contactIndex].targetZ);
-    assert.ok(gap > 1.1, 'hero and fox occupy the same body during the hit');
+    assert.ok(gap > 2.05, 'hero and long-bodied fox occupy the same body during the hit');
     for (let i = 1; i < attackTrace.length; i++) {
       const a = attackTrace[i - 1], b = attackTrace[i];
       if (a.attackToken && a.attackToken === b.attackToken) assert.ok(Math.hypot(a.x - b.x, a.z - b.z) < 0.001, 'hero slides during committed melee');
@@ -333,11 +333,31 @@ try {
       assert.ok(trace.some(t => t.action === 'attack' && Math.hypot(t.x - t.targetX, t.z - t.targetZ) > 2.5), `${classId} did not fire from ranged distance`);
       assert.ok(trace.some(t => new RegExp(classId === 'mage' ? 'Spell1' : 'Bow_Shoot', 'i').test(t.clip ?? '')), `${classId} chose the wrong action clip`);
       await writeFile(`${reportDir}/${classId}-motion-trace.json`, JSON.stringify(trace));
-      await visibleWorldScreenshot(`motion-${classId}-combat`);
       await page.keyboard.down('s'); await page.waitForTimeout(500); await page.keyboard.up('s');
       const afterCancel = await page.evaluate(() => window.__VARENDOR_FIXTURE__.actors());
       assert.equal(afterCancel.find(e => e.uid === target.uid).engaged, false, `${classId} manual movement failed to cancel pursuit`);
       assert.equal(afterCancel.find(e => e.kind === 'player').attack, null, `${classId} attack survived a movement cancellation`);
+      await visibleWorldScreenshot(`motion-${classId}-combat`);
+      if (classId === 'mage') {
+        await page.evaluate(id => {
+          window.__CORPSE_PROBE__ = { captured: false };
+          const deadline = performance.now() + 12000;
+          const observe = () => {
+            const actor = window.__VARENDOR_FIXTURE__.actors().find(e => e.uid === id);
+            if (actor?.motion?.action === 'death' && actor.motion.phase > 0.9 && actor.meshes > 0) {
+              window.__VARENDOR_FIXTURE__.pause(true); window.__CORPSE_PROBE__ = { captured: true, actor }; return;
+            }
+            if (performance.now() < deadline) requestAnimationFrame(observe);
+          };
+          requestAnimationFrame(observe); window.__VARENDOR_FIXTURE__.kill(id);
+        }, target.uid);
+        await page.waitForFunction(() => window.__CORPSE_PROBE__.captured, {}, { timeout: 15000 });
+        const corpseBounds = await page.evaluate(id => window.__VARENDOR_FIXTURE__.bounds(id), target.uid);
+        assert.ok(corpseBounds.minY >= corpseBounds.supportY - 0.35, `fox corpse buried: ${JSON.stringify(corpseBounds)}`);
+        assert.ok(corpseBounds.minY <= corpseBounds.supportY + 0.35, `fox corpse floats: ${JSON.stringify(corpseBounds)}`);
+        await visibleWorldScreenshot('motion-fox-corpse');
+        check('real Fox death pose stops locomotion and remains on the terrain', corpseBounds);
+      }
       check(`${classId}: one-click ranged attack, correct casting clip, projectile damage and manual cancel`);
       await rangedContext.close();
     }

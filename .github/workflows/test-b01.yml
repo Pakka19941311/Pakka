@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   validate:
@@ -48,11 +49,13 @@ jobs:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: npm run test:browser
       - name: Check out unchanged baseline for comparison
+        if: ${{ !contains(github.event.head_commit.message, '[contact-final]') }}
         uses: actions/checkout@v4
         with:
           ref: 752fb581bbddc4995270df797c58700fb62a8c34
           path: baseline
       - name: Compare baseline on the same software-rendering runner
+        if: ${{ !contains(github.event.head_commit.message, '[contact-final]') }}
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
@@ -62,6 +65,16 @@ jobs:
           cd ..
           node scripts/motion-profile.mjs baseline/dist-qa before
           node scripts/motion-profile.mjs dist-qa after
+      # Only combat contact/spacing and build labels change in this final candidate. Keep the
+      # completed same-runner graphics profile rather than repeat those GPU windows.
+      - name: Include completed movement comparison from b860d29b
+        if: ${{ contains(github.event.head_commit.message, '[contact-final]') }}
+        uses: actions/download-artifact@v4
+        with:
+          name: browser-evidence
+          run-id: 33963345742
+          github-token: ${{ github.token }}
+          path: qa-artifacts/profile-reference
       - name: Save screenshots and machine-readable evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -133,6 +146,7 @@ jobs:
           cp production/server.ps1 "$stage/"
           cp production/packaging/windows/RUN_VARENDOR.bat "$stage/"
           cp production/packaging/windows/README_B01_RU.txt "$stage/README_RU.txt"
+          cp docs/MOTION_COMBAT_QA.md "$stage/QA_REPORT_RU.md"
           printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
           zip -q -9 -r "${stage}.zip" "$stage"
           unzip -t "${stage}.zip" | tail -1

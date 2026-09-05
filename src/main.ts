@@ -353,7 +353,7 @@ app.innerHTML = `
  <div class="quick-items glass" aria-label="Быстрые расходники"><button class="skill-button" id="potion"><span class="key" id="potion-key">Q</span><span class="symbol">♥</span><small>Зелье <b id="potion-count">0</b></small></button><button class="skill-button" id="ether"><span class="key" id="ether-key">E</span><span class="symbol">◆</span><small>Эфир <b id="ether-count">0</b></small></button></div>
  <div class="notice-stack" id="notices"></div><div class="damage-layer" id="damage-layer"></div>
 </div><div id="modal-root"></div><div id="confirm-root"></div>`;
-q('#hud').insertAdjacentHTML('beforeend', '<output id="performance-readout" aria-label="Производительность">B01 · измерение FPS…</output>');
+q('#hud').insertAdjacentHTML('beforeend', '<output id="performance-readout" aria-label="Производительность">Motion · измерение FPS…</output>');
 q('.bottom-cluster').append(q('.quick-items'));
 
 function settingsDefaults(): Settings { return {
@@ -1625,9 +1625,12 @@ function entityCollisionRadius(entity: Entity): number {
 
 function actorBodyRadius(entity: Entity): number {
   if (entity.kind === 'player') return 0.46;
+  // The fox rig is much longer than a humanoid at the same normalized height.
+  // Keep its torso clear of the player, including the scaled miniboss variant.
+  if (entity.model === 'Fox') return Math.max(0.7, Math.min(2.05, entity.targetHeight * 0.85));
   if (entity.boss === 'big') return 1.4;
   if (entity.boss === 'mini') return 1;
-  return entity.model === 'Fox' ? Math.max(0.68, Math.min(1, entity.targetHeight * 0.6)) : 0.46;
+  return 0.46;
 }
 
 function monsterReach(entity: Entity): number { return Math.max(1.65, actorBodyRadius(entity) + 0.64); }

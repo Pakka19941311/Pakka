@@ -96,7 +96,9 @@ export class ActorAnimation {
   beginAttack(maxDuration = Infinity): AttackTimings {
     this.request('attack', true);
     this.duration = Math.max(0.35, Math.min(clipDuration(this.attack) || 0.8, maxDuration));
-    const contact = this.model === 'Wizard' ? 0.56 : this.model === 'Ranger' ? 0.48 : 0.42;
+    // Shipped clips: Warrior Weapon.R reaches the forward crossing at 50%;
+    // Wizard casts at its hand extension, Ranger releases during the left-hand recoil.
+    const contact = this.model === 'Warrior' ? 0.5 : this.model === 'Wizard' ? 0.56 : this.model === 'Ranger' ? 0.48 : 0.42;
     return { windup: this.duration * contact, recovery: this.duration * (1 - contact) };
   }
 
