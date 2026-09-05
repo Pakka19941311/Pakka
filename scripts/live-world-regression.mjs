@@ -68,14 +68,14 @@ try{
  const focus=await state();await page.keyboard.type('wasd123');await timeAdvances('chat leaves world running');
  const typed=await state();assert.ok(Math.hypot(typed.player.x-focus.player.x,typed.player.z-focus.player.z)<0.08);
  await page.keyboard.press('Escape');check('text focus clears held movement and does not execute game keys');
- await page.keyboard.press('c');await page.locator('#reset-save').click();
+ await page.keyboard.press('Escape');await page.locator('#reset-save').click();
  await timeAdvances('confirmation leaves world running');
  assert.ok(await page.evaluate(()=>{
   const box=document.querySelector('#modal-root .window').getBoundingClientRect();
   return Boolean(document.elementFromPoint(box.left+15,box.top+15)?.closest('#confirm-root'));
  }));
  check('top confirmation blocks pointer access to underlying window');
- await page.keyboard.press('Escape');assert.equal((await state()).confirmation,null);assert.equal((await state()).activeWindow,'character');
+ await page.keyboard.press('Escape');assert.equal((await state()).confirmation,null);assert.equal((await state()).activeWindow,'settings');
  await page.keyboard.press('Escape');check('Escape closes only top cancellable layer');
  if (!production) {
  // A real monster continues attacking through an inventory and can kill the hero.
@@ -95,9 +95,9 @@ try{
  assert.equal(dead.player.xp,beforeDeath.player.xp-Math.floor(beforeDeath.player.xp*.05));
  const deadItems=await page.evaluate(()=>window.__VARENDOR_FIXTURE__.playerSnapshot());
  await page.keyboard.press('q');await page.keyboard.press('4');await page.keyboard.press('w');
- await page.locator('[data-equip="weapon"]').click();
+ await page.locator('.ci-equipment-grid [data-slot="weapon"]').dblclick({force:true});
  const potion=await page.evaluate(()=>window.__VARENDOR_FIXTURE__.playerSnapshot().inventory.findIndex(i=>i.id==='potion'));
- await page.locator(`[data-item="${potion}"]`).click();await page.locator('#use-item').click();
+ await page.locator(`.ci-bag-grid [data-bag-index="${potion}"]`).dblclick({force:true});
 
  await timeAdvances('dead character cannot act');
  const deadAfter=await state();assert.equal(deadAfter.player.hp,0);assert.equal(deadAfter.player.inventory,dead.player.inventory);
@@ -129,7 +129,7 @@ try{
  await page.waitForFunction(p=>Math.hypot(window.__VARENDOR_QA__.getState().player.x-p.x,window.__VARENDOR_QA__.getState().player.z-p.z)>.3,respawn.player);
  await page.keyboard.up('w');check('movement works after respawn');
  // Stale confirmation cannot run after death or after a respawn.
- await page.keyboard.press('c');await page.locator('#reset-save').click();
+ await page.keyboard.press('Escape');await page.locator('#reset-save').click();
  await page.evaluate(()=>{window.__STALE_YES__=document.querySelector('#confirm-yes').onclick;window.__VARENDOR_FIXTURE__.die();});
  await page.evaluate(()=>window.__STALE_YES__());assert.ok((await state()).player.dead);
  await page.locator('#confirm-yes').click();await page.evaluate(()=>window.__STALE_YES__());

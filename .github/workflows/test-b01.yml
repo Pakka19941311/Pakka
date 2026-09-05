@@ -1,4 +1,4 @@
-name: Combat E validation and Windows test build
+name: Inventory C validation and Windows test build
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   validate:
-    # Profiling-only checkpoints have their own job and must not publish a combat candidate.
+    # Profiling-only checkpoints have their own job and must not publish an inventory candidate.
     if: ${{ github.ref == 'refs/heads/work/v06-commercial-rebuild' && !contains(github.event.head_commit.message, '[motion-profile]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -37,14 +37,20 @@ jobs:
             dist
             server.ps1
             packaging/windows/RUN_VARENDOR.bat
-            packaging/windows/README_E_RU.txt
+            packaging/windows/README_C_RU.txt
           retention-days: 14
       - name: Prepare isolated browser regression build
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
           google-chrome --version
-      - name: Block E production combat and isolated class regressions
+      - name: Block C production inventory and isolated item regressions
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          node scripts/inventory-regression.mjs dist production
+          node scripts/inventory-regression.mjs dist-qa
+      - name: Current SHA regression for accepted E combat and classes
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
@@ -118,11 +124,13 @@ jobs:
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          stage="Varendor_Combat_E_Windows_Test_${short_sha}"
+          stage="Varendor_Inventory_C_Windows_Test_${short_sha}"
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
           import { readFileSync } from 'node:fs';
           const expected = new Map([
+            ['C-production-inventory.json', 'C-production'],
+            ['C-inventory.json', 'C'],
             ['E-production-combat-intent.json', 'E-production'],
             ['E-combat-intent.json', 'E'],
             ['A-production-live-world.json', 'A-production'],
@@ -142,29 +150,29 @@ jobs:
           cp -a production/dist "$stage/dist"
           cp production/server.ps1 "$stage/"
           cp production/packaging/windows/RUN_VARENDOR.bat "$stage/"
-          cp production/packaging/windows/README_E_RU.txt "$stage/README_RU.txt"
-          cp docs/COMBAT_INTENT_QA.md "$stage/QA_REPORT_RU.md"
+          cp production/packaging/windows/README_C_RU.txt "$stage/README_RU.txt"
+          cp docs/INVENTORY_QA.md "$stage/QA_REPORT_RU.md"
           cp docs/BLOCK_SPEC_V2_RU.md "$stage/TZ_V2_RU.md"
           cp docs/ENHANCEMENT_BALANCE_V2.json "$stage/ENHANCEMENT_BALANCE_V2.json"
-          cp qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
-          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. E production/QA и регрессия A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия E.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
+          cp qa-artifacts/C-inventory.json qa-artifacts/C-production-inventory.json qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
+          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. C production/QA и регрессии E/A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия C.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
           printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
           zip -q -9 -r "${stage}.zip" "$stage"
           unzip -t "${stage}.zip" | tail -1
           sha256sum "${stage}.zip" > "${stage}.zip.sha256"
           stat -c '%n %s bytes' "${stage}.zip"
           cat "${stage}.zip.sha256"
-          zip -q -r "Combat_E_QA_${short_sha}.zip" qa-artifacts
-          unzip -t "Combat_E_QA_${short_sha}.zip" | tail -1
+          zip -q -r "Inventory_C_QA_${short_sha}.zip" qa-artifacts
+          unzip -t "Inventory_C_QA_${short_sha}.zip" | tail -1
       - name: Publish immutable prerelease, never merge main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          tag="v0.6-combat-e-test-${short_sha}"
+          tag="v0.6-inventory-c-test-${short_sha}"
           gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
-            --title "Varendor — Combat E Test (${short_sha})" \
-            --notes "Блок E: однокликовый бой, подход и однократный выпуск навыка, отмена и смена цели, буфер навыка 350 мс, существующие Knight/Ranger/Mage. Принятый живой мир A проверен на этом же SHA. Новый HUD, инвентарь и заточка V2 остаются следующими блоками. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. После выдачи — СТОП до пользовательского теста и принятия E. main не изменён. CI WebGL использует software GPU; сценарии E — Low/50%, результаты не являются FPS-прогнозом для игрового ПК." \
-            "Varendor_Combat_E_Windows_Test_${short_sha}.zip" "Varendor_Combat_E_Windows_Test_${short_sha}.zip.sha256" \
-            "Combat_E_QA_${short_sha}.zip"
+            --title "Varendor — Inventory C Test (${short_sha})" \
+            --notes "Блок C: компактный инвентарь рядом с героем, Tab, 42 ячейки и 12 слотов экипировки, наведение и сравнение характеристик, двойной клик и перетаскивание. Полноэкранная подложка инвентаря убрана, мир продолжает жить. Принятые E и A проверены на этом же SHA. Новый HUD B и заточка V2 D остаются следующими блоками. Windows ZIP: распаковать целиком, запустить RUN_VARENDOR.bat. После выдачи — СТОП до пользовательского теста и принятия C. main не изменён. CI WebGL использует software GPU; результаты не являются FPS-прогнозом для игрового ПК." \
+            "Varendor_Inventory_C_Windows_Test_${short_sha}.zip" "Varendor_Inventory_C_Windows_Test_${short_sha}.zip.sha256" \
+            "Inventory_C_QA_${short_sha}.zip"

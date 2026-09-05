@@ -39,18 +39,20 @@ import {
 import { CLASSES, EQUIP_SLOTS, ITEMS, LOCATIONS, MONSTERS, SLOT_NAMES } from './data/game-data';
 import {
   INVENTORY_CAPACITY,
-  baseVitals,
   bossRespawnSeconds,
   classAttackRange,
   classCombatProfile,
   enhancementCanDestroy,
   enhancementChance,
-  enhancementStatMultiplier,
   monsterMovementSpeed,
-  statsAtLevel,
   xpNeeded,
 } from './core/game-rules';
-import { addOrStackItem, applyExperience, equipmentSlot, resolveEnhancement } from './core/gameplay-session';
+import { addOrStackItem, applyExperience, resolveEnhancement } from './core/gameplay-session';
+import { compatibleEquipmentSlots, resolveEquipmentSlot, itemReference, equipInventoryItem, unequipInventoryItem, reorderInventoryItem } from './core/inventory-commands';
+import type { ItemReference, InventoryFailureReason } from './core/inventory-commands';
+import { calculateEquipmentStats, itemStatBreakdown } from './core/equipment-stats';
+import { createCharacterInventory } from './ui/character-inventory';
+import type { CharacterInventoryModel, InventoryItemRef, InventoryTooltip, InventoryDropTarget, InventoryPosition } from './ui/character-inventory';
 import { LocalGameGateway } from './network/game-gateway';
 import { CombatControl, SKILL_BUFFER_SECONDS } from './controls/combat-controller';
 import { CharacterMotor, smoothAngle } from './controls/character-motor';
@@ -272,6 +274,7 @@ type Settings = {
   cameraSmoothing: number;
   invertCameraY: boolean;
   uiScale: number;
+  inventoryWindow?: InventoryPosition;
   shadows: boolean;
   bloom: boolean;
   damage: boolean;
@@ -380,7 +383,6 @@ const state = {
   entities: [] as Entity[],
   effects: [] as Array<{ update: (dt: number) => void; dead?: boolean }>,
   worldTime: 12.5,
-  selectedItem: null as number | null,
   quest: 0,
   kills: 0,
   bossKills: 0,
@@ -392,6 +394,9 @@ const state = {
 };
 
 const targeting = new TargetingController<Entity>();
+let inventoryPanel: ReturnType<typeof createCharacterInventory> | null = null;
+let inventorySelection: InventoryItemRef | null = null;
+let preferredEquipmentSlot: string | undefined;
 const combatControl = new CombatControl();
 const playerMotor = new CharacterMotor();
 const collisionWorld = new CollisionWorld();
@@ -1363,41 +1368,10 @@ function newPlayer(): void {
 
 function recalculate(fill = false): void {
   const classDef = CLASSES_MAP[player.classId];
-  const stats = statsAtLevel(player.classId, classDef.stats, player.level);
-  const profile = classCombatProfile(player.classId, player.level, stats);
-  const computed: CombatStats = {
-    ...stats,
-    atkMin: profile.physicalScaling,
-    atkMax: profile.physicalScaling,
-    matk: profile.magicScaling,
-    def: stats.vit * 1.2 + player.level * 0.7,
-    mdef: stats.spi * 1.15 + player.level * 0.65,
-    crit: profile.critChance,
-    accuracy: profile.accuracy,
-    evasion: stats.dex * 0.45,
-    speed: profile.movementSpeed,
-  };
-  let gearHp = 0;
-  let gearMp = 0;
-  Object.values(player.equipment).filter((item): item is ItemInstance => Boolean(item)).forEach((item) => {
-    const definition = itemDef(item);
-    const multiplier = enhancementStatMultiplier(definition.slot === 'weapon' ? 'weapon' : 'armor', item.plus);
-    if (definition.atk) {
-      computed.atkMin += definition.atk[0] * multiplier;
-      computed.atkMax += definition.atk[1] * multiplier;
-    }
-    for (const key of ['matk', 'def', 'mdef'] as const) computed[key] += (definition[key] ?? 0) * multiplier;
-    computed.crit += definition.crit ?? 0;
-    computed.accuracy += definition.accuracy ?? 0;
-    computed.evasion += definition.evasion ?? 0;
-    computed.speed += (definition.speed ?? 0) * 0.062;
-    gearHp += definition.hp ?? 0;
-    gearMp += definition.mp ?? 0;
-  });
-  player.stats = computed;
-  const vitals = baseVitals(player.classId, player.level, stats);
-  player.maxHp = vitals.hp + gearHp;
-  player.maxMp = vitals.mp + gearMp;
+  const computed = calculateEquipmentStats(player.classId, classDef.stats, player.level, player.equipment, itemDef);
+  player.stats = computed.stats;
+  player.maxHp = computed.maxHp;
+  player.maxMp = computed.maxMp;
   if (fill) {
     player.hp = player.maxHp;
     player.mp = player.maxMp;
@@ -2700,6 +2674,7 @@ function updateHud(): void {
     const cooldown = button.querySelector<HTMLElement>('.cooldown');
     if (cooldown) cooldown.textContent = player.cooldowns[index] > 0 ? player.cooldowns[index].toFixed(1) : '';
   });
+  inventoryPanel?.refresh();
 }
 
 function formatTimer(seconds: number): string {
@@ -2752,6 +2727,7 @@ window.addEventListener('keydown', (event) => {
     if (event.repeat) return;
     if (typing) { (event.target as HTMLElement).blur(); inputControl.reset(); return; }
     if (confirmation?.cancel) { closeConfirm(); return; }
+    if (inventoryPanel?.cancelInteraction()) return;
     if (state.activeWindow) closeWindow(); else openWindow('settings');
     return;
   }
@@ -2761,7 +2737,7 @@ window.addEventListener('keydown', (event) => {
   if (windowType) {
     event.preventDefault();
     if (!event.repeat && !confirmation?.cancel) {
-      if (state.activeWindow === windowType) closeWindow(); else openWindow(windowType);
+      if (state.activeWindow === (windowType === 'character' ? 'inventory' : windowType)) closeWindow(); else openWindow(windowType);
     }
     return;
   }
@@ -2852,21 +2828,26 @@ function interactNpc(npc: Entity): void {
 function openWindow(type: string): void {
   if (!state.started) return;
   if (confirmation?.cancel) closeConfirm();
-  state.activeWindow = type;
+  inventoryPanel?.destroy(); inventoryPanel = null;
+  const isInventory = type === 'inventory' || type === 'character';
+  state.activeWindow = isInventory ? 'inventory' : type;
   inputControl.reset(); playerMotor.stopPlanar();
-  q('#modal-root').innerHTML = '<div class="modal-shade"></div><section class="window"><button class="close-window">×</button><div id="window-content"></div></section>';
-  q<HTMLButtonElement>('#modal-root .close-window').onclick = closeWindow;
-  q<HTMLElement>('#modal-root .modal-shade').onclick = closeWindow;
+  q('#modal-root').innerHTML = isInventory ? '' : '<div class="modal-shade"></div><section class="window"><button class="close-window">×</button><div id="window-content"></div></section>';
+  if (!isInventory) {
+    q<HTMLButtonElement>('#modal-root .close-window').onclick = closeWindow;
+    q<HTMLElement>('#modal-root .modal-shade').onclick = closeWindow;
+  }
   if (type === 'inventory') renderInventory();
   if (type === 'character') renderCharacter();
   if (type === 'skills') renderSkills();
   if (type === 'map') renderMap();
   if (type === 'settings') renderSettings();
-  qa<HTMLElement>('[data-window]').forEach((button) => button.classList.toggle('active', button.dataset.window === type));
+  qa<HTMLElement>('[data-window]').forEach((button) => button.classList.toggle('active', isInventory ? ['character', 'inventory'].includes(button.dataset.window ?? '') : button.dataset.window === type));
 }
 
 function closeWindow(): void {
   if (confirmation?.cancel) closeConfirm();
+  inventoryPanel?.destroy(); inventoryPanel = null; inventorySelection = null; preferredEquipmentSlot = undefined;
   state.activeWindow = null; inputControl.reset();
   q('#modal-root').innerHTML = '';
   qa('[data-window]').forEach((button) => button.classList.remove('active')); canvas.focus();
@@ -2881,72 +2862,192 @@ function formatItem(item: ItemInstance): string {
   return `<span><span class="big-icon">${definition.icon}${item.plus ? ` <small>+${item.plus}</small>` : ''}</span>${definition.name}</span>${item.count > 1 ? `<span class="count">${item.count}</span>` : ''}`;
 }
 
-function renderInventory(selected = state.selectedItem): void {
-  q('#window-content').innerHTML = `<h2>Инвентарь</h2>${tabs('inventory')}<div class="inventory-shell"><div class="paper-doll"><div class="doll-art"></div><div class="equipment-grid">${EQUIPMENT_SLOTS.map((slot) => `<button class="equip-slot ${player.equipment[slot] ? 'filled' : ''}" title="${SLOT_NAMES_MAP[slot]} — нажмите, чтобы снять" data-equip="${slot}" data-slot="${slot}">${player.equipment[slot] ? formatItem(player.equipment[slot] as ItemInstance) : `<span>${SLOT_NAMES_MAP[slot]}</span>`}</button>`).join('')}</div></div><div class="bag-panel"><div class="bag-toolbar"><b>ПОХОДНАЯ СУМКА</b><span>${player.inventory.length} / ${INVENTORY_CAPACITY} · ◈ ${player.gold.toLocaleString()} ${state.lootBuffer.length ? `· Буфер: ${state.lootBuffer.length} <button class="dark-btn" id="collect-buffer">Забрать</button>` : ''}</span></div><div class="bag-grid">${player.inventory.map((item, index) => `<button class="item-card ${index === selected ? 'selected' : ''}" title="${itemDef(item).name}${item.count > 1 ? ` ×${item.count}` : ''}" data-item="${index}">${formatItem(item)}</button>`).join('')}${Array(Math.max(0, INVENTORY_CAPACITY - player.inventory.length)).fill('<div class="empty-slot"></div>').join('')}</div><div class="item-details" id="item-details"><b>Сравнение экипировки</b><br>Выберите предмет. Характеристики покажут разницу с надетой вещью.</div></div></div>`;
-  bindTabs();
-  qa<HTMLButtonElement>('[data-item]').forEach((button) => { const uid = player.inventory[Number(button.dataset.item)]?.uid; button.onclick = () => selectItem(player.inventory.findIndex(item => item.uid === uid)); });
-  qa<HTMLButtonElement>('[data-equip]').forEach((button) => { button.onclick = () => unequip(button.dataset.equip ?? ''); });
-  const collect = document.querySelector<HTMLButtonElement>('#collect-buffer');
-  if (collect) collect.onclick = () => { if (player.dead) return; while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift() as ItemInstance); renderInventory(); saveGame(); };
+const ITEM_STAT_LABELS = {
+  atkMin: 'Мин. физ. атака', atkMax: 'Макс. физ. атака', matk: 'Магическая атака',
+  def: 'Физическая защита', mdef: 'Магическая защита', hp: 'Макс. HP', mp: 'Макс. MP',
+  crit: 'Критический шанс', accuracy: 'Точность', evasion: 'Уклонение', speed: 'Скорость, м/с',
+} as const;
+type ItemStatKey = keyof typeof ITEM_STAT_LABELS;
+const itemStatKeys = Object.keys(ITEM_STAT_LABELS) as ItemStatKey[];
+const statText = (value: number): string => Number(value.toFixed(3)).toLocaleString('ru-RU', {maximumFractionDigits: 3});
+
+function inventorySnapshot() {
+  return structuredClone({classId: player.classId, dead: player.dead, inventory: player.inventory, equipment: player.equipment,
+    hp: player.hp, mp: player.mp, maxHp: player.maxHp, maxMp: player.maxMp, cooldowns: player.cooldowns,
+    attackCd: player.attackCd, stats: player.stats, gold: player.gold});
 }
 
-function selectItem(index: number): void {
-  state.selectedItem = index; renderInventory(index);
-  const item = player.inventory[index]; if (!item) return; const definition = itemDef(item); const parts: string[] = [];
-  const slot = definition.slot === 'ring' ? 'ring1' : definition.slot;
-  const current = slot ? player.equipment[slot] : undefined;
-  if (definition.atk) parts.push(`Урон ${definition.atk[0]}–${definition.atk[1]}`);
-  if (definition.matk) parts.push(`Магическая атака +${definition.matk}`);
-  if (definition.def) parts.push(`Защита +${definition.def}`);
-  if (definition.mdef) parts.push(`Магическая защита +${definition.mdef}`);
-  const statKeys: Array<[keyof ItemDef, string]> = [['def', 'Защита'], ['mdef', 'Маг. защита'], ['hp', 'HP'], ['mp', 'MP'], ['matk', 'Маг. атака'], ['crit', 'Крит'], ['accuracy', 'Точность'], ['evasion', 'Уклонение'], ['speed', 'Скорость']];
-  const currentDef = current ? itemDef(current) : undefined;
-  const deltas = definition.slot ? statKeys.map(([key, label]) => {
-    const next = Number(definition[key] ?? 0); const equipped = Number(currentDef?.[key] ?? 0); const delta = next - equipped;
-    return next || equipped ? `<span class="${delta >= 0 ? 'compare-positive' : 'compare-negative'}">${label}: ${next || 0} (${delta >= 0 ? '+' : ''}${delta})</span>` : '';
-  }).filter(Boolean) : [];
-  if (definition.atk) {
-    const oldAtk = currentDef?.atk ?? [0, 0]; const deltaMin = definition.atk[0] - oldAtk[0]; const deltaMax = definition.atk[1] - oldAtk[1];
-    deltas.unshift(`<span class="${deltaMin + deltaMax >= 0 ? 'compare-positive' : 'compare-negative'}">Урон: ${definition.atk[0]}–${definition.atk[1]} (${deltaMin >= 0 ? '+' : ''}${deltaMin}/${deltaMax >= 0 ? '+' : ''}${deltaMax})</span>`);
+function referencedInventoryItem(ref: InventoryItemRef): ItemInstance | undefined {
+  const item = ref.location === 'equipment' ? player.equipment[ref.slot ?? ''] : player.inventory.find(item => item.uid === ref.uid);
+  return item?.uid === ref.uid && item.id === ref.id && item.plus === ref.plus && item.count === ref.count ? item : undefined;
+}
+
+function selectedReplacementSlot(item: ItemInstance): string | undefined {
+  const possible = compatibleEquipmentSlots(itemDef(item).slot);
+  return resolveEquipmentSlot(itemDef(item).slot, player.equipment,
+    preferredEquipmentSlot && possible.includes(preferredEquipmentSlot) ? preferredEquipmentSlot : undefined);
+}
+
+function inventoryModel(): CharacterInventoryModel {
+  const s = player.stats;
+  if (inventorySelection && !referencedInventoryItem(inventorySelection)) inventorySelection = null;
+  const selected = inventorySelection && referencedInventoryItem(inventorySelection);
+  const definition = selected ? itemDef(selected) : undefined;
+  const selectedInBag = Boolean(selected && inventorySelection?.location === 'bag');
+  const cell = (item: ItemInstance) => ({...itemReference(item), name: itemDef(item).name, icon: itemDef(item).icon,
+    kind: itemDef(item).slot ?? itemDef(item).type ?? 'material'});
+  const stats = [
+    ['Уровень', String(player.level)], ['Опыт', `${player.xp} / ${xpNeeded(player.level)}`],
+    ['HP', `${Math.ceil(player.hp)} / ${player.maxHp}`], ['MP', `${Math.ceil(player.mp)} / ${player.maxMp}`],
+    ['Сила', s.str], ['Ловкость', s.dex], ['Интеллект', s.int], ['Выносливость', s.vit], ['Дух', s.spi],
+    ['Физ. атака', `${statText(s.atkMin)}–${statText(s.atkMax)}`], ['Маг. атака', statText(s.matk)],
+    ['Физ. защита', statText(s.def)], ['Маг. защита', statText(s.mdef)], ['Крит. шанс', `${statText(s.crit)}%`],
+    ['Точность', statText(s.accuracy)], ['Уклонение', statText(s.evasion)], ['Скорость, м/с', statText(s.speed)],
+    ['Боссы', state.bossKills],
+  ].map(([label, value]) => ({label: String(label), value: String(value)}));
+  return {name: player.name, className: CLASSES_MAP[player.classId].name, level: player.level, stats,
+    equipment: Object.fromEntries(EQUIPMENT_SLOTS.map(slot => [slot, player.equipment[slot] ? cell(player.equipment[slot]!) : null])),
+    bag: player.inventory.map(cell), gold: player.gold, capacity: INVENTORY_CAPACITY,
+    selectedUid: inventorySelection?.uid, activeSlot: preferredEquipmentSlot,
+    readOnly: player.dead, status: player.dead ? 'Персонаж погиб · только просмотр' : 'Наведение — свойства · двойной клик — действие',
+    scale: state.settings.uiScale, position: state.settings.inventoryWindow,
+    actions: [
+      ...(selectedInBag && definition?.slot ? [{id: 'equip', label: 'Надеть', disabled: player.dead}] : []),
+      ...(selectedInBag && definition?.type === 'consumable' ? [{id: 'use', label: 'Использовать', disabled: player.dead}] : []),
+      ...(selected && inventorySelection?.location === 'equipment' ? [{id: 'unequip', label: 'Снять', disabled: player.dead}] : []),
+      ...(selectedInBag ? [{id: 'sell', label: `Продать · ${Math.floor(definition!.value * .48) * selected!.count} ◈`, disabled: player.dead}] : []),
+      ...(state.lootBuffer.length ? [{id: 'collect-buffer', label: `Забрать добычу (${state.lootBuffer.length})`, disabled: player.dead}] : []),
+    ]};
+}
+
+function inventoryTooltip(ref: InventoryItemRef): InventoryTooltip | null {
+  const item = referencedInventoryItem(ref);
+  if (!item) return null;
+  const definition = itemDef(item);
+  const breakdown = itemStatBreakdown(definition, item.plus);
+  const slot = selectedReplacementSlot(item);
+  const rows = itemStatKeys.filter(key => breakdown.total[key] !== 0).map(key => ({key, label: ITEM_STAT_LABELS[key],
+    value: `${statText(breakdown.total[key])}${key === 'crit' ? '%' : ''}`,
+    detail: breakdown.bonus[key] ? `База ${statText(breakdown.base[key])} + заточка ${statText(breakdown.bonus[key])} = ${statText(breakdown.total[key])}` : undefined}));
+  const comparisons: NonNullable<InventoryTooltip['comparisons']> = [];
+  if (ref.location === 'bag' && definition.slot && slot) {
+    const possible = compatibleEquipmentSlots(definition.slot);
+    const compareSlots = possible.length === 2 && possible.every(candidate => player.equipment[candidate]) ? possible : [slot];
+    for (const comparedSlot of compareSlots) {
+      // A read-only preview is allowed after death, but it cannot execute the command.
+      const change = equipInventoryItem({...player, dead: false}, ref, itemDef, comparedSlot);
+      if (!change.ok) continue;
+      const after = calculateEquipmentStats(player.classId, CLASSES_MAP[player.classId].stats, player.level, change.equipment, itemDef);
+      const beforeValues = {...player.stats, hp: player.maxHp, mp: player.maxMp};
+      const afterValues = {...after.stats, hp: after.maxHp, mp: after.maxMp};
+      const current = player.equipment[comparedSlot];
+      const equippedStats = current ? itemStatBreakdown(itemDef(current), current.plus) : undefined;
+      const equippedRows = equippedStats ? itemStatKeys.filter(key => equippedStats.total[key] !== 0).map(key => ({
+        label: ITEM_STAT_LABELS[key], value: `${statText(equippedStats.total[key])}${key === 'crit' ? '%' : ''}`,
+        detail: equippedStats.bonus[key] ? `База ${statText(equippedStats.base[key])} + заточка ${statText(equippedStats.bonus[key])}` : undefined,
+      })) : [];
+      const deltas = itemStatKeys.filter(key => Math.abs(afterValues[key] - beforeValues[key]) > 1e-8)
+        .map(key => ({key, label: ITEM_STAT_LABELS[key], value: `${statText(beforeValues[key])} → ${statText(afterValues[key])}`,
+          delta: afterValues[key] - beforeValues[key]}));
+      comparisons.push({title: `${SLOT_NAMES_MAP[comparedSlot]}: ${current ? `${itemDef(current).name}${current.plus ? ` +${current.plus}` : ''}` : 'пусто'}`,
+        selected: comparedSlot === slot, equippedRows, rows: deltas.length ? deltas : [{label: 'Характеристики', value: 'Без изменений'}]});
+    }
   }
-  const compare = definition.slot ? `<br><span style="color:#c4a876">Надето: ${current ? `${itemDef(current).name}${current.plus ? ` +${current.plus}` : ''}` : 'ничего'}</span>${deltas.length ? `<div class="stat-columns">${deltas.join('')}</div>` : ''}` : '';
-  q('#item-details').innerHTML = `<b>${definition.name}${item.plus ? ` +${item.plus}` : ''}</b><br>${parts.join(' · ') || definition.desc || 'Ресурс мира'}${compare}<br><span style="color:#8f887c">Источник: ${definition.origin || 'Торговцы Варендора'}</span><div class="action-row">${definition.slot ? '<button class="gold-btn" id="equip-item">Надеть</button>' : ''}${definition.type === 'consumable' ? '<button class="gold-btn" id="use-item">Использовать</button>' : ''}<button class="dark-btn" id="sell-item">Продать за ${Math.floor(definition.value * 0.48)} ◈</button></div>`;
-  const equip = document.querySelector<HTMLButtonElement>('#equip-item'); if (equip) equip.onclick = () => equipItem(player.inventory.findIndex(candidate => candidate.uid === item.uid));
-  const use = document.querySelector<HTMLButtonElement>('#use-item'); if (use) use.onclick = () => { useItem(item.id); renderInventory(); };
-  q<HTMLButtonElement>('#sell-item').onclick = () => sellItem(player.inventory.findIndex(candidate => candidate.uid === item.uid));
+  const category = definition.slot ? (definition.slot === 'ring' ? 'Кольцо' : SLOT_NAMES_MAP[definition.slot] ?? definition.slot)
+    : definition.type === 'consumable' ? 'Расходник' : definition.type === 'enhance' ? 'Свиток улучшения' : 'Материал';
+  return {title: `${definition.name}${item.plus ? ` +${item.plus}` : ''}`, subtitle: `${category}${ref.location === 'equipment' ? ' · надето' : ''}${item.count > 1 ? ` · ${item.count} шт.` : ''}`,
+    description: [definition.desc, definition.origin ? `Источник: ${definition.origin}` : ''].filter(Boolean).join('\n'), rows,
+    restrictions: definition.slot ? ['Без требования уровня.'] : [],
+    actions: player.dead ? ['После возрождения действия снова будут доступны.']
+      : ref.location === 'equipment' ? ['Двойной клик — снять в сумку.']
+      : definition.slot ? [`Двойной клик — надеть: ${SLOT_NAMES_MAP[slot ?? ''] ?? 'слот экипировки'}.`, 'Перетащите на нужный слот для точной замены.']
+      : definition.type === 'consumable' ? ['Двойной клик — использовать одну единицу.']
+      : definition.type === 'enhance' ? ['Этот свиток используется в кузнице Брана.'] : [],
+    comparisons};
 }
 
-function equipItem(index: number): void {
-  if (!state.started || player.dead) return;
-  const item = player.inventory[index]; if (!item) return; const definition = itemDef(item); const itemSlot = definition.slot;
-  if (!itemSlot) return;
-  const slot = equipmentSlot(itemSlot, player.equipment);
-  if (player.equipment[slot]) player.inventory.push(player.equipment[slot] as ItemInstance);
-  player.equipment[slot] = item; player.inventory.splice(index, 1); state.selectedItem = null;
-  void gateway.send({ type: 'equip', itemUid: item.uid, slot });
-  recalculate(); renderInventory(); toast(`Надето: ${definition.name}`); saveGame();
+function inventoryFailure(reason: InventoryFailureReason): void {
+  const messages: Partial<Record<InventoryFailureReason, string>> = {
+    dead: 'После смерти доступен только просмотр.', 'bag-full': 'Сумка заполнена. Освободите ячейку, чтобы снять вещь.',
+    'invalid-slot': 'Предмет не подходит для этого слота.', 'class-restricted': 'Предмет недоступен этому классу.',
+    'stale-item': 'Предмет изменился. Выберите его ещё раз.', 'missing-item': 'Предмета больше нет в этой ячейке.',
+    'not-equippable': 'Этот предмет нельзя надеть.', 'stacked-equipment': 'Нельзя надеть стопку снаряжения.',
+  };
+  toast(messages[reason] ?? 'Не удалось выполнить действие с предметом.', 'bad'); inventoryPanel?.refresh();
 }
 
-function unequip(slot: string): void {
-  if (!state.started || player.dead) return;
-  const item = player.equipment[slot]; if (!item || player.inventory.length >= INVENTORY_CAPACITY) return;
-  player.inventory.push(item); delete player.equipment[slot]; recalculate(); renderInventory(); saveGame();
+function activateInventoryItem(ref: InventoryItemRef, preferredSlot?: string): void {
+  if (!state.started || player.dead) return inventoryFailure('dead');
+  const item = referencedInventoryItem(ref);
+  if (!item) return inventoryFailure('stale-item');
+  if (ref.location === 'bag' && !itemDef(item).slot) {
+    if (itemDef(item).type === 'consumable') useItem(item.id, ref);
+    else if (itemDef(item).type === 'enhance') toast('Этот свиток используется в кузнице Брана.');
+    return;
+  }
+  const result = ref.location === 'equipment'
+    ? unequipInventoryItem(player, ref, ref.slot ?? '')
+    : equipInventoryItem(player, ref, itemDef, preferredSlot ?? selectedReplacementSlot(item));
+  if (!result.ok) return inventoryFailure(result.reason);
+  player.inventory = result.inventory; player.equipment = result.equipment; inventorySelection = null;
+  if (ref.location === 'bag') void gateway.send({type: 'equip', itemUid: item.uid, slot: result.slot});
+  recalculate(); saveGame();
+  toast(`${ref.location === 'equipment' ? 'Снято' : 'Надето'}: ${itemDef(item).name}`);
 }
 
-function sellItem(index: number): void {
-  if (!state.started || player.dead) return;
-  const item = player.inventory[index]; if (!item) return; const definition = itemDef(item);
-  player.gold += Math.floor(definition.value * 0.48) * item.count; player.inventory.splice(index, 1); state.selectedItem = null;
-  renderInventory(); updateHud(); saveGame();
+function moveInventoryItem(ref: InventoryItemRef, target: InventoryDropTarget): void {
+  if (player.dead) return inventoryFailure('dead');
+  if (target.location === 'equipment') {
+    if (ref.location === 'equipment') return;
+    activateInventoryItem(ref, target.slot); return;
+  }
+  let result = ref.location === 'equipment' ? unequipInventoryItem(player, ref, ref.slot ?? '')
+    : reorderInventoryItem(player, ref, target.bagIndex);
+  if (!result.ok) return inventoryFailure(result.reason);
+  if (ref.location === 'equipment') {
+    const reordered = reorderInventoryItem({...player, inventory: result.inventory, equipment: result.equipment}, ref, target.bagIndex);
+    if (!reordered.ok) return inventoryFailure(reordered.reason);
+    result = reordered;
+  }
+  player.inventory = result.inventory; player.equipment = result.equipment; inventorySelection = null;
+  recalculate(); saveGame();
+}
+
+function inventoryAction(id: string, ref: InventoryItemRef | null): void {
+  if (player.dead) return inventoryFailure('dead');
+  if (id === 'collect-buffer') {
+    while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift()!);
+    if (state.lootBuffer.length) toast('Для оставшейся добычи нужно место в сумке.', 'bad');
+    inventoryPanel?.refresh(); saveGame(); return;
+  }
+  if (!ref) return;
+  const item = referencedInventoryItem(ref);
+  if (!item) return inventoryFailure('stale-item');
+  if (id === 'equip' || id === 'unequip' || id === 'use') { activateInventoryItem(ref); return; }
+  if (id === 'sell' && ref.location === 'bag') {
+    const index = player.inventory.findIndex(candidate => candidate.uid === ref.uid);
+    player.gold += Math.floor(itemDef(item).value * .48) * item.count;
+    player.inventory.splice(index, 1); inventorySelection = null; updateHud(); saveGame();
+  }
+}
+
+function renderInventory(): void {
+  if (inventoryPanel) { inventoryPanel.refresh(); return; }
+  inventoryPanel = createCharacterInventory(q('#modal-root'), {
+    read: inventoryModel, tooltip: inventoryTooltip, onClose: closeWindow,
+    onSelect: ref => { inventorySelection = ref; inventoryPanel?.refresh(); },
+    onActivate: activateInventoryItem, onMove: moveInventoryItem,
+    onSlotSelect: slot => { preferredEquipmentSlot = slot; inventoryPanel?.refresh(); },
+    onAction: inventoryAction,
+    onPosition: position => { state.settings.inventoryWindow = position; saveGame(); },
+  });
 }
 
 function renderCharacter(): void {
-  const s = player.stats; const classDef = CLASSES_MAP[player.classId];
-  const rows: Array<[string, string | number]> = [['Уровень', player.level], ['Опыт', `${player.xp.toLocaleString()} / ${xpNeeded(player.level).toLocaleString()}`], ['Сила', s.str], ['Ловкость', s.dex], ['Интеллект', s.int], ['Выносливость', s.vit], ['Дух', s.spi], ['Физическая атака', `${Math.floor(s.atkMin)}–${Math.floor(s.atkMax)}`], ['Магическая атака', Math.floor(s.matk)], ['Физическая защита', Math.floor(s.def)], ['Магическая защита', Math.floor(s.mdef)], ['Критический шанс', `${s.crit.toFixed(1)}%`], ['Точность', s.accuracy.toFixed(1)], ['Уклонение', s.evasion.toFixed(1)], ['Скорость движения', s.speed.toFixed(1)], ['Побеждено боссов', state.bossKills]];
-  q('#window-content').innerHTML = `<h2>${player.name} · ${classDef.name}</h2>${tabs('character')}<div class="stat-columns"><section><h3>Основные параметры</h3>${rows.slice(0, 8).map(([name, value]) => `<div class="stat-row"><span>${name}</span><b>${value}</b></div>`).join('')}</section><section><h3>Боевые параметры</h3>${rows.slice(8).map(([name, value]) => `<div class="stat-row"><span>${name}</span><b>${value}</b></div>`).join('')}</section></div><p style="color:#9c9488;margin-top:22px">Экипировка не имеет требований уровня. Её ценность определяется источником, фиксированными характеристиками и рисковой заточкой.</p><button class="danger-btn" id="reset-save">Удалить персонажа</button>`;
-  bindTabs();
-  q<HTMLButtonElement>('#reset-save').onclick = () => confirmBox('Удалить персонажа?', 'Весь локальный прогресс будет удалён без восстановления.', () => { void gateway.clear().then(() => window.location.reload()); });
+  renderInventory();
+  inventoryPanel?.element.querySelector<HTMLElement>('[data-inventory-stats]')?.focus();
 }
+
 
 function renderSkills(): void {
   const classDef = CLASSES_MAP[player.classId];
@@ -2997,7 +3098,7 @@ function renderSettings(): void {
       ${[['master', 'Общая громкость'], ['music', 'Фоновая музыка'], ['ambience', 'Природа и лес'], ['sfx', 'Бой и монстры'], ['ui', 'Интерфейс']].map(([id, name]) => range(id, name, Math.round((s[id as keyof Settings] as number) * 100), 0, 100, 1, '%')).join('')}
       <div class="setting"><label>Приглушать вне окна <input type="checkbox" id="mute-on-blur" ${s.muteOnBlur ? 'checked' : ''}></label></div>
       <h3>Режим отображения</h3><button class="dark-btn" id="fullscreen">Полный экран</button>
-      <div class="settings-actions"><button class="gold-btn" id="save-settings">Применить</button><button class="dark-btn" id="reset-settings">Сбросить</button></div>
+      <div class="settings-actions"><button class="gold-btn" id="save-settings">Применить</button><button class="dark-btn" id="reset-settings">Сбросить</button><button class="danger-btn" id="reset-save">Удалить персонажа</button></div>
       <p class="settings-note">Изменение плотности леса применяется после следующего входа в мир. Остальные параметры — сразу.</p>
     </section>
   </div>`;
@@ -3018,6 +3119,7 @@ function renderSettings(): void {
   qa<HTMLInputElement>('[data-setting-range]').forEach((input) => { input.oninput = () => { q(`#${input.id}-value`).textContent = `${input.value}${input.dataset.suffix ?? ''}`; }; });
   q<HTMLButtonElement>('#fullscreen').onclick = () => { if (document.fullscreenElement) void document.exitFullscreen(); else void canvas.requestFullscreen(); };
   q<HTMLButtonElement>('#reset-settings').onclick = () => { Object.assign(s, settingsDefaults()); renderSettings(); };
+  q<HTMLButtonElement>('#reset-save').onclick = () => confirmBox('Удалить персонажа?', 'Весь локальный прогресс будет удалён без восстановления.', () => { void gateway.clear().then(() => window.location.reload()); });
   q<HTMLButtonElement>('#save-settings').onclick = () => {
     const requestedBindings = {
       potion: q<HTMLSelectElement>('#potion-binding').value,
@@ -3083,26 +3185,26 @@ function applySettings(): void {
 }
 
 function openDialog(npc: Entity, text: string, actions: Array<{ label: string; action: () => void }>): void {
-  openWindow('character');
+  openWindow('npc');
   q('#window-content').innerHTML = `<h2>${npc.name}</h2><div class="npc-dialog"><div class="npc-portrait"></div><div><div class="eyebrow">Гринфолл</div><h3>${npc.name}</h3><p style="font:20px/1.6 'Cormorant Garamond'">«${text}»</p><div class="action-row">${actions.map((action, index) => `<button class="${index ? 'dark-btn' : 'gold-btn'}" data-dialog="${index}">${action.label}</button>`).join('')}</div></div></div>`;
   qa<HTMLButtonElement>('[data-dialog]').forEach((button) => { button.onclick = actions[Number(button.dataset.dialog)].action; });
 }
 
 function openShop(): void {
-  openWindow('character');
+  openWindow('shop');
   const stock: Array<[string, number]> = [['potion', 55], ['ether', 70], ['scroll', 240], ['teleport', 130]];
   q('#window-content').innerHTML = `<h2>Лавка Эльзы</h2><div class="npc-dialog"><div class="npc-portrait"></div><div><p>Боссовые вещи не продаются. За ними придётся идти в лес.</p><div class="shop-grid">${stock.map(([id, cost]) => `<div class="shop-item"><span class="big-icon">${ITEMS_MAP[id].icon}</span><b>${ITEMS_MAP[id].name}</b><span>◈ ${cost}</span><button class="dark-btn" data-buy="${id}" data-cost="${cost}">Купить</button></div>`).join('')}</div></div></div>`;
   qa<HTMLButtonElement>('[data-buy]').forEach((button) => { button.onclick = () => { if (player.dead) return; const cost = Number(button.dataset.cost); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; addItem(button.dataset.buy ?? 'potion'); updateHud(); saveGame(); }; });
 }
 
 function openTeleport(): void {
-  openWindow('character');
+  openWindow('teleport');
   const points: Array<[string, number, number, number, number]> = [['Астерхолд', -108, -82, 0, 1], ['Гринфолл', GREENFALL_SPAWN.x, GREENFALL_SPAWN.z, 25, 1], ['Чёрный лес', 94, 44, 90, 10], ['Вход в шахту', 132, 94, 150, 10]];
   q('#window-content').innerHTML = `<h2>Проводник Каэль</h2><p>Путь сохраняет цену. Бесплатен только переход в столицу. Чёрный лес открывается на 10 уровне.</p><div class="shop-grid">${points.map((point) => `<div class="shop-item"><b>${point[0]}</b><span>◈ ${point[3]} · ур. ${point[4]}</span><button class="dark-btn" data-tp="${point.slice(1).join(',')}" data-destination="${point[0]}">Отправиться</button></div>`).join('')}</div>`;
   qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { if (player.dead) return; const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
 
-function openForge(): void { openWindow('character'); renderForge(); }
+function openForge(): void { openWindow('forge'); renderForge(); }
 function renderForge(): void {
   const gear = Object.entries(player.equipment).filter((entry): entry is [string, ItemInstance] => Boolean(entry[1]));
   q('#window-content').innerHTML = `<h2>Кузница Брана</h2><p>Усиление до +3 безопасно. Начиная с попытки <b>+3 → +4</b>, неудача полностью уничтожает предмет.</p><p>Свитков: <b>${countItem('scroll')}</b></p><div class="bag-grid">${gear.map(([slot, item]) => `<button class="item-card" data-forge="${slot}">${formatItem(item)}</button>`).join('')}</div><div class="item-details" id="forge-info">Выберите надетый предмет.</div>`;
@@ -3133,12 +3235,17 @@ function attemptEnhance(slot: string): void {
 }
 
 function countItem(id: string): number { return player.inventory.filter((item) => item.id === id).reduce((total, item) => total + item.count, 0); }
-function consumeItem(id: string): boolean { const index = player.inventory.findIndex((item) => item.id === id); if (index < 0) return false; player.inventory[index].count -= 1; if (player.inventory[index].count <= 0) player.inventory.splice(index, 1); return true; }
-function useItem(id: string): void {
+function consumeItem(id: string, reference?: ItemReference): boolean {
+  const index = player.inventory.findIndex(item => item.id === id && (!reference || item.uid === reference.uid));
+  const item = player.inventory[index];
+  if (!item || reference && (item.id !== reference.id || item.plus !== reference.plus || item.count !== reference.count)) return false;
+  item.count -= 1; if (item.count <= 0) player.inventory.splice(index, 1); return true;
+}
+function useItem(id: string, reference?: ItemReference): void {
   if (!state.started || player.dead) return;
-  if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); }
-  else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
-  else if (id === 'teleport' && consumeItem(id)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
+  if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id, reference)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); }
+  else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id, reference)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); }
+  else if (id === 'teleport' && consumeItem(id, reference)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
   updateHud(); saveGame();
 }
 
@@ -3303,7 +3410,7 @@ function combatSnapshot() {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-combat-e-test',
+    version: '0.6.0-inventory-c-test',
     actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
@@ -3320,6 +3427,8 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
       started: state.started,
       simulationSeconds: state.simulationSeconds,
       activeWindow: state.activeWindow,
+      moveTarget: state.moveTarget ? {...state.moveTarget} : null,
+      inventory: inventorySnapshot(),
       confirmation: confirmation ? { cancel: confirmation.cancel } : null,
       entities: state.entities.length,
       monsters: state.entities.filter((entity) => entity.kind === 'monster').length,
@@ -3440,6 +3549,37 @@ if (__QA_BUILD__) {
   });
   Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
     actors,
+    inventorySetup: (scenario = 'normal') => {
+      closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset();
+      const wasDead = player.dead;
+      player.dead = false; player.cooldowns = [0, 0, 0, 0]; player.attackCd = 0;
+      if (wasDead) recreateEntityVisual(playerEntity());
+      player.equipment = {weapon: makeItem(CLASSES_MAP[player.classId].weapon), chest: makeItem(CLASSES_MAP[player.classId].armor)};
+      const weapon = makeItem('executioner', 7), ringA = makeItem('ember_ring', 1), ringB = makeItem('ember_ring', 6);
+      const ringCandidate = makeItem('ember_ring', 4), potion = makeItem('potion', 0, 6), longItem = makeItem('sovereign_seal', 8);
+      const statsItems = [weapon, makeItem('dead_king_plate', 7), longItem, makeItem('oracle_robe', 5),
+        makeItem('night_leather', 4), makeItem('grave_boots', 3), makeItem('rotten_root', 7)];
+      player.inventory = [weapon, ringCandidate, potion, ...statsItems.slice(1), makeItem('ether', 0, 4), makeItem('scroll', 0, 4)];
+      if (scenario === 'pairs') { player.equipment.ring1 = ringA; player.equipment.ring2 = ringB; }
+      if (scenario === 'full') while (player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(makeItem('iron'));
+      state.lootBuffer = []; state.qaFrozen = true; state.playerBuffs.guard = 0; state.playerBuffs.vanish = 0;
+      state.settings.uiScale = 1; state.settings.inventoryWindow = undefined;
+      document.documentElement.style.setProperty('--ui-scale', '1'); fitActionDock();
+      for (const entity of state.entities) if (entity.kind === 'monster') { cancelActorAttack(entity); entity.status = {stun: 9999}; }
+      recalculate(true);
+      if (scenario === 'depleted') { player.hp = Math.floor(player.maxHp * .2); player.mp = Math.floor(player.maxMp * .3); player.cooldowns = [3, 6, 9, 12]; player.attackCd = .8; }
+      simulationClock.reset(); skipFrameDelta = true; q('#notices').replaceChildren(); updateHud(); saveGame();
+      const allItems = [...player.inventory, ...Object.values(player.equipment).filter((item): item is ItemInstance => Boolean(item))];
+      return {ids: {weapon: weapon.uid, ringA: ringA.uid, ringB: ringB.uid, ringCandidate: ringCandidate.uid,
+        potion: potion.uid, longItem: longItem.uid, statsItems: statsItems.map(item => item.uid)},
+        definitions: Object.fromEntries(allItems.map(item => [item.uid, structuredClone(itemDef(item))]))};
+    },
+    inventorySnapshot,
+    inventoryRemove: (id: string) => {
+      player.inventory = player.inventory.filter(item => item.uid !== id);
+      for (const slot of EQUIPMENT_SLOTS) if (player.equipment[slot]?.uid === id) delete player.equipment[slot];
+      recalculate(); inventoryPanel?.refresh(); saveGame();
+    },
     combatSetup: setupCombat,
     combatCluster: (count = 5) => {
       const first = setupCombat({distance: 6, hp:10000, clusterView:true});
