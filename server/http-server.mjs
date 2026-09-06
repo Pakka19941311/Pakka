@@ -4,6 +4,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WorldStore } from './world-store.mjs';
+import { createWorldStream } from './world-stream.mjs';
 import { WorldSimulation } from '../src/server/world-simulation.ts';
 import { restoreWorldTopology } from '../src/world/world-topology.ts';
 
@@ -21,10 +22,7 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
       if(now()-broadcastAt>=100){
         broadcastAt=now();
         for(const [id,connections] of streams)for(const connection of connections){
-          if(connection.response.writableLength>262144){connection.response.destroy();continue;}
-          const snapshot=world.snapshot(id,connection.after);
-          connection.after=world.state.sequence;
-          connection.response.write(`data: ${JSON.stringify(snapshot)}\n\n`);
+          connection.stream.flush(after=>world.snapshot(id,after),world.state.sequence,world.state.time);
         }
       }
     }catch(error){fatal=error;clearInterval(clock);for(const connections of streams.values())for(const connection of connections)connection.response.destroy();console.error('World persistence failed; mutations stopped:',error.message);}
@@ -77,7 +75,8 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
         res.writeHead(200,{'Content-Type':'text/event-stream','Connection':'keep-alive'});
         res.flushHeaders();
         const after=Number(url.searchParams.get('after')??world.state.sequence);
-        const connection={response:res,after:Number.isSafeInteger(after)&&after>=0?Math.min(after,world.state.sequence):world.state.sequence};
+        const cursor=Number.isSafeInteger(after)&&after>=0?Math.min(after,world.state.sequence):world.state.sequence;
+        const connection={response:res,stream:createWorldStream(res,cursor)};
         let connections=streams.get(id);if(!connections){connections=new Set();streams.set(id,connections);}
         connections.add(connection);
         req.on('close',()=>{connections.delete(connection);if(!connections.size){streams.delete(id);if(!fatal)world.disconnect(id);}});

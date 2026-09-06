@@ -1,6 +1,35 @@
-import type { WorldSnapshot, WorldCommand, WorldIntent, CommandReceipt } from './world-protocol.ts';
+import type { WorldSnapshot, WorldCommand, WorldIntent, CommandReceipt, WorldEvent } from './world-protocol.ts';
 
 class WorldRequestError extends Error { readonly status:number; constructor(message:string,status:number){super(message);this.status=status;} }
+
+/** A suspended/slow renderer can receive many valid SSE frames in one read.
+ * Bound each frame, not that transport batch, and project only its newest state. */
+export class WorldStreamDecoder {
+  private remainder='';
+  private afterEvent:number;
+  private readonly maxPacketLength:number;
+  constructor(afterEvent=0,maxPacketLength=2_000_000){this.afterEvent=afterEvent;this.maxPacketLength=maxPacketLength;}
+  push(chunk:string):WorldSnapshot|null {
+    const input=this.remainder+chunk;
+    let offset=0,delimiter:number,latest:WorldSnapshot|null=null;
+    const events=new Map<number,WorldEvent>();
+    while((delimiter=input.indexOf('\n\n',offset))>=0){
+      if(delimiter-offset>this.maxPacketLength)throw Error('invalid-world-packet');
+      const packet=input.slice(offset,delimiter);offset=delimiter+2;
+      if(!packet.startsWith('data: '))continue;
+      const snapshot=JSON.parse(packet.slice(6)) as WorldSnapshot;
+      if(snapshot.protocol!==1)throw Error('Несовместимая версия сервера.');
+      if(!latest||snapshot.time>latest.time||snapshot.time===latest.time&&snapshot.revision>=latest.revision)latest=snapshot;
+      for(const event of snapshot.events)if(event.sequence>this.afterEvent)events.set(event.sequence,event);
+    }
+    this.remainder=input.slice(offset);
+    if(this.remainder.length>this.maxPacketLength)throw Error('invalid-world-packet');
+    if(!latest)return null;
+    const unseen=[...events.values()].sort((a,b)=>a.sequence-b.sequence);
+    if(unseen.length)this.afterEvent=unseen[unseen.length-1].sequence;
+    return {...latest,events:unseen};
+  }
+}
 
 export class RemoteWorldGateway {
   private readonly storage:Storage;
@@ -122,15 +151,12 @@ export class RemoteWorldGateway {
         // Replay a pending receipt before re-enabling inventory after reconnect.
         await this.recoverPending();
         if(controller.signal.aborted||this.connection!==controller)return;
-        this.onConnection(true);const reader=response.body.getReader();const decoder=new TextDecoder();let buffer='';
+        this.onConnection(true);const reader=response.body.getReader();const decoder=new TextDecoder();
+        const packets=new WorldStreamDecoder(this.lastEventSequence);
         while(!controller.signal.aborted){
-          const {value,done}=await reader.read();if(controller.signal.aborted||this.connection!==controller)return;if(done)break;buffer+=decoder.decode(value,{stream:true});
-          if(buffer.length>2_000_000)throw Error('invalid-world-packet');
-          let delimiter:number;
-          while((delimiter=buffer.indexOf('\n\n'))>=0){
-            const packet=buffer.slice(0,delimiter);buffer=buffer.slice(delimiter+2);
-            if(packet.startsWith('data: '))this.accept(JSON.parse(packet.slice(6)));
-          }
+          const {value,done}=await reader.read();if(controller.signal.aborted||this.connection!==controller)return;if(done)break;
+          const snapshot=packets.push(decoder.decode(value,{stream:true}));
+          if(snapshot)this.accept(snapshot);
         }
       }catch(error){if(controller.signal.aborted)return;}
       if(!controller.signal.aborted){this.onConnection(false);this.reconnectTimer=setTimeout(()=>this.connect(),1500);}

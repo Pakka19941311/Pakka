@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
 import { WorldEventCursor, reconcilePosition } from '../src/network/client-world-state.ts';
-import { RemoteWorldGateway } from '../src/network/remote-world-gateway.ts';
+import { RemoteWorldGateway, WorldStreamDecoder } from '../src/network/remote-world-gateway.ts';
 import { startWorldServer } from '../server/http-server.mjs';
 import { CollisionWorld } from '../src/world/collision-world.ts';
 
@@ -16,6 +16,31 @@ class MemoryStorage {
   removeItem(key){this.values.delete(key);}
 }
 async function until(predicate){const deadline=Date.now()+5000;while(!predicate()){if(Date.now()>deadline)throw Error('client condition timeout');await new Promise(resolve=>setTimeout(resolve,20));}}
+
+test('A valid SSE backlog larger than 2 MB coalesces to newest state without losing or repeating events',()=>{
+  const decoder=new WorldStreamDecoder(10);
+  const event=sequence=>({sequence,at:sequence*100,kind:'hit',actor:'hero',target:'monster'});
+  const frame=(time,revision,events)=>`data: ${JSON.stringify({protocol:1,time,revision,character:{id:'hero',x:time},heroes:[],monsters:[],summons:[],events,padding:'x'.repeat(710_000)})}\n\n`;
+  const batch=frame(1100,1,[event(10),event(11)])+frame(1200,2,[event(11),event(12)])+frame(1300,3,[event(12),event(13)]);
+  assert.ok(Buffer.byteLength(batch)>2_000_000);
+  const result=decoder.push(batch);
+  assert.equal(result.time,1300);assert.equal(result.character.x,1300);
+  assert.deepEqual(result.events.map(e=>e.sequence),[11,12,13]);
+  const split=frame(1400,4,[event(13),event(14)]);
+  assert.equal(decoder.push(split.slice(0,-1)),null);
+  assert.deepEqual(decoder.push(split.slice(-1)).events.map(e=>e.sequence),[14]);
+  const ordered=decoder.push(frame(1600,6,[event(16)])+frame(1500,5,[event(15),event(16)]));
+  assert.equal(ordered.time,1600);assert.deepEqual(ordered.events.map(e=>e.sequence),[15,16]);
+});
+
+test('One oversized complete or incomplete SSE frame is rejected even beside valid frames',()=>{
+  const packet='data: '+JSON.stringify({protocol:1,events:[],padding:'x'.repeat(2_000_000)});
+  assert.throws(()=>new WorldStreamDecoder().push(packet+'\n\n'),/invalid-world-packet/);
+  const decoder=new WorldStreamDecoder();
+  assert.equal(decoder.push(packet.slice(0,1_000_000)),null);
+  assert.throws(()=>decoder.push(packet.slice(1_000_000)),/invalid-world-packet/);
+  assert.throws(()=>new WorldStreamDecoder().push(': heartbeat\n\n'+packet+'\n\n'),/invalid-world-packet/);
+});
 
 test('Resuming repeated event windows never replays old attacks or awards, and skips stale visuals',()=>{
   const cursor=new WorldEventCursor();

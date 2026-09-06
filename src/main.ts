@@ -458,6 +458,10 @@ function saveSnapshot(nextPlayer=player, reserve=legacyScrolls, receipts=enhance
 function targetEnhancement(ref: InventoryItemRef): boolean {
   const selection=enhancementSelection;if(!selection)return false;
   if(SCROLLS[ref.id])return false;
+  if(!localFixture&&(!worldConnected||worldCommandBusy)){
+    toast(worldCommandBusy?'Дождитесь ответа на предыдущее действие.':'Нет связи с миром. Свиток остаётся выбранным; повторите клик после подключения.','bad');
+    return true;
+  }
   const expected=selection.targets.get(ref.uid);
   if(!expected || !referencedInventoryItem(expected)) {toast('Предмет изменился. Выберите свиток заново.','bad');cancelEnhancement();return true;}
   const item=referencedInventoryItem(expected)!;
@@ -1037,8 +1041,13 @@ function addNameplate(entity: Entity): void {
   refreshNameplate(entity);
 }
 
+// World snapshots arrive independently of render frames. Upload a label only
+// when its contents change; walking alone must not redraw every monster canvas.
+const nameplateContents = new WeakMap<DynamicTexture, string>();
 function refreshNameplate(entity: Entity): void {
   if (!entity.labelTexture) return;
+  const contents = JSON.stringify([entity.name, entity.boss, entity.hp, entity.maxHp]);
+  if (nameplateContents.get(entity.labelTexture) === contents) return;
   const context = entity.labelTexture.getContext() as unknown as CanvasRenderingContext2D;
   context.clearRect(0, 0, 512, 96);
   context.textAlign = 'center';
@@ -1054,6 +1063,7 @@ function refreshNameplate(entity: Entity): void {
   const ratio = clamp((entity.hp ?? 0) / Math.max(1, entity.maxHp ?? 1), 0, 1);
   context.fillRect(99, 59, 314 * ratio, 8);
   entity.labelTexture.update();
+  nameplateContents.set(entity.labelTexture, contents);
 }
 
 const ROUND_PROPS = new Set(['tree', 'tree-crooked', 'tree-high', 'tree-high-crooked',
@@ -1507,6 +1517,7 @@ function syncWorldEntities(snapshot: WorldSnapshot): void {
   for(const entity of [...state.entities]) if(['remote-player','monster','summon'].includes(entity.kind)&&!ids.has(entity.uid)){
     if(targeting.isSelected(entity))targeting.clear();disposeEntityVisual(entity);state.entities.splice(state.entities.indexOf(entity),1);
   }
+  const byId = new Map(state.entities.map(entity => [entity.uid, entity]));
   const syncMotion=(entity:Entity,p:{x:number;z:number;yOffset:number;yaw:number;action:string;actionStartedAt:number;actionEndsAt:number;generation?:number},alive:boolean)=>{
     if(entity.networkGeneration!==p.generation && entity.networkGeneration!==undefined) recreateEntityVisual(entity);
     entity.networkGeneration=p.generation;entity.networkPosition={x:p.x,z:p.z,height:p.yOffset};
@@ -1529,13 +1540,13 @@ function syncWorldEntities(snapshot: WorldSnapshot): void {
   const hero=playerEntity();hero.uid=snapshot.character.id;syncMotion(hero,snapshot.character,!snapshot.character.dead);
   for(const p of snapshot.heroes){
     if(p.id===snapshot.character.id)continue;
-    let entity=state.entities.find(e=>e.uid===p.id);
+    let entity=byId.get(p.id);
     if(!entity){entity=makeEntity({uid:p.id,kind:'remote-player',classId:p.classId,name:p.name,model:CLASSES_MAP[p.classId].model,x:p.x,z:p.z,targetHeight:2.05});createEntityModel(entity);state.entities.push(entity);}
     syncMotion(entity,p,!p.dead);
     entity.root?.getChildMeshes().filter(mesh=>/Warrior_Sword|Ranger_Bow|Wizard_Staff|Rogue_Dagger/.test(mesh.name)).forEach(mesh=>mesh.isVisible=Boolean(p.equipment.weapon));
   }
   for(const m of snapshot.monsters){
-    let entity=state.entities.find(e=>e.uid===m.uid);
+    let entity=byId.get(m.uid);
     if(!entity){entity=spawnMonster(m.id,m.x,m.z);entity.uid=m.uid;}
     entity.hp=m.hp;entity.maxHp=MONSTERS_MAP[m.id].hp;entity.phase=m.phase;entity.respawn=Math.max(0,(m.respawnAt-snapshot.time)/1000);
     entity.status={slow:Math.max(0,(m.status.slow-snapshot.time)/1000),stun:Math.max(0,(m.status.stun-snapshot.time)/1000),dot:Math.max(0,(m.status.dot-snapshot.time)/1000)};
@@ -1543,7 +1554,7 @@ function syncWorldEntities(snapshot: WorldSnapshot): void {
     if(entity.boss)state.bossTimers[entity.boss]=entity.respawn;
   }
   for(const s of snapshot.summons){
-    let entity=state.entities.find(e=>e.uid===s.uid);
+    let entity=byId.get(s.uid);
     if(!entity){entity=makeEntity({uid:s.uid,kind:'summon',name:'Призванный страж',model:'Skeleton',x:s.x,z:s.z,targetHeight:1.8});createEntityModel(entity);state.entities.push(entity);}
     syncMotion(entity,s,true);
   }

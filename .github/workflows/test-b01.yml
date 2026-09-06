@@ -26,7 +26,7 @@ jobs:
       - name: Check the changed server and client boundary
         run: |
           npm ci
-          node --experimental-strip-types --test tests/persistent-world.test.mjs tests/beta-import.test.mjs tests/server-combat-parity.test.mjs tests/remote-world-client.test.mjs tests/world-package.test.mjs
+          node --experimental-strip-types --test tests/persistent-world.test.mjs tests/beta-import.test.mjs tests/server-combat-parity.test.mjs tests/remote-world-client.test.mjs tests/world-stream.test.mjs tests/world-package.test.mjs
       - name: Build checkpoint and verify local asset references
         run: npm run build
       - name: Exercise the production game with two clients of a dedicated server
