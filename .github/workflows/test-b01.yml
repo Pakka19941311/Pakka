@@ -23,10 +23,10 @@ jobs:
         with:
           node-version: 22.18.0
           cache: npm
-      - name: Check changed castle passages and shared collision behavior
+      - name: Check the changed beta import and static map contract
         run: |
           npm ci
-          npm run test:castle
+          npm run test:world-transfer
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -39,13 +39,13 @@ jobs:
           fi
       - name: Build checkpoint and verify local asset references
         run: npm run build
-      - name: Render only the changed environment in project CI
+      - name: Compare the map built by two independent rendering clients
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa
-          node scripts/world-environment-regression.mjs dist-qa --castle
+          node --experimental-strip-types scripts/world-environment-regression.mjs dist-qa --topology
       - name: Preserve generated game assets in the working branch
         run: |
           git add public/assets/world
@@ -57,7 +57,7 @@ jobs:
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'assets(world): preserve approved nature derivatives [world-assets]'
+          git commit -m 'assets(world): preserve reviewed static topology [world-assets]'
           git push origin HEAD:refs/heads/work/v06-commercial-rebuild
       - name: Preserve checkpoint evidence, not a user release
         if: always()
@@ -67,4 +67,5 @@ jobs:
           path: |
             qa-artifacts
             public/assets/world/prepared-assets.json
+            public/assets/world/world-topology.json
           retention-days: 30

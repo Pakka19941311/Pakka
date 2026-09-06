@@ -3,7 +3,7 @@ export type Point3 = Point2 & Readonly<{ y: number }>;
 
 type CircleObstacle = Readonly<{ kind: 'circle'; x: number; z: number; radius: number; bottom?: number; top?: number }>;
 type BoxObstacle = Readonly<{ kind: 'box'; x: number; z: number; halfX: number; halfZ: number; rotation: number; bottom?: number; top?: number; blocksMovement?: boolean }>;
-type Obstacle = CircleObstacle | BoxObstacle;
+export type Obstacle = CircleObstacle | BoxObstacle;
 
 export type CollisionMove = Readonly<{ x: number; z: number; blocked: boolean }>;
 
@@ -152,6 +152,9 @@ export class CollisionWorld {
   get size(): number {
     return this.obstacles.length;
   }
+
+  /** Exported during the offline map build, never supplied by a connected player. */
+  manifest(): Obstacle[] { return this.obstacles.map(obstacle => ({ ...obstacle })); }
 
   /** Camera sphere sweep against only nearby, height-bounded static colliders.
    * No scene traversal, triangle picking or new physics engine. */

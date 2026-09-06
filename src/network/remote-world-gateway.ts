@@ -14,6 +14,23 @@ export class RemoteWorldGateway {
     this.storage=storage;this.base=base;this.token=storage.getItem('varendor_world_token_v1');
   }
   get hasSession():boolean{return Boolean(this.token);}
+  get hasPendingImport():boolean{return this.storage.getItem('varendor_world_import_pending_v1')!==null;}
+  async importLocal(save?:unknown):Promise<WorldSnapshot>{
+    let raw=this.storage.getItem('varendor_world_import_pending_v1');
+    if(!raw){
+      if(save===undefined)throw Error('Нет сохранения для переноса.');
+      raw=JSON.stringify({id:crypto.randomUUID(),save});
+      // Both writes precede the request. Quota failure leaves the old save and
+      // prevents a half-completed client-side migration.
+      this.storage.setItem('varendor_world_import_backup_v1',JSON.stringify(save));
+      this.storage.setItem('varendor_world_import_pending_v1',raw);
+    }
+    const pending=JSON.parse(raw);
+    const response=await this.request('/session',{importId:pending.id,legacySave:pending.save});
+    this.storage.setItem('varendor_world_token_v1',response.token);this.token=response.token;
+    this.storage.removeItem('varendor_world_import_pending_v1');
+    this.accept(response.snapshot);this.connect();return response.snapshot;
+  }
   async create(name:string,classId:string):Promise<WorldSnapshot>{
     const response=await this.request('/session',{name,classId});
     // Preserve the previous local save; it is never replaced with an empty online character.

@@ -1,5 +1,7 @@
 export type SurfacePoint = Readonly<{ x: number; y: number; z: number }>;
 export type RoadArea = Readonly<{ x: number; z: number; width: number; depth: number; rotation: number }>;
+export const TERRAIN_VERSION = 2;
+export type TerrainPlatform = RoadArea & Readonly<{ y: number }>;
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 
 /** The same triangles are used by rendering and actor support. No per-frame raycast. */
@@ -10,7 +12,7 @@ export class TerrainSurface {
   readonly rows = 140;
   readonly heights = new Float32Array((this.columns + 1) * (this.rows + 1));
   readonly roads: RoadArea[] = [];
-  private platforms: Array<RoadArea & { y: number }> = [];
+  private platforms: TerrainPlatform[] = [];
 
   constructor() {
     for (let row = 0; row <= this.rows; row++) for (let col = 0; col <= this.columns; col++) {
@@ -56,6 +58,7 @@ export class TerrainSurface {
   addPlatform(x: number, z: number, width: number, depth: number, y: number): void {
     this.platforms.push({ x, z, width, depth, y, rotation: 0 });
   }
+  platformManifest(): TerrainPlatform[] { return this.platforms.map(platform => ({ ...platform })); }
   addRoad(x: number, z: number, width: number, depth: number, rotation = 0): void {
     this.roads.push({ x, z, width, depth, rotation });
   }

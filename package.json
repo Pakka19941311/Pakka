@@ -14,7 +14,8 @@
     "world:server": "node --experimental-strip-types server/http-server.mjs",
     "build": "npm run typecheck && npm run verify:assets && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test:castle": "node --experimental-strip-types --test tests/collision-world.test.mjs tests/castle-passage.test.mjs"
+    "test:castle": "node --experimental-strip-types --test tests/collision-world.test.mjs tests/castle-passage.test.mjs",
+    "test:world-transfer": "node --experimental-strip-types --test tests/beta-import.test.mjs tests/world-topology.test.mjs"
   },
   "dependencies": {
     "@babylonjs/core": "8.26.1",

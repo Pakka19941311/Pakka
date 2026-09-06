@@ -15,7 +15,9 @@ export class WorldStore {
         character TEXT NOT NULL, command TEXT NOT NULL, fingerprint TEXT NOT NULL, result TEXT NOT NULL,
         PRIMARY KEY(character, command));
       CREATE TABLE IF NOT EXISTS sessions (token_hash TEXT PRIMARY KEY, character TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS imports (character TEXT PRIMARY KEY, original TEXT NOT NULL, imported_at INTEGER NOT NULL);`);
+      CREATE TABLE IF NOT EXISTS imports (character TEXT PRIMARY KEY, original TEXT NOT NULL, imported_at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS import_requests (
+        id TEXT PRIMARY KEY, source_hash TEXT NOT NULL UNIQUE, character TEXT NOT NULL UNIQUE);`);
   }
   load() {
     const row = this.db.prepare('SELECT state FROM world WHERE id=1').get();
@@ -48,6 +50,22 @@ export class WorldStore {
     this.db.prepare('INSERT INTO imports VALUES (?, ?, ?)').run(character, JSON.stringify(original), now);
   }
   hasImport(character) { return Boolean(this.db.prepare('SELECT character FROM imports WHERE character=?').get(character)); }
+  imported(id, original) {
+    const sourceHash=fingerprint(original);
+    const row=this.db.prepare('SELECT source_hash,character FROM import_requests WHERE id=?').get(id);
+    if(row){if(row.source_hash!==sourceHash)throw Error('import-id-conflict');return row.character;}
+    if(this.db.prepare('SELECT id FROM import_requests WHERE source_hash=?').get(sourceHash))throw Error('save-already-imported');
+    return null;
+  }
+  commitImport(state, character, id, original, at) {
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      this.save(state);
+      this.importBackup(character,original,at);
+      this.db.prepare('INSERT INTO import_requests VALUES (?, ?, ?)').run(id,fingerprint(original),character);
+      this.db.exec('COMMIT');
+    } catch(error) { this.db.exec('ROLLBACK');throw error; }
+  }
   close() { this.db.close(); }
 }
 function fingerprint(value) { return createHash('sha256').update(JSON.stringify(value)).digest('hex'); }

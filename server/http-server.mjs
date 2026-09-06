@@ -5,11 +5,13 @@ import { resolve, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WorldStore } from './world-store.mjs';
 import { WorldSimulation } from '../src/server/world-simulation.ts';
-import { CollisionWorld } from '../src/world/collision-world.ts';
+import { restoreWorldTopology } from '../src/world/world-topology.ts';
 
-export function startWorldServer({database, collision, port=4173, host='127.0.0.1', beta=false, staticRoot, now=Date.now}) {
+export function startWorldServer({database, collision, terrain, port=4173, host='127.0.0.1', beta=false, allowLocalImport=false, staticRoot, now=Date.now}) {
+  const loopback=address=>['127.0.0.1','::1','::ffff:127.0.0.1'].includes(address);
+  if(allowLocalImport&&(!beta||!loopback(host)))throw Error('Local import requires a private loopback beta server');
   const store=new WorldStore(database);
-  const world=new WorldSimulation({store,collision,now:now(),identifier:randomUUID,beta});
+  const world=new WorldSimulation({store,collision,terrain,now:now(),identifier:randomUUID,beta});
   const streams=new Map();let broadcastAt=0;
   let fatal=null;
   const clock=setInterval(()=>{
@@ -49,17 +51,20 @@ export function startWorldServer({database, collision, port=4173, host='127.0.0.
       if(!rate||rate.until<now()){rate={until:now()+1000,count:0};rates.set(address,rate);}
       if(++rate.count>80){json(429,{error:'rate-limit'});return;}
       if(rates.size>1000)for(const [key,value] of rates)if(value.until<now())rates.delete(key);
-      if(req.method==='GET'&&url.pathname==='/api/health'){json(200,{protocol:1,time:world.state.time,revision:world.state.revision,beta});return;}
+      if(req.method==='GET'&&url.pathname==='/api/health'){json(200,{protocol:1,time:world.state.time,revision:world.state.revision,beta,localImport:allowLocalImport&&loopback(address)});return;}
       let body={};
       if(req.method==='POST'){
         if(!req.headers['content-type']?.startsWith('application/json')){json(415,{error:'json-required'});return;}
         const chunks=[];let size=0;
-        for await(const chunk of req){size+=chunk.length;if(size>16_384){json(413,{error:'request-too-large'});return;}chunks.push(chunk);}
+        const limit=allowLocalImport&&loopback(address)&&url.pathname==='/api/session'?262144:16384;
+        for await(const chunk of req){size+=chunk.length;if(size>limit){json(413,{error:'request-too-large'});return;}chunks.push(chunk);}
         try{body=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{json(400,{error:'invalid-json'});return;}
         if(!body||Array.isArray(body)||typeof body!=='object'){json(400,{error:'invalid-body'});return;}
       }
       if(req.method==='POST'&&url.pathname==='/api/session'){
-        const p=world.createCharacter(body.name,body.classId);const token=randomBytes(32).toString('base64url');
+        if(body.legacySave!==undefined&&(!allowLocalImport||!loopback(address))){json(403,{error:'beta-import-disabled'});return;}
+        const p=body.legacySave===undefined?world.createCharacter(body.name,body.classId):world.importCharacter(body.importId,body.legacySave);
+        const token=randomBytes(32).toString('base64url');
         store.session(token,p.id);world.heartbeat(p.id);world.checkpoint();
         json(201,{token,snapshot:world.snapshot(p.id)});return;
       }
@@ -102,16 +107,12 @@ export function startWorldServer({database, collision, port=4173, host='127.0.0.
 }
 
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
-  const manifest=process.env.VARENDOR_COLLISIONS;
-  if(!manifest)throw Error('VARENDOR_COLLISIONS must name the reviewed world collision manifest. An empty world is not a release candidate.');
-  const entries=JSON.parse(readFileSync(manifest,'utf8'));const collision=new CollisionWorld();
-  for(const p of entries){
-    if(p.kind==='circle')collision.addCircle(p.x,p.z,p.radius,p.bottom,p.top);
-    else if(p.kind==='box')collision.addBox(p.x,p.z,p.halfX,p.halfZ,p.rotation,p.bottom,p.top);
-    else throw Error('invalid-collision-manifest');
-  }
-  const running=startWorldServer({database:process.env.VARENDOR_DATABASE??'server-data/world.sqlite',collision,
-    port:Number(process.env.PORT??4173),host:'127.0.0.1',beta:process.env.VARENDOR_BETA==='1',staticRoot:'dist'});
+  const manifest=process.env.VARENDOR_COLLISIONS??'public/assets/world/world-topology.json';
+  if(!existsSync(manifest))throw Error('The reviewed world topology is missing. Generate it during the offline world build before starting the server.');
+  const {collision,terrain}=restoreWorldTopology(JSON.parse(readFileSync(manifest,'utf8')));
+  const running=startWorldServer({database:process.env.VARENDOR_DATABASE??'server-data/world.sqlite',collision,terrain,
+    port:Number(process.env.PORT??4173),host:'127.0.0.1',beta:process.env.VARENDOR_BETA==='1',
+    allowLocalImport:process.env.VARENDOR_ALLOW_LOCAL_IMPORT==='1',staticRoot:'dist'});
   running.server.on('listening',()=>console.log(`Varendor world listening on http://127.0.0.1:${running.server.address().port}`));
   for(const signal of ['SIGINT','SIGTERM'])process.once(signal,()=>void running.close().then(()=>process.exit(0)));
 }

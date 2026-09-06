@@ -58,6 +58,8 @@ import { resolveAttackAccuracy } from './core/attack-accuracy';
 import { itemDamageSummary } from './core/item-progression';
 import { createCharacterInventory } from './ui/character-inventory';
 import type { CharacterInventoryModel, InventoryItemRef, InventoryTooltip, InventoryDropTarget, InventoryPosition } from './ui/character-inventory';
+import { createLayoutRandom } from './world/layout-random';
+import { worldTopology } from './world/world-topology';
 import { LocalGameGateway } from './network/game-gateway';
 import { CombatControl, SKILL_BUFFER_SECONDS } from './controls/combat-controller';
 import { CharacterMotor, smoothAngle } from './controls/character-motor';
@@ -360,6 +362,7 @@ function qa<T extends Element>(selector: string): T[] {
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
+let layoutRandom = createLayoutRandom();
 const rint = (min: number, max: number) => Math.floor(rand(min, max + 1));
 const uid = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
 
@@ -1209,7 +1212,7 @@ function buildTown(x: number, z: number, scale: number): void {
   createBuilding('asterhold-barracks', x + 7.8 * scale, z - 1.4 * scale, 5.8 * scale, 4.5 * scale, 3.2 * scale, 0x81796d, 0x4e5355);
   realismModel('large_castle_door', x, z - 3.22 * scale, 3.2 * scale, Math.PI);
   realismModel('gothic_statue', x, z + 4.2 * scale, 4.4 * scale, Math.PI);
-  for (const [bx, bz] of [[x - 7, z - 7], [x + 7, z - 7], [x - 9, z + 2]]) realismModel('Barrel_01', bx, bz, 1.2 * scale, rand(0, Math.PI * 2));
+  for (const [bx, bz] of [[x - 7, z - 7], [x + 7, z - 7], [x - 9, z + 2]]) realismModel('Barrel_01', bx, bz, 1.2 * scale, layoutRandom(0, Math.PI * 2));
 }
 
 function createBonfire(x: number, z: number): void {
@@ -1285,7 +1288,7 @@ function buildStarterSettlement(x: number, z: number): void {
 }
 
 function buildRuinLandmark(x: number, z: number, scale = 1): void {
-  worldModel('wall-arch', x, z, 2.1 * scale, rand(0, Math.PI * 2), 0x777870);
+  worldModel('wall-arch', x, z, 2.1 * scale, layoutRandom(0, Math.PI * 2), 0x777870);
   for (let index = 0; index < 5; index += 1) {
     const angle = index * 0.92 + 0.25;
     worldModel(index % 2 ? 'wall-block' : 'pillar-stone', x + Math.cos(angle) * 4.3 * scale, z + Math.sin(angle) * 4.3 * scale, 1.3 * scale, -angle, 0x6d716c);
@@ -1305,11 +1308,8 @@ function buildFrontierCamp(x: number, z: number, scale = 1): void {
 function buildWorld(): void {
   collisionWorld.clear();
   // Stable decoration positions across Continue, quality levels and character selection.
-  let seed = 314159;
-  const rand = (min: number, max: number) => {
-    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
-    return min + seed / 4294967296 * (max - min);
-  };
+  layoutRandom = createLayoutRandom();
+  const rand = layoutRandom;
   roadBetween(-108, -82, -65, -55, 5.4);
   roadBetween(-65, -55, -7, -27, 5.2);
   roadBetween(-7, -27, -7, -15, 5.2);
@@ -3544,6 +3544,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
     version: '0.6.0-world-part1-checkpoint',
+    worldTopology: () => worldTopology(collisionWorld, terrain),
     worldEnvironment: () => ({...environmentAssets.describe(),groundReady:ground.isReady(true),
       groundMaterial:groundMaterial.name,skyReady:environment.isReady(),castle:castleAssets.describe()}),
     actorTargets,

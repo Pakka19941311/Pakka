@@ -8,7 +8,7 @@ export type WorldCharacter = Position & {
   id: string; name: string; classId: string; level: number; xp: number; gold: number;
   hp: number; mp: number; maxHp: number; maxMp: number; stats: EquipmentCombatStats;
   inventory: InventoryItem[]; equipment: Record<string, InventoryItem | undefined>;
-  lootBuffer: InventoryItem[]; betaScrollGrant?: string; quest: number; kills: number; bossKills: number;
+  lootBuffer: InventoryItem[]; betaScrollGrant?: string; legacyScrolls?: number; quest: number; kills: number; bossKills: number;
   dead: boolean; cooldowns: number[]; attackReadyAt: number; buffs: { guard: number; vanish: number };
   activeUntil: number; lastInputSequence: number; lastInputAt: number;
   direction: Position; destination: Position | null; target: string | null; skill: number | null;

@@ -14,6 +14,7 @@ import { findNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
 import { MonsterAiBrain } from '../world/monster-ai.ts';
 import { WORLD_PROTOCOL, DISCONNECT_GRACE_MS } from '../network/world-protocol.ts';
+import { parseBetaSave } from './beta-import.ts';
 import type { WorldCharacter, WorldMonster, WorldSummon, WorldCommand, WorldIntent, WorldEvent, WorldSnapshot, CommandReceipt, Position } from '../network/world-protocol.ts';
 
 type ClassId = keyof typeof CLASSES;
@@ -31,6 +32,8 @@ export interface SimulationStore {
   save(state: PersistedWorld): void;
   receipt(character: string, id: string, payload: WorldCommand): CommandReceipt | null;
   commit(state: PersistedWorld, character: string, id: string, payload: WorldCommand, result: CommandReceipt): void;
+  imported(id: string, original: unknown): string | null;
+  commitImport(state: PersistedWorld, character: string, id: string, original: unknown, at: number): void;
 }
 const SPAWN = { x: -7, z: -11 };
 const distance = (a: Position, b: Position) => Math.hypot(a.x - b.x, a.z - b.z);
@@ -52,13 +55,14 @@ export class WorldSimulation {
   private readonly store: SimulationStore;
   private readonly collision: CollisionWorld;
   private readonly beta: boolean;
-  private readonly terrain = new TerrainSurface();
+  private readonly terrain: TerrainSurface;
   private lastCheckpoint: number;
   private paths = new Map<string, { goal: Position; points: Position[]; expiresAt: number }>();
   private brains = new Map<string,MonsterAiBrain>();
 
-  constructor(options: {store: SimulationStore; collision: CollisionWorld; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
+  constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSurface; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
     this.store = options.store; this.collision = options.collision;
+    this.terrain = options.terrain ?? new TerrainSurface();
     this.random = options.random ?? Math.random; this.identifier = options.identifier; this.beta = Boolean(options.beta);
     this.state = this.store.load() ?? {schema:1,time:options.now,revision:0,sequence:0,characters:{},monsters:[],summons:[],pending:[]};
     if (this.state.schema !== 1) throw Error('unsupported-world-schema');
@@ -76,6 +80,35 @@ export class WorldSimulation {
   }
 
   createCharacter(name: string, classId: string): WorldCharacter {
+    const p=this.prepareCharacter(name,classId);
+    this.state.characters[p.id] = p;
+    try { this.store.save(this.state); } catch (error) { delete this.state.characters[p.id]; throw error; }
+    return p;
+  }
+
+  importCharacter(importId: string, raw: unknown): WorldCharacter {
+    if (!this.beta) throw Error('beta-import-disabled');
+    if (!/^[a-zA-Z0-9:_-]{16,128}$/.test(importId)) throw Error('invalid-import-id');
+    const existing=this.store.imported(importId,raw);
+    if (existing) return this.character(existing);
+    const imported=parseBetaSave(raw);
+    let p:WorldCharacter={...this.prepareCharacter(imported.name,imported.classId),...imported};
+    // Old client UIDs are not world-global identities. The exact original is
+    // retained in the same durable transaction as the remapped character.
+    const remap=(item:InventoryItem)=>({...item,uid:this.identifier()});
+    p.inventory=p.inventory.map(remap);p.lootBuffer=p.lootBuffer.map(remap);
+    p.equipment=Object.fromEntries(Object.entries(p.equipment).map(([slot,item])=>[slot,item?remap(item):undefined]));
+    const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
+    p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
+    this.recalculate(p);if(p.dead)p.hp=0;
+    Object.assign(p,this.collision.findNearestFree(p,.46));
+    this.state.characters[p.id]=p;
+    try { this.store.commitImport(this.state,p.id,importId,raw,this.state.time); }
+    catch(error){delete this.state.characters[p.id];throw error;}
+    return p;
+  }
+
+  private prepareCharacter(name: string, classId: string): WorldCharacter {
     if (!Object.hasOwn(CLASSES,classId) || typeof name !== 'string') throw Error('invalid-character');
     const cls = CLASSES[classId as ClassId];
     const equipment = {weapon:this.item(cls.weapon),chest:this.item(cls.armor)};
@@ -92,8 +125,6 @@ export class WorldSimulation {
       const granted = grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant}, id=>this.item(id));
       p = {...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
     }
-    this.state.characters[p.id] = p;
-    try { this.store.save(this.state); } catch (error) { delete this.state.characters[p.id]; throw error; }
     return p;
   }
 
