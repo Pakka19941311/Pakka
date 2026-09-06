@@ -13,7 +13,8 @@ const staticRoot=resolve(process.argv[2]??'dist');
 const temporary=await mkdtemp(join(tmpdir(),'varendor-client-server-'));
 const report={block:'part1-connected-client',sha:process.env.GITHUB_SHA??'local-working-tree',passed:false,
   environment:'Two Chromium clients and a dedicated Node process; software WebGL, not a hardware FPS benchmark.',checks:[],errors:[]};
-let serverProcess,browser;
+let serverProcess;
+const browsers=[];
 const check=(name,details={})=>{report.checks.push({name,...details});console.log('PASS',name);};
 const state=page=>page.evaluate(()=>window.__VARENDOR_QA__.getState());
 const network=page=>page.evaluate(()=>window.__VARENDOR_QA__.network());
@@ -40,6 +41,11 @@ async function startServer(){
   });
 }
 async function newClient(base,name){
+  // Separate Chromium/GPU processes model two player devices. Freezing a tab
+  // in a shared software-GPU process can stall another tab's shader startup.
+  const browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE,headless:true,
+    args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage','--no-sandbox']});
+  browsers.push(browser);
   const context=await browser.newContext({viewport:{width:1024,height:768},deviceScaleFactor:1});
   await context.addInitScript(()=>{
     if(!localStorage.getItem('varendor_client_settings_v1'))localStorage.setItem('varendor_client_settings_v1',JSON.stringify({quality:'low',resolutionScale:.5}));
@@ -56,6 +62,7 @@ async function newClient(base,name){
     await page.waitForFunction(()=>window.__VARENDOR_QA__?.getState().started&&window.__VARENDOR_QA__.network().connected
       ||Boolean(document.querySelector('#start-error')?.textContent),{}, {timeout:180_000});
     assert.ok((await state(page)).started&&(await network(page)).connected,'Client startup failed');
+    console.log('CLIENT READY',name);
   }catch(error){
     const diagnostic=await page.evaluate(()=>({loading:document.querySelector('#load-text')?.textContent,
       startError:document.querySelector('#start-error')?.textContent,network:window.__VARENDOR_QA__?.network(),
@@ -67,8 +74,6 @@ async function newClient(base,name){
 try{
   await mkdir('qa-artifacts',{recursive:true});
   const base=await startServer();
-  browser=await chromium.launch({executablePath:process.env.BROWSER_EXECUTABLE,headless:true,
-    args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage','--no-sandbox']});
   const first=await newClient(base,'Первый клиент');
   const before=await network(first.page);
   // A real frozen page cannot run its local loop or read the stream. This is
@@ -129,7 +134,7 @@ try{
   assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(error){report.errors.push(error.stack??String(error));console.error('CLIENT REPORT',JSON.stringify(report));throw error;}
 finally{
-  await browser?.close();
+  await Promise.allSettled(browsers.map(browser=>browser.close()));
   if(serverProcess&&serverProcess.exitCode===null){const exit=once(serverProcess,'exit');serverProcess.kill('SIGTERM');await exit;}
   await writeFile('qa-artifacts/part1-connected-client.json',JSON.stringify(report,null,2)+'\n');
   await rm(temporary,{recursive:true,force:true});

@@ -37,6 +37,7 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
     try {
       const url=new URL(req.url,'http://localhost');
       if(!url.pathname.startsWith('/api/')){
+        if(url.pathname==='/favicon.ico'&&['GET','HEAD'].includes(req.method)){res.writeHead(204);res.end();return;}
         if(!staticRoot||!['GET','HEAD'].includes(req.method)){json(404,{error:'not-found'});return;}
         const root=resolve(staticRoot);const path=resolve(root,'.'+decodeURIComponent(url.pathname==='/'?'/index.html':url.pathname));
         if(!path.startsWith(root+sep)||!existsSync(path)){json(404,{error:'not-found'});return;}
