@@ -75,7 +75,8 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
         world.heartbeat(id);
         res.writeHead(200,{'Content-Type':'text/event-stream','Connection':'keep-alive'});
         res.flushHeaders();
-        const connection={response:res,after:0};
+        const after=Number(url.searchParams.get('after')??world.state.sequence);
+        const connection={response:res,after:Number.isSafeInteger(after)&&after>=0?Math.min(after,world.state.sequence):world.state.sequence};
         let connections=streams.get(id);if(!connections){connections=new Set();streams.set(id,connections);}
         connections.add(connection);
         req.on('close',()=>{connections.delete(connection);if(!connections.size){streams.delete(id);if(!fatal)world.disconnect(id);}});

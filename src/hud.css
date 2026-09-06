@@ -24,3 +24,9 @@
 .hud .region-info summary{padding:4px 7px;cursor:pointer;color:#dac49d;position:sticky;top:0;background:#20242a;z-index:1}
 .hud .region-info .tracker,.hud .region-info .boss-timers{position:static;width:auto;margin:0;padding:7px;border:0;box-shadow:none;display:block}
 .hud .left-rail .combat-log{position:static;flex:1 1 auto;margin-top:auto;min-height:100px;height:155px;max-height:155px;width:290px}
+
+#world-connection {position:fixed;top:14px;left:50%;transform:translateX(-50%);padding:12px 20px;border:1px solid #ad8b56;background:#171c20ee;color:#eedbb5;z-index:300;pointer-events:none;}
+#world-connection[hidden] {display:none;}
+
+#start-error {color:#e7a39b;max-width:700px;margin:16px auto;}
+#world-character-select {max-width:270px;}

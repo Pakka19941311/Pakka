@@ -29,7 +29,7 @@ try{
   page.on('pageerror',error=>report.errors.push(error.stack??error.message));
   page.on('console',message=>{if(message.type()==='error')report.errors.push(message.text());});
   page.on('response',response=>{if(response.status()>=400)report.errors.push(`HTTP ${response.status()} ${response.url()}`);});
-  await page.goto(`http://127.0.0.1:${server.address().port}`);
+  await page.goto(`http://127.0.0.1:${server.address().port}/?fixture=environment`);
   await page.locator('#name-field').fill('Мир — проверка природы');await page.locator('#begin').click();
   await page.waitForFunction(()=>window.__VARENDOR_QA__?.getState().started,{},{timeout:180000});
   await page.evaluate(()=>window.__VARENDOR_FIXTURE__.pause(true));
@@ -43,7 +43,7 @@ try{
     const second=await browser.newPage({viewport:{width:960,height:600}});
     second.setDefaultTimeout(60000);
     second.on('pageerror',error=>report.errors.push(error.stack??error.message));
-    await second.goto(`http://127.0.0.1:${server.address().port}`);
+    await second.goto(`http://127.0.0.1:${server.address().port}/?fixture=environment`);
     await second.locator('#name-field').fill('Второй клиент');await second.locator('#begin').click();
     await second.waitForFunction(()=>window.__VARENDOR_QA__?.getState().started,{},{timeout:180000});
     await second.evaluate(()=>window.__VARENDOR_FIXTURE__.pause(true));

@@ -61,6 +61,9 @@ import type { CharacterInventoryModel, InventoryItemRef, InventoryTooltip, Inven
 import { createLayoutRandom } from './world/layout-random';
 import { worldTopology } from './world/world-topology';
 import { LocalGameGateway } from './network/game-gateway';
+import { RemoteWorldGateway } from './network/remote-world-gateway';
+import { WorldEventCursor, reconcilePosition } from './network/client-world-state';
+import type { WorldSnapshot, WorldCharacter, WorldEvent, WorldCommand, CommandReceipt } from './network/world-protocol';
 import { CombatControl, SKILL_BUFFER_SECONDS } from './controls/combat-controller';
 import { CharacterMotor, smoothAngle } from './controls/character-motor';
 import { slidePastActor } from './controls/actor-spacing';
@@ -208,7 +211,11 @@ type Player = {
 type Statuses = { dot?: number; slow?: number; stun?: number };
 type Entity = {
   uid: string;
-  kind: 'player' | 'npc' | 'ambient' | 'monster' | 'summon';
+  kind: 'player' | 'remote-player' | 'npc' | 'ambient' | 'monster' | 'summon';
+  networkGeneration?: number;
+  networkPosition?: {x:number;z:number;height:number};
+  networkActionUntil?: number;
+  classId?: string;
   id?: string;
   name?: string;
   model: string;
@@ -457,6 +464,16 @@ function targetEnhancement(ref: InventoryItemRef): boolean {
   const chance=scrollChance(selection.scroll.id,itemDef(item).slot,item.plus);
   if(!chance || item.count!==1) {toast(item.plus>=15?'Достигнут предел +15.':'Этот предмет не подходит к свитку.','bad');return true;}
   enhancementSelection=null;
+  if (!localFixture) {
+    inventoryPanel?.refresh();
+    void runWorldCommand({type:'enhance',item:expected,scroll:selection.scroll}, selection.id).then(receipt => {
+      if (!receipt?.ok) return;
+      const outcome=receipt.outcome as {success:boolean;from:number;to:number|null};
+      enhancementResult=outcome.success?`${itemDef(item).name}: +${outcome.from} → +${outcome.to}`:`${itemDef(item).name} +${outcome.from} уничтожен`;
+      inventorySelection=null;gameAudio.play('hammer',.72,1);toast(enhancementResult,outcome.success?'':'bad');log(enhancementResult,outcome.success?'loot':'combat');updateHud();
+    });
+    return true;
+  }
   if(enhancementReceipts.includes(selection.id))return true;
   const outcome=enhanceItem(player,selection.scroll,expected,itemDef,qaEnhancementRoll?.() ?? Math.random());
   if(!outcome.ok){toast(outcome.reason,'bad');inventoryPanel?.refresh();return true;}
@@ -490,7 +507,43 @@ let player: Player = {
 
 const gameAudio = new GameAudio(settings);
 
+// The local simulation is reachable only in a compiled QA build and an explicit
+// environment fixture. It never serves as a production connection fallback.
+const localFixture = __QA_BUILD__ && new URLSearchParams(location.search).get('fixture') === 'environment';
 const gateway = new LocalGameGateway<PlayerSave>('varendor_reborn_v03', window.localStorage, ['varendor_reborn_v02']);
+const remoteWorld = new RemoteWorldGateway(window.localStorage);
+let worldSnapshot: WorldSnapshot | null = null;
+let worldSnapshotAt = 0;
+let worldConnected = false;
+let worldCommandBusy = false;
+let worldEventCursor = new WorldEventCursor();
+let worldGeneration = -1;
+remoteWorld.onSnapshot = acceptWorldSnapshot;
+remoteWorld.onRecovered = (receipt,command) => {
+  if(lastWorldReceipt?.id===receipt.id)return;
+  lastWorldReceipt=receipt;worldReceiptCount++;
+  if(!state.started)return;
+  if(command.type==='enhance'&&receipt.ok){
+    const outcome=receipt.outcome as {success:boolean;from:number;to:number|null};
+    enhancementResult=outcome.success?`${ITEMS_MAP[command.item.id].name}: +${outcome.from} → +${outcome.to}`:`${ITEMS_MAP[command.item.id].name} +${outcome.from} уничтожен`;
+    toast(enhancementResult,outcome.success?'':'bad');log(enhancementResult,outcome.success?'loot':'combat');
+  }else toast(receipt.ok?'Предыдущее действие подтверждено сервером.':'Предыдущее действие не выполнено. Предметы сохранены.',receipt.ok?'':'bad');
+};
+remoteWorld.onInputRejected = reason => {
+  const messages:Record<string,string>={'missing-target':'Цель уже недоступна.','skill-cooldown':'Навык ещё восстанавливается.','insufficient-mp':'Недостаточно ресурса.','airborne':'Навык недоступен в прыжке.','insufficient-resource':'Недостаточно ресурса.','attack-in-progress':'Дождитесь завершения удара.'};
+  if(state.started)combatToast(messages[reason]??'Команда не выполнена: цель или навык недоступны.','bad');
+};
+remoteWorld.onConnection = connected => {
+  worldConnected = connected;
+  if (!state.started || localFixture) return;
+  connectionNotice.hidden = connected;
+  if (!connected) { playerMotor.stopPlanar(); wasMovingManually = false; }
+};
+const connectionNotice = document.createElement('div');
+connectionNotice.id = 'world-connection'; connectionNotice.setAttribute('role','status'); connectionNotice.hidden = true;
+connectionNotice.textContent = 'Связь с миром потеряна. Переподключаемся…';
+document.body.append(connectionNotice);
+try { const savedSettings = localStorage.getItem('varendor_client_settings_v1'); if(savedSettings)Object.assign(state.settings,JSON.parse(savedSettings)); } catch { /* Keep valid defaults. */ }
 let assetsLoaded = false;
 
 Object.entries(CLASSES_MAP).forEach(([id, classDef]) => {
@@ -509,9 +562,22 @@ qa<HTMLButtonElement>('[data-class]').forEach((button) => {
   };
 });
 
+const startError=document.createElement('p');startError.id='start-error';startError.setAttribute('role','alert');
+q('.start-content').append(startError);
+if(!localFixture){
+  try {
+    const profiles=remoteWorld.profiles;
+    if(profiles.length){
+      const select=document.createElement('select');select.id='world-character-select';select.className='name-field';select.setAttribute('aria-label','Сохранённый персонаж');
+      for(const profile of profiles){const option=document.createElement('option');option.value=profile.id;option.textContent=`${profile.name} · ${CLASSES_MAP[profile.classId]?.name??profile.classId}`;option.selected=profile.selected;select.append(option);}
+      select.onchange=()=>{try{remoteWorld.selectProfile(select.value);}catch(error){startError.textContent=error instanceof Error?error.message:'Не удалось выбрать персонажа.';}};
+      q('.start-actions').insertBefore(select,q('#continue'));
+    }
+  }catch(error){startError.textContent=error instanceof Error?error.message:'Не удалось прочитать список персонажей.';}
+}
 void gateway.load().then((save) => {
-  if (save) q('#continue').classList.remove('hidden');
-});
+  if (save || remoteWorld.hasSession || remoteWorld.hasPendingImport) q('#continue').classList.remove('hidden');
+}).catch(error=>{startError.textContent=error instanceof Error?error.message:'Не удалось прочитать прежнее сохранение.';});
 
 const canvas = q<HTMLCanvasElement>('#game-canvas');
 const inputControl = new PlayerInputController(canvas, window, () => state.started && !player.dead && !confirmation?.cancel);
@@ -813,7 +879,7 @@ function cancelActorAttack(entity: Entity): void {
 }
 
 function createEntityModel(entity: Entity): void {
-  const wantsCharacter = entity.kind === 'player' || entity.kind === 'npc' || entity.kind === 'ambient';
+  const wantsCharacter = entity.kind === 'player' || entity.kind === 'remote-player' || entity.kind === 'npc' || entity.kind === 'ambient';
   const container = wantsCharacter
     ? characterAssets.get(entity.model)
     : monsterAssets.get(entity.model) ?? characterAssets.get(entity.model);
@@ -838,7 +904,7 @@ function createEntityModel(entity: Entity): void {
   }
   entity.visualGeneration = (entity.visualGeneration ?? 0) + 1;
   entity.motion = new ActorAnimation(entity.model, entity.targetHeight, entity.animations, instance.pose,
-    entity.root.scaling.y, entity.kind === 'player');
+    entity.root.scaling.y, entity.kind === 'player' || entity.kind === 'remote-player');
   entity.previousX = entity.x; entity.previousZ = entity.z;
   entity.previousSupportY = terrain.supportAt(entity.x, entity.z);
   entity.verticalOffset = 0; entity.previousVerticalOffset = 0;
@@ -862,7 +928,7 @@ function createEntityModel(entity: Entity): void {
   }
   setEntityAction(entity, 'idle');
   if (entity.kind === 'monster') addNameplate(entity);
-  if (entity.kind === 'npc') addNpcLabel(entity);
+  if (entity.kind === 'npc' || entity.kind === 'remote-player') addNpcLabel(entity);
   syncEntityTransform(entity);
 }
 
@@ -1391,6 +1457,176 @@ function itemDef(item: ItemInstance): ItemDef {
   return definition;
 }
 
+// All gameplay values below are projections of the server snapshot. Only the
+// local hero's presentation predicts input; it cannot award, damage or enchant.
+let lastWorldReceipt: CommandReceipt | null = null;
+let worldReceiptCount = 0;
+async function runWorldCommand(command: WorldCommand, id?: string): Promise<CommandReceipt | null> {
+  if (!worldConnected) { toast('Нет связи с миром. Дождитесь переподключения.','bad'); return null; }
+  if (worldCommandBusy) { toast('Дождитесь ответа на предыдущее действие.'); return null; }
+  worldCommandBusy=true;inventoryPanel?.refresh();
+  try {
+    const result=await remoteWorld.command(command,id);
+    if(lastWorldReceipt?.id!==result.id){lastWorldReceipt=result;worldReceiptCount++;}
+    if (!result.ok) {
+      const reasons:Record<string,string>={'stale-item':'Предмет изменился. Выберите его заново.','cannot-use':'Сейчас этот предмет не требуется.','insufficient-gold':'Недостаточно золота.','level-required':'Недостаточный уровень.','shop-unavailable':'Подойдите к торговке.','teleport-unavailable':'Подойдите к проводнику.','elder-unavailable':'Подойдите к старосте.','dead':'Персонаж погиб.','bag-full':'Сумка заполнена.'};
+      toast(reasons[result.reason??'']??'Действие не выполнено. Предметы не изменены.','bad');
+    }
+    return result;
+  } catch(error) { toast(error instanceof Error?error.message:'Действие ожидает восстановления связи.','bad'); return null; }
+  finally { worldCommandBusy=false;inventoryPanel?.refresh(); }
+}
+function serverNow(): number { return (worldSnapshot?.time??0)+Math.min(1000,performance.now()-worldSnapshotAt); }
+function acceptWorldSnapshot(snapshot: WorldSnapshot): void {
+  const previous=worldSnapshot?.character;
+  if (worldSnapshot && (snapshot.time<worldSnapshot.time || snapshot.time===worldSnapshot.time&&snapshot.revision<worldSnapshot.revision)) return;
+  worldSnapshot=snapshot;worldSnapshotAt=performance.now();
+  const p=snapshot.character;
+  const discontinuity=worldGeneration!==p.generation || !previous || Math.hypot(previous.x-p.x,previous.z-p.z)>3.5;
+  const predicted={x:player.x,z:player.z};
+  player={name:p.name,classId:p.classId,level:p.level,xp:p.xp,gold:p.gold,x:p.x,z:p.z,hp:p.hp,mp:p.mp,
+    maxHp:p.maxHp,maxMp:p.maxMp,stats:structuredClone(p.stats),inventory:structuredClone(p.inventory),equipment:structuredClone(p.equipment),
+    cooldowns:p.cooldowns.map(at=>Math.max(0,(at-snapshot.time)/1000)),attackCd:Math.max(0,(p.attackReadyAt-snapshot.time)/1000),dead:p.dead};
+  if (state.started && !discontinuity) {player.x=predicted.x;player.z=predicted.z;}
+  state.selectedClass=p.classId;state.quest=p.quest;state.kills=p.kills;state.bossKills=p.bossKills;
+  state.lootBuffer=structuredClone(p.lootBuffer);legacyScrolls=p.legacyScrolls??0;betaScrollGrant=p.betaScrollGrant;
+  state.playerBuffs={guard:Math.max(0,(p.buffs.guard-snapshot.time)/1000),vanish:Math.max(0,(p.buffs.vanish-snapshot.time)/1000)};
+  const events=worldEventCursor.consume(snapshot.events,snapshot.time);
+  worldGeneration=p.generation;
+  if (!state.started) return;
+  if(discontinuity){playerMotor.reset();resetPlayerControl(true);cameraControl.snap({x:p.x,y:terrain.supportAt(p.x,p.z),z:p.z});}
+  syncWorldEntities(snapshot);
+  syncPlayerWeaponVisual();updateQuest();updateHud();
+  if (p.dead && !previous?.dead) {inputControl.reset();closeWindow();showRespawn('Сервер сохранил потерю опыта. Предметы сохранены.');}
+  if (!p.dead && previous?.dead) {closeConfirm();toast('Вы возродились в Гринфолле');}
+  if (previous && p.level>previous.level) {toast(`Достигнут уровень ${p.level}`);log(`Новый уровень: ${p.level}.`,'loot');}
+  if (!document.hidden) events.forEach(presentWorldEvent);
+}
+function syncWorldEntities(snapshot: WorldSnapshot): void {
+  const ids=new Set([snapshot.character.id,...snapshot.heroes.map(p=>p.id),...snapshot.monsters.map(m=>m.uid),...snapshot.summons.map(s=>s.uid)]);
+  for(const entity of [...state.entities]) if(['remote-player','monster','summon'].includes(entity.kind)&&!ids.has(entity.uid)){
+    if(targeting.isSelected(entity))targeting.clear();disposeEntityVisual(entity);state.entities.splice(state.entities.indexOf(entity),1);
+  }
+  const syncMotion=(entity:Entity,p:{x:number;z:number;yOffset:number;yaw:number;action:string;actionStartedAt:number;actionEndsAt:number;generation?:number},alive:boolean)=>{
+    if(entity.networkGeneration!==p.generation && entity.networkGeneration!==undefined) recreateEntityVisual(entity);
+    entity.networkGeneration=p.generation;entity.networkPosition={x:p.x,z:p.z,height:p.yOffset};
+    const wasAlive=entity.alive;entity.alive=alive;
+    if(!alive){
+      if(wasAlive)setEntityAction(entity,'death',true);
+      const corpseVisible=serverNow()-p.actionStartedAt<2300;
+      entity.root?.setEnabled(corpseVisible);entity.pickVolume?.setEnabled(false);entity.label?.setEnabled(false);
+      if(targeting.isSelected(entity))targeting.clear();
+    } else {
+      entity.root?.setEnabled(entity.visualActive!==false);entity.pickVolume?.setEnabled(entity.visualActive!==false);
+      if(p.action==='attack'&&entity.networkActionUntil!==p.actionEndsAt){
+        entity.motion?.beginAttack(Math.max(.1,(p.actionEndsAt-p.actionStartedAt)/1000));
+        entity.motion?.advance(Math.max(0,(snapshot.time-p.actionStartedAt)/1000));entity.actionType='attack';
+      } else if(p.action!=='attack' && entity.kind!=='player')setEntityAction(entity,p.action as ActorAction);
+    }
+    entity.networkActionUntil=p.actionEndsAt;
+    if(entity.kind!=='player'&&entity.root)entity.root.rotation.y=p.yaw;
+  };
+  const hero=playerEntity();hero.uid=snapshot.character.id;syncMotion(hero,snapshot.character,!snapshot.character.dead);
+  for(const p of snapshot.heroes){
+    if(p.id===snapshot.character.id)continue;
+    let entity=state.entities.find(e=>e.uid===p.id);
+    if(!entity){entity=makeEntity({uid:p.id,kind:'remote-player',classId:p.classId,name:p.name,model:CLASSES_MAP[p.classId].model,x:p.x,z:p.z,targetHeight:2.05});createEntityModel(entity);state.entities.push(entity);}
+    syncMotion(entity,p,!p.dead);
+    entity.root?.getChildMeshes().filter(mesh=>/Warrior_Sword|Ranger_Bow|Wizard_Staff|Rogue_Dagger/.test(mesh.name)).forEach(mesh=>mesh.isVisible=Boolean(p.equipment.weapon));
+  }
+  for(const m of snapshot.monsters){
+    let entity=state.entities.find(e=>e.uid===m.uid);
+    if(!entity){entity=spawnMonster(m.id,m.x,m.z);entity.uid=m.uid;}
+    entity.hp=m.hp;entity.maxHp=MONSTERS_MAP[m.id].hp;entity.phase=m.phase;entity.respawn=Math.max(0,(m.respawnAt-snapshot.time)/1000);
+    entity.status={slow:Math.max(0,(m.status.slow-snapshot.time)/1000),stun:Math.max(0,(m.status.stun-snapshot.time)/1000),dot:Math.max(0,(m.status.dot-snapshot.time)/1000)};
+    syncMotion(entity,m,m.alive);refreshNameplate(entity);
+    if(entity.boss)state.bossTimers[entity.boss]=entity.respawn;
+  }
+  for(const s of snapshot.summons){
+    let entity=state.entities.find(e=>e.uid===s.uid);
+    if(!entity){entity=makeEntity({uid:s.uid,kind:'summon',name:'Призванный страж',model:'Skeleton',x:s.x,z:s.z,targetHeight:1.8});createEntityModel(entity);state.entities.push(entity);}
+    syncMotion(entity,s,true);
+  }
+}
+function presentWorldEvent(event: WorldEvent): void {
+  const actor=state.entities.find(e=>e.uid===event.actor),target=state.entities.find(e=>e.uid===event.target);
+  if(event.kind==='cancel'){if(actor){cancelActorAttack(actor);setEntityAction(actor,'idle',true);}if(event.actor===playerEntity().uid&&event.reason)combatToast('Действие прервано: цель или навык недоступны','bad');return;}
+  if(event.kind==='attack'&&actor&&target){
+    const duration=Math.max(.1,((event.endsAt??event.at+800)-event.at)/1000);
+    actor.motion?.beginAttack(duration);actor.motion?.advance(Math.max(0,(serverNow()-event.at)/1000));actor.actionType='attack';
+    rotateTowards(actor,target.x,target.z);return;
+  }
+  if(event.kind==='release'&&actor&&target){
+    const classId=actor.classId??(actor.kind==='player'?player.classId:undefined);
+    const skill=classId&&event.skill!==undefined&&event.skill!==null?CLASSES_MAP[classId].skills[event.skill]:undefined;
+    const effect=event.effect??skill?.fx??(classId==='ranger'?'arrow':classId==='mage'||classId==='necro'?'fire':'slash');
+    if(effect==='slash'){impactEffect(entityWorldPosition(target),new Color3(.65,.55,.37));gameAudio.play('swordSwing',.4,1);}
+    else {spawnAttackEffect(effect,actor,target,undefined,classId==='ranger');playSfx(effect);}
+    return;
+  }
+  if(event.kind==='hit'&&target){damageNumber(target,String(event.amount??0),target.kind==='player'?'#e8847e':event.critical?'#f2d382':'#e2d3bb',event.critical);target.motion?.reactToHit();if(target.kind==='player')pulseScreen('#aa222244');return;}
+  if(event.kind==='miss'&&target){damageNumber(target,'MISS','#c4d1d7');return;}
+  if(event.kind==='buff'&&actor){impactEffect(entityWorldPosition(actor),new Color3(.7,.5,.85));return;}
+  if(event.kind==='loot'&&event.actor===playerEntity().uid){playSfx('loot');log(`${target?.name??'Противник'} повержен. Опыт, золото и добыча сохранены.`,'loot');}
+}
+function updateRemoteWorld(dt:number): void {
+  if(!worldSnapshot)return;
+  state.simulationSeconds+=dt;
+  const now=serverNow(),p=worldSnapshot.character,hero=playerEntity();
+  state.worldTime=12.5;
+  for(const entity of state.entities){entity.previousX=entity.x;entity.previousZ=entity.z;entity.previousVerticalOffset=entity.verticalOffset;entity.previousSupportY=entity.supportY;}
+  const axes=inputControl.movementAxes(),manual=!player.dead&&worldConnected&&Math.hypot(axes.forward,axes.strafe)>.0001;
+  const direction=manual?cameraControl.movementDirection(axes):{x:0,z:0};
+  if(inputControl.consumeMovementStart()&&manual){combatControl.cancelPursuit();state.moveTarget=null;state.interactionTarget=null;}
+  if(inputControl.consumeJump()&&!player.dead&&worldConnected){remoteWorld.sendIntent({type:'jump'});playerMotor.requestJump();}
+  movementIntentCooldown=Math.max(0,movementIntentCooldown-dt);
+  if(manual){
+    if(!wasMovingManually||movementIntentCooldown<=0){remoteWorld.sendIntent({type:'direction',...direction});movementIntentCooldown=.1;}
+    wasMovingManually=true;
+  }else if(wasMovingManually){remoteWorld.sendIntent({type:'direction',x:0,z:0});wasMovingManually=false;}
+  if(manual){
+    const motion=playerMotor.step(direction,player.stats.speed,dt);
+    const next=collisionWorld.resolve(player,{x:motion.dx,z:motion.dz},.46);player.x=next.x;player.z=next.z;
+    if(hero.root)hero.root.rotation.y=smoothAngle(hero.root.rotation.y,Math.atan2(direction.x,direction.z),16,dt);
+  } else playerMotor.stopPlanar();
+  // Extrapolate at most one short packet interval. A missing connection cannot
+  // produce unlimited movement or invent a newer world state.
+  const age=Math.min(.12,Math.max(0,(now-worldSnapshot.time)/1000));
+  const moving=p.action==='walk'&&worldConnected;
+  const authority={x:p.x+(moving?Math.sin(p.yaw)*p.stats.speed*age:0),z:p.z+(moving?Math.cos(p.yaw)*p.stats.speed*age:0)};
+  const corrected=reconcilePosition(player,authority,dt*(manual?.45:1));
+  const legal=collisionWorld.resolve(player,{x:corrected.x-player.x,z:corrected.z-player.z},.46);
+  player.x=legal.x;player.z=legal.z;
+  hero.x=player.x;hero.z=player.z;
+  if(!manual&&hero.root)hero.root.rotation.y=smoothAngle(hero.root.rotation.y,p.yaw,16,dt);
+  if(!player.dead){
+    const action=manual?(p.grounded?'walk':'jump'):p.action;
+    if(action!=='attack'||now>=p.actionEndsAt)setEntityAction(hero,action==='attack'?'idle':action);
+  }
+  syncEntityTransform(hero,p.yOffset);
+  player.attackCd=Math.max(0,(p.attackReadyAt-now)/1000);player.cooldowns=p.cooldowns.map(at=>Math.max(0,(at-now)/1000));
+  state.playerBuffs={guard:Math.max(0,(p.buffs.guard-now)/1000),vanish:Math.max(0,(p.buffs.vanish-now)/1000)};
+  if(state.interactionTarget&&Math.hypot(state.interactionTarget.x-player.x,state.interactionTarget.z-player.z)<3.15){
+    const npc=state.interactionTarget;state.interactionTarget=null;state.moveTarget=null;remoteWorld.sendIntent({type:'cancel'});interactNpc(npc);
+  }
+  for(const entity of state.entities){
+    if(entity.kind==='npc')updateTownNpc(entity,dt);
+    else if(entity.kind==='ambient')updateAmbientResident(entity,dt);
+    else if(entity!==hero&&entity.networkPosition){
+      const point=reconcilePosition(entity,entity.networkPosition,dt);
+      entity.x=point.x;entity.z=point.z;syncEntityTransform(entity,entity.networkPosition.height);
+    }
+    const previousPhase=entity.motion?.phase??0;
+    entity.motion?.advance(dt,Math.hypot(entity.x-(entity.previousX??entity.x),entity.z-(entity.previousZ??entity.z)));
+    if(entity===hero&&p.grounded&&hero.actionType==='walk'){
+      const phase=hero.motion?.phase??0;
+      if([.24,.75].some(contact=>phase>=previousPhase?previousPhase<contact&&phase>=contact:previousPhase<contact||phase>=contact))gameAudio.footstep();
+    }
+  }
+  state.effects.forEach(effect=>effect.update(dt));state.effects=state.effects.filter(effect=>!effect.dead);
+  updateTargetIndicator();gameAudio.update(dt);gameAudio.setRegion(zoneAt(player.x,player.z).kind==='safe');
+}
+
 function newPlayer(): void {
   legacyScrolls=0; betaScrollGrant=undefined; enhancementReceipts=[]; enhancementSelection=null; enhancementResult="";
   const classDef = CLASSES_MAP[state.selectedClass];
@@ -1512,7 +1748,7 @@ function spawnEntities(): void {
   player.x = safeSpawn.x;
   player.z = safeSpawn.z;
   const classDef = CLASSES_MAP[player.classId];
-  const playerEntity = makeEntity({ kind: 'player', model: classDef.model, x: player.x, z: player.z, targetHeight: 2.05 });
+  const playerEntity = makeEntity({ kind: 'player', uid: worldSnapshot?.character.id ?? uid(), classId: player.classId, model: classDef.model, x: player.x, z: player.z, targetHeight: 2.05 });
   createEntityModel(playerEntity);
   state.entities.push(playerEntity);
   const npcs: Array<[string, string, number, number, string, number, number]> = [
@@ -1529,6 +1765,7 @@ function spawnEntities(): void {
     state.entities.push(entity);
   });
   spawnAmbientResidents();
+  if (!localFixture) return;
   for (const region of SPAWN_REGIONS) {
     for (let index = 0; index < region.population; index += 1) {
       const point = spawnPointInRegion(region, index);
@@ -1547,10 +1784,23 @@ function playerEntity(): Entity {
 async function startGame(load: boolean): Promise<void> {
   if (state.starting) return;
   state.starting = true;
+  startError.textContent='';
   initAudio();
   q('#start-screen').classList.add('hidden');
   q('#loading').classList.remove('hidden');
   try {
+    if (!localFixture) {
+      let snapshot: WorldSnapshot;
+      if (remoteWorld.hasPendingImport) snapshot = await remoteWorld.importLocal();
+      else if (load && remoteWorld.hasSession) snapshot = await remoteWorld.resume();
+      else if (load) {
+        const save = await gateway.load();
+        if (!save) throw Error('Сохранение не найдено. Создайте персонажа.');
+        snapshot = await remoteWorld.importLocal(save);
+        Object.assign(state.settings, save.settings ?? {});
+      } else snapshot = await remoteWorld.create(q<HTMLInputElement>('#name-field').value.trim() || 'Странник',state.selectedClass);
+      acceptWorldSnapshot(snapshot);
+    } else {
     if (load) {
       let save = await gateway.load();
       if(save) {
@@ -1588,9 +1838,11 @@ async function startGame(load: boolean): Promise<void> {
         enhancementResult = 'Бета-тест: выдано по 100 свитков каждого вида.';
       }
     }
+    }
     await loadAssets();
     if (!state.started) buildWorld();
     spawnEntities();
+    if (!localFixture && worldSnapshot) syncWorldEntities(worldSnapshot);
     targeting.clear();
     combatControl.cancelPursuit();
     playerMotor.reset();
@@ -1607,6 +1859,7 @@ async function startGame(load: boolean): Promise<void> {
     q('#loading').classList.add('hidden');
     q('#hud').classList.remove('hidden');
     state.started = true;
+    connectionNotice.hidden = localFixture || worldConnected;
     state.qaFrozen = false;
     if (player.dead) { setEntityAction(playerEntity(), 'death', true); showRespawn('Потеря опыта уже учтена в сохранении.'); }
     skipFrameDelta = true;
@@ -1620,8 +1873,11 @@ async function startGame(load: boolean): Promise<void> {
     saveGame();
   } catch (error) {
     console.error(error);
+    if (!localFixture) remoteWorld.close();
     q('#load-text').textContent = error instanceof Error ? error.message : 'Не удалось загрузить игру. Исходное сохранение не сброшено.';
     (q<HTMLElement>('#load-text')).style.color = '#d36d61';
+    startError.textContent=q('#load-text').textContent;
+    q('#loading').classList.add('hidden');
     q('#start-screen').classList.remove('hidden');
   } finally {
     state.starting = false;
@@ -1863,6 +2119,7 @@ let qaCombatEvent: ((event: Record<string, unknown>) => void) | undefined;
 let qaAttackRoll: (() => number) | undefined;
 function update(dt: number): void {
   if (!state.started || state.qaFrozen) return;
+  if (!localFixture) { updateRemoteWorld(dt); return; }
   state.simulationSeconds += dt;
   rebuildCrowdCells();
   for (const entity of state.entities) {
@@ -2165,6 +2422,7 @@ function die(): void {
 
 function showRespawn(message: string): void {
   confirmBox('Вы пали', message, () => {
+    if (!localFixture) { void runWorldCommand({type:'respawn'}).then(result=>{if(!result?.ok)showRespawn('Возрождение ожидает подтверждения сервера.');}); return; }
     player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; player.hp = player.maxHp; player.mp = player.maxMp; player.dead = false;
     const hero = playerEntity(); hero.x = player.x; hero.z = player.z; recreateEntityVisual(hero);
     playerMotor.reset(); cameraControl.snap({ x: player.x, y: 0, z: player.z });
@@ -2181,6 +2439,7 @@ function basicAttack(): void {
   state.interactionTarget = null;
   clearPursuitProgress();
   combatControl.engageBasic(target.uid);
+  if (!localFixture && worldConnected) remoteWorld.sendIntent({type:'attack',entityId:target.uid,skill:null});
 }
 
 function promoteReadySkill(now: number): void {
@@ -2200,6 +2459,7 @@ function promoteReadySkill(now: number): void {
 function releaseSelfSkill(index: number): void {
   const skill = CLASSES_MAP[player.classId].skills[index];
   if (player.dead || !skill || (!skill.buff && !skill.summon) || player.mp < skill.cost || player.cooldowns[index] > 0) return;
+  if (!localFixture) { if(worldConnected)remoteWorld.sendIntent({type:'attack',entityId:playerEntity().uid,skill:index}); return; }
   const before = player.mp;
   player.mp -= skill.cost;
   player.cooldowns[index] = skill.cd;
@@ -2223,6 +2483,13 @@ function castSkill(index: number): void {
   const target = targeting.validate();
   const self = Boolean(skill.buff || skill.summon);
   if (!self && !target) return combatToast('Выберите живую цель', 'bad');
+  if (!localFixture) {
+    if (!worldConnected) return combatToast('Нет связи с миром','bad');
+    if (!worldSnapshot?.character.grounded) return combatToast('Навык недоступен в прыжке','bad');
+    state.moveTarget=null;state.interactionTarget=null;
+    remoteWorld.sendIntent({type:'attack',entityId:self?playerEntity().uid:target!.uid,skill:index});
+    return;
+  }
   if (!playerMotor.grounded) return combatToast('Навык недоступен в прыжке', 'bad');
   const attack = hero.activeAttack;
   if (attack) {
@@ -2899,7 +3166,8 @@ function selectCombatTarget(entity: Entity, engage = true): void {
   targeting.select(entity);
   if (engage) combatControl.engageBasic(entity.uid); else combatControl.cancelPursuit();
   state.moveTarget = null; state.interactionTarget = null;
-  void gateway.send({ type: 'target', entityId: entity.uid });
+  if (!localFixture) { if(worldConnected && engage)remoteWorld.sendIntent({type:'attack',entityId:entity.uid,skill:null}); }
+  else void gateway.send({ type: 'target', entityId: entity.uid });
 }
 
 canvas.addEventListener('pointerdown', (event) => {
@@ -2934,6 +3202,7 @@ canvas.addEventListener('pointerdown', (event) => {
       else {
         state.interactionTarget = entity;
         state.moveTarget = { x: entity.x, z: entity.z };
+        if (!localFixture && worldConnected) remoteWorld.sendIntent({type:'destination',x:entity.x,z:entity.z});
       }
       return;
     }
@@ -2943,7 +3212,8 @@ canvas.addEventListener('pointerdown', (event) => {
     state.moveTarget = collisionWorld.findNearestFree({ x: hit.pickedPoint.x, z: hit.pickedPoint.z }, 0.46);
     state.interactionTarget = null;
     combatControl.cancelPursuit();
-    void gateway.send({ type: 'move', x: hit.pickedPoint.x, z: hit.pickedPoint.z });
+    if(!localFixture) { if(worldConnected)remoteWorld.sendIntent({type:'destination',...state.moveTarget}); }
+    else void gateway.send({ type: 'move', x: hit.pickedPoint.x, z: hit.pickedPoint.z });
   }
 });
 
@@ -2951,7 +3221,8 @@ function interactNpc(npc: Entity): void {
   if (!state.started || player.dead) return;
   void gateway.send({ type: 'npc', role: npc.role ?? '' });
   if (npc.role === 'elder') {
-    state.quest = Math.max(1, state.quest); updateQuest();
+    if (!localFixture) { if(state.quest===0)void runWorldCommand({type:'quest'}); }
+    else { state.quest = Math.max(1, state.quest); updateQuest(); }
     openDialog(npc, 'За стенами снова слышен вой. Восемь тварей — и я поверю, что ты способен пережить эту ночь.', [{ label: 'Я очищу дорогу', action: closeWindow }]);
   }
   if (npc.role === 'shop') openShop();
@@ -3044,7 +3315,7 @@ function inventoryModel(): CharacterInventoryModel {
     selectedUid: inventorySelection?.uid, activeSlot: preferredEquipmentSlot,
     enhancementText: enhancementSelection ? `${ITEMS_MAP[enhancementSelection.scroll.id].name}\nОдин клик по подсвеченной вещи — одна попытка.\nШанс показан при наведении.\nНа рискованной ступени при неудаче предмет уничтожается.\nEsc / ПКМ — отменить.` : undefined,
     eligibleUids: enhancementSelection ? [...enhancementSelection.targets.values()].filter(ref=>{const i=referencedInventoryItem(ref);return i&&i.count===1&&scrollChance(enhancementSelection!.scroll.id,itemDef(i).slot,i.plus)>0;}).map(ref=>ref.uid) : [],
-    readOnly: player.dead, status: player.dead ? 'Персонаж погиб · только просмотр' : enhancementResult || 'Наведение — свойства · двойной клик — действие',
+    readOnly: player.dead || (!localFixture && (!worldConnected || worldCommandBusy)), status: player.dead ? 'Персонаж погиб · только просмотр' : enhancementResult || 'Наведение — свойства · двойной клик — действие',
     scale: state.settings.uiScale, position: state.settings.inventoryWindow,
     actions: enhancementSelection ? [{id:'cancel-enhance',label:'Отменить заточку'}] : [
       ...(selectedInBag && definition?.slot ? [{id: 'equip', label: 'Надеть', disabled: player.dead}] : []),
@@ -3128,6 +3399,11 @@ function activateInventoryItem(ref: InventoryItemRef, preferredSlot?: string): v
     else if (item.id==='scroll') toast('Этот старый тип свитка больше не используется.');
     return;
   }
+  if (!localFixture) {
+    void runWorldCommand(ref.location==='equipment'?{type:'unequip',item:ref,slot:ref.slot??''}:{type:'equip',item:ref,slot:preferredSlot??selectedReplacementSlot(item)}).then(result=>{
+      if(result?.ok){inventorySelection=null;toast(`${ref.location==='equipment'?'Снято':'Надето'}: ${itemDef(item).name}`);}
+    });return;
+  }
   const result = ref.location === 'equipment'
     ? unequipInventoryItem(player, ref, ref.slot ?? '')
     : equipInventoryItem(player, ref, itemDef, preferredSlot ?? selectedReplacementSlot(item));
@@ -3144,6 +3420,7 @@ function moveInventoryItem(ref: InventoryItemRef, target: InventoryDropTarget): 
     if (ref.location === 'equipment') return;
     activateInventoryItem(ref, target.slot); return;
   }
+  if (!localFixture) {void runWorldCommand(ref.location==='equipment'?{type:'unequip',item:ref,slot:ref.slot??'',index:target.bagIndex}:{type:'reorder',item:ref,index:target.bagIndex});return;}
   let result = ref.location === 'equipment' ? unequipInventoryItem(player, ref, ref.slot ?? '')
     : reorderInventoryItem(player, ref, target.bagIndex);
   if (!result.ok) return inventoryFailure(result.reason);
@@ -3160,6 +3437,7 @@ function inventoryAction(id: string, ref: InventoryItemRef | null): void {
   if(id==='cancel-enhance'){cancelEnhancement();return;}
   if (player.dead) return inventoryFailure('dead');
   if (id === 'collect-buffer') {
+    if(!localFixture){void runWorldCommand({type:'collect'});return;}
     while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift()!);
     if (state.lootBuffer.length) toast('Для оставшейся добычи нужно место в сумке.', 'bad');
     inventoryPanel?.refresh(); saveGame(); return;
@@ -3169,6 +3447,7 @@ function inventoryAction(id: string, ref: InventoryItemRef | null): void {
   if (!item) return inventoryFailure('stale-item');
   if (id === 'equip' || id === 'unequip' || id === 'use') { activateInventoryItem(ref); return; }
   if (id === 'sell' && ref.location === 'bag') {
+    if(!localFixture){void runWorldCommand({type:'sell',item:ref});return;}
     const index = player.inventory.findIndex(candidate => candidate.uid === ref.uid);
     player.gold += Math.floor(itemDef(item).value * .48) * item.count;
     player.inventory.splice(index, 1); inventorySelection = null; updateHud(); saveGame();
@@ -3265,7 +3544,8 @@ function renderSettings(): void {
   qa<HTMLInputElement>('[data-setting-range]').forEach((input) => { input.oninput = () => { q(`#${input.id}-value`).textContent = `${input.value}${input.dataset.suffix ?? ''}`; }; });
   q<HTMLButtonElement>('#fullscreen').onclick = () => { if (document.fullscreenElement) void document.exitFullscreen(); else void canvas.requestFullscreen(); };
   q<HTMLButtonElement>('#reset-settings').onclick = () => { Object.assign(s, settingsDefaults()); renderSettings(); };
-  q<HTMLButtonElement>('#reset-save').onclick = () => confirmBox('Удалить персонажа?', 'Весь локальный прогресс будет удалён без восстановления.', () => { void gateway.clear().then(() => window.location.reload()); });
+  if(!localFixture){q<HTMLButtonElement>('#reset-save').disabled=true;q<HTMLButtonElement>('#reset-save').textContent='Персонаж сохраняется на сервере';}
+  else q<HTMLButtonElement>('#reset-save').onclick = () => confirmBox('Удалить персонажа?', 'Весь локальный прогресс будет удалён без восстановления.', () => { void gateway.clear().then(() => window.location.reload()); });
   q<HTMLButtonElement>('#save-settings').onclick = () => {
     const requestedBindings = {
       potion: q<HTMLSelectElement>('#potion-binding').value,
@@ -3341,14 +3621,14 @@ function openShop(): void {
   openWindow('shop');
   const stock: Array<[string, number]> = [['potion', 55], ['ether', 70], ['teleport', 130]];
   q('#window-content').innerHTML = `<h2>Лавка Эльзы</h2><div class="npc-dialog"><div class="npc-portrait"></div><div><p>Боссовые вещи не продаются. За ними придётся идти в лес.</p><div class="shop-grid">${stock.map(([id, cost]) => `<div class="shop-item"><span class="big-icon">${ITEMS_MAP[id].icon}</span><b>${ITEMS_MAP[id].name}</b><span>◈ ${cost}</span><button class="dark-btn" data-buy="${id}" data-cost="${cost}">Купить</button></div>`).join('')}</div></div></div>`;
-  qa<HTMLButtonElement>('[data-buy]').forEach((button) => { button.onclick = () => { if (player.dead) return; const cost = Number(button.dataset.cost); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; addItem(button.dataset.buy ?? 'potion'); updateHud(); saveGame(); }; });
+  qa<HTMLButtonElement>('[data-buy]').forEach((button) => { button.onclick = () => { if (player.dead) return; if(!localFixture){void runWorldCommand({type:'buy',itemId:button.dataset.buy??'potion'}).then(r=>{if(r?.ok)toast('Покупка получена');});return;} const cost = Number(button.dataset.cost); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; addItem(button.dataset.buy ?? 'potion'); updateHud(); saveGame(); }; });
 }
 
 function openTeleport(): void {
   openWindow('teleport');
   const points: Array<[string, number, number, number, number]> = [['Астерхолд', -108, -82, 0, 1], ['Гринфолл', GREENFALL_SPAWN.x, GREENFALL_SPAWN.z, 25, 1], ['Чёрный лес', 94, 44, 90, 10], ['Вход в шахту', 132, 94, 150, 10]];
   q('#window-content').innerHTML = `<h2>Проводник Каэль</h2><p>Путь сохраняет цену. Бесплатен только переход в столицу. Чёрный лес открывается на 10 уровне.</p><div class="shop-grid">${points.map((point) => `<div class="shop-item"><b>${point[0]}</b><span>◈ ${point[3]} · ур. ${point[4]}</span><button class="dark-btn" data-tp="${point.slice(1).join(',')}" data-destination="${point[0]}">Отправиться</button></div>`).join('')}</div>`;
-  qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { if (player.dead) return; const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
+  qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { if (player.dead) return; if(!localFixture){void runWorldCommand({type:'teleport',destination:button.dataset.destination??''}).then(r=>{if(r?.ok){closeWindow();toast('Переход завершён');}});return;} const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
 
 function openForge(): void {
@@ -3365,6 +3645,11 @@ function consumeItem(id: string, reference?: ItemReference): boolean {
 }
 function useItem(id: string, reference?: ItemReference): void {
   if (!state.started || player.dead) return;
+  if (!localFixture) {
+    const item=player.inventory.find(i=>i.id===id&&(!reference||i.uid===reference.uid));
+    if(!item)return toast('Предмета нет в сумке','bad');
+    void runWorldCommand({type:'use',item:reference??itemReference(item)}).then(r=>{if(r?.ok){gameAudio.play('potion',.7,1);toast(id==='teleport'?'Камень возвращает вас в Гринфолл':'Расходник использован');}});return;
+  }
   if (id === 'potion') { if (player.hp >= player.maxHp) return toast('Здоровье уже полное'); if (!consumeItem(id, reference)) return toast('Нет багровых зелий', 'bad'); player.hp = Math.min(player.maxHp, player.hp + Math.round(player.maxHp * 0.45)); gameAudio.play('potion', 0.74, 0.92); toast('Здоровье восстановлено'); log('Багровое зелье: здоровье восстановлено.', 'combat'); }
   else if (id === 'ether') { if (player.mp >= player.maxMp) return toast('Ресурс уже полный'); if (!consumeItem(id, reference)) return toast('Нет эфирных зелий', 'bad'); player.mp = Math.min(player.maxMp, player.mp + Math.round(player.maxMp * 0.45)); gameAudio.play('potion', 0.68, 1.12); toast(`${CLASSES_MAP[player.classId].resource} восстановлена`); log('Эфирное зелье: ресурс восстановлен.', 'combat'); }
   else if (id === 'teleport' && consumeItem(id, reference)) { player.x = GREENFALL_SPAWN.x; player.z = GREENFALL_SPAWN.z; resetPlayerControl(true); cameraControl.snap({ x: player.x, y: 0, z: player.z }); toast('Камень возвращает вас в Гринфолл'); }
@@ -3393,6 +3678,7 @@ function closeConfirm(): void {
 
 function saveGame(): void {
   if (!state.started) return;
+  if(!localFixture){try{localStorage.setItem('varendor_client_settings_v1',JSON.stringify(state.settings));}catch{toast('Не удалось сохранить настройки','bad');}return;}
   void gateway.save(saveSnapshot()).catch(()=>toast('Не удалось сохранить игру.','bad'));
 }
 
@@ -3454,6 +3740,11 @@ window.addEventListener('resize', applyRenderResolution);
 let skipFrameDelta = false;
 document.addEventListener('visibilitychange', () => {
   simulationClock.reset(); inputControl.reset(); playerMotor.stopPlanar();
+  if(!localFixture){
+    if(wasMovingManually)remoteWorld.sendIntent({type:'direction',x:0,z:0});
+    wasMovingManually=false;
+    if(!document.hidden)void remoteWorld.refresh().catch(()=>{});
+  }
   skipFrameDelta = true;
 });
 let saveTimer = 0;
@@ -3542,6 +3833,10 @@ function combatSnapshot() {
 // Exposed only for deterministic smoke tests executed by the project's QA harness.
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
+    network: () => ({connected:worldConnected&&!localFixture,time:worldSnapshot?.time??0,revision:worldSnapshot?.revision??0,
+      characterId:worldSnapshot?.character.id??null,heroes:worldSnapshot?.heroes.map(p=>({id:p.id,x:p.x,z:p.z,dead:p.dead}))??[],
+      eventSequence:worldEventCursor.lastSequence,lastCommand:lastWorldReceipt?{id:lastWorldReceipt.id,ok:lastWorldReceipt.ok}:null,
+      receiptCount:worldReceiptCount,authority:localFixture?'environment-fixture':'server'}),
     engine: 'babylon',
     version: '0.6.0-world-part1-checkpoint',
     worldTopology: () => worldTopology(collisionWorld, terrain),

@@ -1,5 +1,7 @@
 import type { WorldSnapshot, WorldCommand, WorldIntent, CommandReceipt } from './world-protocol.ts';
 
+class WorldRequestError extends Error { readonly status:number; constructor(message:string,status:number){super(message);this.status=status;} }
+
 export class RemoteWorldGateway {
   private readonly storage:Storage;
   private readonly base:string;
@@ -8,12 +10,38 @@ export class RemoteWorldGateway {
   private connection:AbortController|null=null;
   private reconnectTimer:ReturnType<typeof setTimeout>|undefined;
   private commandQueue:Promise<unknown>=Promise.resolve();
+  private latest:{time:number;revision:number}|null=null;
+  private lastEventSequence=0;
+  private readonly fetcher:typeof fetch;
+  private refreshing:Promise<WorldSnapshot>|null=null;
   onSnapshot:(snapshot:WorldSnapshot)=>void=()=>{};
   onConnection:(connected:boolean)=>void=()=>{};
-  constructor(storage:Storage,base='/api'){
-    this.storage=storage;this.base=base;this.token=storage.getItem('varendor_world_token_v1');
+  onInputRejected:(reason:string)=>void=()=>{};
+  onRecovered:(receipt:CommandReceipt,command:WorldCommand)=>void=()=>{};
+  constructor(storage:Storage,base='/api',fetcher:typeof fetch=fetch){
+    this.storage=storage;this.base=base;this.fetcher=fetcher;this.token=storage.getItem('varendor_world_token_v1');
   }
   get hasSession():boolean{return Boolean(this.token);}
+  get profiles():Array<{id:string;name:string;classId:string;selected:boolean}>{
+    return this.savedProfiles().map(({id,name,classId,token})=>({id,name,classId,selected:token===this.token}));
+  }
+  selectProfile(id:string):void{
+    if(this.storage.getItem('varendor_world_pending_v1'))throw Error('Сначала продолжите текущего персонажа: сервер должен подтвердить предыдущее действие.');
+    const profile=this.savedProfiles().find(p=>p.id===id);if(!profile)throw Error('Персонаж не найден.');
+    this.close();this.storage.setItem('varendor_world_token_v1',profile.token);this.token=profile.token;
+    this.latest=null;this.lastEventSequence=0;this.sequence=0;
+  }
+  private savedProfiles():Array<{id:string;name:string;classId:string;token:string}>{
+    const raw=this.storage.getItem('varendor_world_profiles_v1');if(!raw)return [];
+    const profiles=JSON.parse(raw);if(!Array.isArray(profiles))throw Error('Список персонажей повреждён. Исходные данные сохранены.');
+    return profiles;
+  }
+  private remember(token:string,snapshot:WorldSnapshot):void{
+    const profiles=this.savedProfiles().filter(p=>p.id!==snapshot.character.id);
+    profiles.push({id:snapshot.character.id,name:snapshot.character.name,classId:snapshot.character.classId,token});
+    this.storage.setItem('varendor_world_profiles_v1',JSON.stringify(profiles));
+    this.storage.setItem('varendor_world_token_v1',token);this.token=token;
+  }
   get hasPendingImport():boolean{return this.storage.getItem('varendor_world_import_pending_v1')!==null;}
   async importLocal(save?:unknown):Promise<WorldSnapshot>{
     let raw=this.storage.getItem('varendor_world_import_pending_v1');
@@ -27,53 +55,74 @@ export class RemoteWorldGateway {
     }
     const pending=JSON.parse(raw);
     const response=await this.request('/session',{importId:pending.id,legacySave:pending.save});
-    this.storage.setItem('varendor_world_token_v1',response.token);this.token=response.token;
+    this.remember(response.token,response.snapshot);
     this.storage.removeItem('varendor_world_import_pending_v1');
     this.accept(response.snapshot);this.connect();return response.snapshot;
   }
   async create(name:string,classId:string):Promise<WorldSnapshot>{
+    if(this.token){await this.recoverPending();const previous=await this.request('/world');this.remember(this.token,previous);}
     const response=await this.request('/session',{name,classId});
     // Preserve the previous local save; it is never replaced with an empty online character.
-    this.token=response.token;this.storage.setItem('varendor_world_token_v1',response.token);
+    this.remember(response.token,response.snapshot);this.latest=null;this.lastEventSequence=0;
     this.accept(response.snapshot);this.connect();return response.snapshot;
   }
   async resume():Promise<WorldSnapshot>{
-    const snapshot=await this.request('/world');this.accept(snapshot);await this.recoverPending();this.connect();return snapshot;
+    const snapshot=await this.request('/world');this.remember(this.token!,snapshot);this.accept(snapshot);await this.recoverPending();this.connect();return snapshot;
+  }
+  async refresh():Promise<WorldSnapshot>{
+    if(this.refreshing)return this.refreshing;
+    this.refreshing=(async()=>{const snapshot=await this.request('/world');this.accept(snapshot);await this.recoverPending();return snapshot;})();
+    try{return await this.refreshing;}finally{this.refreshing=null;}
   }
   sendIntent(intent:WorldIntent):void{
     const sequence=++this.sequence;
-    void this.request('/input',{sequence,intent}).catch(()=>this.onConnection(false));
+    void this.request('/input',{sequence,intent}).catch(error=>{
+      if(error instanceof WorldRequestError && error.status>=400 && error.status<500){this.onInputRejected(error.message);return;}
+      this.onConnection(false);this.connect();
+    });
   }
-  command(command:WorldCommand,id=crypto.randomUUID()):Promise<CommandReceipt>{
+  command(command:WorldCommand,id:string=crypto.randomUUID()):Promise<CommandReceipt>{
     // Persist the ID before sending. A reconnect retries precisely the same operation.
     const execute=async()=>{
       const existing=this.storage.getItem('varendor_world_pending_v1');
       if(existing&&JSON.parse(existing).id!==id)throw Error('Предыдущая операция ожидает ответа сервера. Переподключитесь для восстановления.');
       const pending={id,command};this.storage.setItem('varendor_world_pending_v1',JSON.stringify(pending));
-      const result=await this.request('/command',pending);
-      this.accept(result.snapshot);this.storage.removeItem('varendor_world_pending_v1');return result.receipt as CommandReceipt;
+      try {
+        const result=await this.request('/command',pending);
+        this.accept(result.snapshot);this.storage.removeItem('varendor_world_pending_v1');return result.receipt as CommandReceipt;
+      } catch(error) {
+        if(!(error instanceof WorldRequestError)){this.onConnection(false);this.connect();}
+        throw error;
+      }
     };
     const result=this.commandQueue.then(execute);this.commandQueue=result.catch(()=>{});return result;
   }
   async recoverPending():Promise<CommandReceipt|null>{
     const raw=this.storage.getItem('varendor_world_pending_v1');if(!raw)return null;
-    const {id,command}=JSON.parse(raw);return this.command(command,id);
+    const {id,command}=JSON.parse(raw);const receipt=await this.command(command,id);this.onRecovered(receipt,command);return receipt;
   }
   close():void{clearTimeout(this.reconnectTimer);this.connection?.abort();this.connection=null;}
   private accept(snapshot:WorldSnapshot):void{
     if(snapshot.protocol!==1)throw Error('Несовместимая версия сервера.');
+    if(this.latest&&(snapshot.time<this.latest.time||(snapshot.time===this.latest.time&&snapshot.revision<this.latest.revision)))return;
+    this.latest={time:snapshot.time,revision:snapshot.revision};
     this.sequence=Math.max(this.sequence,snapshot.character.lastInputSequence+1);
     this.onSnapshot(snapshot);
+    for(const event of snapshot.events)this.lastEventSequence=Math.max(this.lastEventSequence,event.sequence);
   }
   private connect():void{
     this.close();const controller=new AbortController();this.connection=controller;
     void(async()=>{
       try{
-        const response=await fetch(this.base+'/stream',{headers:{Authorization:`Bearer ${this.token}`},signal:controller.signal});
+        const response=await this.fetcher(this.base+'/stream?after='+this.lastEventSequence,{headers:{Authorization:`Bearer ${this.token}`},signal:controller.signal});
+        if(controller.signal.aborted||this.connection!==controller)return;
         if(!response.ok||!response.body)throw Error('stream-unavailable');
+        // Replay a pending receipt before re-enabling inventory after reconnect.
+        await this.recoverPending();
+        if(controller.signal.aborted||this.connection!==controller)return;
         this.onConnection(true);const reader=response.body.getReader();const decoder=new TextDecoder();let buffer='';
         while(!controller.signal.aborted){
-          const {value,done}=await reader.read();if(done)break;buffer+=decoder.decode(value,{stream:true});
+          const {value,done}=await reader.read();if(controller.signal.aborted||this.connection!==controller)return;if(done)break;buffer+=decoder.decode(value,{stream:true});
           if(buffer.length>2_000_000)throw Error('invalid-world-packet');
           let delimiter:number;
           while((delimiter=buffer.indexOf('\n\n'))>=0){
@@ -86,9 +135,12 @@ export class RemoteWorldGateway {
     })();
   }
   private async request(path:string,body?:unknown):Promise<any>{
-    const response=await fetch(this.base+path,{method:body===undefined?'GET':'POST',
+    const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12_000);
+    try{
+    const response=await this.fetcher(this.base+path,{signal:controller.signal,method:body===undefined?'GET':'POST',
       headers:{...(this.token?{Authorization:`Bearer ${this.token}`}:{ }),...(body===undefined?{}:{'Content-Type':'application/json'})},
       body:body===undefined?undefined:JSON.stringify(body)});
-    const result=await response.json();if(!response.ok)throw Error(result.error??'Сервер недоступен.');return result;
+    const result=await response.json();if(!response.ok)throw new WorldRequestError(result.error==='beta-import-disabled'?'Перенос сохранения доступен в локальной бета-сборке. Исходное сохранение сохранено.':result.error??'Сервер недоступен.',response.status);return result;
+    }catch(error){if(controller.signal.aborted)throw Error('Сервер не ответил. Операция будет проверена после переподключения.');throw error;}finally{clearTimeout(timer);}
   }
 }

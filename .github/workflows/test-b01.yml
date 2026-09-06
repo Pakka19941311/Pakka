@@ -23,42 +23,18 @@ jobs:
         with:
           node-version: 22.18.0
           cache: npm
-      - name: Check the changed beta import and static map contract
+      - name: Check the changed server and client boundary
         run: |
           npm ci
-          npm run test:world-transfer
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Prepare verified approved source derivatives when absent
-        run: |
-          if [ ! -f public/assets/world/prepared-assets.json ]; then
-            python -m pip install numpy==2.5.2 scipy==1.17.0 Pillow==12.3.0 fast-simplification==0.2.0
-            python scripts/fetch-world-assets.py world-source
-            python scripts/prepare-world-assets.py world-source
-          fi
+          node --experimental-strip-types --test tests/persistent-world.test.mjs tests/beta-import.test.mjs tests/server-combat-parity.test.mjs tests/remote-world-client.test.mjs tests/world-package.test.mjs
       - name: Build checkpoint and verify local asset references
         run: npm run build
-      - name: Compare the map built by two independent rendering clients
+      - name: Exercise the production game with two clients of a dedicated server
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
-          VARENDOR_QA=1 npx vite build --outDir dist-qa
-          node --experimental-strip-types scripts/world-environment-regression.mjs dist-qa --topology
-      - name: Preserve generated game assets in the working branch
-        run: |
-          git add public/assets/world
-          if git diff --cached --quiet; then exit 0; fi
-          remote_sha=$(git ls-remote origin refs/heads/work/v06-commercial-rebuild | cut -f1)
-          if [ "$remote_sha" != "$GITHUB_SHA" ]; then
-            echo 'Working branch advanced; asset commit cancelled without reset or force push.'
-            exit 1
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m 'assets(world): preserve reviewed static topology [world-assets]'
-          git push origin HEAD:refs/heads/work/v06-commercial-rebuild
+          node --experimental-strip-types scripts/world-client-regression.mjs dist
       - name: Preserve checkpoint evidence, not a user release
         if: always()
         uses: actions/upload-artifact@v4
@@ -68,4 +44,41 @@ jobs:
             qa-artifacts
             public/assets/world/prepared-assets.json
             public/assets/world/world-topology.json
+          retention-days: 30
+  windows:
+    needs: validate
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      VARENDOR_BETA: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build the changed Windows server package
+        run: |
+          npm ci
+          npm run build
+          node scripts/package-world-windows.mjs --commit $env:GITHUB_SHA --output release-output
+      - name: Start the shipped Windows launcher and retain a world across package folders
+        run: |
+          $packageName = 'Varendor_Part1_Windows_Test_' + $env:GITHUB_SHA.Substring(0, 12)
+          Expand-Archive -LiteralPath (Join-Path 'release-output' ($packageName + '.zip')) -DestinationPath 'verified-extract'
+          node scripts/windows-world-smoke.mjs (Join-Path 'verified-extract' $packageName) | Tee-Object -FilePath release-output/windows-smoke.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve the Windows checkpoint, not a user release
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: part1-windows-checkpoint
+          path: |
+            release-output/*.zip.sha256
+            release-output/windows-smoke.json
+            release-output/Varendor*/BUILD_COMMIT.txt
+            release-output/Varendor*/PACKAGE_MANIFEST.json
           retention-days: 30
