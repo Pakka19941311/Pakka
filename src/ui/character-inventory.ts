@@ -41,6 +41,8 @@ export type CharacterInventoryModel = {
   activeSlot?: string | null;
   readOnly?: boolean;
   status?: string;
+  enhancementText?: string;
+  eligibleUids?: string[];
   scale?: number;
   position?: InventoryPosition;
   actions?: { id: string; label: string; disabled?: boolean }[];
@@ -49,6 +51,8 @@ export type CharacterInventoryOptions = {
   read(): CharacterInventoryModel;
   tooltip(ref: InventoryItemRef): InventoryTooltip | null;
   onClose(): void;
+  onTarget?(ref: InventoryItemRef): boolean;
+  onCancelTarget?(): boolean;
   onSelect(ref: InventoryItemRef | null): void;
   onActivate(ref: InventoryItemRef): void;
   onMove(ref: InventoryItemRef, target: InventoryDropTarget): void;
@@ -162,7 +166,8 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
   const statsHeading = node('div', 'ci-section-label', 'Характеристики');
   const stats = node('div', 'ci-stats');
   stats.dataset.inventoryStats = ''; stats.tabIndex = 0; stats.setAttribute('aria-label', 'Характеристики персонажа');
-  statsPanel.append(statsHeading, stats);
+  const enhancementBanner=node('div','ci-enhance-banner');
+  statsPanel.append(statsHeading, stats, enhancementBanner);
   const equipment = node('div', 'ci-equipment-grid');
   equipment.setAttribute('aria-label', 'Экипировка');
   overview.append(statsPanel, equipment);
@@ -312,6 +317,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
     ghost.hidden = true; element.classList.remove('ci-dragging');
     setDropHighlight(null);
   }
+  listen(element, 'contextmenu', event=>{if(options.onCancelTarget?.()){event.preventDefault();event.stopPropagation();cancelInteraction();refresh();}});
   function cancelInteraction(): boolean {
     const hadInteraction = !!pointer;
     if (pointer?.kind === 'window') options.onPosition?.({ ...position });
@@ -344,7 +350,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
       if (e.button !== 0 || !cell.ref) return;
       // The reference is copied before a live refresh can change the cell underneath the pointer.
       pressed = { cell, ref: { ...cell.ref } };
-      if (!model.readOnly) pointer = { kind: 'item', pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, ref: { ...cell.ref }, source: cell, dragging: false };
+      if (!model.readOnly && !model.enhancementText) pointer = { kind: 'item', pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, ref: { ...cell.ref }, source: cell, dragging: false };
     });
     listen(button, 'click', event => {
       const e = event as MouseEvent;
@@ -353,6 +359,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
       const original = pressed?.cell === cell ? pressed.ref : cell.ref;
       pressed = null;
       if (original && cell.ref && !sameRef(original, cell.ref)) return;
+      if(original && options.onTarget?.({...original})) {clickStart=null; suppressClickUntil=performance.now()+500; refresh(); return;}
       clickStart = original ? { cell, ref: { ...original } } : null;
       if (cell.target.location === 'equipment') options.onSlotSelect?.(cell.target.slot);
       options.onSelect(original ? { ...original } : null);
@@ -371,7 +378,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
       const e = event as KeyboardEvent;
       if (e.key !== 'Enter' || e.repeat || !cell.ref) return;
       e.preventDefault(); e.stopPropagation();
-      options.onActivate({ ...cell.ref }); refresh();
+      if(!options.onTarget?.({...cell.ref}))options.onActivate({ ...cell.ref }); refresh();
     });
     return cell;
   }
@@ -417,6 +424,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
       }
       stats.replaceChildren(fragment); stats.scrollTop = oldScroll; statsSignature = nextStats;
     }
+    element.classList.toggle('ci-enhancing',!!model.enhancementText); enhancementBanner.textContent=model.enhancementText??'';
     for (const cell of cells) {
       const item = cell.target.location === 'bag' ? model.bag[cell.target.bagIndex] : model.equipment[cell.target.slot];
       const previousRef = cell.ref;
@@ -433,7 +441,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
           cell.button.dataset.count = String(item.count);
           cell.icon.innerHTML = iconMarkup(iconKind(item));
           cell.icon.dataset.itemKind = item.id === 'ether' ? 'ether' : iconKind(item);
-          cell.plus.textContent = item.plus ? `+${item.plus}` : '';
+          cell.plus.textContent = item.plus ? `+${item.plus}` : /scroll/.test(item.id) ? `${item.id.startsWith('weapon')?'О':'Д'}${item.quality==='improved'?'★':''}` : '';
           cell.count.textContent = item.count > 1 ? String(item.count) : '';
           cell.button.setAttribute('aria-label', `${item.name}${item.plus ? ` +${item.plus}` : ''}${item.count > 1 ? `, ${item.count} шт.` : ''}${cell.target.location === 'equipment' ? ', надето' : ''}`);
           if (item.quality) cell.button.dataset.quality = item.quality; else delete cell.button.dataset.quality;
@@ -446,6 +454,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
           cell.button.setAttribute('aria-label', cell.target.location === 'equipment' ? `${cell.label.textContent}, пусто` : `Ячейка ${cell.target.bagIndex + 1}, пусто`);
         }
       }
+      cell.button.classList.toggle('ci-enhance-eligible',!!item && !!model.enhancementText && !!model.eligibleUids?.includes(item.uid));
       const selected = !!item && model.selectedUid === item.uid;
       cell.button.classList.toggle('ci-selected', selected);
       cell.button.setAttribute('aria-pressed', String(selected));

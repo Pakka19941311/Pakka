@@ -37,7 +37,7 @@ test('enhancement is safe through +3 and destructive from +3 to +4', () => {
   assert.equal(enhancementChance(0), 1);
   assert.equal(enhancementChance(1), 1);
   assert.equal(enhancementChance(2), 1);
-  assert.equal(enhancementChance(3), 0.7);
+  assert.equal(enhancementChance(3), 0.5);
   assert.equal(enhancementCanDestroy(2), false);
   assert.equal(enhancementCanDestroy(3), true);
   assert.equal(enhancementChance(15), 0);

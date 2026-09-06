@@ -1,3 +1,4 @@
+import { SCROLLS, scrollChance, enhanceItem, rollScrollDrops, migrateScrollSave, exchangeLegacyScroll } from './core/enhancement-v2';
 import './styles.css';
 import './hotbar.css';
 import './overhaul.css';
@@ -45,12 +46,10 @@ import {
   bossRespawnSeconds,
   classAttackRange,
   classCombatProfile,
-  enhancementCanDestroy,
-  enhancementChance,
   monsterMovementSpeed,
   xpNeeded,
 } from './core/game-rules';
-import { addOrStackItem, applyExperience, resolveEnhancement } from './core/gameplay-session';
+import { addOrStackItem, applyExperience } from './core/gameplay-session';
 import { compatibleEquipmentSlots, resolveEquipmentSlot, itemReference, equipInventoryItem, unequipInventoryItem, reorderInventoryItem } from './core/inventory-commands';
 import type { ItemReference, InventoryFailureReason } from './core/inventory-commands';
 import { calculateEquipmentStats, itemStatBreakdown } from './core/equipment-stats';
@@ -295,7 +294,9 @@ type Settings = {
   keybinds: ConsumableBindings;
 };
 type PlayerSave = {
-  schema: 1;
+  schema: 1 | 2;
+  legacyScrolls?: number;
+  enhancementReceipts?: string[];
   savedAt?: number;
   player: Player;
   quest: number;
@@ -412,6 +413,55 @@ const state = {
 const targeting = new TargetingController<Entity>();
 let inventoryPanel: ReturnType<typeof createCharacterInventory> | null = null;
 let inventorySelection: InventoryItemRef | null = null;
+let legacyScrolls = 0;
+let enhancementReceipts: string[] = [];
+let enhancementSelection: {id:string;scroll:InventoryItemRef;targets:Map<string,InventoryItemRef>} | null = null;
+let enhancementResult = '';
+let qaEnhancementRoll: (()=>number) | undefined;
+function cancelEnhancement(): boolean {const active=!!enhancementSelection; enhancementSelection=null; inventoryPanel?.refresh(); return active;}
+function beginEnhancement(ref: InventoryItemRef): void {
+  if(player.dead || !SCROLLS[ref.id] || ref.location!=='bag' || !referencedInventoryItem(ref)) return;
+  const targets=new Map<string,InventoryItemRef>();
+  player.inventory.forEach((item,bagIndex)=>targets.set(item.uid,{...itemReference(item),location:'bag',bagIndex}));
+  Object.entries(player.equipment).forEach(([slot,item])=>{if(item)targets.set(item.uid,{...itemReference(item),location:'equipment',slot});});
+  enhancementSelection={id:uid(),scroll:{...ref},targets}; enhancementResult=''; inventoryPanel?.refresh();
+}
+function saveSnapshot(nextPlayer=player, reserve=legacyScrolls, receipts=enhancementReceipts): PlayerSave {
+  return {schema:2,savedAt:Date.now(),player:nextPlayer,legacyScrolls:reserve,enhancementReceipts:receipts,
+    quest:state.quest,kills:state.kills,bossKills:state.bossKills,lootBuffer:state.lootBuffer,settings:state.settings,bossTimers:{...state.bossTimers}};
+}
+function targetEnhancement(ref: InventoryItemRef): boolean {
+  const selection=enhancementSelection;if(!selection)return false;
+  if(SCROLLS[ref.id])return false;
+  const expected=selection.targets.get(ref.uid);
+  if(!expected || !referencedInventoryItem(expected)) {toast('Предмет изменился. Выберите свиток заново.','bad');cancelEnhancement();return true;}
+  const item=referencedInventoryItem(expected)!;
+  const chance=scrollChance(selection.scroll.id,itemDef(item).slot,item.plus);
+  if(!chance || item.count!==1) {toast(item.plus>=15?'Достигнут предел +15.':'Этот предмет не подходит к свитку.','bad');return true;}
+  enhancementSelection=null;
+  if(enhancementReceipts.includes(selection.id))return true;
+  const outcome=enhanceItem(player,selection.scroll,expected,itemDef,qaEnhancementRoll?.() ?? Math.random());
+  if(!outcome.ok){toast(outcome.reason,'bad');inventoryPanel?.refresh();return true;}
+  const next={...player,inventory:outcome.inventory,equipment:outcome.equipment};
+  const computed=calculateEquipmentStats(player.classId,CLASSES_MAP[player.classId].stats,player.level,next.equipment,itemDef);
+  Object.assign(next,computed);next.hp=Math.min(next.hp,next.maxHp);next.mp=Math.min(next.mp,next.maxMp);
+  const receipts=[...enhancementReceipts,selection.id].slice(-64);
+  try {gateway.saveNow(saveSnapshot(next,legacyScrolls,receipts));}
+  catch {toast('Не удалось сохранить заточку. Предмет и свиток не изменены.','bad');inventoryPanel?.refresh();return true;}
+  player=next;enhancementReceipts=receipts;inventorySelection=null;syncPlayerWeaponVisual();
+  enhancementResult=outcome.success?`${itemDef(item).name}: +${outcome.from} → +${outcome.to}`:`${itemDef(item).name} +${outcome.from} уничтожен`;
+  gameAudio.play('hammer',.72,1);toast(enhancementResult,outcome.success?'':'bad');log(enhancementResult,outcome.success?'loot':'combat');updateHud();
+  void gateway.send({type:'enhance',itemUid:item.uid,from:outcome.from,to:outcome.to,attemptId:selection.id,scrollUid:selection.scroll.uid,scrollId:selection.scroll.id});
+  return true;
+}
+function exchangeOldScroll(category:'weapon'|'armor'): void {
+  if(player.dead)return;
+  const outcome=exchangeLegacyScroll(player.inventory,legacyScrolls,category,id=>makeItem(id));
+  if(!outcome.ok)return toast(outcome.reason,'bad');
+  const next={...player,inventory:outcome.inventory};
+  try{gateway.saveNow(saveSnapshot(next,outcome.legacyScrolls));}catch{return toast('Обмен не сохранён. Старый запас не изменён.','bad');}
+  player=next;legacyScrolls=outcome.legacyScrolls;updateHud();toast('Обменян 1 старый свиток.');
+}
 let preferredEquipmentSlot: string | undefined;
 const combatControl = new CombatControl();
 const playerMotor = new CharacterMotor();
@@ -777,6 +827,7 @@ function createEntityModel(entity: Entity): void {
     mesh.metadata = { entity };
     mesh.isPickable = false; // Capsules own actor picking, including skinned models.
   });
+  if(entity.kind==='player')syncPlayerWeaponVisual();
   if (entity.kind === 'monster' || entity.kind === 'npc') {
     const radius = entity.kind === 'npc'
       ? 0.62
@@ -1367,11 +1418,12 @@ function itemDef(item: ItemInstance): ItemDef {
 }
 
 function newPlayer(): void {
+  legacyScrolls=0; enhancementReceipts=[]; enhancementSelection=null; enhancementResult="";
   const classDef = CLASSES_MAP[state.selectedClass];
   player = {
     name: q<HTMLInputElement>('#name-field').value.trim() || 'Странник', classId: state.selectedClass,
     level: 1, xp: 0, gold: 320, x: GREENFALL_SPAWN.x, z: GREENFALL_SPAWN.z, hp: 1, mp: 1, maxHp: 1, maxMp: 1,
-    stats: { ...emptyStats }, inventory: [makeItem('potion', 0, 6), makeItem('ether', 0, 4), makeItem('scroll', 0, 4), makeItem('teleport')],
+    stats: { ...emptyStats }, inventory: [makeItem('potion', 0, 6), makeItem('ether', 0, 4), makeItem('weapon_scroll', 0, 2), makeItem('armor_scroll', 0, 2), makeItem('teleport')],
     equipment: { weapon: makeItem(classDef.weapon), chest: makeItem(classDef.armor) },
     cooldowns: [0, 0, 0, 0], attackCd: 0, dead: false,
   };
@@ -1382,7 +1434,12 @@ function newPlayer(): void {
   recalculate(true);
 }
 
+function syncPlayerWeaponVisual(): void {
+  const hero=state.entities.find(e=>e.kind==='player');
+  hero?.root?.getChildMeshes().filter(mesh=>/Warrior_Sword|Ranger_Bow|Wizard_Staff|Rogue_Dagger/.test(mesh.name)).forEach(mesh=>{mesh.isVisible=Boolean(player.equipment.weapon);});
+}
 function recalculate(fill = false): void {
+  syncPlayerWeaponVisual();
   const classDef = CLASSES_MAP[player.classId];
   const computed = calculateEquipmentStats(player.classId, classDef.stats, player.level, player.equipment, itemDef);
   player.stats = computed.stats;
@@ -1521,7 +1578,13 @@ async function startGame(load: boolean): Promise<void> {
   q('#loading').classList.remove('hidden');
   try {
     if (load) {
-      const save = await gateway.load();
+      let save = await gateway.load();
+      if(save) {
+        if(!save.player || !Array.isArray(save.player.inventory) || !save.player.equipment)throw Error('Повреждённое сохранение. Исходные данные сохранены.');
+        const migrated=migrateScrollSave(save);
+        if(save.schema!==2 || JSON.stringify(save)!==JSON.stringify(migrated))gateway.saveNow(migrated,true);
+        save=migrated;legacyScrolls=save.legacyScrolls??0;enhancementReceipts=save.enhancementReceipts??[];
+      }
       if (save?.player) {
         player = save.player;
         player.cooldowns = [0, 0, 0, 0];
@@ -1572,7 +1635,7 @@ async function startGame(load: boolean): Promise<void> {
     saveGame();
   } catch (error) {
     console.error(error);
-    q('#load-text').textContent = 'Не удалось загрузить игровые ассеты. Перезапустите сборку.';
+    q('#load-text').textContent = error instanceof Error ? error.message : 'Не удалось загрузить игру. Исходное сохранение не сброшено.';
     (q<HTMLElement>('#load-text')).style.color = '#d36d61';
     q('#start-screen').classList.remove('hidden');
   } finally {
@@ -2477,7 +2540,8 @@ function killMonster(entity: Entity): void {
   const gold = rint(definition.gold[0], definition.gold[1]);
   player.gold += gold;
   log(`${definition.name} повержен: +${definition.xp} опыта, +${gold} золота.`, 'combat');
-  definition.drops.forEach(([id, chance]) => { if (Math.random() < chance) addItem(id); });
+  definition.drops.forEach(([id, chance]) => { if (id !== 'scroll' && Math.random() < chance) addItem(id); });
+  rollScrollDrops(entity.id ?? 'wolf').forEach(id=>addItem(id));
   combatControl.targetRemoved(entity.uid);
   if (targeting.isSelected(entity)) targeting.clear();
   if (state.quest === 1 && state.kills >= 8) state.quest = 2;
@@ -2796,6 +2860,7 @@ window.addEventListener('keydown', (event) => {
     if (typing) { (event.target as HTMLElement).blur(); inputControl.reset(); return; }
     if (quickEditing) { quickEditing = false; q('#quick-edit').setAttribute('aria-pressed','false'); q('#hotbar').classList.remove('editing'); q('#quick-editor').classList.add('hidden'); return; }
     if (confirmation?.cancel) { closeConfirm(); return; }
+    if (cancelEnhancement()) return;
     if (inventoryPanel?.cancelInteraction()) return;
     if (state.activeWindow) closeWindow(); else openWindow('settings');
     return;
@@ -2897,6 +2962,7 @@ function interactNpc(npc: Entity): void {
 }
 
 function openWindow(type: string): void {
+  enhancementSelection=null;
   if (!state.started) return;
   if (confirmation?.cancel) closeConfirm();
   inventoryPanel?.destroy(); inventoryPanel = null;
@@ -2917,6 +2983,7 @@ function openWindow(type: string): void {
 }
 
 function closeWindow(): void {
+  enhancementSelection=null;
   if (confirmation?.cancel) closeConfirm();
   inventoryPanel?.destroy(); inventoryPanel = null; inventorySelection = null; preferredEquipmentSlot = undefined;
   state.activeWindow = null; inputControl.reset();
@@ -2961,12 +3028,13 @@ function selectedReplacementSlot(item: ItemInstance): string | undefined {
 
 function inventoryModel(): CharacterInventoryModel {
   const s = player.stats;
+  if(enhancementSelection && (player.dead || !referencedInventoryItem(enhancementSelection.scroll)))enhancementSelection=null;
   if (inventorySelection && !referencedInventoryItem(inventorySelection)) inventorySelection = null;
   const selected = inventorySelection && referencedInventoryItem(inventorySelection);
   const definition = selected ? itemDef(selected) : undefined;
   const selectedInBag = Boolean(selected && inventorySelection?.location === 'bag');
   const cell = (item: ItemInstance) => ({...itemReference(item), name: itemDef(item).name, icon: itemDef(item).icon,
-    kind: itemDef(item).slot ?? itemDef(item).type ?? 'material'});
+    kind: itemDef(item).slot ?? itemDef(item).type ?? 'material', quality:SCROLLS[item.id]?.quality});
   const stats = [
     ['Уровень', String(player.level)], ['Опыт', `${player.xp} / ${xpNeeded(player.level)}`],
     ['HP', `${Math.ceil(player.hp)} / ${player.maxHp}`], ['MP', `${Math.ceil(player.mp)} / ${player.maxMp}`],
@@ -2980,9 +3048,12 @@ function inventoryModel(): CharacterInventoryModel {
     equipment: Object.fromEntries(EQUIPMENT_SLOTS.map(slot => [slot, player.equipment[slot] ? cell(player.equipment[slot]!) : null])),
     bag: player.inventory.map(cell), gold: player.gold, capacity: INVENTORY_CAPACITY,
     selectedUid: inventorySelection?.uid, activeSlot: preferredEquipmentSlot,
-    readOnly: player.dead, status: player.dead ? 'Персонаж погиб · только просмотр' : 'Наведение — свойства · двойной клик — действие',
+    enhancementText: enhancementSelection ? `${ITEMS_MAP[enhancementSelection.scroll.id].name}\nОдин клик по подсвеченной вещи — одна попытка.\nШанс показан при наведении.\nНа рискованной ступени при неудаче предмет уничтожается.\nEsc / ПКМ — отменить.` : undefined,
+    eligibleUids: enhancementSelection ? [...enhancementSelection.targets.values()].filter(ref=>{const i=referencedInventoryItem(ref);return i&&i.count===1&&scrollChance(enhancementSelection!.scroll.id,itemDef(i).slot,i.plus)>0;}).map(ref=>ref.uid) : [],
+    readOnly: player.dead, status: player.dead ? 'Персонаж погиб · только просмотр' : enhancementResult || (legacyScrolls ? `Старый запас: ${legacyScrolls}. Обмен 1:1, по одной единице.` : 'Наведение — свойства · двойной клик — действие'),
     scale: state.settings.uiScale, position: state.settings.inventoryWindow,
-    actions: [
+    actions: enhancementSelection ? [{id:'cancel-enhance',label:'Отменить заточку'}] : [
+      ...(legacyScrolls>0 ? [{id:'exchange-weapon',label:'1 → оружие',disabled:player.dead},{id:'exchange-armor',label:'1 → доспехи',disabled:player.dead}] : []),
       ...(selectedInBag && definition?.slot ? [{id: 'equip', label: 'Надеть', disabled: player.dead}] : []),
       ...(selectedInBag && definition?.type === 'consumable' ? [{id: 'use', label: 'Использовать', disabled: player.dead}] : []),
       ...(selected && inventorySelection?.location === 'equipment' ? [{id: 'unequip', label: 'Снять', disabled: player.dead}] : []),
@@ -3028,12 +3099,12 @@ function inventoryTooltip(ref: InventoryItemRef): InventoryTooltip | null {
     : definition.type === 'consumable' ? 'Расходник' : definition.type === 'enhance' ? 'Свиток улучшения' : 'Материал';
   return {title: `${definition.name}${item.plus ? ` +${item.plus}` : ''}`, subtitle: `${category}${ref.location === 'equipment' ? ' · надето' : ''}${item.count > 1 ? ` · ${item.count} шт.` : ''}`,
     description: [definition.desc, definition.origin ? `Источник: ${definition.origin}` : ''].filter(Boolean).join('\n'), rows,
-    restrictions: definition.slot ? ['Без требования уровня.'] : [],
+    restrictions: enhancementSelection && definition.slot ? [`${ITEMS_MAP[enhancementSelection.scroll.id].name}: ${item.plus>=15?"предел +15":`+${item.plus} → +${item.plus+1}`}`, `Шанс: ${(scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)*100).toLocaleString('ru-RU',{maximumFractionDigits:2})}%`, scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)===1?'Безопасно.':scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)>0?'При неудаче предмет уничтожается.':'Этот предмет нельзя усилить выбранным свитком.'] : definition.slot ? ['Без требования уровня.'] : [],
     actions: player.dead ? ['После возрождения действия снова будут доступны.']
       : ref.location === 'equipment' ? ['Двойной клик — снять в сумку.']
       : definition.slot ? [`Двойной клик — надеть: ${SLOT_NAMES_MAP[slot ?? ''] ?? 'слот экипировки'}.`, 'Перетащите на нужный слот для точной замены.']
       : definition.type === 'consumable' ? ['Двойной клик — использовать одну единицу.']
-      : definition.type === 'enhance' ? ['Этот свиток используется в кузнице Брана.'] : [],
+      : definition.type === 'enhance' ? ['Двойной клик — выбрать предмет для одной попытки заточки.'] : [],
     comparisons};
 }
 
@@ -3053,7 +3124,8 @@ function activateInventoryItem(ref: InventoryItemRef, preferredSlot?: string): v
   if (!item) return inventoryFailure('stale-item');
   if (ref.location === 'bag' && !itemDef(item).slot) {
     if (itemDef(item).type === 'consumable') useItem(item.id, ref);
-    else if (itemDef(item).type === 'enhance') toast('Этот свиток используется в кузнице Брана.');
+    else if (SCROLLS[item.id]) beginEnhancement(ref);
+    else if (item.id==='scroll') toast('Старые свитки будут доступны для обмена после перезагрузки.');
     return;
   }
   const result = ref.location === 'equipment'
@@ -3085,6 +3157,8 @@ function moveInventoryItem(ref: InventoryItemRef, target: InventoryDropTarget): 
 }
 
 function inventoryAction(id: string, ref: InventoryItemRef | null): void {
+  if(id==='cancel-enhance'){cancelEnhancement();return;}
+  if(id==='exchange-weapon'||id==='exchange-armor'){exchangeOldScroll(id==='exchange-weapon'?'weapon':'armor');return;}
   if (player.dead) return inventoryFailure('dead');
   if (id === 'collect-buffer') {
     while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift()!);
@@ -3105,7 +3179,7 @@ function inventoryAction(id: string, ref: InventoryItemRef | null): void {
 function renderInventory(): void {
   if (inventoryPanel) { inventoryPanel.refresh(); return; }
   inventoryPanel = createCharacterInventory(q('#modal-root'), {
-    read: inventoryModel, tooltip: inventoryTooltip, onClose: closeWindow,
+    read: inventoryModel, tooltip: inventoryTooltip, onClose: closeWindow, onTarget: targetEnhancement, onCancelTarget: cancelEnhancement,
     onSelect: ref => { inventorySelection = ref; inventoryPanel?.refresh(); },
     onActivate: activateInventoryItem, onMove: moveInventoryItem,
     onSlotSelect: slot => { preferredEquipmentSlot = slot; inventoryPanel?.refresh(); },
@@ -3266,7 +3340,7 @@ function openDialog(npc: Entity, text: string, actions: Array<{ label: string; a
 
 function openShop(): void {
   openWindow('shop');
-  const stock: Array<[string, number]> = [['potion', 55], ['ether', 70], ['scroll', 240], ['teleport', 130]];
+  const stock: Array<[string, number]> = [['potion', 55], ['ether', 70], ['teleport', 130]];
   q('#window-content').innerHTML = `<h2>Лавка Эльзы</h2><div class="npc-dialog"><div class="npc-portrait"></div><div><p>Боссовые вещи не продаются. За ними придётся идти в лес.</p><div class="shop-grid">${stock.map(([id, cost]) => `<div class="shop-item"><span class="big-icon">${ITEMS_MAP[id].icon}</span><b>${ITEMS_MAP[id].name}</b><span>◈ ${cost}</span><button class="dark-btn" data-buy="${id}" data-cost="${cost}">Купить</button></div>`).join('')}</div></div></div>`;
   qa<HTMLButtonElement>('[data-buy]').forEach((button) => { button.onclick = () => { if (player.dead) return; const cost = Number(button.dataset.cost); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; addItem(button.dataset.buy ?? 'potion'); updateHud(); saveGame(); }; });
 }
@@ -3278,34 +3352,9 @@ function openTeleport(): void {
   qa<HTMLButtonElement>('[data-tp]').forEach((button) => { button.onclick = () => { if (player.dead) return; const [x, z, cost, level] = (button.dataset.tp ?? '').split(',').map(Number); if (player.level < level) return toast(`Требуется доступ к территории: уровень ${level}`, 'bad'); if (player.gold < cost) return toast('Недостаточно золота', 'bad'); player.gold -= cost; player.x = x; player.z = z; resetPlayerControl(true); cameraControl.snap({ x, y: 0, z }); void gateway.send({ type: 'teleport', destination: button.dataset.destination ?? '' }); closeWindow(); toast('Переход завершён'); saveGame(); }; });
 }
 
-function openForge(): void { openWindow('forge'); renderForge(); }
-function renderForge(): void {
-  const gear = Object.entries(player.equipment).filter((entry): entry is [string, ItemInstance] => Boolean(entry[1]));
-  q('#window-content').innerHTML = `<h2>Кузница Брана</h2><p>Усиление до +3 безопасно. Начиная с попытки <b>+3 → +4</b>, неудача полностью уничтожает предмет.</p><p>Свитков: <b>${countItem('scroll')}</b></p><div class="bag-grid">${gear.map(([slot, item]) => `<button class="item-card" data-forge="${slot}">${formatItem(item)}</button>`).join('')}</div><div class="item-details" id="forge-info">Выберите надетый предмет.</div>`;
-  qa<HTMLButtonElement>('[data-forge]').forEach((button) => { button.onclick = () => { const item = player.equipment[button.dataset.forge ?? '']; if (!item) return; const chance = enhancementChance(item.plus); q('#forge-info').innerHTML = `<b>${itemDef(item).name} +${item.plus} → +${item.plus + 1}</b><br>Вероятность успеха: ${Math.round(chance * 100)}%. ${enhancementCanDestroy(item.plus) ? '<span class="danger-text">При неудаче предмет будет уничтожен.</span>' : 'Безопасное улучшение.'}<div class="action-row"><button class="gold-btn" id="enhance">Усилить</button></div>`; q<HTMLButtonElement>('#enhance').onclick = () => attemptEnhance(button.dataset.forge ?? ''); }; });
-}
-
-function attemptEnhance(slot: string): void {
-  if (!state.started || player.dead) return;
-  const item = player.equipment[slot]; if (!item || item.plus >= 15) return;
-  if (!countItem('scroll')) return toast('Нужен свиток улучшения', 'bad');
-  const expectedPlus = item.plus;
-  let completed = false;
-  const run = () => {
-    if (completed || player.dead || player.equipment[slot]?.uid !== item.uid || item.plus !== expectedPlus || !consumeItem('scroll')) return;
-    completed = true;
-    gameAudio.play('hammer', 0.72, 0.94 + Math.random() * 0.08);
-    void gateway.send({ type: 'enhance', itemUid: item.uid, from: item.plus, to: item.plus + 1 });
-    const outcome = resolveEnhancement(item.plus);
-    if (outcome.kind === 'success') {
-      item.plus = outcome.level; recalculate(); toast(`${itemDef(item).name} усилен до +${item.plus}`); log(`Заточка успешна: ${itemDef(item).name} +${item.plus}.`, 'loot');
-    } else if (outcome.kind === 'destroyed') {
-      const name = itemDef(item).name; delete player.equipment[slot]; recalculate(); toast(`${name} уничтожен`, 'bad'); log(`Неудача: ${name} уничтожен при заточке.`, 'combat');
-    }
-    closeConfirm(); if (state.activeWindow) renderForge(); saveGame();
-  };
-  if (enhancementCanDestroy(item.plus)) confirmBox('Рискованная заточка', `Шанс успеха ${Math.round(enhancementChance(item.plus) * 100)}%. <span class="danger-text">При неудаче предмет будет уничтожен.</span> Продолжить?`, run);
-  else run();
+function openForge(): void {
+  openWindow('inventory');
+  toast('Бран: дважды нажмите свиток, затем один раз — предмет. Старый запас обменивается кнопками под сумкой.');
 }
 
 function countItem(id: string): number { return player.inventory.filter((item) => item.id === id).reduce((total, item) => total + item.count, 0); }
@@ -3345,12 +3394,7 @@ function closeConfirm(): void {
 
 function saveGame(): void {
   if (!state.started) return;
-  const save: PlayerSave = {
-    schema: 1, savedAt: Date.now(), player, quest: state.quest, kills: state.kills,
-    bossKills: state.bossKills, lootBuffer: state.lootBuffer, settings: state.settings,
-    bossTimers: { ...state.bossTimers },
-  };
-  void gateway.save(save);
+  void gateway.save(saveSnapshot()).catch(()=>toast('Не удалось сохранить игру.','bad'));
 }
 
 let logFilter = 'all';
@@ -3500,7 +3544,7 @@ function combatSnapshot() {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-hud-b-test',
+    version: '0.6.0-enhancement-d-test',
     actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
@@ -3519,6 +3563,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
       activeWindow: state.activeWindow,
       moveTarget: state.moveTarget ? {...state.moveTarget} : null,
       inventory: inventorySnapshot(),
+      enhancement: {active:enhancementSelection?.scroll.id??null,legacyScrolls,result:enhancementResult},
       confirmation: confirmation ? { cancel: confirmation.cancel } : null,
       entities: state.entities.length,
       monsters: state.entities.filter((entity) => entity.kind === 'monster').length,
@@ -3639,6 +3684,24 @@ if (__QA_BUILD__) {
   });
   Object.defineProperty(window, '__VARENDOR_FIXTURE__', { value: {
     actors,
+    enhancementSetup: (options:{scroll?:string;plus?:number;equipped?:boolean;roll?:number}={}) => {
+      resetPlayerControl(true);closeWindow();closeConfirm();state.qaFrozen=true;player.dead=false;legacyScrolls=0;enhancementReceipts=[];
+      const scrollId=options.scroll??'weapon_scroll';const category=SCROLLS[scrollId].category;
+      const target=makeItem(category==='weapon'?CLASSES_MAP[player.classId].weapon:CLASSES_MAP[player.classId].armor,options.plus??0);
+      const scroll=makeItem(scrollId,0,5);const wrong=makeItem(category==='weapon'?CLASSES_MAP[player.classId].armor:CLASSES_MAP[player.classId].weapon);
+      player.inventory=[scroll,wrong];player.equipment={weapon:makeItem(CLASSES_MAP[player.classId].weapon),chest:makeItem(CLASSES_MAP[player.classId].armor)};
+      if(options.equipped)player.equipment[category==='weapon'?'weapon':'chest']=target;else player.inventory.push(target);
+      player.cooldowns=[2,3,4,5];recalculate();player.hp=17;player.mp=13;
+      qaEnhancementRoll=()=>options.roll??0;enhancementResult='';state.settings.inventoryWindow=undefined;saveGame();updateHud();
+      return {scroll:scroll.uid,target:target.uid,wrong:wrong.uid,slot:category==='weapon'?'weapon':'chest'};
+    },
+    enhancementLegacySave: () => {
+      const candidate=structuredClone(saveSnapshot());candidate.schema=1;candidate.legacyScrolls=0;
+      candidate.player.inventory.push(makeItem('scroll',0,4));candidate.lootBuffer=[makeItem('scroll',0,3)];gateway.saveNow(candidate);
+      return {name:player.name,level:player.level,weapon:player.equipment.weapon?.uid};
+    },
+    enhancementStorageFailure: () => {const original=gateway.saveNow.bind(gateway);gateway.saveNow=()=>{gateway.saveNow=original;throw Error('QA quota');};},
+    enhancementMutateTarget: (id:string) => {const i=player.inventory.find(i=>i.uid===id);if(i)i.plus++;updateHud();},
     inventorySetup: (scenario = 'normal') => {
       closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset();
       const wasDead = player.dead;
@@ -3649,7 +3712,7 @@ if (__QA_BUILD__) {
       const ringCandidate = makeItem('ember_ring', 4), potion = makeItem('potion', 0, 6), longItem = makeItem('sovereign_seal', 8);
       const statsItems = [weapon, makeItem('dead_king_plate', 7), longItem, makeItem('oracle_robe', 5),
         makeItem('night_leather', 4), makeItem('grave_boots', 3), makeItem('rotten_root', 7)];
-      player.inventory = [weapon, ringCandidate, potion, ...statsItems.slice(1), makeItem('ether', 0, 4), makeItem('scroll', 0, 4)];
+      player.inventory = [weapon, ringCandidate, potion, ...statsItems.slice(1), makeItem('ether', 0, 4), makeItem('weapon_scroll', 0, 4)];
       if (scenario === 'pairs') { player.equipment.ring1 = ringA; player.equipment.ring2 = ringB; }
       if (scenario === 'full') while (player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(makeItem('iron'));
       state.lootBuffer = []; state.qaFrozen = true; state.playerBuffs.guard = 0; state.playerBuffs.vanish = 0;

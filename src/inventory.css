@@ -137,3 +137,8 @@
 }
 
 .ci-comparison-summary { margin: 10px 0 5px; color: #b5c2bf; font-size: 10px; line-height: 1.4; }
+.ci-enhance-banner{display:none;white-space:pre-line;padding:9px;color:#efd29e;font-size:12px;line-height:1.5;overflow:auto}
+.ci-enhancing .ci-stats,.ci-enhancing .ci-section-label{display:none}.ci-enhancing .ci-enhance-banner{display:block;grid-row:1/-1}
+.character-window .ci-enhance-eligible{border:2px solid #d5b66c;box-shadow:inset 0 0 12px #ce9f4033}
+.character-window .ci-cell[data-quality="improved"]{color:#b9cfff;background:radial-gradient(#37446a,#151e24)}
+.ci-actions{overflow-x:auto;overflow-y:hidden;white-space:nowrap}.ci-actions .ci-action{flex:0 0 auto}

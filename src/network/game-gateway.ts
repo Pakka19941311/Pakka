@@ -4,7 +4,7 @@ export type GameCommand =
   | { type: 'target'; entityId: string }
   | { type: 'attack'; entityId: string; skillIndex: number | null }
   | { type: 'equip'; itemUid: string; slot: string }
-  | { type: 'enhance'; itemUid: string; from: number; to: number }
+  | { type: 'enhance'; itemUid: string; from: number; to: number | null; attemptId: string; scrollUid: string; scrollId: string }
   | { type: 'npc'; role: string }
   | { type: 'teleport'; destination: string };
 
@@ -40,15 +40,18 @@ export class LocalGameGateway<TSave> implements GameGateway<TSave> {
         if (key !== this.storageKey) await this.save(state);
         return state;
       } catch {
-        if (key === this.storageKey) this.storage.removeItem(key);
+        throw new Error('Не удалось прочитать сохранение. Исходные данные сохранены.');
       }
     }
     return null;
   }
 
-  async save(state: TSave): Promise<void> {
-    this.storage.setItem(this.storageKey, JSON.stringify(state));
+  saveNow(state: TSave, backup = false): void {
+    const bytes = JSON.stringify(state);
+    if (backup) {const previous = this.storage.getItem(this.storageKey); if(previous && !this.storage.getItem(this.storageKey + '_before_scroll_v2')) this.storage.setItem(this.storageKey + '_before_scroll_v2',previous);}
+    this.storage.setItem(this.storageKey, bytes);
   }
+  async save(state: TSave): Promise<void> { this.saveNow(state); }
 
   async send(command: GameCommand): Promise<void> {
     this.commandLog.push(command);

@@ -1,3 +1,4 @@
+import { ENHANCEMENT_PERCENT } from './enhancement-v2.ts';
 export type BaseStats = {
   str: number;
   dex: number;
@@ -12,9 +13,7 @@ export const SAFE_ENHANCEMENT_MAX = 3;
 export const MINI_BOSS_RESPAWN_SECONDS = { min: 30 * 60, max: 50 * 60 } as const;
 export const PIT_BOSS_RESPAWN_SECONDS = 7 * 60 * 60;
 
-export const ENHANCEMENT_CHANCES = [
-  1, 1, 1, 0.7, 0.6, 0.5, 0.4, 0.32, 0.25, 0.19, 0.14, 0.1, 0.07, 0.05, 0.03,
-] as const;
+export const ENHANCEMENT_CHANCES = ENHANCEMENT_PERCENT.weapon_normal.map(p=>p/100);
 
 const WEAPON_ENHANCEMENT_BONUS = [
   0, 0.04, 0.08, 0.12, 0.17, 0.22, 0.28, 0.34, 0.41, 0.48, 0.56, 0.65, 0.75, 0.86, 0.98, 1.12,
