@@ -18,6 +18,12 @@ const browsers=[];
 const check=(name,details={})=>{report.checks.push({name,...details});console.log('PASS',name);};
 const state=page=>page.evaluate(()=>window.__VARENDOR_QA__.getState());
 const network=page=>page.evaluate(()=>window.__VARENDOR_QA__.network());
+const enhancementDiagnostic=page=>page.evaluate(()=>{const s=window.__VARENDOR_QA__.getState();return {
+  enhancement:s.enhancement,network:window.__VARENDOR_QA__.network(),dead:s.player.dead,
+  weapon:s.inventory.equipment.weapon,scrolls:s.inventory.inventory.filter(i=>i.id.includes('scroll')),
+  panelReadonly:document.querySelector('[data-inventory-window]')?.classList.contains('ci-readonly'),
+  status:document.querySelector('.ci-status')?.textContent,selection:document.querySelector('.ci-selection-name')?.textContent,
+  toast:document.querySelector('#toast')?.textContent};});
 async function startServer(){
   const entry=pathToFileURL(resolve('server/http-server.mjs')).href;
   const topology=pathToFileURL(resolve('src/world/world-topology.ts')).href;
@@ -52,7 +58,8 @@ async function newClient(base,name){
   });
   const page=await context.newPage();page.setDefaultTimeout(60_000);
   page.on('pageerror',error=>report.errors.push(error.stack??error.message));
-  page.on('console',message=>{if(message.type()==='error'){report.errors.push(message.text());console.error('CLIENT CONSOLE',message.text());}});
+  page.on('console',message=>{if(message.type()==='error'){report.errors.push(message.text());console.error('CLIENT CONSOLE',message.text());}
+    else if(message.text().startsWith('CELL EVENT'))console.log(message.text());});
   page.on('response',response=>{if(response.status()>=400&&!response.url().endsWith('/favicon.ico'))report.errors.push(`HTTP ${response.status()} ${response.url()}`);});
   await page.goto(base,{waitUntil:'domcontentloaded',timeout:60_000});
   assert.equal(await page.evaluate(()=>typeof window.__VARENDOR_FIXTURE__),'undefined','Use the production build, without local simulation fixtures');
@@ -94,13 +101,15 @@ try{
   assert.ok(returned.heroes.some(hero=>hero.id===seen.characterId));
   check('Resuming the frozen page receives current authoritative state without creating another hero');
 
-  const position=(await state(first.page)).player;
+  const own=await network(first.page);const position=own.heroes.find(p=>p.id===own.characterId);
+  assert.ok(position);
   await first.page.keyboard.down('KeyW');
-  await first.page.waitForFunction(origin=>{const p=window.__VARENDOR_QA__.getState().player;return Math.hypot(p.x-origin.x,p.z-origin.z)>.25;},position);
+  await first.page.waitForFunction(origin=>{const n=window.__VARENDOR_QA__.network();const p=n.heroes.find(p=>p.id===n.characterId);return p&&Math.hypot(p.x-origin.x,p.z-origin.z)>.25;},position);
   await first.page.keyboard.press('Tab');
   const opened=await state(first.page);
   assert.equal(opened.activeWindow,'inventory');
-  await first.page.waitForFunction(origin=>{const p=window.__VARENDOR_QA__.getState().player;return Math.hypot(p.x-origin.x,p.z-origin.z)>.25;},opened.player);
+  const afterOpen=await network(first.page);const confirmed=afterOpen.heroes.find(p=>p.id===afterOpen.characterId);
+  await first.page.waitForFunction(origin=>{const n=window.__VARENDOR_QA__.network();const p=n.heroes.find(p=>p.id===n.characterId);return p&&Math.hypot(p.x-origin.x,p.z-origin.z)>.25;},confirmed);
   await first.page.keyboard.up('KeyW');
   check('Opening Tab during held movement preserves movement through the server');
 
@@ -108,9 +117,22 @@ try{
   const items=bagBefore.inventory??bagBefore.items;
   const scroll=items.find(item=>item.id==='weapon_scroll');
   assert.equal(scroll.count,100);
-  await first.page.locator(`.ci-bag-grid [data-uid="${scroll.uid}"]`).dblclick();
-  await first.page.locator('.ci-equipment-grid [data-slot="weapon"]').click();
-  await first.page.waitForFunction(()=>window.__VARENDOR_QA__.getState().inventory.equipment.weapon.plus===1);
+  await first.page.evaluate(()=>{
+    for(const kind of ['click','dblclick'])document.addEventListener(kind,event=>{
+      const cell=event.target?.closest?.('.ci-cell');if(!cell)return;
+      const item=cell.dataset.itemId;
+      queueMicrotask(()=>console.log('CELL EVENT',JSON.stringify({kind,detail:event.detail,item,
+        active:window.__VARENDOR_QA__.getState().enhancement.active,network:window.__VARENDOR_QA__.network().connected})));
+    },true);
+  });
+  try{
+    console.log('ENHANCEMENT BEFORE',JSON.stringify(await enhancementDiagnostic(first.page)));
+    await first.page.locator(`.ci-bag-grid [data-uid="${scroll.uid}"]`).dblclick();
+    await first.page.waitForFunction(()=>window.__VARENDOR_QA__.getState().enhancement.active==='weapon_scroll',{}, {timeout:15000});
+    console.log('ENHANCEMENT ARMED',JSON.stringify(await enhancementDiagnostic(first.page)));
+    await first.page.locator('.ci-equipment-grid [data-slot="weapon"]').click();
+    await first.page.waitForFunction(()=>window.__VARENDOR_QA__.getState().inventory.equipment.weapon?.plus===1,{}, {timeout:15000});
+  }catch(error){console.error('ENHANCEMENT DIAGNOSTIC',JSON.stringify(await enhancementDiagnostic(first.page)));throw error;}
   const inventory=(await state(first.page)).inventory;
   assert.equal((inventory.inventory??inventory.items).find(item=>item.id==='weapon_scroll').count,99);
   await first.page.screenshot({path:'qa-artifacts/part1-connected-inventory.png'});
