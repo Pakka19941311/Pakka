@@ -87,6 +87,8 @@ import { MonsterLifecycle } from './core/monster-lifecycle';
 import { qualityPreset } from './rendering/quality-presets';
 import { WorldSectorGrid } from './world/world-sectors';
 import { AttackTimeline, combatTimings } from './combat/attack-timeline';
+import { EnvironmentAssets, type EnvironmentModel } from './rendering/environment-assets';
+import { createForestGround } from './rendering/forest-ground';
 import { resolveChainLightning } from './combat/chain-lightning';
 import { SimulationClock } from './core/simulation-clock';
 import { FrameTelemetry, ResolutionGovernor, renderScaling, effectiveRenderBudget } from './rendering/frame-budget';
@@ -527,15 +529,12 @@ scene.imageProcessingConfiguration.vignetteEnabled = true;
 scene.imageProcessingConfiguration.vignetteWeight = 1.3;
 scene.imageProcessingConfiguration.vignetteStretch = 0.3;
 
-const sky = new PhotoDome('ashen-frontier-sky', '/assets/textures/pbr/dark_autumn_forest_2k.jpg', {
-  resolution: 32,
-  size: 260,
-}, scene);
-sky.mesh.isPickable = false;
-const environment = new HDRCubeTexture('/assets/textures/pbr/dark_autumn_forest_1k.hdr', scene, 128, false, true, false, true);
+const environment = new HDRCubeTexture('/assets/world/kloppenheim_05_puresky_1k.hdr', scene, 256, false, true, false, true);
 environment.rotationY = Math.PI * 0.18;
 scene.environmentTexture = environment;
 scene.environmentIntensity = 0.62;
+const sky = scene.createDefaultSkybox(environment, true, 300, 0, false);
+if (sky) sky.isPickable = false;
 
 const camera = new ArcRotateCamera('third-person-camera', -Math.PI / 2, 1.06, 10.5, new Vector3(0, 1, 0), scene);
 camera.panningSensibility = 0;
@@ -578,7 +577,7 @@ let lastRenderStats = { drawCalls: 0, activeMeshes: 0, renderWidth: 0, renderHei
 const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 24, mainTextureRatio: 0.25 });
 glow.intensity = 0.35;
 
-const groundMaterial = createPbrSurface(scene, 'forest_ground_06', REFERENCE_SURFACES.groundRepeats, 0.96);
+const groundMaterial = createForestGround(scene);
 const ground = new Mesh('ground', scene);
 ground.material = groundMaterial;
 ground.receiveShadows = true;
@@ -657,6 +656,7 @@ const characterAssets = new Map<string, AssetContainer>();
 const monsterAssets = new Map<string, AssetContainer>();
 const worldAssets = new Map<string, AssetContainer>();
 const realismAssets = new Map<RealismModel, AssetContainer>();
+const environmentAssets = new EnvironmentAssets(scene);
 const sectorGrid = new WorldSectorGrid(48);
 const sectorNodes = new Map<string, TransformNode>();
 let sectorVisibilityCooldown = 0;
@@ -690,6 +690,7 @@ function updateWorldSectorVisibility(dt: number): void {
   sectorVisibilityCooldown -= dt;
   if (sectorVisibilityCooldown > 0) return;
   sectorVisibilityCooldown = 0.45;
+  environmentAssets.update(player.x,player.z,state.settings.quality==='low');
   const distance = state.settings.quality === 'low' ? 74 : state.settings.quality === 'medium' ? 104 : state.settings.quality === 'high' ? 142 : 196;
   const active = sectorGrid.activeKeysAround(player.x, player.z, distance);
   sectorNodes.forEach((node, key) => node.setEnabled(active.has(key)));
@@ -716,7 +717,7 @@ async function loadAssets(): Promise<void> {
   if (assetsLoaded) return;
   const tasks: Array<Promise<void>> = [];
   let loaded = 0;
-  const total = CHARACTER_MODELS.length + MONSTER_MODELS.length + EXTRA_MONSTER_MODELS.length + WORLD_MODELS.length + REALISM_MODELS.length;
+  const total = CHARACTER_MODELS.length + MONSTER_MODELS.length + EXTRA_MONSTER_MODELS.length + WORLD_MODELS.length + REALISM_MODELS.length + 30;
   const progress = (label: string) => {
     loaded += 1;
     (q<HTMLElement>('#load-fill')).style.width = `${Math.round((loaded / total) * 100)}%`;
@@ -752,6 +753,7 @@ async function loadAssets(): Promise<void> {
       progress('Детализируем мир');
     }));
   }
+  tasks.push(environmentAssets.load(()=>progress('Готовим лес, камни и растительность')));
   await Promise.all(tasks);
   assetsLoaded = true;
 }
@@ -1028,6 +1030,7 @@ function worldModel(name: string, x: number, z: number, scale = 1, rotation = 0,
 }
 
 function realismModel(name: RealismModel, x: number, z: number, height: number, rotation = 0): TransformNode | null {
+  if (name==='boulder_01'||name==='rock_09') return approvedEnvironmentModel('rock_moss_set_01',Math.abs(Math.round(x*7+z*3))%6,x,z,height,rotation,true);
   const container = realismAssets.get(name);
   if (!container) return null;
   const instance = instantiateContainer(container, `realism-${name}-${uid()}`);
@@ -1073,15 +1076,21 @@ foliageMaterial.roughness = 0.98;
 foliageMaterial.metallic = 0;
 let pineGeometry: readonly ConiferSources[] | undefined;
 function createPineTree(name: string, x: number, z: number, height: number, rotation: number): void {
-  pineGeometry ??= createConiferSources(scene, barkMaterial, foliageMaterial);
-  for (const [part, source] of Object.entries(coniferSourceForName(name, pineGeometry))) {
-    const mesh = source.createInstance(`${name}-${part}`);
-    mesh.position.set(x, terrain.heightAt(x, z), z); mesh.rotation.y = rotation; mesh.scaling.setAll(height);
-    mesh.isVisible = true; mesh.isPickable = false;
-    shadowCasters.add(mesh);
-    assignWorldSector(mesh, x, z);
+  approvedEnvironmentModel('pine_tree_01',Number(name.split('-').at(-1))%3,x,z,height,rotation,false);
+  // Only the trunk is solid. Needles and empty space between branches are not walls.
+  collisionWorld.addCircle(x,z,Math.max(.16,height*.028),terrain.heightAt(x,z),terrain.heightAt(x,z)+height*.84);
+}
+
+function approvedEnvironmentModel(name:EnvironmentModel,variant:number,x:number,z:number,height:number,rotation:number,solid=false):TransformNode {
+  const root=environmentAssets.place(name,variant,x,terrain.heightAt(x,z),z,height,rotation,mesh=>shadowCasters.add(mesh));
+  assignWorldSector(root,x,z);
+  if(solid){
+    root.computeWorldMatrix(true);root.getChildMeshes().forEach(mesh=>mesh.computeWorldMatrix(true));
+    const bounds=root.getHierarchyBoundingVectors(true);
+    collisionWorld.addCircle((bounds.min.x+bounds.max.x)*.5,(bounds.min.z+bounds.max.z)*.5,
+      Math.max(bounds.max.x-bounds.min.x,bounds.max.z-bounds.min.z)*.43,bounds.min.y,bounds.max.y);
   }
-  collisionWorld.addCircle(x, z, height * 0.06 + 0.03, terrain.heightAt(x, z), terrain.heightAt(x, z) + height);
+  return root;
 }
 
 const townMaterials = new Map<number, StandardMaterial>();
@@ -1330,6 +1339,16 @@ function buildWorld(): void {
     const x = rand(45, 155); const z = rand(-18, 126);
     if (reserved(x, z, 1.5)) continue;
     realismModel(index % 2 ? 'dead_tree_trunk' : 'tree_stump_01', x, z, rand(1.5, 3.8), rand(0, Math.PI * 2));
+  }
+  // Undergrowth appears in irregular pockets around the forest, leaving roads clear.
+  for(let index=0;index<180;index++){
+    const x=rand(38,155),z=rand(-22,127);
+    if(reserved(x,z,.7)||Math.sin(x*.12)*Math.cos(z*.16)<-.18)continue;
+    const shrub=index%5===0;
+    approvedEnvironmentModel(shrub?'shrub_04':'fern_02',shrub?0:index%4,x,z,shrub?rand(.75,1.65):rand(.35,.85),rand(0,Math.PI*2));
+  }
+  for(const [x,z,height,rotation] of [[150,-102,20,.6],[-151,58,24,2.8],[48,134,18,3.2],[153,126,27,2.1]]){
+    approvedEnvironmentModel('coastal_cliff_04',0,x,z,height,rotation,true);
   }
   buildTown(-108, -82, 1.65);
   buildStarterSettlement(-7, -5);

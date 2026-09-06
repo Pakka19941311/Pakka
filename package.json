@@ -10,6 +10,8 @@
     "verify:assets": "node scripts/verify-assets.mjs",
     "smoke": "node scripts/runtime-smoke.mjs",
     "test:browser": "node scripts/browser-regression.mjs",
+    "test:part1": "node --experimental-strip-types --test tests/persistent-world.test.mjs tests/terrain-support.test.mjs tests/collision-world.test.mjs",
+    "world:server": "node --experimental-strip-types server/http-server.mjs",
     "build": "npm run typecheck && npm run verify:assets && vite build",
     "preview": "vite preview --host 0.0.0.0"
   },

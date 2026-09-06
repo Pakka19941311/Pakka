@@ -95,6 +95,18 @@ for (const [kind, names, directory] of [
 }
 
 assert.ok(externalReferences > 0, 'Asset scan must discover referenced external files');
+const preparedWorld = JSON.parse(await readFile(path.join(publicAssetsRoot, 'world/prepared-assets.json'), 'utf8'));
+assert.equal(preparedWorld.length, 30, 'Five approved model sets need all near/far variants');
+for (const entry of preparedWorld) {
+  const filename=path.resolve(root,'public',entry.path);
+  const bytes=await readFile(filename);
+  assert.equal(bytes.readUInt32LE(8),bytes.length,`${entry.path}: truncated GLB`);
+  assert.equal(bytes.length,entry.bytes,`${entry.path}: changed prepared file`);
+  await verifyExternalUris(parseGlbDocument(bytes,entry.path),filename);
+}
+for(const name of ['forest_ground_04','brown_mud','mud_forest','roots','brown_mud_03']) {
+  for(const map of ['diff.jpg','normal-roughness.png'])assert.ok((await stat(path.join(publicAssetsRoot,'world',name,map))).size>1000);
+}
 for (const relative of [
   'audio/music/dark-shrine.ogg', 'audio/music/town-in-ruins.ogg', 'audio/ambient/forest.mp3',
   'audio/sfx/sword-swing.ogg', 'audio/sfx/melee-impact.ogg', 'audio/sfx/monster-aggro.ogg',

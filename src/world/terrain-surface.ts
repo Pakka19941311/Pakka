@@ -23,7 +23,8 @@ export class TerrainSurface {
       const asterhold = Math.max(Math.abs(x + 108) - 25, Math.abs(z + 82) - 24);
       const edge = clamp(Math.min(greenfall, asterhold) / 8, 0, 1);
       const blend = edge * edge * (3 - 2 * edge);
-      this.heights[row * (this.columns + 1) + col] = (macro * 0.42 + detail) * blend;
+      const broadHills = Math.sin(x*.043+1.1)*Math.cos(z*.036)*1.1;
+      this.heights[row * (this.columns + 1) + col] = (macro * .9 + broadHills + detail) * blend;
     }
   }
 
