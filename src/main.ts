@@ -3101,6 +3101,7 @@ function inventoryTooltip(ref: InventoryItemRef): InventoryTooltip | null {
     description: [definition.desc, definition.origin ? `Источник: ${definition.origin}` : ''].filter(Boolean).join('\n'), rows,
     restrictions: enhancementSelection && definition.slot ? [`${ITEMS_MAP[enhancementSelection.scroll.id].name}: ${item.plus>=15?"предел +15":`+${item.plus} → +${item.plus+1}`}`, `Шанс: ${(scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)*100).toLocaleString('ru-RU',{maximumFractionDigits:2})}%`, scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)===1?'Безопасно.':scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)>0?'При неудаче предмет уничтожается.':'Этот предмет нельзя усилить выбранным свитком.'] : definition.slot ? ['Без требования уровня.'] : [],
     actions: player.dead ? ['После возрождения действия снова будут доступны.']
+      : enhancementSelection && definition.slot ? [scrollChance(enhancementSelection.scroll.id, definition.slot, item.plus) > 0 ? 'Один клик — одна попытка заточки.' : 'Выберите подходящий предмет или отмените заточку.', 'Esc / ПКМ — отменить без расхода свитка.']
       : ref.location === 'equipment' ? ['Двойной клик — снять в сумку.']
       : definition.slot ? [`Двойной клик — надеть: ${SLOT_NAMES_MAP[slot ?? ''] ?? 'слот экипировки'}.`, 'Перетащите на нужный слот для точной замены.']
       : definition.type === 'consumable' ? ['Двойной клик — использовать одну единицу.']

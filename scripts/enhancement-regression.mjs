@@ -65,6 +65,7 @@ try {
  const before=await inv();const scroll=before.inventory.find(i=>i.id==='weapon_scroll');const weapon=before.equipment.weapon;
  assert.ok(scroll&&weapon);await activate(scroll.uid);assert.equal((await inv()).inventory.find(i=>i.uid===scroll.uid).count,scroll.count);
  await gear(weapon.uid).hover();assert.match(await page.locator('[data-inventory-tooltip]').textContent(),/100%/);
+ const hint=await page.locator('[data-inventory-tooltip]').textContent();assert.match(hint,/Один клик — одна попытка заточки/);assert.doesNotMatch(hint,/Двойной клик — снять/);
  const time=(await state()).simulationSeconds;
  await page.waitForFunction(t=>window.__VARENDOR_QA__.getState().simulationSeconds>t+.4,time);
  await shot('selection');await gear(weapon.uid).dblclick();
