@@ -37,7 +37,11 @@ try{
   await page.locator('#resolution-scale').selectOption('1');await page.locator('#save-settings').click();
   if(topology){
     const first=await page.evaluate(()=>window.__VARENDOR_QA__.worldTopology());
+    // Compare independent constructions, not simultaneous software-GPU load.
+    // Server concurrency has a separate process test; this check needs one renderer at a time.
+    await page.close();
     const second=await browser.newPage({viewport:{width:960,height:600}});
+    second.setDefaultTimeout(60000);
     second.on('pageerror',error=>report.errors.push(error.stack??error.message));
     await second.goto(`http://127.0.0.1:${server.address().port}`);
     await second.locator('#name-field').fill('Второй клиент');await second.locator('#begin').click();
