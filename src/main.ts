@@ -54,6 +54,8 @@ import { addOrStackItem, applyExperience } from './core/gameplay-session';
 import { compatibleEquipmentSlots, resolveEquipmentSlot, itemReference, equipInventoryItem, unequipInventoryItem, reorderInventoryItem } from './core/inventory-commands';
 import type { ItemReference, InventoryFailureReason } from './core/inventory-commands';
 import { calculateEquipmentStats, itemStatBreakdown } from './core/equipment-stats';
+import { resolveAttackAccuracy } from './core/attack-accuracy';
+import { itemDamageSummary } from './core/item-progression';
 import { createCharacterInventory } from './ui/character-inventory';
 import type { CharacterInventoryModel, InventoryItemRef, InventoryTooltip, InventoryDropTarget, InventoryPosition } from './ui/character-inventory';
 import { LocalGameGateway } from './network/game-gateway';
@@ -93,6 +95,8 @@ import { ActorAnimation } from './rendering/actor-animation';
 import type { ActorAction } from './rendering/actor-animation';
 import { TerrainSurface } from './world/terrain-surface';
 import { createStaticPart } from './rendering/static-part';
+import { createGabledRoof } from './rendering/gabled-roof';
+import { greenfallFortLayout, registerFortPartCollider, GREENFALL_REFERENCE_VIEWS } from './world/greenfall-layout';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -1036,23 +1040,18 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   return instance.root;
 }
 
-function realismModelPart(partName: string, x: number, z: number, height: number, rotation = 0): TransformNode | null {
+function realismModelPart(partName: string, x: number, z: number, height: number, rotation = 0,
+  footprint: Readonly<{width?: number; depth?: number}> = {}): TransformNode | null {
   const container = realismAssets.get('modular_fort_01');
   if (!container) return null;
-  const { root, size } = createStaticPart(container, partName, `fort-part-${partName}-${uid()}`, height);
+  const { root, size } = createStaticPart(container, partName, `fort-part-${partName}-${uid()}`, height, footprint);
   root.position.set(x, terrain.heightAt(x, z), z);
   root.rotation.y = rotation;
   assignWorldSector(root, x, z);
   tintMeshes(root);
   root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
-  // Colliders are registered only after a real visual exists, using that visual's bounds.
-  const bottom = terrain.heightAt(x, z), top = bottom + height;
-  if (partName.includes('gate')) {
-    const offset = size.x * 0.41;
-    for (const side of [-1, 1]) collisionWorld.addBox(x + Math.cos(rotation) * offset * side,
-      z - Math.sin(rotation) * offset * side, size.x * 0.09, size.z * 0.5, rotation, bottom, top);
-  } else if (partName.includes('tower')) collisionWorld.addCircle(x, z, Math.min(size.x, size.z) * 0.44, bottom, top);
-  else collisionWorld.addBox(x, z, size.x * 0.5, size.z * 0.5, rotation, bottom, top);
+  const bottom = terrain.heightAt(x, z);
+  registerFortPartCollider(collisionWorld, partName, x, z, size, rotation, bottom, bottom + height);
   return root;
 }
 
@@ -1131,15 +1130,8 @@ function townCylinder(name: string, x: number, y: number, z: number, diameter: n
 
 function createBuilding(name: string, x: number, z: number, width: number, depth: number, height: number, wallColor: number, roofColor: number): void {
   townBox(`${name}-body`, x, height * 0.5, z, width, height, depth, wallColor);
-  const roof = MeshBuilder.CreateCylinder(`${name}-roof`, {
-    height: 1.55,
-    diameterTop: 0.25,
-    diameterBottom: Math.max(width, depth) * 1.18,
-    tessellation: 4,
-  }, scene);
-  roof.position.set(x, height + 0.7, z);
-  roof.rotation.y = Math.PI / 4;
-  roof.scaling.z = Math.max(0.72, depth / Math.max(width, depth));
+  const roof = createGabledRoof(scene, `${name}-roof`, width + 0.6, depth + 0.6, 1.55);
+  roof.position.set(x, height, z);
   roof.material = roofSlateMaterial;
   roof.receiveShadows = true;
   shadowCasters.add(roof);
@@ -1175,10 +1167,19 @@ function createGate(name: string, x: number, z: number, width = 7): void {
 function createSmithy(x: number, z: number): void {
   townBox('smithy-floor', x, 0.08, z, 5.8, 0.16, 4.4, 0x746b5d, false);
   terrain.addPlatform(x, z, 5.8, 4.4, 0.16);
-  townBox('smithy-back', x, 1.3, z + 1.85, 5.8, 2.6, 0.35, 0x685f52);
-  townBox('smithy-awning', x, 2.55, z + 0.1, 5.6, 0.24, 3.2, 0x6e3f2c, false);
+  townBox('smithy-back', x, 1.51, z + 1.85, 5.8, 2.7, 0.35, 0x685f52);
+  for (const px of [-2.55, 2.55]) for (const pz of [-1.6, 1.6]) {
+    townBox(`smithy-beam-post-${px}-${pz}`, x + px, 1.51, z + pz, 0.24, 2.7, 0.24, 0x6e3f2c);
+  }
+  townBox('smithy-beam-front', x, 2.73, z - 1.6, 5.6, 0.26, 0.26, 0x6e3f2c, false);
+  const roof = createGabledRoof(scene, 'smithy-roof', 6.2, 4.7, 0.82);
+  roof.position.set(x, 2.86, z); roof.material = roofSlateMaterial;
+  roof.receiveShadows = true; roof.isPickable = false; shadowCasters.add(roof); assignWorldSector(roof, x, z);
   townBox('smithy-anvil-base', x + 0.8, 0.38, z - 0.15, 0.65, 0.75, 0.7, 0x3b4244);
-  townBox('smithy-anvil-top', x + 0.8, 0.86, z - 0.15, 1.35, 0.28, 0.62, 0x4f595c, false);
+  const anvil = townBox('smithy-anvil-top', x + 0.8, 0.86, z - 0.15, 1.35, 0.28, 0.62, 0x4f595c, false);
+  const iron = new PBRMaterial('smithy-forged-iron', scene);
+  iron.albedoColor = new Color3(0.17, 0.19, 0.21); iron.metallic = 0.8; iron.roughness = 0.6;
+  anvil.material = iron;
   townCylinder('smithy-brazier', x - 1.1, 0.5, z - 0.25, 1.15, 0.65, 0x3d3630, 12);
   const flame = MeshBuilder.CreateCylinder('smithy-brazier-flame', { height: 0.8, diameterTop: 0.08, diameterBottom: 0.72, tessellation: 10 }, scene);
   flame.position.set(x - 1.1, 1.08, z - 0.25);
@@ -1259,28 +1260,15 @@ function buildStarterSettlement(x: number, z: number): void {
   road(x - 8.8, z + 3.0, 13, 3.5, 0.1);
   road(x + 8.8, z + 3.0, 13, 3.5, -0.1);
 
-  // Production CC0 fort modules form a complete defensive silhouette.
-  realismModelPart('wall_thin_gate_01', x, z - 17.2, 5.6, 0);
-  realismModelPart('tower_round', x - 5.2, z - 17.1, 6.8, 0);
-  realismModelPart('tower_round', x + 5.2, z - 17.1, 6.8, 0);
-  for (const side of [-1, 1]) {
-    for (const offset of [-10.6, -3.4, 3.8]) {
-      realismModelPart('wall_thin_straight_01', x + side * 15.8, z + offset, 4.8, Math.PI / 2);
-    }
-    realismModelPart('wall_thin_corner_01', x + side * 15.8, z + 10.2, 5.0, side > 0 ? Math.PI : -Math.PI / 2);
-    realismModelPart('tower_round', x + side * 15.4, z + 10.0, 6.3, 0);
-    realismModelPart('wall_thin_straight_01', x + side * 10.5, z + 10.5, 4.8, 0);
-    realismModelPart('wall_thin_straight_01', x + side * 4.2, z + 10.5, 4.8, 0);
+  // Measured modules share an axis contract, connected spans and an open street.
+  for (const part of greenfallFortLayout(x, z)) {
+    realismModelPart(part.part, part.x, part.z, part.height, part.rotation, {width: part.width, depth: part.depth});
   }
-  realismModelPart('wall_thin_straight_01', x - 11.0, z - 17.0, 4.8, 0);
-  realismModelPart('wall_thin_straight_01', x + 11.0, z - 17.0, 4.8, 0);
 
   // Raised northern keep, framed by real fort towers and a textured castle door.
   createBuilding('greenfall-keep', x, z + 6.0, 9.4, 6.2, 4.7, 0x978d7d, 0x5c4a42);
   townBox('greenfall-keep-steps', x, 0.24, z + 2.45, 3.8, 0.48, 1.5, 0x8a8172, false);
   terrain.addPlatform(x, z + 2.45, 3.8, 1.5, 0.48);
-  realismModelPart('tower_round', x - 6.0, z + 7.0, 7.0, 0);
-  realismModelPart('tower_round', x + 6.0, z + 7.0, 7.0, 0);
   realismModel('large_castle_door', x, z + 2.9, 4.2, 0);
 
   // Western craft lane: tavern, working smithy, storage and delivery props.
@@ -1512,8 +1500,8 @@ function spawnAmbientResidents(): void {
   spawnAmbientResident('Подмастерье', 'Warrior', -18.5, -12.8, [
     { x: -17.2, z: -11.2, activity: 'work' }, { x: -12.5, z: -8.2, activity: 'talk' },
   ], 2, 1.22);
-  spawnAmbientResident('Дозорный', 'Warrior', -12.2, -20.3, [
-    { x: -12.2, z: -20.3, activity: 'guard' }, { x: -1.8, z: -20.3, activity: 'guard' },
+  spawnAmbientResident('Дозорный', 'Warrior', -12.2, -18.7, [
+    { x: -12.2, z: -18.7, activity: 'guard' }, { x: -1.8, z: -18.7, activity: 'guard' },
   ], 3, 1.0);
   spawnAmbientResident('Жительница', 'Monk', 3.4, -14.5, [
     { x: 1.1, z: -8.5, activity: 'trade' }, { x: -4.2, z: -4.6, activity: 'talk' }, { x: -7, z: -6.2, activity: 'warm' },
@@ -1881,6 +1869,7 @@ function updateTargetIndicator(): void {
 
 let qaMotionSample: (() => void) | undefined;
 let qaCombatEvent: ((event: Record<string, unknown>) => void) | undefined;
+let qaAttackRoll: (() => number) | undefined;
 function update(dt: number): void {
   if (!state.started || state.qaFrozen) return;
   state.simulationSeconds += dt;
@@ -2290,6 +2279,7 @@ function performAttack(skillIndex: number | null): void {
   const base = magic ? player.stats.matk : rand(player.stats.atkMin, player.stats.atkMax);
   const multiplier = skill?.mul ?? 1;
   const critical = Math.random() < player.stats.crit / 100;
+  const accuracy = player.stats.accuracy;
   const damage = Math.max(1, Math.round(base * multiplier * (critical ? classCombatProfile(player.classId, player.level, player.stats).critMultiplier : 1)));
   const timeline = new AttackTimeline(timings);
   queueAttackTimeline(timeline, () => {
@@ -2317,6 +2307,16 @@ function performAttack(skillIndex: number | null): void {
     else gameAudio.play('swordSwing', 0.7, 0.94 + Math.random() * 0.12);
     const resolveHit = () => {
       if (!target.alive || target.visualGeneration !== generation) return;
+      const hitVictim = (victim: Entity, amount: number, crit: boolean): boolean => {
+        if (!resolveAttackAccuracy(accuracy, (__QA_BUILD__ ? qaAttackRoll?.() : undefined) ?? Math.random()).hit) {
+          damageNumber(victim, 'MISS', '#c4d1d7');
+          if (__QA_BUILD__) qaCombatEvent?.({kind:'miss', target:victim.uid, skillIndex, time:state.simulationSeconds});
+          return false;
+        }
+        damageMonster(victim, amount, crit);
+        return true;
+      };
+      let primaryHit = false;
       if (skill?.chain) {
         const chainHits = resolveChainLightning(
           target,
@@ -2324,7 +2324,7 @@ function performAttack(skillIndex: number | null): void {
           { maxTargets: skill.chain, radius: skill.chainRadius ?? 6.5, falloff: skill.chainFalloff ?? 0.76 },
         );
         const generations = new Map(chainHits.map(hit => [hit.target.uid, hit.target.visualGeneration]));
-        damageMonster(target, damage, critical);
+        primaryHit = hitVictim(target, damage, critical);
         const strikeJump = (index: number): void => {
           const hit = chainHits[index];
           if (!hit) return;
@@ -2333,16 +2333,19 @@ function performAttack(skillIndex: number | null): void {
             || !combatLineOfSight(hit.source, hit.target)) return;
           spawnAttackEffect('lightning', hit.source, hit.target, () => {
             if (!hit.target.alive || hit.target.visualGeneration !== generations.get(hit.target.uid)) return;
-            damageMonster(hit.target, Math.max(1, Math.round(damage * hit.multiplier)), false);
-            strikeJump(index + 1);
+            if (hitVictim(hit.target, Math.max(1, Math.round(damage * hit.multiplier)), false)) strikeJump(index + 1);
           });
         };
-        strikeJump(1);
+        if (primaryHit) strikeJump(1);
       } else {
         let victims = [target];
         if (skill?.aoe) victims = [target, ...state.entities.filter((entity) => entity !== target && entity.kind === 'monster' && entity.alive && Math.hypot(entity.x - target.x, entity.z - target.z) < (skill.aoe ?? 0) && combatLineOfSight(target, entity))];
-        victims.forEach((entity, index) => damageMonster(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0));
+        victims.forEach((entity, index) => {
+          const hit = hitVictim(entity, Math.round(damage * (index ? 0.72 : 1)), critical && index === 0);
+          if (index === 0) primaryHit = hit;
+        });
       }
+      if (!primaryHit) return;
       if (target.alive && skill?.dot) target.status.dot = skill.dot;
       if (target.alive && skill?.slow) target.status.slow = skill.slow;
       if (target.alive && skill?.stun) target.status.stun = skill.stun;
@@ -2909,15 +2912,13 @@ function selectCombatTarget(entity: Entity, engage = true): void {
 }
 
 canvas.addEventListener('pointerdown', (event) => {
-  if (event.button !== 0 || !state.started || state.qaFrozen || player.dead || Boolean(confirmation)) return;
+  if (event.button !== 0 || !state.started || player.dead || Boolean(confirmation)) return;
   const pick = pickVisibleActor(scene, camera, event.offsetX, event.offsetY, mesh => {
     const entity: Entity | undefined = mesh.metadata?.entity;
     return Boolean(entity?.alive && (entity.kind === 'monster' || entity.kind === 'npc')
       && entity.visualActive !== false && mesh !== entity.pickVolume);
-  });
-  // Exact actor geometry is still occluded by the actual static world.
-  const unobstructed = pick?.pickedPoint && collisionWorld.hasLineOfSight(camera.globalPosition, pick.pickedPoint, 0.01);
-  const hit = pick?.hit && unobstructed ? pick : scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
+  }, {radius: 14, visible: hit => Boolean(hit.pickedPoint && collisionWorld.hasLineOfSight(camera.globalPosition, hit.pickedPoint, 0.01))});
+  const hit = pick ?? scene.pick(event.offsetX, event.offsetY, mesh => mesh === ground);
   if (!hit?.hit || !hit.pickedPoint) return;
   inputControl.consumeMovementStart(); // Preserve input order: the latest click owns the destination.
   clearPursuitProgress();
@@ -2974,7 +2975,6 @@ function openWindow(type: string): void {
   inventoryPanel?.destroy(); inventoryPanel = null;
   const isInventory = type === 'inventory' || type === 'character';
   state.activeWindow = isInventory ? 'inventory' : type;
-  inputControl.reset(); playerMotor.stopPlanar();
   q('#modal-root').innerHTML = isInventory ? '' : '<div class="modal-shade"></div><section class="window"><button class="close-window">×</button><div id="window-content"></div></section>';
   if (!isInventory) {
     q<HTMLButtonElement>('#modal-root .close-window').onclick = closeWindow;
@@ -2992,7 +2992,7 @@ function closeWindow(): void {
   enhancementSelection=null;
   if (confirmation?.cancel) closeConfirm();
   inventoryPanel?.destroy(); inventoryPanel = null; inventorySelection = null; preferredEquipmentSlot = undefined;
-  state.activeWindow = null; inputControl.reset();
+  state.activeWindow = null;
   q('#modal-root').innerHTML = '';
   qa('[data-window]').forEach((button) => button.classList.remove('active')); canvas.focus();
 }
@@ -3009,7 +3009,7 @@ function formatItem(item: ItemInstance): string {
 const ITEM_STAT_LABELS = {
   atkMin: 'Мин. физ. атака', atkMax: 'Макс. физ. атака', matk: 'Магическая атака',
   def: 'Физическая защита', mdef: 'Магическая защита', hp: 'Макс. HP', mp: 'Макс. MP',
-  crit: 'Критический шанс', accuracy: 'Точность', evasion: 'Уклонение', speed: 'Скорость, м/с',
+  crit: 'Критический шанс', accuracy: 'Точность', evasion: 'Уклонение', speed: 'Скорость передвижения',
 } as const;
 type ItemStatKey = keyof typeof ITEM_STAT_LABELS;
 const itemStatKeys = Object.keys(ITEM_STAT_LABELS) as ItemStatKey[];
@@ -3042,14 +3042,11 @@ function inventoryModel(): CharacterInventoryModel {
   const cell = (item: ItemInstance) => ({...itemReference(item), name: itemDef(item).name, icon: itemDef(item).icon,
     kind: itemDef(item).slot ?? itemDef(item).type ?? 'material', quality:SCROLLS[item.id]?.quality});
   const stats = [
-    ['Уровень', String(player.level)], ['Опыт', `${player.xp} / ${xpNeeded(player.level)}`],
-    ['HP', `${Math.ceil(player.hp)} / ${player.maxHp}`], ['MP', `${Math.ceil(player.mp)} / ${player.maxMp}`],
-    ['Сила', s.str], ['Ловкость', s.dex], ['Интеллект', s.int], ['Выносливость', s.vit], ['Дух', s.spi],
-    ['Физ. атака', `${statText(s.atkMin)}–${statText(s.atkMax)}`], ['Маг. атака', statText(s.matk)],
-    ['Физ. защита', statText(s.def)], ['Маг. защита', statText(s.mdef)], ['Крит. шанс', `${statText(s.crit)}%`],
-    ['Точность', statText(s.accuracy)], ['Уклонение', statText(s.evasion)], ['Скорость, м/с', statText(s.speed)],
-    ['Боссы', state.bossKills],
-  ].map(([label, value]) => ({label: String(label), value: String(value)}));
+    ['level', 'Уровень', player.level], ['xp', 'Опыт', `${player.xp} / ${xpNeeded(player.level)}`],
+    ['hp', 'HP', `${Math.ceil(player.hp)} / ${player.maxHp}`], ['mp', 'MP', `${Math.ceil(player.mp)} / ${player.maxMp}`],
+    ['str', 'Сила', s.str], ['dex', 'Ловкость', s.dex], ['int', 'Интеллект', s.int],
+    ['def', 'Общая защита', s.def], ['mdef', 'Магическая защита', s.mdef],
+  ].map(([key, label, value]) => ({key: String(key), label: String(label), value: String(value)}));
   return {name: player.name, className: CLASSES_MAP[player.classId].name, level: player.level, stats,
     equipment: Object.fromEntries(EQUIPMENT_SLOTS.map(slot => [slot, player.equipment[slot] ? cell(player.equipment[slot]!) : null])),
     bag: player.inventory.map(cell), gold: player.gold, capacity: INVENTORY_CAPACITY,
@@ -3073,9 +3070,19 @@ function inventoryTooltip(ref: InventoryItemRef): InventoryTooltip | null {
   const definition = itemDef(item);
   const breakdown = itemStatBreakdown(definition, item.plus);
   const slot = selectedReplacementSlot(item);
-  const rows = itemStatKeys.filter(key => breakdown.total[key] !== 0).map(key => ({key, label: ITEM_STAT_LABELS[key],
-    value: `${statText(breakdown.total[key])}${key === 'crit' ? '%' : ''}`,
-    detail: breakdown.bonus[key] ? `База ${statText(breakdown.base[key])} + заточка ${statText(breakdown.bonus[key])} = ${statText(breakdown.total[key])}` : undefined}));
+  const itemRows = (stats: ReturnType<typeof itemStatBreakdown>): InventoryTooltip['rows'] => {
+    const damage = itemDamageSummary(stats.base, stats.total);
+    const rows: InventoryTooltip['rows'] = stats.total.atkMax ? [{key:'damage',label:'Урон',
+      value:`${damage.base} + ${damage.bonus} (${damage.min}–${damage.max})`,
+      detail:`База + заточка; точный диапазон: ${stats.base.atkMin} + ${stats.bonus.atkMin} … ${stats.base.atkMax} + ${stats.bonus.atkMax}`}] : [];
+    for (const key of itemStatKeys) {
+      if (key === 'atkMin' || key === 'atkMax' || stats.total[key] === 0) continue;
+      rows.push({key,label:ITEM_STAT_LABELS[key],value:`${stats.total[key]}${['crit','speed'].includes(key)?'%':''}`,
+        detail:stats.bonus[key] ? `База ${stats.base[key]} + заточка ${stats.bonus[key]} = ${stats.total[key]}` : undefined});
+    }
+    return rows;
+  };
+  const rows = itemRows(breakdown);
   const comparisons: NonNullable<InventoryTooltip['comparisons']> = [];
   if (ref.location === 'bag' && definition.slot && slot) {
     const possible = compatibleEquipmentSlots(definition.slot);
@@ -3084,18 +3091,14 @@ function inventoryTooltip(ref: InventoryItemRef): InventoryTooltip | null {
       // A read-only preview is allowed after death, but it cannot execute the command.
       const change = equipInventoryItem({...player, dead: false}, ref, itemDef, comparedSlot);
       if (!change.ok) continue;
-      const after = calculateEquipmentStats(player.classId, CLASSES_MAP[player.classId].stats, player.level, change.equipment, itemDef);
-      const beforeValues = {...player.stats, hp: player.maxHp, mp: player.maxMp};
-      const afterValues = {...after.stats, hp: after.maxHp, mp: after.maxMp};
       const current = player.equipment[comparedSlot];
       const equippedStats = current ? itemStatBreakdown(itemDef(current), current.plus) : undefined;
-      const equippedRows = equippedStats ? itemStatKeys.filter(key => equippedStats.total[key] !== 0).map(key => ({
-        label: ITEM_STAT_LABELS[key], value: `${statText(equippedStats.total[key])}${key === 'crit' ? '%' : ''}`,
-        detail: equippedStats.bonus[key] ? `База ${statText(equippedStats.base[key])} + заточка ${statText(equippedStats.bonus[key])}` : undefined,
-      })) : [];
-      const deltas = itemStatKeys.filter(key => Math.abs(afterValues[key] - beforeValues[key]) > 1e-8)
-        .map(key => ({key, label: ITEM_STAT_LABELS[key], value: `${statText(beforeValues[key])} → ${statText(afterValues[key])}`,
-          delta: afterValues[key] - beforeValues[key]}));
+      const equippedRows = equippedStats ? itemRows(equippedStats) : [];
+      // Show only the properties of these two items; system character attack,
+      // accuracy and cadence remain absent from the player-facing panel.
+      const deltas = itemStatKeys.map(key => ({key, delta: breakdown.total[key] - (equippedStats?.total[key] ?? 0)}))
+        .filter(row => row.delta !== 0).map(({key,delta}) => ({key,label:ITEM_STAT_LABELS[key],
+          value:`${delta > 0 ? '+' : ''}${delta}${['crit','speed'].includes(key)?'%':''}`,delta}));
       comparisons.push({title: `${SLOT_NAMES_MAP[comparedSlot]}: ${current ? `${itemDef(current).name}${current.plus ? ` +${current.plus}` : ''}` : 'пусто'}`,
         selected: comparedSlot === slot, equippedRows, rows: deltas.length ? deltas : [{label: 'Характеристики', value: 'Без изменений'}]});
     }
@@ -3600,6 +3603,7 @@ if (__QA_BUILD__) {
   };
   const setupCombat = (options: {distance?: number; secondDistance?: number; hp?: number; clusterView?: boolean} = {}) => {
     resetPlayerControl(true); inputControl.reset(); closeWindow(); closeConfirm();
+    qaAttackRoll = () => .5;
     // Settle and dispose the previous scenario's transient effects through their
     // own cleanup path. No gameplay meshes or materials are silently abandoned.
     for (let pass = 0; pass < 12 && state.effects.length; pass++) {
@@ -3738,7 +3742,54 @@ if (__QA_BUILD__) {
       for (const slot of EQUIPMENT_SLOTS) if (player.equipment[slot]?.uid === id) delete player.equipment[slot];
       recalculate(); inventoryPanel?.refresh(); saveGame();
     },
+    combinedPickScene: () => {
+      const result = setupCombat({distance:3,secondDistance:5});
+      const near = state.entities.find(e => e.uid === result.targetIds[0])!;
+      const blocked = state.entities.find(e => e.uid === result.targetIds[1])!;
+      const hero = playerEntity();
+      player.x = hero.x = 3; player.z = hero.z = -28;
+      hero.previousX = hero.x; hero.previousZ = hero.z; syncEntityTransform(hero);
+      moveCombatTarget(near.uid,1,-25.4); moveCombatTarget(blocked.uid,3,-20.5);
+      cameraControl.snap({x:player.x,y:terrain.supportAt(player.x,player.z),z:player.z});
+      cameraControl.update(1,{x:player.x,y:terrain.supportAt(player.x,player.z),z:player.z});
+      actorVisibilityCooldown=0;sectorVisibilityCooldown=0;updateActorVisibility(1);updateWorldSectorVisibility(1);presentActors(1);
+      camera.getViewMatrix(true);scene.updateTransformMatrix(true);
+      const project = (e:Entity) => {
+        const p=Vector3.Project(entityWorldPosition(e,e.targetHeight*.55),Matrix.Identity(),scene.getTransformMatrix(),
+          camera.viewport.toGlobal(engine.getRenderWidth(),engine.getRenderHeight()));
+        return {x:p.x*canvas.clientWidth/engine.getRenderWidth(),y:p.y*canvas.clientHeight/engine.getRenderHeight()};
+      };
+      const visible = (hit: {pickedPoint:Vector3|null}) => Boolean(hit.pickedPoint && collisionWorld.hasLineOfSight(camera.globalPosition,hit.pickedPoint,.01));
+      const center=project(near), filter=(mesh:AbstractMesh)=>mesh.metadata?.entity === near && mesh !== near.pickVolume;
+      pickVisibleActor(scene,camera,center.x,center.y,filter); // Prepare its real current skin once.
+      let nearPoint:{uid:string;x:number;y:number}|undefined;
+      for(let direction=0;direction<12 && !nearPoint;direction++) {
+        const angle=direction*Math.PI/6;let touched=false;
+        for(let radius=0;radius<110;radius+=3) {
+          const x=center.x+Math.cos(angle)*radius,y=center.y+Math.sin(angle)*radius;
+          const exact=scene.pick(x,y,filter,false,camera);
+          if(exact.hit && visible(exact)) {touched=true;continue;}
+          if(!touched)continue;
+          const forgiving=pickVisibleActor(scene,camera,x,y,filter,{radius:14,visible});
+          if(forgiving && x>80 && x<canvas.clientWidth-80 && y>110 && y<canvas.clientHeight-150)nearPoint={uid:near.uid,x,y};
+          break;
+        }
+      }
+      const hiddenCenter=project(blocked);
+      const hiddenFilter=(mesh:AbstractMesh)=>mesh.metadata?.entity===blocked && mesh!==blocked.pickVolume;
+      const hiddenPick=pickVisibleActor(scene,camera,hiddenCenter.x,hiddenCenter.y,hiddenFilter,{radius:14});
+      if(!nearPoint || !hiddenPick || visible(hiddenPick)
+        || pickVisibleActor(scene,camera,hiddenCenter.x,hiddenCenter.y,hiddenFilter,{radius:14,visible}))
+        throw new Error('Real silhouette/wall fixture unavailable');
+      return {near:nearPoint,blocked:{uid:blocked.uid,...hiddenCenter},tolerance:14,exactNearHit:false,wallOccluded:true};
+    },
     combatSetup: setupCombat,
+    combatHitRoll: (value: number | null) => {
+      if (value !== null && (!Number.isFinite(value) || value < 0 || value >= 1)) throw new RangeError('Invalid combat roll');
+      qaAttackRoll = value === null ? undefined : () => value;
+    },
+    combinedItemAudit: () => ({items: Object.entries(ITEMS_MAP).filter(([,definition]) => definition.slot)
+      .flatMap(([id,definition]) => Array.from({length:16},(_,plus) => ({id,plus,...itemStatBreakdown(definition,plus)})))}),
     combatCluster: (count = 5) => {
       const first = setupCombat({distance: 6, hp:10000, clusterView:true});
       const primary = state.entities.find(e => e.uid === first.targetIds[0])!;
@@ -3820,6 +3871,28 @@ if (__QA_BUILD__) {
       } : undefined;
     },
     motionTrace: () => motionTrace,
+    combinedCastleView: (name: 'approach' | 'courtyard' | 'smith' = 'approach') => {
+      closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset(); state.qaFrozen = true;
+      const view = GREENFALL_REFERENCE_VIEWS[name === 'approach' ? 'gate' : name === 'courtyard' ? 'square' : 'smith'];
+      const point = collisionWorld.findNearestFree(view, .46);
+      player.x = point.x; player.z = point.z; player.dead = false;
+      const hero = playerEntity(); hero.x = hero.previousX = point.x; hero.z = hero.previousZ = point.z;
+      syncEntityTransform(hero); hero.root!.rotation.y = 0;
+      cameraControl.configure({mouseSensitivity: 1, zoomSensitivity: 1, smoothing: 1, invertY: false});
+      const old = cameraControl.state;
+      cameraControl.orbit({x: (old.yaw - view.alpha) / .0048, y: (old.pitch - view.beta) / .0038});
+      cameraControl.zoom((view.radius - old.distance) / .0065);
+      cameraControl.snap({x: point.x, y: terrain.supportAt(point.x, point.z), z: point.z});
+      state.worldTime = 12; sectorVisibilityCooldown = 0; actorVisibilityCooldown = 0;
+      updateWorldSectorVisibility(1); updateActorVisibility(1); presentActors(1); updateHud();
+      simulationClock.reset(); skipFrameDelta = true;
+      const path = findNavigationPath(collisionWorld, {x: -7, z: -29}, {x: -7, z: -15}, {actorRadius: .46});
+      return {view: name, parts: greenfallFortLayout(-7, -5).length,
+        gateBlocked: collisionWorld.isBlocked({x: -7, z: -22.2}, .46), gatePath: path.length === 1,
+        smithBlocked: collisionWorld.isBlocked({x: -17.2, z: -12.6}, .46),
+        npcs: state.entities.filter(e => e.kind === 'npc').map(e => ({role: e.role, x: e.x, z: e.z,
+          blocked: collisionWorld.isBlocked(e, .42)}))};
+    },
     surface: (x: number, z: number) => ({ ground: terrain.heightAt(x, z), support: terrain.supportAt(x, z), blocked: collisionWorld.isBlocked({ x, z }, 0.46) }),
     world: () => ({ fortParts: scene.transformNodes.filter(node => node.name.startsWith('fort-part-') && !node.name.endsWith('-content')).length,
       groundTriangles: ground.getTotalIndices() / 3, roads: terrain.roads.length,

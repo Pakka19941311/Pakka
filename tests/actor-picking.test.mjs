@@ -72,3 +72,19 @@ test('hidden and disabled actor geometry cannot intercept a visible actor', () =
     assert.equal(pickVisibleActor(f.scene, f.camera, 400, 300, () => true)?.pickedMesh?.name, visible.name);
   } finally { f.dispose(); }
 });
+
+test('click tolerance catches a silhouette edge but preserves exact priority and wall rejection', () => {
+  const f = fixture();
+  try {
+    const actor = MeshBuilder.CreatePlane('live', {size:2,sideOrientation:Mesh.DOUBLESIDE},f.scene);
+    const edge = f.screen(new Vector3(1,0,0));
+    assert.equal(pickVisibleActor(f.scene,f.camera,edge.x+7,edge.y,()=>true),null);
+    assert.equal(pickVisibleActor(f.scene,f.camera,edge.x+7,edge.y,()=>true,{radius:14})?.pickedMesh,actor);
+    assert.equal(pickVisibleActor(f.scene,f.camera,edge.x+20,edge.y,()=>true,{radius:14}),null);
+    assert.equal(pickVisibleActor(f.scene,f.camera,edge.x+7,edge.y,()=>true,{radius:14,visible:()=>false}),null);
+    const direct = MeshBuilder.CreatePlane('direct',{size:.08,sideOrientation:Mesh.DOUBLESIDE},f.scene);
+    direct.position = new Vector3(1.1,0,0);
+    const point=f.screen(direct.position);
+    assert.equal(pickVisibleActor(f.scene,f.camera,point.x,point.y,()=>true,{radius:14})?.pickedMesh,direct);
+  } finally {f.dispose();}
+});

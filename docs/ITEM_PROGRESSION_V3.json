@@ -1,0 +1,2674 @@
+{
+  "version": 3,
+  "note": "Exact item contributions; every value is an integer. speed and crit are percentage points. Character hidden scaling is not included. Enhancement probabilities and drops are unchanged.",
+  "curves": {
+    "weaponMin": [
+      0,
+      1,
+      2,
+      4,
+      6,
+      8,
+      10,
+      13,
+      14,
+      15,
+      18,
+      22,
+      27,
+      33,
+      40,
+      48
+    ],
+    "weaponMax": [
+      0,
+      1,
+      2,
+      4,
+      8,
+      12,
+      18,
+      25,
+      35,
+      47,
+      61,
+      77,
+      95,
+      115,
+      137,
+      161
+    ],
+    "weaponAccuracy": [
+      0,
+      0,
+      1,
+      2,
+      3,
+      5,
+      7,
+      9,
+      11,
+      13,
+      16,
+      19,
+      22,
+      26,
+      30,
+      35
+    ],
+    "defense": [
+      0,
+      1,
+      2,
+      3,
+      5,
+      7,
+      10,
+      14,
+      19,
+      25,
+      32,
+      40,
+      49,
+      59,
+      70,
+      82
+    ],
+    "accessoryAttack": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      7,
+      9,
+      12,
+      15,
+      19,
+      23,
+      28,
+      34,
+      41,
+      49
+    ],
+    "vitalPercent": [
+      0,
+      3,
+      6,
+      9,
+      13,
+      17,
+      22,
+      27,
+      33,
+      39,
+      46,
+      54,
+      63,
+      73,
+      84,
+      96
+    ],
+    "secondary": [
+      0,
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      3,
+      3,
+      4,
+      4,
+      5,
+      5,
+      6,
+      6,
+      7
+    ]
+  },
+  "items": [
+    {
+      "id": "wardens_blade",
+      "name": "Меч северного дозора",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "atkMin": 12,
+            "atkMax": 18,
+            "accuracy": 1
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "atkMin": 13,
+            "atkMax": 19,
+            "accuracy": 1
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "atkMin": 14,
+            "atkMax": 20,
+            "accuracy": 2
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "atkMin": 16,
+            "atkMax": 22,
+            "accuracy": 3
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "atkMin": 18,
+            "atkMax": 26,
+            "accuracy": 4
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "atkMin": 20,
+            "atkMax": 30,
+            "accuracy": 6
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "atkMin": 22,
+            "atkMax": 36,
+            "accuracy": 8
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "atkMin": 25,
+            "atkMax": 43,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "atkMin": 26,
+            "atkMax": 53,
+            "accuracy": 12
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "atkMin": 27,
+            "atkMax": 65,
+            "accuracy": 14
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "atkMin": 30,
+            "atkMax": 79,
+            "accuracy": 17
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "atkMin": 34,
+            "atkMax": 95,
+            "accuracy": 20
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "atkMin": 39,
+            "atkMax": 113,
+            "accuracy": 23
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "atkMin": 45,
+            "atkMax": 133,
+            "accuracy": 27
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "atkMin": 52,
+            "atkMax": 155,
+            "accuracy": 31
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "atkMin": 60,
+            "atkMax": 179,
+            "accuracy": 36
+          }
+        }
+      ]
+    },
+    {
+      "id": "ember_staff",
+      "name": "Посох тлеющего камня",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "matk": 22,
+            "accuracy": 1
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "matk": 23,
+            "accuracy": 1
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "matk": 24,
+            "accuracy": 2
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "matk": 26,
+            "accuracy": 3
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "matk": 29,
+            "accuracy": 4
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "matk": 32,
+            "accuracy": 6
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "matk": 36,
+            "accuracy": 8
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "matk": 41,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "matk": 47,
+            "accuracy": 12
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "matk": 53,
+            "accuracy": 14
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "matk": 62,
+            "accuracy": 17
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "matk": 72,
+            "accuracy": 20
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "matk": 83,
+            "accuracy": 23
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "matk": 96,
+            "accuracy": 27
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "matk": 111,
+            "accuracy": 31
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "matk": 127,
+            "accuracy": 36
+          }
+        }
+      ]
+    },
+    {
+      "id": "bone_fangs",
+      "name": "Парные костяные клинки",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "atkMin": 10,
+            "atkMax": 16,
+            "crit": 5,
+            "accuracy": 2
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "atkMin": 11,
+            "atkMax": 17,
+            "crit": 5,
+            "accuracy": 2
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "atkMin": 12,
+            "atkMax": 18,
+            "crit": 5,
+            "accuracy": 3
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "atkMin": 14,
+            "atkMax": 20,
+            "crit": 6,
+            "accuracy": 4
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "atkMin": 16,
+            "atkMax": 24,
+            "crit": 6,
+            "accuracy": 5
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "atkMin": 18,
+            "atkMax": 28,
+            "crit": 7,
+            "accuracy": 7
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "atkMin": 20,
+            "atkMax": 34,
+            "crit": 7,
+            "accuracy": 9
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "atkMin": 23,
+            "atkMax": 41,
+            "crit": 8,
+            "accuracy": 11
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "atkMin": 24,
+            "atkMax": 51,
+            "crit": 8,
+            "accuracy": 13
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "atkMin": 25,
+            "atkMax": 63,
+            "crit": 9,
+            "accuracy": 15
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "atkMin": 28,
+            "atkMax": 77,
+            "crit": 9,
+            "accuracy": 18
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "atkMin": 32,
+            "atkMax": 93,
+            "crit": 10,
+            "accuracy": 21
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "atkMin": 37,
+            "atkMax": 111,
+            "crit": 10,
+            "accuracy": 24
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "atkMin": 43,
+            "atkMax": 131,
+            "crit": 11,
+            "accuracy": 28
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "atkMin": 50,
+            "atkMax": 153,
+            "crit": 11,
+            "accuracy": 32
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "atkMin": 58,
+            "atkMax": 177,
+            "crit": 12,
+            "accuracy": 37
+          }
+        }
+      ]
+    },
+    {
+      "id": "blackwood_bow",
+      "name": "Лук Чёрного леса",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "atkMin": 11,
+            "atkMax": 18,
+            "accuracy": 7
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "atkMin": 12,
+            "atkMax": 19,
+            "accuracy": 7
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "atkMin": 13,
+            "atkMax": 20,
+            "accuracy": 8
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "atkMin": 15,
+            "atkMax": 22,
+            "accuracy": 9
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "atkMin": 17,
+            "atkMax": 26,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "atkMin": 19,
+            "atkMax": 30,
+            "accuracy": 12
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "atkMin": 21,
+            "atkMax": 36,
+            "accuracy": 14
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "atkMin": 24,
+            "atkMax": 43,
+            "accuracy": 16
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "atkMin": 25,
+            "atkMax": 53,
+            "accuracy": 18
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "atkMin": 26,
+            "atkMax": 65,
+            "accuracy": 20
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "atkMin": 29,
+            "atkMax": 79,
+            "accuracy": 23
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "atkMin": 33,
+            "atkMax": 95,
+            "accuracy": 26
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "atkMin": 38,
+            "atkMax": 113,
+            "accuracy": 29
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "atkMin": 44,
+            "atkMax": 133,
+            "accuracy": 33
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "atkMin": 51,
+            "atkMax": 155,
+            "accuracy": 37
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "atkMin": 59,
+            "atkMax": 179,
+            "accuracy": 42
+          }
+        }
+      ]
+    },
+    {
+      "id": "mourn_grimoire",
+      "name": "Гримуар Последнего вздоха",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "matk": 24,
+            "accuracy": 2
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "matk": 25,
+            "accuracy": 2
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "matk": 26,
+            "accuracy": 3
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "matk": 28,
+            "accuracy": 4
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "matk": 31,
+            "accuracy": 5
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "matk": 34,
+            "accuracy": 7
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "matk": 38,
+            "accuracy": 9
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "matk": 43,
+            "accuracy": 11
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "matk": 49,
+            "accuracy": 13
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "matk": 55,
+            "accuracy": 15
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "matk": 64,
+            "accuracy": 18
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "matk": 74,
+            "accuracy": 21
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "matk": 85,
+            "accuracy": 24
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "matk": 98,
+            "accuracy": 28
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "matk": 113,
+            "accuracy": 32
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "matk": 129,
+            "accuracy": 37
+          }
+        }
+      ]
+    },
+    {
+      "id": "militia_plate",
+      "name": "Латы пограничной стражи",
+      "slot": "chest",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 14,
+            "hp": 45
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 15,
+            "hp": 46
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 16,
+            "hp": 48
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 17,
+            "hp": 49
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 19,
+            "hp": 51
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 21,
+            "hp": 53
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 24,
+            "hp": 55
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 28,
+            "hp": 57
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 33,
+            "hp": 60
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 39,
+            "hp": 63
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 46,
+            "hp": 66
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 54,
+            "hp": 69
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 63,
+            "hp": 73
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 73,
+            "hp": 78
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 84,
+            "hp": 83
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 96,
+            "hp": 88
+          }
+        }
+      ]
+    },
+    {
+      "id": "oracle_robe",
+      "name": "Мантия пепельного оракула",
+      "slot": "chest",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "mdef": 16,
+            "mp": 60
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "mdef": 17,
+            "mp": 62
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "mdef": 18,
+            "mp": 64
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "mdef": 19,
+            "mp": 65
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "mdef": 21,
+            "mp": 68
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "mdef": 23,
+            "mp": 70
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "mdef": 26,
+            "mp": 73
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "mdef": 30,
+            "mp": 76
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "mdef": 35,
+            "mp": 80
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "mdef": 41,
+            "mp": 83
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "mdef": 48,
+            "mp": 88
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "mdef": 56,
+            "mp": 92
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "mdef": 65,
+            "mp": 98
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "mdef": 75,
+            "mp": 104
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "mdef": 86,
+            "mp": 110
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "mdef": 98,
+            "mp": 118
+          }
+        }
+      ]
+    },
+    {
+      "id": "night_leather",
+      "name": "Теневой панцирь",
+      "slot": "chest",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 10,
+            "evasion": 5
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 11,
+            "evasion": 5
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 12,
+            "evasion": 5
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 13,
+            "evasion": 6
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 15,
+            "evasion": 6
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 17,
+            "evasion": 7
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 20,
+            "evasion": 7
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 24,
+            "evasion": 8
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 29,
+            "evasion": 8
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 35,
+            "evasion": 9
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 42,
+            "evasion": 9
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 50,
+            "evasion": 10
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 59,
+            "evasion": 10
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 69,
+            "evasion": 11
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 80,
+            "evasion": 11
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 92,
+            "evasion": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "tracker_coat",
+      "name": "Куртка чёрного следопыта",
+      "slot": "chest",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 11,
+            "accuracy": 5
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 12,
+            "accuracy": 5
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 13,
+            "accuracy": 5
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 14,
+            "accuracy": 6
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 16,
+            "accuracy": 6
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 18,
+            "accuracy": 7
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 21,
+            "accuracy": 7
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 25,
+            "accuracy": 8
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 30,
+            "accuracy": 8
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 36,
+            "accuracy": 9
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 43,
+            "accuracy": 9
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 51,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 60,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 70,
+            "accuracy": 11
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 81,
+            "accuracy": 11
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 93,
+            "accuracy": 12
+          }
+        }
+      ]
+    },
+    {
+      "id": "bone_raiment",
+      "name": "Облачение костяного хора",
+      "slot": "chest",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "mdef": 15,
+            "mp": 45
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "mdef": 16,
+            "mp": 46
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "mdef": 17,
+            "mp": 48
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "mdef": 18,
+            "mp": 49
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "mdef": 20,
+            "mp": 51
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "mdef": 22,
+            "mp": 53
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "mdef": 25,
+            "mp": 55
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "mdef": 29,
+            "mp": 57
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "mdef": 34,
+            "mp": 60
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "mdef": 40,
+            "mp": 63
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "mdef": 47,
+            "mp": 66
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "mdef": 55,
+            "mp": 69
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "mdef": 64,
+            "mp": 73
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "mdef": 74,
+            "mp": 78
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "mdef": 85,
+            "mp": 83
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "mdef": 97,
+            "mp": 88
+          }
+        }
+      ]
+    },
+    {
+      "id": "wolf_gloves",
+      "name": "Перчатки Серой стаи",
+      "slot": "gloves",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 5,
+            "crit": 3
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 6,
+            "crit": 3
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 7,
+            "crit": 3
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 8,
+            "crit": 4
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 10,
+            "crit": 4
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 12,
+            "crit": 5
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 15,
+            "crit": 5
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 19,
+            "crit": 6
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 24,
+            "crit": 6
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 30,
+            "crit": 7
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 37,
+            "crit": 7
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 45,
+            "crit": 8
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 54,
+            "crit": 8
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 64,
+            "crit": 9
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 75,
+            "crit": 9
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 87,
+            "crit": 10
+          }
+        }
+      ]
+    },
+    {
+      "id": "grave_boots",
+      "name": "Сапоги могильщика",
+      "slot": "boots",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 5,
+            "speed": 8
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 6,
+            "speed": 8
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 7,
+            "speed": 8
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 8,
+            "speed": 9
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 10,
+            "speed": 9
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 12,
+            "speed": 10
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 15,
+            "speed": 10
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 19,
+            "speed": 11
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 24,
+            "speed": 11
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 30,
+            "speed": 12
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 37,
+            "speed": 12
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 45,
+            "speed": 13
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 54,
+            "speed": 13
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 64,
+            "speed": 14
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 75,
+            "speed": 14
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 87,
+            "speed": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "fallen_helm",
+      "name": "Шлем павшего командира",
+      "slot": "head",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 13,
+            "hp": 70
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 14,
+            "hp": 72
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 15,
+            "hp": 74
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 16,
+            "hp": 76
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 18,
+            "hp": 79
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 20,
+            "hp": 82
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 23,
+            "hp": 85
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 27,
+            "hp": 89
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 32,
+            "hp": 93
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 38,
+            "hp": 97
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 45,
+            "hp": 102
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 53,
+            "hp": 108
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 62,
+            "hp": 114
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 72,
+            "hp": 121
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 83,
+            "hp": 129
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 95,
+            "hp": 137
+          }
+        }
+      ]
+    },
+    {
+      "id": "ember_ring",
+      "name": "Кольцо тлеющего угля",
+      "slot": "ring",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "matk": 8,
+            "crit": 3
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "matk": 9,
+            "crit": 3
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "matk": 10,
+            "crit": 3
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "matk": 11,
+            "crit": 4
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "matk": 12,
+            "crit": 4
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "matk": 13,
+            "crit": 5
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "matk": 15,
+            "crit": 5
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "matk": 17,
+            "crit": 6
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "matk": 20,
+            "crit": 6
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "matk": 23,
+            "crit": 7
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "matk": 27,
+            "crit": 7
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "matk": 31,
+            "crit": 8
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "matk": 36,
+            "crit": 8
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "matk": 42,
+            "crit": 9
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "matk": 49,
+            "crit": 9
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "matk": 57,
+            "crit": 10
+          }
+        }
+      ]
+    },
+    {
+      "id": "fang_necklace",
+      "name": "Ожерелье волчьих клыков",
+      "slot": "neck",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "atkMin": 4,
+            "atkMax": 6
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "atkMin": 5,
+            "atkMax": 7
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "atkMin": 6,
+            "atkMax": 8
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "atkMin": 7,
+            "atkMax": 9
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "atkMin": 8,
+            "atkMax": 10
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "atkMin": 9,
+            "atkMax": 11
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "atkMin": 11,
+            "atkMax": 13
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "atkMin": 13,
+            "atkMax": 15
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "atkMin": 16,
+            "atkMax": 18
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "atkMin": 19,
+            "atkMax": 21
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "atkMin": 23,
+            "atkMax": 25
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "atkMin": 27,
+            "atkMax": 29
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "atkMin": 32,
+            "atkMax": 34
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "atkMin": 38,
+            "atkMax": 40
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "atkMin": 45,
+            "atkMax": 47
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "atkMin": 53,
+            "atkMax": 55
+          }
+        }
+      ]
+    },
+    {
+      "id": "ash_belt",
+      "name": "Пояс Пепельной клятвы",
+      "slot": "belt",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 7,
+            "hp": 35
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 8,
+            "hp": 36
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 9,
+            "hp": 37
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 10,
+            "hp": 38
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 12,
+            "hp": 40
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 14,
+            "hp": 41
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 17,
+            "hp": 43
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 21,
+            "hp": 44
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 26,
+            "hp": 47
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 32,
+            "hp": 49
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 39,
+            "hp": 51
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 47,
+            "hp": 54
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 56,
+            "hp": 57
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 66,
+            "hp": 61
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 77,
+            "hp": 64
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 89,
+            "hp": 69
+          }
+        }
+      ]
+    },
+    {
+      "id": "executioner",
+      "name": "Клинок Палача",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "atkMin": 31,
+            "atkMax": 44,
+            "crit": 6,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "atkMin": 32,
+            "atkMax": 45,
+            "crit": 6,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "atkMin": 33,
+            "atkMax": 46,
+            "crit": 6,
+            "accuracy": 11
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "atkMin": 35,
+            "atkMax": 48,
+            "crit": 7,
+            "accuracy": 12
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "atkMin": 37,
+            "atkMax": 52,
+            "crit": 7,
+            "accuracy": 13
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "atkMin": 39,
+            "atkMax": 56,
+            "crit": 8,
+            "accuracy": 15
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "atkMin": 41,
+            "atkMax": 62,
+            "crit": 8,
+            "accuracy": 17
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "atkMin": 44,
+            "atkMax": 69,
+            "crit": 9,
+            "accuracy": 19
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "atkMin": 45,
+            "atkMax": 79,
+            "crit": 9,
+            "accuracy": 21
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "atkMin": 46,
+            "atkMax": 91,
+            "crit": 10,
+            "accuracy": 23
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "atkMin": 49,
+            "atkMax": 105,
+            "crit": 10,
+            "accuracy": 26
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "atkMin": 53,
+            "atkMax": 121,
+            "crit": 11,
+            "accuracy": 29
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "atkMin": 58,
+            "atkMax": 139,
+            "crit": 11,
+            "accuracy": 32
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "atkMin": 64,
+            "atkMax": 159,
+            "crit": 12,
+            "accuracy": 36
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "atkMin": 71,
+            "atkMax": 181,
+            "crit": 12,
+            "accuracy": 40
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "atkMin": 79,
+            "atkMax": 205,
+            "crit": 13,
+            "accuracy": 45
+          }
+        }
+      ]
+    },
+    {
+      "id": "rotten_root",
+      "name": "Посох Гнилого Корня",
+      "slot": "weapon",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "matk": 54,
+            "mp": 90,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "matk": 55,
+            "mp": 93,
+            "accuracy": 10
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "matk": 56,
+            "mp": 95,
+            "accuracy": 11
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "matk": 58,
+            "mp": 98,
+            "accuracy": 12
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "matk": 61,
+            "mp": 102,
+            "accuracy": 13
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "matk": 64,
+            "mp": 105,
+            "accuracy": 15
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "matk": 68,
+            "mp": 110,
+            "accuracy": 17
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "matk": 73,
+            "mp": 114,
+            "accuracy": 19
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "matk": 79,
+            "mp": 120,
+            "accuracy": 21
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "matk": 85,
+            "mp": 125,
+            "accuracy": 23
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "matk": 94,
+            "mp": 131,
+            "accuracy": 26
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "matk": 104,
+            "mp": 139,
+            "accuracy": 29
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "matk": 115,
+            "mp": 147,
+            "accuracy": 32
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "matk": 128,
+            "mp": 156,
+            "accuracy": 36
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "matk": 143,
+            "mp": 166,
+            "accuracy": 40
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "matk": 159,
+            "mp": 176,
+            "accuracy": 45
+          }
+        }
+      ]
+    },
+    {
+      "id": "dead_king_plate",
+      "name": "Панцирь Мёртвого Короля",
+      "slot": "chest",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "def": 31,
+            "mdef": 18,
+            "hp": 120
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "def": 32,
+            "mdef": 19,
+            "hp": 124
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "def": 33,
+            "mdef": 20,
+            "hp": 127
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "def": 34,
+            "mdef": 21,
+            "hp": 131
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "def": 36,
+            "mdef": 23,
+            "hp": 136
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "def": 38,
+            "mdef": 25,
+            "hp": 140
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "def": 41,
+            "mdef": 28,
+            "hp": 146
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "def": 45,
+            "mdef": 32,
+            "hp": 152
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "def": 50,
+            "mdef": 37,
+            "hp": 160
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "def": 56,
+            "mdef": 43,
+            "hp": 167
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "def": 63,
+            "mdef": 50,
+            "hp": 175
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "def": 71,
+            "mdef": 58,
+            "hp": 185
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "def": 80,
+            "mdef": 67,
+            "hp": 196
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "def": 90,
+            "mdef": 77,
+            "hp": 208
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "def": 101,
+            "mdef": 88,
+            "hp": 221
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "def": 113,
+            "mdef": 100,
+            "hp": 235
+          }
+        }
+      ]
+    },
+    {
+      "id": "sovereign_seal",
+      "name": "Печать древнего владыки",
+      "slot": "neck",
+      "levels": [
+        {
+          "plus": 0,
+          "stats": {
+            "atkMin": 8,
+            "atkMax": 11,
+            "matk": 13,
+            "hp": 60
+          }
+        },
+        {
+          "plus": 1,
+          "stats": {
+            "atkMin": 9,
+            "atkMax": 12,
+            "matk": 14,
+            "hp": 62
+          }
+        },
+        {
+          "plus": 2,
+          "stats": {
+            "atkMin": 10,
+            "atkMax": 13,
+            "matk": 15,
+            "hp": 64
+          }
+        },
+        {
+          "plus": 3,
+          "stats": {
+            "atkMin": 11,
+            "atkMax": 14,
+            "matk": 16,
+            "hp": 65
+          }
+        },
+        {
+          "plus": 4,
+          "stats": {
+            "atkMin": 12,
+            "atkMax": 15,
+            "matk": 17,
+            "hp": 68
+          }
+        },
+        {
+          "plus": 5,
+          "stats": {
+            "atkMin": 13,
+            "atkMax": 16,
+            "matk": 18,
+            "hp": 70
+          }
+        },
+        {
+          "plus": 6,
+          "stats": {
+            "atkMin": 15,
+            "atkMax": 18,
+            "matk": 20,
+            "hp": 73
+          }
+        },
+        {
+          "plus": 7,
+          "stats": {
+            "atkMin": 17,
+            "atkMax": 20,
+            "matk": 22,
+            "hp": 76
+          }
+        },
+        {
+          "plus": 8,
+          "stats": {
+            "atkMin": 20,
+            "atkMax": 23,
+            "matk": 25,
+            "hp": 80
+          }
+        },
+        {
+          "plus": 9,
+          "stats": {
+            "atkMin": 23,
+            "atkMax": 26,
+            "matk": 28,
+            "hp": 83
+          }
+        },
+        {
+          "plus": 10,
+          "stats": {
+            "atkMin": 27,
+            "atkMax": 30,
+            "matk": 32,
+            "hp": 88
+          }
+        },
+        {
+          "plus": 11,
+          "stats": {
+            "atkMin": 31,
+            "atkMax": 34,
+            "matk": 36,
+            "hp": 92
+          }
+        },
+        {
+          "plus": 12,
+          "stats": {
+            "atkMin": 36,
+            "atkMax": 39,
+            "matk": 41,
+            "hp": 98
+          }
+        },
+        {
+          "plus": 13,
+          "stats": {
+            "atkMin": 42,
+            "atkMax": 45,
+            "matk": 47,
+            "hp": 104
+          }
+        },
+        {
+          "plus": 14,
+          "stats": {
+            "atkMin": 49,
+            "atkMax": 52,
+            "matk": 54,
+            "hp": 110
+          }
+        },
+        {
+          "plus": 15,
+          "stats": {
+            "atkMin": 57,
+            "atkMax": 60,
+            "matk": 62,
+            "hp": 118
+          }
+        }
+      ]
+    }
+  ]
+}

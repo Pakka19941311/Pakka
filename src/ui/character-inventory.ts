@@ -289,7 +289,7 @@ export function createCharacterInventory(host: HTMLElement, options: CharacterIn
           }
           comparisonPanel.append(equippedRows);
         }
-        comparisonPanel.append(node('div', 'ci-comparison-summary', 'Характеристики героя после замены'));
+        comparisonPanel.append(node('div', 'ci-comparison-summary', 'Разница характеристик предметов'));
         appendRows(comparisonPanel, comparison.rows);
         tooltip.append(comparisonPanel);
       }

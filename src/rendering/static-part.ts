@@ -2,7 +2,8 @@ import { AssetContainer, TransformNode, Vector3 } from '@babylonjs/core';
 
 /** Keep the selected glTF descendant and its coordinate-conversion parent.
  * glTF's root is __root__, not the exported Blender object name. */
-export function createStaticPart(container: AssetContainer, partName: string, name: string, height: number) {
+export function createStaticPart(container: AssetContainer, partName: string, name: string, height: number,
+  footprint: Readonly<{ width?: number; depth?: number }> = {}) {
   const entries = container.instantiateModelsToScene(source => `${name}-${source}`, false, { doNotInstantiate: true });
   const root = new TransformNode(name, container.scene);
   const content = new TransformNode(`${name}-content`, container.scene);
@@ -24,11 +25,21 @@ export function createStaticPart(container: AssetContainer, partName: string, na
   entries.animationGroups.forEach(group => group.dispose());
   content.computeWorldMatrix(true);
   retained.forEach(mesh => mesh.computeWorldMatrix(true));
-  const bounds = content.getHierarchyBoundingVectors(true);
+  let bounds = content.getHierarchyBoundingVectors(true);
+  // These CC0 modules are exported along Z. The layout/collision contract uses
+  // X for the wall span and Z for its thickness, including the gate's opening.
+  if (/wall_thin_(straight|gate)/.test(partName) && bounds.max.z - bounds.min.z > bounds.max.x - bounds.min.x) {
+    content.rotation.y = Math.PI / 2;
+    content.computeWorldMatrix(true);
+    retained.forEach(mesh => mesh.computeWorldMatrix(true));
+    bounds = content.getHierarchyBoundingVectors(true);
+  }
   const scale = height / Math.max(0.001, bounds.max.y - bounds.min.y);
   // Offset the exported grid placement BEFORE applying the world rotation.
   content.scaling.setAll(scale);
   content.position.set(-(bounds.min.x + bounds.max.x) * scale / 2, -bounds.min.y * scale, -(bounds.min.z + bounds.max.z) * scale / 2);
   const size = bounds.max.subtract(bounds.min).scale(scale);
+  if (footprint.width !== undefined) { root.scaling.x = footprint.width / size.x; size.x = footprint.width; }
+  if (footprint.depth !== undefined) { root.scaling.z = footprint.depth / size.z; size.z = footprint.depth; }
   return { root, size: new Vector3(size.x, size.y, size.z), meshes: retained };
 }
