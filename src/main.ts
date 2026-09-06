@@ -1119,6 +1119,14 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   const instance = instantiateContainer(container, `realism-${name}-${uid()}`);
   instance.root.position.set(x, 0, z);
   normalizeHeight(instance.root, height);
+  if (name === 'dead_tree_trunk') {
+    // A fallen trunk is sized by its length. Sizing this horizontal source by
+    // height alone produced logs tens of metres long across the forest.
+    const sourceBounds = instance.root.getHierarchyBoundingVectors(true);
+    const factor = Math.min(1, height * 2 / Math.max(sourceBounds.max.x - sourceBounds.min.x, sourceBounds.max.z - sourceBounds.min.z));
+    instance.root.scaling.scaleInPlace(factor);
+    instance.root.position.y *= factor;
+  }
   instance.root.computeWorldMatrix(true);
   instance.root.getChildMeshes().forEach(mesh => mesh.computeWorldMatrix(true));
   const bounds = instance.root.getHierarchyBoundingVectors(true);
@@ -1131,9 +1139,10 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   assignWorldSector(instance.root, x, z);
   tintMeshes(instance.root);
   instance.root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
-  const bottom = terrain.heightAt(cx, cz), top = bottom + height;
+  const bottom = terrain.heightAt(cx, cz), top = bottom + bounds.max.y - bounds.min.y;
   if (name === 'Barrel_01') collisionWorld.addCircle(cx, cz, Math.max(halfX, halfZ), bottom, top);
-  else if (name === 'dead_tree_trunk' || name === 'tree_stump_01') collisionWorld.addCircle(cx, cz, Math.max(0.25, Math.min(halfX, halfZ) * 0.65), bottom, top);
+  else if (name === 'dead_tree_trunk') collisionWorld.addBox(cx, cz, halfX * .85, halfZ * .85, rotation, bottom, top);
+  else if (name === 'tree_stump_01') collisionWorld.addCircle(cx, cz, Math.max(0.25, Math.min(halfX, halfZ) * 0.65), bottom, top);
   else collisionWorld.addBox(cx, cz, halfX, halfZ, rotation, bottom, top);
   return instance.root;
 }
@@ -1170,10 +1179,20 @@ function approvedEnvironmentModel(name:EnvironmentModel,variant:number,x:number,
   const root=environmentAssets.place(name,variant,x,terrain.heightAt(x,z),z,height,rotation,mesh=>shadowCasters.add(mesh));
   assignWorldSector(root,x,z);
   if(solid){
+    if(name==='coastal_cliff_04')root.rotation.y=0;
     root.computeWorldMatrix(true);root.getChildMeshes().forEach(mesh=>mesh.computeWorldMatrix(true));
     const bounds=root.getHierarchyBoundingVectors(true);
-    collisionWorld.addCircle((bounds.min.x+bounds.max.x)*.5,(bounds.min.z+bounds.max.z)*.5,
-      Math.max(bounds.max.x-bounds.min.x,bounds.max.z-bounds.min.z)*.43,bounds.min.y,bounds.max.y);
+    if(name==='coastal_cliff_04'){
+      // Long cliffs need a rotated footprint, not a huge circular exclusion
+      // zone covering empty land in front of the rock face.
+      const dx=(bounds.min.x+bounds.max.x)*.5-x,dz=(bounds.min.z+bounds.max.z)*.5-z;
+      collisionWorld.addBox(x+dx*Math.cos(rotation)+dz*Math.sin(rotation),
+        z-dx*Math.sin(rotation)+dz*Math.cos(rotation),
+        (bounds.max.x-bounds.min.x)*.5,(bounds.max.z-bounds.min.z)*.5,rotation,bounds.min.y,bounds.max.y);
+      root.rotation.y=rotation;
+      root.computeWorldMatrix(true);root.getChildMeshes().forEach(mesh=>mesh.computeWorldMatrix(true));
+    }else collisionWorld.addCircle((bounds.min.x+bounds.max.x)*.5,(bounds.min.z+bounds.max.z)*.5,
+        Math.max(bounds.max.x-bounds.min.x,bounds.max.z-bounds.min.z)*.43,bounds.min.y,bounds.max.y);
   }
   return root;
 }
@@ -4181,7 +4200,7 @@ if (__QA_BUILD__) {
         courtyard: GREENFALL_REFERENCE_VIEWS.square,
         capital: {x:-108,z:-102,alpha:-Math.PI/2+.25,beta:1.0,radius:19},
         forest: {x:57,z:38.2,alpha:2.2,beta:1.16,radius:9.6},
-        rocks: {x:-140,z:53,alpha:.4,beta:1.05,radius:14},
+        rocks: {x:-92,z:-2,alpha:-.78,beta:1.25,radius:14},
         knight: {x:player.x,z:player.z,alpha:-Math.PI/2+.45,beta:.85,radius:10},
         wolf: {x:player.x,z:player.z,alpha:-Math.PI/2-.26,beta:1.15,radius:6.3},
       };
@@ -4212,7 +4231,8 @@ if (__QA_BUILD__) {
           ready:meshes.length>0 && meshes.every(m=>m.isReady(true)),visible:meshes.some(m=>m.isEnabled()),
           animations:entity.animations.length,height:top-bottom,groundGap:bottom-terrain.supportAt(entity.x,entity.z)};
       });
-      return {view,assetsReady:assetsLoaded,gateBlocked:collisionWorld.isBlocked({x:-7,z:-22.2},.46),actors:described,
+      return {view,assetsReady:assetsLoaded,position:point,positionBlocked:collisionWorld.isBlocked(point,.46),
+        cameraRadius:camera.radius,gateBlocked:collisionWorld.isBlocked({x:-7,z:-22.2},.46),actors:described,
         reference:{groundRepeatMetres:[320/REFERENCE_SURFACES.groundRepeats,280/REFERENCE_SURFACES.groundRepeats],
           coniferTemplates:pineGeometry?.length??0,coniferLodDistance:CONIFER_LOD_DISTANCE,
           coniferInstances:scene.meshes.filter(m=>/^pine-\d+-trunk$/.test(m.name)).length,

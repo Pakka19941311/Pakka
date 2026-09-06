@@ -6,7 +6,7 @@ Source geometry stays outside the repository. Source URLs and SHA-256 receipts
 are retained in docs/assets/world-source-manifest.json before delivery.
 """
 from pathlib import Path
-import copy, hashlib, json, struct, sys
+import copy, hashlib, json, struct, subprocess, sys
 import numpy as np
 from scipy.spatial import cKDTree
 from PIL import Image
@@ -108,3 +108,6 @@ for name in ['forest_ground_04','brown_mud','mud_forest','roots','brown_mud_03']
     packed.save(dest/'normal-roughness.png',optimize=True)
 sky='kloppenheim_05_puresky';(OUTPUT/f'{sky}_1k.hdr').write_bytes((SOURCE/sky/f'{sky}_1k.hdr').read_bytes())
 (OUTPUT/'prepared-assets.json').write_text(json.dumps(REPORT,indent=2)+'\n')
+# Needle islands cannot survive the global solid-mesh simplifier. The final
+# pine derivative keeps source twig positions and the source's own sprig atlas.
+subprocess.run([sys.executable, str(ROOT/'scripts/pine-foliage.py'), str(SOURCE)], check=True)

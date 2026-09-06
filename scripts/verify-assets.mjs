@@ -103,7 +103,18 @@ for (const entry of preparedWorld) {
   const bytes=await readFile(filename);
   assert.equal(bytes.readUInt32LE(8),bytes.length,`${entry.path}: truncated GLB`);
   assert.equal(bytes.length,entry.bytes,`${entry.path}: changed prepared file`);
-  await verifyExternalUris(parseGlbDocument(bytes,entry.path),filename);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),entry.sha256,`${entry.path}: prepared resource differs`);
+  const document=parseGlbDocument(bytes,entry.path);
+  if(entry.path.includes('/pine_tree_01/')){
+    const twig=document.materials.findIndex(m=>m.name==='pine_tree_01_twig');
+    const crown=document.meshes[0].primitives.find(p=>p.material===twig);
+    assert.ok(entry.foliage?.sourceStems>=500,`${entry.path}: source twig coverage missing`);
+    assert.equal(document.accessors[crown.indices].count,entry.foliage.sourceStems*entry.foliage.planesPerStem*6,
+      `${entry.path}: foliage islands were lost during preparation`);
+    assert.equal(document.materials[twig].alphaMode,'MASK');
+    for(const image of document.images)if(image.uri.endsWith('.png'))assert.equal(image.mimeType,'image/png');
+  }
+  await verifyExternalUris(document,filename);
 }
 for(const name of ['forest_ground_04','brown_mud','mud_forest','roots','brown_mud_03']) {
   for(const map of ['diff.jpg','normal-roughness.png'])assert.ok((await stat(path.join(publicAssetsRoot,'world',name,map))).size>1000);

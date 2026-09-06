@@ -8,6 +8,7 @@ import { restoreWorldTopology } from '../src/world/world-topology.ts';
 const directory=path.resolve(process.argv[2]??'dist-qa');
 const castle=process.argv.includes('--castle');
 const topology=process.argv.includes('--topology');
+const review=process.argv.includes('--review');
 const report={block:topology?'part1-world-topology':castle?'part1-castle-checkpoint':'part1-environment-checkpoint',sha:process.env.GITHUB_SHA??'local',passed:false,checks:[],errors:[],
   limitation:'Technical software WebGL images of the changed environment. Full Part 1, client/server integration, remaining houses and hardware FPS are not accepted by this report.'};
 await mkdir('qa-artifacts',{recursive:true});
@@ -60,18 +61,26 @@ try{
     console.log('PASS canonical world topology',report.checks.at(-1));
     await second.close();
   }
-  for(const view of topology?[]:castle?['gate','courtyard','capital']:['gate','forest','rocks']){
-    await page.evaluate(value=>window.__VARENDOR_FIXTURE__.visualReferenceView(value),view);
+  for(const view of topology?[]:review?['gate','courtyard','capital','forest','rocks']:castle?['gate','courtyard','capital']:['gate','forest','rocks']){
+    const reference=await page.evaluate(value=>window.__VARENDOR_FIXTURE__.visualReferenceView(value),view);
     await page.waitForFunction(()=>{const w=window.__VARENDOR_QA__.worldEnvironment();return w.groundReady&&w.skyReady;});
     await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
     const state=await page.evaluate(()=>window.__VARENDOR_QA__.worldEnvironment());
+    if(review){
+      assert.equal(reference.positionBlocked,false,`${view}: screenshot starts inside an obstacle`);
+      assert.ok(reference.cameraRadius>3,`${view}: camera is pressed into geometry`);
+      assert.ok(reference.actors.every(actor=>Math.abs(actor.groundGap)<.2),`${view}: actor lost ground contact`);
+      assert.ok(Math.abs(reference.position.x)<160&&Math.abs(reference.position.z)<140,`${view}: outside the playable terrain`);
+      if(view==='forest')assert.ok(state.inView.pine_tree_01>0,'Forest image must contain the approved trees');
+      if(view==='rocks')assert.ok(state.inView.coastal_cliff_04>0,'Rock image must contain an approved cliff');
+    }
     if(castle){assert.equal(state.castle.templates,12);assert.ok(state.castle.instances>=30);assert.ok(state.castle.visible>0);}
     else{assert.equal(state.templates,30);assert.ok(state.instances>200);assert.ok(state.visible>0);}
     assert.equal(state.groundMaterial,'approved-forest-ground');
-    await page.screenshot({path:`qa-artifacts/part1-${castle?'castle':'nature'}-${view}.png`});
-    report.checks.push({view,...state});
+    await page.screenshot({path:`qa-artifacts/part1-${review?'review':castle?'castle':'nature'}-${view}.png`});
+    report.checks.push({view,...state,reference});
     console.log(castle?'PASS castle view':'PASS nature view',view,state);
   }
   assert.deepEqual(report.errors,[]);report.passed=true;
 }catch(error){report.errors.push(error.stack??String(error));throw error;}
-finally{await browser.close();await new Promise(resolve=>server.close(resolve));await writeFile('qa-artifacts/part1-environment.json',JSON.stringify(report,null,2)+'\n');}
+finally{await browser.close();await new Promise(resolve=>server.close(resolve));await writeFile(`qa-artifacts/part1-${topology?'topology':review?'visual-review':'environment'}.json`,JSON.stringify(report,null,2)+'\n');}

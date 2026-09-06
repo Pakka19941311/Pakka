@@ -1,0 +1,47 @@
+name: Part 1 environment visual review
+
+on:
+  push:
+    branches: [work/v06-commercial-rebuild]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  environment:
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[environment-review]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VARENDOR_BETA: '1'
+      BROWSER_EXECUTABLE: /usr/bin/google-chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+      - name: Check only changed environment, collision and map contracts
+        run: |
+          npm ci
+          node --experimental-strip-types --test tests/terrain-support.test.mjs tests/collision-world.test.mjs tests/castle-passage.test.mjs tests/world-topology.test.mjs
+          npm run build
+      - name: Capture actual environment and rebuild the changed server map
+        env:
+          VARENDOR_QA: '1'
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
+          npx vite build --outDir dist-qa
+          node --experimental-strip-types scripts/world-environment-regression.mjs dist-qa --review
+          node --experimental-strip-types scripts/world-environment-regression.mjs dist-qa --topology
+      - name: Preserve images, reports and the generated map
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: part1-environment-review
+          path: |
+            qa-artifacts
+            public/assets/world/prepared-assets.json
+            public/assets/world/world-topology.json
+          retention-days: 30

@@ -8,7 +8,7 @@ export type EnvironmentModel = keyof typeof ENVIRONMENT_MODELS;
  * source-space normalization, so changing distance does not move their feet. */
 export class EnvironmentAssets {
   private readonly assets=new Map<string,AssetContainer>();
-  private readonly instances: Array<{root:TransformNode;near:TransformNode;far:TransformNode;x:number;z:number;low:boolean;plant:boolean}>=[];
+  private readonly instances: Array<{name:EnvironmentModel;root:TransformNode;near:TransformNode;far:TransformNode;x:number;z:number;low:boolean;plant:boolean}>=[];
   private readonly scene: Scene;
   constructor(scene:Scene){this.scene=scene;}
   async load(progress:(name:string)=>void):Promise<void>{
@@ -39,7 +39,7 @@ export class EnvironmentAssets {
     root.scaling.setAll(scale);root.rotation.y=rotation;
     root.position.set(x,y-bounds.min.y*scale,z);
     far.setEnabled(false);
-    this.instances.push({root,near,far,x,z,low:false,plant:name==='fern_02'||name==='shrub_04'});
+    this.instances.push({name,root,near,far,x,z,low:false,plant:name==='fern_02'||name==='shrub_04'});
     return root;
   }
   update(x:number,z:number,lowQuality:boolean):void{
@@ -52,6 +52,8 @@ export class EnvironmentAssets {
     }
   }
   describe(){return {templates:this.assets.size,instances:this.instances.length,
+    inView:Object.fromEntries(Object.keys(ENVIRONMENT_MODELS).map(name=>[name,this.instances.filter(i=>i.name===name&&i.root.isEnabled()
+      &&(i.low?i.far:i.near).getChildMeshes().some(m=>m.isVisible&&m.isInFrustum(this.scene.frustumPlanes))).length])),
     visible:this.instances.filter(i=>i.root.isEnabled()).length,
     lodNear:this.instances.filter(i=>!i.low&&i.root.isEnabled()).length,
     lodFar:this.instances.filter(i=>i.low&&i.root.isEnabled()).length};}
