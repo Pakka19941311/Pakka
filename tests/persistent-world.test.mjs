@@ -85,3 +85,14 @@ test('no client can submit its own damage or buy scrolls',t=>{
   assert.equal(w.command(p.id,'forged-scroll-1',{type:'buy',itemId:'weapon_scroll'}).ok,false);
   assert.equal(w.state.characters[p.id].gold,320);
 });
+
+test('server retains the existing aggro radius and committed return-to-home behavior',t=>{
+  const f=setup(t);const w=f.world;const p=w.createCharacter('Дозор','knight');
+  const m=w.state.monsters.find(m=>m.id==='wolf');w.state.monsters=[m];
+  p.x=m.home.x+11;p.z=m.home.z;w.heartbeat(p.id);const hp=p.hp;
+  w.advance(2000);assert.equal(p.hp,hp);assert.ok(!w.events.some(e=>e.kind==='attack'));
+  m.x=m.home.x+15;m.z=m.home.z;p.x=m.x+1;p.z=m.z;
+  w.advance(2600);const firstDistance=Math.hypot(m.x-m.home.x,m.z-m.home.z);
+  w.advance(3200);assert.ok(Math.hypot(m.x-m.home.x,m.z-m.home.z)<firstDistance);
+  assert.equal(p.hp,hp,'returning monster must not reacquire before reaching home');
+});

@@ -3541,7 +3541,9 @@ function combatSnapshot() {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-visual-reference-g',
+    version: '0.6.0-world-part1-checkpoint',
+    worldEnvironment: () => ({...environmentAssets.describe(),groundReady:ground.isReady(true),
+      groundMaterial:groundMaterial.name,skyReady:environment.isReady()}),
     actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, renderWidth: engine.getRenderWidth(), renderHeight: engine.getRenderHeight(), meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
@@ -3860,7 +3862,7 @@ if (__QA_BUILD__) {
       } : undefined;
     },
     motionTrace: () => motionTrace,
-    visualReferenceView: async (view: 'gate' | 'courtyard' | 'forest' | 'knight' | 'wolf') => {
+    visualReferenceView: async (view: 'gate' | 'courtyard' | 'forest' | 'rocks' | 'knight' | 'wolf') => {
       let featuredIds: string[] = [];
       if (view === 'knight' || view === 'wolf') featuredIds = setupCombat({distance:4,hp:10000,clusterView:true}).targetIds;
       closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset(); state.qaFrozen=true;
@@ -3869,6 +3871,7 @@ if (__QA_BUILD__) {
         gate: GREENFALL_REFERENCE_VIEWS.gate,
         courtyard: GREENFALL_REFERENCE_VIEWS.square,
         forest: {x:57,z:38.2,alpha:2.2,beta:1.16,radius:9.6},
+        rocks: {x:-140,z:53,alpha:.4,beta:1.05,radius:14},
         knight: {x:player.x,z:player.z,alpha:-Math.PI/2+.45,beta:.85,radius:10},
         wolf: {x:player.x,z:player.z,alpha:-Math.PI/2-.26,beta:1.15,radius:6.3},
       };

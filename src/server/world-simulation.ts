@@ -12,6 +12,7 @@ import { CollisionWorld } from '../world/collision-world.ts';
 import { SPAWN_REGIONS, spawnPointInRegion, patrolRouteInRegion } from '../world/spawn-regions.ts';
 import { findNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
+import { MonsterAiBrain } from '../world/monster-ai.ts';
 import { WORLD_PROTOCOL, DISCONNECT_GRACE_MS } from '../network/world-protocol.ts';
 import type { WorldCharacter, WorldMonster, WorldSummon, WorldCommand, WorldIntent, WorldEvent, WorldSnapshot, CommandReceipt, Position } from '../network/world-protocol.ts';
 
@@ -54,6 +55,7 @@ export class WorldSimulation {
   private readonly terrain = new TerrainSurface();
   private lastCheckpoint: number;
   private paths = new Map<string, { goal: Position; points: Position[]; expiresAt: number }>();
+  private brains = new Map<string,MonsterAiBrain>();
 
   constructor(options: {store: SimulationStore; collision: CollisionWorld; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
     this.store = options.store; this.collision = options.collision;
@@ -249,6 +251,7 @@ export class WorldSimulation {
   private expireDeadlines(): void {
     for(const m of this.state.monsters) if(!m.alive&&m.respawnAt<=this.state.time){
       Object.assign(m,{...m.home,hp:monsterDef(m).hp,alive:true,phase:1,generation:m.generation+1,status:{slow:0,stun:0,dot:0,nextDot:0},owner:undefined});
+      this.brains.delete(m.uid);
       this.event('respawn',m.uid);
     }
     this.state.summons=this.state.summons.filter(s=>s.expiresAt>this.state.time);
@@ -307,18 +310,27 @@ export class WorldSimulation {
     const candidates=Object.values(this.state.characters).filter(p=>!p.dead&&p.activeUntil>this.state.time&&!safe(p)&&p.buffs.vanish<=this.state.time);
     const target=candidates.sort((a,b)=>distance(m,a)-distance(m,b))[0];
     const speed=monsterMovementSpeed(boss)*(m.status.slow>this.state.time?.5:1)*dt;
-    if(distance(m,m.home)>(region?.leashRadius??14)||(!target&&distance(m,m.home)>1.2)){
-      this.walk(m,m.home,speed*.9,radius,m.uid);if(distance(m,m.home)<1.2)m.hp=def.hp;return;
+    let brain=this.brains.get(m.uid);
+    if(!brain){brain=new MonsterAiBrain(m.home.x*.173+m.home.z*.127+m.patrolIndex*1.91);this.brains.set(m.uid,brain);}
+    const points=region&&!region.boss?patrolRouteInRegion(region,m.home,m.patrolIndex):[];
+    const point=points[(m.patrolStep??0)%Math.max(1,points.length)];
+    const previous=brain.state;
+    const decision=brain.update({dt,alive:true,playerSafe:false,targetAvailable:Boolean(target),
+      playerDistance:target?distance(m,target):1000,homeDistance:distance(m,m.home),
+      atPatrolPoint:!point||distance(m,point)<.3,aggroRadius:region?.aggroRadius??9,
+      leashRadius:region?.leashRadius??14,attackRange:this.monsterRange(m)});
+    if(previous==='patrol'&&decision.state==='idle')m.patrolStep=(m.patrolStep??0)+1;
+    if(decision.intent==='return'){
+      this.walk(m,m.home,speed*.9,radius,m.uid);if(distance(m,m.home)<.55)m.hp=def.hp;return;
     }
-    if(target&&distance(m,target)<(region?.aggroRadius??9)*1.55){
-      if(distance(m,target)>this.monsterRange(m)||!this.lineOfSight(m,target))this.walk(m,target,speed,radius,m.uid);
+    if(target&&(decision.intent==='chase'||decision.intent==='attack')){
+      if(decision.intent==='chase'||!this.lineOfSight(m,target))this.walk(m,target,speed,radius,m.uid);
       else if(m.attackReadyAt<=this.state.time){
         m.attackReadyAt=this.state.time+(boss?1450:2050);
         this.state.pending.push({actor:m.uid,target:target.id,generation:target.generation,hitAt:this.state.time+380,skill:null,monster:true});
         this.event('attack',m.uid,target.id);
       }
-    }else if(region&&!region.boss){
-      const points=patrolRouteInRegion(region,m.home,m.patrolIndex);const point=points[Math.floor(this.state.time/6500+m.patrolIndex)%points.length];
+    }else if(decision.intent==='patrol'&&point){
       if(distance(m,point)>.3)this.walk(m,point,speed*.46,radius,m.uid);
     }
   }

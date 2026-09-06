@@ -15,7 +15,7 @@ export type WorldCharacter = Position & {
   generation: number;
 };
 export type WorldMonster = Position & {
-  uid: string; id: string; home: Position; regionId?: string; patrolIndex: number;
+  uid: string; id: string; home: Position; regionId?: string; patrolIndex: number; patrolStep?:number;
   hp: number; alive: boolean; respawnAt: number; attackReadyAt: number; generation: number;
   phase: number; status: { slow: number; stun: number; dot: number; nextDot: number; dotOwner?: string };
   owner?: string;

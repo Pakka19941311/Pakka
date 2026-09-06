@@ -40,6 +40,13 @@ jobs:
           fi
       - name: Build checkpoint and verify local asset references
         run: npm run build
+      - name: Render only the changed environment in project CI
+        env:
+          BROWSER_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
+          VARENDOR_QA=1 npx vite build --outDir dist-qa
+          node scripts/world-environment-regression.mjs dist-qa
       - name: Preserve generated game assets in the working branch
         run: |
           git add public/assets/world

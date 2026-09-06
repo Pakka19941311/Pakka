@@ -51,4 +51,8 @@ export class EnvironmentAssets {
       if(instance.plant)instance.root.setEnabled(distance<(lowQuality?36:60));
     }
   }
+  describe(){return {templates:this.assets.size,instances:this.instances.length,
+    visible:this.instances.filter(i=>i.root.isEnabled()).length,
+    lodNear:this.instances.filter(i=>!i.low&&i.root.isEnabled()).length,
+    lodFar:this.instances.filter(i=>i.low&&i.root.isEnabled()).length};}
 }
