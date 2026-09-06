@@ -1,0 +1,394 @@
+{
+  "block": "part1-environment-checkpoint",
+  "sha": "305edd4b3eb02252a77322dfec776bc67b104ad4",
+  "passed": true,
+  "checks": [
+    {
+      "view": "gate",
+      "templates": 30,
+      "instances": 382,
+      "inView": {
+        "pine_tree_01": 8,
+        "fern_02": 0,
+        "shrub_04": 0,
+        "rock_moss_set_01": 2,
+        "coastal_cliff_04": 2
+      },
+      "visible": 254,
+      "lodNear": 10,
+      "lodFar": 244,
+      "groundReady": true,
+      "groundMaterial": "approved-forest-ground",
+      "skyReady": true,
+      "castle": {
+        "templates": 12,
+        "instances": 30,
+        "visible": 30
+      },
+      "reference": {
+        "view": "gate",
+        "assetsReady": true,
+        "position": {
+          "x": -7,
+          "z": -29.5,
+          "alpha": -1.5707963267948966,
+          "beta": 1.05,
+          "radius": 14
+        },
+        "positionBlocked": false,
+        "cameraRadius": 14,
+        "gateBlocked": false,
+        "actors": [
+          {
+            "id": "player",
+            "uid": "2475712f-511f-469f-bb9a-ed73b4d9176c",
+            "kind": "player",
+            "model": "Warrior",
+            "ready": true,
+            "visible": true,
+            "animations": 13,
+            "height": 2.0499999379939178,
+            "groundGap": 1.3898711986870538e-8
+          }
+        ],
+        "reference": {
+          "groundRepeatMetres": [
+            4,
+            3.5
+          ],
+          "coniferTemplates": 0,
+          "coniferLodDistance": 38,
+          "coniferInstances": 0,
+          "fireQuads": 18,
+          "activeFireMaterials": [
+            {
+              "name": "smithy-fire-living-fire-material",
+              "ready": true
+            },
+            {
+              "name": "greenfall-fire-living-fire-material",
+              "ready": true
+            }
+          ],
+          "actorSources": {
+            "Warrior": "Knight_Reference.gltf",
+            "Fox": "Grey_Wolf_Reference.gltf"
+          },
+          "renderWidth": 1280,
+          "renderHeight": 720,
+          "adaptiveScale": 1
+        }
+      }
+    },
+    {
+      "view": "courtyard",
+      "templates": 30,
+      "instances": 382,
+      "inView": {
+        "pine_tree_01": 0,
+        "fern_02": 0,
+        "shrub_04": 0,
+        "rock_moss_set_01": 0,
+        "coastal_cliff_04": 2
+      },
+      "visible": 256,
+      "lodNear": 8,
+      "lodFar": 248,
+      "groundReady": true,
+      "groundMaterial": "approved-forest-ground",
+      "skyReady": true,
+      "castle": {
+        "templates": 12,
+        "instances": 30,
+        "visible": 30
+      },
+      "reference": {
+        "view": "courtyard",
+        "assetsReady": true,
+        "position": {
+          "x": -7,
+          "z": -13.4,
+          "alpha": -1.5707963267948966,
+          "beta": 0.86,
+          "radius": 17
+        },
+        "positionBlocked": false,
+        "cameraRadius": 17,
+        "gateBlocked": false,
+        "actors": [
+          {
+            "id": "player",
+            "uid": "2475712f-511f-469f-bb9a-ed73b4d9176c",
+            "kind": "player",
+            "model": "Warrior",
+            "ready": true,
+            "visible": true,
+            "animations": 13,
+            "height": 2.049999942006726,
+            "groundGap": 1.2238301427824894e-8
+          }
+        ],
+        "reference": {
+          "groundRepeatMetres": [
+            4,
+            3.5
+          ],
+          "coniferTemplates": 0,
+          "coniferLodDistance": 38,
+          "coniferInstances": 0,
+          "fireQuads": 18,
+          "activeFireMaterials": [
+            {
+              "name": "smithy-fire-living-fire-material",
+              "ready": true
+            },
+            {
+              "name": "greenfall-fire-living-fire-material",
+              "ready": true
+            }
+          ],
+          "actorSources": {
+            "Warrior": "Knight_Reference.gltf",
+            "Fox": "Grey_Wolf_Reference.gltf"
+          },
+          "renderWidth": 1280,
+          "renderHeight": 720,
+          "adaptiveScale": 1
+        }
+      }
+    },
+    {
+      "view": "capital",
+      "templates": 30,
+      "instances": 382,
+      "inView": {
+        "pine_tree_01": 6,
+        "fern_02": 0,
+        "shrub_04": 0,
+        "rock_moss_set_01": 2,
+        "coastal_cliff_04": 0
+      },
+      "visible": 85,
+      "lodNear": 6,
+      "lodFar": 79,
+      "groundReady": true,
+      "groundMaterial": "approved-forest-ground",
+      "skyReady": true,
+      "castle": {
+        "templates": 12,
+        "instances": 30,
+        "visible": 30
+      },
+      "reference": {
+        "view": "capital",
+        "assetsReady": true,
+        "position": {
+          "x": -108,
+          "z": -102,
+          "alpha": -1.3207963267948966,
+          "beta": 1,
+          "radius": 19
+        },
+        "positionBlocked": false,
+        "cameraRadius": 17.999999999999996,
+        "gateBlocked": false,
+        "actors": [
+          {
+            "id": "player",
+            "uid": "2475712f-511f-469f-bb9a-ed73b4d9176c",
+            "kind": "player",
+            "model": "Warrior",
+            "ready": true,
+            "visible": true,
+            "animations": 13,
+            "height": 2.0499999453275475,
+            "groundGap": 8.917480309733605e-9
+          }
+        ],
+        "reference": {
+          "groundRepeatMetres": [
+            4,
+            3.5
+          ],
+          "coniferTemplates": 0,
+          "coniferLodDistance": 38,
+          "coniferInstances": 0,
+          "fireQuads": 18,
+          "activeFireMaterials": [
+            {
+              "name": "smithy-fire-living-fire-material",
+              "ready": true
+            },
+            {
+              "name": "greenfall-fire-living-fire-material",
+              "ready": true
+            }
+          ],
+          "actorSources": {
+            "Warrior": "Knight_Reference.gltf",
+            "Fox": "Grey_Wolf_Reference.gltf"
+          },
+          "renderWidth": 1280,
+          "renderHeight": 720,
+          "adaptiveScale": 1
+        }
+      }
+    },
+    {
+      "view": "forest",
+      "templates": 30,
+      "instances": 382,
+      "inView": {
+        "pine_tree_01": 40,
+        "fern_02": 12,
+        "shrub_04": 7,
+        "rock_moss_set_01": 18,
+        "coastal_cliff_04": 3
+      },
+      "visible": 299,
+      "lodNear": 21,
+      "lodFar": 278,
+      "groundReady": true,
+      "groundMaterial": "approved-forest-ground",
+      "skyReady": true,
+      "castle": {
+        "templates": 12,
+        "instances": 30,
+        "visible": 24
+      },
+      "reference": {
+        "view": "forest",
+        "assetsReady": true,
+        "position": {
+          "x": 57,
+          "z": 38.2,
+          "alpha": 2.2,
+          "beta": 1.16,
+          "radius": 9.6
+        },
+        "positionBlocked": false,
+        "cameraRadius": 9.599999999999998,
+        "gateBlocked": false,
+        "actors": [
+          {
+            "id": "player",
+            "uid": "2475712f-511f-469f-bb9a-ed73b4d9176c",
+            "kind": "player",
+            "model": "Warrior",
+            "ready": true,
+            "visible": true,
+            "animations": 13,
+            "height": 2.0499999493162644,
+            "groundGap": -4.5083258903844126e-8
+          }
+        ],
+        "reference": {
+          "groundRepeatMetres": [
+            4,
+            3.5
+          ],
+          "coniferTemplates": 0,
+          "coniferLodDistance": 38,
+          "coniferInstances": 0,
+          "fireQuads": 18,
+          "activeFireMaterials": [
+            {
+              "name": "smithy-fire-living-fire-material",
+              "ready": true
+            },
+            {
+              "name": "greenfall-fire-living-fire-material",
+              "ready": true
+            }
+          ],
+          "actorSources": {
+            "Warrior": "Knight_Reference.gltf",
+            "Fox": "Grey_Wolf_Reference.gltf"
+          },
+          "renderWidth": 1280,
+          "renderHeight": 720,
+          "adaptiveScale": 1
+        }
+      }
+    },
+    {
+      "view": "rocks",
+      "templates": 30,
+      "instances": 382,
+      "inView": {
+        "pine_tree_01": 8,
+        "fern_02": 0,
+        "shrub_04": 0,
+        "rock_moss_set_01": 9,
+        "coastal_cliff_04": 1
+      },
+      "visible": 164,
+      "lodNear": 10,
+      "lodFar": 154,
+      "groundReady": true,
+      "groundMaterial": "approved-forest-ground",
+      "skyReady": true,
+      "castle": {
+        "templates": 12,
+        "instances": 30,
+        "visible": 30
+      },
+      "reference": {
+        "view": "rocks",
+        "assetsReady": true,
+        "position": {
+          "x": -92,
+          "z": -2,
+          "alpha": -0.78,
+          "beta": 1.25,
+          "radius": 14
+        },
+        "positionBlocked": false,
+        "cameraRadius": 13.999999999999998,
+        "gateBlocked": false,
+        "actors": [
+          {
+            "id": "player",
+            "uid": "2475712f-511f-469f-bb9a-ed73b4d9176c",
+            "kind": "player",
+            "model": "Warrior",
+            "ready": true,
+            "visible": true,
+            "animations": 13,
+            "height": 2.0500000099171554,
+            "groundGap": 1.604210542183182e-9
+          }
+        ],
+        "reference": {
+          "groundRepeatMetres": [
+            4,
+            3.5
+          ],
+          "coniferTemplates": 0,
+          "coniferLodDistance": 38,
+          "coniferInstances": 0,
+          "fireQuads": 18,
+          "activeFireMaterials": [
+            {
+              "name": "smithy-fire-living-fire-material",
+              "ready": true
+            },
+            {
+              "name": "greenfall-fire-living-fire-material",
+              "ready": true
+            }
+          ],
+          "actorSources": {
+            "Warrior": "Knight_Reference.gltf",
+            "Fox": "Grey_Wolf_Reference.gltf"
+          },
+          "renderWidth": 1280,
+          "renderHeight": 720,
+          "adaptiveScale": 1
+        }
+      }
+    }
+  ],
+  "errors": [],
+  "limitation": "Technical software WebGL images of the changed environment. Full Part 1, client/server integration, remaining houses and hardware FPS are not accepted by this report."
+}
