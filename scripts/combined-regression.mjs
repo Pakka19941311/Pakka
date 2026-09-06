@@ -118,7 +118,7 @@ async function productionRun() {
   await closeBag();
 
   // Native key remains physically held across both Tab edges in production.
-  await page.keyboard.down('w');
+  await page.keyboard.down('s');
   try {
     const before = await state();
     await page.waitForFunction(p => {
@@ -139,8 +139,8 @@ async function productionRun() {
       return Math.hypot(s.player.x - p.x, s.player.z - p.z) > .15;
     }, closed.player);
     assert.ok((await state()).simulationSeconds > before.simulationSeconds);
-    check('production held W keeps moving through inventory open and close; world continues');
-  } finally { await page.keyboard.up('w'); }
+    check('production held S along the gate road keeps moving through inventory open and close; world continues');
+  } finally { await page.keyboard.up('s'); }
 
   await page.reload(); await page.locator('#continue').click();
   await page.waitForFunction(() => window.__VARENDOR_QA__?.getState().started, {}, { timeout: 180000 });
