@@ -63,6 +63,14 @@ for (const name of characters) {
   await verifyExternalUris(source, filename);
 }
 
+for (const name of ['Knight_Reference','Grey_Wolf_Reference']) {
+  const filename=path.join(root,'public/assets/models/reference',`${name}.gltf`);
+  const source=JSON.parse(await readFile(filename,'utf8'));
+  assert.equal(source.asset?.version,'2.0');
+  assert.ok(source.meshes?.length && source.skins?.length && source.animations?.length, `${name}: missing live rig`);
+  await verifyExternalUris(source,filename);
+}
+
 for (const name of realism) {
   const filename = path.join(root, 'public/assets/models/realism', name, `${name}_1k.gltf`);
   const source = JSON.parse(await readFile(filename, 'utf8'));
@@ -95,4 +103,4 @@ for (const relative of [
   const filename = path.join(publicAssetsRoot, relative);
   assert.ok((await stat(filename)).size > 4_000, `${relative} is missing or unexpectedly small`);
 }
-console.log(`Verified ${characters.length} characters, ${monsters.length} monsters, ${world.length} world models, ${realism.length} PBR props and ${externalReferences} external asset references.`);
+console.log(`Verified ${characters.length} characters plus 2 rigged G derivatives, ${monsters.length} monsters, ${world.length} world models, ${realism.length} PBR props and ${externalReferences} external asset references.`);

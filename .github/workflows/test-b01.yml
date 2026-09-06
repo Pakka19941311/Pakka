@@ -1,4 +1,4 @@
-name: Combined F focused validation and Windows test build
+name: Visual G focused validation and Windows test build
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   validate:
-    # Profiling-only checkpoints have their own job and must not publish an inventory candidate.
+    # Profiling-only checkpoints have their own job and must not publish a game candidate.
     if: ${{ github.ref == 'refs/heads/work/v06-commercial-rebuild' && !contains(github.event.head_commit.message, '[motion-profile]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -39,19 +39,19 @@ jobs:
             dist
             server.ps1
             packaging/windows/RUN_VARENDOR.bat
-            packaging/windows/README_F_RU.txt
+            packaging/windows/README_G_RU.txt
           retention-days: 14
       - name: Prepare isolated browser regression build
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
           google-chrome --version
-      - name: Combined F production inputs and focused deterministic regression
+      - name: Visual G production load and focused reference rendering
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
-          node scripts/combined-regression.mjs dist production
-          node scripts/combined-regression.mjs dist-qa
+          node scripts/visual-reference-regression.mjs dist production
+          node scripts/visual-reference-regression.mjs dist-qa
       - name: Save screenshots and machine-readable evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -114,13 +114,13 @@ jobs:
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          stage="Varendor_Combined_F_Windows_Test_${short_sha}"
+          stage="Varendor_Visual_G_Windows_Test_${short_sha}"
           node --input-type=module <<'JS'
           import assert from 'node:assert/strict';
           import { readFileSync } from 'node:fs';
           const expected = new Map([
-            ['F-production-combined.json', 'F-production'],
-            ['F-combined.json', 'F'],
+            ['G-production-visual.json', 'G-production'],
+            ['G-visual.json', 'G'],
           ]);
           for (const [file, block] of expected) {
             const report = JSON.parse(readFileSync(`qa-artifacts/${file}`, 'utf8'));
@@ -136,30 +136,32 @@ jobs:
           cp -a production/dist "$stage/dist"
           cp production/server.ps1 "$stage/"
           cp production/packaging/windows/RUN_VARENDOR.bat "$stage/"
-          cp production/packaging/windows/README_F_RU.txt "$stage/README_RU.txt"
-          cp docs/COMBINED_QA.md "$stage/QA_REPORT_RU.md"
+          cp production/packaging/windows/README_G_RU.txt "$stage/README_RU.txt"
+          cp docs/VISUAL_REFERENCE_QA.md "$stage/QA_REPORT_RU.md"
           cp docs/BLOCK_SPEC_V2_RU.md "$stage/TZ_V2_RU.md"
+          cp docs/VISUAL_REFERENCE_G.md "$stage/VISUAL_REFERENCE_G.md"
+          cp public/assets/licenses/ASSET_SOURCES.md "$stage/ASSET_SOURCES.md"
           cp docs/ITEM_PROGRESSION_V3.md docs/ITEM_PROGRESSION_V3.json "$stage/"
           cp docs/ENHANCEMENT_BALANCE_V2.json "$stage/ENHANCEMENT_BALANCE_V2.json"
-          cp qa-artifacts/F-production-combined.json qa-artifacts/F-combined.json "$stage/"
-          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. F production/QA: passed=true, ошибок нет, SHA совпадает. Проверки подобраны по изменениям; прежняя полная матрица B/C/E/A не повторялась. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия объединённого F.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
+          cp qa-artifacts/G-production-visual.json qa-artifacts/G-visual.json "$stage/"
+          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. G production/QA: passed=true, ошибок нет, SHA совпадает. Один новый/продолженный рыцарь, пять видов настоящего окружения, готовность моделей и один реальный контакт атаки. Принятые полные матрицы F/A/B/C/D/E не повторялись. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия визуального G / B02.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
           printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
           zip -q -9 -r "${stage}.zip" "$stage"
           unzip -t "${stage}.zip" | tail -1
           sha256sum "${stage}.zip" > "${stage}.zip.sha256"
           stat -c '%n %s bytes' "${stage}.zip"
           cat "${stage}.zip.sha256"
-          zip -q -r "Combined_F_QA_${short_sha}.zip" qa-artifacts
-          unzip -t "Combined_F_QA_${short_sha}.zip" | tail -1
+          zip -q -r "Visual_G_QA_${short_sha}.zip" qa-artifacts
+          unzip -t "Visual_G_QA_${short_sha}.zip" | tail -1
       - name: Publish immutable prerelease, never merge main
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           short_sha="${GITHUB_SHA:0:8}"
-          tag="v0.6-combined-f-test-${short_sha}"
+          tag="v0.6-visual-g-test-${short_sha}"
           gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
-            --title "Varendor — Combined F Test (${short_sha})" \
-            --notes "Единый блок F и замечания: Tab открывает сумку параллельно движению и бою; целочисленные характеристики вещей +0…+15, точность и редкий MISS; упрощённые характеристики героя; удобнее выбирать монстров; исправлена геометрия замка. Бета-запас +100 каждого из четырёх свитков остаётся разовым, обмена нет. Один целевой production/QA прогон на том же SHA, сборка/ассеты и Windows launcher. Распаковать целиком и запустить RUN_VARENDOR.bat. СТОП до принятия общего результата. main не изменён. Software WebGL не подтверждает аппаратный FPS." \
-            "Varendor_Combined_F_Windows_Test_${short_sha}.zip" "Varendor_Combined_F_Windows_Test_${short_sha}.zip.sha256" \
-            "Combined_F_QA_${short_sha}.zip"
+            --title "Varendor — Visual G / B02 Test (${short_sha})" \
+            --notes "Визуальный эталон G / B02: один рыцарь, волк и участок от ворот Гринфолла до ближайшего леса; пропорции и материалы моделей, земля, деревья, костёр и дневной свет. Полная художественная замена остальных классов и регионов остаётся следующими этапами. Принятые управление, инвентарь и баланс F сохраняются. Один production новый/продолженный герой, пять реальных видов окружения, готовность ригов и один контакт атаки; сборка/ассеты и Windows launcher. Распаковать целиком и запустить RUN_VARENDOR.bat. СТОП до принятия визуального результата. main не изменён. Software WebGL не подтверждает аппаратный FPS." \
+            "Varendor_Visual_G_Windows_Test_${short_sha}.zip" "Varendor_Visual_G_Windows_Test_${short_sha}.zip.sha256" \
+            "Visual_G_QA_${short_sha}.zip"

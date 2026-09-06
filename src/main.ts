@@ -96,6 +96,10 @@ import type { ActorAction } from './rendering/actor-animation';
 import { TerrainSurface } from './world/terrain-surface';
 import { createStaticPart } from './rendering/static-part';
 import { createGabledRoof } from './rendering/gabled-roof';
+import { terrainVertexColors, REFERENCE_SURFACES } from './rendering/reference-surfaces';
+import { createConiferSources, coniferSourceForName, CONIFER_LOD_DISTANCE } from './rendering/conifer-geometry';
+import type { ConiferSources } from './rendering/conifer-geometry';
+import { createLivingFire } from './rendering/living-fire';
 import { greenfallFortLayout, registerFortPartCollider, GREENFALL_REFERENCE_VIEWS } from './world/greenfall-layout';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
@@ -326,6 +330,7 @@ const WORLD_DIR = '/assets/models/world/';
 const CHARACTER_MODELS = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'] as const;
 const MONSTER_MODELS = ['Skeleton', 'Slime', 'Bat', 'Dragon'] as const;
 const EXTRA_MONSTER_MODELS = ['Fox'] as const;
+const REFERENCE_ACTOR_FILES: Readonly<Record<string,string>> = {Warrior:'Knight_Reference.gltf',Fox:'Grey_Wolf_Reference.gltf'};
 const REALISM_MODELS = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'modular_fort_01', 'rock_09', 'tree_stump_01', 'wooden_crate_01'] as const;
 type RealismModel = typeof REALISM_MODELS[number];
 const WORLD_MODELS = [
@@ -512,8 +517,8 @@ scene.skipPointerDownPicking = true;
 scene.skipPointerUpPicking = true;
 scene.clearColor = new Color4(0.055, 0.065, 0.07, 1);
 scene.fogMode = Scene.FOGMODE_EXP2;
-scene.fogColor = new Color3(0.18, 0.22, 0.23);
-scene.fogDensity = 0.008;
+scene.fogColor = new Color3(0.3, 0.35, 0.38);
+scene.fogDensity = REFERENCE_SURFACES.fogDensity;
 scene.ambientColor = new Color3(0.32, 0.34, 0.31);
 scene.imageProcessingConfiguration.exposure = 1;
 scene.imageProcessingConfiguration.contrast = 1.16;
@@ -544,13 +549,13 @@ scene.imageProcessingConfiguration.colorCurves = colorCurves;
 scene.imageProcessingConfiguration.colorCurvesEnabled = true;
 
 const hemi = new HemisphericLight('day-sky', new Vector3(0.18, 1, -0.08), scene);
-hemi.intensity = 0.82;
+hemi.intensity = 0.9;
 hemi.diffuse = new Color3(0.74, 0.8, 0.84);
 hemi.groundColor = new Color3(0.2, 0.18, 0.14);
 const moon = new DirectionalLight('sun', new Vector3(-0.38, -1, 0.24), scene);
 moon.position = new Vector3(24, 42, -18);
-moon.intensity = 2.15;
-moon.diffuse = new Color3(1, 0.82, 0.61);
+moon.intensity = 1.7;
+moon.diffuse = new Color3(1, 0.94, 0.84);
 const shadows = new ShadowGenerator(2048, moon);
 shadows.usePercentageCloserFiltering = true;
 shadows.filteringQuality = ShadowGenerator.QUALITY_LOW;
@@ -573,16 +578,22 @@ let lastRenderStats = { drawCalls: 0, activeMeshes: 0, renderWidth: 0, renderHei
 const glow = new GlowLayer('ashen-glow', scene, { blurKernelSize: 24, mainTextureRatio: 0.25 });
 glow.intensity = 0.35;
 
-const groundMaterial = createPbrSurface(scene, 'forest_ground_06', 18, 0.96);
+const groundMaterial = createPbrSurface(scene, 'forest_ground_06', REFERENCE_SURFACES.groundRepeats, 0.96);
 const ground = new Mesh('ground', scene);
 ground.material = groundMaterial;
 ground.receiveShadows = true;
 ground.metadata = { ground: true };
-const roadMaterial = createPbrSurface(scene, 'cobblestone_floor_001', 120, 0.92);
+const roadMaterial = createPbrSurface(scene, 'cobblestone_floor_001', REFERENCE_SURFACES.roadRepeats, 0.92);
 const castleStoneMaterial = createPbrSurface(scene, 'castle_wall_slates', 2.4, 0.88);
 const medievalWoodMaterial = createPbrSurface(scene, 'medieval_wood', 2.2, 0.86);
 const roofSlateMaterial = createPbrSurface(scene, 'roof_slates_02', 2.8, 0.9);
 const barkMaterial = createPbrSurface(scene, 'pine_bark', 2.6, 0.96);
+const windowGlassMaterial = new PBRMaterial('greenfall-smoked-window-glass', scene);
+windowGlassMaterial.albedoColor = new Color3(.07,.12,.14);
+windowGlassMaterial.metallic = .16; windowGlassMaterial.roughness = .32;
+roofSlateMaterial.albedoColor = new Color3(.61,.68,.72);
+groundMaterial.albedoColor = new Color3(.89,.94,.84);
+
 function road(x: number, z: number, width: number, depth: number, rotation = 0) {
   terrain.addRoad(x, z, width, depth, rotation);
 }
@@ -596,6 +607,7 @@ function finishTerrain(): void {
   const data = new VertexData();
   data.positions = geometry.positions;
   data.uvs = geometry.uvs;
+  data.colors = terrainVertexColors(geometry.positions);
   data.indices = [...geometry.groundIndices, ...geometry.roadIndices];
   data.normals = new Array<number>(data.positions.length).fill(0);
   VertexData.ComputeNormals(data.positions, data.indices, data.normals);
@@ -711,7 +723,7 @@ async function loadAssets(): Promise<void> {
     q('#load-text').textContent = label;
   };
   for (const name of CHARACTER_MODELS) {
-    tasks.push(loadContainer(CHARACTER_DIR, `${name}.gltf`).then((container) => {
+    tasks.push(loadContainer(REFERENCE_ACTOR_FILES[name] ? '/assets/models/reference/' : CHARACTER_DIR, REFERENCE_ACTOR_FILES[name] ?? `${name}.gltf`).then((container) => {
       characterAssets.set(name, container);
       progress(`Вооружаем: ${name}`);
     }));
@@ -723,7 +735,7 @@ async function loadAssets(): Promise<void> {
     }));
   }
   for (const name of EXTRA_MONSTER_MODELS) {
-    tasks.push(loadContainer(MONSTER_DIR, `${name}.glb`).then((container) => {
+    tasks.push(loadContainer(REFERENCE_ACTOR_FILES[name] ? '/assets/models/reference/' : MONSTER_DIR, REFERENCE_ACTOR_FILES[name] ?? `${name}.glb`).then((container) => {
       monsterAssets.set(name, container);
       progress(`Пробуждаем: ${name}`);
     }));
@@ -1056,31 +1068,13 @@ function realismModelPart(partName: string, x: number, z: number, height: number
 }
 
 const foliageMaterial = new PBRMaterial('forest-needle-material', scene);
-foliageMaterial.albedoColor = new Color3(0.055, 0.115, 0.078);
+foliageMaterial.albedoColor = new Color3(0.10, 0.16, 0.085);
 foliageMaterial.roughness = 0.98;
 foliageMaterial.metallic = 0;
-let pineGeometry: { trunk: Mesh; crown: Mesh } | undefined;
+let pineGeometry: readonly ConiferSources[] | undefined;
 function createPineTree(name: string, x: number, z: number, height: number, rotation: number): void {
-  if (!pineGeometry) {
-    const trunk = MeshBuilder.CreateCylinder('pine-source-trunk', { height: 0.62, diameterTop: 0.075, diameterBottom: 0.12, tessellation: 12 }, scene);
-    trunk.bakeTransformIntoVertices(Matrix.Translation(0, 0.31, 0));
-    trunk.material = barkMaterial;
-    const layers: Mesh[] = [];
-    for (let layer = 0; layer < 5; layer += 1) {
-      const crown = MeshBuilder.CreateCylinder(`pine-source-layer-${layer}`, { height: 0.3, diameterTop: 0.02, diameterBottom: 0.48 - layer * 0.055, tessellation: 12 }, scene);
-      crown.position.y = 0.48 + layer * 0.105;
-      crown.rotation.y = layer * 0.53;
-      crown.material = foliageMaterial;
-      layers.push(crown);
-    }
-    const crown = Mesh.MergeMeshes(layers, true, true)!;
-    crown.name = 'pine-source-crown';
-    pineGeometry = { trunk, crown };
-    for (const source of [trunk, crown]) {
-      source.isVisible = false; source.isPickable = false; source.receiveShadows = true;
-    }
-  }
-  for (const [part, source] of Object.entries(pineGeometry)) {
+  pineGeometry ??= createConiferSources(scene, barkMaterial, foliageMaterial);
+  for (const [part, source] of Object.entries(coniferSourceForName(name, pineGeometry))) {
     const mesh = source.createInstance(`${name}-${part}`);
     mesh.position.set(x, terrain.heightAt(x, z), z); mesh.rotation.y = rotation; mesh.scaling.setAll(height);
     mesh.isVisible = true; mesh.isPickable = false;
@@ -1106,7 +1100,7 @@ function townBox(name: string, x: number, y: number, z: number, width: number, h
   const mesh = MeshBuilder.CreateBox(name, { width, height, depth }, scene);
   mesh.position.set(x, y, z);
   mesh.material = /door|sign|beam|awning|plank/i.test(name) ? medievalWoodMaterial
-    : /window|flame/i.test(name) ? townMaterial(color)
+    : /window/i.test(name) ? windowGlassMaterial : /flame/i.test(name) ? townMaterial(color)
       : castleStoneMaterial;
   mesh.receiveShadows = true;
   shadowCasters.add(mesh);
@@ -1140,6 +1134,11 @@ function createBuilding(name: string, x: number, z: number, width: number, depth
   townBox(`${name}-door`, x, 1.05, z - depth * 0.505, 1.1, 2.1, 0.16, 0x4b3526, false);
   townBox(`${name}-window-a`, x - width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
   townBox(`${name}-window-b`, x + width * 0.24, 1.75, z - depth * 0.51, 0.75, 0.8, 0.08, 0xa9d2d0, false);
+  for (const wx of [x - width * .24, x + width * .24]) {
+    townBox(`${name}-window-beam-upright-${wx}`, wx, 1.75, z - depth * .51 - .055, .065, .88, .075, 0x493b2e, false);
+    townBox(`${name}-window-beam-cross-${wx}`, wx, 1.75, z - depth * .51 - .058, .83, .055, .075, 0x493b2e, false);
+    townBox(`${name}-window-beam-sill-${wx}`, wx, 1.31, z - depth * .51, .93, .12, .24, 0x493b2e, false);
+  }
   for (const offset of [-width * 0.43, width * 0.43]) {
     townBox(`${name}-beam-${offset}`, x + offset, height * 0.55, z - depth * 0.525, 0.18, height * 0.88, 0.18, 0x4f3322, false);
   }
@@ -1181,14 +1180,8 @@ function createSmithy(x: number, z: number): void {
   iron.albedoColor = new Color3(0.17, 0.19, 0.21); iron.metallic = 0.8; iron.roughness = 0.6;
   anvil.material = iron;
   townCylinder('smithy-brazier', x - 1.1, 0.5, z - 0.25, 1.15, 0.65, 0x3d3630, 12);
-  const flame = MeshBuilder.CreateCylinder('smithy-brazier-flame', { height: 0.8, diameterTop: 0.08, diameterBottom: 0.72, tessellation: 10 }, scene);
-  flame.position.set(x - 1.1, 1.08, z - 0.25);
-  const flameMaterial = new StandardMaterial('smithy-brazier-flame-material', scene);
-  flameMaterial.emissiveColor = new Color3(1, 0.28, 0.035);
-  flameMaterial.diffuseColor = new Color3(0.9, 0.18, 0.02);
-  flameMaterial.alpha = 0.82;
-  flame.material = flameMaterial;
-  flame.isPickable = false;
+  const smithFire = createLivingFire(scene, 'smithy-fire', {x:x-1.1,y:.76,z:z-.25,scale:.52});
+  for (const mesh of [...smithFire.flames,...smithFire.embers]) assignWorldSector(mesh,x,z);
   const light = new PointLight('smithy-brazier-light', new Vector3(x - 1.1, 1.7, z - 0.25), scene);
   light.diffuse = new Color3(1, 0.42, 0.12);
   light.intensity = 1.15;
@@ -1217,26 +1210,8 @@ function createBonfire(x: number, z: number): void {
   worldModel('planks', x, z, 0.72, -Math.PI / 4, 0x704027);
   collisionWorld.addCircle(x, z, 1.15, terrain.heightAt(x,z), terrain.heightAt(x,z) + 0.8);
 
-  const flames: Mesh[] = [];
-  const colors = [new Color3(1, 0.16, 0.01), new Color3(1, 0.48, 0.03), new Color3(1, 0.78, 0.18)];
-  colors.forEach((color, index) => {
-    const flame = MeshBuilder.CreateCylinder(`bonfire-flame-${index}`, {
-      height: 1.3 - index * 0.18,
-      diameterTop: 0.04,
-      diameterBottom: 0.72 - index * 0.13,
-      tessellation: 12,
-    }, scene);
-    const material = new StandardMaterial(`bonfire-flame-material-${index}`, scene);
-    material.emissiveColor = color;
-    material.diffuseColor = color.scale(0.7);
-    material.alpha = 0.82;
-    material.disableLighting = true;
-    flame.material = material;
-    flame.position.set(x + (index - 1) * 0.18, 0.78 + index * 0.08, z + (index % 2 ? 0.12 : -0.08));
-    flame.isPickable = false;
-    glow.addIncludedOnlyMesh(flame);
-    flames.push(flame);
-  });
+  const fire = createLivingFire(scene, 'greenfall-fire', {x,y:terrain.heightAt(x,z)+.25,z,scale:.92});
+  for (const mesh of [...fire.flames,...fire.embers]) assignWorldSector(mesh,x,z);
   const fireLight = new PointLight('greenfall-bonfire-light', new Vector3(x, 2.2, z), scene);
   fireLight.diffuse = new Color3(1, 0.32, 0.06);
   fireLight.intensity = 5.2;
@@ -1244,11 +1219,6 @@ function createBonfire(x: number, z: number): void {
   let fireTime = 0;
   scene.onBeforeRenderObservable.add(() => {
     fireTime += engine.getDeltaTime() / 1000;
-    flames.forEach((flame, index) => {
-      flame.scaling.y = 0.88 + Math.sin(fireTime * (5.5 + index) + index * 1.7) * 0.14;
-      flame.rotation.y += 0.012 * (index % 2 ? 1 : -1);
-      flame.position.x = x + (index - 1) * 0.18 + Math.sin(fireTime * 3.1 + index) * 0.06;
-    });
     fireLight.intensity = 4.8 + Math.sin(fireTime * 8.4) * 0.55;
   });
 }
@@ -1385,7 +1355,7 @@ function buildWorld(): void {
   for (const node of sectorNodes.values()) {
     node.computeWorldMatrix(true); node.freezeWorldMatrix();
     node.getDescendants().forEach(child => {
-      if (child instanceof TransformNode) { child.computeWorldMatrix(true); child.freezeWorldMatrix(); }
+      if (child instanceof TransformNode && !child.metadata?.livingFire) { child.computeWorldMatrix(true); child.freezeWorldMatrix(); }
     });
   }
 }
@@ -3328,7 +3298,7 @@ function applySettings(): void {
   scene.imageProcessingConfiguration.exposure = state.settings.exposure;
   scene.imageProcessingConfiguration.contrast = state.settings.contrast;
   colorCurves.globalSaturation = (state.settings.saturation - 1) * 100;
-  scene.fogDensity = 0.008 * state.settings.fog;
+  scene.fogDensity = REFERENCE_SURFACES.fogDensity * state.settings.fog;
   scene.environmentIntensity = state.settings.quality === 'low' ? 0.38 : state.settings.quality === 'medium' ? 0.5 : 0.62;
   camera.fov = state.settings.fov;
   camera.maxZ = qualityPreset(state.settings.quality).maxDistance;
@@ -3552,9 +3522,9 @@ function combatSnapshot() {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-enhancement-d-beta-stock',
+    version: '0.6.0-visual-reference-g',
     actorTargets,
-    getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
+    getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, renderWidth: engine.getRenderWidth(), renderHeight: engine.getRenderHeight(), meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
       adaptiveScale: resolutionGovernor.scale, adaptiveDetails: resolutionGovernor.detailStep,
       msaaSamples: renderPipeline.samples, shadowSize: shadows.getShadowMap()?.getSize().width,
@@ -3871,6 +3841,55 @@ if (__QA_BUILD__) {
       } : undefined;
     },
     motionTrace: () => motionTrace,
+    visualReferenceView: async (view: 'gate' | 'courtyard' | 'forest' | 'knight' | 'wolf') => {
+      let featuredIds: string[] = [];
+      if (view === 'knight' || view === 'wolf') featuredIds = setupCombat({distance:4,hp:10000,clusterView:true}).targetIds;
+      closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset(); state.qaFrozen=true;
+      const hero = playerEntity();
+      const views = {
+        gate: GREENFALL_REFERENCE_VIEWS.gate,
+        courtyard: GREENFALL_REFERENCE_VIEWS.square,
+        forest: {x:57,z:38.2,alpha:2.2,beta:1.16,radius:9.6},
+        knight: {x:player.x,z:player.z,alpha:Math.PI/2+.35,beta:1.22,radius:5.5},
+        wolf: {x:player.x,z:player.z,alpha:-Math.PI/2-.26,beta:1.15,radius:6.3},
+      };
+      const selected=views[view], point=collisionWorld.findNearestFree(selected,.46);
+      player.x=hero.x=hero.previousX=point.x; player.z=hero.z=hero.previousZ=point.z;
+      syncEntityTransform(hero); if(hero.root)hero.root.rotation.y=0;
+      setEntityAction(hero,'idle',true);
+      cameraControl.configure({mouseSensitivity:1,zoomSensitivity:1,smoothing:1,invertY:false});
+      const old=cameraControl.state;
+      cameraControl.orbit({x:(old.yaw-selected.alpha)/.0048,y:(old.pitch-selected.beta)/.0038});
+      cameraControl.zoom((selected.radius-old.distance)/.0065);
+      cameraControl.snap({x:point.x,y:terrain.supportAt(point.x,point.z),z:point.z});
+      // Still views use the requested quality at real output resolution. This is
+      // only a deterministic screenshot fixture; the production governor stays on.
+      applySettings(); state.worldTime=12.5;
+      sectorVisibilityCooldown=0;actorVisibilityCooldown=0;
+      updateWorldSectorVisibility(1);updateActorVisibility(1);presentActors(1);updateHud();
+      cameraControl.update(1,{x:point.x,y:terrain.supportAt(point.x,point.z),z:point.z});
+      camera.getViewMatrix(true);scene.updateTransformMatrix(true);
+      simulationClock.reset();skipFrameDelta=true;
+      await scene.whenReadyAsync();
+      const described=[hero,...state.entities.filter(e=>featuredIds.includes(e.uid))].map(entity=>{
+        const meshes=entity.root?.getChildMeshes().filter(m=>m.getTotalVertices()>0 && m.isVisible)??[];
+        for(const mesh of meshes){mesh.computeWorldMatrix(true);if(mesh instanceof Mesh)mesh.refreshBoundingInfo({applySkeleton:true,applyMorph:true});}
+        const bottom=Math.min(...meshes.map(m=>m.getBoundingInfo().boundingBox.minimumWorld.y));
+        const top=Math.max(...meshes.map(m=>m.getBoundingInfo().boundingBox.maximumWorld.y));
+        return {id:entity.id??'player',uid:entity.uid,kind:entity.kind,model:entity.model,
+          ready:meshes.length>0 && meshes.every(m=>m.isReady(true)),visible:meshes.some(m=>m.isEnabled()),
+          animations:entity.animations.length,height:top-bottom,groundGap:bottom-terrain.supportAt(entity.x,entity.z)};
+      });
+      return {view,assetsReady:assetsLoaded,gateBlocked:collisionWorld.isBlocked({x:-7,z:-22.2},.46),actors:described,
+        reference:{groundRepeatMetres:[320/REFERENCE_SURFACES.groundRepeats,280/REFERENCE_SURFACES.groundRepeats],
+          coniferTemplates:pineGeometry?.length??0,coniferLodDistance:CONIFER_LOD_DISTANCE,
+          coniferInstances:scene.meshes.filter(m=>/^pine-\d+-trunk$/.test(m.name)).length,
+          coniferSourceTriangles:pineGeometry?.map(source=>(source.trunk.getTotalIndices()+source.crown.getTotalIndices())/3),
+          fireQuads:scene.meshes.filter(m=>m.metadata?.livingFire).length,
+          activeFireMaterials:scene.materials.filter(m=>m.name.endsWith('-living-fire-material')).map(m=>({name:m.name,ready:m.isReady()})),
+          actorSources:REFERENCE_ACTOR_FILES,
+          renderWidth:engine.getRenderWidth(),renderHeight:engine.getRenderHeight(),adaptiveScale:resolutionGovernor.scale}};
+    },
     combinedCastleView: (name: 'approach' | 'courtyard' | 'smith' = 'approach') => {
       closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset(); state.qaFrozen = true;
       const view = GREENFALL_REFERENCE_VIEWS[name === 'approach' ? 'gate' : name === 'courtyard' ? 'square' : 'smith'];

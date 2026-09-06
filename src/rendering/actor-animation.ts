@@ -7,12 +7,12 @@ type Gait = { group: AnimationGroup; duration: number; nativeSpeed: number };
 // Measured from the shipped rigs: backward foot displacement during the lower
 // quarter of the contact-height range, averaged across feet. Units scale with height.
 const GAITS: Record<string, { height: number; walk: number; run: number }> = {
-  Warrior: { height: 2.05, walk: 1.036, run: 3.187 },
+  Warrior: { height: 2.05, walk: 1.072079, run: 3.297988 },
   Wizard: { height: 2.05, walk: 0.993, run: 3.057 },
   Ranger: { height: 2.05, walk: 1.041, run: 3.203 },
   Rogue: { height: 2.05, walk: 1.024, run: 3.152 },
   Monk: { height: 2.05, walk: 1.065, run: 3.279 },
-  Fox: { height: 1.25, walk: 1.401, run: 1.558 },
+  Fox: { height: 1.25, walk: 1.489192, run: 1.670283 },
   Skeleton: { height: 1.9, walk: 3.228, run: 3.228 },
 };
 

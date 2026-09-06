@@ -31,8 +31,12 @@ export function repairImportedMaterial(material: unknown, tint?: Color3): void {
   if (!material.albedoTexture && material.albedoColor.toLuminance() < 0.025) {
     material.albedoColor = tint?.scale(0.5) ?? new Color3(0.34, 0.33, 0.31);
   }
-  material.metallic = Math.min(material.metallic ?? 0, 0.38);
-  material.roughness = Math.max(material.roughness ?? 0.55, 0.48);
+  // G reference surfaces are authored with explicit steel/leather values;
+  // legacy imported assets retain the conservative repair limits.
+  if (!material.name.startsWith('Reference ')) {
+    material.metallic = Math.min(material.metallic ?? 0, 0.38);
+    material.roughness = Math.max(material.roughness ?? 0.55, 0.48);
+  }
   material.environmentIntensity = Math.max(material.environmentIntensity, 0.42);
   // Preserve glTF's doubleSided choice. Do not force every opaque surface two-sided.
 }

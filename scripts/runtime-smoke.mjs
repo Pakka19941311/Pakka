@@ -73,6 +73,7 @@ try {
   const runtimeModels = [
     ...['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'].map((name) => ({ directory: 'characters', file: `${name}.gltf`, animated: true })),
     ...['Skeleton', 'Slime', 'Bat', 'Dragon', 'Fox'].map((name) => ({ directory: 'monsters-glb', file: `${name}.glb`, animated: true, respawnCycles: 5 })),
+    ...['Knight_Reference','Grey_Wolf_Reference'].map(name => ({directory:'reference',file:`${name}.gltf`,animated:true})),
     ...worldModels,
     ...realismModels,
   ];
@@ -109,8 +110,9 @@ try {
         if (mesh.material && !mesh.material.getClassName?.().includes('Multi')) assert.equal(mesh.material.getScene?.(), scene, `Detached material reused in ${model.file}`);
       }
       if (model.animated) {
-        const name = model.file.split('.')[0];
-        const actor = new ActorAnimation(name, 2.05, instance.animations, instance.pose, 1, model.directory === 'characters');
+        const fileName = model.file.split('.')[0];
+        const name = ({Knight_Reference:'Warrior',Grey_Wolf_Reference:'Fox'})[fileName] ?? fileName;
+        const actor = new ActorAnimation(name, 2.05, instance.animations, instance.pose, 1, model.directory === 'characters' || fileName === 'Knight_Reference');
         actor.advance(0.1); actor.render();
         assert.ok(actor.clip, `Missing idle clip: ${name}`);
         if (name === 'Bat' || name === 'Dragon') assert.match(actor.clip, /Flying/i, 'flying creature must not idle with its attack clip');
