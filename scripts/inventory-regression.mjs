@@ -171,6 +171,12 @@ async function productionScenario() {
   await page.waitForFunction(t => window.__VARENDOR_QA__.getState().simulationSeconds > t + .5, beforeTime.simulationSeconds);
   check('open bag leaves the real world ticking and central scene directly reachable');
 
+  // A populated cell may be under the cursor left by the settings button.
+  // Dismiss its interactive tooltip before testing a genuine world click.
+  await page.mouse.move(400, 300);
+  await tooltip().waitFor({ state: 'hidden' });
+  assert.equal(await page.evaluate(() => document.elementFromPoint(590, 465)?.id), 'game-canvas',
+    'movement test point is covered by UI');
   const beforeMove = await state();
   // This point is ordinary visible terrain immediately ahead of the normal
   // spawn. Telemetry only observes the accepted command and actual movement.
