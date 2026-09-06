@@ -7,8 +7,9 @@ import path from 'node:path';
 import { chromium } from 'playwright';
 
 const directory = path.resolve(process.argv[2] ?? 'dist-qa');
-const production = process.argv[3] === 'production';
-const label = production ? 'D-production' : 'D';
+const hardcore = process.argv[3] === 'hardcore';
+const production = hardcore || process.argv[3] === 'production';
+const label = hardcore ? 'D-hardcore' : production ? 'D-production' : 'D';
 const reportDir = path.resolve('qa-artifacts');
 await mkdir(reportDir, { recursive: true });
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
@@ -62,6 +63,17 @@ async function activate(uid){await bag(uid).dblclick();assert.ok((await state())
 async function reload(){await page.reload();await page.locator('#continue').click();await page.waitForFunction(()=>window.__VARENDOR_QA__?.getState().started,{}, {timeout:180000});}
 try {
  await start();await openBag();
+ if(hardcore){
+  assert.equal((await state()).enhancement.betaBuild,false);
+  assert.equal((await inv()).inventory.some(i=>/scroll/.test(i.id)),false);
+  assert.equal(await page.locator('[id^="inventory-exchange-"]').count(),0);
+  await reload();assert.equal((await inv()).inventory.some(i=>/scroll/.test(i.id)),false);
+  check('hardcore build starts without free scrolls; reload does not grant beta stock; no exchange UI');
+ }else{
+ assert.equal((await state()).enhancement.betaBuild,true);
+ for(const id of ['weapon_scroll','weapon_scroll_improved','armor_scroll','armor_scroll_improved'])assert.equal((await inv()).inventory.find(i=>i.id===id)?.count,100);
+ assert.equal(await page.locator('[id^="inventory-exchange-"]').count(),0);
+ await shot('beta-stock');check('beta new hero receives exactly 100 of each scroll, no exchange UI');
  const before=await inv();const scroll=before.inventory.find(i=>i.id==='weapon_scroll');const weapon=before.equipment.weapon;
  assert.ok(scroll&&weapon);await activate(scroll.uid);assert.equal((await inv()).inventory.find(i=>i.uid===scroll.uid).count,scroll.count);
  await gear(weapon.uid).hover();assert.match(await page.locator('[data-inventory-tooltip]').textContent(),/100%/);
@@ -71,7 +83,7 @@ try {
  await shot('selection');await gear(weapon.uid).dblclick();
  const after=await inv();assert.equal(after.equipment.weapon.uid,weapon.uid);assert.equal(after.equipment.weapon.plus,weapon.plus+1);assert.equal(getItem(after,scroll.uid).count,scroll.count-1);assert.equal((await state()).enhancement.active,null);
  check('production double click scroll then target performs exactly one safe attempt; world stays live and equipment stays equipped');
- await reload();assert.equal((await inv()).equipment.weapon.plus,weapon.plus+1);check('production result survives reload with spent scroll');
+ await reload();assert.equal((await inv()).equipment.weapon.plus,weapon.plus+1);assert.equal(getItem(await inv(),scroll.uid).count,99);check('production result survives reload with spent scroll and no repeated beta grant');
  if(!production){
   for(const id of ['weapon_scroll','weapon_scroll_improved','armor_scroll','armor_scroll_improved']) {
    const f=await setup({scroll:id,plus:id.startsWith('weapon')?3:2,roll:0});const original=await inv();
@@ -101,7 +113,12 @@ try {
   const death=await setup();await activate(death.scroll);await page.evaluate(()=>window.__VARENDOR_FIXTURE__.die());assert.equal((await state()).enhancement.active,null);assert.equal(getItem(await inv(),death.scroll).count,5);check('death cancels pending enhancement without spending');
   await setup();const old=await page.evaluate(()=>window.__VARENDOR_FIXTURE__.enhancementLegacySave());await reload();
   assert.equal((await state()).enhancement.legacyScrolls,7);assert.equal(getItem(await inv(),old.weapon)?.uid,old.weapon);assert.equal((await inv()).inventory.some(i=>i.id==='scroll'),false);
-  await openBag();await page.locator('#inventory-exchange-weapon').click();assert.equal((await state()).enhancement.legacyScrolls,6);await page.locator('#inventory-exchange-armor').click();assert.equal((await state()).enhancement.legacyScrolls,5);await shot('legacy-exchange');await reload();assert.equal((await state()).enhancement.legacyScrolls,5);check('old inventory and buffered scrolls migrate once, exchange 1:1 by choice and persist');
+  await openBag();assert.equal(await page.locator('[id^="inventory-exchange-"]').count(),0);
+  const stock=await inv();
+  for(const id of ['weapon_scroll','weapon_scroll_improved','armor_scroll','armor_scroll_improved'])assert.equal(stock.inventory.find(i=>i.id===id)?.count,id==='weapon_scroll'?105:100);
+  await shot('returning-beta-stock');await reload();assert.deepEqual((await inv()).inventory,stock.inventory);assert.equal((await state()).enhancement.legacyScrolls,7);
+  check('returning hero gets +100 of each once, preserves items and stock, no legacy exchange or conversion');
+ }
  }
  assert.deepEqual(report.errors,[]);report.passed=true;
 } catch(error){report.failure=error.stack??String(error);await shot('failure').catch(()=>{});throw error;}

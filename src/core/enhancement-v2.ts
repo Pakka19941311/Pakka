@@ -67,10 +67,3 @@ export function migrateScrollSave<T extends {schema?:number;player:{inventory:En
  if(!Number.isSafeInteger(reserve))throw Error('Переполнение старого запаса');
  return {...next,schema:2,legacyScrolls:reserve};
 }
-export function exchangeLegacyScroll<T extends EnhancementItem>(inventory:T[],reserve:number,category:EnhancementCategory,make:(id:string)=>T) {
- if(!Number.isSafeInteger(reserve)||reserve<1)return {ok:false as const,reason:'Старых свитков нет.'};
- const id=`${category}_scroll`;if(!SCROLLS[id])return {ok:false as const,reason:'Неизвестная категория.'};
- const next=inventory.map(i=>({...i}));const stack=next.find(i=>i.id===id);
- if(stack)stack.count++;else {if(next.length>=42)return {ok:false as const,reason:'Освободите ячейку в сумке.'};next.push(make(id));}
- return {ok:true as const,inventory:next,legacyScrolls:reserve-1};
-}

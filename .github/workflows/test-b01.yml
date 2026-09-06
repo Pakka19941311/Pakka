@@ -1,4 +1,4 @@
-name: Enhancement D validation and Windows test build
+name: Enhancement D beta stock and monster-only scrolls
 
 on:
   push:
@@ -16,6 +16,8 @@ jobs:
     if: ${{ github.ref == 'refs/heads/work/v06-commercial-rebuild' && !contains(github.event.head_commit.message, '[motion-profile]') }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      VARENDOR_BETA: '1'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,11 +45,13 @@ jobs:
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa --sourcemap
+          VARENDOR_BETA=0 npx vite build --outDir dist-hardcore
           google-chrome --version
       - name: Block D production enhancement and deterministic transaction regression
         env:
           BROWSER_EXECUTABLE: /usr/bin/google-chrome
         run: |
+          node scripts/enhancement-regression.mjs dist-hardcore hardcore
           node scripts/enhancement-regression.mjs dist production
           node scripts/enhancement-regression.mjs dist-qa
       - name: Block B production HUD and isolated consumable regressions
@@ -141,6 +145,7 @@ jobs:
           import assert from 'node:assert/strict';
           import { readFileSync } from 'node:fs';
           const expected = new Map([
+            ['D-hardcore-enhancement.json', 'D-hardcore'],
             ['D-production-enhancement.json', 'D-production'],
             ['D-enhancement.json', 'D'],
             ['B-production-hud.json', 'B-production'],
@@ -170,8 +175,8 @@ jobs:
           cp docs/ENHANCEMENT_QA.md "$stage/QA_REPORT_RU.md"
           cp docs/BLOCK_SPEC_V2_RU.md "$stage/TZ_V2_RU.md"
           cp docs/ENHANCEMENT_BALANCE_V2.json "$stage/ENHANCEMENT_BALANCE_V2.json"
-          cp qa-artifacts/D-enhancement.json qa-artifacts/D-production-enhancement.json qa-artifacts/B-hud.json qa-artifacts/B-production-hud.json qa-artifacts/C-inventory.json qa-artifacts/C-production-inventory.json qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
-          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. D production/QA и регрессии B/C/E/A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия D.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
+          cp qa-artifacts/D-hardcore-enhancement.json qa-artifacts/D-enhancement.json qa-artifacts/D-production-enhancement.json qa-artifacts/B-hud.json qa-artifacts/B-production-hud.json qa-artifacts/C-inventory.json qa-artifacts/C-production-inventory.json qa-artifacts/E-combat-intent.json qa-artifacts/E-production-combat-intent.json qa-artifacts/A-live-world.json qa-artifacts/A-production-live-world.json "$stage/"
+          printf '\nФактический результат выпуска: обязательные gates CI выполнены успешно для %s. D hardcore/production/QA и регрессии B/C/E/A production/QA: passed=true, ошибок нет, SHA совпадает. Windows launcher: PASS. Статус сборки: awaiting_user_test; СТОП до принятия D.\nCI: https://github.com/%s/actions/runs/%s\n' "$GITHUB_SHA" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" >> "$stage/QA_REPORT_RU.md"
           printf '%s\n' "$GITHUB_SHA" > "$stage/BUILD_COMMIT.txt"
           zip -q -9 -r "${stage}.zip" "$stage"
           unzip -t "${stage}.zip" | tail -1
@@ -189,6 +194,6 @@ jobs:
           tag="v0.6-enhancement-d-test-${short_sha}"
           gh release create "$tag" --target "$GITHUB_SHA" --prerelease \
             --title "Varendor — Enhancement D Test (${short_sha})" \
-            --notes "Блок D: четыре свитка оружия/доспехов, обычные/улучшенные; двойной клик по свитку и один клик по предмету выполняют одну попытку. Точные шансы V2, полное уничтожение при неудаче, выбранные источники дропа. Старые свитки: обмен 1:1 на обычную категорию по выбору. Сохранение расхода и результата согласовано. Принятые B/C/E/A проверены на этом SHA. Windows: распаковать целиком и запустить RUN_VARENDOR.bat. СТОП до принятия D. main не изменён. Software WebGL не подтверждает аппаратный FPS." \
+            --notes "Блок D: четыре свитка оружия/доспехов, обычные/улучшенные; двойной клик по свитку и один клик по предмету выполняют одну попытку. Точные шансы V2, полное уничтожение при неудаче, выбранные источники дропа. Бета: разово +100 каждого из четырёх видов свитков новому и сохранённому герою. Обмен удалён. В обычной сборке нет стартовых свитков, источник — только монстры. Сохранение расхода и результата согласовано. Принятые B/C/E/A проверены на этом SHA. Windows: распаковать целиком и запустить RUN_VARENDOR.bat. СТОП до принятия D. main не изменён. Software WebGL не подтверждает аппаратный FPS." \
             "Varendor_Enhancement_D_Windows_Test_${short_sha}.zip" "Varendor_Enhancement_D_Windows_Test_${short_sha}.zip.sha256" \
             "Enhancement_D_QA_${short_sha}.zip"

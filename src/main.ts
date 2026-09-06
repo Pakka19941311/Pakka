@@ -1,4 +1,5 @@
-import { SCROLLS, scrollChance, enhanceItem, rollScrollDrops, migrateScrollSave, exchangeLegacyScroll } from './core/enhancement-v2';
+import { grantBetaScrolls } from './core/beta-scrolls';
+import { SCROLLS, scrollChance, enhanceItem, rollScrollDrops, migrateScrollSave } from './core/enhancement-v2';
 import './styles.css';
 import './hotbar.css';
 import './overhaul.css';
@@ -296,6 +297,7 @@ type Settings = {
 type PlayerSave = {
   schema: 1 | 2;
   legacyScrolls?: number;
+  betaScrollGrant?: string;
   enhancementReceipts?: string[];
   savedAt?: number;
   player: Player;
@@ -414,6 +416,7 @@ const targeting = new TargetingController<Entity>();
 let inventoryPanel: ReturnType<typeof createCharacterInventory> | null = null;
 let inventorySelection: InventoryItemRef | null = null;
 let legacyScrolls = 0;
+let betaScrollGrant: string | undefined;
 let enhancementReceipts: string[] = [];
 let enhancementSelection: {id:string;scroll:InventoryItemRef;targets:Map<string,InventoryItemRef>} | null = null;
 let enhancementResult = '';
@@ -427,7 +430,7 @@ function beginEnhancement(ref: InventoryItemRef): void {
   enhancementSelection={id:uid(),scroll:{...ref},targets}; enhancementResult=''; inventoryPanel?.refresh();
 }
 function saveSnapshot(nextPlayer=player, reserve=legacyScrolls, receipts=enhancementReceipts): PlayerSave {
-  return {schema:2,savedAt:Date.now(),player:nextPlayer,legacyScrolls:reserve,enhancementReceipts:receipts,
+  return {schema:2,savedAt:Date.now(),player:nextPlayer,legacyScrolls:reserve,enhancementReceipts:receipts,betaScrollGrant,
     quest:state.quest,kills:state.kills,bossKills:state.bossKills,lootBuffer:state.lootBuffer,settings:state.settings,bossTimers:{...state.bossTimers}};
 }
 function targetEnhancement(ref: InventoryItemRef): boolean {
@@ -453,14 +456,6 @@ function targetEnhancement(ref: InventoryItemRef): boolean {
   gameAudio.play('hammer',.72,1);toast(enhancementResult,outcome.success?'':'bad');log(enhancementResult,outcome.success?'loot':'combat');updateHud();
   void gateway.send({type:'enhance',itemUid:item.uid,from:outcome.from,to:outcome.to,attemptId:selection.id,scrollUid:selection.scroll.uid,scrollId:selection.scroll.id});
   return true;
-}
-function exchangeOldScroll(category:'weapon'|'armor'): void {
-  if(player.dead)return;
-  const outcome=exchangeLegacyScroll(player.inventory,legacyScrolls,category,id=>makeItem(id));
-  if(!outcome.ok)return toast(outcome.reason,'bad');
-  const next={...player,inventory:outcome.inventory};
-  try{gateway.saveNow(saveSnapshot(next,outcome.legacyScrolls));}catch{return toast('Обмен не сохранён. Старый запас не изменён.','bad');}
-  player=next;legacyScrolls=outcome.legacyScrolls;updateHud();toast('Обменян 1 старый свиток.');
 }
 let preferredEquipmentSlot: string | undefined;
 const combatControl = new CombatControl();
@@ -1418,12 +1413,12 @@ function itemDef(item: ItemInstance): ItemDef {
 }
 
 function newPlayer(): void {
-  legacyScrolls=0; enhancementReceipts=[]; enhancementSelection=null; enhancementResult="";
+  legacyScrolls=0; betaScrollGrant=undefined; enhancementReceipts=[]; enhancementSelection=null; enhancementResult="";
   const classDef = CLASSES_MAP[state.selectedClass];
   player = {
     name: q<HTMLInputElement>('#name-field').value.trim() || 'Странник', classId: state.selectedClass,
     level: 1, xp: 0, gold: 320, x: GREENFALL_SPAWN.x, z: GREENFALL_SPAWN.z, hp: 1, mp: 1, maxHp: 1, maxMp: 1,
-    stats: { ...emptyStats }, inventory: [makeItem('potion', 0, 6), makeItem('ether', 0, 4), makeItem('weapon_scroll', 0, 2), makeItem('armor_scroll', 0, 2), makeItem('teleport')],
+    stats: { ...emptyStats }, inventory: [makeItem('potion', 0, 6), makeItem('ether', 0, 4), makeItem('teleport')],
     equipment: { weapon: makeItem(classDef.weapon), chest: makeItem(classDef.armor) },
     cooldowns: [0, 0, 0, 0], attackCd: 0, dead: false,
   };
@@ -1583,7 +1578,7 @@ async function startGame(load: boolean): Promise<void> {
         if(!save.player || !Array.isArray(save.player.inventory) || !save.player.equipment)throw Error('Повреждённое сохранение. Исходные данные сохранены.');
         const migrated=migrateScrollSave(save);
         if(save.schema!==2 || JSON.stringify(save)!==JSON.stringify(migrated))gateway.saveNow(migrated,true);
-        save=migrated;legacyScrolls=save.legacyScrolls??0;enhancementReceipts=save.enhancementReceipts??[];
+        save=migrated;betaScrollGrant=save.betaScrollGrant;legacyScrolls=save.legacyScrolls??0;enhancementReceipts=save.enhancementReceipts??[];
       }
       if (save?.player) {
         player = save.player;
@@ -1603,6 +1598,17 @@ async function startGame(load: boolean): Promise<void> {
         recalculate(false);
       } else newPlayer();
     } else newPlayer();
+    if (__BETA_BUILD__) {
+      const snapshot = saveSnapshot();
+      const granted = grantBetaScrolls(snapshot, id => makeItem(id));
+      if (granted !== snapshot) {
+        // Persist the four stacks and receipt together before accepting them.
+        gateway.saveNow(granted, true);
+        player = granted.player; state.lootBuffer = granted.lootBuffer ?? [];
+        betaScrollGrant = granted.betaScrollGrant;
+        enhancementResult = 'Бета-тест: выдано по 100 свитков каждого вида.';
+      }
+    }
     await loadAssets();
     if (!state.started) buildWorld();
     spawnEntities();
@@ -3050,10 +3056,9 @@ function inventoryModel(): CharacterInventoryModel {
     selectedUid: inventorySelection?.uid, activeSlot: preferredEquipmentSlot,
     enhancementText: enhancementSelection ? `${ITEMS_MAP[enhancementSelection.scroll.id].name}\nОдин клик по подсвеченной вещи — одна попытка.\nШанс показан при наведении.\nНа рискованной ступени при неудаче предмет уничтожается.\nEsc / ПКМ — отменить.` : undefined,
     eligibleUids: enhancementSelection ? [...enhancementSelection.targets.values()].filter(ref=>{const i=referencedInventoryItem(ref);return i&&i.count===1&&scrollChance(enhancementSelection!.scroll.id,itemDef(i).slot,i.plus)>0;}).map(ref=>ref.uid) : [],
-    readOnly: player.dead, status: player.dead ? 'Персонаж погиб · только просмотр' : enhancementResult || (legacyScrolls ? `Старый запас: ${legacyScrolls}. Обмен 1:1, по одной единице.` : 'Наведение — свойства · двойной клик — действие'),
+    readOnly: player.dead, status: player.dead ? 'Персонаж погиб · только просмотр' : enhancementResult || 'Наведение — свойства · двойной клик — действие',
     scale: state.settings.uiScale, position: state.settings.inventoryWindow,
     actions: enhancementSelection ? [{id:'cancel-enhance',label:'Отменить заточку'}] : [
-      ...(legacyScrolls>0 ? [{id:'exchange-weapon',label:'1 → оружие',disabled:player.dead},{id:'exchange-armor',label:'1 → доспехи',disabled:player.dead}] : []),
       ...(selectedInBag && definition?.slot ? [{id: 'equip', label: 'Надеть', disabled: player.dead}] : []),
       ...(selectedInBag && definition?.type === 'consumable' ? [{id: 'use', label: 'Использовать', disabled: player.dead}] : []),
       ...(selected && inventorySelection?.location === 'equipment' ? [{id: 'unequip', label: 'Снять', disabled: player.dead}] : []),
@@ -3126,7 +3131,7 @@ function activateInventoryItem(ref: InventoryItemRef, preferredSlot?: string): v
   if (ref.location === 'bag' && !itemDef(item).slot) {
     if (itemDef(item).type === 'consumable') useItem(item.id, ref);
     else if (SCROLLS[item.id]) beginEnhancement(ref);
-    else if (item.id==='scroll') toast('Старые свитки будут доступны для обмена после перезагрузки.');
+    else if (item.id==='scroll') toast('Этот старый тип свитка больше не используется.');
     return;
   }
   const result = ref.location === 'equipment'
@@ -3159,7 +3164,6 @@ function moveInventoryItem(ref: InventoryItemRef, target: InventoryDropTarget): 
 
 function inventoryAction(id: string, ref: InventoryItemRef | null): void {
   if(id==='cancel-enhance'){cancelEnhancement();return;}
-  if(id==='exchange-weapon'||id==='exchange-armor'){exchangeOldScroll(id==='exchange-weapon'?'weapon':'armor');return;}
   if (player.dead) return inventoryFailure('dead');
   if (id === 'collect-buffer') {
     while (state.lootBuffer.length && player.inventory.length < INVENTORY_CAPACITY) player.inventory.push(state.lootBuffer.shift()!);
@@ -3355,7 +3359,7 @@ function openTeleport(): void {
 
 function openForge(): void {
   openWindow('inventory');
-  toast('Бран: дважды нажмите свиток, затем один раз — предмет. Старый запас обменивается кнопками под сумкой.');
+  toast('Бран: дважды нажмите свиток, затем один раз — предмет. Свитки добываются с монстров.');
 }
 
 function countItem(id: string): number { return player.inventory.filter((item) => item.id === id).reduce((total, item) => total + item.count, 0); }
@@ -3545,7 +3549,7 @@ function combatSnapshot() {
 Object.defineProperty(window, '__VARENDOR_QA__', {
   value: {
     engine: 'babylon',
-    version: '0.6.0-enhancement-d-test',
+    version: '0.6.0-enhancement-d-beta-stock',
     actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
@@ -3564,7 +3568,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
       activeWindow: state.activeWindow,
       moveTarget: state.moveTarget ? {...state.moveTarget} : null,
       inventory: inventorySnapshot(),
-      enhancement: {active:enhancementSelection?.scroll.id??null,legacyScrolls,result:enhancementResult},
+      enhancement: {betaBuild:__BETA_BUILD__,betaScrollGrant,active:enhancementSelection?.scroll.id??null,legacyScrolls,result:enhancementResult},
       confirmation: confirmation ? { cancel: confirmation.cancel } : null,
       entities: state.entities.length,
       monsters: state.entities.filter((entity) => entity.kind === 'monster').length,
@@ -3697,7 +3701,7 @@ if (__QA_BUILD__) {
       return {scroll:scroll.uid,target:target.uid,wrong:wrong.uid,slot:category==='weapon'?'weapon':'chest'};
     },
     enhancementLegacySave: () => {
-      const candidate=structuredClone(saveSnapshot());candidate.schema=1;candidate.legacyScrolls=0;
+      const candidate=structuredClone(saveSnapshot());candidate.schema=1;candidate.legacyScrolls=0;delete candidate.betaScrollGrant;
       candidate.player.inventory.push(makeItem('scroll',0,4));candidate.lootBuffer=[makeItem('scroll',0,3)];gateway.saveNow(candidate);
       return {name:player.name,level:player.level,weapon:player.equipment.weapon?.uid};
     },

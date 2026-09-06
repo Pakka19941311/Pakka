@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {SCROLLS,scrollChance,enhanceItem,enhancementCategory,rollScrollDrops,migrateScrollSave,exchangeLegacyScroll} from '../src/core/enhancement-v2.ts';
+import {SCROLLS,scrollChance,enhanceItem,enhancementCategory,rollScrollDrops,migrateScrollSave} from '../src/core/enhancement-v2.ts';
 import {LocalGameGateway} from '../src/network/game-gateway.ts';
 const golden=JSON.parse(readFileSync(new URL('../docs/ENHANCEMENT_BALANCE_V2.json',import.meta.url))).curves;
 const item=(id,plus=0,count=1,uid=id)=>({id,plus,count,uid});
@@ -36,10 +36,6 @@ test('migration preserves progress and reserve from inventory and loot buffer ex
  const old={schema:1,player:{name:'Mage',level:9,inventory:[item('scroll',0,4),item('weapon',7)]},lootBuffer:[item('scroll',0,2,'buffer')],settings:{uiScale:1.25}};
  const next=migrateScrollSave(old);assert.equal(next.legacyScrolls,6);assert.equal(next.player.level,9);assert.equal(next.player.inventory[0].plus,7);assert.deepEqual(next.settings,old.settings);assert.equal(old.player.inventory.length,2);assert.deepEqual(migrateScrollSave(next),next);
  assert.throws(()=>migrateScrollSave({...old,schema:3}));
-});
-test('legacy exchange preserves count, denies full bag, stacks in full bag',()=>{
- const full=Array.from({length:42},(_,i)=>item('weapon',0,1,String(i)));assert.equal(exchangeLegacyScroll(full,4,'armor',item).ok,false);
- full[0]=item('armor_scroll',0,3);const r=exchangeLegacyScroll(full,4,'armor',item);assert.ok(r.ok);assert.equal(r.legacyScrolls,3);assert.equal(r.inventory[0].count,4);assert.equal(full[0].count,3);
 });
 test('drop lists and categorical boundaries: improved is ten times rarer, no universal source',()=>{
  for(const id of ['wolf','spider','bat','unknown'])assert.deepEqual(rollScrollDrops(id,()=>{throw Error('Must not roll');}),[]);
