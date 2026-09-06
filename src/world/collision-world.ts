@@ -2,7 +2,7 @@ export type Point2 = Readonly<{ x: number; z: number }>;
 export type Point3 = Point2 & Readonly<{ y: number }>;
 
 type CircleObstacle = Readonly<{ kind: 'circle'; x: number; z: number; radius: number; bottom?: number; top?: number }>;
-type BoxObstacle = Readonly<{ kind: 'box'; x: number; z: number; halfX: number; halfZ: number; rotation: number; bottom?: number; top?: number }>;
+type BoxObstacle = Readonly<{ kind: 'box'; x: number; z: number; halfX: number; halfZ: number; rotation: number; bottom?: number; top?: number; blocksMovement?: boolean }>;
 type Obstacle = CircleObstacle | BoxObstacle;
 
 export type CollisionMove = Readonly<{ x: number; z: number; blocked: boolean }>;
@@ -57,10 +57,19 @@ export class CollisionWorld {
       Math.abs(Math.sin(rotation)) * halfX + Math.abs(Math.cos(rotation)) * halfZ);
   }
 
+  /** An arch/roof above the walking space still blocks camera and combat rays. */
+  addOverhang(x: number, z: number, halfX: number, halfZ: number, rotation: number, bottom: number, top: number): void {
+    if (halfX > 0 && halfZ > 0 && top > bottom) this.insert(
+      {kind:'box',x,z,halfX,halfZ,rotation,bottom,top,blocksMovement:false},
+      Math.abs(Math.cos(rotation))*halfX + Math.abs(Math.sin(rotation))*halfZ,
+      Math.abs(Math.sin(rotation))*halfX + Math.abs(Math.cos(rotation))*halfZ);
+  }
+
   isBlocked(point: Point2, actorRadius: number): boolean {
     for (let x = Math.floor((point.x - actorRadius) / this.cellSize); x <= Math.floor((point.x + actorRadius) / this.cellSize); x += 1) {
       for (let z = Math.floor((point.z - actorRadius) / this.cellSize); z <= Math.floor((point.z + actorRadius) / this.cellSize); z += 1) {
         for (const obstacle of this.cells.get(`${x}:${z}`) ?? []) {
+          if (obstacle.kind === 'box' && obstacle.blocksMovement === false) continue;
           this.candidateChecks += 1;
           if (obstacle.kind === 'circle' ? circleOverlap(point, actorRadius, obstacle) : boxOverlap(point, actorRadius, obstacle)) return true;
         }
@@ -96,6 +105,7 @@ export class CollisionWorld {
         }
       }
       for (const obstacle of candidates) {
+        if (obstacle.kind === 'box' && obstacle.blocksMovement === false) continue;
         const dx = point.x - obstacle.x; const dz = point.z - obstacle.z;
         if (obstacle.kind === 'circle') {
           const length = Math.hypot(dx, dz); const depth = radius + obstacle.radius - length;

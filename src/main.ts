@@ -88,6 +88,8 @@ import { qualityPreset } from './rendering/quality-presets';
 import { WorldSectorGrid } from './world/world-sectors';
 import { AttackTimeline, combatTimings } from './combat/attack-timeline';
 import { EnvironmentAssets, type EnvironmentModel } from './rendering/environment-assets';
+import { CastleAssets } from './rendering/castle-assets';
+import { registerCastleCollider, type CastleModel } from './world/castle-collision';
 import { createForestGround } from './rendering/forest-ground';
 import { resolveChainLightning } from './combat/chain-lightning';
 import { SimulationClock } from './core/simulation-clock';
@@ -96,13 +98,12 @@ import { ModelInstances } from './rendering/model-instances';
 import { ActorAnimation } from './rendering/actor-animation';
 import type { ActorAction } from './rendering/actor-animation';
 import { TerrainSurface } from './world/terrain-surface';
-import { createStaticPart } from './rendering/static-part';
 import { createGabledRoof } from './rendering/gabled-roof';
 import { terrainVertexColors, REFERENCE_SURFACES } from './rendering/reference-surfaces';
 import { createConiferSources, coniferSourceForName, CONIFER_LOD_DISTANCE } from './rendering/conifer-geometry';
 import type { ConiferSources } from './rendering/conifer-geometry';
 import { createLivingFire } from './rendering/living-fire';
-import { greenfallFortLayout, registerFortPartCollider, GREENFALL_REFERENCE_VIEWS } from './world/greenfall-layout';
+import { greenfallFortLayout, GREENFALL_REFERENCE_VIEWS } from './world/greenfall-layout';
 
 type ItemInstance = { id: string; plus: number; count: number; uid: string };
 type BaseStats = { str: number; dex: number; int: number; vit: number; spi: number };
@@ -333,7 +334,7 @@ const CHARACTER_MODELS = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'] as con
 const MONSTER_MODELS = ['Skeleton', 'Slime', 'Bat', 'Dragon'] as const;
 const EXTRA_MONSTER_MODELS = ['Fox'] as const;
 const REFERENCE_ACTOR_FILES: Readonly<Record<string,string>> = {Warrior:'Knight_Reference.gltf',Fox:'Grey_Wolf_Reference.gltf'};
-const REALISM_MODELS = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'modular_fort_01', 'rock_09', 'tree_stump_01', 'wooden_crate_01'] as const;
+const REALISM_MODELS = ['Barrel_01', 'boulder_01', 'dead_tree_trunk', 'gothic_statue', 'large_castle_door', 'rock_09', 'tree_stump_01', 'wooden_crate_01'] as const;
 type RealismModel = typeof REALISM_MODELS[number];
 const WORLD_MODELS = [
   'tree', 'tree-crooked', 'tree-high', 'tree-high-crooked', 'rock-large', 'rock-wide',
@@ -657,6 +658,7 @@ const monsterAssets = new Map<string, AssetContainer>();
 const worldAssets = new Map<string, AssetContainer>();
 const realismAssets = new Map<RealismModel, AssetContainer>();
 const environmentAssets = new EnvironmentAssets(scene);
+const castleAssets = new CastleAssets(scene);
 const sectorGrid = new WorldSectorGrid(48);
 const sectorNodes = new Map<string, TransformNode>();
 let sectorVisibilityCooldown = 0;
@@ -691,6 +693,7 @@ function updateWorldSectorVisibility(dt: number): void {
   if (sectorVisibilityCooldown > 0) return;
   sectorVisibilityCooldown = 0.45;
   environmentAssets.update(player.x,player.z,state.settings.quality==='low');
+  castleAssets.update(player.x,player.z,state.settings.quality==='low');
   const distance = state.settings.quality === 'low' ? 74 : state.settings.quality === 'medium' ? 104 : state.settings.quality === 'high' ? 142 : 196;
   const active = sectorGrid.activeKeysAround(player.x, player.z, distance);
   sectorNodes.forEach((node, key) => node.setEnabled(active.has(key)));
@@ -717,7 +720,7 @@ async function loadAssets(): Promise<void> {
   if (assetsLoaded) return;
   const tasks: Array<Promise<void>> = [];
   let loaded = 0;
-  const total = CHARACTER_MODELS.length + MONSTER_MODELS.length + EXTRA_MONSTER_MODELS.length + WORLD_MODELS.length + REALISM_MODELS.length + 30;
+  const total = CHARACTER_MODELS.length + MONSTER_MODELS.length + EXTRA_MONSTER_MODELS.length + WORLD_MODELS.length + REALISM_MODELS.length + 42;
   const progress = (label: string) => {
     loaded += 1;
     (q<HTMLElement>('#load-fill')).style.width = `${Math.round((loaded / total) * 100)}%`;
@@ -754,6 +757,7 @@ async function loadAssets(): Promise<void> {
     }));
   }
   tasks.push(environmentAssets.load(()=>progress('Готовим лес, камни и растительность')));
+  tasks.push(castleAssets.load(()=>progress('Возводим каменные укрепления')));
   await Promise.all(tasks);
   assetsLoaded = true;
 }
@@ -1055,19 +1059,21 @@ function realismModel(name: RealismModel, x: number, z: number, height: number, 
   return instance.root;
 }
 
-function realismModelPart(partName: string, x: number, z: number, height: number, rotation = 0,
-  footprint: Readonly<{width?: number; depth?: number}> = {}): TransformNode | null {
-  const container = realismAssets.get('modular_fort_01');
-  if (!container) return null;
-  const { root, size } = createStaticPart(container, partName, `fort-part-${partName}-${uid()}`, height, footprint);
-  root.position.set(x, terrain.heightAt(x, z), z);
-  root.rotation.y = rotation;
-  assignWorldSector(root, x, z);
-  tintMeshes(root);
-  root.getChildMeshes().forEach((mesh) => { mesh.isPickable = false; });
-  const bottom = terrain.heightAt(x, z);
-  registerFortPartCollider(collisionWorld, partName, x, z, size, rotation, bottom, bottom + height);
+function castleModel(model:CastleModel,x:number,z:number,height:number,rotation=0,
+  footprint:Readonly<{width?:number;depth?:number}>={}):TransformNode {
+  const bottom=terrain.heightAt(x,z);
+  const {root,size}=castleAssets.place(model,x,bottom,z,height,rotation,footprint,mesh=>shadowCasters.add(mesh));
+  assignWorldSector(root,x,z);
+  registerCastleCollider(collisionWorld,model,x,z,size,rotation,bottom,castleAssets.archProfile);
   return root;
+}
+
+function realismModelPart(partName:string,x:number,z:number,height:number,rotation=0,
+  footprint:Readonly<{width?:number;depth?:number}>={}):TransformNode {
+  const role:Record<string,CastleModel>={wall_thin_gate_01:'castle_arch',wall_thin_straight_01:'castle_wall',tower_round:'castle_tower'};
+  const model=role[partName];
+  if(!model)throw Error(`Unknown castle layout part: ${partName}`);
+  return castleModel(model,x,z,height,rotation,footprint);
 }
 
 const foliageMaterial = new PBRMaterial('forest-needle-material', scene);
@@ -1132,6 +1138,7 @@ function townCylinder(name: string, x: number, y: number, z: number, diameter: n
 }
 
 function createBuilding(name: string, x: number, z: number, width: number, depth: number, height: number, wallColor: number, roofColor: number): void {
+  if(name.endsWith('-keep')){castleModel('castle_keep',x,z,height+1.55,0,{width,depth});return;}
   townBox(`${name}-body`, x, height * 0.5, z, width, height, depth, wallColor);
   const roof = createGabledRoof(scene, `${name}-roof`, width + 0.6, depth + 0.6, 1.55);
   roof.position.set(x, height, z);
@@ -1155,21 +1162,16 @@ function createBuilding(name: string, x: number, z: number, width: number, depth
   townBox(`${name}-chimney`, x + width * 0.3, height + 1.0, z + depth * 0.18, 0.72, 2.0, 0.72, 0x6c675e, false);
 }
 
-function createWatchTower(name: string, x: number, z: number, scale = 1): void {
-  townCylinder(`${name}-tower`, x, 2.45 * scale, z, 3.25 * scale, 4.9 * scale, 0x7f7768, 10);
-  townCylinder(`${name}-top`, x, 5.02 * scale, z, 4.05 * scale, 0.38 * scale, 0x5f594f, 10, false);
-  for (let index = 0; index < 8; index += 1) {
-    const angle = (index / 8) * Math.PI * 2;
-    townBox(`${name}-merlon-${index}`, x + Math.cos(angle) * 1.63 * scale, 5.45 * scale, z + Math.sin(angle) * 1.63 * scale, 0.48 * scale, 0.8 * scale, 0.48 * scale, 0x70695d, false);
-  }
+function createWatchTower(name:string,x:number,z:number,scale=1):void {
+  const crowned=name==='asterhold-nw'||name==='asterhold-ne';
+  castleModel(crowned?'castle_spire':'castle_tower',x,z,(crowned?8.2:6.1)*scale,0,
+    crowned?{}:{width:3.9*scale,depth:3.9*scale});
 }
 
-function createGate(name: string, x: number, z: number, width = 7): void {
-  createWatchTower(`${name}-left`, x - width * 0.58, z, 0.92);
-  createWatchTower(`${name}-right`, x + width * 0.58, z, 0.92);
-  townBox(`${name}-beam`, x, 4.2, z, width * 0.72, 1.0, 1.05, 0x71695d, false);
-  townBox(`${name}-door-left`, x - 1.05, 1.55, z + 0.05, 1.9, 3.1, 0.22, 0x563723, false);
-  townBox(`${name}-door-right`, x + 1.05, 1.55, z + 0.05, 1.9, 3.1, 0.22, 0x563723, false);
+function createGate(name:string,x:number,z:number,width=7):void {
+  createWatchTower(`${name}-left`,x-width*.54,z,.92);
+  createWatchTower(`${name}-right`,x+width*.54,z,.92);
+  castleModel('castle_arch',x,z,6.8,0,{width:width*.8,depth:1.75});
 }
 
 function createSmithy(x: number, z: number): void {
@@ -1205,7 +1207,7 @@ function buildTown(x: number, z: number, scale: number): void {
   createWatchTower('asterhold-ne', x + 6.4 * scale, z + 4.9 * scale, scale);
   createBuilding('asterhold-tavern', x - 7.8 * scale, z - 1.4 * scale, 5.7 * scale, 4.4 * scale, 3.0 * scale, 0x92785e, 0x6f4036);
   createBuilding('asterhold-barracks', x + 7.8 * scale, z - 1.4 * scale, 5.8 * scale, 4.5 * scale, 3.2 * scale, 0x81796d, 0x4e5355);
-  realismModel('large_castle_door', x, z - 7.72 * scale, 4.7 * scale, Math.PI);
+  realismModel('large_castle_door', x, z - 3.22 * scale, 3.2 * scale, Math.PI);
   realismModel('gothic_statue', x, z + 4.2 * scale, 4.4 * scale, Math.PI);
   for (const [bx, bz] of [[x - 7, z - 7], [x + 7, z - 7], [x - 9, z + 2]]) realismModel('Barrel_01', bx, bz, 1.2 * scale, rand(0, Math.PI * 2));
 }
@@ -3543,7 +3545,7 @@ Object.defineProperty(window, '__VARENDOR_QA__', {
     engine: 'babylon',
     version: '0.6.0-world-part1-checkpoint',
     worldEnvironment: () => ({...environmentAssets.describe(),groundReady:ground.isReady(true),
-      groundMaterial:groundMaterial.name,skyReady:environment.isReady()}),
+      groundMaterial:groundMaterial.name,skyReady:environment.isReady(),castle:castleAssets.describe()}),
     actorTargets,
     getPerformance: () => ({ ...lastTelemetry, ...lastRenderStats, renderWidth: engine.getRenderWidth(), renderHeight: engine.getRenderHeight(), meshes: scene.meshes.length,
       materials: scene.materials.length, textures: scene.textures.length, skeletons: scene.skeletons.length,
@@ -3862,7 +3864,7 @@ if (__QA_BUILD__) {
       } : undefined;
     },
     motionTrace: () => motionTrace,
-    visualReferenceView: async (view: 'gate' | 'courtyard' | 'forest' | 'rocks' | 'knight' | 'wolf') => {
+    visualReferenceView: async (view: 'gate' | 'courtyard' | 'capital' | 'forest' | 'rocks' | 'knight' | 'wolf') => {
       let featuredIds: string[] = [];
       if (view === 'knight' || view === 'wolf') featuredIds = setupCombat({distance:4,hp:10000,clusterView:true}).targetIds;
       closeWindow(); closeConfirm(); resetPlayerControl(true); inputControl.reset(); state.qaFrozen=true;
@@ -3870,6 +3872,7 @@ if (__QA_BUILD__) {
       const views = {
         gate: GREENFALL_REFERENCE_VIEWS.gate,
         courtyard: GREENFALL_REFERENCE_VIEWS.square,
+        capital: {x:-108,z:-102,alpha:-Math.PI/2+.25,beta:1.0,radius:19},
         forest: {x:57,z:38.2,alpha:2.2,beta:1.16,radius:9.6},
         rocks: {x:-140,z:53,alpha:.4,beta:1.05,radius:14},
         knight: {x:player.x,z:player.z,alpha:-Math.PI/2+.45,beta:.85,radius:10},

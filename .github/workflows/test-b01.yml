@@ -23,11 +23,10 @@ jobs:
         with:
           node-version: 22.18.0
           cache: npm
-      - name: Check changed world and server contracts
+      - name: Check changed castle passages and shared collision behavior
         run: |
           npm ci
-          npm run test:part1
-          node --experimental-strip-types scripts/world-server-regression.mjs
+          npm run test:castle
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -46,7 +45,7 @@ jobs:
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           VARENDOR_QA=1 npx vite build --outDir dist-qa
-          node scripts/world-environment-regression.mjs dist-qa
+          node scripts/world-environment-regression.mjs dist-qa --castle
       - name: Preserve generated game assets in the working branch
         run: |
           git add public/assets/world

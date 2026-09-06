@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { createHash } from 'node:crypto';
 
 const root = process.cwd();
 const characters = ['Warrior', 'Wizard', 'Rogue', 'Ranger', 'Monk'];
@@ -106,6 +107,23 @@ for (const entry of preparedWorld) {
 }
 for(const name of ['forest_ground_04','brown_mud','mud_forest','roots','brown_mud_03']) {
   for(const map of ['diff.jpg','normal-roughness.png'])assert.ok((await stat(path.join(publicAssetsRoot,'world',name,map))).size>1000);
+}
+const castleDirectory=path.join(publicAssetsRoot,'world/castle_pack');
+const castleManifest=JSON.parse(await readFile(path.join(castleDirectory,'prepared-castle.json'),'utf8'));
+assert.equal(castleManifest.modules.length,6,'Approved castle modules are incomplete');
+for(const entry of castleManifest.files){
+  const filename=path.resolve(castleDirectory,entry.path);
+  assert.ok(filename.startsWith(castleDirectory+path.sep),'Castle asset outside its directory');
+  const bytes=await readFile(filename);
+  assert.equal(bytes.length,entry.bytes,`${entry.path}: truncated castle resource`);
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),entry.sha256,`${entry.path}: castle resource differs`);
+  if(entry.path.endsWith('.glb')){
+    assert.equal(bytes.toString('ascii',0,4),'glTF');
+    assert.equal(bytes.readUInt32LE(8),bytes.length);
+    const doc=parseGlbDocument(bytes,entry.path);
+    assert.ok(doc.materials?.every(m=>m.normalTexture&&m.pbrMetallicRoughness?.baseColorTexture),`${entry.path}: missing prepared PBR material`);
+    await verifyExternalUris(doc,filename);
+  }
 }
 for (const relative of [
   'audio/music/dark-shrine.ogg', 'audio/music/town-in-ruins.ogg', 'audio/ambient/forest.mp3',

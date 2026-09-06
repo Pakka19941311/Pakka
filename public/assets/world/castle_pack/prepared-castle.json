@@ -1,0 +1,445 @@
+{
+  "source": {
+    "url": "https://chuckcg.gumroad.com/l/sfehn",
+    "file": "castle_pack.blend",
+    "sha256": "a1d0bb60837ebfeeeb0f9b8da899c0ba3610d743b41e0913d5cf0dd3f8bce55e",
+    "bytes": 176487810,
+    "author": "ChuckCG",
+    "license": "Author permits commercial project use; machine-learning use excluded."
+  },
+  "toolchain": {
+    "blender": "4.5.13 LTS",
+    "python": "3.11",
+    "texture_size": 1024
+  },
+  "coordinate_contract": "glTF +Y up, unit height, footprint centred at zero; source floor at zero",
+  "modules": [
+    {
+      "name": "castle_arch",
+      "source_object": "castle_element_07",
+      "size": [
+        3.153622,
+        1,
+        1.223619
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "triangles": 5872
+        },
+        {
+          "lod": 1,
+          "triangles": 5872
+        }
+      ],
+      "collision_profile": [
+        {
+          "left": -0.5,
+          "right": -0.458333,
+          "bottom": 0.000727,
+          "top": 1.0
+        },
+        {
+          "left": -0.458333,
+          "right": -0.416667,
+          "bottom": 0.000727,
+          "top": 1.0
+        },
+        {
+          "left": -0.416667,
+          "right": -0.375,
+          "bottom": 0.000727,
+          "top": 1.0
+        },
+        {
+          "left": -0.375,
+          "right": -0.333333,
+          "bottom": 0.000162,
+          "top": 1.0
+        },
+        {
+          "left": -0.333333,
+          "right": -0.291667,
+          "bottom": 0.0,
+          "top": 1.0
+        },
+        {
+          "left": -0.291667,
+          "right": -0.25,
+          "bottom": 0.154561,
+          "top": 1.0
+        },
+        {
+          "left": -0.25,
+          "right": -0.208333,
+          "bottom": 0.283429,
+          "top": 1.0
+        },
+        {
+          "left": -0.208333,
+          "right": -0.166667,
+          "bottom": 0.378351,
+          "top": 1.0
+        },
+        {
+          "left": -0.166667,
+          "right": -0.125,
+          "bottom": 0.450219,
+          "top": 1.0
+        },
+        {
+          "left": -0.125,
+          "right": -0.083333,
+          "bottom": 0.503529,
+          "top": 1.0
+        },
+        {
+          "left": -0.083333,
+          "right": -0.041667,
+          "bottom": 0.540411,
+          "top": 1.0
+        },
+        {
+          "left": -0.041667,
+          "right": 0.0,
+          "bottom": 0.562223,
+          "top": 1.0
+        },
+        {
+          "left": 0.0,
+          "right": 0.041667,
+          "bottom": 0.562223,
+          "top": 1.0
+        },
+        {
+          "left": 0.041667,
+          "right": 0.083333,
+          "bottom": 0.540411,
+          "top": 1.0
+        },
+        {
+          "left": 0.083333,
+          "right": 0.125,
+          "bottom": 0.503529,
+          "top": 1.0
+        },
+        {
+          "left": 0.125,
+          "right": 0.166667,
+          "bottom": 0.450219,
+          "top": 1.0
+        },
+        {
+          "left": 0.166667,
+          "right": 0.208333,
+          "bottom": 0.378351,
+          "top": 1.0
+        },
+        {
+          "left": 0.208333,
+          "right": 0.25,
+          "bottom": 0.283429,
+          "top": 1.0
+        },
+        {
+          "left": 0.25,
+          "right": 0.291667,
+          "bottom": 0.154561,
+          "top": 1.0
+        },
+        {
+          "left": 0.291667,
+          "right": 0.333333,
+          "bottom": 0.0,
+          "top": 1.0
+        },
+        {
+          "left": 0.333333,
+          "right": 0.375,
+          "bottom": 0.000162,
+          "top": 1.0
+        },
+        {
+          "left": 0.375,
+          "right": 0.416667,
+          "bottom": 0.000727,
+          "top": 1.0
+        },
+        {
+          "left": 0.416667,
+          "right": 0.458333,
+          "bottom": 0.000727,
+          "top": 1.0
+        },
+        {
+          "left": 0.458333,
+          "right": 0.5,
+          "bottom": 0.000727,
+          "top": 1.0
+        }
+      ]
+    },
+    {
+      "name": "castle_wall",
+      "source_object": "castle_element_03",
+      "size": [
+        1.048495,
+        1,
+        0.372906
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "triangles": 1140
+        },
+        {
+          "lod": 1,
+          "triangles": 1140
+        }
+      ]
+    },
+    {
+      "name": "castle_tower",
+      "source_object": "castle_element_04",
+      "size": [
+        0.542113,
+        1,
+        0.542113
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "triangles": 5364
+        },
+        {
+          "lod": 1,
+          "triangles": 2251
+        }
+      ]
+    },
+    {
+      "name": "castle_keep",
+      "source_object": "castle_element_09",
+      "size": [
+        0.994244,
+        1,
+        0.678658
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "triangles": 29508
+        },
+        {
+          "lod": 1,
+          "triangles": 12384
+        }
+      ]
+    },
+    {
+      "name": "castle_spire",
+      "source_object": "castle_element_10",
+      "size": [
+        0.250665,
+        1,
+        0.250665
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "triangles": 7688
+        },
+        {
+          "lod": 1,
+          "triangles": 3228
+        }
+      ]
+    },
+    {
+      "name": "castle_turret",
+      "source_object": "castle_element_11",
+      "size": [
+        0.133952,
+        1,
+        0.133952
+      ],
+      "lods": [
+        {
+          "lod": 0,
+          "triangles": 1480
+        },
+        {
+          "lod": 1,
+          "triangles": 1480
+        }
+      ]
+    }
+  ],
+  "files": [
+    {
+      "path": "castle_arch_lod0.glb",
+      "bytes": 293312,
+      "sha256": "b73e349c4f15a89a2e7e135a00d1b85593622c2e2d86e35cb31d99615a6441b9"
+    },
+    {
+      "path": "castle_arch_lod1.glb",
+      "bytes": 293316,
+      "sha256": "9c0e80be9af163bc4c4a0e677ca5be8f66936f3ba9444f7646d2c8c0fa8370ed"
+    },
+    {
+      "path": "castle_keep_lod0.glb",
+      "bytes": 1094960,
+      "sha256": "27ba9d52dc66a4218b9100cdf74c86e1c96d866308ba114d80bac50f43362cfb"
+    },
+    {
+      "path": "castle_keep_lod1.glb",
+      "bytes": 557296,
+      "sha256": "12c18b441edb42dfb29bfc007706863f2523735c734eefc5129ab427d04e20d5"
+    },
+    {
+      "path": "castle_spire_lod0.glb",
+      "bytes": 233564,
+      "sha256": "46af964bc5c0293adb372f38c6f79b5a6f4fc633e2ad95a55f5ae4e552a4f875"
+    },
+    {
+      "path": "castle_spire_lod1.glb",
+      "bytes": 121096,
+      "sha256": "5626b905365100fabcdc6572dd4998e46621add6ab9b52b1fbaf8fa8d9d7c89c"
+    },
+    {
+      "path": "castle_tower_lod0.glb",
+      "bytes": 233788,
+      "sha256": "7a4a1fa2d64f5006b01fe9588d9c426c6a4099c21f7a18f4289f8934e013a6a2"
+    },
+    {
+      "path": "castle_tower_lod1.glb",
+      "bytes": 97544,
+      "sha256": "4e074f5696256a435556a15df3141da9ec403edff24e938ac1b60d39703e1131"
+    },
+    {
+      "path": "castle_turret_lod0.glb",
+      "bytes": 52244,
+      "sha256": "92f75c7ff80b4d29b13faf9d43316c3ae34708e8866d3bb3deb359c77fdac4d5"
+    },
+    {
+      "path": "castle_turret_lod1.glb",
+      "bytes": 52248,
+      "sha256": "d13a6d4011715fe41f9d153677c4ccac0e3426f05ece63b1d8343c114b99bd36"
+    },
+    {
+      "path": "castle_wall_lod0.glb",
+      "bytes": 37936,
+      "sha256": "ae98330cd20291cb97b94c9c7c1b534715f93e17c7fb8d8fe606716466cf0f36"
+    },
+    {
+      "path": "castle_wall_lod1.glb",
+      "bytes": 37940,
+      "sha256": "57352ceaf670d4aa80982a9a5357905ab70a930e1c4e393b8cb9cea4e0a07ee1"
+    },
+    {
+      "path": "textures/castle_element_03_BaseColor.jpg",
+      "bytes": 142680,
+      "sha256": "20aafd92d2d54d8d156cf76f5050a2130feaa5f823853f73455e910a658831f5"
+    },
+    {
+      "path": "textures/castle_element_03_Normal_GL.jpg",
+      "bytes": 279611,
+      "sha256": "20ab370768a0bd4d873e58f1edb950a62d593c99cfbeb43e00423bd2a0f29cbc"
+    },
+    {
+      "path": "textures/castle_element_03_Roughness.png",
+      "bytes": 118553,
+      "sha256": "b2db37be7d3a155663ba7ec9ba5d55c66ee7796c64a59bd62ced3a8576fce7d4"
+    },
+    {
+      "path": "textures/castle_element_04_BaseColor.jpg",
+      "bytes": 139500,
+      "sha256": "0f6c2eb20e209c01cbc0538e1f0bbe07cf562e42379b6167c792c4afc1090c83"
+    },
+    {
+      "path": "textures/castle_element_04_Normal_GL.jpg",
+      "bytes": 249432,
+      "sha256": "9623973637db728b9c2b81c164a163caba76a69decaf6f913a5cc8e8314273c5"
+    },
+    {
+      "path": "textures/castle_element_04_Roughness.png",
+      "bytes": 149843,
+      "sha256": "7c3245181f9b161fb2ecd98194f8e9198bfd8ba889122f946a05b9a973783ad2"
+    },
+    {
+      "path": "textures/castle_element_07_BaseColor.jpg",
+      "bytes": 157384,
+      "sha256": "c109829c39c7193c8f7a7c216fe45a841c16da5a74a64af220bdbbb8512840b7"
+    },
+    {
+      "path": "textures/castle_element_07_Normal_GL.jpg",
+      "bytes": 303884,
+      "sha256": "0ae9feab582f0f96e9bf4bd9d5db8c5130e07b55f5a9fcd126137d8066e854c7"
+    },
+    {
+      "path": "textures/castle_element_07_Roughness.png",
+      "bytes": 180722,
+      "sha256": "55a987a0218cb1ad891151cdb54269977cc4c896f15c243c6ed9b97d13bc8acb"
+    },
+    {
+      "path": "textures/castle_element_09_BaseColor.jpg",
+      "bytes": 146343,
+      "sha256": "38a1bbf8ee9a0bc7919b6fb4ce6956381d1e8f70de9b010e0990c5b2b767fd23"
+    },
+    {
+      "path": "textures/castle_element_09_Normal_GL.jpg",
+      "bytes": 303972,
+      "sha256": "65cd6a3c7d8eaac9579359136ea5a9161efdf950bcf5351fde542c902d99a095"
+    },
+    {
+      "path": "textures/castle_element_09_Roughness.png",
+      "bytes": 63977,
+      "sha256": "608092d3dfe8a32440c7c8590fd93e204da8b5280859c9bdd5989c7b91915f53"
+    },
+    {
+      "path": "textures/castle_element_10_BaseColor.jpg",
+      "bytes": 133633,
+      "sha256": "06709cbc69897c2096c21bb12d3376d7cd61e12dc36ec378f5b7376ef1fbd984"
+    },
+    {
+      "path": "textures/castle_element_10_Normal_GL.jpg",
+      "bytes": 258270,
+      "sha256": "678ecca51b070b3fcb3f793a90b6d5b54d94231c83227eb334b212cd5993d290"
+    },
+    {
+      "path": "textures/castle_element_10_Roughness.png",
+      "bytes": 218009,
+      "sha256": "a38276a7b59e1084b0f6e0a1e28c5d1d17d0589e12af85646b501b277d890f1a"
+    },
+    {
+      "path": "textures/castle_element_11_BaseColor.jpg",
+      "bytes": 134197,
+      "sha256": "35edbceec87525d97cb801e9f2cc8064f8fd7f71aaff972b4264be0572252acf"
+    },
+    {
+      "path": "textures/castle_element_11_Normal_GL.jpg",
+      "bytes": 276116,
+      "sha256": "515b3c03e9067fbc3d3649ebc998e04d7006af9173649c54c346a325e43fbddf"
+    },
+    {
+      "path": "textures/castle_element_11_Roughness.png",
+      "bytes": 142571,
+      "sha256": "6d0fe5a6ff44db8e1bbdfdf64eb48ad61c21a3b2911b058a24b1f5dfa6e7765d"
+    },
+    {
+      "path": "textures/castle_props_02_BaseColor.jpg",
+      "bytes": 167574,
+      "sha256": "11a0efb1403d81f39ed3a8b74fb1795e7c610c303c20f7eddcfa651b6dd829a0"
+    },
+    {
+      "path": "textures/castle_props_02_NormalGL.jpg",
+      "bytes": 246980,
+      "sha256": "2d3bb9812b95b15ef09cb7e66afc47439e16363859ee6bfff1bb2435dfbe7b72"
+    },
+    {
+      "path": "textures/castle_props_02_Roughness.png",
+      "bytes": 678543,
+      "sha256": "d933fd6515a2c21443052b328d0103ada485770753cc7cc8ae020e84c788fa53"
+    }
+  ]
+}
