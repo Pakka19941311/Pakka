@@ -1,0 +1,64 @@
+name: Publish v0.5 Windows test build
+
+on:
+  push:
+    branches:
+      - work/v05-core-quality-rebuild
+    paths:
+      - .github/workflows/publish-v05-windows-test.yml
+      - packaging/windows/**
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out test branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Verify and build
+        run: |
+          npm ci
+          npm test
+          npm run build
+          npm run verify:assets
+          npm run smoke
+
+      - name: Package portable Windows build
+        shell: bash
+        run: |
+          set -euo pipefail
+          stage="Varendor_Ashen_Frontier_v0.5_Windows_Test_FIXED_90207343"
+          archive="${stage}.zip"
+          mkdir "$stage"
+          cp -a dist "$stage/dist"
+          cp server.ps1 "$stage/server.ps1"
+          cp packaging/windows/RUN_VARENDOR_v0.5_WINDOWS.bat "$stage/"
+          cp packaging/windows/README_TEST_RU.txt "$stage/"
+          zip -q -9 -r "$archive" "$stage"
+          sha256sum "$archive" > "${archive}.sha256"
+          unzip -t "$archive"
+
+      - name: Publish GitHub Release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="v0.5-test-90207343"
+          archive="Varendor_Ashen_Frontier_v0.5_Windows_Test_FIXED_90207343.zip"
+          if ! gh release view "$tag" >/dev/null 2>&1; then
+            gh release create "$tag" \
+              --target "90207343a40f19b05a76db5014f81cb90772f903" \
+              --title "Varendor v0.5 Core Quality — Windows Test" \
+              --notes "Исправленная тестовая Windows-сборка v0.5. Устранён белый экран portable launcher. Ветка main не изменена."
+          fi
+          gh release upload "$tag" "$archive" "${archive}.sha256" --clobber

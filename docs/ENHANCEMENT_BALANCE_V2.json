@@ -1,0 +1,433 @@
+{
+  "status": "owner anchors fixed; developer interpolation for first gameplay test; commercial economy unvalidated",
+  "curves": {
+    "weapon_normal": [
+      {
+        "target": 1,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 1.0
+      },
+      {
+        "target": 2,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 2.0
+      },
+      {
+        "target": 3,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 3.0
+      },
+      {
+        "target": 4,
+        "chance_percent": 50,
+        "chain_probability": 0.5,
+        "expected_base_items": 2.0,
+        "expected_scrolls_from_zero": 8.0
+      },
+      {
+        "target": 5,
+        "chance_percent": 38,
+        "chain_probability": 0.19,
+        "expected_base_items": 5.2631578947368425,
+        "expected_scrolls_from_zero": 23.684210526315788
+      },
+      {
+        "target": 6,
+        "chance_percent": 29,
+        "chain_probability": 0.055099999999999996,
+        "expected_base_items": 18.148820326678766,
+        "expected_scrolls_from_zero": 85.11796733212341
+      },
+      {
+        "target": 7,
+        "chance_percent": 22,
+        "chain_probability": 0.012121999999999999,
+        "expected_base_items": 82.49463784853985,
+        "expected_scrolls_from_zero": 391.4453060551064
+      },
+      {
+        "target": 8,
+        "chance_percent": 17,
+        "chain_probability": 0.00206074,
+        "expected_base_items": 485.2625755796461,
+        "expected_scrolls_from_zero": 2308.5018003241553
+      },
+      {
+        "target": 9,
+        "chance_percent": 13,
+        "chain_probability": 0.0002678962,
+        "expected_base_items": 3732.789042920355,
+        "expected_scrolls_from_zero": 17765.39846403196
+      },
+      {
+        "target": 10,
+        "chance_percent": 10,
+        "chain_probability": 2.6789620000000003e-05,
+        "expected_base_items": 37327.890429203544,
+        "expected_scrolls_from_zero": 177663.9846403196
+      },
+      {
+        "target": 11,
+        "chance_percent": 8,
+        "chain_probability": 2.1431696000000003e-06,
+        "expected_base_items": 466598.6303650443,
+        "expected_scrolls_from_zero": 2220812.308003995
+      },
+      {
+        "target": 12,
+        "chance_percent": 6,
+        "chain_probability": 1.2859017600000002e-07,
+        "expected_base_items": 7776643.839417405,
+        "expected_scrolls_from_zero": 37013555.13339992
+      },
+      {
+        "target": 13,
+        "chance_percent": 5,
+        "chain_probability": 6.429508800000001e-09,
+        "expected_base_items": 155532876.7883481,
+        "expected_scrolls_from_zero": 740271122.6679983
+      },
+      {
+        "target": 14,
+        "chance_percent": 4,
+        "chain_probability": 2.5718035200000003e-10,
+        "expected_base_items": 3888321919.7087026,
+        "expected_scrolls_from_zero": 18506778091.69996
+      },
+      {
+        "target": 15,
+        "chance_percent": 3,
+        "chain_probability": 7.71541056e-12,
+        "expected_base_items": 129610730656.95677,
+        "expected_scrolls_from_zero": 616892603089.9987
+      }
+    ],
+    "weapon_improved": [
+      {
+        "target": 1,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 1.0
+      },
+      {
+        "target": 2,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 2.0
+      },
+      {
+        "target": 3,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 3.0
+      },
+      {
+        "target": 4,
+        "chance_percent": 75,
+        "chain_probability": 0.75,
+        "expected_base_items": 1.3333333333333333,
+        "expected_scrolls_from_zero": 5.333333333333333
+      },
+      {
+        "target": 5,
+        "chance_percent": 56,
+        "chain_probability": 0.42000000000000004,
+        "expected_base_items": 2.380952380952381,
+        "expected_scrolls_from_zero": 11.309523809523808
+      },
+      {
+        "target": 6,
+        "chance_percent": 41,
+        "chain_probability": 0.17220000000000002,
+        "expected_base_items": 5.807200929152148,
+        "expected_scrolls_from_zero": 30.02322880371661
+      },
+      {
+        "target": 7,
+        "chance_percent": 31,
+        "chain_probability": 0.053382000000000006,
+        "expected_base_items": 18.732906223071446,
+        "expected_scrolls_from_zero": 100.07493162489229
+      },
+      {
+        "target": 8,
+        "chance_percent": 23,
+        "chain_probability": 0.012277860000000002,
+        "expected_base_items": 81.4474183611802,
+        "expected_scrolls_from_zero": 439.4562244560534
+      },
+      {
+        "target": 9,
+        "chance_percent": 17,
+        "chain_probability": 0.0020872362000000006,
+        "expected_base_items": 479.10246094811873,
+        "expected_scrolls_from_zero": 2590.9189673885494
+      },
+      {
+        "target": 10,
+        "chance_percent": 14,
+        "chain_probability": 0.0002922130680000001,
+        "expected_base_items": 3422.160435343705,
+        "expected_scrolls_from_zero": 18513.706909918208
+      },
+      {
+        "target": 11,
+        "chance_percent": 11,
+        "chain_probability": 3.214343748000001e-05,
+        "expected_base_items": 31110.549412215503,
+        "expected_scrolls_from_zero": 168315.5173628928
+      },
+      {
+        "target": 12,
+        "chance_percent": 9,
+        "chain_probability": 2.8929093732000005e-06,
+        "expected_base_items": 345672.77124683897,
+        "expected_scrolls_from_zero": 1870183.5262543645
+      },
+      {
+        "target": 13,
+        "chance_percent": 8,
+        "chain_probability": 2.3143274985600003e-07,
+        "expected_base_items": 4320909.640585487,
+        "expected_scrolls_from_zero": 23377306.578179557
+      },
+      {
+        "target": 14,
+        "chance_percent": 6,
+        "chain_probability": 1.388596499136e-08,
+        "expected_base_items": 72015160.67642479,
+        "expected_scrolls_from_zero": 389621792.96965927
+      },
+      {
+        "target": 15,
+        "chance_percent": 5,
+        "chain_probability": 6.942982495680001e-10,
+        "expected_base_items": 1440303213.5284956,
+        "expected_scrolls_from_zero": 7792435879.393185
+      }
+    ],
+    "armor_normal": [
+      {
+        "target": 1,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 1.0
+      },
+      {
+        "target": 2,
+        "chance_percent": 65,
+        "chain_probability": 0.65,
+        "expected_base_items": 1.5384615384615383,
+        "expected_scrolls_from_zero": 3.0769230769230766
+      },
+      {
+        "target": 3,
+        "chance_percent": 50,
+        "chain_probability": 0.325,
+        "expected_base_items": 3.0769230769230766,
+        "expected_scrolls_from_zero": 8.153846153846153
+      },
+      {
+        "target": 4,
+        "chance_percent": 40,
+        "chain_probability": 0.13,
+        "expected_base_items": 7.692307692307692,
+        "expected_scrolls_from_zero": 22.884615384615383
+      },
+      {
+        "target": 5,
+        "chance_percent": 30,
+        "chain_probability": 0.039,
+        "expected_base_items": 25.641025641025642,
+        "expected_scrolls_from_zero": 79.61538461538461
+      },
+      {
+        "target": 6,
+        "chance_percent": 22,
+        "chain_probability": 0.00858,
+        "expected_base_items": 116.55011655011654,
+        "expected_scrolls_from_zero": 366.4335664335664
+      },
+      {
+        "target": 7,
+        "chance_percent": 15,
+        "chain_probability": 0.0012870000000000002,
+        "expected_base_items": 777.0007770007769,
+        "expected_scrolls_from_zero": 2449.5571095571095
+      },
+      {
+        "target": 8,
+        "chance_percent": 9,
+        "chain_probability": 0.00011583000000000001,
+        "expected_base_items": 8633.3419666753,
+        "expected_scrolls_from_zero": 27228.412328412327
+      },
+      {
+        "target": 9,
+        "chance_percent": 5,
+        "chain_probability": 5.7915e-06,
+        "expected_base_items": 172666.83933350598,
+        "expected_scrolls_from_zero": 544588.2465682465
+      },
+      {
+        "target": 10,
+        "chance_percent": 2,
+        "chain_probability": 1.1583000000000001e-07,
+        "expected_base_items": 8633341.966675298,
+        "expected_scrolls_from_zero": 27229462.328412324
+      },
+      {
+        "target": 11,
+        "chance_percent": 1,
+        "chain_probability": 1.1583000000000002e-09,
+        "expected_base_items": 863334196.6675298,
+        "expected_scrolls_from_zero": 2722946332.8412323
+      },
+      {
+        "target": 12,
+        "chance_percent": 0.5,
+        "chain_probability": 5.791500000000001e-12,
+        "expected_base_items": 172666839333.50598,
+        "expected_scrolls_from_zero": 544589266768.24646
+      },
+      {
+        "target": 13,
+        "chance_percent": 0.2,
+        "chain_probability": 1.1583000000000002e-14,
+        "expected_base_items": 86333419666752.98,
+        "expected_scrolls_from_zero": 272294633384623.22
+      },
+      {
+        "target": 14,
+        "chance_percent": 0.1,
+        "chain_probability": 1.1583000000000002e-17,
+        "expected_base_items": 8.633341966675298e+16,
+        "expected_scrolls_from_zero": 2.7229463338462422e+17
+      },
+      {
+        "target": 15,
+        "chance_percent": 0.05,
+        "chain_probability": 5.791500000000001e-21,
+        "expected_base_items": 1.7266683933350596e+20,
+        "expected_scrolls_from_zero": 5.4458926676924845e+20
+      }
+    ],
+    "armor_improved": [
+      {
+        "target": 1,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 1.0
+      },
+      {
+        "target": 2,
+        "chance_percent": 100,
+        "chain_probability": 1.0,
+        "expected_base_items": 1.0,
+        "expected_scrolls_from_zero": 2.0
+      },
+      {
+        "target": 3,
+        "chance_percent": 70,
+        "chain_probability": 0.7,
+        "expected_base_items": 1.4285714285714286,
+        "expected_scrolls_from_zero": 4.285714285714286
+      },
+      {
+        "target": 4,
+        "chance_percent": 58,
+        "chain_probability": 0.40599999999999997,
+        "expected_base_items": 2.4630541871921183,
+        "expected_scrolls_from_zero": 9.113300492610838
+      },
+      {
+        "target": 5,
+        "chance_percent": 46,
+        "chain_probability": 0.18675999999999998,
+        "expected_base_items": 5.354465624330692,
+        "expected_scrolls_from_zero": 21.98543585350182
+      },
+      {
+        "target": 6,
+        "chance_percent": 34,
+        "chain_probability": 0.0634984,
+        "expected_base_items": 15.748428306854978,
+        "expected_scrolls_from_zero": 67.60422309853476
+      },
+      {
+        "target": 7,
+        "chance_percent": 24,
+        "chain_probability": 0.015239616,
+        "expected_base_items": 65.6184512785624,
+        "expected_scrolls_from_zero": 285.85092957722816
+      },
+      {
+        "target": 8,
+        "chance_percent": 15,
+        "chain_probability": 0.0022859423999999997,
+        "expected_base_items": 437.4563418570827,
+        "expected_scrolls_from_zero": 1912.3395305148545
+      },
+      {
+        "target": 9,
+        "chance_percent": 9,
+        "chain_probability": 0.00020573481599999997,
+        "expected_base_items": 4860.626020634252,
+        "expected_scrolls_from_zero": 21259.328116831715
+      },
+      {
+        "target": 10,
+        "chance_percent": 4,
+        "chain_probability": 8.229392639999998e-06,
+        "expected_base_items": 121515.65051585632,
+        "expected_scrolls_from_zero": 531508.2029207929
+      },
+      {
+        "target": 11,
+        "chance_percent": 2,
+        "chain_probability": 1.6458785279999997e-07,
+        "expected_base_items": 6075782.525792816,
+        "expected_scrolls_from_zero": 26575460.146039642
+      },
+      {
+        "target": 12,
+        "chance_percent": 1,
+        "chain_probability": 1.6458785279999997e-09,
+        "expected_base_items": 607578252.5792816,
+        "expected_scrolls_from_zero": 2657546114.6039643
+      },
+      {
+        "target": 13,
+        "chance_percent": 0.5,
+        "chain_probability": 8.229392639999999e-12,
+        "expected_base_items": 121515650515.85631,
+        "expected_scrolls_from_zero": 531509223120.79285
+      },
+      {
+        "target": 14,
+        "chance_percent": 0.25,
+        "chain_probability": 2.05734816e-14,
+        "expected_base_items": 48606260206342.52,
+        "expected_scrolls_from_zero": 212603689248717.12
+      },
+      {
+        "target": 15,
+        "chance_percent": 0.1,
+        "chain_probability": 2.05734816e-17,
+        "expected_base_items": 4.860626020634252e+16,
+        "expected_scrolls_from_zero": 2.126036892487181e+17
+      }
+    ]
+  }
+}
