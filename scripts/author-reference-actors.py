@@ -2,7 +2,8 @@
 """Deterministic B02 actor derivatives; run offline with Python, NumPy and Pillow.
 
 No raster image is generated or edited. Original knight textures are embedded
-unchanged. Wolf fur is authored vertex colour, sampled from the original UV mask.
+unchanged. Wolf fur retains its source texture; runtime shading removes orange
+without discarding the eyes and muzzle painted inside source triangles.
 The spatial remap is applied to mesh vertices, joint rest positions, inverse bind
 matrices and translation animation keys together. Rotations and clip timing stay
 as authored by the credited source artists.
@@ -279,25 +280,11 @@ def knight_materials(asset):
 
 
 def wolf_materials(asset):
-    """Use the source UV mask to author a grey coat as vertex data, not a bitmap."""
+    """Preserve the source face/coat pixels for runtime grayscale shading."""
     doc = asset.doc
-    texture = asset.image(0)
     for mesh in doc['meshes']:
         for primitive in mesh['primitives']:
             attrs = primitive['attributes']
-            uv = asset.read(attrs['TEXCOORD_0'])
-            source = sample(texture, uv)
-            positions = asset.read(attrs['POSITION'])
-            light = source.mean(1)
-            cream = (source.min(1) > .62)
-            dark = source.max(1) < .42
-            grey = np.where(cream, .58, np.where(dark, .095, .30))
-            # Small spatial variation is stored once in the mesh; no per-frame
-            # noise/shader cost and no extra render pass for an animal coat.
-            mottling = np.sin(positions[:, 0] * .91 + positions[:, 1] * 1.73 + positions[:, 2] * .77) * .023
-            grey = np.clip(grey + mottling + (light - .42) * .08, .035, .7)
-            colors = np.stack([grey * .98, grey, grey * 1.02, np.ones_like(grey)], axis=1)
-            attrs['COLOR_0'] = asset.add(colors, 'VEC4')
             # Smooth duplicated source normals across coincident vertices;
             # retain mesh topology, UVs, skin weights and all animation clips.
             pos = asset.read(attrs['POSITION'])
@@ -320,8 +307,8 @@ def wolf_materials(asset):
                 normals[group] = average
             attrs['NORMAL'] = asset.add(normals, 'VEC3')
     doc['materials'][0]['name'] = 'Reference grey wolf coat'
-    doc['materials'][0]['pbrMetallicRoughness'] = {
-        'baseColorFactor': [1, 1, 1, 1], 'metallicFactor': 0, 'roughnessFactor': .94}
+    doc['materials'][0]['pbrMetallicRoughness'].update(
+        baseColorFactor=[1, 1, 1, 1], metallicFactor=0, roughnessFactor=.94)
 
 
 def main():
@@ -337,7 +324,7 @@ def main():
     wolf_materials(wolf)
     wolf.doc['extras'] = {'varendorReference': 'b02-grey-wolf-v1', 'logicalModel': 'Fox',
                           'source': 'PixelMannen CC0 model; tomkranis rig/animation, AsoboStudio/scurest glTF CC BY 4.0',
-                          'changes': 'Broader chest, shorter ears/tail; grey vertex coat and smooth normals; recomputed bind pose'}
+                          'changes': 'Broader chest, shorter ears/tail; source texture with runtime grey coat and smooth normals; recomputed bind pose'}
     wolf.save('Grey_Wolf_Reference.gltf')
     (OUT / 'reference-actors.json').write_text(json.dumps({
         'knight': {'path': 'Knight_Reference.gltf', 'logicalModel': 'Warrior', 'meshes': knight_report},

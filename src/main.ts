@@ -3850,7 +3850,7 @@ if (__QA_BUILD__) {
         gate: GREENFALL_REFERENCE_VIEWS.gate,
         courtyard: GREENFALL_REFERENCE_VIEWS.square,
         forest: {x:57,z:38.2,alpha:2.2,beta:1.16,radius:9.6},
-        knight: {x:player.x,z:player.z,alpha:Math.PI/2+.35,beta:1.22,radius:5.5},
+        knight: {x:player.x,z:player.z,alpha:-Math.PI/2+.45,beta:.85,radius:10},
         wolf: {x:player.x,z:player.z,alpha:-Math.PI/2-.26,beta:1.15,radius:6.3},
       };
       const selected=views[view], point=collisionWorld.findNearestFree(selected,.46);

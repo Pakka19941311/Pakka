@@ -111,3 +111,17 @@ test('knight reference changes proportions and separates metal from leather whil
   const leather = result.doc.materials.find(m => m.name === 'Reference worn leather and cloth').pbrMetallicRoughness;
   assert.ok(steel.metallicFactor > .6 && leather.metallicFactor === 0 && steel.roughnessFactor < leather.roughnessFactor);
 });
+
+test('wolf coat keeps the original texture mapping so eyes and muzzle survive the grey shader', () => {
+  const source = readAsset(pairs[1][1]), result = readAsset(pairs[1][2]);
+  assert.deepEqual(result.doc.images, source.doc.images);
+  assert.deepEqual(result.doc.textures, source.doc.textures);
+  assert.deepEqual(result.doc.materials[0].pbrMetallicRoughness.baseColorTexture,
+    source.doc.materials[0].pbrMetallicRoughness.baseColorTexture);
+  for (let i = 0; i < source.doc.meshes.length; i++) {
+    const before = source.doc.meshes[i].primitives[0].attributes;
+    const after = result.doc.meshes[i].primitives[0].attributes;
+    assert.deepEqual(result.accessor(after.TEXCOORD_0), source.accessor(before.TEXCOORD_0));
+    assert.equal(after.COLOR_0, undefined, 'lossy vertex mask must not replace painted face detail');
+  }
+});

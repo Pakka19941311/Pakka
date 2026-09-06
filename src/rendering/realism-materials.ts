@@ -1,4 +1,21 @@
-import { Color3, PBRMaterial, Scene, Texture } from '@babylonjs/core';
+import { Color3, MaterialPluginBase, PBRMaterial, Scene, Texture } from '@babylonjs/core';
+
+/** Retain the source atlas's eyes, muzzle and coat boundaries at pixel resolution.
+ * Vertex colour alone loses details painted inside a triangle. */
+class GreyCoat extends MaterialPluginBase {
+  constructor(material: PBRMaterial) {
+    super(material, 'VarendorGreyCoat', 200, {}, true, true);
+    this.doNotSerialize = true;
+  }
+  override getCustomCode(shaderType: string): Record<string, string> | null {
+    return shaderType === 'fragment' ? {
+      CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
+        float varendorCoatLuma = dot(surfaceAlbedo, vec3(0.2126, 0.7152, 0.0722));
+        surfaceAlbedo = varendorCoatLuma * vec3(0.98, 1.0, 1.02);
+      `,
+    } : null;
+  }
+}
 
 export type PbrSurface = 'forest_ground_06' | 'cobblestone_floor_001' | 'castle_wall_slates' | 'medieval_wood' | 'roof_slates_02' | 'pine_bark';
 
@@ -27,6 +44,9 @@ export function createPbrSurface(scene: Scene, surface: PbrSurface, tiling: numb
 
 export function repairImportedMaterial(material: unknown, tint?: Color3): void {
   if (!(material instanceof PBRMaterial)) return;
+  if (material.name.startsWith('Reference grey wolf coat') && !material.pluginManager?.getPlugin('VarendorGreyCoat')) {
+    new GreyCoat(material);
+  }
   if (tint) material.albedoColor = material.albedoColor.multiply(tint);
   if (!material.albedoTexture && material.albedoColor.toLuminance() < 0.025) {
     material.albedoColor = tint?.scale(0.5) ?? new Color3(0.34, 0.33, 0.31);

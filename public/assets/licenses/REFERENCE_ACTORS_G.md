@@ -50,10 +50,12 @@ CC0 asset.
 
 Varendor reference modifications: broader chest, shorter ears, a shorter and
 less bulky tail; coordinated vertex/joint/bind/translation-key adjustments;
-smoothed normals; grey vertex colours using the original UV colour mask, and a
-nonmetallic rough coat material. The source topology, skin weights, UVs and
-**Survey, Walk, Run** clips are retained. The coat is vertex colour, not a new
-raster fur texture. No endorsement by the original authors is implied.
+smoothed normals and a nonmetallic rough coat material. The original texture
+pixels are embedded unchanged; a runtime material shader converts the sampled
+texture colour to a grey coat while retaining its eye, nose and muzzle detail.
+This replaces the earlier coarse vertex-colour coat. The source topology, skin
+weights, UVs and **Survey, Walk, Run** clips are retained. No raster fur texture
+was created or edited. No endorsement by the original authors is implied.
 
 ## Modification record
 
