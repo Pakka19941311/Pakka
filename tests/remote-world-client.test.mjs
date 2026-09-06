@@ -44,7 +44,8 @@ test('Lost enhancement response is recovered with one receipt; input rejection d
   const base=`http://127.0.0.1:${server.server.address().port}/api`;
   const storage=new MemoryStorage();storage.setItem('varendor_reborn_v03','original-local-save');
   let loseResponse=true,commandRequests=[];
-  const fetcher=async(url,options)=>{
+  async function fetcher(url,options){
+    assert.equal(this,undefined,'transport must not receive the gateway as its receiver (browser Window.fetch brand check)');
     const response=await fetch(url,options);
     if(String(url).endsWith('/command')){
       commandRequests.push(JSON.parse(options.body));

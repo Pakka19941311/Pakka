@@ -19,7 +19,9 @@ export class RemoteWorldGateway {
   onInputRejected:(reason:string)=>void=()=>{};
   onRecovered:(receipt:CommandReceipt,command:WorldCommand)=>void=()=>{};
   constructor(storage:Storage,base='/api',fetcher:typeof fetch=fetch){
-    this.storage=storage;this.base=base;this.fetcher=fetcher;this.token=storage.getItem('varendor_world_token_v1');
+    // Call the transport as a function. A browser's native Window.fetch rejects
+    // the RemoteWorldGateway receiver if stored and invoked directly as a method.
+    this.storage=storage;this.base=base;this.fetcher=(...args)=>fetcher(...args);this.token=storage.getItem('varendor_world_token_v1');
   }
   get hasSession():boolean{return Boolean(this.token);}
   get profiles():Array<{id:string;name:string;classId:string;selected:boolean}>{
