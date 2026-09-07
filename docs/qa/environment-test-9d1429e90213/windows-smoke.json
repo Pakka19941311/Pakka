@@ -1,0 +1,17 @@
+{
+  "buildCommit": "9d1429e90213f1a575e883ab8c903d47b750f745",
+  "checks": [
+    "package file integrity",
+    "launcher outside package cwd",
+    "single process per saved world",
+    "HTML and JS query MIME and bytes",
+    "complete GLB",
+    "world clock without browser",
+    "graceful stop",
+    "saved session across package folders"
+  ],
+  "launcher": "shipped portable Node through server.ps1",
+  "node": "v24.20.0",
+  "platform": "win32"
+}
+
