@@ -1,0 +1,13 @@
+✔ WAL backup includes committed items/progress/receipt; isolated restart returns same receipt (33.59619ms)
+✔ unknown schema is refused without changing the source (7.531751ms)
+✔ duplicate item UID is reported, never silently repaired (5.585879ms)
+✔ a backup cannot overwrite a previous backup or enter a Git checkout (12.709867ms)
+✔ empty SQLite is not labelled a restored player database (1.148766ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 251.905929

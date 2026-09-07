@@ -1,0 +1,16 @@
+file:///workspace/scratch/422c820d04d9/Pakka/server/world-store.mjs:27
+    this.db.prepare('INSERT INTO world VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET state=excluded.state').run(JSON.stringify(state));
+            ^
+
+Error: database is not open
+    at WorldStore.save (file:///workspace/scratch/422c820d04d9/Pakka/server/world-store.mjs:27:13)
+    at prototype.<computed> (file:///workspace/scratch/422c820d04d9/Pakka/scripts/p0-live-server-probe.mjs:19:25)
+    at WorldSimulation.disconnect (file:///workspace/scratch/422c820d04d9/Pakka/src/server/world-simulation.ts:158:16)
+    at IncomingMessage.<anonymous> (file:///workspace/scratch/422c820d04d9/Pakka/server/http-server.mjs:82:117)
+    at IncomingMessage.emit (node:events:509:28)
+    at emitCloseNT (node:internal/streams/destroy:148:10)
+    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  code: 'ERR_INVALID_STATE'
+}
+
+Node.js v24.19.0

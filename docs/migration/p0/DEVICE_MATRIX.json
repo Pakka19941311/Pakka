@@ -1,0 +1,11 @@
+{
+  "scope": "P0 observed availability, not supported device claims",
+  "devices": [
+    {"id":"agent-linux", "os":"Linux x86_64", "gpu":"no /dev/dri", "node":"24.19.0", "browser_local_runtime":"blocked: ERR_BLOCKED_BY_CLIENT", "godot":"not installed", "blender":"not installed"},
+    {"id":"owner-windows", "cpu":null, "gpu":null, "driver":null, "osVersion":null, "status":"not provided; no native execution this turn"},
+    {"id":"android-physical", "model":null, "osVersion":null, "status":"blocked: physical device and SDK/JDK absent"},
+    {"id":"iphone-physical", "model":null, "osVersion":null, "status":"blocked: Mac/Xcode/signing/device not accessible"}
+  ],
+  "confirmedGodotExports": [],
+  "iosRemainsRequired": true
+}

@@ -1,0 +1,127 @@
+{
+  "kind": "isolated synchronous microbenchmark, not live load test or gameplay FPS",
+  "date": "2026-09-07",
+  "head": "88838a79c9b544a7918ac1064568d00ed4d57be4",
+  "node": "v24.19.0",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "logical_cpus": 9,
+  "limitations": [
+    "Runs as fast as possible, synthetic time, not wall-clock scheduling",
+    "No HTTP/SSE sockets, rendering, player combat, jitter or real clients",
+    "Temporary database only; live user saves not read or modified",
+    "No claim about user hardware, hosting capacity or cause of video lag"
+  ],
+  "rows": [
+    {
+      "synthetic_characters": 1,
+      "monster_count": 53,
+      "measured_ticks": 400,
+      "simulated_seconds": 20,
+      "motion": "characters idle in spawn; monsters run actual simulation",
+      "advance": {
+        "n": 400,
+        "p50_ms": 0.3857879999999909,
+        "p95_ms": 0.8848340000000121,
+        "p99_ms": 1.2547950000000014,
+        "max_ms": 1.6231659999999692
+      },
+      "full_broadcast": {
+        "n": 200,
+        "p50_ms": 0.27803299999999354,
+        "p95_ms": 0.4896180000000072,
+        "p99_ms": 0.9650209999999788,
+        "max_ms": 1.6579600000000028
+      },
+      "advance_plus_broadcast": {
+        "n": 400,
+        "p50_ms": 0.5413740000000189,
+        "p95_ms": 1.1086369999999874,
+        "p99_ms": 1.5135819999999853,
+        "max_ms": 2.2128889999999615
+      },
+      "save": {
+        "n": 25,
+        "p50_ms": 0.19602199999999925,
+        "p95_ms": 0.3082350000000247,
+        "p99_ms": 0.5404480000000262,
+        "max_ms": 0.5404480000000262
+      },
+      "last_full_broadcast_bytes": 25026,
+      "approx_total_egress_bytes_per_second_at_10hz": 250260
+    },
+    {
+      "synthetic_characters": 10,
+      "monster_count": 53,
+      "measured_ticks": 400,
+      "simulated_seconds": 20,
+      "motion": "characters idle in spawn; monsters run actual simulation",
+      "advance": {
+        "n": 400,
+        "p50_ms": 0.35628299999996216,
+        "p95_ms": 0.8302080000000842,
+        "p99_ms": 1.0309310000000096,
+        "max_ms": 1.9945089999999936
+      },
+      "full_broadcast": {
+        "n": 200,
+        "p50_ms": 2.964226999999937,
+        "p95_ms": 4.303527000000031,
+        "p99_ms": 5.19023900000002,
+        "max_ms": 5.298783000000185
+      },
+      "advance_plus_broadcast": {
+        "n": 400,
+        "p50_ms": 1.4450220000001082,
+        "p95_ms": 4.1524280000001,
+        "p99_ms": 5.473916000000031,
+        "max_ms": 7.226452999999992
+      },
+      "save": {
+        "n": 25,
+        "p50_ms": 0.23770700000000033,
+        "p95_ms": 0.45859500000005937,
+        "p99_ms": 0.5435119999999642,
+        "max_ms": 0.5435119999999642
+      },
+      "last_full_broadcast_bytes": 283671,
+      "approx_total_egress_bytes_per_second_at_10hz": 2836710
+    },
+    {
+      "synthetic_characters": 30,
+      "monster_count": 53,
+      "measured_ticks": 400,
+      "simulated_seconds": 20,
+      "motion": "characters idle in spawn; monsters run actual simulation",
+      "advance": {
+        "n": 400,
+        "p50_ms": 0.9482729999999719,
+        "p95_ms": 1.7490240000001904,
+        "p99_ms": 2.5527140000003783,
+        "max_ms": 5.012361999999939
+      },
+      "full_broadcast": {
+        "n": 200,
+        "p50_ms": 11.856134000000566,
+        "p95_ms": 16.82887699999992,
+        "p99_ms": 19.962996999999632,
+        "max_ms": 22.988522999999986
+      },
+      "advance_plus_broadcast": {
+        "n": 400,
+        "p50_ms": 5.012874000000011,
+        "p95_ms": 16.489031000000068,
+        "p99_ms": 19.650311999999758,
+        "max_ms": 23.815609000000222
+      },
+      "save": {
+        "n": 25,
+        "p50_ms": 0.3862460000000283,
+        "p95_ms": 0.6553180000000793,
+        "p99_ms": 0.6720080000000053,
+        "max_ms": 0.6720080000000053
+      },
+      "last_full_broadcast_bytes": 1074902,
+      "approx_total_egress_bytes_per_second_at_10hz": 10749020
+    }
+  ]
+}

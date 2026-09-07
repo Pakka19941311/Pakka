@@ -1,0 +1,3662 @@
+{
+  "project": "Varendor",
+  "document_version": "2.0",
+  "updated_at": "2026-09-07",
+  "state_kind": "planning_only",
+  "repository_url": "https://github.com/Pakka19941311/Pakka",
+  "observed_local_branch": "work/environment-test-delivered",
+  "tracked_branch": "origin/work/v06-commercial-rebuild",
+  "observed_head": "88838a79c9b544a7918ac1064568d00ed4d57be4",
+  "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
+  "remote_head_revalidated_this_turn": false,
+  "engine_direction": "Godot native + Blender approved by owner",
+  "client_language_proposed": "typed GDScript",
+  "server": "retain TypeScript authoritative simulation",
+  "execution_authorized": false,
+  "execution_note": "Владелец запросил усиление ТЗ; реализация игры не разрешена этим сообщением. Последующее явное разрешение обновляет этот статус без повторного вопроса о том же объёме.",
+  "current_phase": "P0",
+  "current_task": null,
+  "next_task_after_authorization": "P0-01",
+  "next_action": {
+    "task_id": "P0-01",
+    "substep_id": "P0-01.1",
+    "action": "Сверить актуальный Git HEAD, локальные изменения, ветку и ресурсы; сохранить исходную точку.",
+    "requires_execution_authorization": true
+  },
+  "last_accepted_migration_task": null,
+  "migration_completed_tasks": [],
+  "approved_sections": [
+    "territory masterplan",
+    "terrain roads composition",
+    "forest grass sky ambient life",
+    "Greenfall functional fortress",
+    "nine quest concepts",
+    "preserved gameplay architecture",
+    "hero and combat appearance",
+    "animation effects sound combat UI",
+    "monster identities habitats",
+    "AI attacks bosses"
+  ],
+  "preliminary": [
+    "existing drop/economy as baseline; new reward amounts not approved"
+  ],
+  "not_to_reopen": [
+    "approved visual style",
+    "Godot + Blender direction",
+    "accepted A-F functions"
+  ],
+  "preserve": [
+    "characterId and itemUid",
+    "inventory 42 cells / 12 equipment slots",
+    "HUD and 32 quick assignments",
+    "Tab and accepted mouse/keyboard behavior",
+    "four scrolls and all 60 chances",
+    "item progression and server receipts",
+    "legacy data and one-time beta grants",
+    "30 second disconnect exposure"
+  ],
+  "actual_new_deliverables": [
+    "ТЗ v2.0",
+    "50 задач / 200 подпунктов",
+    "119 сохранённых критериев / 100 подробных сценариев",
+    "связи требований с задачами",
+    "обновлённый пакет продолжения"
+  ],
+  "not_done": [
+    "new Godot client",
+    "user database backup",
+    "new Blender assets",
+    "full registration",
+    "character creator modernization",
+    "mobile builds",
+    "Steam submission"
+  ],
+  "blockers_to_resolve": [
+    {
+      "id": "B-TOOLS",
+      "detail": "Godot/Blender executable workflow and hardware renderer not confirmed here"
+    },
+    {
+      "id": "B-DATA",
+      "detail": "Actual user Windows database/browser profile not accessed or backed up"
+    },
+    {
+      "id": "B-IOS",
+      "detail": "Access to Mac/Xcode and real iPhone not confirmed"
+    },
+    {
+      "id": "B-HARDWARE",
+      "detail": "Target PC/GPU and mobile model matrix not provided"
+    },
+    {
+      "id": "B-MAIL",
+      "detail": "Production email delivery not selected"
+    }
+  ],
+  "user_database_expected_path": "%LOCALAPPDATA%\\Varendor\\world-beta-v1\\world.sqlite",
+  "secrets_included": false,
+  "pending_item_operations": "unknown: действующая пользовательская база/браузер не проверялись этой редакцией",
+  "approval_protocol": "Сохранять явные разрешения и принятие владельца. После технического подпункта продолжать разрешённый объём; художественные маршрут/мир/герои/противники предъявлять отдельной приёмкой. Публикация и платежи требуют явного решения.",
+  "phases": [
+    {
+      "id": "P0",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P0-01",
+          "title": "Проверить текущий Git HEAD и создать отдельную контрольную ветку",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P0-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P0-02",
+          "title": "Резервировать реальные игровые данные и проверить копию",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P0-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P0-03",
+          "title": "Закрепить эталон HUD/сумки/заточки и UI-профиль",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P0-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P0-04",
+          "title": "Измерить исходные клиент, сервер и коррекции на реальном маршруте",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P0-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P0-05",
+          "title": "Подтвердить доступные Godot/Blender, GPU и мобильные экспорты",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P0-05.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-05.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-05.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P0-05.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P1",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P1-01",
+          "title": "Создать Godot-клиент и зафиксировать инструменты",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-02",
+          "title": "Состояния запуска, загрузки и ошибок",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-03",
+          "title": "Протокол и восстановление прежнего героя",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-04",
+          "title": "Появление, опора, камера и движение",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-05",
+          "title": "Минимальный участок на Windows/Android/iPhone",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-05.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-05.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-05.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-05.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-06",
+          "title": "Перенести HUD и быстрые панели",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-06.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-06.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-06.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-06.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-07",
+          "title": "Перенести инвентарь и сравнение",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-07.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-07.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-07.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-07.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-08",
+          "title": "Предметные команды и заточка",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-08.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-08.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-08.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-08.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-09",
+          "title": "UI-профиль, смерть и reconnect",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-09.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-09.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-09.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-09.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-10",
+          "title": "Существующий бой и NPC на временных моделях",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-10.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-10.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-10.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-10.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-11",
+          "title": "Собственные образцы архитектуры, природы и поверхности",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-11.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-11.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-11.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-11.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-12",
+          "title": "Первый маршрут по утверждённому образу",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-12.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-12.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-12.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-12.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-13",
+          "title": "Сглаживание, освещение и профили качества",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-13.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-13.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-13.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-13.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-14",
+          "title": "Пробежка и мобильная проверка первого маршрута",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-14.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-14.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-14.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-14.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-15",
+          "title": "Развернуть схему территории и mapVersion",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-15.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-15.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-15.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-15.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-16",
+          "title": "Согласовать проходы/высоты/safe-зоны с сервером",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-16.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-16.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-16.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-16.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-17",
+          "title": "Построить Гринфолл и сервисы",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-17.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-17.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-17.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-17.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-18",
+          "title": "Окружение и жизнь всех основных зон",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-18.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-18.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-18.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-18.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-19",
+          "title": "Разместить прежних NPC/монстров без смены ID",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-19.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-19.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-19.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-19.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P1-20",
+          "title": "Проверить всю территорию и выдать Windows test",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P1-20.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-20.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-20.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P1-20.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P2",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P2-01",
+          "title": "Гуманоидные основы и риг",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P2-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P2-02",
+          "title": "Базовые движения и контакт",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P2-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P2-03",
+          "title": "Десять комплектов и привязка к предметам",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P2-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P2-04",
+          "title": "Двадцать навыков с эффектами и звуком",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P2-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P2-05",
+          "title": "Четыре служебных NPC и шесть жителей",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P2-05.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-05.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-05.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-05.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P2-06",
+          "title": "Полный редактор внешности и сохранение",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P2-06.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-06.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-06.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P2-06.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P3",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P3-01",
+          "title": "Один законченный противник",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P3-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P3-02",
+          "title": "Два разных поведения",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P3-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P3-03",
+          "title": "Остальные идентичности и области обитания",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P3-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P3-04",
+          "title": "Боссы, очистка призывов и дроп",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P3-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P3-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P4",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P4-01",
+          "title": "AccountId и безопасная привязка старых героев",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P4-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P4-02",
+          "title": "Регистрация/вход/письма/восстановление",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P4-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P4-03",
+          "title": "Управление сессиями и устройствами",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P4-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P4-04",
+          "title": "Квестовая схема и legacyProgress",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P4-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P4-05",
+          "title": "Одна полная цепочка, затем остальные шесть задач",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P4-05.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-05.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-05.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-05.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P4-06",
+          "title": "Проверка однократных наград и темпа экономики",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P4-06.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-06.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-06.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P4-06.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P5",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P5-01",
+          "title": "Финальное сенсорное управление",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P5-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P5-02",
+          "title": "Мобильная память/нагрев/качество",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P5-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P5-03",
+          "title": "Совместные сессии ПК и телефонов",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P5-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P5-04",
+          "title": "Закрытые тесты и материалы мобильных магазинов",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P5-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P5-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "P6",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P6-01",
+          "title": "Страница проекта, реальные кадры и трейлер",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P6-01.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-01.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-01.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-01.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P6-02",
+          "title": "Оформление Steam после решения владельца",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P6-02.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-02.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-02.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-02.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P6-03",
+          "title": "Steam Playtest",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P6-03.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-03.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-03.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-03.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P6-04",
+          "title": "Сборки/обновления/серверная совместимость",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P6-04.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-04.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-04.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-04.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        },
+        {
+          "id": "P6-05",
+          "title": "Выпуск и сопровождение после принятия",
+          "status": "planned",
+          "commit": null,
+          "evidence": [],
+          "owner_accepted": false,
+          "substeps": [
+            {
+              "id": "P6-05.1",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-05.2",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-05.3",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            },
+            {
+              "id": "P6-05.4",
+              "status": "planned",
+              "commit": null,
+              "evidence": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "schema_version": 2,
+  "documentation_review_status": "awaiting_owner_review",
+  "allowed_scope": [
+    "revise_specification_and_handoff"
+  ],
+  "current_substep": null,
+  "working_commit": "88838a79c9b544a7918ac1064568d00ed4d57be4",
+  "last_accepted_gate": null,
+  "open_defects": [],
+  "open_defects_note": "Замечания к текущей игре описаны в ТЗ; подтверждённые дефекты будущей миграции ещё не заведены, потому что она не начата.",
+  "build_refs": [],
+  "definitions": {
+    "tasks": "TASKS.json",
+    "acceptance": "ACCEPTANCE.json",
+    "requirements": "REQUIREMENTS_TRACE.md",
+    "baseline": "BASELINE.json"
+  },
+  "verification_results": {
+    "UI-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "UI-08": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-08": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-09": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "INV-10": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "DATA-08": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "BOOT-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "BOOT-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "BOOT-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "BOOT-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "BOOT-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "BOOT-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "WORLD-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "WORLD-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "WORLD-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENV-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CASTLE-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CASTLE-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CASTLE-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CASTLE-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CASTLE-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CASTLE-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ASSET-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ASSET-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ASSET-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ASSET-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ASSET-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ASSET-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-08": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-09": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "HERO-10": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CHAR-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CHAR-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CHAR-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CHAR-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CHAR-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "CHAR-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AUTH-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AUTH-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AUTH-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AUTH-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AUTH-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "QUEST-08": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-08": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-09": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "AI-10": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "LOOT-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "LOOT-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "LOOT-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "LOOT-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "LOOT-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "MOB-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "MOB-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "MOB-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "MOB-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "MOB-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "PERF-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "PERF-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "PERF-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "PERF-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-06": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "ENH-07": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "STEAM-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "STEAM-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "STEAM-03": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "STEAM-04": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "STEAM-05": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-05-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P0-05-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-05-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-05-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-06-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-06-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-07-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-07-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-08-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-08-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-09-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-09-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-10-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-10-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-11-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-11-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-12-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-12-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-13-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-13-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-14-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-14-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-15-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-15-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-16-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-16-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-17-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-17-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-18-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-18-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-19-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-19-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-20-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P1-20-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-05-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-05-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-06-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P2-06-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P3-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-05-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-05-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-06-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P4-06-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P5-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-01-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-01-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-02-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-02-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-03-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-03-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-04-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-04-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-05-01": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    },
+    "SC-P6-05-02": {
+      "status": "not_run",
+      "commit": null,
+      "build": null,
+      "evidence": [],
+      "observed": null,
+      "defect_id": null
+    }
+  },
+  "gate_results": {
+    "G0": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G1": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G2": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G3": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G4": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G5": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G6": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G7": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    },
+    "G8": {
+      "status": "planned",
+      "evidence": [],
+      "owner_accepted": false
+    }
+  }
+}

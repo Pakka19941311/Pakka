@@ -1,0 +1,71 @@
+{
+  "kind": "isolated live loopback HTTP/SSE with one idle synthetic hero; NOT user route, client FPS or hosting load capacity",
+  "sourceCommit": "88838a79c9b544a7918ac1064568d00ed4d57be4",
+  "date": "2026-09-07T11:35:02.142Z",
+  "node": "v24.19.0",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "logicalCpus": 9,
+  "elapsedMs": 60515.501043,
+  "syntheticCharacters": 1,
+  "monsters": 53,
+  "snapshots": 524,
+  "receivedSseBytes": 13419898,
+  "approximateSseBytesPerSecond": 221759.67758185352,
+  "metrics": {
+    "advance": {
+      "n": 1172,
+      "p50_ms": 0.5799230000002353,
+      "p95_ms": 3.952099999998609,
+      "p99_ms": 10.311375000000226,
+      "max_ms": 131.75229200000467
+    },
+    "snapshot": {
+      "n": 525,
+      "p50_ms": 0.2589169999992009,
+      "p95_ms": 1.1734559999968042,
+      "p99_ms": 7.374318999995012,
+      "max_ms": 61.299463000003016
+    },
+    "save": {
+      "n": 64,
+      "p50_ms": 0.43877599999541417,
+      "p95_ms": 2.7682669999994687,
+      "p99_ms": 130.82573400000547,
+      "max_ms": 130.82573400000547
+    },
+    "interval": {
+      "n": 1171,
+      "p50_ms": 50.15373799999361,
+      "p95_ms": 51.693139999995765,
+      "p99_ms": 122.93757400000322,
+      "max_ms": 202.6878340000003
+    },
+    "httpHealth": {
+      "n": 60,
+      "p50_ms": 3.3715569999985746,
+      "p95_ms": 13.416683000003104,
+      "p99_ms": 94.65919900000154,
+      "max_ms": 94.65919900000154
+    },
+    "sseAge": {
+      "n": 524,
+      "p50_ms": 2,
+      "p95_ms": 13,
+      "p99_ms": 38,
+      "max_ms": 134
+    }
+  },
+  "eventLoopDelay": {
+    "p50_ms": 10.108927,
+    "p95_ms": 11.280383,
+    "p99_ms": 20.627455,
+    "max_ms": 168.034303
+  },
+  "limitations": [
+    "No hardware rendering, real user route, camera or combat.",
+    "Local health HTTP latency is not the user network RTT.",
+    "snapshot measures clone/build; SSE byte count is received body only, not TLS or HTTP overhead.",
+    "advance includes synchronous saves; save samples are separately recorded, not additive.",
+    "No claim about personal data backup, remote capacity or the cause of the supplied video."
+  ]
+}

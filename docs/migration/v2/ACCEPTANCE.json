@@ -1,0 +1,2755 @@
+{
+  "project": "Varendor",
+  "version": "2.0",
+  "result_authority": "STATE.json.verification_results",
+  "criteria_count": 119,
+  "scenario_count": 100,
+  "definitions": [
+    {
+      "id": "UI-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P0-03",
+        "P1-06"
+      ],
+      "criterion": "Совпадение принятой компоновки HUD на парных кадрах"
+    },
+    {
+      "id": "UI-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P0-03",
+        "P1-06"
+      ],
+      "criterion": "Сохранены 32 назначения, режимы 2/4 ряда и клавиши"
+    },
+    {
+      "id": "UI-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P0-03"
+      ],
+      "criterion": "Tab один раз; I/C ведут в то же окно; Esc корректен"
+    },
+    {
+      "id": "UI-04",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-06"
+      ],
+      "criterion": "Текстовый фокус не запускает действия игры"
+    },
+    {
+      "id": "UI-05",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-06",
+        "P5-01"
+      ],
+      "criterion": "Клик внутри UI не проходит в мир, снаружи доступен"
+    },
+    {
+      "id": "UI-06",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-06"
+      ],
+      "criterion": "Ресурсы, цель, эффекты и журнал отражают сервер"
+    },
+    {
+      "id": "UI-07",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-06",
+        "P1-13",
+        "P5-02"
+      ],
+      "criterion": "UI доступен при 1080p/1440p/4K и масштабах 80–150%"
+    },
+    {
+      "id": "UI-08",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-09"
+      ],
+      "criterion": "Настройки панели/окна сохраняются после повторного входа"
+    },
+    {
+      "id": "INV-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "criterion": "42 ячейки и 12 слотов доступны"
+    },
+    {
+      "id": "INV-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "criterion": "Полная сумка: обмен 1:1 без потери"
+    },
+    {
+      "id": "INV-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07",
+        "P1-09"
+      ],
+      "criterion": "Снятие без места целиком отклоняется"
+    },
+    {
+      "id": "INV-04",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "criterion": "Парные слоты одинаковы для tooltip и equip"
+    },
+    {
+      "id": "INV-05",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "criterion": "Подсказка: база/добавка/итог и реальная разница"
+    },
+    {
+      "id": "INV-06",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "criterion": "Двойной клик проводит ровно одно действие"
+    },
+    {
+      "id": "INV-07",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "criterion": "Drag/сортировка сохраняют UID и не используют вещь"
+    },
+    {
+      "id": "INV-08",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-09"
+      ],
+      "criterion": "Смерть запрещает изменения, но разрешает просмотр"
+    },
+    {
+      "id": "INV-09",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-09"
+      ],
+      "criterion": "Изменение максимума HP/MP не лечит и не сбрасывает cooldown"
+    },
+    {
+      "id": "INV-10",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-03",
+        "P1-09",
+        "P1-20"
+      ],
+      "criterion": "Reload/reconnect сохраняет вещи, +N, буфер и профиль"
+    },
+    {
+      "id": "DATA-01",
+      "kind": "preserved_criterion",
+      "phase": "P0",
+      "task_ids": [
+        "P0-01",
+        "P0-02"
+      ],
+      "criterion": "Действующая база и профиль однозначно определены"
+    },
+    {
+      "id": "DATA-02",
+      "kind": "preserved_criterion",
+      "phase": "P0",
+      "task_ids": [
+        "P0-02"
+      ],
+      "criterion": "Согласованная резервная копия реально прочитана"
+    },
+    {
+      "id": "DATA-03",
+      "kind": "preserved_criterion",
+      "phase": "P1.1–1.2",
+      "task_ids": [
+        "P1-03",
+        "P4-01"
+      ],
+      "criterion": "Поэкземплярное сравнение UID/ID/plus/count/location выполнено"
+    },
+    {
+      "id": "DATA-04",
+      "kind": "preserved_criterion",
+      "phase": "P1.1–1.2",
+      "task_ids": [
+        "P1-03",
+        "P4-01"
+      ],
+      "criterion": "Повтор миграции не дублирует героя или выдачу"
+    },
+    {
+      "id": "DATA-05",
+      "kind": "preserved_criterion",
+      "phase": "P1.1–1.2",
+      "task_ids": [
+        "P0-02",
+        "P1-03",
+        "P1-15"
+      ],
+      "criterion": "Неизвестная схема сохраняет исходник и даёт отказ"
+    },
+    {
+      "id": "DATA-06",
+      "kind": "preserved_criterion",
+      "phase": "P1.1–1.2",
+      "task_ids": [
+        "P0-02",
+        "P1-03",
+        "P1-15"
+      ],
+      "criterion": "Ошибка на середине не оставляет частичную собственность"
+    },
+    {
+      "id": "DATA-07",
+      "kind": "preserved_criterion",
+      "phase": "P1.1–1.2",
+      "task_ids": [
+        "P6-04",
+        "P6-05"
+      ],
+      "criterion": "Проверен возврат кода с совместимой копией данных"
+    },
+    {
+      "id": "DATA-08",
+      "kind": "preserved_criterion",
+      "phase": "P1.4",
+      "task_ids": [
+        "P1-15"
+      ],
+      "criterion": "Миграция координат не сбрасывает героя и квесты"
+    },
+    {
+      "id": "BOOT-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-01",
+        "P1-02",
+        "P6-03"
+      ],
+      "criterion": "Запуск и загрузка без пустого/бесконечного экрана"
+    },
+    {
+      "id": "BOOT-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-03"
+      ],
+      "criterion": "Выбран прежний characterId с подтверждением доступа"
+    },
+    {
+      "id": "BOOT-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-04"
+      ],
+      "criterion": "Появление на допустимой опоре без провала"
+    },
+    {
+      "id": "BOOT-04",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-04",
+        "P1-10"
+      ],
+      "criterion": "Камера и полный принятый ввод работают"
+    },
+    {
+      "id": "BOOT-05",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-01",
+        "P1-02",
+        "P6-03"
+      ],
+      "criterion": "Сеть/версия/ресурс дают понятную ошибку и повтор"
+    },
+    {
+      "id": "BOOT-06",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-02",
+        "P1-05",
+        "P1-09",
+        "P1-20"
+      ],
+      "criterion": "Повторный запуск возвращает того же героя"
+    },
+    {
+      "id": "WORLD-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-12",
+        "P1-15",
+        "P1-20"
+      ],
+      "criterion": "Маршрут и ориентиры соответствуют утверждённой схеме"
+    },
+    {
+      "id": "WORLD-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-04",
+        "P1-15",
+        "P1-16",
+        "P1-20"
+      ],
+      "criterion": "Видимая поверхность совпадает с серверной проходимостью"
+    },
+    {
+      "id": "WORLD-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-16"
+      ],
+      "criterion": "Доступные многоуровневые пути имеют согласованные поверхности/переходы"
+    },
+    {
+      "id": "ENV-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-12",
+        "P1-18"
+      ],
+      "criterion": "Лес имеет группы, опушки и разные силуэты"
+    },
+    {
+      "id": "ENV-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-12",
+        "P1-18"
+      ],
+      "criterion": "Трава соответствует маскам и не закрывает бой"
+    },
+    {
+      "id": "ENV-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-13",
+        "P1-18"
+      ],
+      "criterion": "Нет заметного мерцания крон на пробежке"
+    },
+    {
+      "id": "ENV-04",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-18"
+      ],
+      "criterion": "LOD сохраняет крону и не исчезает перед камерой"
+    },
+    {
+      "id": "ENV-05",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-18"
+      ],
+      "criterion": "Ветер не двигает корни и не качает всё синхронно"
+    },
+    {
+      "id": "ENV-06",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-18"
+      ],
+      "criterion": "Облака, солнце и туман дают принятый вид"
+    },
+    {
+      "id": "ENV-07",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-18"
+      ],
+      "criterion": "Декоративная жизнь имеет действия без неутверждённого лута"
+    },
+    {
+      "id": "CASTLE-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-12",
+        "P1-17"
+      ],
+      "criterion": "Камера проходит ворота без потери героя"
+    },
+    {
+      "id": "CASTLE-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-17"
+      ],
+      "criterion": "Персонажи расходятся в основных проходах"
+    },
+    {
+      "id": "CASTLE-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-10",
+        "P1-17",
+        "P1-19",
+        "P2-05"
+      ],
+      "criterion": "Все прежние NPC-сервисы доступны"
+    },
+    {
+      "id": "CASTLE-04",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-16",
+        "P1-17"
+      ],
+      "criterion": "Точки входа/возврата безопасны"
+    },
+    {
+      "id": "CASTLE-05",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-16"
+      ],
+      "criterion": "Safe-зона следует расширенному двору"
+    },
+    {
+      "id": "CASTLE-06",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-16",
+        "P1-20"
+      ],
+      "criterion": "Пути и доступные ярусы не ведут через стены"
+    },
+    {
+      "id": "ASSET-01",
+      "kind": "preserved_criterion",
+      "phase": "P1–P3",
+      "task_ids": [
+        "P1-11",
+        "P3-01"
+      ],
+      "criterion": "Масштаб и силуэт соответствуют эталону"
+    },
+    {
+      "id": "ASSET-02",
+      "kind": "preserved_criterion",
+      "phase": "P1–P3",
+      "task_ids": [
+        "P1-11"
+      ],
+      "criterion": "Материалы/UV без растяжения и случайных швов"
+    },
+    {
+      "id": "ASSET-03",
+      "kind": "preserved_criterion",
+      "phase": "P1–P3",
+      "task_ids": [
+        "P1-11",
+        "P2-01",
+        "P3-01"
+      ],
+      "criterion": "Есть исходник, GLB, локальные текстуры, LOD и коллизия"
+    },
+    {
+      "id": "ASSET-04",
+      "kind": "preserved_criterion",
+      "phase": "P1–P3",
+      "task_ids": [
+        "P1-11"
+      ],
+      "criterion": "Движение/ветер/переходы не ломают вид"
+    },
+    {
+      "id": "ASSET-05",
+      "kind": "preserved_criterion",
+      "phase": "P1–P3",
+      "task_ids": [
+        "P1-13",
+        "P5-02"
+      ],
+      "criterion": "Стоимость группы измерена на целевом устройстве"
+    },
+    {
+      "id": "ASSET-06",
+      "kind": "preserved_criterion",
+      "phase": "P1–P3",
+      "task_ids": [
+        "P1-14",
+        "P1-17",
+        "P1-20"
+      ],
+      "criterion": "Реальные кадры приняты владельцем и сохранена версия"
+    },
+    {
+      "id": "HERO-01",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-01"
+      ],
+      "criterion": "Взрослые пропорции и принятая внешность"
+    },
+    {
+      "id": "HERO-02",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-01"
+      ],
+      "criterion": "Мужская/женская основа и общий совместимый риг"
+    },
+    {
+      "id": "HERO-03",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-02"
+      ],
+      "criterion": "Стопы соответствуют поверхности и скорости"
+    },
+    {
+      "id": "HERO-04",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-02"
+      ],
+      "criterion": "Остановка/поворот/прыжок без заметных щелчков"
+    },
+    {
+      "id": "HERO-05",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P1-10",
+        "P2-04"
+      ],
+      "criterion": "Все пять классов и двадцать исходных навыков сохранены"
+    },
+    {
+      "id": "HERO-06",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-03"
+      ],
+      "criterion": "Десять конструктивно разных комплектов"
+    },
+    {
+      "id": "HERO-07",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-03"
+      ],
+      "criterion": "Одежда/крепления корректны на допустимых телосложениях"
+    },
+    {
+      "id": "HERO-08",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-03"
+      ],
+      "criterion": "Смена предмета отражается на модели"
+    },
+    {
+      "id": "HERO-09",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P1-10",
+        "P2-02",
+        "P2-04",
+        "P3-01"
+      ],
+      "criterion": "Попадание/промах/стена/смерть совпадают с сервером"
+    },
+    {
+      "id": "HERO-10",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-04",
+        "P2-05"
+      ],
+      "criterion": "NPC, звук и эффекты читаемы при нескольких игроках"
+    },
+    {
+      "id": "CHAR-01",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "criterion": "Старый герой выбирается без пересоздания"
+    },
+    {
+      "id": "CHAR-02",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "criterion": "Все доступные настройки влияют на модель"
+    },
+    {
+      "id": "CHAR-03",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "criterion": "Повтор создания не создаёт дубликат"
+    },
+    {
+      "id": "CHAR-04",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "criterion": "Имя/внешность валидируются сервером"
+    },
+    {
+      "id": "CHAR-05",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "criterion": "Параметры внешности сохраняются между устройствами"
+    },
+    {
+      "id": "CHAR-06",
+      "kind": "preserved_criterion",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "criterion": "Старый герой без внешности мигрирует без потери личности"
+    },
+    {
+      "id": "AUTH-01",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-01"
+      ],
+      "criterion": "Владение старым героем проверяется безопасной привязкой"
+    },
+    {
+      "id": "AUTH-02",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-02",
+        "P4-03"
+      ],
+      "criterion": "Сессии обновляются/отзываются и секреты защищены"
+    },
+    {
+      "id": "AUTH-03",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-02"
+      ],
+      "criterion": "Реальное восстановление доступа без раскрытия аккаунтов"
+    },
+    {
+      "id": "AUTH-04",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-03",
+        "P5-03"
+      ],
+      "criterion": "Передача управления между устройствами не дублирует героя/команды"
+    },
+    {
+      "id": "AUTH-05",
+      "kind": "preserved_criterion",
+      "phase": "P6",
+      "task_ids": [
+        "P6-04"
+      ],
+      "criterion": "Steam-билет проверяется сервером при добавлении Steam-входа"
+    },
+    {
+      "id": "QUEST-01",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-04",
+        "P4-05"
+      ],
+      "criterion": "Цели проверяют нужное действие/вид/район"
+    },
+    {
+      "id": "QUEST-02",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-04",
+        "P4-05"
+      ],
+      "criterion": "Частичный прогресс сохраняется после выхода"
+    },
+    {
+      "id": "QUEST-03",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-04"
+      ],
+      "criterion": "Повтор события не увеличивает счётчик дважды"
+    },
+    {
+      "id": "QUEST-04",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-06"
+      ],
+      "criterion": "Повтор сдачи возвращает одну квитанцию/награду"
+    },
+    {
+      "id": "QUEST-05",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-06"
+      ],
+      "criterion": "Полная сумка не вызывает частичную потерю"
+    },
+    {
+      "id": "QUEST-06",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-06",
+        "P5-03"
+      ],
+      "criterion": "Две сессии не удваивают выдачу"
+    },
+    {
+      "id": "QUEST-07",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-05"
+      ],
+      "criterion": "Отказ и повтор допустимы только по политике"
+    },
+    {
+      "id": "QUEST-08",
+      "kind": "preserved_criterion",
+      "phase": "P4",
+      "task_ids": [
+        "P4-04"
+      ],
+      "criterion": "Legacy-прогресс сохранён, девять новых задач не завершены автоматически"
+    },
+    {
+      "id": "AI-01",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "criterion": "Враг учитывает стену при обнаружении/ударе"
+    },
+    {
+      "id": "AI-02",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02",
+        "P3-03"
+      ],
+      "criterion": "Склон/проход не создаёт бесконечного застревания"
+    },
+    {
+      "id": "AI-03",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "criterion": "Два игрока не вызывают бессмысленное дрожание цели"
+    },
+    {
+      "id": "AI-04",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "criterion": "Память угрозы и переключение воспроизводимы"
+    },
+    {
+      "id": "AI-05",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "criterion": "Смерть цели корректно завершает действие"
+    },
+    {
+      "id": "AI-06",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "criterion": "Disconnect следует 30-секундному контракту"
+    },
+    {
+      "id": "AI-07",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P1-19",
+        "P3-02"
+      ],
+      "criterion": "Safe-зона не нарушается атакой"
+    },
+    {
+      "id": "AI-08",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P1-19",
+        "P3-01",
+        "P3-03"
+      ],
+      "criterion": "Возврат/домой/respawn сохраняют идентичность"
+    },
+    {
+      "id": "AI-09",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04"
+      ],
+      "criterion": "Повторный бой босса не накапливает популяцию"
+    },
+    {
+      "id": "AI-10",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04"
+      ],
+      "criterion": "Призывы босса/некроманта очищаются по правилам"
+    },
+    {
+      "id": "LOOT-01",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-03",
+        "P3-04"
+      ],
+      "criterion": "Исходные вероятности и независимость категорий сохранены"
+    },
+    {
+      "id": "LOOT-02",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04"
+      ],
+      "criterion": "Reconnect не выдаёт предмет повторно"
+    },
+    {
+      "id": "LOOT-03",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04"
+      ],
+      "criterion": "Полная сумка/lootBuffer сохраняют собственность"
+    },
+    {
+      "id": "LOOT-04",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04",
+        "P5-03"
+      ],
+      "criterion": "Владение добычей при двух игроках соответствует baseline"
+    },
+    {
+      "id": "LOOT-05",
+      "kind": "preserved_criterion",
+      "phase": "P3",
+      "task_ids": [
+        "P1-19",
+        "P3-03",
+        "P4-06"
+      ],
+      "criterion": "Измерен темп добычи после нового размещения"
+    },
+    {
+      "id": "MOB-01",
+      "kind": "preserved_criterion",
+      "phase": "P1.1",
+      "task_ids": [
+        "P1-05",
+        "P1-14",
+        "P5-04"
+      ],
+      "criterion": "Ранний участок установлен на Windows/Android/iPhone в P1"
+    },
+    {
+      "id": "MOB-02",
+      "kind": "preserved_criterion",
+      "phase": "P5",
+      "task_ids": [
+        "P5-01"
+      ],
+      "criterion": "Сенсорный UI/подсказки/заточка не создают лишних действий"
+    },
+    {
+      "id": "MOB-03",
+      "kind": "preserved_criterion",
+      "phase": "P5",
+      "task_ids": [
+        "P5-01",
+        "P5-02"
+      ],
+      "criterion": "Safe Area/мультитач/размеры пригодны в бою"
+    },
+    {
+      "id": "MOB-04",
+      "kind": "preserved_criterion",
+      "phase": "P5",
+      "task_ids": [
+        "P5-02",
+        "P5-04"
+      ],
+      "criterion": "20–30 минут нагрева и памяти проверены на названных устройствах"
+    },
+    {
+      "id": "MOB-05",
+      "kind": "preserved_criterion",
+      "phase": "P5",
+      "task_ids": [
+        "P5-03",
+        "P5-04"
+      ],
+      "criterion": "Звонок/сворачивание/смена сети возвращают тот же мир и героя"
+    },
+    {
+      "id": "PERF-01",
+      "kind": "preserved_criterion",
+      "phase": "P0; по затронутому изменению P1/P5",
+      "task_ids": [
+        "P0-04",
+        "P1-14"
+      ],
+      "criterion": "Зафиксирован одинаковый маршрут и устройство"
+    },
+    {
+      "id": "PERF-02",
+      "kind": "preserved_criterion",
+      "phase": "P0; по затронутому изменению P1/P5",
+      "task_ids": [
+        "P0-04",
+        "P1-14"
+      ],
+      "criterion": "Снят клиентский CPU/GPU/frame-time профиль"
+    },
+    {
+      "id": "PERF-03",
+      "kind": "preserved_criterion",
+      "phase": "P0; по затронутому изменению P1/P5",
+      "task_ids": [
+        "P0-04",
+        "P1-14"
+      ],
+      "criterion": "Снят серверный tick/event-loop/DB/serialization профиль"
+    },
+    {
+      "id": "PERF-04",
+      "kind": "preserved_criterion",
+      "phase": "P0; по затронутому изменению P1/P5",
+      "task_ids": [
+        "P0-04",
+        "P1-14"
+      ],
+      "criterion": "Сняты RTT/jitter/snapshot age и коррекции движения"
+    },
+    {
+      "id": "ENH-01",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "criterion": "Все 60 вероятностей совпадают с контрольной таблицей"
+    },
+    {
+      "id": "ENH-02",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08",
+        "P5-01"
+      ],
+      "criterion": "Один выбор свитка и предмета — одна попытка"
+    },
+    {
+      "id": "ENH-03",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "criterion": "Провал уничтожает ровно нужный предмет"
+    },
+    {
+      "id": "ENH-04",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-03",
+        "P1-08",
+        "P1-20",
+        "P4-03"
+      ],
+      "criterion": "Потерянный ответ после рестарта возвращает прежнюю квитанцию"
+    },
+    {
+      "id": "ENH-05",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "criterion": "Отказ/смерть/несовместимость не расходуют вещи"
+    },
+    {
+      "id": "ENH-06",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "criterion": "Старые свитки архивны, beta-выдача не повторяется"
+    },
+    {
+      "id": "ENH-07",
+      "kind": "preserved_criterion",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "criterion": "Все прибавки свойств совпадают с item-progression"
+    },
+    {
+      "id": "STEAM-01",
+      "kind": "preserved_criterion",
+      "phase": "P6",
+      "task_ids": [
+        "P6-01"
+      ],
+      "criterion": "Материалы показывают реальную сборку"
+    },
+    {
+      "id": "STEAM-02",
+      "kind": "preserved_criterion",
+      "phase": "P6",
+      "task_ids": [
+        "P6-02"
+      ],
+      "criterion": "Coming Soon и оформление проведены после решения владельца"
+    },
+    {
+      "id": "STEAM-03",
+      "kind": "preserved_criterion",
+      "phase": "P6",
+      "task_ids": [
+        "P6-03"
+      ],
+      "criterion": "Playtest устанавливается и обновляется"
+    },
+    {
+      "id": "STEAM-04",
+      "kind": "preserved_criterion",
+      "phase": "P6",
+      "task_ids": [
+        "P6-04"
+      ],
+      "criterion": "Старые данные переживают клиентское обновление"
+    },
+    {
+      "id": "STEAM-05",
+      "kind": "preserved_criterion",
+      "phase": "P6",
+      "task_ids": [
+        "P6-05"
+      ],
+      "criterion": "Серверная совместимость и сопровождение готовы"
+    },
+    {
+      "id": "SC-P0-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-01"
+      ],
+      "given": "Есть локальные изменения поверх известного HEAD.",
+      "action": "Провести инвентаризацию и подготовить отдельную ветку.",
+      "expected": "Изменения присутствуют в сохранённой рабочей точке; ни один файл не исчез.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-01"
+      ],
+      "given": "Один внешний GLB недоступен.",
+      "action": "Проверить зависимость запуска и записать результат.",
+      "expected": "Ресурс помечен отсутствующим; сборка с ним не объявлена воспроизводимой; остальная инвентаризация продолжается.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-02"
+      ],
+      "given": "Сервер продолжает писать WAL.",
+      "action": "Получить согласованную копию и открыть отдельно.",
+      "expected": "Копия читается и содержит подтверждённые операции; оригинал не изменён проверкой.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-02"
+      ],
+      "given": "В браузере есть pending-заточка.",
+      "action": "Сохранить pending и запросить прежнюю квитанцию при восстановлении.",
+      "expected": "Операция не повторяется с новым commandId; исход неизвестен до ответа сервера.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-03"
+      ],
+      "given": "Открыта сумка и игрок бежит.",
+      "action": "Нажать Tab один раз, затем повторить после закрытия.",
+      "expected": "На один нажим приходится одно переключение; бег и серверное время не останавливаются.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-03"
+      ],
+      "given": "Две привязки претендуют на Q.",
+      "action": "Изменить назначение и повторно войти.",
+      "expected": "Принятое правило разрешения конфликта воспроизведено; сохранённое назначение не теряется.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-04"
+      ],
+      "given": "На экране рывок при стабильном серверном тике.",
+      "action": "Сопоставить CPU/GPU-кадр и возраст snapshot.",
+      "expected": "Причина не объявлена серверной только по внешнему виду рывка.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-04"
+      ],
+      "given": "Включение записи ухудшает кадр.",
+      "action": "Повторить маршрут без записи при том же профиле.",
+      "expected": "В отчёте отдельно показана стоимость записи; улучшение не приписано изменению игры.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-05-01",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-05"
+      ],
+      "given": "GLB открывается в Blender, но материал отсутствует в Godot.",
+      "action": "Проследить пути/экспорт текстур и повторить импорт.",
+      "expected": "Причина устранена или шаг помечен blocked; картинка из Blender не закрывает проверку.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P0-05-02",
+      "kind": "detailed_scenario",
+      "phase": "P0",
+      "task_ids": [
+        "P0-05"
+      ],
+      "given": "Доступ к Mac не подтверждён.",
+      "action": "Проверить доступные средства iOS-сборки.",
+      "expected": "iOS остаётся обязательной незакрытой зависимостью; Windows/Android не выдаются за проверку iPhone.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-01"
+      ],
+      "given": "Есть только исходники и зафиксированные инструменты.",
+      "action": "Собрать клиент в чистом каталоге.",
+      "expected": "Получается запускаемый пакет без ручного поиска файлов.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-01"
+      ],
+      "given": "Каталог предметов имеет другую версию.",
+      "action": "Попытаться подключиться.",
+      "expected": "Появляется понятное сообщение несовместимости; игра не работает с произвольными параметрами.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-02"
+      ],
+      "given": "Сервер отвечает с задержкой.",
+      "action": "Нажать повтор и дождаться обоих ответов.",
+      "expected": "Открывается одна актуальная сцена и один герой; старый ответ игнорируется.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-02"
+      ],
+      "given": "Сервер недоступен.",
+      "action": "Запустить клиент.",
+      "expected": "Загрузка заканчивается понятным состоянием с повтором/выходом, а не бесконечным индикатором.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-03"
+      ],
+      "given": "Событие SSE разделено посреди многобайтного имени.",
+      "action": "Доставить его несколькими чанками.",
+      "expected": "Получено одно корректное событие без повреждения имени или второго героя.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-03"
+      ],
+      "given": "Сервер провёл команду, ответ потерян.",
+      "action": "Переподключить клиента и запросить тот же commandId.",
+      "expected": "Возвращается прежний результат; второй расход или бросок не происходит.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-04"
+      ],
+      "given": "Сервер подтверждает часть очереди движения.",
+      "action": "Применить snapshot и оставшийся ввод.",
+      "expected": "Уже подтверждённый шаг не исполняется повторно; скорость не удваивается.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-04"
+      ],
+      "given": "Герой стоит у ворот и камера поворачивается.",
+      "action": "Пройти проём и изменить зум.",
+      "expected": "Камера не застревает в стене и не теряет героя; сервер разрешает тот же проход.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-05-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-05"
+      ],
+      "given": "Android-сборка установлена.",
+      "action": "Подключить её к тестовому серверу и пройти участок.",
+      "expected": "Сеть работает, герой тот же, материал/камера видимы; список экспортов не является единственным доказательством.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-05-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-05"
+      ],
+      "given": "iPhone-приложение свернули во время соединения.",
+      "action": "Вернуть его на экран.",
+      "expected": "Восстанавливается одна сессия; прежние запросы не создают вторую сцену или персонажа.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-06-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-06"
+      ],
+      "given": "В последнем расходнике осталась одна единица.",
+      "action": "Использовать её и получить серверный ответ.",
+      "expected": "Количество согласовано в сумке и панели; ярлык не запускает недоступную вторую единицу.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-06-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-06"
+      ],
+      "given": "Открыто текстовое поле поверх мира.",
+      "action": "Ввести символы, совпадающие с быстрыми клавишами.",
+      "expected": "Ни атака, ни зелье, ни движение не запускаются текстовым вводом.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-07-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "given": "Оба кольца надеты, сумка заполнена.",
+      "action": "Надеть новое кольцо двойным кликом.",
+      "expected": "Выполняется разрешённый обмен 1:1 в выбранный по правилу слот; все UID сохранены.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-07-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-07"
+      ],
+      "given": "Предмет перемещён сервером, пока открыта подсказка.",
+      "action": "Навести на прежнюю ячейку и начать drag.",
+      "expected": "Клиент не действует по старой ссылке; показывает актуальный предмет или отказ.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-08-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "given": "Сервер уничтожил предмет при неудаче, ответ потерялся.",
+      "action": "Повторить доставку с тем же commandId.",
+      "expected": "Возвращается та же квитанция; дополнительный свиток и другой предмет не исчезают.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-08-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-08"
+      ],
+      "given": "Герой умер до принятия предметной команды.",
+      "action": "Отправить выбранную попытку.",
+      "expected": "Сервер отклоняет действие по принятому правилу; UI не показывает ложный успех и не расходует вещи.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-09-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-09"
+      ],
+      "given": "У героя неполное здоровье и новый предмет повышает максимум.",
+      "action": "Надеть вещь и повторно войти.",
+      "expected": "Текущее здоровье меняется только по действующим правилам; бесплатного полного лечения нет.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-09-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-09"
+      ],
+      "given": "Окно сохранено за пределами нового разрешения.",
+      "action": "Запустить в меньшем окне.",
+      "expected": "Инвентарь доступен; вещи и назначения не сброшены вместе с координатами окна.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-10-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-10"
+      ],
+      "given": "Противник выбран, герой автоматически подходит.",
+      "action": "Нажать ручное движение в другую сторону.",
+      "expected": "Подход отменяется по исходному правилу; клиент не возвращает героя скрытым старым намерением.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-10-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-10"
+      ],
+      "given": "Два клиента видят один удар.",
+      "action": "Сопоставить HP цели и событие результата.",
+      "expected": "Оба видят один серверный исход; анимация не наносит второй локальный урон.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-11-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-11"
+      ],
+      "given": "Стена повторяется четырежды и имеет угол.",
+      "action": "Посмотреть швы при боковом свете и пройти рядом.",
+      "expected": "Нет растянутого рисунка/разрывов; модуль стыкуется и имеет ожидаемую коллизию.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-11-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-11"
+      ],
+      "given": "Сосна показана группой при беге и ветре.",
+      "action": "Приблизить/отдалить камеру.",
+      "expected": "Корни неподвижны, крона сохраняется на LOD, прозрачность не даёт неприемлемого мерцания.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-12-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-12"
+      ],
+      "given": "Маршрут выглядит хорошо у ворот.",
+      "action": "Пройти его в обратную сторону со штатной камерой.",
+      "expected": "Композиция остаётся связной; тыльные стороны и переходы поверхности закончены.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-12-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-12"
+      ],
+      "given": "Открыты HUD и сумка, начался бой у опушки.",
+      "action": "Пройти и атаковать цель.",
+      "expected": "Цель/путь/интерфейс читаются; окружение не блокирует принятые действия.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-13-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-13"
+      ],
+      "given": "Выбран 3840×2160 и render-scale ниже 100%.",
+      "action": "Открыть настройки и снять диагностический кадр.",
+      "expected": "Видны обе величины; результат не подписан как нативный 4K.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-13-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-13"
+      ],
+      "given": "Новый полноэкранный режим не подтверждён.",
+      "action": "Дождаться срока возврата.",
+      "expected": "Восстановлен прежний работоспособный режим; настройки героя и UI-панели сохранены.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-14-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-14"
+      ],
+      "given": "Средний FPS приемлем, но на повороте есть длинные кадры.",
+      "action": "Проверить p95/p99 и события загрузки/шейдеров.",
+      "expected": "Проблема фиксируется отдельно; среднее значение не закрывает дефект.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-14-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-14"
+      ],
+      "given": "Владелец отклонил крону и камень образца.",
+      "action": "Обновить замечания и STATE.",
+      "expected": "Массовое производство этих ресурсов не начинается; следующий шаг — исправление образца.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-15-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-15"
+      ],
+      "given": "Старая позиция совпала с новой стеной.",
+      "action": "Применить перенос на копии.",
+      "expected": "Герой получает ближайшую разрешённую безопасную опору по таблице; ID/имущество/прогресс сохраняются.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-15-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-15"
+      ],
+      "given": "Клиент загрузил прежний mapVersion.",
+      "action": "Попытаться войти на обновлённый сервер.",
+      "expected": "Вход в несовместимую геометрию остановлен до движения; показано обновление/ошибка.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-16-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-16"
+      ],
+      "given": "Один герой под мостом, другой на мосту.",
+      "action": "Двигать обоих в одинаковых X/Z.",
+      "expected": "Опорные поверхности не смешиваются; нет прыжка на чужой ярус и удара через перекрытие.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-16-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-16"
+      ],
+      "given": "Двор расширен за прежний радиус 20,5 м.",
+      "action": "Проверить вход, выход и атаку на границе.",
+      "expected": "Безопасность соответствует новой области и одинаково применяется сервером/клиентом.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-17-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-17"
+      ],
+      "given": "Два игрока одновременно входят через ворота.",
+      "action": "Разойтись, открыть сумку и обратиться к NPC.",
+      "expected": "Нет застревания/потери камеры; сервис достижим и UI работает.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-17-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-17"
+      ],
+      "given": "Квестовый NPC стоит у реквизита.",
+      "action": "Подойти с разных сторон и повернуть камеру.",
+      "expected": "Объекты не закрывают цель и диалог; взаимодействие не проходит сквозь стену.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-18-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-18"
+      ],
+      "given": "Герой выходит с дороги в лес и на поляну.",
+      "action": "Пройти маршрут при двух профилях качества.",
+      "expected": "Плотность/переходы читаются; низкий профиль сохраняет бой и ориентиры.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-18-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-18"
+      ],
+      "given": "Декоративная птица пересекает стену/землю.",
+      "action": "Воспроизвести её цикл.",
+      "expected": "Маршрут или поведение исправлены; живность не засчитывается как законченная по одному неподвижному кадру.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-19-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-19"
+      ],
+      "given": "Старая точка босса перекрыта новой скалой.",
+      "action": "Перенести точку по региональной таблице и перезапустить мир.",
+      "expected": "Босс возрождается в допустимой области с прежним видом/наградами, а не исчезает.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-19-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-19"
+      ],
+      "given": "NPC стоит у новой safe-границы.",
+      "action": "Проверить диалог, торговлю и возврат после выхода.",
+      "expected": "Все старые услуги доступны; смена координат не сбрасывает связанные данные.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-20-01",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-20"
+      ],
+      "given": "Пакет скачан в новый каталог.",
+      "action": "Запустить и войти прежним героем.",
+      "expected": "Запуск понятен, данные сохранены, указанные маршруты доступны; не требуется собирать файлы из переписки.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P1-20-02",
+      "kind": "detailed_scenario",
+      "phase": "P1",
+      "task_ids": [
+        "P1-20"
+      ],
+      "given": "Владелец нашёл дефект ворот в сдаваемой сборке.",
+      "action": "Записать замечание с commit и исправить текущую часть.",
+      "expected": "P1 остаётся на доработке; художественная часть героев не подменяет исправление мира.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-01"
+      ],
+      "given": "Герой поднимает руки, поворачивается и приседает в рабочей анимации.",
+      "action": "Осмотреть плечи, пах, кисти и шею.",
+      "expected": "Нет разрывов и грубого схлопывания; silhouette соответствует эталону.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-01"
+      ],
+      "given": "Выбрана другая допустимая основа тела.",
+      "action": "Загрузить тот же комплект анимаций.",
+      "expected": "Кости и крепления совместимы; персонаж не получает иную дальность атаки из-за размера модели.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-02"
+      ],
+      "given": "Герой бежит с постоянной серверной скоростью.",
+      "action": "Пройти ровную дорогу и плавный склон.",
+      "expected": "Стопы не скользят системно, корпус не прыгает от каждой детали поверхности.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-02"
+      ],
+      "given": "Во время атаки получена серверная смерть.",
+      "action": "Применить событие и затем позднее событие клипа.",
+      "expected": "Смерть остаётся актуальным состоянием; поздняя анимация не возвращает героя к атаке.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-03"
+      ],
+      "given": "Сняли нагрудник, надели пояс и сменили оружие.",
+      "action": "Открыть сумку и продолжить движение.",
+      "expected": "Модель соответствует занятым слотам; старые части не остаются висеть и тело не пропадает целиком.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-03"
+      ],
+      "given": "Один комплект надет на крайний допустимый bodyPreset.",
+      "action": "Выполнить бег и атаку.",
+      "expected": "Нет системных пробоев одежды; при дефекте дорабатывается геометрия/скининг, а не скрывается вариант редактора.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-04"
+      ],
+      "given": "Умение промахнулось или встретило препятствие.",
+      "action": "Сравнить событие сервера с визуальным контактом.",
+      "expected": "Нет ложного попадания, HP-эффекта и дополнительной цели.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-04"
+      ],
+      "given": "Несколько игроков применили умения, один переподключился.",
+      "action": "Повторно доставить уже увиденное событие.",
+      "expected": "VFX/звук не воспроизводятся дважды; существенные сигналы боя сохраняются при ограничении декора.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-05-01",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-05"
+      ],
+      "given": "Два игрока одновременно обращаются к Брану.",
+      "action": "Открыть сервис и выполнить независимые операции.",
+      "expected": "Каждый видит свои предметы и результат; один диалог не блокирует второго.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-05-02",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-05"
+      ],
+      "given": "Житель проходит рядом со служебным NPC.",
+      "action": "Пройти к сервису и повернуть камеру.",
+      "expected": "Маршрут не запирает проход и не заслоняет диалог постоянной толпой.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-06-01",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "given": "Подтверждение создания отправлено дважды из-за задержки.",
+      "action": "Дождаться ответов и открыть список.",
+      "expected": "Создан один персонаж с выбранной внешностью и одним устойчивым ID.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P2-06-02",
+      "kind": "detailed_scenario",
+      "phase": "P2",
+      "task_ids": [
+        "P2-06"
+      ],
+      "given": "Старый герой не имеет полей внешности.",
+      "action": "Выбрать его в новом меню и войти.",
+      "expected": "Он получает совместимое представление; уровень, имя и имущество сохранены.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-01"
+      ],
+      "given": "Враг атакует и игрок выходит из допустимой области.",
+      "action": "Сопоставить проверку сервера и контакт.",
+      "expected": "Коготь/эффект не заявляют гарантированное попадание независимо от серверного исхода.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-01"
+      ],
+      "given": "Враг умер и позже возродился.",
+      "action": "Повторить встречу несколько раз.",
+      "expected": "Новый жизненный цикл отделён generation; старый death/VFX не убивает новый экземпляр.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "given": "Два игрока меняют расстояние до врага.",
+      "action": "Провоцировать без нанесения нового урона.",
+      "expected": "Цель меняется по записанному правилу, а не дрожит на каждом тике.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-02"
+      ],
+      "given": "Цель ушла за стену и в безопасную область.",
+      "action": "Продолжить наблюдение врага.",
+      "expected": "Атака отклоняется/перестраивается по правилу; враг возвращается без урона сквозь стену.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-03"
+      ],
+      "given": "Игрок входит в низину, руины и шахтный подход.",
+      "action": "Сравнить три встречи.",
+      "expected": "Виды, поведение и окружение различимы; нет случайной равномерной рассыпки всех монстров.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-03"
+      ],
+      "given": "Клиент обновлён, старое сохранение содержит spider.",
+      "action": "Загрузить сущность и её награды.",
+      "expected": "Сохраняется исходный вид по mapping; запись не теряется из-за художественного имени.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04"
+      ],
+      "given": "Босс пересёк порог фазы и клиент переподключился.",
+      "action": "Восстановить snapshot и журнал событий.",
+      "expected": "Фаза согласована; её призывы/награды не создаются повторно.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P3-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P3",
+      "task_ids": [
+        "P3-04"
+      ],
+      "given": "Пять встреч завершились смертью/возвратом босса.",
+      "action": "Сравнить временные сущности и добычу.",
+      "expected": "Временные существа очищены по правилам; нет нарастающего населения или повторной выдачи.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-01"
+      ],
+      "given": "У аккаунта два старых героя с разными сумками.",
+      "action": "Привязать оба подтверждённым способом.",
+      "expected": "Оба доступны отдельно, UID и валюта не смешаны.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-01"
+      ],
+      "given": "Код привязки уже использован другим запросом.",
+      "action": "Повторить его с другим accountId.",
+      "expected": "Получен отказ; владелец персонажа не сменился и новая копия героя не создана.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-02"
+      ],
+      "given": "Ссылка сброса применена один раз.",
+      "action": "Открыть её повторно и попытаться сменить пароль.",
+      "expected": "Повтор отклонён; ранее установленный пароль не меняется.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-02"
+      ],
+      "given": "Почта задерживается, пользователь нажимает отправку много раз.",
+      "action": "Пройти повторную отправку и затем старую ссылку.",
+      "expected": "Действует записанная политика токенов/лимитов; нет неограниченной очереди и противоречивых успехов.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-03"
+      ],
+      "given": "ПК потерял связь после отправки заточки, телефон вошёл тем же героем.",
+      "action": "Восстановить pending-операцию.",
+      "expected": "Телефон получает один прежний результат; ПК не может провести новую команду старой сессией.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-03"
+      ],
+      "given": "Пользователь выбрал выйти на всех устройствах.",
+      "action": "Отправить команду с прежним access/refresh.",
+      "expected": "Она отклоняется согласно политике; UI предлагает вход без сброса персонажа.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-04"
+      ],
+      "given": "В старом сохранении частично выполнена прежняя цель.",
+      "action": "Мигрировать к новой квестовой схеме.",
+      "expected": "Старая запись сохранена; девять новых задач не стали автоматически rewarded.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-04"
+      ],
+      "given": "Событие цели доставлено повторно.",
+      "action": "Обработать тот же eventId.",
+      "expected": "Счётчик увеличивается один раз и не превышает нужное количество из-за повтора.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-05-01",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-05"
+      ],
+      "given": "Разведывательный квест активен у босса.",
+      "action": "Достичь контрольной позиции и вернуться без убийства.",
+      "expected": "Засчитывается разведка по серверному условию; убийство не становится скрытым обязательством.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-05-02",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-05"
+      ],
+      "given": "Игрок вышел после второго шага цепочки.",
+      "action": "Войти на другом устройстве.",
+      "expected": "Отображается тот же прогресс и следующий шаг; цепочка не начинается заново.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-06-01",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-06"
+      ],
+      "given": "Сумка заполнена, для сдачи нужен материал.",
+      "action": "Подтвердить сдачу.",
+      "expected": "Либо вся операция отклонена без потерь, либо применён явно согласованный буфер; частичной пропажи нет.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P4-06-02",
+      "kind": "detailed_scenario",
+      "phase": "P4",
+      "task_ids": [
+        "P4-06"
+      ],
+      "given": "Два запроса одновременно сдают одно задание.",
+      "action": "Дождаться ответов и перезапустить сервер.",
+      "expected": "Материалы списаны один раз, награда выдана один раз, статус rewarded устойчив.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-01"
+      ],
+      "given": "Два пальца держат движение и камеру.",
+      "action": "Третьим нажать навык.",
+      "expected": "Действия независимы; камера не прыгает, движение не залипает.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-01"
+      ],
+      "given": "Прокручивается сумка рядом со свитком.",
+      "action": "Провести жест, затем отпустить.",
+      "expected": "Прокрутка не включает заточку и не расходует предмет; выбор требует явного действия.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-02"
+      ],
+      "given": "Телефон работает в сцене 25 минут.",
+      "action": "Сравнить начало и конец одинакового маршрута.",
+      "expected": "Показаны деградация/нагрев и выбранный устойчивый профиль; цифры относятся к этому устройству.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-02"
+      ],
+      "given": "Пользователь увеличил системный текст.",
+      "action": "Открыть вход, сумку и диалог.",
+      "expected": "Ключевые кнопки достижимы, текст не обрезан; Safe Area учитывается.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-03"
+      ],
+      "given": "Два разных героя на ПК/Android атакуют одного врага.",
+      "action": "Сопоставить события и добычу.",
+      "expected": "HP/смерть одинаковы; добыча распределяется по исходному серверному правилу.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-03"
+      ],
+      "given": "iPhone принудительно закрылся после отправки сдачи квеста.",
+      "action": "Вернуться и войти тем же героем.",
+      "expected": "Показан один результат; прогресс/имущество не сброшены, фоновое бессмертие не появилось.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-04"
+      ],
+      "given": "Установлена предыдущая тестовая версия.",
+      "action": "Обновить тем же application ID и подписью.",
+      "expected": "Приложение обновляется, учётная запись и настройки сохраняются.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P5-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P5",
+      "task_ids": [
+        "P5-04"
+      ],
+      "given": "Тестер сообщил сбой на неизвестной модели.",
+      "action": "Запросить/записать устройство, ОС и build вместе со сценарием.",
+      "expected": "Дефект привязан к воспроизводимой конфигурации; нет необоснованного статуса «исправлено для всех».",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-01-01",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-01"
+      ],
+      "given": "На странице написано «общий персонаж на ПК и телефоне».",
+      "action": "Открыть подтверждающие результаты P5.",
+      "expected": "Заявление поддержано реальным тестом, либо обозначено планом.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-01-02",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-01"
+      ],
+      "given": "В трейлере есть эффект, отсутствующий в сборке.",
+      "action": "Сверить кадры с asset/build manifest.",
+      "expected": "Кадр исправлен или честно обозначен концептом; ложное обещание не публикуется.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-02-01",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-02"
+      ],
+      "given": "Материалы готовы, разрешения на оплату нет.",
+      "action": "Подготовить карточку действия и сумму/условия.",
+      "expected": "Работа останавливается только перед обязательным внешним действием; оформление не выдаётся за выполненное.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-02-02",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-02"
+      ],
+      "given": "Страница получила замечание площадки.",
+      "action": "Сохранить замечание и исправить указанные материалы.",
+      "expected": "Статус остаётся на проверке до реального принятия, а не меняется по факту локальной правки.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-03-01",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-03"
+      ],
+      "given": "На компьютере нет Godot/Blender/Node как инструмента разработки.",
+      "action": "Установить и запустить опубликованный тестовый пакет.",
+      "expected": "Игра запускается по указанной инструкции; отсутствующая runtime-зависимость обнаружена до выдачи.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-03-02",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-03"
+      ],
+      "given": "Тестовый сервер временно выключен.",
+      "action": "Открыть игру.",
+      "expected": "Игрок видит понятное состояние и повтор; данные не создаются заново в отдельном офлайн-мире.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-04-01",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-04"
+      ],
+      "given": "Клиент старой карты подключается к новому серверу.",
+      "action": "Попытаться войти.",
+      "expected": "Сервер отказывает до управления и указывает обновление; рассогласованной коллизии нет.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-04-02",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-04"
+      ],
+      "given": "Игрок обновил тестовую сборку и вошёл через Steam.",
+      "action": "Сверить старого героя и имущество.",
+      "expected": "Сохранён прежний accountId/characterId; сервер подтвердил билет и не создал отдельную копию собственности.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-05-01",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-05"
+      ],
+      "given": "Произошёл критический дефект после выпуска.",
+      "action": "Применить записанный runbook обслуживания/восстановления.",
+      "expected": "Новые опасные записи остановлены; возврат сохраняет согласованную точку и явно учитывает последующий прогресс.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    },
+    {
+      "id": "SC-P6-05-02",
+      "kind": "detailed_scenario",
+      "phase": "P6",
+      "task_ids": [
+        "P6-05"
+      ],
+      "given": "Нагрузка превышает измеренный предел.",
+      "action": "Проверить метрики и правила ограничения входа.",
+      "expected": "Сервис ограничивает нагрузку управляемо; не теряет квитанции и не создаёт бесконечную очередь.",
+      "evidence_required": [
+        "точный build/commit и версия данных",
+        "исходные условия и устройство, если применимо",
+        "наблюдаемый результат и открытые отклонения"
+      ]
+    }
+  ]
+}
