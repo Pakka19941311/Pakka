@@ -77,6 +77,7 @@ export class WorldSimulation {
   private brains = new Map<string,MonsterAiBrain>();
   private motors=new Map<string,CharacterMotor>();
   private approaching=new Set<string>();
+  private firingPositions=new Map<string,{target:string;origin:Position;goal:Position;expiresAt:number}>();
   private pursuit=new Map<string,{x:number;z:number;since:number}>();
 
   constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSurface; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
@@ -301,8 +302,8 @@ export class WorldSimulation {
   snapshot(id: string, afterEvent=0): WorldSnapshot {
     const character=this.character(id);
     return structuredClone({protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,character,
-      heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time).map(p=>({id:p.id,name:p.name,classId:p.classId,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt})),
-      monsters:this.state.monsters,summons:this.state.summons,events:this.events.filter(e=>e.sequence>afterEvent)});
+      heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time).map(p=>({id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt})),
+      monsters:this.state.monsters.map((m):WorldMonster=>({...m,aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):'dead'})),summons:this.state.summons,events:this.events.filter(e=>e.sequence>afterEvent)});
   }
   private tick(dt: number): void {
     this.expireDeadlines();
@@ -323,14 +324,20 @@ export class WorldSimulation {
         if(target&&(p.autoAttack||p.skill!==null)){
           const skill=p.skill===null?undefined:CLASSES[p.classId as ClassId].skills[p.skill] as Skill;
           if(skill&&(p.mp<skill.cost||p.cooldowns[p.skill!]>this.state.time))p.skill=null;
-          const range=this.lineOfSight(p,target)?classAttackRange(p.classId):.1;
+          const range=classAttackRange(p.classId);
+          const visible=this.lineOfSight(p,target);
           const contact=this.bodyRadius(p)+this.bodyRadius(target)+.04;
           const approachRange=Math.min(range,Math.max(range*.9,contact));
           const d=distance(p,target);if(d>range)this.approaching.add(p.id);
-          if(d>(this.approaching.has(p.id)?approachRange:range)){
+          if(!visible){
+            // A blocked shot needs a different angle, never a zero-range chase
+            // into the target's body. The usual attack range remains unchanged.
+            goal=this.firingPosition(p,target,approachRange);
+            if(!goal){this.cancelControl(p);this.event('cancel',p.id,undefined,{reason:'no-free-path'});}
+          }else if(d>(this.approaching.has(p.id)?approachRange:range)){
             const travel=Math.max(0,d-Math.max(.35,approachRange-.01));goal={x:p.x+(target.x-p.x)/Math.max(.001,d)*travel,z:p.z+(target.z-p.z)/Math.max(.001,d)*travel};
           }else{
-            this.approaching.delete(p.id);motor.stopPlanar();p.yaw=smoothAngle(p.yaw,Math.atan2(target.x-p.x,target.z-p.z),9,dt);
+            this.approaching.delete(p.id);this.firingPositions.delete(p.id);motor.stopPlanar();p.yaw=smoothAngle(p.yaw,Math.atan2(target.x-p.x,target.z-p.z),9,dt);
             if(p.grounded&&(p.skill!==null||p.attackReadyAt<=this.state.time)&&Math.cos(Math.atan2(target.x-p.x,target.z-p.z)-p.yaw)>.97)this.beginPlayerAttack(p,target);
           }
         }
@@ -541,6 +548,39 @@ export class WorldSimulation {
     const def=MONSTERS[id as MonsterId];const home=this.collision.findNearestFree(point,id==='big'?1.2:id==='mini'?.9:.42);
     this.state.monsters.push({...motion(this.state.time),...home,uid,id,home,regionId,patrolIndex:index,hp:def.hp,alive:true,respawnAt:0,attackReadyAt:this.state.time+this.random()*1000,generation:1,phase:1,status:{slow:0,stun:0,dot:0,nextDot:0}});
   }
+  private firingPosition(p:WorldCharacter,target:WorldMonster,range:number):Position|null {
+    const cached=this.firingPositions.get(p.id);
+    if(cached&&cached.target===target.uid&&cached.expiresAt>this.state.time&&distance(cached.origin,target)<.7
+      &&!this.collision.isBlocked(cached.goal,.46)&&this.lineOfSight(cached.goal,target))return cached.goal;
+    const angle=Math.atan2(p.z-target.z,p.x-target.x);
+    const candidates:Position[]=[];
+    for(let i=0;i<24;i++){
+      const offset=(i===0?0:Math.ceil(i/2)*(i%2?1:-1))*Math.PI/12;
+      const goal={x:target.x+Math.cos(angle+offset)*range,z:target.z+Math.sin(angle+offset)*range};
+      if(Math.abs(goal.x)>156||Math.abs(goal.z)>136||this.collision.isBlocked(goal,.46)||!this.lineOfSight(goal,target))continue;
+      candidates.push(goal);
+    }
+    candidates.sort((a,b)=>distance(p,a)-distance(p,b));
+    for(const goal of candidates){
+      const points=findNavigationPath(this.collision,p,goal,{actorRadius:.46,cellSize:.85,margin:24,maxVisited:4500});
+      if(!points.length)continue;
+      // Navigation knows terrain, while live actor spacing is resolved each tick.
+      // Reject routes through the monster instead of walking against its body.
+      const clearance=Math.min(distance(p,target)-.05,this.bodyRadius(p)+this.bodyRadius(target)+.2);
+      let from:Position=p,clear=true;
+      for(const to of points){
+        const dx=to.x-from.x,dz=to.z-from.z,length=dx*dx+dz*dz;
+        const t=length?Math.max(0,Math.min(1,((target.x-from.x)*dx+(target.z-from.z)*dz)/length)):0;
+        if(distance({x:from.x+dx*t,z:from.z+dz*t},target)<clearance){clear=false;break;}
+        from=to;
+      }
+      if(!clear)continue;
+      this.paths.set(p.id,{goal:{...goal},points,expiresAt:this.state.time+650});
+      this.firingPositions.set(p.id,{target:target.uid,origin:{x:target.x,z:target.z},goal,expiresAt:this.state.time+1200});
+      return goal;
+    }
+    this.firingPositions.delete(p.id);return null;
+  }
   private waypoint(actor:Position,goal:Position,radius:number,key:string):Position|undefined {
     // The final centimetres of an attack approach must not be discarded as a
     // reached navigation waypoint while the target is still out of reach.
@@ -592,7 +632,7 @@ export class WorldSimulation {
     const p=this.state.characters[id];if(p)p.bufferedSkill=undefined;
   }
   private cancelControl(p:WorldCharacter,resetMotor=true):void {
-    p.target=null;p.skill=null;p.autoAttack=false;p.bufferedSkill=undefined;p.destination=null;p.direction={x:0,z:0};this.cancelAttack(p.id);this.paths.delete(p.id);this.approaching.delete(p.id);this.pursuit.delete(p.id);
+    p.target=null;p.skill=null;p.autoAttack=false;p.bufferedSkill=undefined;p.destination=null;p.direction={x:0,z:0};this.cancelAttack(p.id);this.paths.delete(p.id);this.firingPositions.delete(p.id);this.approaching.delete(p.id);this.pursuit.delete(p.id);
     if(resetMotor){this.motor(p).reset();p.yOffset=0;p.grounded=true;}
   }
   private recalculate(p:WorldCharacter):void {Object.assign(p,calculateEquipmentStats(p.classId,CLASSES[p.classId as ClassId].stats,p.level,p.equipment,itemDef));p.hp=Math.min(p.hp,p.maxHp);p.mp=Math.min(p.mp,p.maxMp);}

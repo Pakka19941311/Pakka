@@ -2,11 +2,11 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-07",
-  "state_kind": "pc_native_test_released_awaiting_owner",
+  "state_kind": "pc_core_gameplay_repair_in_progress",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
-  "observed_local_branch": "work/godot-migration-p0",
+  "observed_local_branch": "work/godot-p1-recovery",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+  "observed_head": "cd1b4f73d9a8901d7d8e7add3e2b5fab57f55760",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -15,12 +15,12 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
   "current_phase": "P1",
-  "current_task": "Owner Windows test and P1-11 sample review; P1-12 after sample acceptance",
+  "current_task": "Repair rejected core gameplay from owner QA reports; no new content before owner test",
   "next_task_after_authorization": null,
   "next_action": {
     "task_id": "P1-05",
     "substep_id": "P1-05.4",
-    "action": "Владелец тестирует исправленный native Windows ZIP 1dcd61ffd8c6. Затем исправить замечания текущего PC-блока и продолжить открытые подпункты P1. Windows GPU/FPS, прежний личный browser profile и полная визуальная приёмка ещё не подтверждены. Mac/Android отложены.",
+    "action": "Continue current gameplay fixes, targeted native/server QA and Windows test release. NPC/camera/jump/combat/death/HUD/inventory/menu/minimap/audio; resume P1 content after owner accepts this block.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
     "requires_physical_android": false,
@@ -4265,5 +4265,23 @@
     "sha256": "43e5042a1167ff8179e3d84e6e6361027943b111b2f0b989ec9d036e3f97ddf3",
     "direct_download_verified": true,
     "publication": "passed exact source ZIP verification and public re-download"
+  },
+  "gameplay_feedback_2026_09_07": {
+    "status": "implementation_under_test",
+    "source": "Two owner-supplied Markdown gameplay reports; no new video attached for this revision",
+    "scope": [
+      "NPC interpolation",
+      "RMB pointer and orbit",
+      "jump continuity",
+      "ranged firing positions",
+      "combat animation and death feedback",
+      "compact HUD and inventory",
+      "menu close and display rollback",
+      "minimap terrain and landmarks",
+      "combat/ambient audio",
+      "F3 frame diagnostics"
+    ],
+    "new_world_content": false,
+    "windows_gpu_verified": false
   }
 }

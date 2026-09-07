@@ -51,7 +51,7 @@ const topology=JSON.parse(readFileSync('public/assets/world/world-topology.json'
 const restoredTopology=restoreWorldTopology(topology);
 const itemStats=Object.fromEntries(Object.entries(ITEMS).map(([id,def])=>[id,Array.from({length:16},(_,plus)=>itemStatBreakdown(def,plus))]));
 writeFileSync(resolve(output,'game.json'),JSON.stringify({contentVersion:CONTENT_VERSION,mapVersion:mapVersion(restoredTopology.collision,restoredTopology.terrain),classes:CLASSES,items:ITEMS,monsters:MONSTERS,equipSlots:EQUIP_SLOTS,slotNames:SLOT_NAMES,locations:LOCATIONS,quickDefaults:quickDefaults(),quickKeys:QUICK_KEYS,itemStats,scrolls:SCROLLS,chances:ENHANCEMENT_PERCENT,xpNeeded:Array.from({length:MAX_LEVEL+1},(_,i)=>xpNeeded(Math.max(1,i)))}));
-writeFileSync(resolve(output,'terrain.json'),JSON.stringify({width:terrain.width,depth:terrain.depth,columns:terrain.columns,rows:terrain.rows,heights:Array.from(terrain.heights),platforms:topology.platforms,colliders:topology.colliders}));
+writeFileSync(resolve(output,'terrain.json'),JSON.stringify({width:terrain.width,depth:terrain.depth,columns:terrain.columns,rows:terrain.rows,heights:Array.from(terrain.heights),roads:terrain.roads,platforms:topology.platforms,colliders:topology.colliders}));
 writeFileSync(resolve(output,'layout.json'),JSON.stringify({placements,geometry}));
 for(const name of ['Warrior','Wizard','Ranger','Rogue','Monk']){const p=resolve(output,'actors',name+'.gltf');mkdirSync(dirname(p),{recursive:true});cpSync(`public/assets/models/characters/${name}.gltf`,p);}
 for(const name of ['Fox','Skeleton','Slime','Dragon','Bat'])cpSync(`public/assets/models/monsters-glb/${name}.glb`,resolve(output,'actors',name+'.glb'));
@@ -65,3 +65,7 @@ const collisionCases=topology.colliders.filter((_,i)=>i%3===0).flatMap((c,i)=>[
   {x:c.x,z:c.z,dx:Math.sin(i)*1.4,dz:Math.cos(i)*1.4},
 ]).map(v=>({...v,expected:shared.resolve({x:v.x,z:v.z},{x:v.dx,z:v.dz},.46)}));
 writeFileSync(resolve(output,'collision-qa.json'),JSON.stringify(collisionCases));
+
+cpSync(resolve(root, "public/assets/audio/sfx"), resolve(output, "audio"), {recursive:true});
+
+cpSync(resolve(root, "public/assets/audio/ambient/forest.mp3"), resolve(output, "audio/forest.mp3"));

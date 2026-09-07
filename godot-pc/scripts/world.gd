@@ -16,6 +16,21 @@ var movement: Vector2 = Vector2.ZERO
 var camera_yaw: float = 0.0
 var camera_pitch: float = .72
 var camera_distance: float = 21.0
+var orbit_yaw: float = 0.0
+var orbit_pitch: float = .72
+var orbit_distance: float = 21.0
+var camera_clearance: float = 21.0
+var labels_layer: Control
+var jump_offset: float = 0.0
+var jump_velocity: float = 0.0
+var jump_active: bool = false
+var jump_wait_ground: bool = false
+var landing_left: float = 0.0
+var previous_server_time: float = -1
+var sound_players: Array[AudioStreamPlayer] = []
+var sound_streams: Dictionary = {}
+var combat_volume: float = .75
+var ambient_player: AudioStreamPlayer
 var target_id: String = ""
 var target_ring: MeshInstance3D
 var hero_speed: float = 6.2
@@ -40,6 +55,26 @@ signal loot_received(message: String)
 
 func setup(game: Dictionary) -> bool:
 	data = game
+	var canvas: CanvasLayer = CanvasLayer.new()
+	canvas.layer = 0
+	add_child(canvas)
+	labels_layer = Control.new()
+	labels_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	canvas.add_child(labels_layer)
+	for sound_name: String in ["sword-swing", "melee-impact", "monster-hit", "monster-death", "monster-aggro", "coin"]:
+		sound_streams[sound_name] = load("res://generated/audio/" + sound_name + ".ogg")
+	for i: int in range(8):
+		var player: AudioStreamPlayer = AudioStreamPlayer.new()
+		player.volume_db = -10
+		add_child(player)
+		sound_players.append(player)
+	ambient_player = AudioStreamPlayer.new()
+	var forest: AudioStreamMP3 = load("res://generated/audio/forest.mp3")
+	forest.loop = true
+	ambient_player.stream = forest
+	ambient_player.volume_linear = .275
+	add_child(ambient_player)
+	ambient_player.play()
 	terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
 	collision.setup(terrain.colliders)
 	if ResourceLoader.load_threaded_request("res://generated/world.glb") != OK:
@@ -110,6 +145,8 @@ func setup(game: Dictionary) -> bool:
 		var actor: Node3D = make_actor(npc.id, npc.model, 2.05, npc.name, Color("e2c382"))
 		actor.position = point(npc.x, npc.z)
 		actor.set_meta("destination", actor.position)
+		actor.set_meta("previous", actor.position)
+		actor.set_meta("initialized", true)
 		animate(actor, "idle")
 
 	# Load each shared actor template during loading, before exploration.
@@ -175,6 +212,22 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 	label.outline_modulate = Color("151819")
 	label.outline_size = 8
 	root.add_child(label)
+	label.hide()
+	var screen_label: Label = Label.new()
+	screen_label.text = title
+	screen_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	screen_label.add_theme_font_size_override("font_size", 14)
+	screen_label.add_theme_color_override("font_color", color)
+	screen_label.add_theme_color_override("font_outline_color", Color("101619"))
+	screen_label.add_theme_constant_override("outline_size", 4)
+	labels_layer.add_child(screen_label)
+	root.set_meta("screen_label", screen_label)
+	root.tree_exiting.connect(screen_label.queue_free)
+	root.set_meta("model", model)
+	root.set_meta("base_visual", visual.transform)
+	root.set_meta("dead", false)
+	root.set_meta("attack_left", 0.0)
+	root.set_meta("hit_left", 0.0)
 	root.set_meta("label", label)
 	root.set_meta("pick_size", Vector3(maxf(.75, bounds.size.x * size / maxf(.001, bounds.size.y)), size, maxf(.75, bounds.size.z * size / maxf(.001, bounds.size.y))))
 	root.set_meta("pickable", id.begins_with("npc:"))
@@ -198,22 +251,26 @@ func animate(actor: Node3D, action: String) -> void:
 	if action == "walk":
 		candidates = ["run", "running", "walk", "walking", "flying"]
 	elif action == "attack":
-		candidates = ["attack", "sword", "punch", "bite", "shoot", "spell"]
+		candidates = ["bow_draw", "bow_shoot"] if actor.get_meta("model") == "Ranger" else ["spell1", "spell2", "staff_attack"] if actor.get_meta("model") == "Wizard" else ["sword_attack", "dagger_attack", "attack", "bite", "punch"]
+	elif action == "release":
+		candidates = ["bow_shoot"] if actor.get_meta("model") == "Ranger" else ["spell1", "spell2"]
 	elif action == "death":
 		candidates = ["death", "die"]
 	elif action == "jump":
 		candidates = ["jump", "flying", "idle"]
 	for match_text: String in candidates:
 		for clip: String in player.get_animation_list():
-			if match_text in clip.to_lower() and "reset" not in clip.to_lower():
+			if match_text in clip.to_lower() and "reset" not in clip.to_lower() and not (action in ["attack", "release"] and "idle" in clip.to_lower()):
 				var animation: Animation = player.get_animation(clip)
 				animation.loop_mode = Animation.LOOP_LINEAR if action in ["idle", "walk"] else Animation.LOOP_NONE
-				player.play(clip, .12)
+				player.speed_scale = 1.0
+				player.play(clip, .08)
 				actor.set_meta("action", action)
 				return
 
 func apply_snapshot(snapshot: Dictionary) -> void:
-	snapshot_interval = clampf(snapshot_age, .05, .2)
+	snapshot_interval = clampf((float(snapshot.time) - previous_server_time) / 1000.0, .05, .25) if previous_server_time >= 0 else .1
+	previous_server_time = float(snapshot.time)
 	snapshot_age = 0
 	current_snapshot = snapshot
 	var hero: Dictionary = snapshot.character
@@ -228,6 +285,10 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		click_goal = null
 		target_id = ""
 		generation = int(hero.generation)
+		jump_active = false
+		jump_wait_ground = false
+		jump_offset = 0.0
+		jump_velocity = 0.0
 	for pending_input: Dictionary in pending_inputs.duplicate():
 		if int(pending_input.sequence) <= int(hero.lastInputSequence):
 			pending_inputs.erase(pending_input)
@@ -239,9 +300,16 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 	for person: Dictionary in people:
 		var id: String = str(person.id)
 		keep[id] = true
-		var actor: Node3D = make_actor(id, data.classes[person.classId].model, 2.05, person.name + " · " + str(person.get("level", "")), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
+		var actor: Node3D = make_actor(id, data.classes[person.classId].model, 2.05, person.name + (" · %d" % int(person.level) if person.has("level") else ""), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
 		set_destination(actor, point(person.x, person.z, person.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
+		if bool(person.get("dead", false)):
+			begin_death(actor)
+		elif actor.get_meta("dead", false):
+			actor.set_meta("dead", false)
+			(actor.get_meta("visual") as Node3D).transform = actor.get_meta("base_visual")
+			actor.set_meta("action", "")
+			actor.visible = true
 		apply_motion(actor, person)
 	for monster: Dictionary in snapshot.get("monsters", []):
 		if Vector2(monster.x - hero.x, monster.z - hero.z).length() > 115:
@@ -249,11 +317,17 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		var id: String = str(monster.uid)
 		keep[id] = true
 		var def: Dictionary = data.monsters[monster.id]
-		var actor: Node3D = make_actor(id, def.model, 2.05 * float(def.get("scale", 1)), def.name + " · " + str(def.level), Color("e0a6a0"))
+		var actor: Node3D = make_actor(id, def.model, 2.05 * float(def.get("scale", 1)), def.name + " · %d" % int(def.level), Color("e0a6a0"))
 		set_destination(actor, point(monster.x, monster.z, monster.get("yOffset", 0)))
 		actor.set_meta("pickable", bool(monster.alive))
 		actor.set_meta("yaw", -float(monster.get("yaw", 0)) + PI)
-		actor.visible = monster.alive or (snapshot.time - monster.get("actionStartedAt", 0) < 4000)
+		if not monster.alive or float(monster.hp) <= 0:
+			begin_death(actor)
+		elif actor.get_meta("dead", false):
+			actor.set_meta("dead", false)
+			(actor.get_meta("visual") as Node3D).transform = actor.get_meta("base_visual")
+			actor.set_meta("action", "")
+			actor.visible = true
 		apply_motion(actor, monster, "death" if not monster.alive else "")
 	for summon: Dictionary in snapshot.get("summons", []):
 		var id: String = str(summon.uid)
@@ -270,7 +344,16 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		if int(event.sequence) <= last_event:
 			continue
 		last_event = int(event.sequence)
-		if event.kind == "release":
+		if event.kind == "attack" and actors.has(str(event.actor)):
+			var actor: Node3D = actors[str(event.actor)]
+			if not actor.get_meta("dead", false):
+				actor.set_meta("attack_left", maxf(.3, (float(event.get("endsAt", snapshot.time + 700)) - float(snapshot.time)) / 1000.0))
+				actor.set_meta("action", "")
+				animate(actor, "attack")
+				play_sound("sword-swing", actor.position)
+		elif event.kind == "death" and actors.has(str(event.actor)):
+			begin_death(actors[str(event.actor)])
+		elif event.kind == "release":
 			show_release(event)
 		elif event.kind in ["buff", "summon"] and actors.has(str(event.actor)):
 			show_aura(actors[str(event.actor)].position, Color("7da4eb") if event.kind == "buff" else Color("b38bd9"))
@@ -282,33 +365,31 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			if not names.is_empty():
 				message += "\n" + ", ".join(names)
 			loot_received.emit("Добыча: " + message)
-			if actors.has(str(event.get("target", ""))):
-				show_text(actors[str(event.target)].position, message, Color("edcd83"), 4.0)
+			play_sound("coin", hero_position)
 		if event.get("kind") in ["hit", "miss"] and actors.has(str(event.get("target", ""))):
 			var target: Node3D = actors[str(event.target)]
-			var label: Label3D = Label3D.new()
-			label.text = str(int(event.amount)) if event.has("amount") else "Промах"
-			label.font_size = 48 if event.get("critical", false) else 36
-			label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-			label.no_depth_test = true
-			label.modulate = Color("ffc86b") if event.get("critical", false) else Color("f0ded0")
-			label.position = target.position + Vector3(0, 2.6, 0)
-			add_child(label)
-			floaters.append({"node":label,"left":1.0})
+			target.set_meta("hit_left", .18)
+			show_text(target.position, str(int(event.amount)) if event.has("amount") else "Промах", Color("ef7770") if str(event.target) == hero_id else Color("f5d698"), .85)
+			show_aura(target.position + Vector3(0, .7, 0), Color("ffcf87"))
+			play_sound("melee-impact" if str(event.target) == hero_id else "monster-hit", target.position)
 
 func apply_motion(actor: Node3D, motion: Dictionary, override_action: String = "") -> void:
+	if actor.get_meta("dead", false):
+		return
 	var action: String = override_action if not override_action.is_empty() else str(motion.get("action", "idle"))
 	var start: float = float(motion.get("actionStartedAt", 0))
 	if action in ["attack", "jump", "death"] and start != float(actor.get_meta("action_start", -1)):
 		actor.set_meta("action", "")
 		actor.set_meta("action_start", start)
+	if action == "attack" and actor.get_meta("action") == "release":
+		return
 	animate(actor, action)
 
 func blocked(position: Vector3) -> bool:
 	return collision.blocked(Vector2(position.x, -position.z))
 
 func set_destination(actor: Node3D, destination: Vector3) -> void:
-	actor.set_meta("previous", actor.get_meta("destination"))
+	actor.set_meta("previous", actor.position)
 	actor.set_meta("destination", destination)
 	if not actor.get_meta("initialized") or actor.position.distance_to(destination) > 8:
 		actor.position = destination
@@ -318,6 +399,11 @@ func set_destination(actor: Node3D, destination: Vector3) -> void:
 func record_intent(value: Dictionary, input_sequence: int) -> void:
 	sent_sequence = input_sequence
 	pending_inputs.append({"sequence":input_sequence,"intent":value.duplicate()})
+	if value.type == "jump" and not jump_active and not current_snapshot.is_empty() and bool(current_snapshot.character.grounded):
+		jump_active = true
+		jump_wait_ground = false
+		jump_velocity = 8.2
+		jump_offset = 0
 	if value.type in ["attack", "cancel"] or (value.type == "direction" and Vector2(value.x, value.z).length() > .01):
 		click_goal = null
 	if value.type == "destination":
@@ -355,21 +441,44 @@ func _process(delta: float) -> void:
 				var preview: Vector2 = collision.resolve(pos, walk)
 				desired = point(preview.x, preview.y, float(hero.get("yOffset", 0)))
 			hero_position = hero_position.lerp(desired, 1 - exp(-24 * dt))
+	if not current_snapshot.is_empty():
+		var hero: Dictionary = current_snapshot.character
+		if jump_active:
+			jump_offset += jump_velocity * dt - 11.0 * dt * dt
+			jump_velocity -= 22.0 * dt
+			if jump_offset <= 0 and jump_velocity < 0:
+				jump_offset = 0
+				jump_active = false
+				jump_wait_ground = true
+				landing_left = .16
+		elif not bool(hero.grounded) and not jump_wait_ground:
+			jump_offset = lerpf(jump_offset, float(hero.yOffset), 1 - exp(-18 * dt))
+		else:
+			if bool(hero.grounded): jump_wait_ground = false
+			jump_offset = lerpf(jump_offset, 0, 1 - exp(-25 * dt))
+		hero_position.y = height_at(hero_position.x, -hero_position.z) + jump_offset
+	landing_left = maxf(0, landing_left - dt)
 	for id: String in actors:
 		var actor: Node3D = actors[id]
 		var destination: Vector3 = actor.get_meta("destination")
 		actor.position = hero_position if id == hero_id else (actor.get_meta("previous") as Vector3).lerp(destination, clampf(snapshot_age / snapshot_interval, 0, 1))
 		actor.rotation.y = lerp_angle(actor.rotation.y, float(actor.get_meta("yaw")), 1 - exp(-18 * dt))
-		(actor.get_meta("label") as Label3D).visible = show_names
-		if id == hero_id and not movement.is_zero_approx():
+		(actor.get_meta("label") as Label3D).hide()
+		update_actor_pose(actor, dt)
+		if id == hero_id and not movement.is_zero_approx() and not jump_active:
 			actor.rotation.y = lerp_angle(actor.rotation.y, -atan2(movement.x, movement.y) + PI, 1 - exp(-16 * dt))
 			animate(actor, "walk")
-	var pivot: Vector3 = hero_position + Vector3(0, 1.25, 0)
-	var offset: Vector3 = Vector3(sin(camera_yaw) * cos(camera_pitch), sin(camera_pitch), cos(camera_yaw) * cos(camera_pitch))
-	var distance: float = maxf(.6, collision.ray_distance(pivot, pivot + offset * camera_distance, .22) - .12)
-	camera.position = pivot + offset * distance
+	orbit_yaw = lerp_angle(orbit_yaw, camera_yaw, 1 - exp(-18 * dt))
+	orbit_pitch = lerpf(orbit_pitch, clampf(camera_pitch, .18, 1.25), 1 - exp(-18 * dt))
+	orbit_distance = lerpf(orbit_distance, clampf(camera_distance, 9, 30), 1 - exp(-12 * dt))
+	var pivot: Vector3 = hero_position + Vector3(0, 1.25 - jump_offset * .65, 0)
+	var offset: Vector3 = Vector3(sin(orbit_yaw) * cos(orbit_pitch), sin(orbit_pitch), cos(orbit_yaw) * cos(orbit_pitch))
+	var available: float = maxf(1.8, collision.ray_distance(pivot, pivot + offset * orbit_distance, .28) - .2)
+	camera_clearance = available if available < camera_clearance else lerpf(camera_clearance, available, 1 - exp(-7 * dt))
+	camera.position = pivot + offset * camera_clearance
 	camera.position.y = maxf(camera.position.y, height_at(camera.position.x, -camera.position.z) + .3)
 	camera.look_at(pivot)
+	update_nameplates()
 	target_ring.visible = actors.has(target_id) and actors[target_id].visible and actors[target_id].get_meta("pickable", false)
 	if target_ring.visible:
 		target_ring.position = actors[target_id].position + Vector3(0, .13, 0)
@@ -388,7 +497,9 @@ func _process(delta: float) -> void:
 			effects.erase(effect)
 	for floater: Dictionary in floaters.duplicate():
 		floater.left -= delta
-		floater.node.position.y += delta * 1.2
+		floater.position.y += delta * .8
+		floater.node.position = camera.unproject_position(floater.position) - floater.node.size * .5
+		floater.node.visible = not camera.is_position_behind(floater.position)
 		floater.node.modulate.a = maxf(0, floater.left)
 		if floater.left <= 0:
 			floater.node.queue_free()
@@ -445,16 +556,100 @@ func click(screen: Vector2) -> void:
 		previous = position
 
 func show_text(position_value: Vector3, message: String, color: Color, duration: float = 1.0) -> void:
-	var text_node: Label3D = Label3D.new()
+	var text_node: Label = Label.new()
 	text_node.text = message
-	text_node.font_size = 32
-	text_node.pixel_size = .01
-	text_node.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	text_node.no_depth_test = true
+	text_node.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	text_node.add_theme_font_size_override("font_size", 18)
+	text_node.add_theme_constant_override("outline_size", 4)
+	text_node.add_theme_color_override("font_outline_color", Color("111518"))
 	text_node.modulate = color
-	text_node.position = position_value + Vector3(0, 2.4, 0)
-	add_child(text_node)
-	floaters.append({"node":text_node,"left":duration})
+	labels_layer.add_child(text_node)
+	floaters.append({"node":text_node,"position":position_value + Vector3(0, 2.2, 0),"left":duration})
+
+func play_sound(sound_name: String, position_value: Vector3) -> void:
+	var distance: float = position_value.distance_to(hero_position)
+	if distance > 28 or combat_volume <= 0:
+		return
+	for player: AudioStreamPlayer in sound_players:
+		if not player.playing:
+			player.stream = sound_streams.get(sound_name)
+			player.volume_linear = combat_volume * clampf(1.0 - distance / 35.0, .2, 1.0)
+			player.play()
+			return
+
+func stop_audio() -> void:
+	if ambient_player != null:
+		ambient_player.stop()
+		ambient_player.stream = null
+	for player: AudioStreamPlayer in sound_players:
+		player.stop()
+		player.stream = null
+
+func begin_death(actor: Node3D) -> void:
+	if actor.get_meta("dead", false):
+		return
+	actor.set_meta("dead", true)
+	actor.set_meta("death_age", 0.0)
+	actor.set_meta("pickable", false)
+	actor.set_meta("attack_left", 0.0)
+	actor.set_meta("previous", actor.position)
+	actor.set_meta("destination", actor.position)
+	actor.set_meta("action", "")
+	if actor.has_meta("player"):
+		(actor.get_meta("player") as AnimationPlayer).stop()
+	animate(actor, "death")
+	play_sound("monster-death", actor.position)
+
+func update_actor_pose(actor: Node3D, dt: float) -> void:
+	var visual: Node3D = actor.get_meta("visual")
+	var base: Transform3D = actor.get_meta("base_visual")
+	if actor.get_meta("dead", false):
+		var age: float = float(actor.get_meta("death_age", 0)) + dt
+		actor.set_meta("death_age", age)
+		if actor.get_meta("action") != "death":
+			visual.transform = base.rotated_local(Vector3.FORWARD, smoothstep(0, .45, age) * 1.45)
+		visual.position.y = base.origin.y - maxf(0, age - 2.0) * .8
+		actor.visible = age < 2.7
+		return
+	var attack: float = maxf(0, float(actor.get_meta("attack_left", 0)) - dt)
+	actor.set_meta("attack_left", attack)
+	var hit: float = maxf(0, float(actor.get_meta("hit_left", 0)) - dt)
+	actor.set_meta("hit_left", hit)
+	visual.transform = base
+	if actor == actors.get(hero_id):
+		if jump_active:
+			visual.rotation.x += clampf(jump_velocity / 8.2, -1, 1) * .06
+		elif landing_left > 0:
+			visual.scale.y *= 1.0 - sin(landing_left / .16 * PI) * .07
+	if actor.get_meta("model") == "Fox" and attack > 0:
+		visual.rotation.x = sin(attack * 8) * .22
+		visual.position.z += sin(attack * 8) * .3
+	if hit > 0:
+		visual.rotation.z += sin(hit * 28) * .1
+
+func update_nameplates() -> void:
+	var ordered: Array = actors.keys()
+	ordered.sort_custom(func(a: String, b: String): return (0 if a == target_id else 1 if a == hero_id else 2 if a.begins_with("npc:") else 3) < (0 if b == target_id else 1 if b == hero_id else 2 if b.begins_with("npc:") else 3))
+	var used: Array[Rect2] = []
+	for id: String in ordered:
+		var actor: Node3D = actors[id]
+		var title: Label = actor.get_meta("screen_label")
+		title.hide()
+		if not show_names or not actor.visible or actor.get_meta("dead", false) or actor.position.distance_to(hero_position) > 26 or used.size() >= 10:
+			continue
+		var point_value: Vector3 = actor.position + Vector3(0, (actor.get_meta("pick_size") as Vector3).y + .3, 0)
+		if camera.is_position_behind(point_value):
+			continue
+		var pos: Vector2 = camera.unproject_position(point_value) - Vector2(title.size.x * .5, 20)
+		var bounds: Rect2 = Rect2(pos, title.size).grow(4)
+		var overlaps: bool = false
+		for occupied: Rect2 in used:
+			if occupied.intersects(bounds):
+				overlaps = true
+		if not overlaps:
+			title.position = pos
+			title.show()
+			used.append(bounds)
 
 func effect_mesh(color: Color, mesh: Mesh) -> MeshInstance3D:
 	var node: MeshInstance3D = MeshInstance3D.new()
@@ -477,6 +672,7 @@ func show_aura(position_value: Vector3, color: Color) -> void:
 func show_release(event: Dictionary) -> void:
 	if not actors.has(str(event.actor)) or not actors.has(str(event.get("target", ""))):
 		return
+	animate(actors[str(event.actor)], "release")
 	var start: Vector3 = actors[str(event.actor)].position + Vector3(0, 1.15, 0)
 	var end: Vector3 = actors[str(event.target)].position + Vector3(0, .85, 0)
 	var colors: Dictionary = {"fire":Color("ff7736"),"ice":Color("83ddff"),"lightning":Color("d7c2ff"),"poison":Color("91d45b"),"bone":Color("cbaddd"),"drain":Color("cf6689"),"shadow":Color("a882d8"),"arrow":Color("e5d1a1"),"slash":Color("f2dfb3")}
@@ -484,9 +680,16 @@ func show_release(event: Dictionary) -> void:
 	var duration: float = float(event.get("durationMs", 0)) / 1000.0
 	if duration > 0:
 		var sphere: SphereMesh = SphereMesh.new()
-		sphere.radius = .16
-		sphere.height = .32
+		sphere.radius = .24
+		sphere.height = .48
 		var node: MeshInstance3D = effect_mesh(color, sphere)
+		if event.get("effect") == "arrow":
+			var arrow: CylinderMesh = CylinderMesh.new()
+			arrow.top_radius = .025
+			arrow.bottom_radius = .055
+			arrow.height = .9
+			node.mesh = arrow
+			node.quaternion = Quaternion(Vector3.UP, (end - start).normalized())
 		node.position = start
 		effects.append({"node":node,"start":start,"end":end,"left":duration,"duration":duration})
 	else:

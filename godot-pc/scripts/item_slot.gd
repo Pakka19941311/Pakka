@@ -9,6 +9,11 @@ var dragging: bool = false
 var texture: Texture2D
 static var textures: Dictionary = {}
 
+func _ready() -> void:
+	mouse_entered.connect(func(): owner_ui.show_item_tip(payload.get("item", {}), self))
+	mouse_exited.connect(owner_ui.leave_item_tip)
+
+
 func update_item(item: Dictionary) -> void:
 	text = ""
 	texture = null
@@ -22,8 +27,8 @@ func update_item(item: Dictionary) -> void:
 
 func _draw() -> void:
 	var bounds: Rect2 = Rect2(Vector2(2, 2), size - Vector2(4, 4))
-	draw_style_box(owner_ui.panel_style(Color("1c2528"), Color("747461") if payload.kind == "equipment" else Color("575d52")), bounds)
-	draw_line(Vector2(4, 4), Vector2(size.x - 4, 4), Color("999d87"), 1)
+	draw_style_box(owner_ui.panel_style(Color("1c2528"), Color("747461") if payload.kind == "equipment" else Color("a39470")), bounds)
+	draw_line(Vector2(4, 4), Vector2(size.x - 4, 4), Color("c1b18b"), 1)
 	if texture != null:
 		draw_texture_rect(texture, Rect2(Vector2(5, 5), size - Vector2(10, 10)), false)
 	var font: Font = get_theme_default_font()
@@ -65,7 +70,7 @@ func _can_drop_data(_position: Vector2, data) -> bool:
 func _drop_data(_position: Vector2, data) -> void:
 	owner_ui.drop_item(data, payload)
 
-func _make_custom_tooltip(for_text: String) -> Object:
+func legacy_tooltip(for_text: String) -> Object:
 	var panel: PanelContainer = PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", owner_ui.panel_style(Color("12191d"), Color("aa925c")))
 	var info: RichTextLabel = RichTextLabel.new()

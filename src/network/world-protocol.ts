@@ -1,4 +1,5 @@
 import type { InventoryItem, ItemReference } from '../core/inventory-commands.ts';
+import type { MonsterAiState } from '../world/monster-ai.ts';
 import type { EquipmentCombatStats } from '../core/equipment-stats.ts';
 
 export const WORLD_PROTOCOL = 1;
@@ -19,7 +20,7 @@ export type WorldMonster = Position & WorldMotion & {
   uid: string; id: string; home: Position; regionId?: string; patrolIndex: number; patrolStep?:number;
   hp: number; alive: boolean; respawnAt: number; attackReadyAt: number; generation: number;
   phase: number; status: { slow: number; stun: number; dot: number; nextDot: number; dotOwner?: string };
-  owner?: string;
+  owner?: string; aiState?: MonsterAiState;
 };
 export type WorldSummon = Position & WorldMotion & { uid: string; owner: string; expiresAt: number; attackReadyAt: number };
 export type WorldEvent = {
@@ -30,7 +31,7 @@ export type WorldEvent = {
 export type WorldSnapshot = {
   contentVersion?: string; mapVersion?: string;
   protocol: typeof WORLD_PROTOCOL; time: number; revision: number; character: WorldCharacter;
-  heroes: Array<Pick<WorldCharacter, 'id' | 'name' | 'classId' | 'x' | 'z' | 'hp' | 'maxHp' | 'dead' | 'equipment' | 'generation' | keyof WorldMotion>>;
+  heroes: Array<Pick<WorldCharacter, 'id' | 'name' | 'classId' | 'level' | 'x' | 'z' | 'hp' | 'maxHp' | 'dead' | 'equipment' | 'generation' | keyof WorldMotion>>;
   monsters: WorldMonster[]; summons: WorldSummon[]; events: WorldEvent[];
 };
 // The wire format contains intentions only. Damage, prices, dice and rewards are server-owned.
