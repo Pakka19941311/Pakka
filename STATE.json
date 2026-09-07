@@ -15,7 +15,7 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
   "current_phase": "P1",
-  "current_task": "PC recovery final native CI; P1-11 original samples prepared for review",
+  "current_task": "Owner Windows test and P1-11 sample review; P1-12 after sample acceptance",
   "next_task_after_authorization": null,
   "next_action": {
     "task_id": "P1-05",
@@ -513,9 +513,11 @@
         {
           "id": "P1-04",
           "title": "Появление, опора, камера и движение",
-          "status": "planned",
-          "commit": null,
-          "evidence": [],
+          "status": "in_progress",
+          "commit": "3bcc98a900b0f8ecc2cc895b17894c542eb0aa31",
+          "evidence": [
+            "docs/migration/pc/RECOVERY.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -542,7 +544,8 @@
               "commit": null,
               "evidence": []
             }
-          ]
+          ],
+          "verification_scope": "Native PC implementation verified as recorded in native_recovery; whole task and owner acceptance remain open"
         },
         {
           "id": "P1-05",
@@ -711,9 +714,11 @@
         {
           "id": "P1-09",
           "title": "UI-профиль, смерть и reconnect",
-          "status": "planned",
-          "commit": null,
-          "evidence": [],
+          "status": "in_progress",
+          "commit": "3bcc98a900b0f8ecc2cc895b17894c542eb0aa31",
+          "evidence": [
+            "docs/migration/pc/RECOVERY.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -740,14 +745,17 @@
               "commit": null,
               "evidence": []
             }
-          ]
+          ],
+          "verification_scope": "Native PC implementation verified as recorded in native_recovery; whole task and owner acceptance remain open"
         },
         {
           "id": "P1-10",
           "title": "Существующий бой и NPC на временных моделях",
-          "status": "planned",
-          "commit": null,
-          "evidence": [],
+          "status": "in_progress",
+          "commit": "3bcc98a900b0f8ecc2cc895b17894c542eb0aa31",
+          "evidence": [
+            "docs/migration/pc/RECOVERY.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -774,7 +782,8 @@
               "commit": null,
               "evidence": []
             }
-          ]
+          ],
+          "verification_scope": "Native PC implementation verified as recorded in native_recovery; whole task and owner acceptance remain open"
         },
         {
           "id": "P1-11",
@@ -4215,13 +4224,46 @@
     "video_seconds": 60.4,
     "server_checks": 130,
     "native_headless": "passed: controls, settings rollback/rebinding, shared collisions, UTF-8 stream chunks, late session and receipt isolation",
-    "native_graphical": "first CI exposed self-buff timing at 7.5 software-renderer FPS; deterministic wait corrected, static batching added, rerun pending",
-    "windows_executable": "pending CI",
+    "native_graphical": "passed X11/Mesa; functional low profile, screenshot high profile",
+    "windows_executable": "passed shipped EXE and portable Node headless; Windows GPU not verified",
     "player_database_accessed": false,
     "owner_visual_acceptance": "pending new package",
-    "p1_next": "P1-11 original six-sample Blender/native review pack implemented; P1-12 follows required owner visual acceptance",
+    "p1_next": "Owner reviews P1-11 samples using VIEW_WORLD_SAMPLES.bat; P1-12 requires accepted samples per TZ",
     "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained",
-    "sample_review": "six own meshes, PBR provenance, collision/LOD/wind, 18 native camera views; CI pending",
-    "session_safety": "generation invalidates old HTTP responses; per-hero command journals survive profile changes"
+    "sample_review": "native six-asset scene passed; 18 views inspected; own Blender source/packed PBR/GLB included; owner acceptance pending",
+    "session_safety": "generation invalidates old HTTP responses; per-hero command journals survive profile changes",
+    "build_commit": "3bcc98a900b0f8ecc2cc895b17894c542eb0aa31",
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34152592239",
+    "evidence": [
+      "docs/migration/pc/RECOVERY.md",
+      "docs/migration/pc/evidence/recovery-linux-native-qa.json",
+      "docs/migration/pc/evidence/recovery-windows-native-qa.json",
+      "docs/migration/pc/evidence/recovery-publish-result.json"
+    ],
+    "retained_constraints": [
+      "Windows-first until stable owner test",
+      "No main merge or force push",
+      "Original player database not accessed",
+      "No invented item IDs, stats, economy or probabilities"
+    ],
+    "implemented_pc_blocks": {
+      "P1-01": "native project, pinned exports, InputMap and catalog compatibility",
+      "P1-02": "loading/readiness, retry messaging and stale session fencing",
+      "P1-03": "v1 HTTP/SSE, bounded UTF-8 framing, coalescing with event retention, per-hero pending journal",
+      "P1-04": "shared collision/height, click movement, body-aware attacks, camera and generation",
+      "P1-05": "Windows export and launch verified; owner GPU test remains; mobile/macOS deferred",
+      "P1-06": "HUD and 32 bindings, 20 distinct skill icons, counts/cooldowns",
+      "P1-07": "R2 reference composition, 42 bag/12 equipment, drag, paired comparison",
+      "P1-08": "one durable command ID and authoritative enhancement receipt/retry",
+      "P1-09": "UI profile, display rollback, key rebinding and reconnect/profile isolation",
+      "P1-10": "five classes/twenty skills, old NPC services and loot feedback",
+      "P1-11": "six own world samples, native collision/LOD/three views; owner art review required"
+    },
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-3bcc98a900b0/Varendor_Godot_PC_3bcc98a900b0.zip",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-3bcc98a900b0",
+    "zip_bytes": 295813608,
+    "sha256": "43e5042a1167ff8179e3d84e6e6361027943b111b2f0b989ec9d036e3f97ddf3",
+    "direct_download_verified": true,
+    "publication": "passed exact source ZIP verification and public re-download"
   }
 }
