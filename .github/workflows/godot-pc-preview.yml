@@ -37,6 +37,8 @@ jobs:
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs
           "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py
+      - name: Build original P1 world samples
+        run: '"$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-samples.py'
       - name: Import and export the native clients
         run: |
           mkdir -p qa-artifacts/pc-build
@@ -48,12 +50,20 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical
+      - name: Verify original samples in native Godot
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          xvfb-run -a -s '-screen 0 1600x900x24' qa-artifacts/pc-build/Varendor.x86_64 --audio-driver Dummy -- --world-samples --qa-art="$PWD/qa-artifacts/pc-linux/samples"
+          cp -r world-source/p1-samples qa-artifacts/pc-build/
+          cp godot-pc/generated/p1-samples.glb qa-artifacts/pc-build/p1-samples/
       - uses: actions/upload-artifact@v4
         with:
           name: godot-pc-windows-input
           path: |
             qa-artifacts/pc-build/Varendor.exe
             qa-artifacts/pc-build/blender-build.json
+            qa-artifacts/pc-build/p1-samples/
             qa-artifacts/pc-linux/
           compression-level: 0
           retention-days: 14

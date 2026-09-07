@@ -15,7 +15,7 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
   "current_phase": "P1",
-  "current_task": "PC recovery validation; then P1-11 own world samples",
+  "current_task": "PC recovery final native CI; P1-11 original samples prepared for review",
   "next_task_after_authorization": null,
   "next_action": {
     "task_id": "P1-05",
@@ -4215,11 +4215,12 @@
     "video_seconds": 60.4,
     "server_checks": 130,
     "native_headless": "passed",
-    "native_graphical": "pending CI",
+    "native_graphical": "first CI exposed self-buff timing at 7.5 software-renderer FPS; deterministic wait corrected, static batching added, rerun pending",
     "windows_executable": "pending CI",
     "player_database_accessed": false,
     "owner_visual_acceptance": "pending new package",
-    "p1_next": "P1-11 sample assets; P1-12 depends on sample review",
-    "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained"
+    "p1_next": "P1-11 original six-sample Blender/native review pack implemented; P1-12 follows required owner visual acceptance",
+    "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained",
+    "sample_review": "six own meshes, PBR provenance, collision/LOD/wind, 18 native camera views; CI pending"
   }
 }

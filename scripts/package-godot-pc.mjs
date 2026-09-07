@@ -29,6 +29,8 @@ export async function packageNative({ root, output, binary, nodeArchive }) {
   cpSync(join(root, 'public/assets/models/monsters-glb/licenses'), join(destination, 'licenses/monsters'), {recursive:true});
   cpSync(join(root, 'qa-artifacts/pc-linux/godot-license.txt'), join(destination, 'licenses/Godot.txt'));
   cpSync(join(root, 'packaging/windows/RUN_VARENDOR_PC.bat'), join(destination, 'RUN_VARENDOR.bat'));
+  cpSync(join(root, 'packaging/windows/VIEW_WORLD_SAMPLES.bat'), join(destination, 'VIEW_WORLD_SAMPLES.bat'));
+  cpSync(join(root, 'qa-artifacts/pc-build/p1-samples'), join(destination, 'world-sources/P1'), {recursive:true});
   cpSync(join(root, 'packaging/windows/README_GODOT_PC_RU.txt'), join(destination, 'README_RU.txt'));
   const config = JSON.parse(readFileSync(join(root, 'packaging/windows/node-runtime.json'), 'utf8'));
   let bytes;

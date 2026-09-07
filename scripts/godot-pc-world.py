@@ -117,6 +117,24 @@ for i,p in enumerate(layout['placements']):
     elif kind=='fire':
         light=bpy.data.lights.new(name,'POINT');light.energy=180*p.get('scale',1);light.color=(1,.35,.08)
         o=bpy.data.objects.new(name,light);scene.collection.objects.link(o);o.location=(x,z,y+.5)
+# Native profile showed 1295 draw calls in the starter view. Batch immutable
+# geometry by material and 16 m sector, retaining spatial culling and all lights.
+# Copy the active mesh before joining so templates shared by another sector are
+# never mutated. This is an offline operation, not work in a gameplay frame.
+original_objects=len(scene.objects)
+batches={}
+for obj in list(scene.objects):
+    if obj.type!='MESH' or not obj.data.polygons:continue
+    center=obj.matrix_world@(sum((Vector(c) for c in obj.bound_box),Vector())/8)
+    kind='decor' if any(n in obj.name.lower() for n in ['fern','shrub','grass']) else 'solid'
+    key=(math.floor(center.x/16),math.floor(center.y/16),kind,tuple(m.name if m else '' for m in obj.data.materials))
+    batches.setdefault(key,[]).append(obj)
+for index,(key,objects) in enumerate(batches.items()):
+    if len(objects)<2:continue
+    bpy.ops.object.select_all(action='DESELECT')
+    for obj in objects:obj.select_set(True)
+    active=objects[0];active.data=active.data.copy();bpy.context.view_layer.objects.active=active
+    bpy.ops.object.join();active.name=f"{'grass' if key[2]=='decor' else 'World'}_sector_{key[0]}_{key[1]}_{index}"
 for image in bpy.data.images:
     if image.source=='FILE':
         try:image.pack()
@@ -125,5 +143,5 @@ blend_path=ROOT/'world-source'/'Varendor_PC_World.blend'
 blend_path.parent.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(blend_path))
 bpy.ops.export_scene.gltf(filepath=str(OUT/'world.glb'),export_format='GLB',export_animations=False,export_cameras=False,export_lights=True,export_yup=True)
-report={'placements':len(layout['placements']),'source':'existing src/main.ts buildWorld + Git model/texture files','material_fallbacks_for_known_P0_ASSET_001':sorted(set(fallback)),'objects':len(scene.objects),'blend_bytes':blend_path.stat().st_size,'glb_bytes':(OUT/'world.glb').stat().st_size}
+report={'placements':len(layout['placements']),'source':'existing src/main.ts buildWorld + Git model/texture files','material_fallbacks_for_known_P0_ASSET_001':sorted(set(fallback)),'objects':len(scene.objects),'objects_before_batching':original_objects,'static_batches':len(batches),'blend_bytes':blend_path.stat().st_size,'glb_bytes':(OUT/'world.glb').stat().st_size}
 (OUT/'blender-build.json').write_text(json.dumps(report,indent=2)+'\n');print('VARENDOR_BLENDER_WORLD_READY '+json.dumps(report))

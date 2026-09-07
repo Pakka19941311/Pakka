@@ -44,13 +44,21 @@ var inventory_footer: Label
 var inventory_drag: bool = false
 var inventory_drag_offset: Vector2
 var game_settings: Dictionary = {}
+const DEFAULT_BINDINGS: Dictionary = {"move_forward":KEY_W,"move_back":KEY_S,"move_left":KEY_A,"move_right":KEY_D,"orbit_left":KEY_Q,"orbit_right":KEY_E,"jump":KEY_SPACE,"interact":KEY_F}
+const BINDING_NAMES: Dictionary = {"move_forward":"Вперёд","move_back":"Назад","move_left":"Влево","move_right":"Вправо","orbit_left":"Камера влево","orbit_right":"Камера вправо","jump":"Прыжок","interact":"Взаимодействие"}
+var rebinding_action: String = ""
+var binding_message: Label
 var display_before: Dictionary = {}
 var display_remaining: float = 0.0
 var display_countdown: Label
 var quick_panel_node: PanelContainer
 
 func _ready() -> void:
+	if "--world-samples" in OS.get_cmdline_user_args():
+		get_tree().call_deferred("change_scene_to_file", "res://scenes/art_review.tscn")
+		return
 	get_tree().auto_accept_quit = false
+	configure_input()
 	data = JSON.parse_string(FileAccess.get_file_as_string("res://generated/game.json"))
 	quick = data.quickDefaults.duplicate(true)
 	net = VarendorNetwork.new()
@@ -532,6 +540,7 @@ func load_preferences(id: String) -> void:
 				used.append(quick[index].key)
 	world.camera_distance = clampf(float(preferences.get("camera_distance", 21)), 5, 40)
 	game_settings = preferences.get("settings", {})
+	configure_input()
 	full_quick = bool(preferences.get("full_quick", false))
 	if preferences.get("inventory_position") is Array and preferences.inventory_position.size() == 2:
 		inventory_panel.position = Vector2(preferences.inventory_position[0], preferences.inventory_position[1]).clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO))
@@ -563,13 +572,19 @@ func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer
 	active_dialog.theme = ui.theme
 	add_child(active_dialog)
 	active_dialog.close_requested.connect(func():
+		rebinding_action = ""
 		if not display_before.is_empty():
 			revert_display()
 		active_dialog.queue_free())
 	active_dialog.window_input.connect(func(event: InputEvent):
+		if not rebinding_action.is_empty() and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode != KEY_ESCAPE:
+			assign_movement_binding(event)
+			active_dialog.set_input_as_handled()
+			return
 		if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
 			if not display_before.is_empty():
 				revert_display()
+			rebinding_action = ""
 			active_dialog.set_input_as_handled()
 			active_dialog.queue_free())
 	var panel: PanelContainer = PanelContainer.new()
@@ -640,6 +655,16 @@ func controls_dialog() -> void:
 				slider.value = float(game_settings.get("sensitivity", 1.0))
 				page.add_child(slider)
 				slider.value_changed.connect(func(value: float): game_settings["sensitivity"] = value; apply_settings(); save_preferences())
+				var keys: GridContainer = GridContainer.new()
+				keys.columns = 2
+				page.add_child(keys)
+				for action: String in DEFAULT_BINDINGS:
+					var code: int = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
+					keys.add_child(button(str(BINDING_NAMES[action]) + " · " + OS.get_keycode_string(code), func():
+						rebinding_action = action
+						var prompt: VBoxContainer = dialog("Клавиша: " + str(BINDING_NAMES[action]), Vector2i(500, 190))
+						binding_message = label("Нажмите одну клавишу. Esc — отмена.", 15)
+						prompt.add_child(binding_message)))
 			"Дисплей":
 				setting_choice(page, "Режим экрана", "display", ["Оконный", "Без рамки", "Полный экран"], 0)
 				var names: Array = []
@@ -706,6 +731,32 @@ func apply_settings() -> void:
 			if DisplayServer.window_get_size() != requested:
 				DisplayServer.window_set_size(requested)
 	call_deferred("keep_inventory_visible")
+
+func configure_input() -> void:
+	for action: String in DEFAULT_BINDINGS:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+		InputMap.action_erase_events(action)
+		var event: InputEventKey = InputEventKey.new()
+		event.physical_keycode = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
+		InputMap.action_add_event(action, event)
+
+func assign_movement_binding(event: InputEventKey) -> void:
+	var key: int = event.physical_keycode
+	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB] or (key >= KEY_1 and key <= KEY_8):
+		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab и 1–8 заняты интерфейсом."
+		return
+	var bindings: Dictionary = game_settings.get("bindings", {}).duplicate()
+	for action: String in DEFAULT_BINDINGS:
+		if action != rebinding_action and int(bindings.get(action, DEFAULT_BINDINGS[action])) == key:
+			binding_message.text = "Клавиша занята: " + str(BINDING_NAMES[action]) + ".\nВыберите другую."
+			return
+	bindings[rebinding_action] = key
+	game_settings["bindings"] = bindings
+	rebinding_action = ""
+	configure_input()
+	save_preferences()
+	active_dialog.queue_free()
 
 func window_resolutions() -> Array:
 	var monitor: Vector2i = DisplayServer.screen_get_size()
@@ -869,10 +920,10 @@ func _process(delta: float) -> void:
 		qa_times.append(delta * 1000)
 	var direction: Vector2 = Vector2.ZERO
 	if not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead:
-		var local: Vector2 = Vector2(float(Input.is_physical_key_pressed(KEY_D)) - float(Input.is_physical_key_pressed(KEY_A)), float(Input.is_physical_key_pressed(KEY_W)) - float(Input.is_physical_key_pressed(KEY_S)))
+		var local: Vector2 = Input.get_vector("move_left", "move_right", "move_back", "move_forward")
 		direction = local.normalized().rotated(world.camera_yaw)
 		if not Input.is_physical_key_pressed(KEY_SHIFT):
-			world.camera_yaw += (float(Input.is_physical_key_pressed(KEY_E)) - float(Input.is_physical_key_pressed(KEY_Q))) * delta * 1.8
+			world.camera_yaw += (float(Input.is_action_pressed("orbit_right")) - float(Input.is_action_pressed("orbit_left"))) * delta * 1.8
 	world.movement = direction
 	send_elapsed += delta
 	if (direction != last_direction or (not direction.is_zero_approx() and send_elapsed > .1)) and net.connected:
@@ -917,8 +968,10 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 		match event.physical_keycode:
 			KEY_I, KEY_C, KEY_TAB: toggle_inventory()
-			KEY_SPACE: net.intent({"type":"jump"})
-			KEY_F: interact()
+		if event.is_action_pressed("jump"):
+			net.intent({"type":"jump"})
+		elif event.is_action_pressed("interact"):
+			interact()
 	if text_focused():
 		return
 	if event is InputEventMouseButton and event.pressed:
@@ -1053,7 +1106,9 @@ func run_qa() -> void:
 	world.camera_pitch = pitch_before
 	world.target_id = ""
 	activate("skill:3")
-	await get_tree().create_timer(.4).timeout
+	var skill_wait: int = Time.get_ticks_msec() + 4000
+	while float(net.hero.buffs.guard) <= float(world.current_snapshot.time) and Time.get_ticks_msec() < skill_wait:
+		await get_tree().process_frame
 	checks["self_skill_without_enemy"] = float(net.hero.buffs.guard) > float(world.current_snapshot.time)
 	inventory_panel.show()
 	var input_sequence: int = net.sequence
@@ -1067,6 +1122,25 @@ func run_qa() -> void:
 	save_preferences()
 	load_preferences(uid_before)
 	checks["settings_persist"] = is_equal_approx(mouse_sensitivity, 1.25) and invert_camera_y
+	game_settings["bindings"] = {"move_forward":KEY_UP}
+	configure_input()
+	save_preferences()
+	load_preferences(uid_before)
+	var forward_key: InputEventKey = InputEventKey.new()
+	forward_key.physical_keycode = KEY_UP
+	forward_key.pressed = true
+	var former_key: InputEventKey = InputEventKey.new()
+	former_key.physical_keycode = KEY_W
+	former_key.pressed = true
+	checks["movement_binding_persist"] = InputMap.event_is_action(forward_key, "move_forward") and not InputMap.event_is_action(former_key, "move_forward")
+	game_settings["bindings"] = {}
+	configure_input()
+	var prior_display: Dictionary = {"display":game_settings.get("display", 0),"resolution":game_settings.get("resolution", 1)}
+	game_settings["resolution"] = 0
+	confirm_display(prior_display)
+	display_remaining = .1
+	await get_tree().create_timer(.4).timeout
+	checks["display_timeout_rolls_back"] = display_before.is_empty() and game_settings["resolution"] == prior_display.resolution
 	var hp_before_reconnect: float = net.hero.hp
 	net.stream_failed()
 	await get_tree().create_timer(2.0).timeout
@@ -1088,7 +1162,9 @@ func run_qa() -> void:
 	checks["native_render"] = DisplayServer.get_name() != "headless"
 	if checks.native_render:
 		await RenderingServer.frame_post_draw
-		get_viewport().get_texture().get_image().save_png(qa_path.get_basename() + ".png")
+		var capture: Image = get_viewport().get_texture().get_image()
+		capture.save_png(qa_path.get_basename() + ".png")
+		print("VARENDOR_REVIEW_JPG " + Marshalls.raw_to_base64(capture.save_jpg_to_buffer(.85)))
 	var success: bool = true
 	for key: String in checks:
 		if checks[key] is bool and key != "native_render" and not checks[key]:
