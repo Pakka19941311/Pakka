@@ -40,6 +40,7 @@ jobs:
       - name: Build original P1 world samples
         run: '"$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-samples.py'
       - name: Import and export the native clients
+        id: native_export
         run: |
           mkdir -p qa-artifacts/pc-build
           "$GODOT" --headless --path godot-pc --editor --import
@@ -51,6 +52,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical
       - name: Verify original samples in native Godot
+        if: ${{ !cancelled() && steps.native_export.outcome == 'success' }}
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |

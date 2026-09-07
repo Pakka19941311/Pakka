@@ -34,6 +34,7 @@ var inventory_fingerprint: String = ""
 var active_dialog: Window
 var qa_path: String = ""
 var qa_started: bool = false
+var qa_interaction: bool = false
 var qa_times: Array = []
 var mouse_orbit: bool = false
 var mouse_restore: Vector2 = Vector2.ZERO
@@ -719,6 +720,13 @@ func apply_settings() -> void:
 	get_viewport().scaling_3d_scale = [.5, .75, 1.0][clampi(int(game_settings.get("render_scale", 2)), 0, 2)]
 	get_window().content_scale_factor = [.8, 1.0, 1.25, 1.5][clampi(int(game_settings.get("ui_scale", 1)), 0, 3)]
 	get_viewport().msaa_3d = clampi(int(game_settings.get("msaa", 2)), 0, 3) as Viewport.MSAA
+	if qa_interaction and DisplayServer.get_name() != "headless":
+		# Functional mouse/network tests under CPU-only Mesa use the actual low
+		# quality profile. The final screenshot/metrics restore the high profile.
+		get_viewport().scaling_3d_scale = .5
+		get_viewport().msaa_3d = Viewport.MSAA_DISABLED
+		if world.sun_light != null:
+			world.sun_light.shadow_enabled = false
 	Engine.max_fps = [30, 60, 120, 0][clampi(int(game_settings.get("fps", 1)), 0, 3)]
 	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if game_settings.get("vsync", true) else DisplayServer.VSYNC_DISABLED)
@@ -894,6 +902,8 @@ func toggle_inventory() -> void:
 	inventory_panel.visible = not inventory_panel.visible
 
 func notice(message: String) -> void:
+	if not qa_path.is_empty():
+		print("VARENDOR_QA_NOTICE " + message)
 	var translations: Dictionary = {"shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
 	if log_text != null:
 		log_text.append_text(str(translations.get(message, message)) + "\n")
@@ -1007,13 +1017,10 @@ func can_enhance(item: Dictionary) -> bool:
 
 func switch_profile() -> void:
 	save_preferences()
-	if net.connected:
-		await net.intent({"type":"cancel"})
-		await net.request("/api/disconnect", {})
-	net.close_stream()
-	net.connected = false
-	net.token = ""
-	net.input_queue.clear()
+	var previous_token: String = net.token
+	net.end_session()
+	if not previous_token.is_empty():
+		net.request("/api/disconnect", {}, previous_token)
 	inventory_panel.hide()
 	selected_scroll = {}
 	selected_item = {}
@@ -1038,6 +1045,8 @@ func _notification(what: int) -> void:
 
 func run_qa() -> void:
 	# Exercises this native client against a private fixture server, never a player DB.
+	qa_interaction = true
+	apply_settings()
 	await get_tree().create_timer(2.0).timeout
 	var checks: Dictionary = {"connected":net.connected,"classes":data.classes.size(),"item_definitions":data.items.size(),"quick_slots":quick.size(),"bag_slots":bag_slots.size(),"equipment_slots":equipment_slots.size(),"world_loaded":world.get_child_count() > 4,"hero_model_loaded":world.actors.has(world.hero_id)}
 	var license_file: FileAccess = FileAccess.open(qa_path.get_base_dir().path_join("godot-license.txt"), FileAccess.WRITE)
@@ -1146,6 +1155,7 @@ func run_qa() -> void:
 	await get_tree().create_timer(2.0).timeout
 	checks["stream_reconnect_same_hero"] = net.connected and str(net.hero.id) == uid_before and net.hero.hp <= hp_before_reconnect
 	checks["stream_active"] = net.stream_requested and net.stream.get_status() == HTTPClient.STATUS_BODY
+	checks.merge(await preload("res://scripts/network_qa.gd").run(get_tree(), world.current_snapshot, qa_path.get_base_dir()))
 	# Same actual-map collision vectors are resolved independently by TypeScript.
 	var cases = JSON.parse_string(FileAccess.get_file_as_string("res://generated/collision-qa.json")) if FileAccess.file_exists("res://generated/collision-qa.json") else []
 	checks["shared_collision_vectors"] = not cases.is_empty()
@@ -1156,6 +1166,8 @@ func run_qa() -> void:
 			break
 
 	inventory_panel.show()
+	qa_interaction = false
+	apply_settings()
 	qa_started = true
 	await get_tree().create_timer(5.0).timeout
 	qa_started = false
@@ -1170,7 +1182,7 @@ func run_qa() -> void:
 		if checks[key] is bool and key != "native_render" and not checks[key]:
 			success = false
 	qa_times.sort()
-	var report: Dictionary = {"ok":success,"checks":checks,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"frame_ms_median":qa_times[qa_times.size() / 2] if not qa_times.is_empty() else 0,"frame_ms_p95":qa_times[int(qa_times.size() * .95)] if not qa_times.is_empty() else 0,"render_objects":Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),"render_draw_calls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),"notes":"Synthetic fixture. Headless is not graphical or Windows GPU verification; software renderer is not target-PC performance."}
+	var report: Dictionary = {"ok":success,"checks":checks,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"frame_ms_median":qa_times[qa_times.size() / 2] if not qa_times.is_empty() else 0,"frame_ms_p95":qa_times[int(qa_times.size() * .95)] if not qa_times.is_empty() else 0,"render_objects":Performance.get_monitor(Performance.RENDER_TOTAL_OBJECTS_IN_FRAME),"render_draw_calls":Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME),"functional_render_profile":"low under software Mesa; high profile restored for screenshot and frame metrics","notes":"Synthetic fixture. Headless is not graphical or Windows GPU verification; software renderer is not target-PC performance."}
 	net.save_private_json(qa_path, report)
 	print("VARENDOR_NATIVE_QA " + JSON.stringify(report))
 	net.set_process(false)

@@ -4214,13 +4214,14 @@
     "tested_owner_build": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
     "video_seconds": 60.4,
     "server_checks": 130,
-    "native_headless": "passed",
+    "native_headless": "passed: controls, settings rollback/rebinding, shared collisions, UTF-8 stream chunks, late session and receipt isolation",
     "native_graphical": "first CI exposed self-buff timing at 7.5 software-renderer FPS; deterministic wait corrected, static batching added, rerun pending",
     "windows_executable": "pending CI",
     "player_database_accessed": false,
     "owner_visual_acceptance": "pending new package",
     "p1_next": "P1-11 original six-sample Blender/native review pack implemented; P1-12 follows required owner visual acceptance",
     "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained",
-    "sample_review": "six own meshes, PBR provenance, collision/LOD/wind, 18 native camera views; CI pending"
+    "sample_review": "six own meshes, PBR provenance, collision/LOD/wind, 18 native camera views; CI pending",
+    "session_safety": "generation invalidates old HTTP responses; per-hero command journals survive profile changes"
   }
 }

@@ -33,6 +33,7 @@ var input_busy: bool = false
 var expected_content: String = ""
 var expected_map: String = ""
 var incompatible: bool = false
+var session_generation: int = 0
 
 func _ready() -> void:
 	for arg: String in OS.get_cmdline_user_args():
@@ -44,21 +45,27 @@ func _ready() -> void:
 			bootstrap = value
 	server_url = str(bootstrap.get("server_url", server_url))
 
-func request(path: String, data = null) -> Dictionary:
+func request(path: String, data = null, bearer: String = "") -> Dictionary:
+	var generation: int = session_generation
 	var http: HTTPRequest = HTTPRequest.new()
 	http.timeout = 7.0
 	add_child(http)
 	var headers: PackedStringArray = ["Content-Type: application/json"]
-	if not token.is_empty():
-		headers.append("Authorization: Bearer " + token)
+	var authorization: String = token if bearer.is_empty() else bearer
+	if not authorization.is_empty():
+		headers.append("Authorization: Bearer " + authorization)
 	var err: int = http.request(server_url + path, headers, HTTPClient.METHOD_GET if data == null else HTTPClient.METHOD_POST, "" if data == null else JSON.stringify(data))
 	if err != OK:
 		http.queue_free()
 		return {"error":"Нет соединения с сервером"}
 	var result: Array = await http.request_completed
 	http.queue_free()
+	if generation != session_generation:
+		return {"stale":true}
 	if result[0] != HTTPRequest.RESULT_SUCCESS:
 		return {"error":"Соединение потеряно. Повторяем подключение…"}
+	if int(result[1]) == 401:
+		return {"error":"Доступ к герою истёк. Откройте «Герои» и повторите вход."}
 	var parsed = JSON.parse_string((result[3] as PackedByteArray).get_string_from_utf8())
 	if parsed is not Dictionary:
 		return {"error":"Сервер вернул некорректный ответ"}
@@ -66,7 +73,9 @@ func request(path: String, data = null) -> Dictionary:
 
 func accept(value: Dictionary) -> void:
 	if int(value.get("protocol", 0)) != 1 or not value.has("character"):
+		incompatible = true
 		connected = false
+		close_stream()
 		notice.emit("Версия сервера несовместима с этой сборкой")
 		return
 	if (not expected_content.is_empty() and value.get("contentVersion", "") != expected_content) or (not expected_map.is_empty() and value.get("mapVersion", "") != expected_map):
@@ -94,23 +103,40 @@ func accept(value: Dictionary) -> void:
 	if reconnecting and not pending.is_empty() and not command_busy:
 		call_deferred("command", {}, true)
 
-func connect_profile(profile: Dictionary) -> void:
-	if session_busy:
-		return
-	session_busy = true
-	incompatible = false
+func end_session() -> void:
+	# Invalidate callbacks before changing the selected hero. A pending command
+	# remains in its own durable journal until this hero is resumed later.
+	session_generation += 1
 	close_stream()
+	token = ""
+	hero = {}
+	connected = false
+	session_busy = false
+	command_busy = false
+	input_busy = false
+	pending = {}
+	input_queue.clear()
+	sequence = 0
+	event_cursor = 0
 	last_revision = -1
 	last_time = -1
-	event_cursor = 0
-	input_queue.clear()
+	incompatible = false
+
+func connect_profile(profile: Dictionary) -> void:
+	end_session()
+	var generation: int = session_generation
+	session_busy = true
 	token = str(profile.get("token", ""))
 	var value: Dictionary = await request("/api/world")
+	if generation != session_generation or value.get("stale", false):
+		return
 	session_busy = false
 	if value.has("error"):
 		notice.emit(str(value.error))
 		return
 	accept(value)
+	if not connected:
+		return
 	load_pending()
 	if not pending.is_empty():
 		await command({}, true)
@@ -118,14 +144,20 @@ func connect_profile(profile: Dictionary) -> void:
 func create_character(player_name: String, class_id: String) -> void:
 	if session_busy:
 		return
+	end_session()
+	var generation: int = session_generation
 	session_busy = true
 	var value: Dictionary = await request("/api/session", {"name":player_name,"classId":class_id})
+	if generation != session_generation or value.get("stale", false):
+		return
 	session_busy = false
 	if value.has("error"):
 		notice.emit(str(value.error))
 		return
 	token = str(value.token)
 	accept(value.snapshot)
+	if not connected:
+		return
 	var profiles: Array = bootstrap.get("profiles", [])
 	profiles.append({"token":token,"id":hero.id,"name":hero.name,"classId":hero.classId,"level":hero.level})
 	bootstrap["profiles"] = profiles
@@ -153,10 +185,14 @@ func _process(delta: float) -> void:
 			elif stream.has_response():
 				stream_failed()
 		HTTPClient.STATUS_BODY:
+			if stream.get_response_code() == 401:
+				end_session()
+				notice.emit("Доступ к герою истёк. Откройте «Герои» и повторите вход.")
+				return
 			if stream.get_response_code() != 200:
 				stream_failed()
 				return
-			for index: int in range(8):
+			for index: int in range(64):
 				var chunk: PackedByteArray = stream.read_response_body_chunk()
 				if chunk.is_empty():
 					break
@@ -172,6 +208,10 @@ func _process(delta: float) -> void:
 
 func consume_stream() -> void:
 	# Decode UTF-8 only after a complete SSE packet; Cyrillic may span TCP chunks.
+	# Render only the newest state from a burst. Replaying every stale UI/actor
+	# snapshot after a slow frame creates a backlog; all discrete events survive.
+	var latest: Dictionary = {}
+	var events: Dictionary = {}
 	while stream_scan < stream_bytes.size():
 		if stream_bytes[stream_scan - 1] == 10 and stream_bytes[stream_scan] == 10:
 			var packet: String = stream_bytes.slice(0, stream_scan - 1).get_string_from_utf8()
@@ -182,9 +222,20 @@ func consume_stream() -> void:
 					var value = JSON.parse_string(line.trim_prefix("data:").strip_edges())
 					if value is Dictionary:
 						silence = 0
-						accept(value)
+						for event: Dictionary in value.get("events", []):
+							events[int(event.sequence)] = event
+						if events.size() > 2048:
+							stream_failed()
+							return
+						if latest.is_empty() or int(value.get("revision", 0)) > int(latest.get("revision", 0)) or (int(value.get("revision", 0)) == int(latest.get("revision", 0)) and float(value.get("time", 0)) >= float(latest.get("time", 0))):
+							latest = value
 		else:
 			stream_scan += 1
+	if not latest.is_empty():
+		var order: Array = events.keys()
+		order.sort()
+		latest["events"] = order.map(func(id: int): return events[id])
+		accept(latest)
 
 func close_stream() -> void:
 	stream.close()
@@ -210,12 +261,15 @@ func intent(value: Dictionary) -> void:
 		input_queue.append(value.duplicate())
 	if input_busy:
 		return
+	var generation: int = session_generation
 	input_busy = true
 	while not input_queue.is_empty() and connected:
 		var next: Dictionary = input_queue.pop_front()
 		sequence += 1
 		intent_sent.emit(next, sequence)
 		var response: Dictionary = await request("/api/input", {"sequence":sequence,"generation":hero.get("generation", 0),"intent":next})
+		if generation != session_generation or response.get("stale", false):
+			return
 		if response.has("error"):
 			notice.emit(str(response.error))
 	input_queue.clear()
@@ -248,7 +302,10 @@ func command(value: Dictionary, retry: bool = false) -> void:
 			pending = {}
 			return
 	command_busy = true
+	var generation: int = session_generation
 	var response: Dictionary = await request("/api/command", pending)
+	if generation != session_generation or response.get("stale", false):
+		return
 	if response.has("receipt"):
 		var receipt: Dictionary = response.receipt
 		if bool(receipt.get("ok", false)):
