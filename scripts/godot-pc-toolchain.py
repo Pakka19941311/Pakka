@@ -14,9 +14,16 @@ destination.mkdir(parents=True, exist_ok=True)
 paths = {}
 for kind, extension in [('godot', 'zip'), ('export_templates', 'tpz'), ('blender', 'tar.xz')]:
     pin = pins[kind]
+    # Official GitHub release assets have the same recorded bytes/digests.
+    official = {
+        'godot': 'https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/Godot_v4.6.3-stable_linux.x86_64.zip',
+        'export_templates': 'https://github.com/godotengine/godot-builds/releases/download/4.6.3-stable/Godot_v4.6.3-stable_export_templates.tpz',
+    }.get(kind, pin['url'])
     archive = destination/(kind+'.'+extension)
     if not archive.exists():
-        with urllib.request.urlopen(pin['url'], timeout=120) as response, archive.open('wb') as target:
+        print('Downloading '+kind+' from '+official, flush=True)
+        request = urllib.request.Request(official, headers={'User-Agent':'Varendor-PC-build'})
+        with urllib.request.urlopen(request, timeout=120) as response, archive.open('wb') as target:
             while chunk := response.read(1024*1024): target.write(chunk)
     with archive.open('rb') as stream: digest = hashlib.file_digest(stream, 'sha256').hexdigest()
     if digest != pin['sha256']: raise RuntimeError(kind+' SHA-256 mismatch')
