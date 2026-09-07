@@ -7,8 +7,9 @@
       "gpu": "no /dev/dri",
       "node": "24.19.0",
       "browser_local_runtime": "blocked: ERR_BLOCKED_BY_CLIENT",
-      "godot": "not installed",
-      "blender": "4.5.9 LTS archive verified; one version/headless import ran; subsequent SIGSEGV/SIGBUS; runtime not accepted"
+      "godot": "4.6.3.stable.official.7d41c59c4: headless import/reimport and standalone Linux release verified",
+      "blender": "4.5.9 LTS 8bf95cbd38d1: fresh temporary install, repeat starts, roundtrip and Cycles CPU render verified",
+      "graphical_godot": "not_run; no display server, package installation denied by OS permissions"
     },
     {
       "id": "owner-windows",
@@ -31,6 +32,14 @@
       "status": "blocked: Mac/Xcode/signing/device not accessible"
     }
   ],
-  "confirmedGodotExports": [],
+  "confirmedGodotExports": [
+    {
+      "platform": "Linux x86_64",
+      "templates": "4.6.3.stable",
+      "mode": "release embedded PCK",
+      "execution": "headless only",
+      "evidence": "docs/migration/p0/evidence/godot-clean-probe.json"
+    }
+  ],
   "iosRemainsRequired": true
 }

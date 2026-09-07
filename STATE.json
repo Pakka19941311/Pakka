@@ -15,14 +15,15 @@
   "execution_authorized": true,
   "execution_note": "Прямое сообщение владельца 07.09.2026 разрешает весь P0 по ТЗ v2.0; результат предъявить до P1. P1 не разрешён этим блоком.",
   "current_phase": "P0",
-  "current_task": "P0-02",
+  "current_task": "P0-05",
   "next_task_after_authorization": null,
   "next_action": {
-    "task_id": "P0-02",
-    "substep_id": "P0-02.1",
-    "action": "Установить фактический процесс/путь Windows SQLite и origin/profile браузера владельца; затем приватная копия и изолированное восстановление по DATA_BACKUP_RUNBOOK. Доступ к ним сейчас отсутствует.",
+    "task_id": "P0-05",
+    "substep_id": "P0-05.1",
+    "action": "Подтвердить графический Godot render/editor в доступной среде; затем свежие UI-эталоны P0-03. P0-02 и профиль владельца остаются незакрытыми зависимостями, запуск игры от владельца не требуется для независимого продолжения. G0 не закрывать и P1 не начинать.",
     "requires_execution_authorization": false,
-    "requires_data_access": true
+    "requires_data_access": false,
+    "requires_graphical_runtime": true
   },
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
@@ -65,12 +66,15 @@
     "Проверенная утилита SQLite backup (только синтетические данные)",
     "UI_PROFILE_SCHEMA, DATA_BACKUP_RUNBOOK, TOOLCHAIN/DEVICE_MATRIX",
     "60-секундный ограниченный live HTTP/SSE probe ; shutdown-дефект исправлен отдельным продолжением P0",
-    "P0-DEF-001: исправлен порядок закрытия HTTP/SSE и SQLite; 7/7 целевых тестов, production build; личное резервирование не выполнено"
+    "P0-DEF-001: исправлен порядок закрытия HTTP/SSE и SQLite; 7/7 целевых тестов, production build; личное резервирование не выполнено",
+    "P0-05.2: Blender/Godot sample with material, UV, scale, animation, collision and reimport checks",
+    "Standalone Linux release sample verified headless from clean source copy",
+    "119 image decode audit: 118 pass, damaged colormap.png recorded as P0-ASSET-001"
   ],
   "not_done": [
     "new Godot client",
     "user database backup",
-    "new Blender assets",
+    "new production Blender assets",
     "full registration",
     "character creator modernization",
     "mobile builds",
@@ -79,7 +83,7 @@
   "blockers_to_resolve": [
     {
       "id": "B-DATA",
-      "detail": "Личная Windows SQLite, WAL, фактический процесс/профиль и browser pending отсутствуют; никакой личной копии не проверено.",
+      "detail": "Прежняя личная SQLite и браузерный профиль не предоставлены; владелец сейчас не пользуется игрой. Не считать старые данные отсутствующими/зарезервированными и не требовать текущий запуск для независимых работ P0.",
       "tasks": [
         "P0-02"
       ]
@@ -94,7 +98,7 @@
     },
     {
       "id": "B-TOOLS",
-      "detail": "Godot/templates не получены. Архив Blender 4.5.9 LTS проверен; один --version/headless импорт GLB прошёл, проверка текстуры не пройдена. Распакованные файлы имели несовпадения; повторные старты SIGSEGV/SIGBUS. Надёжная установка, render и полный pipeline не подтверждены; причина нестабильности среды не установлена.",
+      "detail": "Blender 4.5.9 и Godot/templates 4.6.3 подтверждены для технического headless Linux цикла. Нет графического Godot render/editor: Xvfb отсутствует, установка пакета отказала на OS setgroups/setegid permissions. Устройства/мобильные SDK остаются отдельными зависимостями.",
       "tasks": [
         "P0-05"
       ]
@@ -124,7 +128,7 @@
     },
     {
       "id": "B-ASSET-SOURCES",
-      "detail": "В Git нет .blend и world-source; runtime derivatives доступны. Исходные URLs перечислены, наличие ссылок не принято за наличие файлов.",
+      "detail": "В Git нет исходных production .blend и world-source; runtime derivatives доступны. Новый P0 .blend — отдельный технический образец из Git-дериватива, не восстановление исходников моделей мира. URLs перечислены, наличие ссылок не принято за наличие файлов.",
       "tasks": [
         "P1-11"
       ]
@@ -353,20 +357,21 @@
               "status": "blocked",
               "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
               "evidence": [
-                "docs/migration/p0/REPORT.md",
-                "docs/migration/p0/evidence/blender-attempt.json"
+                "docs/migration/p0/TOOLCHAIN.md",
+                "docs/migration/p0/evidence/toolchain-distributions.json",
+                "docs/migration/p0/evidence/godot-clean-probe.json"
               ],
-              "verification_scope": "Частичная инструментальная проверка: архив Blender проверен, один запуск прошёл, повторный запуск/материал/pipeline не подтверждены. Подпункт остаётся blocked."
+              "verification_scope": "Versions/templates/Linux headless export and Blender CPU render verified; graphical Godot editor/render still unavailable."
             },
             {
               "id": "P0-05.2",
-              "status": "blocked",
-              "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
+              "status": "technically_verified",
+              "commit": null,
               "evidence": [
-                "docs/migration/p0/REPORT.md",
-                "docs/migration/p0/evidence/blender-attempt.json"
+                "docs/migration/p0/toolchain-sample/README.md",
+                "docs/migration/p0/evidence/godot-clean-probe.json"
               ],
-              "verification_scope": "Частичная инструментальная проверка: архив Blender проверен, один запуск прошёл, повторный запуск/материал/pipeline не подтверждены. Подпункт остаётся blocked."
+              "verification_scope": "Isolated Git-derived sample: Blender texture/UV/scale/rigid animation roundtrip and CPU render; Godot headless material/UV/scale/collision ray/animation, changed-source reimport preserving wrapper settings, clean standalone Linux release. No graphical Godot render, personal data or device acceptance."
             },
             {
               "id": "P0-05.3",
@@ -1962,7 +1967,7 @@
   "allowed_scope": [
     "P0"
   ],
-  "current_substep": "P0-02.1",
+  "current_substep": "P0-05.1",
   "working_commit": "1adb99e5e470979d8fe268ee21402aeb8947b06a",
   "last_accepted_gate": null,
   "open_defects": [
@@ -1989,6 +1994,17 @@
       "evidence": [
         "docs/PART1_IMPLEMENTATION_STATUS.md"
       ]
+    },
+    {
+      "id": "P0-ASSET-001",
+      "status": "open",
+      "title": "Truncated colormap.png in Git, referenced by 21 GLB files",
+      "source_commit": "2b02d4035b1b6dde7a23decd2f4ba2c629232834",
+      "evidence": [
+        "docs/migration/p0/ASSET_DEFECT.md",
+        "docs/migration/p0/evidence/image-decode-audit.json"
+      ],
+      "fix_applied": false
     }
   ],
   "open_defects_note": "Не означает полный аудит дефектов. Старые художественные замечания не закрыты.",
@@ -3783,7 +3799,9 @@
     "G0": {
       "status": "blocked",
       "evidence": [
-        "docs/migration/p0/DATA_BACKUP_RUNBOOK.md"
+        "docs/migration/p0/DATA_BACKUP_RUNBOOK.md",
+        "docs/migration/p0/REPORT.md",
+        "docs/migration/p0/ASSET_DEFECT.md"
       ],
       "owner_accepted": false
     },
@@ -3919,6 +3937,38 @@
         "docs/migration/p0/TOOLCHAIN.md"
       ],
       "evidence_commit": "1adb99e5e470979d8fe268ee21402aeb8947b06a"
+    },
+    {
+      "id": "P0-BLENDER-ROUNDTRIP",
+      "status": "passed_with_limitations",
+      "personal_data": false,
+      "evidence": [
+        "docs/migration/p0/toolchain-sample/blender-report.json",
+        "docs/migration/p0/evidence/blender-roundtrip.log.txt",
+        "docs/migration/p0/toolchain-sample/blender-cpu-render.png"
+      ]
+    },
+    {
+      "id": "P0-GODOT-CLEAN-EXPORT",
+      "status": "passed_with_limitations",
+      "personal_data": false,
+      "evidence": [
+        "docs/migration/p0/evidence/godot-clean-probe.json",
+        "docs/migration/p0/evidence/godot-clean-native.log.txt",
+        "docs/migration/p0/toolchain-sample/README.md"
+      ]
+    },
+    {
+      "id": "P0-IMAGE-DECODE",
+      "status": "failed",
+      "personal_data": false,
+      "passed": 118,
+      "failed": 1,
+      "defect_id": "P0-ASSET-001",
+      "evidence": [
+        "docs/migration/p0/evidence/image-decode-audit.json",
+        "docs/migration/p0/ASSET_DEFECT.md"
+      ]
     }
   ],
   "publication": {
@@ -3948,5 +3998,10 @@
       "owner_accepted": false,
       "fix_commit": "07408b7bdd7a969b28370144a570695f2299c5ae"
     }
-  ]
+  ],
+  "owner_runtime_context": {
+    "currently_using_game": false,
+    "instruction": "Продолжать по согласованному ТЗ; не требовать текущего запуска игры для независимых задач P0.",
+    "does_not_waive_personal_data_preservation": true
+  }
 }

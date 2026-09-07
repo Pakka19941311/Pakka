@@ -1,0 +1,31 @@
+{
+  "blender": {
+    "version": "4.5.9 LTS",
+    "build": "8bf95cbd38d1",
+    "url": "https://download.blender.org/release/Blender4.5/blender-4.5.9-linux-x64.tar.xz",
+    "bytes": 377929956,
+    "sha256": "dcdc3eca6c9825bb35a8033b689c053f3cb5a9b0cd2a61b2eac2a49436b4ad3d",
+    "publisher_checksum_verified": true
+  },
+  "godot": {
+    "version": "4.6.3.stable.official.7d41c59c4",
+    "url": "https://downloads.godotengine.org/?flavor=stable&platform=linux.64&slug=linux.x86_64.zip&version=4.6.3",
+    "bytes": 71806687,
+    "sha256": "d0bc2113065e481c9c2c2b2c37daa4e8be3fe9e27f0ab9ab0b6096e9a37907f3",
+    "zip_crc_verified": true,
+    "publisher_checksum_verified": false
+  },
+  "export_templates": {
+    "version": "4.6.3.stable",
+    "url": "https://downloads.godotengine.org/?flavor=stable&platform=templates&slug=export_templates.tpz&version=4.6.3",
+    "bytes": 1255918323,
+    "sha256": "3fbe2c0e2dec9d537ab9ec97bcf8da91dcf23357fc51f67092dd068d839290a8",
+    "selected_member_crc_verified": [
+      "linux_debug.x86_64",
+      "linux_release.x86_64",
+      "version.txt"
+    ],
+    "publisher_checksum_verified": false
+  },
+  "pin_scope": "Exact versions for reproducing P0; graphical Godot and device acceptance remain open"
+}

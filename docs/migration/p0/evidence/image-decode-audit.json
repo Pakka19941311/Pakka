@@ -1,0 +1,40 @@
+{
+  "source_commit": "2b02d4035b1b6dde7a23decd2f4ba2c629232834",
+  "pillow_version": "12.3.0",
+  "passed": 118,
+  "failed": 1,
+  "failures": [
+    {
+      "path": "public/assets/models/world/Textures/colormap.png",
+      "bytes": 1492,
+      "sha256": "5a447c9fb2027907f5e2e8bed8caf08d2b3d3e261cb39fe605cca0b2c309d9a9",
+      "error": "broken data stream when reading image file",
+      "referenced_by": [
+        "public/assets/models/world/cart.glb",
+        "public/assets/models/world/fence-broken.glb",
+        "public/assets/models/world/fence.glb",
+        "public/assets/models/world/fountain-round.glb",
+        "public/assets/models/world/lantern.glb",
+        "public/assets/models/world/pillar-stone.glb",
+        "public/assets/models/world/planks.glb",
+        "public/assets/models/world/rock-large.glb",
+        "public/assets/models/world/rock-wide.glb",
+        "public/assets/models/world/roof-high.glb",
+        "public/assets/models/world/roof.glb",
+        "public/assets/models/world/stall-red.glb",
+        "public/assets/models/world/stall.glb",
+        "public/assets/models/world/tree-crooked.glb",
+        "public/assets/models/world/tree-high-crooked.glb",
+        "public/assets/models/world/tree-high.glb",
+        "public/assets/models/world/tree.glb",
+        "public/assets/models/world/wall-arch.glb",
+        "public/assets/models/world/wall-block.glb",
+        "public/assets/models/world/wall-corner.glb",
+        "public/assets/models/world/wall-door.glb"
+      ]
+    }
+  ],
+  "checks": "Full image decode; reference presence alone does not establish image validity.",
+  "personal_data_accessed": false,
+  "repairs_applied": false
+}
