@@ -94,7 +94,7 @@
     },
     {
       "id": "B-TOOLS",
-      "detail": "Godot/Blender исполняемые программы не обнаружены. Попытка загрузки Godot не завершена: network approval cancelled. Версии после успешного pipeline не закреплены.",
+      "detail": "Godot/templates не получены. Архив Blender 4.5.9 LTS проверен; один --version/headless импорт GLB прошёл, проверка текстуры не пройдена. Распакованные файлы имели несовпадения; повторные старты SIGSEGV/SIGBUS. Надёжная установка, render и полный pipeline не подтверждены; причина нестабильности среды не установлена.",
       "tasks": [
         "P0-05"
       ]
@@ -353,18 +353,20 @@
               "status": "blocked",
               "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
               "evidence": [
-                "docs/migration/p0/REPORT.md"
+                "docs/migration/p0/REPORT.md",
+                "docs/migration/p0/evidence/blender-attempt.json"
               ],
-              "verification_scope": "Required real data/device/runtime unavailable; supporting work does not close this substep"
+              "verification_scope": "Частичная инструментальная проверка: архив Blender проверен, один запуск прошёл, повторный запуск/материал/pipeline не подтверждены. Подпункт остаётся blocked."
             },
             {
               "id": "P0-05.2",
               "status": "blocked",
               "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
               "evidence": [
-                "docs/migration/p0/REPORT.md"
+                "docs/migration/p0/REPORT.md",
+                "docs/migration/p0/evidence/blender-attempt.json"
               ],
-              "verification_scope": "Required real data/device/runtime unavailable; supporting work does not close this substep"
+              "verification_scope": "Частичная инструментальная проверка: архив Blender проверен, один запуск прошёл, повторный запуск/материал/pipeline не подтверждены. Подпункт остаётся blocked."
             },
             {
               "id": "P0-05.3",
@@ -3904,6 +3906,18 @@
       ],
       "commit": "07408b7bdd7a969b28370144a570695f2299c5ae",
       "evidence_commit": "07408b7bdd7a969b28370144a570695f2299c5ae"
+    },
+    {
+      "id": "P0-BLENDER-ATTEMPT",
+      "status": "blocked",
+      "base_commit": "2d9b0c4e878e6a27558c57e90d41464c6594d2b1",
+      "archive_checksum_verified": true,
+      "runtime_accepted": false,
+      "personal_data": false,
+      "evidence": [
+        "docs/migration/p0/evidence/blender-attempt.json",
+        "docs/migration/p0/TOOLCHAIN.md"
+      ]
     }
   ],
   "publication": {

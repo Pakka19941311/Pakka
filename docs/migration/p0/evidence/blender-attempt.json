@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-07",
+  "base_commit": "2d9b0c4e878e6a27558c57e90d41464c6594d2b1",
+  "scope": "P0-05.1 / preliminary P0-05.2 only",
+  "distribution": {
+    "url": "https://download.blender.org/release/Blender4.5/blender-4.5.9-linux-x64.tar.xz",
+    "checksum_url": "https://download.blender.org/release/Blender4.5/blender-4.5.9.sha256",
+    "bytes": 377929956,
+    "sha256": "dcdc3eca6c9825bb35a8033b689c053f3cb5a9b0cd2a61b2eac2a49436b4ad3d",
+    "checksum_verified": true
+  },
+  "one_successful_version_query": {
+    "version": "Blender 4.5.9 LTS",
+    "build_hash": "8bf95cbd38d1",
+    "build_date": "2026-04-21"
+  },
+  "observations": [
+    "Initial archive extraction left files shorter than archive entries; starting Blender failed.",
+    "Python extraction completed, but later comparison checked 3588 binary/library files and found four mismatches.",
+    "Four files were repaired and verified against archive in the same process; --version then returned exit 0.",
+    "Headless import of Git wall-arch.glb logged successful glTF import. Assertion verifying loaded image data failed; UV/material round trip was not established.",
+    "Subsequent starts returned SIGSEGV (-11 / shell 139) and SIGBUS (-7), including the final diagnostic attempt.",
+    "Cause of extracted-file inconsistencies and unstable execution is not established; no unsupported claim about CPU/GPU compatibility."
+  ],
+  "mismatched_extracted_files": [
+    "lib/libembree4.so.4",
+    "lib/mesa/libGL.so.1.5.0",
+    "4.5/python/lib/python3.11/config-3.11-x86_64-linux-gnu/libpython3.11.a",
+    "blender"
+  ],
+  "sample_source": "public/assets/models/world/wall-arch.glb",
+  "sample_source_sha256": "18076d2770925a570c10708c2726e92f99226a940beb8435b21dfb71e20adcf9",
+  "blender_runtime_accepted": false,
+  "blend_sample_created": false,
+  "glb_roundtrip_completed": false,
+  "render_completed": false,
+  "godot_import_run": false,
+  "exports_verified": [],
+  "personal_data_accessed": false,
+  "p1_started": false,
+  "next_toolchain_action": "Use an environment where the verified extracted binaries remain complete and Blender starts repeatedly; then resume the sample. Godot/templates and physical platforms remain separate dependencies."
+}
