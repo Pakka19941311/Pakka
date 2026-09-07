@@ -6,7 +6,7 @@
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-migration-p0",
   "tracked_branch": "origin/work/godot-migration-p0",
-  "observed_head": "6f245206a60369302ff6e4008e350db1c48491e1",
+  "observed_head": "82e8b478ed54a715953fe6e0a272c1402f19790f",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -251,9 +251,10 @@
           "id": "P0-03",
           "title": "Закрепить эталон HUD/сумки/заточки и UI-профиль",
           "status": "blocked",
-          "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
+          "commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
           "evidence": [
-            "docs/migration/p0/REPORT.md"
+            "docs/migration/p0/REPORT.md",
+            "docs/migration/p0/UI_REFERENCE_FIXTURES.md"
           ],
           "owner_accepted": false,
           "substeps": [
@@ -287,7 +288,7 @@
             {
               "id": "P0-03.4",
               "status": "technically_verified",
-              "commit": null,
+              "commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
               "evidence": [
                 "docs/migration/p0/UI_REFERENCE_FIXTURES.md",
                 "docs/migration/p0/evidence/ui-reference-fixtures.json",
@@ -1972,7 +1973,7 @@
     "P0"
   ],
   "current_substep": "P0-03.1",
-  "working_commit": "6f245206a60369302ff6e4008e350db1c48491e1",
+  "working_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -3987,7 +3988,8 @@
         "docs/migration/p0/UI_REFERENCE_FIXTURES.md",
         "docs/migration/p0/evidence/ui-reference-fixtures.json",
         "docs/migration/p0/evidence/ui-reference-checks.log.txt"
-      ]
+      ],
+      "evidence_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f"
     },
     {
       "id": "P0-GRAPHICAL-RUNTIME-ATTEMPT",
@@ -3995,12 +3997,13 @@
       "evidence": [
         "docs/migration/p0/evidence/graphical-runtime-attempt.json"
       ],
-      "personal_data": false
+      "personal_data": false,
+      "evidence_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f"
     }
   ],
   "publication": {
-    "content_commit": "6f245206a60369302ff6e4008e350db1c48491e1",
-    "url": "https://github.com/Pakka19941311/Pakka/commit/6f245206a60369302ff6e4008e350db1c48491e1",
+    "content_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
+    "url": "https://github.com/Pakka19941311/Pakka/commit/82e8b478ed54a715953fe6e0a272c1402f19790f",
     "branch": "work/godot-migration-p0",
     "remote_tree_matched_local_index": true,
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
