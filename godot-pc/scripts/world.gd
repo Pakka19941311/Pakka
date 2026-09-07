@@ -67,7 +67,7 @@ func setup(game: Dictionary) -> void:
 	target_ring.material_override = material
 	target_ring.visible = false
 	add_child(target_ring)
-	for npc: Dictionary in [{"id":"npc:shop","name":"Торговец","model":"Ranger","x":.3,"z":-7.8}, {"id":"npc:elder","name":"Старейшина","model":"Wizard","x":-7,"z":-2.6}, {"id":"npc:teleport","name":"Хранитель портала","model":"Monk","x":-7,"z":-20}]:
+	for npc: Dictionary in [{"id":"npc:shop","name":"Торговка Эльза","model":"Ranger","x":.3,"z":-7.8}, {"id":"npc:elder","name":"Староста Роэн","model":"Warrior","x":-7,"z":-2.6}, {"id":"npc:smith","name":"Кузнец Бран","model":"Warrior","x":-17.5,"z":-12.6}, {"id":"npc:teleport","name":"Проводник Каэль","model":"Wizard","x":-7,"z":-20}]:
 		var actor: Node3D = make_actor(npc.id, npc.model, 2.05, npc.name, Color("e2c382"))
 		actor.position = point(npc.x, npc.z)
 		actor.set_meta("destination", actor.position)
@@ -169,7 +169,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 	hero_speed = float(hero.stats.get("speed", 6.2))
 	if new_hero or hero_position.distance_to(server_position) > 3.5 or hero.dead:
 		hero_position = server_position
-	var keep: Dictionary = {"npc:shop":true,"npc:elder":true,"npc:teleport":true}
+	var keep: Dictionary = {"npc:shop":true,"npc:elder":true,"npc:smith":true,"npc:teleport":true}
 	var people: Array = snapshot.get("heroes", []).duplicate()
 	# Character is authoritative even when the nearby-heroes list omits self.
 	people.append(hero)
@@ -179,7 +179,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		var actor: Node3D = make_actor(id, data.classes[person.classId].model, 2.05, person.name + " · " + str(person.get("level", "")), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
 		actor.set_meta("destination", point(person.x, person.z, person.get("yOffset", 0)))
 		actor.rotation.y = -float(person.get("yaw", 0)) + PI
-		animate(actor, str(person.get("action", "idle")))
+		apply_motion(actor, person)
 	for monster: Dictionary in snapshot.get("monsters", []):
 		if Vector2(monster.x - hero.x, monster.z - hero.z).length() > 85:
 			continue
@@ -190,14 +190,14 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		actor.set_meta("destination", point(monster.x, monster.z, monster.get("yOffset", 0)))
 		actor.rotation.y = -float(monster.get("yaw", 0)) + PI
 		actor.visible = monster.alive or (snapshot.time - monster.get("actionStartedAt", 0) < 4000)
-		animate(actor, "death" if not monster.alive else str(monster.get("action", "idle")))
+		apply_motion(actor, monster, "death" if not monster.alive else "")
 	for summon: Dictionary in snapshot.get("summons", []):
 		var id: String = str(summon.uid)
 		keep[id] = true
 		var actor: Node3D = make_actor(id, "Skeleton", 1.9, "Призванный скелет", Color("86b3c2"))
 		actor.set_meta("destination", point(summon.x, summon.z, summon.get("yOffset", 0)))
 		actor.rotation.y = -float(summon.get("yaw", 0)) + PI
-		animate(actor, str(summon.get("action", "idle")))
+		apply_motion(actor, summon)
 	for id: String in actors.keys():
 		if not keep.has(id):
 			actors[id].queue_free()
@@ -217,6 +217,14 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			label.position = target.position + Vector3(0, 2.6, 0)
 			add_child(label)
 			floaters.append({"node":label,"left":1.0})
+
+func apply_motion(actor: Node3D, motion: Dictionary, override_action: String = "") -> void:
+	var action: String = override_action if not override_action.is_empty() else str(motion.get("action", "idle"))
+	var start: float = float(motion.get("actionStartedAt", 0))
+	if action in ["attack", "jump", "death"] and start != float(actor.get_meta("action_start", -1)):
+		actor.set_meta("action", "")
+		actor.set_meta("action_start", start)
+	animate(actor, action)
 
 func blocked(position: Vector3) -> bool:
 	var x: float = position.x

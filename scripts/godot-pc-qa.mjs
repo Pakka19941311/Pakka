@@ -40,7 +40,7 @@ try {
   await assert.rejects(startNativeBridge({ data, legacy, backups }), /уже запущена/);
   checks.push('one process per native saved world');
   const reportPath = join(output, 'native-runtime.json');
-  const args = [...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`];
+  const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`];
   const child = spawn(binary, args, { cwd: stage, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';
   child.stdout.on('data', bytes => { log += bytes; });

@@ -314,7 +314,14 @@ func snapshot_received(snapshot: Dictionary) -> void:
 	xp.value = hero.xp
 	xp.tooltip_text = "Опыт: %d / %d · Задание: %d · Побед: %d" % [hero.xp, xp.max_value, hero.quest, hero.kills]
 	health_text.text = "ОЗ %d / %d    %s %d / %d" % [hero.hp, hero.maxHp, data.classes[hero.classId].resource, hero.mp, hero.maxMp]
-	status.text = "Гринфолл · %d FPS · сервер подключён" % int(Engine.get_frames_per_second())
+	var region: String = ""
+	var nearest: float = INF
+	for location: Dictionary in data.locations:
+		var distance: float = Vector2(location.x - hero.x, location.z - hero.z).length_squared()
+		if distance < nearest:
+			nearest = distance
+			region = location.name
+	status.text = region + " · %d FPS · сервер подключён" % int(Engine.get_frames_per_second())
 	respawn.visible = hero.dead
 	inventory_title.text = "ПЕРСОНАЖ · %d золота" % hero.gold
 	var fingerprint: String = JSON.stringify([hero.inventory, hero.equipment, hero.stats, hero.xp])
@@ -507,7 +514,7 @@ func controls_dialog() -> void:
 
 func picked(id: String) -> void:
 	if id.begins_with("npc:"):
-		target_text.text = {"npc:shop":"Торговец · F","npc:elder":"Старейшина · F","npc:teleport":"Хранитель портала · F"}.get(id, "")
+		target_text.text = {"npc:shop":"Торговка Эльза · F","npc:elder":"Староста Роэн · F","npc:smith":"Кузнец Бран · F","npc:teleport":"Проводник Каэль · F"}.get(id, "")
 		interact()
 	else:
 		net.intent({"type":"attack","entityId":id,"skill":null})
@@ -520,6 +527,9 @@ func interact() -> void:
 			box.add_child(button(data.items[id].name + " · " + str({"potion":55,"ether":70,"teleport":130}[id]) + " золота", func(): net.command({"type":"buy","itemId":id})))
 	elif world.target_id == "npc:elder":
 		net.command({"type":"quest"})
+	elif world.target_id == "npc:smith":
+		inventory_panel.show()
+		notice("Бран: дважды нажмите свиток, затем один раз — предмет. Свитки добываются с монстров.")
 	elif world.target_id == "npc:teleport":
 		var box: VBoxContainer = dialog("Хранитель портала", Vector2i(480, 320))
 		box.add_child(label("Для перемещения подойдите к хранителю."))
