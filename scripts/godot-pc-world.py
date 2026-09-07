@@ -3,7 +3,7 @@ import bpy
 import json
 import math
 from pathlib import Path
-from mathutils import Vector
+from mathutils import Vector, Matrix
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT/'godot-pc/generated'
@@ -66,12 +66,18 @@ def template(name):
     meshes=[o for o in new if o.type=='MESH'];assert meshes, name
     # Realism source packs may contain several LOD alternatives. The old client
     # used their hierarchy; preserve it here except the named prepared variants.
+    # Same axis normalization as createStaticPart in the established map.
     points=[o.matrix_world@Vector(c) for o in meshes for c in o.bound_box]
+    axis=Matrix.Identity(4)
+    if group=='castle' and ('wall_thin_straight' in variant or 'wall_thin_gate' in variant):
+        if max(p.y for p in points)-min(p.y for p in points)>max(p.x for p in points)-min(p.x for p in points):
+            axis=Matrix.Rotation(-math.pi/2,4,'Z')
+            points=[axis@p for p in points]
     low=Vector(tuple(min(p[i] for p in points) for i in range(3)))
     high=Vector(tuple(max(p[i] for p in points) for i in range(3)))
     parts=[]
     for o in meshes:
-        parts.append((o.data,o.matrix_world.copy()))
+        parts.append((o.data,axis@o.matrix_world))
         # The original Git colormap is truncated. Keep geometry and original
         # material factors; never rewrite that source or claim its repair.
         for slot in o.material_slots:
@@ -91,14 +97,13 @@ for i,p in enumerate(layout['placements']):
         if name=='realism/dead_tree_trunk':factor*=min(1,p['height']*2/max(.001,max(size.x,size.y)*factor))
         scale=Vector((p.get('width',size.x*factor)/max(.001,size.x),p.get('depth',size.y*factor)/max(.001,size.y),factor))
         pivot=bpy.data.objects.new(f'{name}-{i}',None);scene.collection.objects.link(pivot)
-        pivot.location=(x,z,y);pivot.rotation_euler.z=p.get('rotation',0)
+        pivot.location=(x,z,y);pivot.rotation_euler.z=-p.get('rotation',0)
         # Babylon's glTF handedness transform followed by the native adapter.
         for data,matrix in parts:
             obj=bpy.data.objects.new(f'{name}-{i}-mesh',data);scene.collection.objects.link(obj)
-            obj.parent=pivot;obj.matrix_local=matrix
-            obj.location.z-=low.z if p.get('height') is not None else 0
-            obj.location.x*=scale.x;obj.location.y*=scale.y;obj.location.z*=scale.z
-            obj.scale=scale
+            obj.parent=pivot
+            center=Vector(((low.x+high.x)/2,(low.y+high.y)/2,low.z)) if name.startswith('castle/') else Vector((0,0,low.z if p.get('height') is not None else 0))
+            obj.matrix_local=Matrix.Diagonal((*scale,1))@Matrix.Translation(-center)@matrix
     elif kind=='box':
         bpy.ops.mesh.primitive_cube_add(size=1,location=(x,z,y));o=bpy.context.object;o.name=name
         o.scale=(p['width'],p['depth'],p['height']);bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)

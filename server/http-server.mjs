@@ -91,7 +91,11 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
         json(200,world.snapshot(id,Number.isSafeInteger(after)?after:0));return;
       }
       if(req.method==='POST'&&url.pathname==='/api/input'){
-        world.heartbeat(id);world.input(id,body.sequence,body.intent);json(200,{sequence:world.state.characters[id].lastInputSequence});return;
+        world.heartbeat(id);
+        // Native generation fences delayed pre-teleport inputs. Legacy v1
+        // clients without this additive envelope field remain supported.
+        if(body.generation===undefined||body.generation===world.state.characters[id].generation)world.input(id,body.sequence,body.intent);
+        json(200,{sequence:world.state.characters[id].lastInputSequence});return;
       }
       if(req.method==='POST'&&url.pathname==='/api/command'){
         world.heartbeat(id);const receipt=world.command(id,body.id,body.command);json(200,{receipt,snapshot:world.snapshot(id)});return;

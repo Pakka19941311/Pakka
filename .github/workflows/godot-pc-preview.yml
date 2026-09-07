@@ -2,7 +2,7 @@ name: Godot PC preview
 
 on:
   push:
-    branches: [work/godot-migration-p0]
+    branches: [work/godot-migration-p0, work/godot-p1-recovery]
 
 permissions:
   contents: write
@@ -31,6 +31,8 @@ jobs:
           sudo apt-get install -y xvfb libgl1-mesa-dri libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0
           python scripts/godot-pc-toolchain.py
           npm ci
+      - name: Verify authoritative recovery scenarios
+        run: node --experimental-strip-types --test tests/native-recovery.test.mjs tests/persistent-world.test.mjs tests/combat-obstruction.test.mjs tests/collision-world.test.mjs tests/castle-passage.test.mjs tests/world-stream.test.mjs tests/inventory-commands.test.mjs tests/enhancement-v2.test.mjs
       - name: Assemble the existing world in Blender
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs

@@ -5,7 +5,7 @@
   "state_kind": "pc_native_test_released_awaiting_owner",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-migration-p0",
-  "tracked_branch": "origin/work/godot-migration-p0",
+  "tracked_branch": "work/godot-p1-recovery",
   "observed_head": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
@@ -15,7 +15,7 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
   "current_phase": "P1",
-  "current_task": "P1-01",
+  "current_task": "PC recovery validation; then P1-11 own world samples",
   "next_task_after_authorization": null,
   "next_action": {
     "task_id": "P1-05",
@@ -2008,7 +2008,7 @@
     "P0 independent remaining tasks",
     "P1 first native Windows integration and test release"
   ],
-  "current_substep": "P1-01.4",
+  "current_substep": "130 server regressions and native Godot input/UI/SSE checks passed; clean Linux render and Windows package pending",
   "working_commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
   "last_accepted_gate": null,
   "open_defects": [
@@ -4208,5 +4208,18 @@
         "docs/migration/pc/evidence/linux-native-qa.json"
       ]
     }
-  ]
+  ],
+  "native_recovery": {
+    "baseline": "954384fbb4a08bed4b771b404771c1e4ad08c5b6",
+    "tested_owner_build": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+    "video_seconds": 60.4,
+    "server_checks": 130,
+    "native_headless": "passed",
+    "native_graphical": "pending CI",
+    "windows_executable": "pending CI",
+    "player_database_accessed": false,
+    "owner_visual_acceptance": "pending new package",
+    "p1_next": "P1-11 sample assets; P1-12 depends on sample review",
+    "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained"
+  }
 }

@@ -4,6 +4,8 @@ extends Node
 signal snapshot_received(snapshot: Dictionary)
 signal notice(message: String)
 signal profiles_changed
+signal receipt_received(receipt: Dictionary)
+signal intent_sent(value: Dictionary, input_sequence: int)
 
 var server_url: String = "http://127.0.0.1:4185"
 var token: String = ""
@@ -20,6 +22,17 @@ var elapsed: float = 0.0
 var last_revision: int = -1
 var last_time: float = -1
 var session_busy: bool = false
+var stream: HTTPClient = HTTPClient.new()
+var stream_requested: bool = false
+var stream_bytes: PackedByteArray = PackedByteArray()
+var stream_scan: int = 1
+var retry_in: float = 0.0
+var silence: float = 0.0
+var input_queue: Array = []
+var input_busy: bool = false
+var expected_content: String = ""
+var expected_map: String = ""
+var incompatible: bool = false
 
 func _ready() -> void:
 	for arg: String in OS.get_cmdline_user_args():
@@ -56,6 +69,12 @@ func accept(value: Dictionary) -> void:
 		connected = false
 		notice.emit("Версия сервера несовместима с этой сборкой")
 		return
+	if (not expected_content.is_empty() and value.get("contentVersion", "") != expected_content) or (not expected_map.is_empty() and value.get("mapVersion", "") != expected_map):
+		incompatible = true
+		connected = false
+		close_stream()
+		notice.emit("Версии мира и клиента не совпадают. Запустите клиент и сервер из одного пакета.")
+		return
 	# A slower poll must not undo a newer item receipt or resurrect a stale item.
 	var revision: int = int(value.get("revision", 0))
 	var server_time: float = float(value.get("time", 0))
@@ -63,17 +82,28 @@ func accept(value: Dictionary) -> void:
 		return
 	last_revision = revision
 	last_time = server_time
+	var reconnecting: bool = not connected
+	if not hero.is_empty() and hero.get("generation") != value.character.get("generation"):
+		input_queue.clear()
 	hero = value.character
 	sequence = maxi(sequence, int(hero.get("lastInputSequence", 0)))
 	connected = true
 	snapshot_received.emit(value)
 	for event: Dictionary in value.get("events", []):
 		event_cursor = maxi(event_cursor, int(event.sequence))
+	if reconnecting and not pending.is_empty() and not command_busy:
+		call_deferred("command", {}, true)
 
 func connect_profile(profile: Dictionary) -> void:
 	if session_busy:
 		return
 	session_busy = true
+	incompatible = false
+	close_stream()
+	last_revision = -1
+	last_time = -1
+	event_cursor = 0
+	input_queue.clear()
 	token = str(profile.get("token", ""))
 	var value: Dictionary = await request("/api/world")
 	session_busy = false
@@ -103,25 +133,93 @@ func create_character(player_name: String, class_id: String) -> void:
 	profiles_changed.emit()
 
 func _process(delta: float) -> void:
-	elapsed += delta
-	if token.is_empty() or polling or elapsed < .10:
+	if token.is_empty() or session_busy or incompatible:
 		return
-	elapsed = 0.0
-	polling = true
-	var value: Dictionary = await request("/api/world?after=" + str(event_cursor))
-	if value.has("error"):
-		if connected:
-			notice.emit(str(value.error))
-		connected = false
-	else:
-		accept(value)
-	polling = false
+	retry_in -= delta
+	silence += delta
+	if retry_in > 0:
+		return
+	stream.poll()
+	match stream.get_status():
+		HTTPClient.STATUS_DISCONNECTED:
+			var address: String = server_url.trim_prefix("http://").trim_prefix("https://").trim_suffix("/")
+			var host: String = address.get_slice(":", 0)
+			var port: int = int(address.get_slice(":", 1)) if ":" in address else (443 if server_url.begins_with("https://") else 80)
+			stream.connect_to_host(host, port, TLSOptions.client() if server_url.begins_with("https://") else null)
+		HTTPClient.STATUS_CONNECTED:
+			if not stream_requested:
+				stream_requested = true
+				stream.request(HTTPClient.METHOD_GET, "/api/stream?after=" + str(event_cursor), ["Authorization: Bearer " + token, "Accept: text/event-stream"])
+			elif stream.has_response():
+				stream_failed()
+		HTTPClient.STATUS_BODY:
+			if stream.get_response_code() != 200:
+				stream_failed()
+				return
+			for index: int in range(8):
+				var chunk: PackedByteArray = stream.read_response_body_chunk()
+				if chunk.is_empty():
+					break
+				stream_bytes.append_array(chunk)
+				if stream_bytes.size() > 4194304:
+					stream_failed()
+					return
+			consume_stream()
+		HTTPClient.STATUS_CANT_RESOLVE, HTTPClient.STATUS_CANT_CONNECT, HTTPClient.STATUS_CONNECTION_ERROR, HTTPClient.STATUS_TLS_HANDSHAKE_ERROR:
+			stream_failed()
+	if silence > 5.0:
+		stream_failed()
+
+func consume_stream() -> void:
+	# Decode UTF-8 only after a complete SSE packet; Cyrillic may span TCP chunks.
+	while stream_scan < stream_bytes.size():
+		if stream_bytes[stream_scan - 1] == 10 and stream_bytes[stream_scan] == 10:
+			var packet: String = stream_bytes.slice(0, stream_scan - 1).get_string_from_utf8()
+			stream_bytes = stream_bytes.slice(stream_scan + 1)
+			stream_scan = 1
+			for line: String in packet.split("\n"):
+				if line.begins_with("data:"):
+					var value = JSON.parse_string(line.trim_prefix("data:").strip_edges())
+					if value is Dictionary:
+						silence = 0
+						accept(value)
+		else:
+			stream_scan += 1
+
+func close_stream() -> void:
+	stream.close()
+	stream_requested = false
+	stream_bytes.clear()
+	stream_scan = 1
+	silence = 0
+
+func stream_failed() -> void:
+	close_stream()
+	retry_in = 1.0
+	if connected:
+		notice.emit("Соединение потеряно. Восстанавливаем…")
+	connected = false
 
 func intent(value: Dictionary) -> void:
 	if not connected:
 		return
-	sequence += 1
-	await request("/api/input", {"sequence":sequence,"intent":value})
+	# Serialize intents. A slower direction request must never cancel a later hit.
+	if value.type == "direction" and not input_queue.is_empty() and input_queue.back().type == "direction":
+		input_queue[input_queue.size() - 1] = value.duplicate()
+	else:
+		input_queue.append(value.duplicate())
+	if input_busy:
+		return
+	input_busy = true
+	while not input_queue.is_empty() and connected:
+		var next: Dictionary = input_queue.pop_front()
+		sequence += 1
+		intent_sent.emit(next, sequence)
+		var response: Dictionary = await request("/api/input", {"sequence":sequence,"generation":hero.get("generation", 0),"intent":next})
+		if response.has("error"):
+			notice.emit(str(response.error))
+	input_queue.clear()
+	input_busy = false
 
 func pending_path() -> String:
 	return bootstrap_path.get_base_dir().path_join("pending-" + str(hero.get("id", "unknown")) + ".json")
@@ -154,12 +252,15 @@ func command(value: Dictionary, retry: bool = false) -> void:
 	if response.has("receipt"):
 		var receipt: Dictionary = response.receipt
 		if bool(receipt.get("ok", false)):
-			notice.emit("Действие выполнено" + (" · " + JSON.stringify(receipt.outcome) if receipt.get("outcome") != null else ""))
+			var outcome = receipt.get("outcome")
+			if outcome is Dictionary and outcome.has("success"):
+				notice.emit("Заточка успешна: +%d → +%d" % [outcome.from, outcome.to] if outcome.success else "Заточка не удалась. Предмет разрушен.")
 		else:
 			notice.emit(str(receipt.get("reason", "Действие недоступно")))
 		pending = {}
 		save_private_json(pending_path(), {})
 		accept(response.snapshot)
+		receipt_received.emit(receipt)
 	else:
 		notice.emit(str(response.get("error", "Ответ не получен. Запрос сохранён для повтора.")))
 	command_busy = false

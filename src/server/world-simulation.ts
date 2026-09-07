@@ -10,6 +10,7 @@ import { bossRespawnSeconds, classAttackRange, classCombatProfile, monsterMoveme
 import { resolveAttackAccuracy } from '../core/attack-accuracy.ts';
 import { CollisionWorld } from '../world/collision-world.ts';
 import { SPAWN_REGIONS, spawnPointInRegion, patrolRouteInRegion } from '../world/spawn-regions.ts';
+import { CONTENT_VERSION, mapVersion } from './content-manifest.ts';
 import { findNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
 import { CharacterMotor, smoothAngle } from '../controls/character-motor.ts';
@@ -55,7 +56,8 @@ const itemDef = (item: InventoryItem): ItemStatDefinition & {slot?:string} => IT
 const monsterDef = (m: WorldMonster) => MONSTERS[m.id as MonsterId];
 const npcPositions = { shop: {x:.3,z:-7.8}, elder: {x:-7,z:-2.6}, teleport: {x:-7,z:-20} };
 const teleportPoints: Record<string, {x:number;z:number;cost:number;level:number}> = {
-  'Астерхолд': {x:-108,z:-82,cost:0,level:1}, 'Гринфолл': {...SPAWN,cost:25,level:1},
+  // Arrival courtyard, south of the keep and inside the open gate.
+  'Астерхолд': {x:-108,z:-90,cost:0,level:1}, 'Гринфолл': {...SPAWN,cost:25,level:1},
   'Чёрный лес': {x:94,z:44,cost:90,level:10}, 'Вход в шахту': {x:132,z:94,cost:150,level:10},
 };
 
@@ -69,6 +71,7 @@ export class WorldSimulation {
   private readonly collision: CollisionWorld;
   private readonly beta: boolean;
   private readonly terrain: TerrainSurface;
+  private readonly mapContentVersion: string;
   private lastCheckpoint: number;
   private paths = new Map<string, { goal: Position; points: Position[]; expiresAt: number }>();
   private brains = new Map<string,MonsterAiBrain>();
@@ -79,6 +82,7 @@ export class WorldSimulation {
   constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSurface; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
     this.store = options.store; this.collision = options.collision;
     this.terrain = options.terrain ?? new TerrainSurface();
+    this.mapContentVersion=mapVersion(this.collision,this.terrain);
     this.random = options.random ?? Math.random; this.identifier = options.identifier; this.beta = Boolean(options.beta);
     this.state = this.store.load() ?? {schema:1,time:options.now,revision:0,sequence:0,characters:{},monsters:[],summons:[],pending:[]};
     if (this.state.schema !== 1) throw Error('unsupported-world-schema');
@@ -221,7 +225,7 @@ export class WorldSimulation {
   private applyCommand(p: WorldCharacter, command: WorldCommand): unknown {
     if (command.type==='respawn') {
       if (!p.dead) throw Error('not-dead');
-      this.cancelControl(p);Object.assign(p,SPAWN,motion(this.state.time),{dead:false,hp:p.maxHp,mp:p.maxMp,target:null,destination:null,direction:{x:0,z:0},generation:p.generation+1});
+      this.relocate(p,SPAWN);Object.assign(p,{dead:false,hp:p.maxHp,mp:p.maxMp});
       return;
     }
     if (p.dead) throw Error('dead');
@@ -244,7 +248,7 @@ export class WorldSimulation {
       if (!item || item.id!==command.item.id || item.plus!==command.item.plus || item.count!==command.item.count) throw Error('stale-item');
       if (item.id==='potion' && p.hp<p.maxHp) p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*.45));
       else if(item.id==='ether' && p.mp<p.maxMp) p.mp=Math.min(p.maxMp,p.mp+Math.round(p.maxMp*.45));
-      else if(item.id==='teleport') {Object.assign(p,SPAWN);this.cancelControl(p);}
+      else if(item.id==='teleport') this.relocate(p,SPAWN);
       else throw Error('cannot-use');
       if (--item.count===0) p.inventory=p.inventory.filter(i=>i.uid!==item.uid);
       return;
@@ -265,7 +269,7 @@ export class WorldSimulation {
       if (!point||distance(p,npcPositions.teleport)>3.2) throw Error('teleport-unavailable');
       if (p.level<point.level) throw Error('level-required');
       if (p.gold<point.cost) throw Error('insufficient-gold');
-      p.gold-=point.cost;p.x=point.x;p.z=point.z;this.cancelControl(p);return;
+      this.relocate(p,point);p.gold-=point.cost;return;
     }
     if (command.type==='collect') {
       const retained: InventoryItem[]=[];
@@ -296,7 +300,7 @@ export class WorldSimulation {
   checkpoint(): void {this.store.save(this.state);this.lastCheckpoint=this.state.time;}
   snapshot(id: string, afterEvent=0): WorldSnapshot {
     const character=this.character(id);
-    return structuredClone({protocol:WORLD_PROTOCOL,time:this.state.time,revision:this.state.revision,character,
+    return structuredClone({protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,character,
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time).map(p=>({id:p.id,name:p.name,classId:p.classId,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt})),
       monsters:this.state.monsters,summons:this.state.summons,events:this.events.filter(e=>e.sequence>afterEvent)});
   }
@@ -320,16 +324,18 @@ export class WorldSimulation {
           const skill=p.skill===null?undefined:CLASSES[p.classId as ClassId].skills[p.skill] as Skill;
           if(skill&&(p.mp<skill.cost||p.cooldowns[p.skill!]>this.state.time))p.skill=null;
           const range=this.lineOfSight(p,target)?classAttackRange(p.classId):.1;
+          const contact=this.bodyRadius(p)+this.bodyRadius(target)+.04;
+          const approachRange=Math.min(range,Math.max(range*.9,contact));
           const d=distance(p,target);if(d>range)this.approaching.add(p.id);
-          if(d>(this.approaching.has(p.id)?range*.9:range)){
-            const travel=Math.max(0,d-Math.max(.35,range*.78));goal={x:p.x+(target.x-p.x)/Math.max(.001,d)*travel,z:p.z+(target.z-p.z)/Math.max(.001,d)*travel};
+          if(d>(this.approaching.has(p.id)?approachRange:range)){
+            const travel=Math.max(0,d-Math.max(.35,approachRange-.01));goal={x:p.x+(target.x-p.x)/Math.max(.001,d)*travel,z:p.z+(target.z-p.z)/Math.max(.001,d)*travel};
           }else{
             this.approaching.delete(p.id);motor.stopPlanar();p.yaw=smoothAngle(p.yaw,Math.atan2(target.x-p.x,target.z-p.z),9,dt);
             if(p.grounded&&(p.skill!==null||p.attackReadyAt<=this.state.time)&&Math.cos(Math.atan2(target.x-p.x,target.z-p.z)-p.yaw)>.97)this.beginPlayerAttack(p,target);
           }
         }
         if(goal){
-          if(distance(p,goal)<.18){if(p.destination)p.destination=null;this.pursuit.delete(p.id);}
+          if(distance(p,goal)<(p.destination?.18:.01)){if(p.destination)p.destination=null;this.pursuit.delete(p.id);}
           else{
             const progress=this.pursuit.get(p.id);
             if(!progress||distance(p,progress)>.2)this.pursuit.set(p.id,{x:p.x,z:p.z,since:this.state.time});
@@ -521,13 +527,14 @@ export class WorldSimulation {
       const owner=this.state.characters[m.owner]??p;owner.kills++;if('boss' in def)owner.bossKills++;
       const gained=applyExperience(owner.level,owner.xp,def.xp);owner.level=gained.level;owner.xp=gained.xp;
       if(gained.levelsGained){this.recalculate(owner);if(!owner.dead){owner.hp=owner.maxHp;owner.mp=owner.maxMp;}}
-      owner.gold+=Math.floor(def.gold[0]+this.random()*(def.gold[1]-def.gold[0]+1));
-      for(const [id,chance] of def.drops)if(id!=='scroll'&&this.random()<Number(chance))this.addItem(owner,String(id));
-      for(const id of rollScrollDrops(m.id,this.random))this.addItem(owner,id);
+      const gold=Math.floor(def.gold[0]+this.random()*(def.gold[1]-def.gold[0]+1));owner.gold+=gold;
+      const items:string[]=[];
+      for(const [id,chance] of def.drops)if(id!=='scroll'&&this.random()<Number(chance)){this.addItem(owner,String(id));items.push(String(id));}
+      for(const id of rollScrollDrops(m.id,this.random)){this.addItem(owner,id);items.push(id);}
       if(owner.quest===1&&owner.kills>=8)owner.quest=2;
       if(owner.quest===2&&m.id==='mini')owner.quest=3;
       if(owner.quest===3&&m.id==='big')owner.quest=4;
-      this.event('loot',owner.id,m.uid);this.checkpoint();
+      this.event('loot',owner.id,m.uid,{gold,xp:def.xp,items});this.checkpoint();
     }
   }
   private spawnMonster(id:string,point:Position,uid:string,regionId?:string,index=0):void {
@@ -535,6 +542,9 @@ export class WorldSimulation {
     this.state.monsters.push({...motion(this.state.time),...home,uid,id,home,regionId,patrolIndex:index,hp:def.hp,alive:true,respawnAt:0,attackReadyAt:this.state.time+this.random()*1000,generation:1,phase:1,status:{slow:0,stun:0,dot:0,nextDot:0}});
   }
   private waypoint(actor:Position,goal:Position,radius:number,key:string):Position|undefined {
+    // The final centimetres of an attack approach must not be discarded as a
+    // reached navigation waypoint while the target is still out of reach.
+    if(distance(actor,goal)<.2&&!this.collision.isBlocked(goal,radius))return goal;
     let path=this.paths.get(key);
     if(!path||path.expiresAt<=this.state.time||distance(path.goal,goal)>.7){
       path={goal:{...goal},points:findNavigationPath(this.collision,actor,goal,{actorRadius:radius,cellSize:.85,margin:24,maxVisited:4500}),expiresAt:this.state.time+650};this.paths.set(key,path);
@@ -568,6 +578,12 @@ export class WorldSimulation {
   private monsterRadius(m:WorldMonster):number{return m.id==='big'?1.2:m.id==='mini'?.9:.42;}
   private bodyRadius(actor:Position):number {const m=this.state.monsters.find(m=>m===actor);return m?m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
   private monsterRange(m:WorldMonster):number{return Math.max(1.65,this.bodyRadius(m)+.64);}
+  private relocate(p:WorldCharacter,point:Position):void {
+    const free=this.collision.findNearestFree(point,.46);
+    if(this.collision.isBlocked(free,.46))throw Error('no-free-arrival');
+    this.cancelControl(p);this.paths.delete(p.id);this.pursuit.delete(p.id);this.approaching.delete(p.id);
+    Object.assign(p,free,motion(this.state.time),{generation:p.generation+1});
+  }
   private motor(p:WorldCharacter):CharacterMotor {let motor=this.motors.get(p.id);if(!motor){motor=new CharacterMotor();this.motors.set(p.id,motor);}return motor;}
   private action(actor:WorldMotion,action:WorldMotion['action'],endsAt=0):void {if(actor.action!==action||action==='attack'){actor.action=action;actor.actionStartedAt=this.state.time;actor.actionEndsAt=endsAt;}}
   private cancelAttack(id:string):void {

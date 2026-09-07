@@ -22,13 +22,38 @@ var hero_speed: float = 6.2
 var current_snapshot: Dictionary = {}
 var last_event: int = 0
 var floaters: Array = []
+var collision: VarendorCollision = VarendorCollision.new()
+var effects: Array = []
+var arrival_marker: MeshInstance3D
+var click_goal: Variant = null
+var predicted_velocity: Vector2 = Vector2.ZERO
+var snapshot_age: float = 0.0
+var snapshot_interval: float = .1
+var generation: int = -1
+var sent_sequence: int = 0
+var pending_inputs: Array = []
+var sun_light: DirectionalLight3D
+var world_environment: Environment
+var show_names: bool = true
+var decorations: Array[GeometryInstance3D] = []
+signal loot_received(message: String)
 
-func setup(game: Dictionary) -> void:
+func setup(game: Dictionary) -> bool:
 	data = game
 	terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
-	var scene: PackedScene = load("res://generated/world.glb")
+	collision.setup(terrain.colliders)
+	if ResourceLoader.load_threaded_request("res://generated/world.glb") != OK:
+		return false
+	while ResourceLoader.load_threaded_get_status("res://generated/world.glb") == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		await get_tree().process_frame
+	var scene: PackedScene = ResourceLoader.load_threaded_get("res://generated/world.glb")
+	if scene == null:
+		return false
 	var environment_world: Node3D = scene.instantiate()
 	add_child(environment_world)
+	for mesh: Node in environment_world.find_children("*", "GeometryInstance3D", true, false):
+		if "fern" in str(mesh.name).to_lower() or "shrub" in str(mesh.name).to_lower() or "grass" in str(mesh.name).to_lower():
+			decorations.append(mesh)
 	# Blender exports photometric intensities (5087/9001 cd). Compatibility uses
 	# relative energy here; copying those values clips the whole settlement white.
 	for node: Node in environment_world.find_children("*", "OmniLight3D", true, false):
@@ -48,8 +73,10 @@ func setup(game: Dictionary) -> void:
 	env.fog_light_color = Color("8b9995")
 	env.fog_density = .0024
 	environment.environment = env
+	world_environment = env
 	add_child(environment)
 	var sun: DirectionalLight3D = DirectionalLight3D.new()
+	sun_light = sun
 	sun.rotation_degrees = Vector3(-48, -35, 0)
 	sun.light_color = Color("ffe3ba")
 	sun.light_energy = 1.65
@@ -75,11 +102,23 @@ func setup(game: Dictionary) -> void:
 	target_ring.material_override = material
 	target_ring.visible = false
 	add_child(target_ring)
+	arrival_marker = target_ring.duplicate()
+	add_child(arrival_marker)
+	arrival_marker.scale = Vector3(.65, .65, .65)
+	arrival_marker.visible = false
 	for npc: Dictionary in [{"id":"npc:shop","name":"Торговка Эльза","model":"Ranger","x":.3,"z":-7.8}, {"id":"npc:elder","name":"Староста Роэн","model":"Warrior","x":-7,"z":-2.6}, {"id":"npc:smith","name":"Кузнец Бран","model":"Warrior","x":-17.5,"z":-12.6}, {"id":"npc:teleport","name":"Проводник Каэль","model":"Wizard","x":-7,"z":-20}]:
 		var actor: Node3D = make_actor(npc.id, npc.model, 2.05, npc.name, Color("e2c382"))
 		actor.position = point(npc.x, npc.z)
 		actor.set_meta("destination", actor.position)
 		animate(actor, "idle")
+
+	# Load each shared actor template during loading, before exploration.
+	for model: String in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk", "Fox", "Slime", "Skeleton", "Dragon", "Bat"]:
+		if not templates.has(model):
+			var path: String = "res://generated/actors/" + model + (".gltf" if model in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk"] else ".glb")
+			templates[model] = load(path)
+		await get_tree().process_frame
+	return true
 
 func height_at(x: float, z: float) -> float:
 	var cols: int = int(terrain.columns)
@@ -137,6 +176,11 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 	label.outline_size = 8
 	root.add_child(label)
 	root.set_meta("label", label)
+	root.set_meta("pick_size", Vector3(maxf(.75, bounds.size.x * size / maxf(.001, bounds.size.y)), size, maxf(.75, bounds.size.z * size / maxf(.001, bounds.size.y))))
+	root.set_meta("pickable", id.begins_with("npc:"))
+	root.set_meta("yaw", 0.0)
+	root.set_meta("previous", root.position)
+	root.set_meta("initialized", false)
 	root.set_meta("visual", visual)
 	var players: Array[Node] = visual.find_children("*", "AnimationPlayer", true, false)
 	if not players.is_empty():
@@ -169,42 +213,54 @@ func animate(actor: Node3D, action: String) -> void:
 				return
 
 func apply_snapshot(snapshot: Dictionary) -> void:
+	snapshot_interval = clampf(snapshot_age, .05, .2)
+	snapshot_age = 0
 	current_snapshot = snapshot
 	var hero: Dictionary = snapshot.character
 	var new_hero: bool = hero_id != str(hero.id)
 	hero_id = str(hero.id)
 	server_position = point(hero.x, hero.z, hero.get("yOffset", 0))
 	hero_speed = float(hero.stats.get("speed", 6.2))
-	if new_hero or hero_position.distance_to(server_position) > 3.5 or hero.dead:
+	if new_hero or int(hero.generation) != generation or hero_position.distance_to(server_position) > 3.5 or hero.dead:
 		hero_position = server_position
+		predicted_velocity = Vector2.ZERO
+		pending_inputs.clear()
+		click_goal = null
+		target_id = ""
+		generation = int(hero.generation)
+	for pending_input: Dictionary in pending_inputs.duplicate():
+		if int(pending_input.sequence) <= int(hero.lastInputSequence):
+			pending_inputs.erase(pending_input)
 	var keep: Dictionary = {"npc:shop":true,"npc:elder":true,"npc:smith":true,"npc:teleport":true}
 	var people: Array = snapshot.get("heroes", []).duplicate()
 	# Character is authoritative even when the nearby-heroes list omits self.
+	people = people.filter(func(person: Dictionary): return str(person.id) != hero_id)
 	people.append(hero)
 	for person: Dictionary in people:
 		var id: String = str(person.id)
 		keep[id] = true
 		var actor: Node3D = make_actor(id, data.classes[person.classId].model, 2.05, person.name + " · " + str(person.get("level", "")), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
-		actor.set_meta("destination", point(person.x, person.z, person.get("yOffset", 0)))
-		actor.rotation.y = -float(person.get("yaw", 0)) + PI
+		set_destination(actor, point(person.x, person.z, person.get("yOffset", 0)))
+		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
 		apply_motion(actor, person)
 	for monster: Dictionary in snapshot.get("monsters", []):
-		if Vector2(monster.x - hero.x, monster.z - hero.z).length() > 85:
+		if Vector2(monster.x - hero.x, monster.z - hero.z).length() > 115:
 			continue
 		var id: String = str(monster.uid)
 		keep[id] = true
 		var def: Dictionary = data.monsters[monster.id]
 		var actor: Node3D = make_actor(id, def.model, 2.05 * float(def.get("scale", 1)), def.name + " · " + str(def.level), Color("e0a6a0"))
-		actor.set_meta("destination", point(monster.x, monster.z, monster.get("yOffset", 0)))
-		actor.rotation.y = -float(monster.get("yaw", 0)) + PI
+		set_destination(actor, point(monster.x, monster.z, monster.get("yOffset", 0)))
+		actor.set_meta("pickable", bool(monster.alive))
+		actor.set_meta("yaw", -float(monster.get("yaw", 0)) + PI)
 		actor.visible = monster.alive or (snapshot.time - monster.get("actionStartedAt", 0) < 4000)
 		apply_motion(actor, monster, "death" if not monster.alive else "")
 	for summon: Dictionary in snapshot.get("summons", []):
 		var id: String = str(summon.uid)
 		keep[id] = true
 		var actor: Node3D = make_actor(id, "Skeleton", 1.9, "Призванный скелет", Color("86b3c2"))
-		actor.set_meta("destination", point(summon.x, summon.z, summon.get("yOffset", 0)))
-		actor.rotation.y = -float(summon.get("yaw", 0)) + PI
+		set_destination(actor, point(summon.x, summon.z, summon.get("yOffset", 0)))
+		actor.set_meta("yaw", -float(summon.get("yaw", 0)) + PI)
 		apply_motion(actor, summon)
 	for id: String in actors.keys():
 		if not keep.has(id):
@@ -214,6 +270,20 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		if int(event.sequence) <= last_event:
 			continue
 		last_event = int(event.sequence)
+		if event.kind == "release":
+			show_release(event)
+		elif event.kind in ["buff", "summon"] and actors.has(str(event.actor)):
+			show_aura(actors[str(event.actor)].position, Color("7da4eb") if event.kind == "buff" else Color("b38bd9"))
+		elif event.kind == "loot" and str(event.actor) == hero_id:
+			var names: Array = []
+			for item_id: String in event.get("items", []):
+				names.append(str(data.items.get(item_id, {}).get("name", item_id)))
+			var message: String = "+%d золота · +%d опыта" % [event.get("gold", 0), event.get("xp", 0)]
+			if not names.is_empty():
+				message += "\n" + ", ".join(names)
+			loot_received.emit("Добыча: " + message)
+			if actors.has(str(event.get("target", ""))):
+				show_text(actors[str(event.target)].position, message, Color("edcd83"), 4.0)
 		if event.get("kind") in ["hit", "miss"] and actors.has(str(event.get("target", ""))):
 			var target: Node3D = actors[str(event.target)]
 			var label: Label3D = Label3D.new()
@@ -235,53 +305,87 @@ func apply_motion(actor: Node3D, motion: Dictionary, override_action: String = "
 	animate(actor, action)
 
 func blocked(position: Vector3) -> bool:
-	var x: float = position.x
-	var z: float = -position.z
-	var y: float = height_at(x, z)
-	for collider: Dictionary in terrain.colliders:
-		if collider.top < y + .38 or collider.bottom > y + 1.7:
-			continue
-		var offset: Vector2 = Vector2(x - collider.x, z - collider.z)
-		if collider.kind == "circle":
-			if offset.length_squared() < pow(float(collider.radius) + .4, 2):
-				return true
-		else:
-			var local: Vector2 = offset.rotated(float(collider.rotation))
-			if absf(local.x) < collider.halfX + .4 and absf(local.y) < collider.halfZ + .4:
-				return true
-	return false
+	return collision.blocked(Vector2(position.x, -position.z))
+
+func set_destination(actor: Node3D, destination: Vector3) -> void:
+	actor.set_meta("previous", actor.get_meta("destination"))
+	actor.set_meta("destination", destination)
+	if not actor.get_meta("initialized") or actor.position.distance_to(destination) > 8:
+		actor.position = destination
+		actor.set_meta("previous", destination)
+		actor.set_meta("initialized", true)
+
+func record_intent(value: Dictionary, input_sequence: int) -> void:
+	sent_sequence = input_sequence
+	pending_inputs.append({"sequence":input_sequence,"intent":value.duplicate()})
+	if value.type in ["attack", "cancel"] or (value.type == "direction" and Vector2(value.x, value.z).length() > .01):
+		click_goal = null
+	if value.type == "destination":
+		click_goal = collision.nearest_free(Vector2(value.x, value.z))
 
 func _process(delta: float) -> void:
 	if camera == null:
 		return
 	var dt: float = minf(delta, .05)
+	snapshot_age += delta
 	if not current_snapshot.is_empty():
 		var hero: Dictionary = current_snapshot.character
-		if not hero.dead and not movement.is_zero_approx():
-			var displacement: Vector3 = Vector3(movement.x, 0, -movement.y) * hero_speed * dt
-			var next: Vector3 = hero_position + displacement
-			if not blocked(next):
-				hero_position = next
-			else:
-				for slide: Vector3 in [Vector3(displacement.x, 0, 0), Vector3(0, 0, displacement.z)]:
-					if not blocked(hero_position + slide):
-						hero_position += slide
-			hero_position.y = height_at(hero_position.x, -hero_position.z) + float(hero.get("yOffset", 0))
-			hero_position = hero_position.lerp(server_position, 1.0 - exp(-2.0 * dt))
-		else:
-			hero_position = hero_position.lerp(server_position, 1.0 - exp(-14.0 * dt))
+		var local: Vector2 = movement
+		var pos: Vector2 = Vector2(hero_position.x, -hero_position.z)
+		if click_goal != null and pos.distance_to(click_goal) < .25:
+			click_goal = null
+		# Predict manual input immediately. Click/auto-approach follows the server's
+		# path with bounded velocity extrapolation, never walks through a wall.
+		if not hero.dead and not local.is_zero_approx():
+			predicted_velocity = predicted_velocity.lerp(local * hero_speed, 1.0 - exp(-19.0 * dt))
+			var next: Vector2 = collision.resolve(pos, predicted_velocity * dt)
+			hero_position = point(next.x, next.y, float(hero.get("yOffset", 0)))
+			if pending_inputs.is_empty():
+				hero_position = hero_position.lerp(server_position, 1 - exp(-3 * dt))
+		elif actors.has(hero_id):
+			predicted_velocity = Vector2.ZERO
+			var previous: Vector3 = actors[hero_id].get_meta("previous")
+			var velocity: Vector3 = (server_position - previous) / snapshot_interval
+			velocity = velocity.limit_length(hero_speed)
+			var extra: Vector3 = velocity * minf(snapshot_age, .12) if hero.action == "walk" else Vector3.ZERO
+			var next: Vector2 = collision.resolve(Vector2(server_position.x, -server_position.z), Vector2(extra.x, -extra.z))
+			var desired: Vector3 = point(next.x, next.y, float(hero.get("yOffset", 0)))
+			if click_goal != null and not pending_inputs.is_empty():
+				var walk: Vector2 = (click_goal - pos).limit_length(hero_speed * dt)
+				var preview: Vector2 = collision.resolve(pos, walk)
+				desired = point(preview.x, preview.y, float(hero.get("yOffset", 0)))
+			hero_position = hero_position.lerp(desired, 1 - exp(-24 * dt))
 	for id: String in actors:
 		var actor: Node3D = actors[id]
-		actor.position = hero_position if id == hero_id else actor.position.lerp(actor.get_meta("destination"), 1.0 - exp(-15.0 * dt))
+		var destination: Vector3 = actor.get_meta("destination")
+		actor.position = hero_position if id == hero_id else (actor.get_meta("previous") as Vector3).lerp(destination, clampf(snapshot_age / snapshot_interval, 0, 1))
+		actor.rotation.y = lerp_angle(actor.rotation.y, float(actor.get_meta("yaw")), 1 - exp(-18 * dt))
+		(actor.get_meta("label") as Label3D).visible = show_names
 		if id == hero_id and not movement.is_zero_approx():
-			actor.rotation.y = -atan2(movement.x, movement.y) + PI
+			actor.rotation.y = lerp_angle(actor.rotation.y, -atan2(movement.x, movement.y) + PI, 1 - exp(-16 * dt))
 			animate(actor, "walk")
 	var pivot: Vector3 = hero_position + Vector3(0, 1.25, 0)
-	camera.position = pivot + Vector3(sin(camera_yaw) * cos(camera_pitch), sin(camera_pitch), cos(camera_yaw) * cos(camera_pitch)) * camera_distance
+	var offset: Vector3 = Vector3(sin(camera_yaw) * cos(camera_pitch), sin(camera_pitch), cos(camera_yaw) * cos(camera_pitch))
+	var distance: float = maxf(.6, collision.ray_distance(pivot, pivot + offset * camera_distance, .22) - .12)
+	camera.position = pivot + offset * distance
+	camera.position.y = maxf(camera.position.y, height_at(camera.position.x, -camera.position.z) + .3)
 	camera.look_at(pivot)
-	target_ring.visible = actors.has(target_id) and actors[target_id].visible
+	target_ring.visible = actors.has(target_id) and actors[target_id].visible and actors[target_id].get_meta("pickable", false)
 	if target_ring.visible:
 		target_ring.position = actors[target_id].position + Vector3(0, .13, 0)
+	arrival_marker.visible = click_goal != null
+	if click_goal != null:
+		arrival_marker.position = point(click_goal.x, click_goal.y, .12)
+	for effect: Dictionary in effects.duplicate():
+		effect.left -= delta
+		var progress: float = 1 - maxf(0, effect.left) / effect.duration
+		if effect.has("end"):
+			effect.node.position = (effect.start as Vector3).lerp(effect.end, progress)
+		else:
+			effect.node.scale = Vector3.ONE * (.5 + progress * 1.7)
+		if effect.left <= 0:
+			effect.node.queue_free()
+			effects.erase(effect)
 	for floater: Dictionary in floaters.duplicate():
 		floater.left -= delta
 		floater.node.position.y += delta * 1.2
@@ -290,19 +394,34 @@ func _process(delta: float) -> void:
 			floater.node.queue_free()
 			floaters.erase(floater)
 
-func click(screen: Vector2) -> void:
-	var closest: float = 55.0
+func pick_entity(screen: Vector2) -> String:
+	var origin: Vector3 = camera.project_ray_origin(screen)
+	var direction: Vector3 = camera.project_ray_normal(screen)
+	var closest: float = INF
 	var selected: String = ""
 	for id: String in actors:
 		var actor: Node3D = actors[id]
-		if id == hero_id or not actor.visible or camera.is_position_behind(actor.position):
+		if id == hero_id or not actor.visible or not actor.get_meta("pickable", false):
 			continue
-		var distance: float = camera.unproject_position(actor.position + Vector3(0, 1, 0)).distance_to(screen)
-		if distance < closest:
-			closest = distance
-			selected = id
+		var size: Vector3 = actor.get_meta("pick_size")
+		var transform_inverse: Transform3D = actor.global_transform.affine_inverse()
+		var local_origin: Vector3 = transform_inverse * origin
+		var local_direction: Vector3 = transform_inverse.basis * direction
+		var bounds: AABB = AABB(Vector3(-size.x / 2, 0, -size.z / 2), size).grow(.12)
+		var hit = bounds.intersects_ray(local_origin, local_direction)
+		if hit != null:
+			var location: Vector3 = actor.global_transform * hit
+			var distance: float = origin.distance_to(location)
+			if distance < closest and collision.ray_distance(origin, location) >= distance - .05:
+				closest = distance
+				selected = id
+	return selected
+
+func click(screen: Vector2) -> void:
+	var selected: String = pick_entity(screen)
 	if not selected.is_empty():
 		target_id = selected
+		click_goal = null
 		picked.emit(selected)
 		return
 	var origin: Vector3 = camera.project_ray_origin(screen)
@@ -317,6 +436,66 @@ func click(screen: Vector2) -> void:
 					position = midpoint
 				else:
 					previous = midpoint
-			moved_to.emit(Vector2(position.x, -position.z))
+			var goal: Vector2 = collision.nearest_free(Vector2(position.x, -position.z).clamp(Vector2(-155, -135), Vector2(155, 135)))
+			if not collision.blocked(goal):
+				click_goal = goal
+				target_id = ""
+				moved_to.emit(goal)
 			return
 		previous = position
+
+func show_text(position_value: Vector3, message: String, color: Color, duration: float = 1.0) -> void:
+	var text_node: Label3D = Label3D.new()
+	text_node.text = message
+	text_node.font_size = 32
+	text_node.pixel_size = .01
+	text_node.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	text_node.no_depth_test = true
+	text_node.modulate = color
+	text_node.position = position_value + Vector3(0, 2.4, 0)
+	add_child(text_node)
+	floaters.append({"node":text_node,"left":duration})
+
+func effect_mesh(color: Color, mesh: Mesh) -> MeshInstance3D:
+	var node: MeshInstance3D = MeshInstance3D.new()
+	node.mesh = mesh
+	var material: StandardMaterial3D = StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = color
+	node.material_override = material
+	add_child(node)
+	return node
+
+func show_aura(position_value: Vector3, color: Color) -> void:
+	var ring: TorusMesh = TorusMesh.new()
+	ring.inner_radius = .55
+	ring.outer_radius = .65
+	var node: MeshInstance3D = effect_mesh(color, ring)
+	node.position = position_value + Vector3(0, .25, 0)
+	effects.append({"node":node,"left":.6,"duration":.6})
+
+func show_release(event: Dictionary) -> void:
+	if not actors.has(str(event.actor)) or not actors.has(str(event.get("target", ""))):
+		return
+	var start: Vector3 = actors[str(event.actor)].position + Vector3(0, 1.15, 0)
+	var end: Vector3 = actors[str(event.target)].position + Vector3(0, .85, 0)
+	var colors: Dictionary = {"fire":Color("ff7736"),"ice":Color("83ddff"),"lightning":Color("d7c2ff"),"poison":Color("91d45b"),"bone":Color("cbaddd"),"drain":Color("cf6689"),"shadow":Color("a882d8"),"arrow":Color("e5d1a1"),"slash":Color("f2dfb3")}
+	var color: Color = colors.get(event.get("effect", "slash"), Color("b3a0e3"))
+	var duration: float = float(event.get("durationMs", 0)) / 1000.0
+	if duration > 0:
+		var sphere: SphereMesh = SphereMesh.new()
+		sphere.radius = .16
+		sphere.height = .32
+		var node: MeshInstance3D = effect_mesh(color, sphere)
+		node.position = start
+		effects.append({"node":node,"start":start,"end":end,"left":duration,"duration":duration})
+	else:
+		var beam: CylinderMesh = CylinderMesh.new()
+		beam.top_radius = .035
+		beam.bottom_radius = .07
+		beam.height = start.distance_to(end)
+		var node: MeshInstance3D = effect_mesh(color, beam)
+		node.position = (start + end) / 2
+		if start.distance_to(end) > .01:
+			node.quaternion = Quaternion(Vector3.UP, (end - start).normalized())
+		effects.append({"node":node,"left":.12,"duration":.12,"start":node.position,"end":node.position})

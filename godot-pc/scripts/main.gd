@@ -35,6 +35,19 @@ var active_dialog: Window
 var qa_path: String = ""
 var qa_started: bool = false
 var qa_times: Array = []
+var mouse_orbit: bool = false
+var mouse_restore: Vector2 = Vector2.ZERO
+var mouse_sensitivity: float = 1.0
+var invert_camera_y: bool = false
+var chosen_equipment: String = ""
+var inventory_footer: Label
+var inventory_drag: bool = false
+var inventory_drag_offset: Vector2
+var game_settings: Dictionary = {}
+var display_before: Dictionary = {}
+var display_remaining: float = 0.0
+var display_countdown: Label
+var quick_panel_node: PanelContainer
 
 func _ready() -> void:
 	get_tree().auto_accept_quit = false
@@ -42,6 +55,8 @@ func _ready() -> void:
 	quick = data.quickDefaults.duplicate(true)
 	net = VarendorNetwork.new()
 	add_child(net)
+	net.expected_content = str(data.get("contentVersion", ""))
+	net.expected_map = str(data.get("mapVersion", ""))
 	net.snapshot_received.connect(snapshot_received)
 	net.notice.connect(notice)
 	world = VarendorWorld.new()
@@ -50,8 +65,16 @@ func _ready() -> void:
 	login.hide()
 	notice("Загрузка мира…")
 	await get_tree().process_frame
-	world.setup(data)
+	if not await world.setup(data):
+		notice("Не удалось загрузить мир. Полностью распакуйте свежий пакет игры.")
+		return
 	world.picked.connect(picked)
+	net.intent_sent.connect(world.record_intent)
+	world.loot_received.connect(notice)
+	net.receipt_received.connect(func(_receipt: Dictionary):
+		selected_scroll = {}
+		selected_item = {}
+		refresh_inventory())
 	world.moved_to.connect(func(point: Vector2): net.intent({"type":"destination","x":point.x,"z":point.y}))
 	login.show()
 	for arg: String in OS.get_cmdline_user_args():
@@ -108,6 +131,7 @@ func build_ui() -> void:
 	canvas.add_child(ui)
 	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	get_viewport().size_changed.connect(keep_inventory_visible)
 	var theme: Theme = Theme.new()
 	theme.default_font_size = 15
 	theme.set_stylebox("panel", "PanelContainer", panel_style())
@@ -152,9 +176,10 @@ func build_ui() -> void:
 	var menu: HBoxContainer = HBoxContainer.new()
 	ui.add_child(menu)
 	menu.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	menu.position += Vector2(-365, 18)
+	menu.position += Vector2(-445, 18)
 	menu.add_child(button("Инвентарь · I", toggle_inventory))
-	menu.add_child(button("Управление", controls_dialog))
+	menu.add_child(button("Настройки", controls_dialog))
+	menu.add_child(button("Герои", switch_profile))
 	menu.add_child(button("Выход", quit_game))
 	var minimap: Control = preload("res://scripts/minimap.gd").new()
 	minimap.world = world
@@ -164,6 +189,7 @@ func build_ui() -> void:
 	minimap.size = Vector2(166, 154)
 	minimap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var quick_panel: PanelContainer = place_panel(Control.PRESET_CENTER_BOTTOM, Vector2(-345, -192), Vector2(690, 168))
+	quick_panel_node = quick_panel
 	var quick_box: VBoxContainer = VBoxContainer.new()
 	quick_panel.add_child(quick_box)
 	var quick_header: HBoxContainer = HBoxContainer.new()
@@ -182,7 +208,9 @@ func build_ui() -> void:
 	quick_grid.columns = 8
 	quick_box.add_child(quick_grid)
 	for index: int in range(32):
-		var slot: Button = button("", func(): activate(quick[index].action))
+		var slot: VarendorQuickSlot = VarendorQuickSlot.new()
+		slot.focus_mode = Control.FOCUS_NONE
+		slot.pressed.connect(func(): activate(quick[index].action))
 		slot.custom_minimum_size = Vector2(79, 55)
 		slot.add_theme_font_size_override("font_size", 12)
 		slot.gui_input.connect(func(event: InputEvent):
@@ -246,56 +274,84 @@ func build_login() -> void:
 	box.add_child(create)
 
 func build_inventory() -> void:
-	inventory_panel = place_panel(Control.PRESET_TOP_RIGHT, Vector2(-426, 72), Vector2(408, 455))
+	inventory_panel = place_panel(Control.PRESET_TOP_RIGHT, Vector2(-450, 64), Vector2(432, 632))
 	var box: VBoxContainer = VBoxContainer.new()
-	box.add_theme_constant_override("separation", 7)
+	box.add_theme_constant_override("separation", 6)
 	inventory_panel.add_child(box)
 	var top: HBoxContainer = HBoxContainer.new()
 	box.add_child(top)
-	inventory_title = label("ПЕРСОНАЖ", 18, Color("dfc591"))
+	inventory_title = label("ПЕРСОНАЖ", 16, Color("dfc591"))
 	inventory_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inventory_title.mouse_filter = Control.MOUSE_FILTER_STOP
+	inventory_title.gui_input.connect(func(event: InputEvent):
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+			inventory_drag = event.pressed
+			inventory_drag_offset = get_viewport().get_mouse_position() - inventory_panel.position
+			if not event.pressed:
+				save_preferences()
+		elif event is InputEventMouseMotion and inventory_drag:
+			inventory_panel.position = (get_viewport().get_mouse_position() - inventory_drag_offset).clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO)))
 	top.add_child(inventory_title)
 	top.add_child(button("×", toggle_inventory))
+	var character_area: HBoxContainer = HBoxContainer.new()
+	character_area.add_theme_constant_override("separation", 8)
+	box.add_child(character_area)
+	var stat_panel: PanelContainer = PanelContainer.new()
+	stat_panel.custom_minimum_size = Vector2(184, 270)
+	stat_panel.add_theme_stylebox_override("panel", panel_style(Color("181e20"), Color("454a42")))
+	character_area.add_child(stat_panel)
+	stats_text = label("", 12)
+	stats_text.clip_text = true
+	stat_panel.add_child(stats_text)
 	var equipment: GridContainer = GridContainer.new()
-	equipment.columns = 4
-	box.add_child(equipment)
-	for slot_name: String in data.equipSlots:
+	equipment.columns = 3
+	equipment.add_theme_constant_override("h_separation", 3)
+	equipment.add_theme_constant_override("v_separation", 4)
+	character_area.add_child(equipment)
+	# Twelve established slots, positioned like the reference character paper doll.
+	for slot_name: String in ["neck", "head", "ear1", "weapon", "chest", "ear2", "offhand", "gloves", "ring1", "belt", "boots", "ring2"]:
 		var slot: VarendorItemSlot = VarendorItemSlot.new()
 		slot.owner_ui = self
 		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(92, 49)
-		slot.add_theme_font_size_override("font_size", 11)
+		slot.custom_minimum_size = Vector2(63, 63)
 		slot.payload = {"kind":"equipment","slot":slot_name,"item":{}}
-		slot.text = data.slotNames[slot_name]
+		slot.tooltip_text = data.slotNames[slot_name]
 		equipment.add_child(slot)
 		equipment_slots[slot_name] = slot
-	stats_text = label("", 12)
-	box.add_child(stats_text)
-	box.add_child(label("СУМКА · 42 ЯЧЕЙКИ", 13, Color("c7b489")))
+	var tabs: HBoxContainer = HBoxContainer.new()
+	box.add_child(tabs)
+	var bag_tab: Label = label("ИНВЕНТАРЬ", 14, Color("dfc591"))
+	bag_tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tabs.add_child(bag_tab)
+	tabs.add_child(button("Бонусы комплекта", func():
+		var details: VBoxContainer = dialog("Бонусы комплекта", Vector2i(390, 180))
+		details.add_child(label("В текущих предметах бонусы комплектов\nне заданы. Характеристики экипировки\nучитываются в окне персонажа.", 15))))
 	var scroll: ScrollContainer = ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(380, 151)
+	scroll.custom_minimum_size = Vector2(406, 197)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
 	box.add_child(scroll)
 	var bag: GridContainer = GridContainer.new()
 	bag.columns = 6
+	bag.add_theme_constant_override("h_separation", 3)
+	bag.add_theme_constant_override("v_separation", 3)
 	scroll.add_child(bag)
 	for index: int in range(42):
 		var slot: VarendorItemSlot = VarendorItemSlot.new()
 		slot.owner_ui = self
 		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(58, 45)
-		slot.add_theme_font_size_override("font_size", 13)
-		slot.add_theme_stylebox_override("normal", panel_style(Color("222a2b"), Color("5d5746")))
+		slot.custom_minimum_size = Vector2(62, 62)
 		slot.payload = {"kind":"bag","index":index,"item":{}}
 		bag.add_child(slot)
 		bag_slots.append(slot)
+	inventory_footer = label("Золото: 0      Ячейки: 0 / 42", 12)
+	box.add_child(inventory_footer)
 	var commands: HBoxContainer = HBoxContainer.new()
 	box.add_child(commands)
 	commands.add_child(button("Использовать", use_selected))
 	commands.add_child(button("Продать", sell_selected))
-	commands.add_child(button("Забрать лут", func(): net.command({"type":"collect"})))
-	var hint: Label = label("Двойной щелчок: надеть / использовать\nПеретаскивание: перенести. Свиток → предмет: заточка.", 12)
-	box.add_child(hint)
+	commands.add_child(button("Забрать добычу", func(): net.command({"type":"collect"})))
+	box.add_child(label("Двойной щелчок — надеть / использовать.\nЗаточка: дважды свиток → один раз предмет.", 11, Color("a8aa9d")))
 	inventory_panel.hide()
 
 func snapshot_received(snapshot: Dictionary) -> void:
@@ -323,12 +379,15 @@ func snapshot_received(snapshot: Dictionary) -> void:
 			region = location.name
 	status.text = region + " · %d FPS · сервер подключён" % int(Engine.get_frames_per_second())
 	respawn.visible = hero.dead
-	inventory_title.text = "ПЕРСОНАЖ · %d золота" % hero.gold
-	var fingerprint: String = JSON.stringify([hero.inventory, hero.equipment, hero.stats, hero.xp])
+	inventory_title.text = "ПЕРСОНАЖ"
+	inventory_footer.text = "Золото: %d      Ячейки: %d / 42" % [hero.gold, hero.inventory.size()]
+	stats_text.text = "%s\n\nУровень        %d\nОЗ            %d / %d\n%s       %d / %d\n\nСила           %d\nЛовкость       %d\nИнтеллект      %d\nВыносливость   %d\nДух            %d\n\nАтака          %d–%d\nМаг. атака      %d\nЗащита         %d\nМаг. защита     %d" % [hero.name, hero.level, hero.hp, hero.maxHp, data.classes[hero.classId].resource, hero.mp, hero.maxMp, hero.stats.get("str", 0), hero.stats.get("dex", 0), hero.stats.get("int", 0), hero.stats.get("vit", 0), hero.stats.get("spi", 0), hero.stats.get("atkMin", 0), hero.stats.get("atkMax", 0), hero.stats.get("matk", 0), hero.stats.get("def", 0), hero.stats.get("mdef", 0)]
+	var fingerprint: String = JSON.stringify([hero.inventory, hero.equipment, hero.stats, selected_scroll])
 	if fingerprint != inventory_fingerprint:
 		inventory_fingerprint = fingerprint
 		refresh_inventory()
 	refresh_quick()
+	target_text.text = ""
 	if not world.target_id.is_empty():
 		for monster: Dictionary in snapshot.get("monsters", []):
 			if str(monster.uid) == world.target_id:
@@ -338,12 +397,12 @@ func snapshot_received(snapshot: Dictionary) -> void:
 func item_name(item: Dictionary) -> String:
 	if item.is_empty():
 		return ""
-	return str(data.items[item.id].name) + (" +" + str(int(item.plus)) if item.plus > 0 else "")
+	return str(data.items.get(item.id, {}).get("name", "Неизвестный предмет: " + str(item.id))) + (" +" + str(int(item.plus)) if item.plus > 0 else "")
 
 func item_tip(item: Dictionary) -> String:
 	if item.is_empty():
 		return "Свободная ячейка"
-	var def: Dictionary = data.items[item.id]
+	var def: Dictionary = data.items.get(item.id, {})
 	var lines: Array = [item_name(item)]
 	if def.has("origin"):
 		lines.append(def.origin)
@@ -361,13 +420,17 @@ func item_tip(item: Dictionary) -> String:
 			if stats.total[key] != 0:
 				lines.append("%s: %s + %s = %s" % [names.get(key, key), stats.base.get(key, 0), stats.bonus.get(key, 0), stats.total[key]])
 		if not net.hero.is_empty():
-			for slot: String in [resolve_slot(def.get("slot", ""))]:
+			var item_slot: String = str(def.get("slot", ""))
+			var compared: Array = ["ring1", "ring2"] if item_slot == "ring" else ["ear1", "ear2"] if item_slot in ["ear", "earring"] else [resolve_slot(item_slot)]
+			for slot: String in compared:
 				var equipped = net.hero.equipment.get(slot)
-				if equipped is Dictionary and equipped.uid != item.uid and data.items[equipped.id].get("slot", "") == def.get("slot", "-"):
-					lines.append("\nНадето: " + item_name(equipped))
+				if equipped is Dictionary and equipped.uid != item.uid and data.items.get(equipped.id, {}).get("slot", "") == def.get("slot", "-"):
+					lines.append("\n" + ("Замена: " if slot == resolve_slot(item_slot) else "Вторая ячейка: ") + item_name(equipped))
 					var other: Dictionary = data.itemStats[equipped.id][clampi(int(equipped.plus), 0, 15)].total
-					for key: String in stats.total:
-						var difference: float = float(stats.total[key]) - float(other.get(key, 0))
+					var keys: Dictionary = other.duplicate()
+					keys.merge(stats.total, true)
+					for key: String in keys:
+						var difference: float = float(stats.total.get(key, 0)) - float(other.get(key, 0))
 						if difference != 0:
 							lines.append("%s: %+.2f" % [names.get(key, key), difference])
 	if data.scrolls.has(item.id):
@@ -377,13 +440,16 @@ func item_tip(item: Dictionary) -> String:
 		var category: String = "weapon" if def.slot == "weapon" else "armor"
 		if scroll.category == category:
 			var chance: float = float(data.chances[category + "_" + scroll.quality][int(item.plus)])
-			lines.append("\nЗаточка: +%d → +%d · Шанс %s%%\nПри неудаче предмет уничтожается. Улучшенный свиток не страхует." % [item.plus, item.plus + 1, chance])
+			lines.append("\nЗаточка: +%d → +%d · Шанс %s%%" % [item.plus, item.plus + 1, chance])
+			lines.append("Безопасная попытка." if chance >= 100 else "При неудаче предмет уничтожается.\nУлучшенный свиток не страхует.")
 	lines.append("Количество: %d · Продажа: %d золота" % [item.count, floorf(float(def.get("value", 0)) * .48) * item.count])
 	return "\n".join(lines)
 
 func resolve_slot(item_slot: String) -> String:
 	# Same selection order as the existing core/inventory-commands.ts resolver.
 	var slots: Array = ["ring1", "ring2"] if item_slot == "ring" else ["ear1", "ear2"] if item_slot in ["ear", "earring"] else [item_slot]
+	if chosen_equipment in slots:
+		return chosen_equipment
 	for slot: String in slots:
 		if not net.hero.equipment.get(slot):
 			return slot
@@ -396,16 +462,14 @@ func refresh_inventory() -> void:
 		var item: Dictionary = net.hero.inventory[index] if index < net.hero.inventory.size() else {}
 		var slot: VarendorItemSlot = bag_slots[index]
 		slot.payload.item = item.duplicate()
-		slot.text = str(data.items[item.id].icon) + ("\n+" + str(int(item.plus)) if item.plus > 0 else "\n" + str(int(item.count)) if item.count > 1 else "") if not item.is_empty() else ""
+		slot.update_item(item)
 		slot.tooltip_text = item_tip(item)
 	for slot_name: String in equipment_slots:
 		var item = net.hero.equipment.get(slot_name)
 		var slot: VarendorItemSlot = equipment_slots[slot_name]
 		slot.payload.item = item.duplicate() if item is Dictionary else {}
-		slot.text = data.slotNames[slot_name] + ("\n" + str(data.items[item.id].icon) + (" +" + str(int(item.plus)) if item.plus > 0 else "") if item is Dictionary else "\n—")
-		slot.tooltip_text = item_tip(item if item is Dictionary else {})
-	var stats: Dictionary = net.hero.stats
-	stats_text.text = "Атака %d–%d · Маг. атака %d · Защита %d / %d\nКрит %s · Точность %s · Уклонение %s · Опыт %d" % [stats.get("atkMin", 0), stats.get("atkMax", 0), stats.get("matk", 0), stats.get("def", 0), stats.get("mdef", 0), stats.get("crit", 0), stats.get("accuracy", 0), stats.get("evasion", 0), net.hero.xp]
+		slot.update_item(item if item is Dictionary else {})
+		slot.tooltip_text = item_tip(item) if item is Dictionary else str(data.slotNames[slot_name])
 
 func action_name(action: String) -> String:
 	if action.begins_with("skill:"):
@@ -415,21 +479,36 @@ func action_name(action: String) -> String:
 
 func refresh_quick() -> void:
 	for index: int in range(quick_buttons.size()):
-		var slot: Button = quick_buttons[index]
+		var slot: VarendorQuickSlot = quick_buttons[index]
 		var action: String = quick[index].action
 		var key: String = quick[index].key.replace("Shift+", "⇧").replace("Digit", "").replace("Key", "")
 		var title: String = action_name(action)
+		var artwork_id: String = action if data.items.has(action) else str(data.classes[net.hero.get("classId", "knight")].weapon)
+		slot.artwork = load("res://assets/icons/" + artwork_id + ".svg") if not action.is_empty() else null
+		slot.remaining = 0
+		slot.quantity = 0
+		slot.usable = not net.hero.get("dead", false)
+		if action in ["potion", "ether", "teleport"] and not net.hero.is_empty():
+			for item: Dictionary in net.hero.inventory:
+				if item.id == action:
+					slot.quantity += int(item.count)
+			slot.usable = slot.usable and slot.quantity > 0
 		var icon: String = {"":"·","attack":"⚔","potion":"ОЗ","ether":"MP","teleport":"⌂"}.get(action, str(index % 8 + 1))
 		if action.begins_with("skill:"):
 			var skill_index: int = int(action.trim_prefix("skill:"))
 			var skill: Dictionary = data.classes[net.hero.get("classId", "knight")].skills[skill_index]
 			icon = str(skill.icon)
 			if not net.hero.is_empty():
-				var left: float = maxf(0, (net.hero.cooldowns[skill_index] - world.current_snapshot.time) / 1000.0)
+				var left: float = maxf(0, (net.hero.cooldowns[skill_index] - float(world.current_snapshot.get("time", net.last_time))) / 1000.0)
+				slot.remaining = left
+				slot.cooldown = float(skill.cd)
+				slot.usable = slot.usable and net.hero.mp >= skill.cost and left <= 0
 				if left > 0:
 					icon = "%.1f" % left
 			title += "\nЦена: %s · Перезарядка: %s с" % [skill.cost, skill.cd]
-		slot.text = key + "\n" + icon
+		slot.text = ""
+		slot.key_label = key
+		slot.queue_redraw()
 		slot.tooltip_text = title + "\nПКМ — назначение действия и клавиши"
 		slot.visible = index < 16 or full_quick
 
@@ -451,7 +530,14 @@ func load_preferences(id: String) -> void:
 			quick[index].key = key if key in data.quickKeys and key not in used else ""
 			if not quick[index].key.is_empty():
 				used.append(quick[index].key)
-	world.camera_distance = clampf(float(preferences.get("camera_distance", 21)), 9, 40)
+	world.camera_distance = clampf(float(preferences.get("camera_distance", 21)), 5, 40)
+	game_settings = preferences.get("settings", {})
+	full_quick = bool(preferences.get("full_quick", false))
+	if preferences.get("inventory_position") is Array and preferences.inventory_position.size() == 2:
+		inventory_panel.position = Vector2(preferences.inventory_position[0], preferences.inventory_position[1]).clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO))
+	apply_settings()
+	quick_panel_node.position.y = ui.size.y - (326 if full_quick else 192)
+	quick_panel_node.size.y = 302 if full_quick else 168
 	refresh_quick()
 
 func save_preferences() -> void:
@@ -459,6 +545,10 @@ func save_preferences() -> void:
 		return
 	preferences["quickbar"] = quick
 	preferences["camera_distance"] = world.camera_distance
+	preferences["schema"] = 2
+	preferences["full_quick"] = full_quick
+	preferences["inventory_position"] = [inventory_panel.position.x, inventory_panel.position.y]
+	preferences["settings"] = game_settings
 	if not net.save_private_json(preference_path, preferences):
 		notice("Не удалось сохранить назначения клавиш")
 
@@ -472,7 +562,16 @@ func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer
 	active_dialog.exclusive = true
 	active_dialog.theme = ui.theme
 	add_child(active_dialog)
-	active_dialog.close_requested.connect(func(): active_dialog.queue_free())
+	active_dialog.close_requested.connect(func():
+		if not display_before.is_empty():
+			revert_display()
+		active_dialog.queue_free())
+	active_dialog.window_input.connect(func(event: InputEvent):
+		if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
+			if not display_before.is_empty():
+				revert_display()
+			active_dialog.set_input_as_handled()
+			active_dialog.queue_free())
 	var panel: PanelContainer = PanelContainer.new()
 	active_dialog.add_child(panel)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -508,9 +607,138 @@ func assign_dialog(index: int) -> void:
 		active_dialog.queue_free()))
 
 func controls_dialog() -> void:
-	var box: VBoxContainer = dialog("Управление", Vector2i(540, 350))
-	box.add_child(label("WASD — движение · Q / E — поворот камеры\nПКМ + мышь — камера · Колесо — приближение\nЛКМ — идти / выбрать цель и атаковать\nПробел — прыжок · F — действие у NPC\nI / Tab — инвентарь · Esc — отмена\n1–8, Shift + 1–8 — быстрые действия\nПКМ на быстрой ячейке — сменить назначение\nДвойной щелчок по свитку → предмет — заточка", 17))
-	box.add_child(button("Закрыть", func(): active_dialog.queue_free()))
+	var box: VBoxContainer = dialog("Настройки", Vector2i(590, 520))
+	var tabs: TabContainer = TabContainer.new()
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(tabs)
+	for title: String in ["Игра", "Графика", "Управление", "Дисплей"]:
+		var page: VBoxContainer = VBoxContainer.new()
+		page.name = title
+		page.add_theme_constant_override("separation", 12)
+		tabs.add_child(page)
+		match title:
+			"Игра":
+				setting_toggle(page, "Имена над персонажами", "names", true)
+				setting_choice(page, "Масштаб интерфейса", "ui_scale", ["80%", "100%", "125%", "150%"], 1)
+				page.add_child(label("Окна не останавливают мир и восстановление умений.\nI / C / Tab — инвентарь и персонаж.\nEsc — закрыть верхнее окно / отменить действие.", 15))
+			"Графика":
+				setting_choice(page, "Профиль", "quality", ["Низкий", "Средний", "Высокий"], 2)
+				setting_choice(page, "Сглаживание MSAA", "msaa", ["Выкл.", "2×", "4×", "8×"], 2)
+				setting_toggle(page, "Тени", "shadows", true)
+				setting_toggle(page, "Атмосферный туман", "fog", true)
+				setting_choice(page, "Дальность мира", "distance", ["150 м", "240 м", "360 м"], 2)
+				setting_choice(page, "Декоративная растительность", "vegetation", ["24 м", "45 м", "80 м"], 2)
+				setting_choice(page, "Разрешение 3D", "render_scale", ["50%", "75%", "100%"], 2)
+			"Управление":
+				page.add_child(label("ЛКМ по земле — движение. ЛКМ по врагу — атака.\nЗажатая ПКМ — вращение камеры. Колесо — масштаб.\nWASD — движение, Q / E — камера, Пробел — прыжок.\nПКМ по быстрой ячейке — действие и клавиша.", 15))
+				setting_toggle(page, "Инвертировать камеру по вертикали", "invert_y", false)
+				page.add_child(label("Чувствительность мыши"))
+				var slider: HSlider = HSlider.new()
+				slider.min_value = .25
+				slider.max_value = 2.5
+				slider.step = .05
+				slider.value = float(game_settings.get("sensitivity", 1.0))
+				page.add_child(slider)
+				slider.value_changed.connect(func(value: float): game_settings["sensitivity"] = value; apply_settings(); save_preferences())
+			"Дисплей":
+				setting_choice(page, "Режим экрана", "display", ["Оконный", "Без рамки", "Полный экран"], 0)
+				var names: Array = []
+				for resolution: Vector2i in window_resolutions():
+					names.append("%d × %d" % [resolution.x, resolution.y])
+				setting_choice(page, "Размер окна (полный экран — размер монитора)", "resolution", names, 1)
+				var actual: Vector2i = DisplayServer.window_get_size()
+				var internal: Vector2i = Vector2i(Vector2(actual) * get_viewport().scaling_3d_scale)
+				page.add_child(label("Вывод: %d × %d · Рендер 3D: %d × %d" % [actual.x, actual.y, internal.x, internal.y], 13))
+				setting_toggle(page, "Вертикальная синхронизация", "vsync", true)
+				setting_choice(page, "Ограничение кадров", "fps", ["30", "60", "120", "Без ограничения"], 1)
+	box.add_child(button("Готово", func(): save_preferences(); active_dialog.queue_free()))
+
+func setting_toggle(parent: Control, title: String, key: String, fallback: bool) -> void:
+	var check: CheckButton = CheckButton.new()
+	check.text = title
+	check.button_pressed = bool(game_settings.get(key, fallback))
+	parent.add_child(check)
+	check.toggled.connect(func(value: bool): game_settings[key] = value; apply_settings(); save_preferences())
+
+func setting_choice(parent: Control, title: String, key: String, choices: Array, fallback: int) -> void:
+	parent.add_child(label(title))
+	var choice: OptionButton = OptionButton.new()
+	for value: String in choices:
+		choice.add_item(value)
+	choice.selected = clampi(int(game_settings.get(key, fallback)), 0, choices.size() - 1)
+	parent.add_child(choice)
+	choice.item_selected.connect(func(value: int):
+		var previous: Dictionary = {"display":game_settings.get("display", 0),"resolution":game_settings.get("resolution", 1)}
+		game_settings[key] = value
+		if key in ["display", "resolution"]:
+			confirm_display(previous)
+			return
+		if key == "quality":
+			game_settings["msaa"] = [0, 1, 2][value]
+			game_settings["shadows"] = value > 0
+		apply_settings()
+		save_preferences())
+
+func apply_settings() -> void:
+	mouse_sensitivity = clampf(float(game_settings.get("sensitivity", 1.0)), .25, 2.5)
+	invert_camera_y = bool(game_settings.get("invert_y", false))
+	world.show_names = bool(game_settings.get("names", true))
+	if world.sun_light != null:
+		world.sun_light.shadow_enabled = bool(game_settings.get("shadows", true))
+		world.sun_light.directional_shadow_max_distance = [35.0, 60.0, 90.0][clampi(int(game_settings.get("quality", 2)), 0, 2)]
+		world.world_environment.fog_enabled = bool(game_settings.get("fog", true))
+	if world.camera != null:
+		world.camera.far = [150.0, 240.0, 360.0][clampi(int(game_settings.get("distance", 2)), 0, 2)]
+		for mesh: GeometryInstance3D in world.decorations:
+			mesh.visibility_range_end = [24.0, 45.0, 80.0][clampi(int(game_settings.get("vegetation", 2)), 0, 2)]
+	get_viewport().scaling_3d_scale = [.5, .75, 1.0][clampi(int(game_settings.get("render_scale", 2)), 0, 2)]
+	get_window().content_scale_factor = [.8, 1.0, 1.25, 1.5][clampi(int(game_settings.get("ui_scale", 1)), 0, 3)]
+	get_viewport().msaa_3d = clampi(int(game_settings.get("msaa", 2)), 0, 3) as Viewport.MSAA
+	Engine.max_fps = [30, 60, 120, 0][clampi(int(game_settings.get("fps", 1)), 0, 3)]
+	if DisplayServer.get_name() != "headless":
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if game_settings.get("vsync", true) else DisplayServer.VSYNC_DISABLED)
+		var mode: int = clampi(int(game_settings.get("display", 0)), 0, 2)
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if mode == 2 else DisplayServer.WINDOW_MODE_WINDOWED)
+		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, mode == 1)
+		if mode == 0:
+			var resolutions: Array = window_resolutions()
+			var requested: Vector2i = resolutions[clampi(int(game_settings.get("resolution", 1)), 0, resolutions.size() - 1)]
+			if DisplayServer.window_get_size() != requested:
+				DisplayServer.window_set_size(requested)
+	call_deferred("keep_inventory_visible")
+
+func window_resolutions() -> Array:
+	var monitor: Vector2i = DisplayServer.screen_get_size()
+	var values: Array = []
+	for resolution: Vector2i in [Vector2i(1280, 720), Vector2i(1440, 810), Vector2i(1600, 900), Vector2i(1920, 1080), Vector2i(2560, 1440), Vector2i(3840, 2160)]:
+		if DisplayServer.get_name() == "headless" or (resolution.x <= monitor.x and resolution.y <= monitor.y):
+			values.append(resolution)
+	if monitor.x > 0 and monitor.y > 0 and monitor not in values:
+		values.append(monitor)
+	return values if not values.is_empty() else [Vector2i(1280, 720)]
+
+func keep_inventory_visible() -> void:
+	if inventory_panel != null:
+		inventory_panel.position = inventory_panel.position.clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO))
+
+func confirm_display(previous: Dictionary) -> void:
+	display_before = previous
+	display_remaining = 15.0
+	apply_settings()
+	var box: VBoxContainer = dialog("Сохранить видеорежим?", Vector2i(450, 190))
+	display_countdown = label("Возврат прежнего режима через 15 с")
+	box.add_child(display_countdown)
+	box.add_child(button("Сохранить", func():
+		display_before = {}
+		save_preferences()
+		active_dialog.queue_free()))
+	box.add_child(button("Вернуть прежний", func(): revert_display(); active_dialog.queue_free()))
+
+func revert_display() -> void:
+	game_settings.merge(display_before, true)
+	display_before = {}
+	apply_settings()
+	save_preferences()
 
 func picked(id: String) -> void:
 	if id.begins_with("npc:"):
@@ -539,7 +767,7 @@ func interact() -> void:
 				active_dialog.queue_free()))
 
 func activate(action: String) -> void:
-	if net.hero.is_empty():
+	if net.hero.is_empty() or net.hero.dead or not net.connected:
 		return
 	if action in ["potion", "ether", "teleport"]:
 		for item: Dictionary in net.hero.inventory:
@@ -548,19 +776,28 @@ func activate(action: String) -> void:
 				return
 		notice("Нет подходящего предмета в сумке")
 	elif action == "attack" or action.begins_with("skill:"):
-		if world.target_id.is_empty() or world.target_id.begins_with("npc:"):
+		var index: int = int(action.trim_prefix("skill:")) if action.begins_with("skill:") else -1
+		var skill: Dictionary = data.classes[net.hero.classId].skills[index] if index >= 0 else {}
+		var self_cast: bool = skill.has("buff") or bool(skill.get("summon", false))
+		if not self_cast and (world.target_id.is_empty() or world.target_id.begins_with("npc:")):
 			notice("Выберите противника щелчком мыши")
 			return
-		net.intent({"type":"attack","entityId":world.target_id,"skill":int(action.trim_prefix("skill:")) if action.begins_with("skill:") else null})
+		net.intent({"type":"attack","entityId":"@self" if self_cast else world.target_id,"skill":index if index >= 0 else null})
 
 func item_clicked(payload: Dictionary, double_click: bool) -> void:
+	if net.command_busy or net.hero.get("dead", true):
+		return
 	selected_item = payload.duplicate(true)
+	if payload.get("kind") == "equipment":
+		chosen_equipment = str(payload.slot)
 	var item: Dictionary = payload.get("item", {})
 	if item.is_empty():
 		return
 	if not selected_scroll.is_empty() and item.uid != selected_scroll.uid:
-		net.command({"type":"enhance","item":item.duplicate(),"scroll":selected_scroll.duplicate()})
-		selected_scroll = {}
+		if can_enhance(item):
+			net.command({"type":"enhance","item":item.duplicate(),"scroll":selected_scroll.duplicate()})
+		else:
+			notice("Этот свиток не подходит к выбранному предмету")
 		return
 	if double_click:
 		use_selected()
@@ -569,13 +806,16 @@ func use_selected() -> void:
 	var item: Dictionary = selected_item.get("item", {})
 	if item.is_empty():
 		return
+	if not data.items.has(item.id):
+		notice("Этот предмет сохранён, но пока не поддерживается клиентом")
+		return
 	if data.scrolls.has(item.id):
 		selected_scroll = item.duplicate()
 		refresh_inventory()
 		notice("Выберите предмет для заточки: " + item_name(item) + ". Esc — отмена.")
 	elif selected_item.kind == "equipment":
 		net.command({"type":"unequip","item":item.duplicate(),"slot":selected_item.slot})
-	elif data.items[item.id].has("slot"):
+	elif data.items.get(item.id, {}).has("slot"):
 		net.command({"type":"equip","item":item.duplicate(),"slot":resolve_slot(data.items[item.id].slot)})
 	else:
 		net.command({"type":"use","item":item.duplicate()})
@@ -603,9 +843,11 @@ func toggle_inventory() -> void:
 	inventory_panel.visible = not inventory_panel.visible
 
 func notice(message: String) -> void:
-	var translations: Dictionary = {"shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа"}
+	var translations: Dictionary = {"shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
 	if log_text != null:
 		log_text.append_text(str(translations.get(message, message)) + "\n")
+		if log_text.get_paragraph_count() > 200:
+			log_text.remove_paragraph(0)
 	else:
 		print(message)
 
@@ -615,6 +857,14 @@ func text_focused() -> bool:
 func _process(delta: float) -> void:
 	if world == null or net == null:
 		return
+	if not display_before.is_empty():
+		display_remaining -= delta
+		if is_instance_valid(display_countdown):
+			display_countdown.text = "Возврат прежнего режима через %d с" % ceili(display_remaining)
+		if display_remaining <= 0:
+			revert_display()
+			if is_instance_valid(active_dialog):
+				active_dialog.queue_free()
 	if qa_started:
 		qa_times.append(delta * 1000)
 	var direction: Vector2 = Vector2.ZERO
@@ -635,7 +885,16 @@ func _process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_ESCAPE:
-			selected_scroll = {}
+			if is_instance_valid(active_dialog):
+				active_dialog.queue_free()
+				return
+			if not selected_scroll.is_empty():
+				selected_scroll = {}
+				refresh_inventory()
+				return
+			if inventory_panel.visible:
+				inventory_panel.hide()
+				return
 			world.target_id = ""
 			target_text.text = ""
 			net.intent({"type":"cancel"})
@@ -657,20 +916,59 @@ func _unhandled_input(event: InputEvent) -> void:
 					activate(entry.action)
 					return
 		match event.physical_keycode:
-			KEY_I, KEY_TAB: toggle_inventory()
+			KEY_I, KEY_C, KEY_TAB: toggle_inventory()
 			KEY_SPACE: net.intent({"type":"jump"})
 			KEY_F: interact()
 	if text_focused():
 		return
-	if event is InputEventMouseMotion and Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
-		world.camera_yaw -= event.relative.x * .005
-		world.camera_pitch = clampf(world.camera_pitch + event.relative.y * .004, .35, 1.35)
-	elif event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_LEFT:
+	if event is InputEventMouseButton and event.pressed:
+		if event.button_index == MOUSE_BUTTON_RIGHT:
+			mouse_orbit = true
+			mouse_restore = get_viewport().get_mouse_position()
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+		elif event.button_index == MOUSE_BUTTON_LEFT and not mouse_orbit:
 			world.click(event.position)
 		elif event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-			world.camera_distance = clampf(world.camera_distance + (-1.5 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.5), 9, 40)
+			world.camera_distance = clampf(world.camera_distance + (-1.5 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.5), 5, 40)
 			save_preferences()
+
+func _input(event: InputEvent) -> void:
+	if mouse_orbit and event is InputEventMouseMotion:
+		world.camera_yaw -= event.screen_relative.x * .005 * mouse_sensitivity
+		world.camera_pitch = clampf(world.camera_pitch + event.screen_relative.y * .004 * mouse_sensitivity * (-1 if invert_camera_y else 1), -.1, 1.48)
+		get_viewport().set_input_as_handled()
+	elif mouse_orbit and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and not event.pressed:
+		release_orbit()
+		get_viewport().set_input_as_handled()
+
+func release_orbit() -> void:
+	mouse_orbit = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Input.warp_mouse(mouse_restore)
+
+func can_enhance(item: Dictionary) -> bool:
+	if selected_scroll.is_empty() or item.is_empty() or int(item.get("plus", 0)) >= 15:
+		return false
+	var slot: String = str(data.items.get(item.id, {}).get("slot", ""))
+	return not slot.is_empty() and data.scrolls[selected_scroll.id].category == ("weapon" if slot == "weapon" else "armor")
+
+func switch_profile() -> void:
+	save_preferences()
+	if net.connected:
+		await net.intent({"type":"cancel"})
+		await net.request("/api/disconnect", {})
+	net.close_stream()
+	net.connected = false
+	net.token = ""
+	net.input_queue.clear()
+	inventory_panel.hide()
+	selected_scroll = {}
+	selected_item = {}
+	world.target_id = ""
+	world.click_goal = null
+	login.queue_free()
+	build_login()
+	login.show()
 
 func quit_game() -> void:
 	save_preferences()
@@ -680,6 +978,8 @@ func quit_game() -> void:
 	get_tree().quit()
 
 func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and mouse_orbit:
+		release_orbit()
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		quit_game()
 
@@ -718,6 +1018,69 @@ func run_qa() -> void:
 		await net.command({"type":"equip","item":weapon.duplicate(),"slot":"weapon"})
 		checks["reequip_uid"] = net.hero.equipment.get("weapon", {}).get("uid", "") == weapon.uid
 	checks["pending_journal_cleared"] = net.read_private_json(net.pending_path()).is_empty()
+	# Exercise actual native mouse projection and the callback used by LMB.
+	var ground_goal: Vector2 = world.collision.nearest_free(Vector2(net.hero.x - 3, net.hero.z - 1))
+	var clicked: Array = []
+	var on_move: Callable = func(value: Vector2): clicked.append(value)
+	world.moved_to.connect(on_move)
+	world.click(world.camera.unproject_position(world.point(ground_goal.x, ground_goal.y)))
+	await get_tree().create_timer(1.2).timeout
+	world.moved_to.disconnect(on_move)
+	checks["mouse_ground_destination"] = not clicked.is_empty() and Vector2(net.hero.x, net.hero.z).distance_to(ground_goal) < 1.0
+	await net.intent({"type":"cancel"})
+	# A model-sized ray pick must work well away from the old 55-pixel centre.
+	var probe: Node3D = world.make_actor("qa:pick", "Fox", 2.8, "", Color.WHITE)
+	probe.position = world.hero_position + Vector3(0, 0, -3)
+	probe.set_meta("pickable", true)
+	var old_collision: VarendorCollision = world.collision
+	world.collision = VarendorCollision.new()
+	var selected_probe: String = world.pick_entity(world.camera.unproject_position(probe.position + Vector3(0, 1.6, 0)))
+	checks["mouse_model_picking"] = selected_probe == "qa:pick"
+	probe.set_meta("pickable", false)
+	checks["dead_target_not_pickable"] = world.pick_entity(world.camera.unproject_position(probe.position + Vector3(0, 1.6, 0))) != "qa:pick"
+	world.collision = old_collision
+	probe.queue_free()
+	world.actors.erase("qa:pick")
+	var yaw_before: float = world.camera_yaw
+	var pitch_before: float = world.camera_pitch
+	mouse_orbit = true
+	var motion_event: InputEventMouseMotion = InputEventMouseMotion.new()
+	motion_event.screen_relative = Vector2(100, 40)
+	_input(motion_event)
+	mouse_orbit = false
+	checks["right_mouse_two_axes"] = not is_equal_approx(yaw_before, world.camera_yaw) and not is_equal_approx(pitch_before, world.camera_pitch)
+	world.camera_yaw = yaw_before
+	world.camera_pitch = pitch_before
+	world.target_id = ""
+	activate("skill:3")
+	await get_tree().create_timer(.4).timeout
+	checks["self_skill_without_enemy"] = float(net.hero.buffs.guard) > float(world.current_snapshot.time)
+	inventory_panel.show()
+	var input_sequence: int = net.sequence
+	var escape: InputEventKey = InputEventKey.new()
+	escape.physical_keycode = KEY_ESCAPE
+	escape.pressed = true
+	_unhandled_input(escape)
+	checks["escape_closes_only_bag"] = not inventory_panel.visible and net.sequence == input_sequence
+	game_settings["sensitivity"] = 1.25
+	game_settings["invert_y"] = true
+	save_preferences()
+	load_preferences(uid_before)
+	checks["settings_persist"] = is_equal_approx(mouse_sensitivity, 1.25) and invert_camera_y
+	var hp_before_reconnect: float = net.hero.hp
+	net.stream_failed()
+	await get_tree().create_timer(2.0).timeout
+	checks["stream_reconnect_same_hero"] = net.connected and str(net.hero.id) == uid_before and net.hero.hp <= hp_before_reconnect
+	checks["stream_active"] = net.stream_requested and net.stream.get_status() == HTTPClient.STATUS_BODY
+	# Same actual-map collision vectors are resolved independently by TypeScript.
+	var cases = JSON.parse_string(FileAccess.get_file_as_string("res://generated/collision-qa.json")) if FileAccess.file_exists("res://generated/collision-qa.json") else []
+	checks["shared_collision_vectors"] = not cases.is_empty()
+	for sample: Dictionary in cases:
+		var resolved: Vector2 = world.collision.resolve(Vector2(sample.x, sample.z), Vector2(sample.dx, sample.dz))
+		if resolved.distance_to(Vector2(sample.expected.x, sample.expected.z)) > .003:
+			checks["shared_collision_vectors"] = false
+			break
+
 	inventory_panel.show()
 	qa_started = true
 	await get_tree().create_timer(5.0).timeout

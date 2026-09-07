@@ -25,8 +25,10 @@ export type WorldSummon = Position & WorldMotion & { uid: string; owner: string;
 export type WorldEvent = {
   sequence: number; at: number; kind: 'attack' | 'release' | 'cancel' | 'hit' | 'miss' | 'death' | 'respawn' | 'loot' | 'buff' | 'summon';
   actor: string; target?: string; skill?: number | null; amount?: number; critical?: boolean; generation?: number; impactAt?:number; endsAt?:number; effect?:string; durationMs?:number; reason?:string;
+  gold?: number; xp?: number; items?: string[];
 };
 export type WorldSnapshot = {
+  contentVersion?: string; mapVersion?: string;
   protocol: typeof WORLD_PROTOCOL; time: number; revision: number; character: WorldCharacter;
   heroes: Array<Pick<WorldCharacter, 'id' | 'name' | 'classId' | 'x' | 'z' | 'hp' | 'maxHp' | 'dead' | 'equipment' | 'generation' | keyof WorldMotion>>;
   monsters: WorldMonster[]; summons: WorldSummon[]; events: WorldEvent[];

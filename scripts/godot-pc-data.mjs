@@ -4,6 +4,8 @@ import { resolve, dirname } from 'node:path';
 import vm from 'node:vm';
 import ts from 'typescript';
 import { CLASSES, ITEMS, MONSTERS, EQUIP_SLOTS, SLOT_NAMES, LOCATIONS } from '../src/data/game-data.ts';
+import { CONTENT_VERSION, mapVersion } from '../src/server/content-manifest.ts';
+import { restoreWorldTopology } from '../src/world/world-topology.ts';
 import { TerrainSurface } from '../src/world/terrain-surface.ts';
 import { greenfallFortLayout } from '../src/world/greenfall-layout.ts';
 import { createLayoutRandom } from '../src/world/layout-random.ts';
@@ -46,10 +48,20 @@ if(functions.length!==names.size)throw Error('Reviewed world construction functi
 vm.runInNewContext(ts.transpileModule(functions.join('\n')+'\nbuildWorld();',{compilerOptions:{target:ts.ScriptTarget.ES2022}}).outputText,context,{timeout:30000});
 const geometry=terrain.geometry();
 const topology=JSON.parse(readFileSync('public/assets/world/world-topology.json','utf8'));
+const restoredTopology=restoreWorldTopology(topology);
 const itemStats=Object.fromEntries(Object.entries(ITEMS).map(([id,def])=>[id,Array.from({length:16},(_,plus)=>itemStatBreakdown(def,plus))]));
-writeFileSync(resolve(output,'game.json'),JSON.stringify({classes:CLASSES,items:ITEMS,monsters:MONSTERS,equipSlots:EQUIP_SLOTS,slotNames:SLOT_NAMES,locations:LOCATIONS,quickDefaults:quickDefaults(),quickKeys:QUICK_KEYS,itemStats,scrolls:SCROLLS,chances:ENHANCEMENT_PERCENT,xpNeeded:Array.from({length:MAX_LEVEL+1},(_,i)=>xpNeeded(Math.max(1,i)))}));
+writeFileSync(resolve(output,'game.json'),JSON.stringify({contentVersion:CONTENT_VERSION,mapVersion:mapVersion(restoredTopology.collision,restoredTopology.terrain),classes:CLASSES,items:ITEMS,monsters:MONSTERS,equipSlots:EQUIP_SLOTS,slotNames:SLOT_NAMES,locations:LOCATIONS,quickDefaults:quickDefaults(),quickKeys:QUICK_KEYS,itemStats,scrolls:SCROLLS,chances:ENHANCEMENT_PERCENT,xpNeeded:Array.from({length:MAX_LEVEL+1},(_,i)=>xpNeeded(Math.max(1,i)))}));
 writeFileSync(resolve(output,'terrain.json'),JSON.stringify({width:terrain.width,depth:terrain.depth,columns:terrain.columns,rows:terrain.rows,heights:Array.from(terrain.heights),platforms:topology.platforms,colliders:topology.colliders}));
 writeFileSync(resolve(output,'layout.json'),JSON.stringify({placements,geometry}));
 for(const name of ['Warrior','Wizard','Ranger','Rogue','Monk']){const p=resolve(output,'actors',name+'.gltf');mkdirSync(dirname(p),{recursive:true});cpSync(`public/assets/models/characters/${name}.gltf`,p);}
 for(const name of ['Fox','Skeleton','Slime','Dragon','Bat'])cpSync(`public/assets/models/monsters-glb/${name}.glb`,resolve(output,'actors',name+'.glb'));
 console.log(JSON.stringify({placements:placements.length,terrainTriangles:(geometry.groundIndices.length+geometry.roadIndices.length)/3,characters:Object.keys(CLASSES).length,itemDefinitions:Object.keys(ITEMS).length,quickSlots:quickDefaults().length}));
+
+// Cross-engine collision contract: actual map vectors, including rounded box
+// corners, overhead arches, long sweeps and embedded starts.
+const shared=restoreWorldTopology(topology).collision;
+const collisionCases=topology.colliders.filter((_,i)=>i%3===0).flatMap((c,i)=>[
+  {x:c.x+(c.halfX??c.radius)+.4,z:c.z+(c.halfZ??0)+.4,dx:-.28,dz:-.31},
+  {x:c.x,z:c.z,dx:Math.sin(i)*1.4,dz:Math.cos(i)*1.4},
+]).map(v=>({...v,expected:shared.resolve({x:v.x,z:v.z},{x:v.dx,z:v.dz},.46)}));
+writeFileSync(resolve(output,'collision-qa.json'),JSON.stringify(collisionCases));
