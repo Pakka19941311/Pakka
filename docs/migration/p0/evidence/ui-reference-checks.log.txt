@@ -1,0 +1,18 @@
+{
+  "file": "docs/migration/p0/evidence/ui-reference-fixtures.json",
+  "sha256": "959827042bd2ce2e3ed5cd88bbde0e97a59e577ebf8fc0e6bc8b371c5ecfddf5",
+  "checks": {
+    "knownItemDefinitions": true,
+    "uniqueSyntheticUids": true,
+    "fullBagSwapPreservesUids": true,
+    "pairedSlotResolver": true,
+    "fullBagUnequipRejected": true,
+    "lastScrollConsumedOnceInEachIndependentFixture": true,
+    "enhancementSuccessRetainsTargetUid": true,
+    "enhancementFailureRemovesOnlyTargetAndConsumedScroll": true,
+    "referenceInputUnchanged": true,
+    "quickbar32Roundtrip": true,
+    "tooltipBasePlusBonusEqualsTotal": true,
+    "all60ChancesUnchanged": true
+  }
+}

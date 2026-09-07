@@ -15,12 +15,12 @@
   "execution_authorized": true,
   "execution_note": "Прямое сообщение владельца 07.09.2026 разрешает весь P0 по ТЗ v2.0; результат предъявить до P1. P1 не разрешён этим блоком.",
   "current_phase": "P0",
-  "current_task": "P0-05",
+  "current_task": "P0-03",
   "next_task_after_authorization": null,
   "next_action": {
-    "task_id": "P0-05",
-    "substep_id": "P0-05.1",
-    "action": "Подтвердить графический Godot render/editor в доступной среде; затем свежие UI-эталоны P0-03. P0-02 и профиль владельца остаются незакрытыми зависимостями, запуск игры от владельца не требуется для независимого продолжения. G0 не закрывать и P1 не начинать.",
+    "task_id": "P0-03",
+    "substep_id": "P0-03.1",
+    "action": "Получить свежие UI-кадры прежнего клиента в доступной разрешённой графической среде, используя подготовленный синтетический набор P0-03.4; затем измерения P0-03.3. Текущий Browser отклонил доступ по URL policy, Xvfb не слушает сокет. Не обходить эти ограничения. Незавершённые P0-02/P0-04/P0-05 остаются зависимостями, P1 не начинать.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
     "requires_graphical_runtime": true
@@ -69,7 +69,8 @@
     "P0-DEF-001: исправлен порядок закрытия HTTP/SSE и SQLite; 7/7 целевых тестов, production build; личное резервирование не выполнено",
     "P0-05.2: Blender/Godot sample with material, UV, scale, animation, collision and reimport checks",
     "Standalone Linux release sample verified headless from clean source copy",
-    "119 image decode audit: 118 pass, damaged colormap.png recorded as P0-ASSET-001"
+    "119 image decode audit: 118 pass, damaged colormap.png recorded as P0-ASSET-001",
+    "P0-03.4: synthetic UI comparison fixtures and 12 passed source-rule conditions; no personal profile or screenshot claim"
   ],
   "not_done": [
     "new Godot client",
@@ -90,7 +91,7 @@
     },
     {
       "id": "B-BROWSER",
-      "detail": "Текущий Browser отказал открытию локальной игры: ERR_BLOCKED_BY_CLIENT. Свежий комплект UI-кадров не получен.",
+      "detail": "The existing failed local-game tab remains at chrome-error://chromewebdata/. Browser rejected DOM inspection under URL policy; no bypass attempted and no fresh UI frames obtained.",
       "tasks": [
         "P0-03",
         "P0-04"
@@ -98,7 +99,7 @@
     },
     {
       "id": "B-TOOLS",
-      "detail": "Blender 4.5.9 и Godot/templates 4.6.3 подтверждены для технического headless Linux цикла. Нет графического Godot render/editor: Xvfb отсутствует, установка пакета отказала на OS setgroups/setegid permissions. Устройства/мобильные SDK остаются отдельными зависимостями.",
+      "detail": "Blender/Godot/templates and headless Linux sample verified previously. Fresh local Xvfb extraction launches but cannot open a listening socket, exit 1. No graphical Godot window/render obtained.",
       "tasks": [
         "P0-05"
       ]
@@ -285,12 +286,14 @@
             },
             {
               "id": "P0-03.4",
-              "status": "blocked",
-              "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
+              "status": "technically_verified",
+              "commit": null,
               "evidence": [
-                "docs/migration/p0/UI_PROFILE_SCHEMA.md"
+                "docs/migration/p0/UI_REFERENCE_FIXTURES.md",
+                "docs/migration/p0/evidence/ui-reference-fixtures.json",
+                "docs/migration/p0/evidence/ui-reference-checks.log.txt"
               ],
-              "verification_scope": "Required real data/device/runtime unavailable; supporting work does not close this substep"
+              "verification_scope": "Synthetic comparison items and source-rule assertions only; no personal profile, screen capture, browser interaction or geometry measurement."
             }
           ]
         },
@@ -1968,7 +1971,7 @@
   "allowed_scope": [
     "P0"
   ],
-  "current_substep": "P0-05.1",
+  "current_substep": "P0-03.1",
   "working_commit": "6f245206a60369302ff6e4008e350db1c48491e1",
   "last_accepted_gate": null,
   "open_defects": [
@@ -3974,6 +3977,25 @@
         "docs/migration/p0/ASSET_DEFECT.md"
       ],
       "evidence_commit": "6f245206a60369302ff6e4008e350db1c48491e1"
+    },
+    {
+      "id": "P0-UI-REFERENCE-FIXTURES",
+      "status": "passed_with_limitations",
+      "personal_data": false,
+      "conditions_passed": 12,
+      "evidence": [
+        "docs/migration/p0/UI_REFERENCE_FIXTURES.md",
+        "docs/migration/p0/evidence/ui-reference-fixtures.json",
+        "docs/migration/p0/evidence/ui-reference-checks.log.txt"
+      ]
+    },
+    {
+      "id": "P0-GRAPHICAL-RUNTIME-ATTEMPT",
+      "status": "blocked",
+      "evidence": [
+        "docs/migration/p0/evidence/graphical-runtime-attempt.json"
+      ],
+      "personal_data": false
     }
   ],
   "publication": {

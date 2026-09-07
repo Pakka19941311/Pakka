@@ -1,0 +1,54 @@
+{
+  "base_commit": "937e5976a04406156f58f887d4793e6107c95a07",
+  "xvfb": {
+    "version": "21.1.12-1ubuntu1.6",
+    "download": "https://archive.ubuntu.com/ubuntu/pool/universe/x/xorg-server/xvfb_21.1.12-1ubuntu1.6_amd64.deb",
+    "sha256": "9188c2ab6394dfe6aa53f782f6bfa22b7eb6febfe51a48e0e36af35cd2f64307",
+    "publisher_checksum_verified": true,
+    "installation": "Extracted to /tmp only; no system package installation",
+    "launch_arguments": [
+      "-displayfd",
+      "<pipe fd>",
+      "-screen",
+      "0",
+      "800x600x24",
+      "-nolisten",
+      "tcp"
+    ],
+    "launch_exit": 1,
+    "display_ready": false,
+    "raw_log_bytes": 23970861,
+    "raw_log_sha256": "773523ec51ebbc921dff9980c9532aeb039936a8acd12640e8c136b8c679d358",
+    "log_excerpt": [
+      "_XSERVTransSocketOpenCOTSServer: Unable to open socket for local",
+      "_XSERVTransOpen: transport open failed for local/localhost:0",
+      "_XSERVTransMakeAllCOTSServerListeners: failed to open listener for local",
+      "_XSERVTransSocketOpenCOTSServer: Unable to open socket for unix",
+      "_XSERVTransOpen: transport open failed for unix/localhost:0",
+      "_XSERVTransMakeAllCOTSServerListeners: failed to open listener for unix",
+      "_XSERVTransSocketOpenCOTSServer: Unable to open socket for local",
+      "_XSERVTransOpen: transport open failed for local/localhost:1",
+      "_XSERVTransMakeAllCOTSServerListeners: failed to open listener for local",
+      "_XSERVTransSocketOpenCOTSServer: Unable to open socket for unix",
+      "_XSERVTransOpen: transport open failed for unix/localhost:1",
+      "_XSERVTransMakeAllCOTSServerListeners: failed to open listener for unix",
+      "[repeated automatic display-number attempts omitted]",
+      "_XSERVTransOpen: transport open failed for unix/localhost:59535",
+      "_XSERVTransMakeAllCOTSServerListeners: failed to open listener for unix",
+      "(EE) ",
+      "Fatal server error:",
+      "(EE) Failed to find a socket to listen on(EE) "
+    ]
+  },
+  "browser": {
+    "observed_tab_url": "chrome-error://chromewebdata/",
+    "requested_action": "Read DOM of the existing failed local-game tab",
+    "result": "Rejected by Cloud browser URL policy",
+    "bypass_attempted": false,
+    "fresh_game_screenshots": false
+  },
+  "godot_graphical_run_this_block": false,
+  "new_substeps_satisfied_by_this_attempt": [],
+  "limitations": "Xvfb did not establish a listening socket. Exact OS cause was not established. Browser rejection refers to the current error tab; it is not a successful fresh game UI test.",
+  "personal_data_accessed": false
+}
