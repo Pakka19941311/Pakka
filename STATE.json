@@ -6,7 +6,7 @@
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-migration-p0",
   "tracked_branch": "origin/work/godot-migration-p0",
-  "observed_head": "eda0af17888dee89b737784706382e1bee3a5ce7",
+  "observed_head": "07408b7bdd7a969b28370144a570695f2299c5ae",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -1961,7 +1961,7 @@
     "P0"
   ],
   "current_substep": "P0-02.1",
-  "working_commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
+  "working_commit": "07408b7bdd7a969b28370144a570695f2299c5ae",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -3901,12 +3901,14 @@
       "limitations": [
         "Synthetic Linux loopback only; no personal backup or Windows/browser runtime acceptance.",
         "No additional P0 substep or G0 gate closed."
-      ]
+      ],
+      "commit": "07408b7bdd7a969b28370144a570695f2299c5ae",
+      "evidence_commit": "07408b7bdd7a969b28370144a570695f2299c5ae"
     }
   ],
   "publication": {
-    "content_commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
-    "url": "https://github.com/Pakka19941311/Pakka/commit/eda0af17888dee89b737784706382e1bee3a5ce7",
+    "content_commit": "07408b7bdd7a969b28370144a570695f2299c5ae",
+    "url": "https://github.com/Pakka19941311/Pakka/commit/07408b7bdd7a969b28370144a570695f2299c5ae",
     "branch": "work/godot-migration-p0",
     "remote_tree_matched_local_index": true,
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
@@ -3928,7 +3930,8 @@
       ],
       "fix_applied": true,
       "impact": "Штатное завершение ждёт обработчиков disconnect перед checkpoint/SQLite close. Правило 30 секунд, личные данные и механики не менялись.",
-      "owner_accepted": false
+      "owner_accepted": false,
+      "fix_commit": "07408b7bdd7a969b28370144a570695f2299c5ae"
     }
   ]
 }
