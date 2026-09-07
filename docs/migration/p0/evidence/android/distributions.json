@@ -1,0 +1,98 @@
+{
+  "base_commit": "c4a88e841f42a852eb8d8ad098c792a2f19366b4",
+  "packages": [
+    {
+      "id": "cmdline-tools;16.0",
+      "url": "https://dl.google.com/android/repository/commandlinetools-linux-12266719_latest.zip",
+      "size": 165618711,
+      "publisher_sha1": "47e61d3bb57b5e907a74f225a767a767a8b4d7a5",
+      "sha256": "3fab261d5219d582321db0c5670b3bbafd563096bce3f6277eb358807fc15f6e",
+      "zip_crc_verified": true
+    },
+    {
+      "url": "https://archive.ubuntu.com/ubuntu/pool/main/o/openjdk-17/openjdk-17-jdk-headless_17.0.20+8-1~24.04_amd64.deb",
+      "metadata_url": "https://archive.ubuntu.com/ubuntu/dists/noble-updates/main/binary-amd64/Packages.gz",
+      "version": "17.0.20+8-1~24.04",
+      "bytes": 71573808,
+      "publisher_sha256": "24a6fc05d51f205b4de06f78621c37f27d1e87673aa55507cf38d20f7eb38968",
+      "javac_version": "javac 17.0.20",
+      "base_runtime": "existing Ubuntu OpenJDK 17.0.20+8",
+      "scope": "isolated copy of installed runtime plus matching headless JDK package; system unchanged"
+    },
+    {
+      "id": "platform-tools",
+      "url": "https://dl.google.com/android/repository/platform-tools_r37.0.1-linux.zip",
+      "metadata_bytes": 9054187,
+      "metadata_checksum": "477254aa5f903c15cf51001717bdf347fb6b53e0",
+      "checksum_type": "sha1",
+      "installation": "official sdkmanager, exit 0; downloaded archive not retained by runner"
+    },
+    {
+      "id": "build-tools;35.0.1",
+      "url": "https://dl.google.com/android/repository/build-tools_r35.0.1_linux.zip",
+      "metadata_bytes": 61959297,
+      "metadata_checksum": "e009a9b188cfeb1d2b4c318ab5cb4f1ddc368861",
+      "checksum_type": "sha1",
+      "installation": "official sdkmanager, exit 0; downloaded archive not retained by runner"
+    },
+    {
+      "id": "platforms;android-35",
+      "url": "https://dl.google.com/android/repository/platform-35_r02.zip",
+      "metadata_bytes": 64273788,
+      "metadata_checksum": "0bb560a90a7a2cbd0dd8348224d518b638fe7949",
+      "checksum_type": "sha1",
+      "installation": "official sdkmanager, exit 0; downloaded archive not retained by runner"
+    },
+    {
+      "id": "build-tools;36.0.0",
+      "url": "https://dl.google.com/android/repository/build-tools_r36_linux.zip",
+      "metadata_bytes": 63737259,
+      "metadata_checksum": "b0b6376977657e8ad9b969bacf4093601da2c6fb",
+      "checksum_type": "sha1",
+      "installation": "official sdkmanager, exit 0; downloaded archive not retained by runner"
+    },
+    {
+      "id": "platforms;android-36",
+      "url": "https://dl.google.com/android/repository/platform-36_r02.zip",
+      "metadata_bytes": 65878410,
+      "metadata_checksum": "2c1a80dd4d9f7d0e6dd336ec603d9b5c55a6f576",
+      "checksum_type": "sha1",
+      "installation": "official sdkmanager, exit 0; downloaded archive not retained by runner"
+    }
+  ],
+  "godot_android_templates": [
+    {
+      "member": "templates/android_debug.apk",
+      "bytes": 124546428,
+      "sha256": "5cd4cfc1a8fc23ed45be5f0a36a6cc279d15b50a40c6ef69c89276895441cd1d",
+      "crc_verified_on_read": true
+    },
+    {
+      "member": "templates/android_release.apk",
+      "bytes": 102855501,
+      "sha256": "e91ef7e517e73aec1ddcc4c455c5fd53de1837c240a7c520ac438b73874b54c1",
+      "crc_verified_on_read": true
+    }
+  ],
+  "metadata_url": "https://dl.google.com/android/repository/repository2-1.xml",
+  "metadata_sha256": "461e45d338c8969a89b4f8b05d8abd698a2b58403fe6d8c2cca241b4a502ee0a",
+  "godot_source_url": "https://github.com/godotengine/godot/blob/4.6.3-stable/platform/android/export/export_plugin.cpp",
+  "godot_source_sha256": "9bb2416174a1e262a4282baaf346b118be921d4e3d78755743e1b1a6cb21bfd4",
+  "sdkmanager_version": "16.0",
+  "sdk_install_exit": 0,
+  "sdk36_install_exit": 0,
+  "apk_publication": "not_published; temporary technical build, reproduction script committed",
+  "fallbacks": [
+    "Adoptium metadata HTTP 403; used official Ubuntu package matching the installed runtime.",
+    "Generic Godot documentation listed SDK 35; exact 4.6.3 APK targets 36.",
+    "First export configuration rejected missing mobile texture import; enabled ETC2/ASTC in sample and used SDK 36."
+  ],
+  "personal_data_accessed": false,
+  "release_signing_key_accessed": false,
+  "log_presentation": {
+    "trailing_spaces_removed_in": [
+      "android-export.log.txt"
+    ],
+    "other_log_content_changed": false
+  }
+}

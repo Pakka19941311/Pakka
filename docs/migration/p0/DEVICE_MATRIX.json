@@ -9,7 +9,8 @@
       "browser_local_runtime": "blocked: ERR_BLOCKED_BY_CLIENT",
       "godot": "4.6.3.stable.official.7d41c59c4: headless import/reimport and standalone Linux release verified",
       "blender": "4.5.9 LTS 8bf95cbd38d1: fresh temporary install, repeat starts, roundtrip and Cycles CPU render verified",
-      "graphical_godot": "not_run; no display server, package installation denied by OS permissions"
+      "graphical_godot": "not_run; local Xvfb process failed to listen on socket; no graphical Godot render",
+      "android_toolchain": "JDK 17.0.20 compile/run; SDK Platform 36 r2 / Build-Tools 36.0.0 / Platform-Tools 37.0.1; signed ARM64 sample APK verified"
     },
     {
       "id": "owner-windows",
@@ -23,7 +24,7 @@
       "id": "android-physical",
       "model": null,
       "osVersion": null,
-      "status": "blocked: physical device and SDK/JDK absent"
+      "status": "blocked: adb devices exit 0, empty device list; SDK/JDK and sample APK export/signature verified separately"
     },
     {
       "id": "iphone-physical",
@@ -39,6 +40,15 @@
       "mode": "release embedded PCK",
       "execution": "headless only",
       "evidence": "docs/migration/p0/evidence/godot-clean-probe.json"
+    },
+    {
+      "platform": "Android arm64-v8a",
+      "templates": "4.6.3.stable",
+      "mode": "debug APK, isolated org.varendor.p0toolchain package",
+      "execution": "not_installed; no physical device",
+      "signature": "apksigner verify passed, v2 scheme verified",
+      "manifest_network_permission": "android.permission.INTERNET present; runtime network not tested",
+      "evidence": "docs/migration/p0/evidence/android/android-probe.json"
     }
   ],
   "iosRemainsRequired": true

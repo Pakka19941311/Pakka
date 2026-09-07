@@ -1,0 +1,68 @@
+{
+  "source_commit": "c4a88e841f42a852eb8d8ad098c792a2f19366b4",
+  "source_files_sha256": {
+    "project.godot": "42f41781960189038db8abd9b304750eef48b607dd12189c0d24151867b0ff36",
+    "export_presets.cfg": "7af6327968de17946e5f3666a365d8aec6c35390517023ee8f965109960326a6",
+    "sample.gd": "a3c5969d19841fc015a0bb38ff0c08b9e5cfcd9db32116a0b528e66d134b4e38",
+    "sample.gd.uid": "62b84a84c2cb1b210aa54192dbab4bc84f7759cd65014e888b08863dbaa6887e",
+    "sample.tscn": "502d45c5b3706bcc6bd5d5e66dfb58bb8100b7563ad62c510d9f3b4d8294b381",
+    "p0-crate.glb": "d84fa596fcd8f6720e7b0f70b60408f7c3dfcbe3e440934e9c28f3dafa7de18e"
+  },
+  "scope": "P0 technical sample APK only; no game client migration",
+  "personal_data_accessed": false,
+  "p1_started": false,
+  "device_installation": "not_attempted",
+  "device_render": "not_measured",
+  "network_runtime": "not_tested",
+  "checks": {
+    "jdk_compile_and_run": true,
+    "tool_versions_available": true,
+    "clean_android_export": true,
+    "apk_zip_crc": true,
+    "arm64_only": true,
+    "project_resources_present": true,
+    "apk_v2_signature_verified": true,
+    "apk_alignment_16k": true,
+    "internet_manifest_permission": true,
+    "isolated_package_identity": true
+  },
+  "godot_version": "4.6.3.stable.official.7d41c59c4",
+  "java_version": "openjdk version \"17.0.20\" 2026-07-21\nOpenJDK Runtime Environment (build 17.0.20+8-1-24.04-Ubuntu)\nOpenJDK 64-Bit Server VM (build 17.0.20+8-1-24.04-Ubuntu, mixed mode, sharing)",
+  "javac_version": "javac 17.0.20",
+  "apk_asset_files": [
+    "assets/.godot/imported/p0-crate.glb-cd5e1aa30e611db09d91c5f365a7afed.scn",
+    "assets/p0-crate.glb.import",
+    "assets/.godot/imported/p0-crate_wooden_crate_01_arm_1k.jpg-013add06f18d3c9920b23b0c924941d6.ctex",
+    "assets/p0-crate_wooden_crate_01_arm_1k.jpg.import",
+    "assets/.godot/imported/p0-crate_wooden_crate_01_diff_1k.jpg-f153e4356f02f6d7b59563113b0f4833.ctex",
+    "assets/p0-crate_wooden_crate_01_diff_1k.jpg.import",
+    "assets/.godot/imported/p0-crate_wooden_crate_01_nor_gl_1k.jpg-cec38d3e0bde500b2b7c98d0a257153b.ctex",
+    "assets/p0-crate_wooden_crate_01_nor_gl_1k.jpg.import",
+    "assets/sample.gdc",
+    "assets/.godot/exported/133200997/export-add55c565b6d6de10c4690c26d067bde-sample.scn",
+    "assets/sample.gd.remap",
+    "assets/sample.tscn.remap",
+    "assets/.godot/global_script_class_cache.cfg",
+    "assets/.godot/uid_cache.bin",
+    "assets/project.binary",
+    "assets/assets.sparsepck",
+    "assets/_cl_"
+  ],
+  "apk_bytes": 32445936,
+  "apk_sha256": "7884d266ed063e32655b127f7868641e6e5e75870131c7f77f4f872931eb4ca1",
+  "apk_abis": [
+    "arm64-v8a"
+  ],
+  "certificate_sha256": "cdaa52738b8f3a08d8ba31302159293f8f589c2e2c5058cb637e3fc1e81c0552",
+  "sdk_properties": {
+    "platform-tools/source.properties": "Pkg.UserSrc=false\nPkg.Revision=37.0.1\n",
+    "build-tools/36.0.0/source.properties": "Pkg.UserSrc=false\nPkg.Revision=36.0.0\n#Pkg.Revision=36.0.0 rc5",
+    "platforms/android-36/source.properties": "Pkg.Desc=Android SDK Platform 16\nPkg.UserSrc=false\nPlatform.Version=16\nPlatform.CodeName=\nPkg.Revision=2\nAndroidVersion.ApiLevel=36\nAndroidVersion.ExtensionLevel=17\nAndroidVersion.IsBaseSdk=true\nLayoutlib.Api=15\nLayoutlib.Revision=1\nPlatform.MinToolsRev=22\n"
+  },
+  "adb_device_enumeration": {
+    "exit_code": 0,
+    "output": "List of devices attached\n\n* daemon not running; starting now at tcp:5037\n* daemon started successfully\n"
+  },
+  "status": "passed_with_limitations",
+  "temporary_key_removed": true
+}

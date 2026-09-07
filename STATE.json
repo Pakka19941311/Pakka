@@ -15,15 +15,15 @@
   "execution_authorized": true,
   "execution_note": "Прямое сообщение владельца 07.09.2026 разрешает весь P0 по ТЗ v2.0; результат предъявить до P1. P1 не разрешён этим блоком.",
   "current_phase": "P0",
-  "current_task": "P0-03",
+  "current_task": "P0-05",
   "next_task_after_authorization": null,
   "next_action": {
-    "task_id": "P0-03",
-    "substep_id": "P0-03.1",
-    "action": "Получить свежие UI-кадры прежнего клиента в доступной разрешённой графической среде, используя подготовленный синтетический набор P0-03.4; затем измерения P0-03.3. Текущий Browser отклонил доступ по URL policy, Xvfb не слушает сокет. Не обходить эти ограничения. Незавершённые P0-02/P0-04/P0-05 остаются зависимостями, P1 не начинать.",
+    "task_id": "P0-05",
+    "substep_id": "P0-05.3",
+    "action": "Завершить установку и runtime технического APK на доступном физическом Android. SDK/JDK/export/signature уже проверены; не повторять их без изменения или конкретного риска. Остальные зависимости P0: разрешённая графическая среда для UI/Godot render, профиль реального ПК и доступ к прежним личным данным. Не обходить ограничения Browser. P1 не начинать.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
-    "requires_graphical_runtime": true
+    "requires_physical_android": true
   },
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
@@ -70,7 +70,8 @@
     "P0-05.2: Blender/Godot sample with material, UV, scale, animation, collision and reimport checks",
     "Standalone Linux release sample verified headless from clean source copy",
     "119 image decode audit: 118 pass, damaged colormap.png recorded as P0-ASSET-001",
-    "P0-03.4: synthetic UI comparison fixtures and 12 passed source-rule conditions; no personal profile or screenshot claim"
+    "P0-03.4: synthetic UI comparison fixtures and 12 passed source-rule conditions; no personal profile or screenshot claim",
+    "P0-05.3 частично: JDK compile/run, Android SDK 36, signed ARM64 sample APK, 10 passed conditions; no physical device installation/runtime"
   ],
   "not_done": [
     "new Godot client",
@@ -78,7 +79,7 @@
     "new production Blender assets",
     "full registration",
     "character creator modernization",
-    "mobile builds",
+    "production mobile game builds and device acceptance",
     "Steam submission"
   ],
   "blockers_to_resolve": [
@@ -114,7 +115,7 @@
     },
     {
       "id": "B-ANDROID",
-      "detail": "Нет Android SDK/JDK toolchain и физического Android; доступен лишь Java runtime 17.",
+      "detail": "JDK 17.0.20, Android SDK 36 и подписанный ARM64 P0 APK проверены. adb devices завершён с кодом 0, список устройств пуст. Установка, render, touch, фактическая сеть и производительность на физическом Android не проверены.",
       "tasks": [
         "P0-05"
       ]
@@ -353,7 +354,8 @@
           "commit": "6f245206a60369302ff6e4008e350db1c48491e1",
           "evidence": [
             "docs/migration/p0/REPORT.md",
-            "docs/migration/p0/toolchain-sample/README.md"
+            "docs/migration/p0/toolchain-sample/README.md",
+            "docs/migration/p0/ANDROID_EXPORT.md"
           ],
           "owner_accepted": false,
           "substeps": [
@@ -381,11 +383,13 @@
             {
               "id": "P0-05.3",
               "status": "blocked",
-              "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
+              "commit": null,
               "evidence": [
-                "docs/migration/p0/REPORT.md"
+                "docs/migration/p0/ANDROID_EXPORT.md",
+                "docs/migration/p0/DEVICE_MATRIX.md",
+                "docs/migration/p0/evidence/android/android-probe.json"
               ],
-              "verification_scope": "Required real data/device/runtime unavailable; supporting work does not close this substep"
+              "verification_scope": "JDK compilation/run, clean ARM64 debug APK export, signature v2, ZIP CRC, resources, 16 KiB alignment and INTERNET manifest permission verified. No device installation, runtime networking, render or performance measurement; adb list empty."
             },
             {
               "id": "P0-05.4",
@@ -1972,7 +1976,7 @@
   "allowed_scope": [
     "P0"
   ],
-  "current_substep": "P0-03.1",
+  "current_substep": "P0-05.3",
   "working_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
   "last_accepted_gate": null,
   "open_defects": [
@@ -3999,6 +4003,21 @@
       ],
       "personal_data": false,
       "evidence_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f"
+    },
+    {
+      "id": "P0-ANDROID-EXPORT",
+      "status": "passed_with_limitations",
+      "personal_data": false,
+      "conditions_passed": 10,
+      "base_commit": "c4a88e841f42a852eb8d8ad098c792a2f19366b4",
+      "evidence": [
+        "docs/migration/p0/ANDROID_EXPORT.md",
+        "docs/migration/p0/evidence/android/android-probe.json",
+        "docs/migration/p0/evidence/android/distributions.json"
+      ],
+      "device_installation": "not_attempted",
+      "whole_substep_closed": false,
+      "apk_published": false
     }
   ],
   "publication": {
