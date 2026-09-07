@@ -6,7 +6,7 @@
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-migration-p0",
   "tracked_branch": "origin/work/godot-migration-p0",
-  "observed_head": "82e8b478ed54a715953fe6e0a272c1402f19790f",
+  "observed_head": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -351,7 +351,7 @@
           "id": "P0-05",
           "title": "Подтвердить доступные Godot/Blender, GPU и мобильные экспорты",
           "status": "blocked",
-          "commit": "6f245206a60369302ff6e4008e350db1c48491e1",
+          "commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
           "evidence": [
             "docs/migration/p0/REPORT.md",
             "docs/migration/p0/toolchain-sample/README.md",
@@ -383,7 +383,7 @@
             {
               "id": "P0-05.3",
               "status": "blocked",
-              "commit": null,
+              "commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
               "evidence": [
                 "docs/migration/p0/ANDROID_EXPORT.md",
                 "docs/migration/p0/DEVICE_MATRIX.md",
@@ -1977,7 +1977,7 @@
     "P0"
   ],
   "current_substep": "P0-05.3",
-  "working_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
+  "working_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -4017,12 +4017,13 @@
       ],
       "device_installation": "not_attempted",
       "whole_substep_closed": false,
-      "apk_published": false
+      "apk_published": false,
+      "evidence_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819"
     }
   ],
   "publication": {
-    "content_commit": "82e8b478ed54a715953fe6e0a272c1402f19790f",
-    "url": "https://github.com/Pakka19941311/Pakka/commit/82e8b478ed54a715953fe6e0a272c1402f19790f",
+    "content_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
+    "url": "https://github.com/Pakka19941311/Pakka/commit/de78d6bf63d36297e91a4a89c85b5ed4d9269819",
     "branch": "work/godot-migration-p0",
     "remote_tree_matched_local_index": true,
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
