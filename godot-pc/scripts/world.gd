@@ -27,7 +27,15 @@ func setup(game: Dictionary) -> void:
 	data = game
 	terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
 	var scene: PackedScene = load("res://generated/world.glb")
-	add_child(scene.instantiate())
+	var environment_world: Node3D = scene.instantiate()
+	add_child(environment_world)
+	# Blender exports photometric intensities (5087/9001 cd). Compatibility uses
+	# relative energy here; copying those values clips the whole settlement white.
+	for node: Node in environment_world.find_children("*", "OmniLight3D", true, false):
+		var fire_light: OmniLight3D = node
+		fire_light.light_energy = 1.0
+		fire_light.omni_range = 5.0
+		fire_light.omni_attenuation = 1.6
 	var environment: WorldEnvironment = WorldEnvironment.new()
 	var env: Environment = Environment.new()
 	env.background_mode = Environment.BG_COLOR
