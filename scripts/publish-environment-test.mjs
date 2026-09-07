@@ -20,8 +20,11 @@ assert.equal(evidence.passed,true);
 assert.equal(evidence.sha,'305edd4b3eb02252a77322dfec776bc67b104ad4');
 assert.equal(evidence.checks.length,5);
 assert.equal(evidence.errors.length,0);
-assert.equal(checksum(readFileSync('public/assets/world/world-topology.json')),
+// Windows Git checkout may use CRLF. Pin canonical Git bytes, then compare data.
+const committedMap=execFileSync('git',['show',`${commit}:public/assets/world/world-topology.json`]);
+assert.equal(checksum(committedMap),
   '5c94270c590ae38e5be3a388a6dc404517dc4557e5eb51c45fc7c251ccb3b894');
+assert.deepEqual(json('public/assets/world/world-topology.json'),JSON.parse(committedMap.toString('utf8')));
 const smokePath=resolve(output,'windows-smoke.json'),smoke=json(smokePath);
 assert.equal(smoke.platform,'win32');
 assert.equal(smoke.buildCommit,commit);

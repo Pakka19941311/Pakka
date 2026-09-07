@@ -65,3 +65,11 @@ jobs:
             release-output/Varendor*/BUILD_COMMIT.txt
             release-output/Varendor*/PACKAGE_MANIFEST.json
           retention-days: 30
+      - name: Preserve the built ZIP if publication fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: environment-test-unpublished-package
+          path: release-output/Varendor*.zip
+          compression-level: 0
+          retention-days: 14
