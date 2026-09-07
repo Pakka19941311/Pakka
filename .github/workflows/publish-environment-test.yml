@@ -1,0 +1,67 @@
+name: Publish current environment Windows test
+
+on:
+  push:
+    branches: [work/v06-commercial-rebuild]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: environment-test-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    if: ${{ contains(github.event.head_commit.message, '[environment-preview]') }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      VARENDOR_BETA: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Confirm that the reviewed game and map are unchanged
+        run: |
+          git diff --exit-code 4be06872864a332af65577466a49551ee03d2155 HEAD -- src server public package.json package-lock.json vite.config.ts tsconfig.json
+          if ($LASTEXITCODE -ne 0) { throw 'New game changes require new scoped runtime evidence before this preview.' }
+      - name: Build and package the current world
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/package-world-windows.mjs --commit $env:GITHUB_SHA --output release-output
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Run the actual shipped Windows server and verify saved progress
+        run: |
+          $packageName = 'Varendor_Part1_Windows_Test_' + $env:GITHUB_SHA.Substring(0, 12)
+          Expand-Archive -LiteralPath (Join-Path 'release-output' ($packageName + '.zip')) -DestinationPath 'verified-extract'
+          node scripts/windows-world-smoke.mjs (Join-Path 'verified-extract' $packageName) | Tee-Object -FilePath release-output/windows-smoke.json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish the tested ZIP and verify its direct download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/publish-environment-test.mjs release-output
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Retain package and publication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: environment-test-release-evidence
+          path: |
+            release-output/*.zip.sha256
+            release-output/windows-smoke.json
+            release-output/publish-result.json
+            release-output/Varendor*/BUILD_COMMIT.txt
+            release-output/Varendor*/PACKAGE_MANIFEST.json
+          retention-days: 30
