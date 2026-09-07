@@ -36,6 +36,7 @@ var qa_path: String = ""
 var qa_started: bool = false
 var qa_interaction: bool = false
 var qa_times: Array = []
+var qa_last_frame_usec: int = 0
 var mouse_orbit: bool = false
 var mouse_restore: Vector2 = Vector2.ZERO
 var mouse_sensitivity: float = 1.0
@@ -505,6 +506,7 @@ func refresh_quick() -> void:
 		var icon: String = {"":"·","attack":"⚔","potion":"ОЗ","ether":"MP","teleport":"⌂"}.get(action, str(index % 8 + 1))
 		if action.begins_with("skill:"):
 			var skill_index: int = int(action.trim_prefix("skill:"))
+			slot.artwork = load("res://assets/icons/%s_skill_%d.svg" % [net.hero.get("classId", "knight"), skill_index])
 			var skill: Dictionary = data.classes[net.hero.get("classId", "knight")].skills[skill_index]
 			icon = str(skill.icon)
 			if not net.hero.is_empty():
@@ -927,7 +929,10 @@ func _process(delta: float) -> void:
 			if is_instance_valid(active_dialog):
 				active_dialog.queue_free()
 	if qa_started:
-		qa_times.append(delta * 1000)
+		var now_usec: int = Time.get_ticks_usec()
+		if qa_last_frame_usec > 0:
+			qa_times.append(float(now_usec - qa_last_frame_usec) / 1000.0)
+		qa_last_frame_usec = now_usec
 	var direction: Vector2 = Vector2.ZERO
 	if not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead:
 		var local: Vector2 = Input.get_vector("move_left", "move_right", "move_back", "move_forward")
