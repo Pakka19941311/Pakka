@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "platform": "linux",
+  "node": "v24.20.0",
+  "native": {
+    "checks": {
+      "bag_slots": 42,
+      "classes": 5,
+      "connected": true,
+      "equipment_slots": 12,
+      "hero_model_loaded": true,
+      "hero_uid_stable": true,
+      "inventory_command_uid": true,
+      "item_definitions": 33,
+      "native_render": true,
+      "pending_journal_cleared": true,
+      "quick_slots": 32,
+      "reequip_uid": true,
+      "server_movement": true,
+      "slot_32_persisted": true,
+      "unequip_uid": true,
+      "world_loaded": true
+    },
+    "display": "X11",
+    "frame_ms_median": 132.880333333333,
+    "frame_ms_p95": 144.444444444444,
+    "godot": "4.6.3-stable (official)",
+    "notes": "Synthetic fixture. Headless is not graphical or Windows GPU verification; software renderer is not target-PC performance.",
+    "ok": true,
+    "render_draw_calls": 1181,
+    "render_objects": 1712
+  },
+  "checks": [
+    "verified clone: all five tables, full state and UIDs",
+    "one process per native saved world",
+    "exported native client: world, five classes, HUD 42/12/32, move, reorder, equip, UID, persisted quickbar",
+    "enhancement receipt: identical retry after process/package restart, one scroll, same item UID",
+    "original database unchanged; new native quickbar survives restart"
+  ],
+  "scope": "synthetic fixture only; no access to player database or old browser profile",
+  "source": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+  "windowsGraphics": false,
+  "graphicalEnvironment": "native Godot under Xvfb/Mesa; software rendering"
+}

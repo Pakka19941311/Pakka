@@ -2,11 +2,11 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-07",
-  "state_kind": "pc_native_integration_in_progress",
+  "state_kind": "pc_native_test_released_awaiting_owner",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-migration-p0",
   "tracked_branch": "origin/work/godot-migration-p0",
-  "observed_head": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
+  "observed_head": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -18,12 +18,13 @@
   "current_task": "P1-01",
   "next_task_after_authorization": null,
   "next_action": {
-    "task_id": "P1-01",
-    "substep_id": "P1-01.4",
-    "action": "Собрать и опубликовать native Windows test ZIP; проверить изменённый native блок в Linux graphics и Windows runtime; выдать прямую Release-ссылку. Мобильные зависимости не блокируют PC.",
+    "task_id": "P1-05",
+    "substep_id": "P1-05.4",
+    "action": "Владелец тестирует исправленный native Windows ZIP 1dcd61ffd8c6. Затем исправить замечания текущего PC-блока и продолжить открытые подпункты P1. Windows GPU/FPS, прежний личный browser profile и полная визуальная приёмка ещё не подтверждены. Mac/Android отложены.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
-    "requires_physical_android": false
+    "requires_physical_android": false,
+    "requires_owner_pc_test": true
   },
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
@@ -74,10 +75,11 @@
     "P0-05.3 частично: JDK compile/run, Android SDK 36, signed ARM64 sample APK, 10 passed conditions; no physical device installation/runtime",
     "Native Godot PC client source using unchanged authoritative server, 5 class definitions, 33 item definitions, 42/12 inventory and 32 persisted assignments",
     "Blender assembly of existing world: 604 placements, reproducible scene and GLB; no claim of recovered production source models",
-    "Isolated native SQLite clone adapter and portable Windows package/CI scripts; publication pending"
+    "Isolated native SQLite clone adapter and portable Windows package/CI scripts; Windows native runtime passed, Release published and public download verified",
+    "Windows ZIP 202210883 bytes; actual native Godot screenshot, Windows/Linux fixture evidence and SHA-256 in Release; fire overexposure corrected in 1dcd61ffd8c6"
   ],
   "not_done": [
-    "Full native client acceptance P1–P6; first integration client now implemented, not yet delivered",
+    "Full native client acceptance P1–P6; first native Windows integration test delivered",
     "user database backup",
     "new production Blender assets",
     "full registration",
@@ -99,13 +101,6 @@
       "tasks": [
         "P0-03",
         "P0-04"
-      ]
-    },
-    {
-      "id": "B-TOOLS",
-      "detail": "Blender/Godot/templates and headless Linux sample verified previously. Fresh local Xvfb extraction launches but cannot open a listening socket, exit 1. No graphical Godot window/render obtained.",
-      "tasks": [
-        "P0-05"
       ]
     },
     {
@@ -349,14 +344,12 @@
           "substeps": [
             {
               "id": "P0-05.1",
-              "status": "blocked",
-              "commit": "6f245206a60369302ff6e4008e350db1c48491e1",
+              "status": "technically_verified",
+              "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
               "evidence": [
-                "docs/migration/p0/TOOLCHAIN.md",
-                "docs/migration/p0/evidence/toolchain-distributions.json",
-                "docs/migration/p0/evidence/godot-clean-probe.json"
+                "docs/migration/pc/evidence/linux-native-qa.json"
               ],
-              "verification_scope": "Versions/templates/Linux headless export and Blender CPU render verified; graphical Godot editor/render still unavailable."
+              "verification_scope": "Actual native Godot X11/Mesa render in CI, not owner PC/GPU or mobile device"
             },
             {
               "id": "P0-05.2",
@@ -411,9 +404,13 @@
           "substeps": [
             {
               "id": "P1-01.1",
-              "status": "planned",
-              "commit": null,
-              "evidence": []
+              "status": "technically_verified",
+              "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+              "evidence": [
+                "godot-pc/BUILD.md",
+                "docs/migration/pc/REPORT.md"
+              ],
+              "verification_scope": "First native PC integration, portable package and reproducible clean CI; P1 task as a whole remains open"
             },
             {
               "id": "P1-01.2",
@@ -429,9 +426,13 @@
             },
             {
               "id": "P1-01.4",
-              "status": "planned",
-              "commit": null,
-              "evidence": []
+              "status": "technically_verified",
+              "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+              "evidence": [
+                "godot-pc/BUILD.md",
+                "docs/migration/pc/REPORT.md"
+              ],
+              "verification_scope": "First native PC integration, portable package and reproducible clean CI; P1 task as a whole remains open"
             }
           ]
         },
@@ -558,25 +559,41 @@
               "id": "P1-05.1",
               "status": "planned",
               "commit": null,
-              "evidence": []
+              "evidence": [],
+              "active_scope": "Windows",
+              "deferred_scope": [
+                "Android",
+                "iOS"
+              ]
             },
             {
               "id": "P1-05.2",
-              "status": "planned",
+              "status": "deferred_by_owner",
               "commit": null,
-              "evidence": []
+              "evidence": [],
+              "resume_condition": "Stable PC accepted"
             },
             {
               "id": "P1-05.3",
               "status": "planned",
               "commit": null,
-              "evidence": []
+              "evidence": [],
+              "active_scope": "Windows",
+              "deferred_scope": [
+                "Android",
+                "iOS"
+              ]
             },
             {
               "id": "P1-05.4",
               "status": "planned",
               "commit": null,
-              "evidence": []
+              "evidence": [],
+              "active_scope": "Windows",
+              "deferred_scope": [
+                "Android",
+                "iOS"
+              ]
             }
           ]
         },
@@ -1991,8 +2008,8 @@
     "P0 independent remaining tasks",
     "P1 first native Windows integration and test release"
   ],
-  "current_substep": "P1-01.1",
-  "working_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
+  "current_substep": "P1-01.4",
+  "working_commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -2043,6 +2060,13 @@
       "commit": "9d1429e90213f1a575e883ab8c903d47b750f745",
       "kind": "historical portable Windows release, not rerun this turn",
       "url": "https://github.com/Pakka19941311/Pakka/releases/tag/part1-environment-test-9d1429e90213"
+    },
+    {
+      "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+      "kind": "native Godot Windows PC preview; Blender assembly; portable Node",
+      "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-1dcd61ffd8c6",
+      "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-1dcd61ffd8c6/Varendor_Godot_PC_1dcd61ffd8c6.zip",
+      "evidence": "docs/migration/pc/REPORT.md"
     }
   ],
   "definitions": {
@@ -3871,7 +3895,7 @@
       "owner_accepted": false
     }
   },
-  "state_commit_note": "working_commit указывает последний опубликованный содержательный commit; коммит самого STATE определяется git log -1 -- STATE.json, без самоссылочного SHA.",
+  "state_commit_note": "working_commit/observed_head identify the tested source observed before this documentation-only state commit; the branch HEAD is the descendant state commit. No circular self-reference. Current release source is fixed in publication/evidence.",
   "source_checkpoint": {
     "branch": "checkpoint/pre-godot-20260907",
     "commit": "88838a79c9b544a7918ac1064568d00ed4d57be4",
@@ -4034,16 +4058,52 @@
       "whole_substep_closed": false,
       "apk_published": false,
       "evidence_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819"
+    },
+    {
+      "id": "PC-NATIVE-LINUX",
+      "status": "passed_with_limitations",
+      "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+      "personal_data": false,
+      "evidence": [
+        "docs/migration/pc/evidence/linux-native-qa.json"
+      ],
+      "scope": "Actual exported native client and isolated SQLite fixture; Linux graphical/Windows headless, no owner GPU acceptance"
+    },
+    {
+      "id": "PC-NATIVE-WINDOWS",
+      "status": "passed_with_limitations",
+      "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+      "personal_data": false,
+      "evidence": [
+        "docs/migration/pc/evidence/windows-native-qa.json"
+      ],
+      "scope": "Actual exported native client and isolated SQLite fixture; Linux graphical/Windows headless, no owner GPU acceptance"
+    },
+    {
+      "id": "PC-RELEASE-DOWNLOAD",
+      "status": "passed",
+      "commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+      "evidence": [
+        "docs/migration/pc/evidence/publication.json"
+      ]
     }
   ],
   "publication": {
-    "content_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
-    "url": "https://github.com/Pakka19941311/Pakka/commit/de78d6bf63d36297e91a4a89c85b5ed4d9269819",
+    "content_commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+    "url": "https://github.com/Pakka19941311/Pakka/commit/1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
     "branch": "work/godot-migration-p0",
     "remote_tree_matched_local_index": true,
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
     "personal_database_uploaded": false,
-    "p1_started": false
+    "p1_started": true,
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-1dcd61ffd8c6",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-1dcd61ffd8c6/Varendor_Godot_PC_1dcd61ffd8c6.zip",
+    "bytes": 202210883,
+    "sha256": "7b2087b23ea6d5468e55520ce49972a202fbfcd2a400b0219dbe1fc39700cdd1",
+    "native_windows_headless_passed": true,
+    "native_linux_graphics_passed": true,
+    "windows_gpu_verified": false,
+    "direct_download_verified": true
   },
   "resolved_defects": [
     {
@@ -4062,6 +4122,20 @@
       "impact": "Штатное завершение ждёт обработчиков disconnect перед checkpoint/SQLite close. Правило 30 секунд, личные данные и механики не менялись.",
       "owner_accepted": false,
       "fix_commit": "07408b7bdd7a969b28370144a570695f2299c5ae"
+    },
+    {
+      "id": "PC-RENDER-001",
+      "title": "Blender photometric fire intensity overexposes Godot Compatibility scene",
+      "status": "technically_verified",
+      "source_commit": "52e5ed89eedc68ddf82c740288a63e96f5f816fb",
+      "fix_commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+      "fix_applied": true,
+      "owner_accepted": false,
+      "evidence": [
+        "docs/migration/pc/REPORT.md",
+        "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-1dcd61ffd8c6/native-runtime.png"
+      ],
+      "impact": "Presentation-only conversion to relative energy/range; no server/game-rule changes"
     }
   ],
   "owner_runtime_context": {
@@ -4105,14 +4179,34 @@
     }
   ],
   "pc_native_preview": {
-    "status": "implemented_pending_ci_release",
+    "status": "released_awaiting_owner_pc_test",
     "baseline_head": "2fd5e87c7780c446c1256800213873207e012acb",
     "source": "godot-pc/ and scripts/godot-pc-*",
     "personal_data_access": false,
     "personal_backup_verified": false,
     "legacy_browser_assignments_imported": false,
-    "local_headless_integration": "passed on initial candidate: 5-table clone/UIDs, native move/inventory/equip/32-slot persistence, enhancement receipt retry after restart; final candidate CI pending",
+    "local_headless_integration": "Initial local exported-client check passed; final source verified by Linux graphical and Windows headless CI",
     "windows_gpu_tested": false,
-    "source_original_game_modified": false
-  }
+    "source_original_game_modified": false,
+    "source_commit": "1dcd61ffd8c61391793526c011d74b1bb1ae50f8",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-1dcd61ffd8c6",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-1dcd61ffd8c6/Varendor_Godot_PC_1dcd61ffd8c6.zip",
+    "bytes": 202210883,
+    "sha256": "7b2087b23ea6d5468e55520ce49972a202fbfcd2a400b0219dbe1fc39700cdd1",
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34140841356",
+    "native_windows_headless_passed": true,
+    "native_linux_graphics_passed": true,
+    "direct_download_verified": true,
+    "graphical_frame_review": "Actual native frame inspected; fire overexposure corrected; full artistic acceptance remains open"
+  },
+  "resolved_dependencies": [
+    {
+      "id": "B-TOOLS",
+      "status": "resolved_for_native_pc_ci",
+      "detail": "Godot/Blender desktop chain and actual X11/Mesa native render passed; local sandbox graphics limitations remain unchanged.",
+      "evidence": [
+        "docs/migration/pc/evidence/linux-native-qa.json"
+      ]
+    }
+  ]
 }
