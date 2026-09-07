@@ -12,26 +12,36 @@ var templates: Dictionary = {}
 var hero_id: String = ""
 var hero_position: Vector3 = Vector3(-7, 0, 11)
 var server_position: Vector3 = hero_position
-var movement: Vector2 = Vector2.ZERO
-var camera_yaw: float = 0.0
-var camera_pitch: float = .72
-var camera_distance: float = 21.0
-var orbit_yaw: float = 0.0
-var orbit_pitch: float = .72
-var orbit_distance: float = 21.0
-var camera_clearance: float = 21.0
+var camera_controller: VarendorCameraController = VarendorCameraController.new()
+var player_motion: VarendorPlayerMovement = VarendorPlayerMovement.new()
+var targeting: VarendorTargeting = VarendorTargeting.new()
+var timeline: SnapshotTimeline = SnapshotTimeline.new()
+var camera_yaw: float:
+	get: return camera_controller.yaw
+	set(value): camera_controller.yaw = value
+var camera_pitch: float:
+	get: return camera_controller.pitch
+	set(value): camera_controller.pitch = value
+var camera_distance: float:
+	get: return camera_controller.distance
+	set(value): camera_controller.distance = clampf(value,9,28)
+var movement: Vector2:
+	get: return player_motion.input_direction
+	set(value): player_motion.submit({"type":"direction","x":value.x,"z":value.y})
+var jump_offset: float:
+	get: return player_motion.height
+var jump_active: bool:
+	get: return not player_motion.grounded
+var jump_velocity: float:
+	get: return player_motion.vertical_velocity
 var labels_layer: Control
-var jump_offset: float = 0.0
-var jump_velocity: float = 0.0
-var jump_active: bool = false
-var jump_wait_ground: bool = false
-var landing_left: float = 0.0
-var previous_server_time: float = -1
 var sound_players: Array[AudioStreamPlayer] = []
 var sound_streams: Dictionary = {}
 var combat_volume: float = .75
 var ambient_player: AudioStreamPlayer
-var target_id: String = ""
+var target_id: String:
+	get: return targeting.selected_id
+	set(value): targeting.select(value) if not value.is_empty() else targeting.clear()
 var target_ring: MeshInstance3D
 var hero_speed: float = 6.2
 var current_snapshot: Dictionary = {}
@@ -40,18 +50,59 @@ var floaters: Array = []
 var collision: VarendorCollision = VarendorCollision.new()
 var effects: Array = []
 var arrival_marker: MeshInstance3D
-var click_goal: Variant = null
-var predicted_velocity: Vector2 = Vector2.ZERO
-var snapshot_age: float = 0.0
-var snapshot_interval: float = .1
+var click_goal: Variant:
+	get: return player_motion.destination
+	set(value): player_motion.destination = value
 var generation: int = -1
-var sent_sequence: int = 0
-var pending_inputs: Array = []
 var sun_light: DirectionalLight3D
 var world_environment: Environment
 var show_names: bool = true
 var decorations: Array[GeometryInstance3D] = []
 signal loot_received(message: String)
+signal snapshot_presented(snapshot: Dictionary)
+
+func _init() -> void:
+	player_motion.collision = collision
+	targeting.setup(self)
+
+func receive_snapshot(snapshot: Dictionary) -> void:
+	# Validate chronology/lifecycle before ANY consumer mutates live state.
+	# A delayed HTTP reply must not rewind prediction after a new SSE generation.
+	if not timeline.ingest(snapshot): return
+	if timeline.did_resynchronize:
+		# Recovery is one explicit authoritative correction after a real outage.
+		# Do not fly through seconds of old motion or replay expired projectiles.
+		player_motion.identity = ""
+		for effect: Dictionary in effects:
+			if is_instance_valid(effect.get("node")): effect.node.queue_free()
+		effects.clear()
+		for floater: Dictionary in floaters:
+			if is_instance_valid(floater.get("node")): floater.node.queue_free()
+		floaters.clear()
+	var reset: bool = player_motion.reconcile(snapshot)
+	server_position = point(snapshot.character.x,snapshot.character.z,snapshot.character.yOffset)
+	if reset:
+		last_event = 0
+		hero_position = server_position
+		camera_controller.reset_follow()
+		targeting.clear()
+
+func submit_intent(value: Dictionary) -> void:
+	player_motion.submit(value)
+	if value.type == "attack": targeting.select(str(value.entityId))
+	elif value.type in ["cancel","destination"] or (value.type == "direction" and Vector2(value.x,value.z).length() > .01): targeting.clear()
+
+func reject_intent(value: Dictionary, input_sequence: int, error: String) -> void:
+	# An old HTTP rejection must not erase a newer click or manual direction.
+	if input_sequence != player_motion.last_sent_sequence or str(value.get("type", "")) != "attack": return
+	if error not in ["target-occluded", "missing-target"] or target_id != str(value.get("entityId", "")): return
+	targeting.clear()
+	player_motion.cancel_planar()
+	player_motion.intent_pending = false
+
+func _physics_process(delta: float) -> void:
+	player_motion.physics_step(delta)
+
 
 func setup(game: Dictionary) -> bool:
 	data = game
@@ -124,6 +175,8 @@ func setup(game: Dictionary) -> bool:
 	camera.far = 360
 	add_child(camera)
 	camera.current = true
+	add_child(camera_controller)
+	camera_controller.setup(camera,collision,Callable(self,"height_at"))
 	var ring: TorusMesh = TorusMesh.new()
 	ring.inner_radius = .57
 	ring.outer_radius = .66
@@ -147,7 +200,6 @@ func setup(game: Dictionary) -> bool:
 		actor.set_meta("destination", actor.position)
 		actor.set_meta("previous", actor.position)
 		actor.set_meta("initialized", true)
-		animate(actor, "idle")
 
 	# Load each shared actor template during loading, before exploration.
 	for model: String in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk", "Fox", "Slime", "Skeleton", "Dragon", "Bat"]:
@@ -240,58 +292,19 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 		root.set_meta("player", players[0])
 	root.set_meta("destination", root.position)
 	root.set_meta("action", "")
+	var controller: VarendorAnimationController = VarendorAnimationController.new()
+	controller.bind(root)
+	root.set_meta("motion", {})
 	actors[id] = root
 	return root
 
-func animate(actor: Node3D, action: String) -> void:
-	if str(actor.get_meta("action")) == action or not actor.has_meta("player"):
-		return
-	var player: AnimationPlayer = actor.get_meta("player")
-	var candidates: Array = ["idle_weapon", "idle", "survey", "flying"]
-	if action == "walk":
-		candidates = ["run", "running", "walk", "walking", "flying"]
-	elif action == "attack":
-		candidates = ["bow_draw", "bow_shoot"] if actor.get_meta("model") == "Ranger" else ["spell1", "spell2", "staff_attack"] if actor.get_meta("model") == "Wizard" else ["sword_attack", "dagger_attack", "attack", "bite", "punch"]
-	elif action == "release":
-		candidates = ["bow_shoot"] if actor.get_meta("model") == "Ranger" else ["spell1", "spell2"]
-	elif action == "death":
-		candidates = ["death", "die"]
-	elif action == "jump":
-		candidates = ["jump", "flying", "idle"]
-	for match_text: String in candidates:
-		for clip: String in player.get_animation_list():
-			if match_text in clip.to_lower() and "reset" not in clip.to_lower() and not (action in ["attack", "release"] and "idle" in clip.to_lower()):
-				var animation: Animation = player.get_animation(clip)
-				animation.loop_mode = Animation.LOOP_LINEAR if action in ["idle", "walk"] else Animation.LOOP_NONE
-				player.speed_scale = 1.0
-				player.play(clip, .08)
-				actor.set_meta("action", action)
-				return
-
 func apply_snapshot(snapshot: Dictionary) -> void:
-	snapshot_interval = clampf((float(snapshot.time) - previous_server_time) / 1000.0, .05, .25) if previous_server_time >= 0 else .1
-	previous_server_time = float(snapshot.time)
-	snapshot_age = 0
 	current_snapshot = snapshot
 	var hero: Dictionary = snapshot.character
-	var new_hero: bool = hero_id != str(hero.id)
 	hero_id = str(hero.id)
-	server_position = point(hero.x, hero.z, hero.get("yOffset", 0))
-	hero_speed = float(hero.stats.get("speed", 6.2))
-	if new_hero or int(hero.generation) != generation or hero_position.distance_to(server_position) > 3.5 or hero.dead:
-		hero_position = server_position
-		predicted_velocity = Vector2.ZERO
-		pending_inputs.clear()
-		click_goal = null
-		target_id = ""
-		generation = int(hero.generation)
-		jump_active = false
-		jump_wait_ground = false
-		jump_offset = 0.0
-		jump_velocity = 0.0
-	for pending_input: Dictionary in pending_inputs.duplicate():
-		if int(pending_input.sequence) <= int(hero.lastInputSequence):
-			pending_inputs.erase(pending_input)
+	hero_speed = float(hero.stats.get("speed",6.2))
+	if player_motion.identity.is_empty(): player_motion.reconcile(snapshot)
+	targeting.reconcile(snapshot)
 	var keep: Dictionary = {"npc:shop":true,"npc:elder":true,"npc:smith":true,"npc:teleport":true}
 	var people: Array = snapshot.get("heroes", []).duplicate()
 	# Character is authoritative even when the nearby-heroes list omits self.
@@ -301,16 +314,18 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		var id: String = str(person.id)
 		keep[id] = true
 		var actor: Node3D = make_actor(id, data.classes[person.classId].model, 2.05, person.name + (" · %d" % int(person.level) if person.has("level") else ""), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
-		set_destination(actor, point(person.x, person.z, person.get("yOffset", 0)))
+		initialize_pose(actor, point(person.x, person.z, person.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
+		actor.set_meta("motion", person.duplicate(true))
 		if bool(person.get("dead", false)):
 			begin_death(actor)
 		elif actor.get_meta("dead", false):
 			actor.set_meta("dead", false)
+			(actor.get_meta("animation_controller") as VarendorAnimationController).reset_alive()
 			(actor.get_meta("visual") as Node3D).transform = actor.get_meta("base_visual")
 			actor.set_meta("action", "")
 			actor.visible = true
-		apply_motion(actor, person)
+
 	for monster: Dictionary in snapshot.get("monsters", []):
 		if Vector2(monster.x - hero.x, monster.z - hero.z).length() > 115:
 			continue
@@ -318,166 +333,122 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		keep[id] = true
 		var def: Dictionary = data.monsters[monster.id]
 		var actor: Node3D = make_actor(id, def.model, 2.05 * float(def.get("scale", 1)), def.name + " · %d" % int(def.level), Color("e0a6a0"))
-		set_destination(actor, point(monster.x, monster.z, monster.get("yOffset", 0)))
+		initialize_pose(actor, point(monster.x, monster.z, monster.get("yOffset", 0)))
 		actor.set_meta("pickable", bool(monster.alive))
 		actor.set_meta("yaw", -float(monster.get("yaw", 0)) + PI)
+		actor.set_meta("motion", monster.duplicate(true))
 		if not monster.alive or float(monster.hp) <= 0:
 			begin_death(actor)
 		elif actor.get_meta("dead", false):
 			actor.set_meta("dead", false)
+			(actor.get_meta("animation_controller") as VarendorAnimationController).reset_alive()
 			(actor.get_meta("visual") as Node3D).transform = actor.get_meta("base_visual")
 			actor.set_meta("action", "")
 			actor.visible = true
-		apply_motion(actor, monster, "death" if not monster.alive else "")
+
 	for summon: Dictionary in snapshot.get("summons", []):
 		var id: String = str(summon.uid)
 		keep[id] = true
 		var actor: Node3D = make_actor(id, "Skeleton", 1.9, "Призванный скелет", Color("86b3c2"))
-		set_destination(actor, point(summon.x, summon.z, summon.get("yOffset", 0)))
+		initialize_pose(actor, point(summon.x, summon.z, summon.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(summon.get("yaw", 0)) + PI)
-		apply_motion(actor, summon)
+		actor.set_meta("motion", summon.duplicate(true))
+
 	for id: String in actors.keys():
 		if not keep.has(id):
 			actors[id].queue_free()
 			actors.erase(id)
-	for event: Dictionary in snapshot.get("events", []):
-		if int(event.sequence) <= last_event:
-			continue
-		last_event = int(event.sequence)
-		if event.kind == "attack" and actors.has(str(event.actor)):
-			var actor: Node3D = actors[str(event.actor)]
-			if not actor.get_meta("dead", false):
-				actor.set_meta("attack_left", maxf(.3, (float(event.get("endsAt", snapshot.time + 700)) - float(snapshot.time)) / 1000.0))
-				actor.set_meta("action", "")
-				animate(actor, "attack")
-				play_sound("sword-swing", actor.position)
-		elif event.kind == "death" and actors.has(str(event.actor)):
-			begin_death(actors[str(event.actor)])
-		elif event.kind == "release":
-			show_release(event)
-		elif event.kind in ["buff", "summon"] and actors.has(str(event.actor)):
-			show_aura(actors[str(event.actor)].position, Color("7da4eb") if event.kind == "buff" else Color("b38bd9"))
-		elif event.kind == "loot" and str(event.actor) == hero_id:
-			var names: Array = []
-			for item_id: String in event.get("items", []):
-				names.append(str(data.items.get(item_id, {}).get("name", item_id)))
-			var message: String = "+%d золота · +%d опыта" % [event.get("gold", 0), event.get("xp", 0)]
-			if not names.is_empty():
-				message += "\n" + ", ".join(names)
-			loot_received.emit("Добыча: " + message)
-			play_sound("coin", hero_position)
-		if event.get("kind") in ["hit", "miss"] and actors.has(str(event.get("target", ""))):
-			var target: Node3D = actors[str(event.target)]
-			target.set_meta("hit_left", .18)
-			show_text(target.position, str(int(event.amount)) if event.has("amount") else "Промах", Color("ef7770") if str(event.target) == hero_id else Color("f5d698"), .85)
-			show_aura(target.position + Vector3(0, .7, 0), Color("ffcf87"))
-			play_sound("melee-impact" if str(event.target) == hero_id else "monster-hit", target.position)
+	for event: Dictionary in snapshot.get("events", []): present_event(event)
+	snapshot_presented.emit(snapshot)
 
-func apply_motion(actor: Node3D, motion: Dictionary, override_action: String = "") -> void:
-	if actor.get_meta("dead", false):
-		return
-	var action: String = override_action if not override_action.is_empty() else str(motion.get("action", "idle"))
-	var start: float = float(motion.get("actionStartedAt", 0))
-	if action in ["attack", "jump", "death"] and start != float(actor.get_meta("action_start", -1)):
-		actor.set_meta("action", "")
-		actor.set_meta("action_start", start)
-	if action == "attack" and actor.get_meta("action") == "release":
-		return
-	animate(actor, action)
+func present_event(event: Dictionary) -> void:
+	if int(event.sequence) <= last_event: return
+	last_event = int(event.sequence)
+	if actors.has(str(event.actor)):
+		var actor: Node3D = actors[str(event.actor)]
+		if event.has("actorGeneration") and int(actor.get_meta("motion", {}).get("generation",event.actorGeneration)) != int(event.actorGeneration): return
+		if event.kind in ["attack","release","death","cancel"]:
+			(actor.get_meta("animation_controller") as VarendorAnimationController).on_event(event,float(current_snapshot.get("time",0)))
+	if event.kind == "death" and target_id == str(event.actor): targeting.clear()
+	if event.kind == "cancel" and str(event.actor) == hero_id: targeting.clear()
+	if event.kind == "attack" and actors.has(str(event.actor)):
+		var actor: Node3D = actors[str(event.actor)]
+		if not actor.get_meta("dead", false):
+
+			play_sound("sword-swing", actor.position)
+	elif event.kind == "death" and actors.has(str(event.actor)):
+		begin_death(actors[str(event.actor)])
+	elif event.kind == "release":
+		show_release(event)
+	elif event.kind in ["buff", "summon"] and actors.has(str(event.actor)):
+		show_aura(actors[str(event.actor)].position, Color("7da4eb") if event.kind == "buff" else Color("b38bd9"))
+	elif event.kind == "loot" and str(event.actor) == hero_id:
+		var names: Array = []
+		for item_id: String in event.get("items", []):
+			names.append(str(data.items.get(item_id, {}).get("name", item_id)))
+		var message: String = "+%d золота · +%d опыта" % [event.get("gold", 0), event.get("xp", 0)]
+		if not names.is_empty():
+			message += "\n" + ", ".join(names)
+		loot_received.emit("Добыча: " + message)
+		play_sound("coin", hero_position)
+	if event.get("kind") in ["hit", "miss"] and actors.has(str(event.get("target", ""))):
+		var target: Node3D = actors[str(event.target)]
+		(target.get_meta("animation_controller") as VarendorAnimationController).on_event(event,float(current_snapshot.get("time",0)))
+		show_text(target.position, str(int(event.amount)) if event.has("amount") else "Промах", Color("ef7770") if str(event.target) == hero_id else Color("f5d698"), .85)
+		show_aura(target.position + Vector3(0, .7, 0), Color("ffcf87"))
+		play_sound("melee-impact" if str(event.target) == hero_id else "monster-hit", target.position)
 
 func blocked(position: Vector3) -> bool:
 	return collision.blocked(Vector2(position.x, -position.z))
 
-func set_destination(actor: Node3D, destination: Vector3) -> void:
+func initialize_pose(actor: Node3D, destination: Vector3) -> void:
 	actor.set_meta("previous", actor.position)
 	actor.set_meta("destination", destination)
-	if not actor.get_meta("initialized") or actor.position.distance_to(destination) > 8:
+	if not actor.get_meta("initialized"):
 		actor.position = destination
 		actor.set_meta("previous", destination)
 		actor.set_meta("initialized", true)
 
 func record_intent(value: Dictionary, input_sequence: int) -> void:
-	sent_sequence = input_sequence
-	pending_inputs.append({"sequence":input_sequence,"intent":value.duplicate()})
-	if value.type == "jump" and not jump_active and not current_snapshot.is_empty() and bool(current_snapshot.character.grounded):
-		jump_active = true
-		jump_wait_ground = false
-		jump_velocity = 8.2
-		jump_offset = 0
-	if value.type in ["attack", "cancel"] or (value.type == "direction" and Vector2(value.x, value.z).length() > .01):
-		click_goal = null
-	if value.type == "destination":
-		click_goal = collision.nearest_free(Vector2(value.x, value.z))
+	player_motion.sent(value,input_sequence)
 
 func _process(delta: float) -> void:
-	if camera == null:
-		return
-	var dt: float = minf(delta, .05)
-	snapshot_age += delta
-	if not current_snapshot.is_empty():
-		var hero: Dictionary = current_snapshot.character
-		var local: Vector2 = movement
-		var pos: Vector2 = Vector2(hero_position.x, -hero_position.z)
-		if click_goal != null and pos.distance_to(click_goal) < .25:
-			click_goal = null
-		# Predict manual input immediately. Click/auto-approach follows the server's
-		# path with bounded velocity extrapolation, never walks through a wall.
-		if not hero.dead and not local.is_zero_approx():
-			predicted_velocity = predicted_velocity.lerp(local * hero_speed, 1.0 - exp(-19.0 * dt))
-			var next: Vector2 = collision.resolve(pos, predicted_velocity * dt)
-			hero_position = point(next.x, next.y, float(hero.get("yOffset", 0)))
-			if pending_inputs.is_empty():
-				hero_position = hero_position.lerp(server_position, 1 - exp(-3 * dt))
-		elif actors.has(hero_id):
-			predicted_velocity = Vector2.ZERO
-			var previous: Vector3 = actors[hero_id].get_meta("previous")
-			var velocity: Vector3 = (server_position - previous) / snapshot_interval
-			velocity = velocity.limit_length(hero_speed)
-			var extra: Vector3 = velocity * minf(snapshot_age, .12) if hero.action == "walk" else Vector3.ZERO
-			var next: Vector2 = collision.resolve(Vector2(server_position.x, -server_position.z), Vector2(extra.x, -extra.z))
-			var desired: Vector3 = point(next.x, next.y, float(hero.get("yOffset", 0)))
-			if click_goal != null and not pending_inputs.is_empty():
-				var walk: Vector2 = (click_goal - pos).limit_length(hero_speed * dt)
-				var preview: Vector2 = collision.resolve(pos, walk)
-				desired = point(preview.x, preview.y, float(hero.get("yOffset", 0)))
-			hero_position = hero_position.lerp(desired, 1 - exp(-24 * dt))
-	if not current_snapshot.is_empty():
-		var hero: Dictionary = current_snapshot.character
-		if jump_active:
-			jump_offset += jump_velocity * dt - 11.0 * dt * dt
-			jump_velocity -= 22.0 * dt
-			if jump_offset <= 0 and jump_velocity < 0:
-				jump_offset = 0
-				jump_active = false
-				jump_wait_ground = true
-				landing_left = .16
-		elif not bool(hero.grounded) and not jump_wait_ground:
-			jump_offset = lerpf(jump_offset, float(hero.yOffset), 1 - exp(-18 * dt))
-		else:
-			if bool(hero.grounded): jump_wait_ground = false
-			jump_offset = lerpf(jump_offset, 0, 1 - exp(-25 * dt))
-		hero_position.y = height_at(hero_position.x, -hero_position.z) + jump_offset
-	landing_left = maxf(0, landing_left - dt)
+	if camera == null: return
+	var before_clock: float = timeline.clock_ms
+	var frame: Dictionary = timeline.advance(delta)
+	if not frame.snapshot.is_empty(): apply_snapshot(frame.snapshot)
+	if not current_snapshot.is_empty(): current_snapshot["time"] = timeline.clock_ms if not timeline.current.is_empty() else current_snapshot.time
+	for event: Dictionary in frame.events: present_event(event)
+	var presentation_dt: float = maxf(0,(timeline.clock_ms-before_clock)/1000.0) if not timeline.current.is_empty() else delta
+	var alpha: float = Engine.get_physics_interpolation_fraction()
+	var local_pose: Dictionary = player_motion.render_pose(alpha)
+	hero_position = point(local_pose.x,local_pose.z,local_pose.yOffset)
 	for id: String in actors:
 		var actor: Node3D = actors[id]
-		var destination: Vector3 = actor.get_meta("destination")
-		actor.position = hero_position if id == hero_id else (actor.get_meta("previous") as Vector3).lerp(destination, clampf(snapshot_age / snapshot_interval, 0, 1))
-		actor.rotation.y = lerp_angle(actor.rotation.y, float(actor.get_meta("yaw")), 1 - exp(-18 * dt))
+		var before: Vector3 = actor.position
+		var motion: Dictionary = actor.get_meta("motion", {}).duplicate()
+		if id == hero_id:
+			actor.position = hero_position
+			actor.rotation.y = -float(local_pose.yaw) + PI
+			motion.merge(local_pose,true)
+			motion["grounded"] = player_motion.grounded
+			if player_motion.input_mode == "manual" or player_motion.manual_cancel_pending:
+				motion["combatState"] = "idle"
+				motion["action"] = "walk" if player_motion.actual_velocity.length() > .08 else "idle"
+				motion["actionStartedAt"] = maxf(float(motion.get("actionStartedAt",0)),float(current_snapshot.get("time",0)))
+		elif not id.begins_with("npc:"):
+			var pose: Dictionary = timeline.sample_motion(id)
+			if pose.is_empty(): pose = motion
+			if not pose.is_empty():
+				actor.position = point(pose.x,pose.z,pose.get("yOffset",0))
+				actor.rotation.y = -float(pose.get("yaw",0)) + PI
+		var rendered_velocity: Vector3 = (actor.position-before)/maxf(.0001,delta)
+		if id == hero_id: rendered_velocity = Vector3(player_motion.actual_velocity.x,player_motion.vertical_velocity,-player_motion.actual_velocity.y)
+		var controller: VarendorAnimationController = actor.get_meta("animation_controller")
+		controller.update(motion,rendered_velocity,timeline.clock_ms if not timeline.current.is_empty() else float(current_snapshot.get("time",0)),delta if id == hero_id else presentation_dt)
+		actor.visible = not controller.corpse_complete
 		(actor.get_meta("label") as Label3D).hide()
-		update_actor_pose(actor, dt)
-		if id == hero_id and not movement.is_zero_approx() and not jump_active:
-			actor.rotation.y = lerp_angle(actor.rotation.y, -atan2(movement.x, movement.y) + PI, 1 - exp(-16 * dt))
-			animate(actor, "walk")
-	orbit_yaw = lerp_angle(orbit_yaw, camera_yaw, 1 - exp(-18 * dt))
-	orbit_pitch = lerpf(orbit_pitch, clampf(camera_pitch, .18, 1.25), 1 - exp(-18 * dt))
-	orbit_distance = lerpf(orbit_distance, clampf(camera_distance, 9, 30), 1 - exp(-12 * dt))
-	var pivot: Vector3 = hero_position + Vector3(0, 1.25 - jump_offset * .65, 0)
-	var offset: Vector3 = Vector3(sin(orbit_yaw) * cos(orbit_pitch), sin(orbit_pitch), cos(orbit_yaw) * cos(orbit_pitch))
-	var available: float = maxf(1.8, collision.ray_distance(pivot, pivot + offset * orbit_distance, .28) - .2)
-	camera_clearance = available if available < camera_clearance else lerpf(camera_clearance, available, 1 - exp(-7 * dt))
-	camera.position = pivot + offset * camera_clearance
-	camera.position.y = maxf(camera.position.y, height_at(camera.position.x, -camera.position.z) + .3)
-	camera.look_at(pivot)
+	camera_controller.update_pose(delta,hero_position,jump_offset)
 	update_nameplates()
 	target_ring.visible = actors.has(target_id) and actors[target_id].visible and actors[target_id].get_meta("pickable", false)
 	if target_ring.visible:
@@ -486,7 +457,7 @@ func _process(delta: float) -> void:
 	if click_goal != null:
 		arrival_marker.position = point(click_goal.x, click_goal.y, .12)
 	for effect: Dictionary in effects.duplicate():
-		effect.left -= delta
+		effect.left -= presentation_dt
 		var progress: float = 1 - maxf(0, effect.left) / effect.duration
 		if effect.has("end"):
 			effect.node.position = (effect.start as Vector3).lerp(effect.end, progress)
@@ -506,54 +477,18 @@ func _process(delta: float) -> void:
 			floaters.erase(floater)
 
 func pick_entity(screen: Vector2) -> String:
-	var origin: Vector3 = camera.project_ray_origin(screen)
-	var direction: Vector3 = camera.project_ray_normal(screen)
-	var closest: float = INF
-	var selected: String = ""
-	for id: String in actors:
-		var actor: Node3D = actors[id]
-		if id == hero_id or not actor.visible or not actor.get_meta("pickable", false):
-			continue
-		var size: Vector3 = actor.get_meta("pick_size")
-		var transform_inverse: Transform3D = actor.global_transform.affine_inverse()
-		var local_origin: Vector3 = transform_inverse * origin
-		var local_direction: Vector3 = transform_inverse.basis * direction
-		var bounds: AABB = AABB(Vector3(-size.x / 2, 0, -size.z / 2), size).grow(.12)
-		var hit = bounds.intersects_ray(local_origin, local_direction)
-		if hit != null:
-			var location: Vector3 = actor.global_transform * hit
-			var distance: float = origin.distance_to(location)
-			if distance < closest and collision.ray_distance(origin, location) >= distance - .05:
-				closest = distance
-				selected = id
-	return selected
+	return targeting.pick(screen)
 
 func click(screen: Vector2) -> void:
-	var selected: String = pick_entity(screen)
+	var selected: String = targeting.pick(screen)
 	if not selected.is_empty():
-		target_id = selected
-		click_goal = null
+		targeting.select(selected)
 		picked.emit(selected)
 		return
-	var origin: Vector3 = camera.project_ray_origin(screen)
-	var direction: Vector3 = camera.project_ray_normal(screen)
-	var previous: Vector3 = origin
-	for index: int in range(1, 700):
-		var position: Vector3 = origin + direction * index * .5
-		if position.y <= height_at(position.x, -position.z):
-			for step: int in range(8):
-				var midpoint: Vector3 = (position + previous) * .5
-				if midpoint.y <= height_at(midpoint.x, -midpoint.z):
-					position = midpoint
-				else:
-					previous = midpoint
-			var goal: Vector2 = collision.nearest_free(Vector2(position.x, -position.z).clamp(Vector2(-155, -135), Vector2(155, 135)))
-			if not collision.blocked(goal):
-				click_goal = goal
-				target_id = ""
-				moved_to.emit(goal)
-			return
-		previous = position
+	var goal: Variant = targeting.ground(screen)
+	if goal != null:
+		targeting.clear()
+		moved_to.emit(goal)
 
 func show_text(position_value: Vector3, message: String, color: Color, duration: float = 1.0) -> void:
 	var text_node: Label = Label.new()
@@ -586,46 +521,12 @@ func stop_audio() -> void:
 		player.stream = null
 
 func begin_death(actor: Node3D) -> void:
-	if actor.get_meta("dead", false):
-		return
-	actor.set_meta("dead", true)
-	actor.set_meta("death_age", 0.0)
-	actor.set_meta("pickable", false)
-	actor.set_meta("attack_left", 0.0)
-	actor.set_meta("previous", actor.position)
-	actor.set_meta("destination", actor.position)
-	actor.set_meta("action", "")
-	if actor.has_meta("player"):
-		(actor.get_meta("player") as AnimationPlayer).stop()
-	animate(actor, "death")
-	play_sound("monster-death", actor.position)
-
-func update_actor_pose(actor: Node3D, dt: float) -> void:
-	var visual: Node3D = actor.get_meta("visual")
-	var base: Transform3D = actor.get_meta("base_visual")
-	if actor.get_meta("dead", false):
-		var age: float = float(actor.get_meta("death_age", 0)) + dt
-		actor.set_meta("death_age", age)
-		if actor.get_meta("action") != "death":
-			visual.transform = base.rotated_local(Vector3.FORWARD, smoothstep(0, .45, age) * 1.45)
-		visual.position.y = base.origin.y - maxf(0, age - 2.0) * .8
-		actor.visible = age < 2.7
-		return
-	var attack: float = maxf(0, float(actor.get_meta("attack_left", 0)) - dt)
-	actor.set_meta("attack_left", attack)
-	var hit: float = maxf(0, float(actor.get_meta("hit_left", 0)) - dt)
-	actor.set_meta("hit_left", hit)
-	visual.transform = base
-	if actor == actors.get(hero_id):
-		if jump_active:
-			visual.rotation.x += clampf(jump_velocity / 8.2, -1, 1) * .06
-		elif landing_left > 0:
-			visual.scale.y *= 1.0 - sin(landing_left / .16 * PI) * .07
-	if actor.get_meta("model") == "Fox" and attack > 0:
-		visual.rotation.x = sin(attack * 8) * .22
-		visual.position.z += sin(attack * 8) * .3
-	if hit > 0:
-		visual.rotation.z += sin(hit * 28) * .1
+	if actor.get_meta("dead",false): return
+	actor.set_meta("dead",true)
+	actor.set_meta("pickable",false)
+	var motion: Dictionary = actor.get_meta("motion",{})
+	(actor.get_meta("animation_controller") as VarendorAnimationController).begin_death(float(motion.get("deathAt",current_snapshot.get("time",0))),float(motion.get("corpseUntil",float(current_snapshot.get("time",0))+3000)))
+	play_sound("monster-death",actor.position)
 
 func update_nameplates() -> void:
 	var ordered: Array = actors.keys()
@@ -672,10 +573,13 @@ func show_aura(position_value: Vector3, color: Color) -> void:
 func show_release(event: Dictionary) -> void:
 	if not actors.has(str(event.actor)) or not actors.has(str(event.get("target", ""))):
 		return
-	animate(actors[str(event.actor)], "release")
 	var start: Vector3 = actors[str(event.actor)].position + Vector3(0, 1.15, 0)
 	var end: Vector3 = actors[str(event.target)].position + Vector3(0, .85, 0)
 	var colors: Dictionary = {"fire":Color("ff7736"),"ice":Color("83ddff"),"lightning":Color("d7c2ff"),"poison":Color("91d45b"),"bone":Color("cbaddd"),"drain":Color("cf6689"),"shadow":Color("a882d8"),"arrow":Color("e5d1a1"),"slash":Color("f2dfb3")}
+	if event.has("origin"):
+		start = point(float(event.origin.x),float(event.origin.z),float(event.origin.y)-height_at(float(event.origin.x),float(event.origin.z)))
+	if event.has("destination"):
+		end = point(float(event.destination.x),float(event.destination.z),float(event.destination.y)-height_at(float(event.destination.x),float(event.destination.z)))
 	var color: Color = colors.get(event.get("effect", "slash"), Color("b3a0e3"))
 	var duration: float = float(event.get("durationMs", 0)) / 1000.0
 	if duration > 0:
@@ -690,8 +594,9 @@ func show_release(event: Dictionary) -> void:
 			arrow.height = .9
 			node.mesh = arrow
 			node.quaternion = Quaternion(Vector3.UP, (end - start).normalized())
-		node.position = start
-		effects.append({"node":node,"start":start,"end":end,"left":duration,"duration":duration})
+		var age: float = float(event.get("presentationAgeMs",0))/1000.0
+		node.position = start.lerp(end,clampf(age/duration,0,1))
+		effects.append({"node":node,"start":start,"end":end,"left":maxf(0,duration-age),"duration":duration})
 	else:
 		var beam: CylinderMesh = CylinderMesh.new()
 		beam.top_radius = .035

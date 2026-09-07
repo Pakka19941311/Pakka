@@ -5,7 +5,9 @@ signal snapshot_received(snapshot: Dictionary)
 signal notice(message: String)
 signal profiles_changed
 signal receipt_received(receipt: Dictionary)
-signal intent_sent(value: Dictionary, input_sequence: int)
+signal intent_reserved(value: Dictionary, input_sequence: int)
+signal intent_submitted(value: Dictionary)
+signal intent_rejected(value: Dictionary, input_sequence: int, error: String)
 
 var server_url: String = "http://127.0.0.1:4185"
 var token: String = ""
@@ -252,25 +254,25 @@ func stream_failed() -> void:
 	connected = false
 
 func intent(value: Dictionary) -> void:
-	if not connected:
-		return
-	# Serialize intents. A slower direction request must never cancel a later hit.
-	if value.type == "direction" and not input_queue.is_empty() and input_queue.back().type == "direction":
-		input_queue[input_queue.size() - 1] = value.duplicate()
-	else:
-		input_queue.append(value.duplicate())
-	if input_busy:
-		return
+	if not connected: return
+	# Reserve the acknowledgement ID before local prediction. Queued input and
+	# sent input must share an ID; an old ACK cannot cancel a newer local intent.
+	sequence += 1
+	var entry: Dictionary = {"value":value.duplicate(),"sequence":sequence}
+	intent_reserved.emit(value.duplicate(),sequence)
+	intent_submitted.emit(value.duplicate())
+	if value.type == "direction" and not input_queue.is_empty() and input_queue.back().value.type == "direction":
+		input_queue[input_queue.size()-1] = entry
+	else: input_queue.append(entry)
+	if input_busy: return
 	var generation: int = session_generation
 	input_busy = true
 	while not input_queue.is_empty() and connected:
 		var next: Dictionary = input_queue.pop_front()
-		sequence += 1
-		intent_sent.emit(next, sequence)
-		var response: Dictionary = await request("/api/input", {"sequence":sequence,"generation":hero.get("generation", 0),"intent":next})
-		if generation != session_generation or response.get("stale", false):
-			return
+		var response: Dictionary = await request("/api/input", {"sequence":next.sequence,"generation":hero.get("generation",0),"intent":next.value})
+		if generation != session_generation or response.get("stale",false): return
 		if response.has("error"):
+			intent_rejected.emit(next.value.duplicate(),int(next.sequence),str(response.error))
 			notice.emit(str(response.error))
 	input_queue.clear()
 	input_busy = false

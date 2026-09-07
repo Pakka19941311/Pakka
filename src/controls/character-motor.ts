@@ -1,5 +1,9 @@
 export type PlanarDirection = Readonly<{ x: number; z: number }>;
 
+export type LocomotionState = 'ground' | 'jump_start' | 'airborne' | 'fall' | 'land';
+export const JUMP_SPEED = 8.2;
+export const JUMP_GRAVITY = 22;
+
 export type CharacterMotorStep = Readonly<{
   dx: number;
   dz: number;
@@ -8,6 +12,8 @@ export type CharacterMotorStep = Readonly<{
   height: number;
   grounded: boolean;
   moving: boolean;
+  verticalVelocity: number;
+  locomotionState: LocomotionState;
 }>;
 
 const response = (speed: number, dt: number): number => 1 - Math.exp(-speed * Math.max(0, dt));
@@ -25,21 +31,32 @@ export class CharacterMotor {
   private verticalVelocity = 0;
   private jumpHeight = 0;
   private onGround = true;
+  private jumpTime = 0;
+  private landTime = 0;
 
   requestJump(): boolean {
     if (!this.onGround) return false;
     this.onGround = false;
-    this.verticalVelocity = 8.2;
+    this.verticalVelocity = JUMP_SPEED;
+    this.jumpTime = 0;
+    this.landTime = 0;
     return true;
   }
 
   step(direction: PlanarDirection, maxSpeed: number, dt: number, maxDistance = Infinity): CharacterMotorStep {
+    dt = Math.max(0, dt);
     const length = Math.hypot(direction.x, direction.z);
     const inputX = length > 0.0001 ? direction.x / length : 0;
     const inputZ = length > 0.0001 ? direction.z / length : 0;
-    const blend = response(length > 0.0001 ? 19 : 30, dt);
-    this.velocityX += (inputX * maxSpeed - this.velocityX) * blend;
-    this.velocityZ += (inputZ * maxSpeed - this.velocityZ) * blend;
+    const rate = length > 0.0001 ? 19 : 30;
+    const blend = response(rate, dt);
+    const targetX = inputX * maxSpeed, targetZ = inputZ * maxSpeed;
+    // Integrate exponential acceleration analytically. The integral, unlike
+    // finalVelocity * dt, is identical when a server interval is subdivided.
+    let dx = targetX * dt + (this.velocityX - targetX) * blend / rate;
+    let dz = targetZ * dt + (this.velocityZ - targetZ) * blend / rate;
+    this.velocityX += (targetX - this.velocityX) * blend;
+    this.velocityZ += (targetZ - this.velocityZ) * blend;
 
     if (length > 0.0001) {
       // The visual yaw already interpolates along the shortest arc in main.
@@ -49,8 +66,6 @@ export class CharacterMotor {
       this.facingZ = inputZ;
     }
 
-    let dx = this.velocityX * dt;
-    let dz = this.velocityZ * dt;
     const distance = Math.hypot(dx, dz);
     if (distance > maxDistance) {
       const scale = maxDistance / Math.max(distance, 0.0001);
@@ -61,14 +76,16 @@ export class CharacterMotor {
     }
 
     if (!this.onGround) {
-      this.verticalVelocity -= 22 * dt;
-      this.jumpHeight += this.verticalVelocity * dt;
-      if (this.jumpHeight <= 0) {
+      this.jumpTime += dt;
+      this.jumpHeight += this.verticalVelocity * dt - 0.5 * JUMP_GRAVITY * dt * dt;
+      this.verticalVelocity -= JUMP_GRAVITY * dt;
+      if (this.jumpHeight <= 0 && this.verticalVelocity <= 0) {
         this.jumpHeight = 0;
         this.verticalVelocity = 0;
         this.onGround = true;
+        this.landTime = 0.10;
       }
-    }
+    } else this.landTime = Math.max(0, this.landTime - dt);
 
     return {
       dx,
@@ -78,6 +95,9 @@ export class CharacterMotor {
       height: this.jumpHeight,
       grounded: this.onGround,
       moving: Math.hypot(this.velocityX, this.velocityZ) > 0.08,
+      verticalVelocity: this.verticalVelocity,
+      locomotionState: this.onGround ? (this.landTime > 0 ? 'land' : 'ground')
+        : this.jumpTime <= 0.06 ? 'jump_start' : this.verticalVelocity > 0 ? 'airborne' : 'fall',
     };
   }
 
@@ -87,6 +107,8 @@ export class CharacterMotor {
     this.verticalVelocity = 0;
     this.jumpHeight = 0;
     this.onGround = true;
+    this.jumpTime = 0;
+    this.landTime = 0;
   }
 
   stopPlanar(): void {

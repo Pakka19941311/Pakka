@@ -24,7 +24,6 @@ var diagnostics: Label
 var tooltip_panel: PanelContainer
 var tooltip_timer: float = 0
 var tooltip_anchor: Control
-var mouse_restore_valid: bool = false
 var frame_intervals: Array[float] = []
 var frame_previous: int = 0
 var diagnostic_elapsed: float = 0
@@ -49,8 +48,9 @@ var qa_started: bool = false
 var qa_interaction: bool = false
 var qa_times: Array = []
 var qa_last_frame_usec: int = 0
-var mouse_orbit: bool = false
-var mouse_restore: Vector2 = Vector2.ZERO
+var player_input: VarendorPlayerInput = VarendorPlayerInput.new()
+var mouse_orbit: bool:
+	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
 var invert_camera_y: bool = false
 var chosen_equipment: String = ""
@@ -84,6 +84,8 @@ func _ready() -> void:
 	net.notice.connect(notice)
 	world = VarendorWorld.new()
 	add_child(world)
+	player_input.setup(world,net)
+	world.snapshot_presented.connect(present_snapshot)
 	build_ui()
 	login.hide()
 	notice("Загрузка мира…")
@@ -92,7 +94,9 @@ func _ready() -> void:
 		notice("Не удалось загрузить мир. Полностью распакуйте свежий пакет игры.")
 		return
 	world.picked.connect(picked)
-	net.intent_sent.connect(world.record_intent)
+	net.intent_reserved.connect(world.record_intent)
+	net.intent_submitted.connect(world.submit_intent)
+	net.intent_rejected.connect(world.reject_intent)
 	world.loot_received.connect(notice)
 	net.receipt_received.connect(func(_receipt: Dictionary):
 		selected_scroll = {}
@@ -413,12 +417,14 @@ func build_inventory() -> void:
 	inventory_panel.hide()
 
 func snapshot_received(snapshot: Dictionary) -> void:
+	world.receive_snapshot(snapshot)
+
+func present_snapshot(snapshot: Dictionary) -> void:
 	var hero: Dictionary = snapshot.character
 	if login != null:
 		login.hide()
 	if preference_hero != str(hero.id):
 		load_preferences(str(hero.id))
-	world.apply_snapshot(snapshot)
 	heading.text = hero.name + " · " + data.classes[hero.classId].name + " · " + str(int(hero.level))
 	hp.max_value = hero.maxHp
 	hp.value = hero.hp
@@ -628,6 +634,9 @@ func save_preferences() -> void:
 		notice("Не удалось сохранить назначения клавиш")
 
 func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer:
+	# Embedded exclusive windows receive their own input events. Return the
+	# cursor before transferring focus so RMB release cannot become stranded.
+	release_orbit()
 	if is_instance_valid(active_dialog):
 		close_dialog()
 	active_dialog = Window.new()
@@ -781,6 +790,8 @@ func setting_choice(parent: Control, title: String, key: String, choices: Array,
 func apply_settings() -> void:
 	mouse_sensitivity = clampf(float(game_settings.get("sensitivity", 1.0)), .25, 2.5)
 	invert_camera_y = bool(game_settings.get("invert_y", false))
+	world.camera_controller.sensitivity = mouse_sensitivity
+	world.camera_controller.invert_y = invert_camera_y
 	world.show_names = bool(game_settings.get("names", true))
 	world.combat_volume = clampf(float(game_settings.get("combat_volume", 3)) / 4.0, 0, 1)
 	if world.ambient_player != null:
@@ -1024,18 +1035,7 @@ func _process(delta: float) -> void:
 		if qa_last_frame_usec > 0:
 			qa_times.append(float(now_usec - qa_last_frame_usec) / 1000.0)
 		qa_last_frame_usec = now_usec
-	var direction: Vector2 = Vector2.ZERO
-	if not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead:
-		var local: Vector2 = Input.get_vector("move_left", "move_right", "move_back", "move_forward")
-		direction = local.normalized().rotated(world.camera_yaw)
-		if not Input.is_physical_key_pressed(KEY_SHIFT):
-			world.camera_yaw += (float(Input.is_action_pressed("orbit_right")) - float(Input.is_action_pressed("orbit_left"))) * delta * 1.8
-	world.movement = direction
-	send_elapsed += delta
-	if (direction != last_direction or (not direction.is_zero_approx() and send_elapsed > .1)) and net.connected:
-		last_direction = direction
-		send_elapsed = 0
-		net.intent({"type":"direction","x":direction.x,"z":direction.y})
+	player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
 	if status != null and not net.connected and not net.hero.is_empty():
 		status.text = "Соединение потеряно · переподключение…"
 
@@ -1086,41 +1086,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			interact()
 	if text_focused():
 		return
-	if event is InputEventMouseButton and event.pressed:
-		if event.button_index == MOUSE_BUTTON_RIGHT:
-			mouse_orbit = true
-			mouse_restore = Vector2(DisplayServer.mouse_get_position())
-			mouse_restore_valid = true
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-		elif event.button_index == MOUSE_BUTTON_LEFT and not mouse_orbit:
-			world.click(event.position)
-		elif event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
-			world.camera_distance = clampf(world.camera_distance + (-1.5 if event.button_index == MOUSE_BUTTON_WHEEL_UP else 1.5), 9, 30)
-			save_preferences()
+	if player_input.mouse(event):
+		get_viewport().set_input_as_handled()
+		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]: save_preferences()
 
 func _input(event: InputEvent) -> void:
-	if mouse_orbit and event is InputEventMouseMotion:
-		world.camera_yaw -= event.screen_relative.x * .005 * mouse_sensitivity
-		world.camera_pitch = clampf(world.camera_pitch + event.screen_relative.y * .004 * mouse_sensitivity * (-1 if invert_camera_y else 1), .18, 1.25)
-		get_viewport().set_input_as_handled()
-	elif mouse_orbit and event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and not event.pressed:
-		release_orbit()
-		get_viewport().set_input_as_handled()
+	if world != null and world.camera_controller.handle_captured_input(event): get_viewport().set_input_as_handled()
 
 func release_orbit(restore: bool = true) -> void:
-	mouse_orbit = false
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	if restore and mouse_restore_valid:
-		call_deferred("restore_pointer")
-	else:
-		mouse_restore_valid = false
-
-func restore_pointer() -> void:
-	if not mouse_orbit and mouse_restore_valid and DisplayServer.get_name() != "headless":
-		var local: Vector2i = Vector2i(mouse_restore) - DisplayServer.window_get_position()
-		local = local.clamp(Vector2i.ZERO, DisplayServer.window_get_size() - Vector2i.ONE)
-		DisplayServer.warp_mouse(local)
-	mouse_restore_valid = false
+	world.camera_controller.release_capture(restore)
 
 func can_enhance(item: Dictionary) -> bool:
 	if selected_scroll.is_empty() or item.is_empty() or int(item.get("plus", 0)) >= 15:
@@ -1129,6 +1103,7 @@ func can_enhance(item: Dictionary) -> bool:
 	return not slot.is_empty() and data.scrolls[selected_scroll.id].category == ("weapon" if slot == "weapon" else "armor")
 
 func switch_profile() -> void:
+	release_orbit(false)
 	save_preferences()
 	var previous_token: String = net.token
 	net.end_session()
@@ -1137,8 +1112,10 @@ func switch_profile() -> void:
 	inventory_panel.hide()
 	selected_scroll = {}
 	selected_item = {}
-	world.target_id = ""
-	world.click_goal = null
+	world.targeting.clear()
+	world.timeline.reset()
+	world.player_motion.cancel_planar()
+	world.player_motion.identity = ""
 	login.queue_free()
 	build_login()
 	login.show()
@@ -1152,8 +1129,10 @@ func quit_game() -> void:
 	get_tree().quit()
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and mouse_orbit:
-		release_orbit(false)
+	if world != null and what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		player_input.focus_changed(false)
+	elif world != null and what == NOTIFICATION_APPLICATION_FOCUS_IN:
+		player_input.focus_changed(true)
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
 		quit_game()
 
@@ -1217,16 +1196,6 @@ func run_qa() -> void:
 	world.collision = old_collision
 	probe.queue_free()
 	world.actors.erase("qa:pick")
-	var yaw_before: float = world.camera_yaw
-	var pitch_before: float = world.camera_pitch
-	mouse_orbit = true
-	var motion_event: InputEventMouseMotion = InputEventMouseMotion.new()
-	motion_event.screen_relative = Vector2(100, 40)
-	_input(motion_event)
-	mouse_orbit = false
-	checks["right_mouse_two_axes"] = not is_equal_approx(yaw_before, world.camera_yaw) and not is_equal_approx(pitch_before, world.camera_pitch)
-	world.camera_yaw = yaw_before
-	world.camera_pitch = pitch_before
 	world.target_id = ""
 	activate("skill:3")
 	var skill_wait: int = Time.get_ticks_msec() + 4000
@@ -1270,7 +1239,7 @@ func run_qa() -> void:
 	checks["stream_reconnect_same_hero"] = net.connected and str(net.hero.id) == uid_before and net.hero.hp <= hp_before_reconnect
 	checks["stream_active"] = net.stream_requested and net.stream.get_status() == HTTPClient.STATUS_BODY
 	checks.merge(await preload("res://scripts/network_qa.gd").run(get_tree(), world.current_snapshot, qa_path.get_base_dir()))
-	checks.merge(await preload("res://scripts/gameplay_qa.gd").run(self))
+	checks.merge(await preload("res://scripts/core_acceptance.gd").run(self))
 	# Same actual-map collision vectors are resolved independently by TypeScript.
 	var cases = JSON.parse_string(FileAccess.get_file_as_string("res://generated/collision-qa.json")) if FileAccess.file_exists("res://generated/collision-qa.json") else []
 	checks["shared_collision_vectors"] = not cases.is_empty()

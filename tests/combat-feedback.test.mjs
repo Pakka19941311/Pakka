@@ -22,9 +22,13 @@ function fixture(classId='ranger', obstacle) {
 const gap=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 
 for(const classId of ['ranger','mage','necro'])test(`${classId} circles blocked shot and releases at ranged distance`,()=>{
-  const {world,p,m,collision,advance}=fixture(classId,c=>c.addBox(30,24,2,.3,0,0,8));
-  assert.equal(collision.hasLineOfSight({...p,y:1.3},{...m,y:1.3},.04),false);
+  const {world,p,m,collision,advance}=fixture(classId);
+  // Selection requires LOS. This scenario covers a valid selected target
+  // becoming occluded during pursuit, rather than selecting through a wall.
+  assert.equal(collision.hasLineOfSight({...p,y:1.3},{...m,y:1.3},.04),true);
   world.input(p.id,1,{type:'attack',entityId:m.uid,skill:null});
+  collision.addBox(30,24,2,.3,0,0,8);
+  assert.equal(collision.hasLineOfSight({...p,y:1.3},{...m,y:1.3},.04),false);
   let releaseDistance=null,nearest=Infinity;
   advance(10000,()=>{
     nearest=Math.min(nearest,gap(p,m));
@@ -38,13 +42,17 @@ for(const classId of ['ranger','mage','necro'])test(`${classId} circles blocked 
   assert.ok(world.events.some(e=>e.kind==='hit'&&e.actor===p.id&&e.target===m.uid));
 });
 
-test('fully occluded target cancels without walking into an enclosure or starting fake attacks',()=>{
-  const {world,p,m,advance}=fixture('ranger',c=>{
+test('fully occluded target rejects new selection and cancels existing pursuit without fake attacks',()=>{
+  const enclose=c=>{
     c.addBox(30,27,3.5,.4,0,0,8);c.addBox(30,33,3.5,.4,0,0,8);
     c.addBox(27,30,.4,3.5,0,0,8);c.addBox(33,30,.4,3.5,0,0,8);
-  });
+  };
+  const blocked=fixture('ranger',enclose);
+  assert.throws(()=>blocked.world.input(blocked.p.id,1,{type:'attack',entityId:blocked.m.uid,skill:null}),/target-occluded/);
+  assert.equal(blocked.p.target,null);assert.equal(blocked.world.state.pending.length,0);
+  const {world,p,m,collision,advance}=fixture('ranger');
   const before={x:p.x,z:p.z};
-  world.input(p.id,1,{type:'attack',entityId:m.uid,skill:null});advance(1500);
+  world.input(p.id,1,{type:'attack',entityId:m.uid,skill:null});enclose(collision);advance(1500);
   assert.equal(p.target,null);assert.equal(p.autoAttack,false);
   assert.deepEqual({x:p.x,z:p.z},before);
   assert.ok(world.events.some(e=>e.kind==='cancel'&&e.actor===p.id&&e.reason==='no-free-path'));
@@ -64,10 +72,13 @@ test('ranged impact precedes death and loot, dead actor stops immediately and ca
   assert.ok(index('attack')>=0&&index('attack')<index('release'));
   assert.ok(index('release')<index('hit')&&index('hit')<index('death')&&index('death')<index('loot'));
   assert.equal(m.alive,false);assert.equal(m.action,'death');assert.equal(m.hp,0);
+  assert.equal(world.snapshot(p.id).monsters[0].aiState,'dead','lethal impact enters Dead immediately');
+  assert.equal(world.state.pending.some(a=>a.actor===m.uid||a.target===m.uid),false);
   const deathPosition={x:m.x,z:m.z},sequence=world.state.sequence;
   m.status.stun=0;advance(2000);
   assert.deepEqual({x:m.x,z:m.z},deathPosition);
-  assert.equal(world.snapshot(p.id).monsters[0].aiState,'dead');
+  assert.equal(world.snapshot(p.id).monsters[0].aiState,'corpse','after death animation only the noncombat corpse remains');
+  advance(1000);assert.equal(world.snapshot(p.id).monsters[0].aiState,'despawn');
   assert.equal(world.events.some(e=>e.sequence>sequence&&e.actor===m.uid&&e.kind==='attack'),false);
   assert.equal(world.events.filter(e=>e.kind==='loot').length,1);
 });
