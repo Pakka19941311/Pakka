@@ -79,7 +79,11 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
         const connection={response:res,stream:createWorldStream(res,cursor)};
         let connections=streams.get(id);if(!connections){connections=new Set();streams.set(id,connections);}
         connections.add(connection);
-        req.on('close',()=>{connections.delete(connection);if(!connections.size){streams.delete(id);if(!fatal)world.disconnect(id);}});
+        connection.closed=new Promise(resolveClosed=>req.once('close',()=>{
+          connections.delete(connection);
+          if(!connections.size){streams.delete(id);if(!fatal)world.disconnect(id);}
+          resolveClosed();
+        }));
         return;
       }
       if(req.method==='GET'&&url.pathname==='/api/world'){
@@ -100,8 +104,12 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
   server.listen(port,host);
   const close=()=>new Promise((resolveClose,reject)=>{
     clearInterval(clock);
-    for(const connections of streams.values())for(const connection of connections)connection.response.end();
-    server.close(error=>{try{if(!fatal)world.checkpoint();store.close();error?reject(error):resolveClose();}catch(error){reject(error);}});
+    const disconnected=[];
+    for(const connections of streams.values())for(const connection of connections){
+      disconnected.push(connection.closed);connection.response.end();
+    }
+    // server.close can precede the request-close handlers that persist disconnects.
+    server.close(async error=>{try{await Promise.all(disconnected);if(!fatal)world.checkpoint();store.close();error?reject(error):resolveClose();}catch(error){reject(error);}});
     server.closeIdleConnections();
   });
   return {server,world,close};

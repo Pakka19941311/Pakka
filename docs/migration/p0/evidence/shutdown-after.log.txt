@@ -1,0 +1,15 @@
+✔ WAL backup includes committed items/progress/receipt; isolated restart returns same receipt (50.710584ms)
+✔ unknown schema is refused without changing the source (6.396776ms)
+✔ duplicate item UID is reported, never silently repaired (6.550848ms)
+✔ a backup cannot overwrite a previous backup or enter a Git checkout (13.310544ms)
+✔ empty SQLite is not labelled a restored player database (3.705199ms)
+✔ P0 shutdown: server-stop preserves hero, item UID, progress and receipt (497.871212ms)
+✔ P0 shutdown: client-disconnect preserves hero, item UID, progress and receipt (4589.450458ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5312.722474

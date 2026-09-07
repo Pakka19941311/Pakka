@@ -64,7 +64,8 @@
     "32 fingerprint и полная инвентаризация Git-ресурсов",
     "Проверенная утилита SQLite backup (только синтетические данные)",
     "UI_PROFILE_SCHEMA, DATA_BACKUP_RUNBOOK, TOOLCHAIN/DEVICE_MATRIX",
-    "60-секундный ограниченный live HTTP/SSE probe и открытый shutdown-дефект"
+    "60-секундный ограниченный live HTTP/SSE probe ; shutdown-дефект исправлен отдельным продолжением P0",
+    "P0-DEF-001: исправлен порядок закрытия HTTP/SSE и SQLite; 7/7 целевых тестов, production build; личное резервирование не выполнено"
   ],
   "not_done": [
     "new Godot client",
@@ -1963,18 +1964,6 @@
   "working_commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
   "last_accepted_gate": null,
   "open_defects": [
-    {
-      "id": "P0-DEF-001",
-      "title": "Late SSE disconnect after SQLite close",
-      "source_commit": "88838a79c9b544a7918ac1064568d00ed4d57be4",
-      "status": "open",
-      "observed": "Первый live probe после 60s завершился ERR_INVALID_STATE database is not open; stack сохранён. Гонка при остановке сервера/закрытии SSE.",
-      "evidence": [
-        "docs/migration/p0/evidence/live-server-first-attempt-error.txt"
-      ],
-      "fix_applied": false,
-      "impact": "Ошибка orderly shutdown; потеря пользовательских данных не наблюдалась/не проверялась; резервировать online или после подтверждённой остановки."
-    },
     {
       "id": "LEGACY-UV",
       "status": "open",
@@ -3894,6 +3883,25 @@
         "docs/migration/p0/evidence/live-server-first-attempt-error.txt"
       ],
       "evidence_commit": "eda0af17888dee89b737784706382e1bee3a5ce7"
+    },
+    {
+      "id": "P0-SHUTDOWN-FIX",
+      "status": "passed_with_limitations",
+      "personal_data": false,
+      "tests_passed": 7,
+      "baseline_reproduction": "server-stop fails, client-disconnect passes on 62672cf",
+      "tested_base_commit": "62672cf7397d55451bb035069b38e4f9019428ea",
+      "tested_source_sha256": "116ae27c9cd7f9933d6ca5089e7832b50f66c722746938e317912c1216ead74a",
+      "evidence": [
+        "docs/migration/p0/evidence/shutdown-before.log.txt",
+        "docs/migration/p0/evidence/shutdown-after.log.txt",
+        "docs/migration/p0/evidence/shutdown-build.log.txt",
+        "docs/migration/p0/evidence/shutdown-validation.json"
+      ],
+      "limitations": [
+        "Synthetic Linux loopback only; no personal backup or Windows/browser runtime acceptance.",
+        "No additional P0 substep or G0 gate closed."
+      ]
     }
   ],
   "publication": {
@@ -3904,5 +3912,23 @@
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
     "personal_database_uploaded": false,
     "p1_started": false
-  }
+  },
+  "resolved_defects": [
+    {
+      "id": "P0-DEF-001",
+      "title": "Late SSE disconnect after SQLite close",
+      "source_commit": "88838a79c9b544a7918ac1064568d00ed4d57be4",
+      "status": "technically_verified",
+      "observed": "На неизменённом 62672cf тест остановки с двумя SSE воспроизвёл database is not open; обычное отключение прошло. После исправления 2/2 shutdown и 5/5 backup тестов прошли. Только синтетические данные, Linux Node 24.19.0; Windows release не обновлён.",
+      "evidence": [
+        "docs/migration/p0/evidence/live-server-first-attempt-error.txt",
+        "docs/migration/p0/SHUTDOWN_FIX.md",
+        "docs/migration/p0/evidence/shutdown-before.log.txt",
+        "docs/migration/p0/evidence/shutdown-after.log.txt"
+      ],
+      "fix_applied": true,
+      "impact": "Штатное завершение ждёт обработчиков disconnect перед checkpoint/SQLite close. Правило 30 секунд, личные данные и механики не менялись.",
+      "owner_accepted": false
+    }
+  ]
 }

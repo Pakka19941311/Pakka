@@ -1,0 +1,46 @@
+✖ P0 shutdown: server-stop preserves hero, item UID, progress and receipt (891.050062ms)
+✔ P0 shutdown: client-disconnect preserves hero, item UID, progress and receipt (5656.097081ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6686.474436
+
+✖ failing tests:
+
+test at tests/p0-shutdown.test.mjs:7:3
+✖ P0 shutdown: server-stop preserves hero, item UID, progress and receipt (891.050062ms)
+  AssertionError [ERR_ASSERTION]: file:///workspace/scratch/422c820d04d9/Pakka/server/world-store.mjs:27
+      this.db.prepare('INSERT INTO world VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET state=excluded.state').run(JSON.stringify(state));
+              ^
+  
+  Error: database is not open
+      at WorldStore.save (file:///workspace/scratch/422c820d04d9/Pakka/server/world-store.mjs:27:13)
+      at WorldSimulation.disconnect (file:///workspace/scratch/422c820d04d9/Pakka/src/server/world-simulation.ts:158:16)
+      at IncomingMessage.<anonymous> (file:///workspace/scratch/422c820d04d9/Pakka/server/http-server.mjs:82:117)
+      at IncomingMessage.emit (node:events:521:24)
+      at emitCloseNT (node:internal/streams/destroy:148:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+    code: 'ERR_INVALID_STATE'
+  }
+  
+  Node.js v24.19.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///workspace/scratch/422c820d04d9/Pakka/tests/p0-shutdown.test.mjs:13:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
