@@ -2,7 +2,7 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-07",
-  "state_kind": "p0_execution_partial_blocked",
+  "state_kind": "pc_native_integration_in_progress",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-migration-p0",
   "tracked_branch": "origin/work/godot-migration-p0",
@@ -13,17 +13,17 @@
   "client_language_proposed": "typed GDScript",
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
-  "execution_note": "Прямое сообщение владельца 07.09.2026 разрешает весь P0 по ТЗ v2.0; результат предъявить до P1. P1 не разрешён этим блоком.",
-  "current_phase": "P0",
-  "current_task": "P0-05",
+  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
+  "current_phase": "P1",
+  "current_task": "P1-01",
   "next_task_after_authorization": null,
   "next_action": {
-    "task_id": "P0-05",
-    "substep_id": "P0-05.3",
-    "action": "Завершить установку и runtime технического APK на доступном физическом Android. SDK/JDK/export/signature уже проверены; не повторять их без изменения или конкретного риска. Остальные зависимости P0: разрешённая графическая среда для UI/Godot render, профиль реального ПК и доступ к прежним личным данным. Не обходить ограничения Browser. P1 не начинать.",
+    "task_id": "P1-01",
+    "substep_id": "P1-01.4",
+    "action": "Собрать и опубликовать native Windows test ZIP; проверить изменённый native блок в Linux graphics и Windows runtime; выдать прямую Release-ссылку. Мобильные зависимости не блокируют PC.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
-    "requires_physical_android": true
+    "requires_physical_android": false
   },
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
@@ -71,10 +71,13 @@
     "Standalone Linux release sample verified headless from clean source copy",
     "119 image decode audit: 118 pass, damaged colormap.png recorded as P0-ASSET-001",
     "P0-03.4: synthetic UI comparison fixtures and 12 passed source-rule conditions; no personal profile or screenshot claim",
-    "P0-05.3 частично: JDK compile/run, Android SDK 36, signed ARM64 sample APK, 10 passed conditions; no physical device installation/runtime"
+    "P0-05.3 частично: JDK compile/run, Android SDK 36, signed ARM64 sample APK, 10 passed conditions; no physical device installation/runtime",
+    "Native Godot PC client source using unchanged authoritative server, 5 class definitions, 33 item definitions, 42/12 inventory and 32 persisted assignments",
+    "Blender assembly of existing world: 604 placements, reproducible scene and GLB; no claim of recovered production source models",
+    "Isolated native SQLite clone adapter and portable Windows package/CI scripts; publication pending"
   ],
   "not_done": [
-    "new Godot client",
+    "Full native client acceptance P1–P6; first integration client now implemented, not yet delivered",
     "user database backup",
     "new production Blender assets",
     "full registration",
@@ -111,21 +114,6 @@
       "tasks": [
         "P0-04",
         "P0-05"
-      ]
-    },
-    {
-      "id": "B-ANDROID",
-      "detail": "JDK 17.0.20, Android SDK 36 и подписанный ARM64 P0 APK проверены. adb devices завершён с кодом 0, список устройств пуст. Установка, render, touch, фактическая сеть и производительность на физическом Android не проверены.",
-      "tasks": [
-        "P0-05"
-      ]
-    },
-    {
-      "id": "B-IOS",
-      "detail": "Нет доступа к Mac/Xcode/подписи/физическому iPhone. iOS остаётся обязательным.",
-      "tasks": [
-        "P0-05",
-        "P1-05"
       ]
     },
     {
@@ -382,23 +370,25 @@
             },
             {
               "id": "P0-05.3",
-              "status": "blocked",
+              "status": "deferred_by_owner",
               "commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
               "evidence": [
                 "docs/migration/p0/ANDROID_EXPORT.md",
                 "docs/migration/p0/DEVICE_MATRIX.md",
                 "docs/migration/p0/evidence/android/android-probe.json"
               ],
-              "verification_scope": "JDK compilation/run, clean ARM64 debug APK export, signature v2, ZIP CRC, resources, 16 KiB alignment and INTERNET manifest permission verified. No device installation, runtime networking, render or performance measurement; adb list empty."
+              "verification_scope": "JDK compilation/run, clean ARM64 debug APK export, signature v2, ZIP CRC, resources, 16 KiB alignment and INTERNET manifest permission verified. No device installation, runtime networking, render or performance measurement; adb list empty.",
+              "resume_condition": "Stable PC accepted; previous technical evidence retained"
             },
             {
               "id": "P0-05.4",
-              "status": "blocked",
+              "status": "deferred_by_owner",
               "commit": "eda0af17888dee89b737784706382e1bee3a5ce7",
               "evidence": [
                 "docs/migration/p0/REPORT.md"
               ],
-              "verification_scope": "Required real data/device/runtime unavailable; supporting work does not close this substep"
+              "verification_scope": "Required real data/device/runtime unavailable; supporting work does not close this substep",
+              "resume_condition": "Stable PC accepted; previous technical evidence retained"
             }
           ]
         }
@@ -406,14 +396,17 @@
     },
     {
       "id": "P1",
-      "status": "planned",
+      "status": "in_progress",
       "tasks": [
         {
           "id": "P1-01",
           "title": "Создать Godot-клиент и зафиксировать инструменты",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -445,9 +438,12 @@
         {
           "id": "P1-02",
           "title": "Состояния запуска, загрузки и ошибок",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -479,9 +475,12 @@
         {
           "id": "P1-03",
           "title": "Протокол и восстановление прежнего героя",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -547,9 +546,12 @@
         {
           "id": "P1-05",
           "title": "Минимальный участок на Windows/Android/iPhone",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -581,9 +583,12 @@
         {
           "id": "P1-06",
           "title": "Перенести HUD и быстрые панели",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -615,9 +620,12 @@
         {
           "id": "P1-07",
           "title": "Перенести инвентарь и сравнение",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -649,9 +657,12 @@
         {
           "id": "P1-08",
           "title": "Предметные команды и заточка",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -751,9 +762,12 @@
         {
           "id": "P1-11",
           "title": "Собственные образцы архитектуры, природы и поверхности",
-          "status": "planned",
+          "status": "in_progress",
           "commit": null,
-          "evidence": [],
+          "evidence": [
+            "godot-pc/BUILD.md",
+            "docs/migration/PC_FIRST.md"
+          ],
           "owner_accepted": false,
           "substeps": [
             {
@@ -1654,7 +1668,7 @@
     },
     {
       "id": "P5",
-      "status": "planned",
+      "status": "deferred_by_owner",
       "tasks": [
         {
           "id": "P5-01",
@@ -1974,9 +1988,10 @@
   "schema_version": 2,
   "documentation_review_status": "v2_0_read_in_full_execution_P0_authorized",
   "allowed_scope": [
-    "P0"
+    "P0 independent remaining tasks",
+    "P1 first native Windows integration and test release"
   ],
-  "current_substep": "P0-05.3",
+  "current_substep": "P1-01.1",
   "working_commit": "de78d6bf63d36297e91a4a89c85b5ed4d9269819",
   "last_accepted_gate": null,
   "open_defects": [
@@ -4051,7 +4066,53 @@
   ],
   "owner_runtime_context": {
     "currently_using_game": false,
-    "instruction": "Продолжать по согласованному ТЗ; не требовать текущего запуска игры для независимых задач P0.",
+    "instruction": "Начать Blender/Godot и выдать runnable тест ПК. Mac и Android отложить до устойчивой ПК-версии. Проверять изменённый блок, не повторять весь прежний QA.",
     "does_not_waive_personal_data_preservation": true
+  },
+  "deferred_platforms": {
+    "platforms": [
+      "macOS",
+      "Android",
+      "iOS/Mac toolchain"
+    ],
+    "reason": "Owner explicitly prioritizes stable PC, then other platforms",
+    "resume_condition": "Stable PC build accepted by owner",
+    "tasks": [
+      "P0-05.3",
+      "P0-05.4",
+      "P1-05 touch/mobile parts",
+      "P1-14 mobile profiles",
+      "P5"
+    ]
+  },
+  "deferred_dependencies": [
+    {
+      "id": "B-ANDROID",
+      "detail": "JDK 17.0.20, Android SDK 36 и подписанный ARM64 P0 APK проверены. adb devices завершён с кодом 0, список устройств пуст. Установка, render, touch, фактическая сеть и производительность на физическом Android не проверены.",
+      "tasks": [
+        "P0-05"
+      ],
+      "status": "deferred_by_owner_until_stable_pc"
+    },
+    {
+      "id": "B-IOS",
+      "detail": "Нет доступа к Mac/Xcode/подписи/физическому iPhone. iOS остаётся обязательным.",
+      "tasks": [
+        "P0-05",
+        "P1-05"
+      ],
+      "status": "deferred_by_owner_until_stable_pc"
+    }
+  ],
+  "pc_native_preview": {
+    "status": "implemented_pending_ci_release",
+    "baseline_head": "2fd5e87c7780c446c1256800213873207e012acb",
+    "source": "godot-pc/ and scripts/godot-pc-*",
+    "personal_data_access": false,
+    "personal_backup_verified": false,
+    "legacy_browser_assignments_imported": false,
+    "local_headless_integration": "passed on initial candidate: 5-table clone/UIDs, native move/inventory/equip/32-slot persistence, enhancement receipt retry after restart; final candidate CI pending",
+    "windows_gpu_tested": false,
+    "source_original_game_modified": false
   }
 }
