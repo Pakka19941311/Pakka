@@ -636,7 +636,7 @@ func save_preferences() -> void:
 func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer:
 	# Embedded exclusive windows receive their own input events. Return the
 	# cursor before transferring focus so RMB release cannot become stranded.
-	release_orbit()
+	world.camera_controller.release_for_modal()
 	if is_instance_valid(active_dialog):
 		close_dialog()
 	active_dialog = Window.new()

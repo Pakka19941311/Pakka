@@ -16,14 +16,21 @@ static func run(main: Node, tree: SceneTree) -> Dictionary:
 	await tree.process_frame
 	await tree.process_frame
 	var saved: Vector2 = viewport.get_mouse_position()
+	# Compare OS positions only with OS positions. Root viewport mouse state may
+	# remain stale while an embedded modal owns motion delivery, so record it
+	# for diagnostics and assert it after the root regains input ownership.
+	var saved_os: Vector2i = DisplayServer.mouse_get_position()
 	var captured: bool = controller.begin_capture()
 	await tree.process_frame
 	main.system_menu()
 	await tree.process_frame
 	await tree.process_frame
+	var modal_os: Vector2i = DisplayServer.mouse_get_position()
+	var modal_viewport: Vector2 = viewport.get_mouse_position()
 	var checks: Dictionary = {
 		"rmb_then_modal_releases_capture":captured and is_instance_valid(main.active_dialog) and not controller.captured and Input.mouse_mode == original_mode,
-		"rmb_then_modal_restores_viewport_cursor":viewport.get_mouse_position().distance_to(saved) <= 2.0
+		"rmb_then_modal_restores_os_cursor":Vector2(modal_os).distance_to(Vector2(saved_os)) <= 2.0,
+		"rmb_modal_pointer_coordinates":{"saved_viewport":[saved.x,saved.y],"saved_os":[saved_os.x,saved_os.y],"modal_viewport":[modal_viewport.x,modal_viewport.y],"modal_os":[modal_os.x,modal_os.y]}
 	}
 	main.close_dialog()
 	await tree.process_frame
@@ -34,6 +41,10 @@ static func run(main: Node, tree: SceneTree) -> Dictionary:
 	late_release.pressed = false
 	main._input(late_release)
 	await tree.process_frame
-	checks["rmb_release_after_modal_does_not_recapture_or_warp"] = not controller.captured and Input.mouse_mode == original_mode and viewport.get_mouse_position().distance_to(saved) <= 2.0
+	var released_os: Vector2i = DisplayServer.mouse_get_position()
+	var released_viewport: Vector2 = viewport.get_mouse_position()
+	checks.rmb_modal_pointer_coordinates["released_os"] = [released_os.x,released_os.y]
+	checks.rmb_modal_pointer_coordinates["released_viewport"] = [released_viewport.x,released_viewport.y]
+	checks["rmb_release_after_modal_does_not_recapture_or_warp"] = not controller.captured and Input.mouse_mode == original_mode and Vector2(released_os).distance_to(Vector2(saved_os)) <= 2.0 and released_viewport.distance_to(saved) <= 2.0
 	viewport.warp_mouse(original_position)
 	return checks

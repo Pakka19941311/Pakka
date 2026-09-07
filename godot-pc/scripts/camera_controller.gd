@@ -108,6 +108,15 @@ func release_capture(restore: bool = true) -> void:
 		_capture_generation += 1
 		_restore_valid = false
 
+func release_for_modal() -> void:
+	# An embedded Window takes viewport focus during popup_centered(). Restore
+	# synchronously while the root still owns focus; otherwise its focus-out
+	# notification invalidates the deferred release before it restores the point.
+	# The ordinary RMB path keeps its deferred, generation-guarded restoration.
+	release_capture()
+	if _restore_valid and not captured:
+		_restore_pointer(_capture_generation, _restore_position, _restore_rect)
+
 func _restore_pointer(generation_value: int, position_value: Vector2, bounds: Rect2) -> void:
 	if generation_value != _capture_generation or captured or not _restore_valid:
 		return
