@@ -44,22 +44,28 @@ const bytes = readFileSync(archive), checksum = sha(bytes);
 writeFileSync(archive + '.sha256', checksum + '  ' + basename(archive) + '\n');
 const notes = join(output, 'release-notes.md');
 const forwardStop = linux.native.scope === 'forward-stop-follow-up';
+const territory = linux.native.scope === 'territory-world-map';
 const followup = linux.native.scope === 'stop-npc-stats-follow-up';
-const changes = forwardStop
+const changes = territory?'Мир перестроен по утверждённой схеме ТЗ: Гринфолл 70×60 м и три сектора, отдельный Астерхолд, дороги, руины, лес, логово, лагерь и северная арена. Добавлены архитектурные детали, подлесок, ветер, облака и декоративная фауна. Полная игровая карта — M: названия, дороги, персонаж, масштабирование. Все 53 противника и четыре службы сохранены; старые позиции мигрируют с журналом, вещи и прогресс сохраняются.':forwardStop
   ? 'Убрано остаточное продвижение персонажа после остановки: горизонтальная скорость обнуляется при отпускании клавиш и достижении точки. Последовательная отправка команд работает независимо от частоты отрисовки, поэтому остановка не ждёт обработки очереди в медленных кадрах. Проверки охватывают первый кадр остановки, движение к точке и монстру, задержанные сетевые снимки и реальные анимированные модели.'
   : followup
   ? 'Исправлены запоздалые сдвиги персонажа после остановки, подход и функции городских NPC. Все девять характеристик помещаются в окне инвентаря без вертикальной прокрутки.'
   : 'Перенесены управление, камера, движение, бой, поведение монстров, HUD и инвентарь из принятой эталонной сборки Varendor в Godot.';
-const report = forwardStop ? 'FORWARD_STOP_FIX.md' : followup ? 'STOP_NPC_FOLLOWUP.md' : 'REFERENCE_CONTROL_PORT.md';
+const report = territory?'WORLD_TERRITORY.md':forwardStop ? 'FORWARD_STOP_FIX.md' : followup ? 'STOP_NPC_FOLLOWUP.md' : 'REFERENCE_CONTROL_PORT.md';
 writeFileSync(notes, `Тестовая сборка **Varendor на Godot для Windows x64**.\n\nРаспакуйте ZIP и запустите **RUN_VARENDOR.bat**. Движки и Node устанавливать не нужно.\n\n${changes}\n\n[Проверки и ограничения](https://github.com/${repository}/blob/work/godot-p1-recovery/docs/migration/pc/${report}). После пользовательской проверки этих исправлений — продолжение по ТЗ.\n\nПроверены нативный Godot render в Linux/Mesa и поставляемый Windows EXE + Node без графики. Проверки используют отдельную синтетическую базу; исходная SQLite не изменяется. Оценка ощущений управления и Windows GPU остаётся за тестом на игровом ПК.\n\nИсходный commit: \`${commit}\`. ZIP: ${bytes.length} байт. SHA-256: \`${checksum}\`.\n`);
 const linuxAsset = join(output, 'linux-native-qa.json'), windowsAsset = join(output, 'windows-native-qa.json');
 writeFileSync(linuxAsset, JSON.stringify(linux, null, 2) + '\n');
 writeFileSync(windowsAsset, JSON.stringify(windows, null, 2) + '\n');
 const screenshot = join(directory, 'pc-linux/native-runtime.png');
-const sampleReport=read(join(directory,'pc-linux/samples/samples-qa.json'));
-assert.equal(sampleReport.ok,true);
-assert.equal(sampleReport.checks.graphics,true);
-const files = [archive, archive + '.sha256', linuxAsset, windowsAsset, screenshot, join(directory,'pc-linux/samples/contact.jpg'), join(directory,'pc-linux/samples/samples-qa.json')];
+const files = [archive, archive + '.sha256', linuxAsset, windowsAsset, screenshot];
+if(territory){
+  files.push(join(directory,'pc-build/Varendor_World_Source.zip'));
+  for(const name of ['territory-courtyard','territory-gate','territory-forest','territory-atlas'])files.push(join(directory,'pc-linux',name+'.jpg'));
+}else{
+  const sampleReport=read(join(directory,'pc-linux/samples/samples-qa.json'));
+  assert.equal(sampleReport.ok,true);assert.equal(sampleReport.checks.graphics,true);
+  files.push(join(directory,'pc-linux/samples/contact.jpg'),join(directory,'pc-linux/samples/samples-qa.json'));
+}
 const gh = args => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
 const tag = `godot-pc-preview-${commit.slice(0, 12)}`;
 gh(['release', 'create', tag, ...files, '--repo', repository, '--target', commit, '--prerelease', '--latest=false', '--title', 'Varendor — Godot PC test', '--notes-file', notes]);

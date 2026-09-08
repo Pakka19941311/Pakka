@@ -17,7 +17,7 @@ const root = process.cwd();
 const [binaryArg, outputArg, ...options] = process.argv.slice(2);
 assert.ok(binaryArg && outputArg, 'Usage: godot-pc-qa.mjs BINARY OUTPUT [--graphical] [--package=DIR] [--qa-scope=full|stop-npc|stop-only]');
 const qaScope = options.find(arg => arg.startsWith('--qa-scope='))?.slice('--qa-scope='.length) || 'full';
-assert.ok(['full', 'stop-npc', 'stop-only'].includes(qaScope), `Unknown native QA scope: ${qaScope}`);
+assert.ok(['full', 'stop-npc', 'stop-only', 'world'].includes(qaScope), `Unknown native QA scope: ${qaScope}`);
 const binary = resolve(binaryArg), output = resolve(outputArg);
 mkdirSync(output, { recursive: true });
 const privateRoot = mkdtempSync(join(tmpdir(), 'varendor-native-qa-'));
@@ -47,7 +47,7 @@ try {
   let log = '';
   child.stdout.on('data', bytes => { log += bytes; });
   child.stderr.on('data', bytes => { log += bytes; });
-  const timeout = setTimeout(() => child.kill(), 300000);
+  const timeout = setTimeout(() => child.kill(), qaScope==='world'?420000:300000);
   let code;
   try { [code] = await once(child, 'exit'); }
   finally { clearTimeout(timeout); writeFileSync(join(output, 'native-runtime.log'), log); }
@@ -59,18 +59,18 @@ try {
       failed: Object.entries(observed.checks).filter(([key, value]) => value === false && key !== 'native_render').map(([key]) => key),
       stops: observed.checks.live_stop_observations?.map(({ samples, ...summary }) => summary) }));
   }
-  for (const line of log.split('\n')) if (line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
+  for (const line of log.split('\n')) if (line.startsWith('VARENDOR_WORLD_JPG ') || line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
   assert.equal(code, 0, log.split('\n').filter(line => !line.startsWith('VARENDOR_REVIEW_JPG ') && !line.startsWith('VARENDOR_CORE_JPG ')).join('\n').slice(-16000));
   assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, 'Native client runtime errors');
   const native = JSON.parse(readFileSync(reportPath, 'utf8'));
   assert.equal(native.ok, true);
-  if (qaScope !== 'full') assert.equal(native.scope, qaScope === 'stop-only' ? 'forward-stop-follow-up' : 'stop-npc-stats-follow-up', 'The native client must execute the requested regression scope');
+  if (qaScope !== 'full') assert.equal(native.scope, qaScope==='world'?'territory-world-map':qaScope === 'stop-only' ? 'forward-stop-follow-up' : 'stop-npc-stats-follow-up', 'The native client must execute the requested regression scope');
   for (const [key, value] of Object.entries({ classes: 5, item_definitions: 33, quick_slots: 32, bag_slots: 42, equipment_slots: 12 })) assert.equal(native.checks[key], value, key);
   if (options.includes('--graphical')) {
     assert.equal(native.checks.native_render, true);
     assert.ok(existsSync(reportPath.replace(/\.json$/, '.png')));
   }
-  checks.push(native.scope === 'forward-stop-follow-up'
+  checks.push(native.scope==='territory-world-map'?'exported native client: authored territory, moved service anchors, gates, forest encounter, danger shortcut, M atlas and runtime views':native.scope === 'forward-stop-follow-up'
     ? 'exported native client: zero neutral coast, first-frame stopping, frame-independent sequential input delivery, delayed reconciliation and real rig pose checks'
     : native.scope === 'stop-npc-stats-follow-up'
     ? 'exported native client: stopping and delayed reconciliation, city service interactions, compact stats, persisted quickbar'
@@ -83,6 +83,19 @@ try {
     return response.json();
   };
   const before = await request('/api/world');
+  if(qaScope==='world'){
+    const identity={id:before.character.id,equipment:before.character.equipment,gold:before.character.gold,inventory:before.character.inventory};
+    await request('/api/disconnect',{});await bridge.close();
+    bridge=await startNativeBridge({data,legacy,backups});
+    bootstrap=JSON.parse(readFileSync(bridge.bootstrapPath,'utf8'));token=bootstrap.profiles.find(p=>p.id===identity.id).token;
+    const after=await request('/api/world');
+    assert.deepEqual({id:after.character.id,equipment:after.character.equipment,gold:after.character.gold,inventory:after.character.inventory},identity);
+    assert.equal(after.mapVersion,before.mapVersion);
+    assert.equal(sha(legacy),originalHash);
+    checks.push('territory package restart: identical mapVersion, character identity, equipment and inventory; original database unchanged');
+    const report={ok:true,platform:process.platform,node:process.version,native,checks,scope:'isolated synthetic territory fixture only',source:process.env.GITHUB_SHA||'local-uncommitted',windowsGraphics:false,graphicalEnvironment:options.includes('--graphical')?'native Godot under Xvfb/Mesa; software rendering':'headless'};
+    writeFileSync(join(output,'pc-integration.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
+  }else{
   const weapon = before.character.equipment.weapon;
   const scroll = before.character.inventory.find(item => item.id === 'weapon_scroll');
   assert.ok(weapon && scroll);
@@ -119,4 +132,5 @@ try {
     windowsGraphics: false, graphicalEnvironment: options.includes('--graphical') ? 'native Godot under Xvfb/Mesa; software rendering' : 'headless' };
   writeFileSync(join(output, 'pc-integration.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report, null, 2));
+  }
 } finally { await bridge.close(); }

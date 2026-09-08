@@ -13,6 +13,8 @@ import { SPAWN_REGIONS, spawnPointInRegion, patrolRouteInRegion } from '../world
 import { CONTENT_VERSION, mapVersion } from './content-manifest.ts';
 import { findNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
+import { START_POINT, SERVICES, isTerritorySafe, TERRITORY_VERSION } from '../world/territory.ts';
+import { migrateTerritory, legacyTerritoryPosition } from '../world/territory-migration.ts';
 import { CharacterMotor, smoothAngle } from '../controls/character-motor.ts';
 import { slidePastActor } from '../controls/actor-spacing.ts';
 import { resolveChainLightning } from '../combat/chain-lightning.ts';
@@ -34,6 +36,8 @@ type PendingAttack = {
 type Projectile = {actor:string;target:string;generation:number;actorGeneration:number;skill:number|null;damage:number;critical:boolean;accuracy:number;startedAt:number;endsAt:number;origin:Position & {y:number};point:Position & {y:number}};
 const motion=(now:number):WorldMotion=>({yOffset:0,grounded:true,yaw:0,action:'idle',actionStartedAt:now,actionEndsAt:0,velocityX:0,velocityZ:0,verticalVelocity:0,locomotionState:'ground',combatState:'idle',hitAt:0,hitUntil:0});
 export type PersistedWorld = {
+  mapVersion?:string; territoryVersion?:number;
+  coordinateMigrations?:Array<{at:number;from:string;to:string;positions:Array<{id:string;kind:string;from:Position;to:Position;oldHome?:Position}>}>;
   schema: 1; time: number; revision: number; sequence: number;
   characters: Record<string, WorldCharacter>; monsters: WorldMonster[]; summons: WorldSummon[];
   pending: PendingAttack[]; projectiles?:Projectile[];
@@ -50,16 +54,16 @@ export const WORLD_PHYSICS_HZ = 60;
 const STEP_MS = 1000 / WORLD_PHYSICS_HZ;
 const REFERENCE_DEATH_MS = 420;
 const REFERENCE_CORPSE_MS = 650;
-const SPAWN = { x: -7, z: -11 };
+const SPAWN = START_POINT;
 const distance = (a: Position, b: Position) => Math.hypot(a.x - b.x, a.z - b.z);
-const safe = (p: Position) => Math.hypot(p.x + 7, p.z + 5) < 20.5 || Math.hypot(p.x + 108, p.z + 82) < 16;
+const safe = isTerritorySafe;
 const itemDef = (item: InventoryItem): ItemStatDefinition & {slot?:string} => ITEMS[item.id as ItemId] as ItemStatDefinition & {slot?:string};
 const monsterDef = (m: WorldMonster) => MONSTERS[m.id as MonsterId];
-const npcPositions = { shop: {x:.3,z:-7.8}, elder: {x:-7,z:-2.6}, teleport: {x:-7,z:-20} };
+const npcPositions = { shop: SERVICES['npc:shop'], elder: SERVICES['npc:elder'], teleport: SERVICES['npc:teleport'] };
 const teleportPoints: Record<string, {x:number;z:number;cost:number;level:number}> = {
   // Arrival courtyard, south of the keep and inside the open gate.
-  'Астерхолд': {x:-108,z:-90,cost:0,level:1}, 'Гринфолл': {...SPAWN,cost:25,level:1},
-  'Чёрный лес': {x:94,z:44,cost:90,level:10}, 'Вход в шахту': {x:132,z:94,cost:150,level:10},
+  'Астерхолд': {x:-98,z:-84,cost:0,level:1}, 'Гринфолл': {...SPAWN,cost:25,level:1},
+  'Чёрный лес': {x:74,z:34,cost:90,level:10}, 'Вход в шахту': {x:-46,z:90,cost:150,level:10},
 };
 
 /** No DOM, engine, frame rate, client clock or rendering visibility is consulted here. */
@@ -89,8 +93,10 @@ export class WorldSimulation {
     this.terrain = options.terrain ?? new TerrainSurface();
     this.mapContentVersion=mapVersion(this.collision,this.terrain);
     this.random = options.random ?? Math.random; this.identifier = options.identifier; this.beta = Boolean(options.beta);
-    this.state = this.store.load() ?? {schema:1,time:options.now,revision:0,sequence:0,characters:{},monsters:[],summons:[],pending:[]};
+    const loaded=this.store.load();
+    this.state = loaded ?? {schema:1,mapVersion:this.mapContentVersion,territoryVersion:TERRITORY_VERSION,time:options.now,revision:0,sequence:0,characters:{},monsters:[],summons:[],pending:[]};
     if (this.state.schema !== 1) throw Error('unsupported-world-schema');
+    if(loaded)migrateTerritory(this.state,this.collision,this.mapContentVersion);
     this.state.projectiles??=[];
     for(const actor of [...Object.values(this.state.characters),...this.state.monsters,...this.state.summons])Object.assign(actor,{...motion(this.state.time),...actor});
     this.lastCheckpoint = this.state.time;
@@ -133,7 +139,10 @@ export class WorldSimulation {
     const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
     p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
     this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
-    Object.assign(p,this.collision.findNearestFree(p,.46));
+    const oldPosition={x:p.x,z:p.z};
+    Object.assign(p,this.collision.findNearestFree(legacyTerritoryPosition(p),.46));
+    this.state.coordinateMigrations??=[];
+    this.state.coordinateMigrations.push({at:this.state.time,from:'browser-import',to:this.mapContentVersion,positions:[{id:p.id,kind:'character',from:oldPosition,to:{x:p.x,z:p.z}}]});
     this.state.characters[p.id]=p;
     try { this.store.commitImport(this.state,p.id,importId,raw,this.state.time); }
     catch(error){delete this.state.characters[p.id];throw error;}

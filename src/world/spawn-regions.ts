@@ -1,3 +1,4 @@
+import { REGION_CENTERS } from './territory.ts';
 export type SpawnRegion = Readonly<{
   id: string;
   label: string;
@@ -22,13 +23,15 @@ export const SPAWN_REGIONS: readonly SpawnRegion[] = [
   { id: 'drowned-fen', label: 'Затонувшая топь', monsterId: 'wraith', center: { x: 111, z: 12 }, population: 6, radius: 10, patrolRadius: 7, aggroRadius: 10, leashRadius: 17 },
   { id: 'blood-alpha-den', label: 'Логово Кровавого Оборотня', monsterId: 'mini', center: { x: 109, z: 2 }, population: 1, radius: 0, patrolRadius: 4, aggroRadius: 11, leashRadius: 18, boss: 'mini' },
   { id: 'rotten-lord-pit', label: 'Чертог Хозяина леса', monsterId: 'big', center: { x: 136, z: 101 }, population: 1, radius: 0, patrolRadius: 3, aggroRadius: 13, leashRadius: 21, boss: 'big' },
-] as const;
+].map(region=>({...region,center:REGION_CENTERS[region.id]})) as readonly SpawnRegion[];
 
 function fractional(value: number): number {
   return value - Math.floor(value);
 }
 
 export function spawnPointInRegion(region: SpawnRegion, index: number): Readonly<{ x: number; z: number }> {
+  // The first wolf is isolated at the approach to the western forest.
+  if(region.id==='greyfang-meadow'&&index===0)return {x:-99,z:-5};
   if (region.population <= 1 || region.radius <= 0) return region.center;
   const normalizedIndex = Math.max(0, Math.floor(index));
   const radial = Math.sqrt((normalizedIndex + 0.7) / (region.population + 0.7));

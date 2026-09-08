@@ -2,10 +2,13 @@
 import bpy
 import json
 import math
+import sys
 from pathlib import Path
 from mathutils import Vector, Matrix
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'scripts'))
+from territory_art import build_prop, build_wildlife
 OUT = ROOT/'godot-pc/generated'
 layout = json.loads((OUT/'layout.json').read_text())
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -36,6 +39,22 @@ roofmat=pbr('Existing slate roof',pbrroot,'roof_slates_02_albedo.jpg','roof_slat
 ground=pbr('Existing forest ground',ROOT/'public/assets/world/forest_ground_04','diff.jpg')
 road=pbr('Existing paved roads',pbrroot,'cobblestone_floor_001_albedo.jpg','cobblestone_floor_001_normal.jpg','cobblestone_floor_001_roughness.jpg')
 
+def color_material(name,color):
+    m=bpy.data.materials.new(name);m.use_nodes=True
+    b=m.node_tree.nodes.get('Principled BSDF');b.inputs['Base Color'].default_value=(*color,1);b.inputs['Roughness'].default_value=.83
+    return m
+prop_materials={'stone':stone,'wood':wood,'roof':roofmat,
+    'plaster':pbr('Limewashed fieldstone',pbrroot,'castle_wall_slates_albedo.jpg','castle_wall_slates_normal.jpg','castle_wall_slates_roughness.jpg'),
+    'iron':color_material('Forged iron',(.08,.095,.1)), 'dark':color_material('Recessed dark openings',(.018,.026,.025)),
+    'canvas':color_material('Weathered ochre canvas',(.4,.32,.21)), 'tent':color_material('Exile waxed canvas',(.29,.22,.17)),
+    'banner':color_material('Territory_Wind_Banner',(.27,.035,.055)), 'gold':color_material('Pale brass heraldry',(.64,.52,.28)),
+    'paper':color_material('Weathered parchment',(.67,.62,.46)), 'straw':color_material('Bound training straw',(.35,.31,.16)),
+    'ember':color_material('Warm coals and lanterns',(.9,.23,.035)),
+    'grass':color_material('Territory_Wind_Grass',(.22,.29,.12)),
+    'crow':color_material('Raven feather charcoal',(.022,.031,.037)), 'hare':color_material('Hare brindled umber',(.33,.27,.18))}
+prop_materials['ember'].node_tree.nodes.get('Principled BSDF').inputs['Emission Color'].default_value=(1,.16,.015,1)
+prop_materials['ember'].node_tree.nodes.get('Principled BSDF').inputs['Emission Strength'].default_value=.9
+
 def mesh(name,vertices,faces,material):
     data=bpy.data.meshes.new(name);data.from_pydata(vertices,[],faces);data.update()
     obj=bpy.data.objects.new(name,data);scene.collection.objects.link(obj)
@@ -53,6 +72,19 @@ g=layout['geometry'];vertices=[(g['positions'][i],g['positions'][i+2],g['positio
 for key,mat in [('groundIndices',ground),('roadIndices',road)]:
     ix=g[key];obj=mesh('Terrain' if key=='groundIndices' else 'Roads',vertices,[tuple(reversed(ix[i:i+3])) for i in range(0,len(ix),3)],mat)
     for poly in obj.data.polygons:poly.use_smooth=True
+    if key=='roadIndices':
+        # One terrain mesh, two material regions: paving inside settlements,
+        # packed earth outside. No overlays, fighting faces or painted straight strip.
+        earth=pbr('Packed woodland track',ROOT/'public/assets/world/forest_ground_04','diff.jpg')
+        nodes=earth.node_tree.nodes;links=earth.node_tree.links;bsdf=nodes.get('Principled BSDF')
+        texture=next(n for n in nodes if n.type=='TEX_IMAGE')
+        tint=nodes.new('ShaderNodeMixRGB');tint.blend_type='MULTIPLY';tint.inputs[0].default_value=1;tint.inputs[2].default_value=(1.32,1.02,.66,1)
+        links.new(texture.outputs['Color'],tint.inputs[1]);links.new(tint.outputs[0],bsdf.inputs['Base Color'])
+        obj.data.materials.append(earth)
+        for poly in obj.data.polygons:
+            x,y=poly.center.x,poly.center.y
+            paved=(abs(x+7)<35 and abs(y+5)<30) or (abs(x+108)<22 and abs(y+82)<19)
+            poly.material_index=0 if paved else 1
 
 def template(name):
     if name in templates:return templates[name]
@@ -77,6 +109,16 @@ def template(name):
     high=Vector(tuple(max(p[i] for p in points) for i in range(3)))
     parts=[]
     for o in meshes:
+        if group in ['pine_tree_01','fern_02','shrub_04']:
+            # Per-instance roots remain fixed after offline spatial batching.
+            # Only leaf/needle materials receive the native wind shader.
+            colors=o.data.color_attributes.get('Color') or o.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
+            for v in o.data.vertices:
+                height=(axis@o.matrix_world@v.co).z-low.z
+                colors.data[v.index].color=(1,1,1,max(0,min(1,height/max(.001,(high.z-low.z)*.8))))
+            for mat in o.data.materials:
+                if mat and (group!='pine_tree_01' or any(word in mat.name.lower() for word in ['needle','leav','branch','trunk_a'])):
+                    if not mat.name.startswith('Territory_Wind_'):mat.name='Territory_Wind_Foliage_'+mat.name
         parts.append((o.data,axis@o.matrix_world))
         # The original Git colormap is truncated. Keep geometry and original
         # material factors; never rewrite that source or claim its repair.
@@ -102,21 +144,13 @@ for i,p in enumerate(layout['placements']):
         for data,matrix in parts:
             obj=bpy.data.objects.new(f'{name}-{i}-mesh',data);scene.collection.objects.link(obj)
             obj.parent=pivot
-            center=Vector(((low.x+high.x)/2,(low.y+high.y)/2,low.z)) if name.startswith('castle/') else Vector((0,0,low.z if p.get('height') is not None else 0))
+            center=Vector(((low.x+high.x)/2,(low.y+high.y)/2,low.z)) if name.startswith('castle/') or p.get('centered') else Vector((0,0,low.z if p.get('height') is not None else 0))
             obj.matrix_local=Matrix.Diagonal((*scale,1))@Matrix.Translation(-center)@matrix
-    elif kind=='box':
-        bpy.ops.mesh.primitive_cube_add(size=1,location=(x,z,y));o=bpy.context.object;o.name=name
-        o.scale=(p['width'],p['depth'],p['height']);bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
-        mat=wood if any(s in name for s in ['door','sign','beam','awning','plank']) else stone
-        o.data.materials.append(mat)
-    elif kind=='cylinder':
-        bpy.ops.mesh.primitive_cylinder_add(vertices=12,radius=p['diameter']/2,depth=p['height'],location=(x,z,y));bpy.context.object.name=name;bpy.context.object.data.materials.append(stone)
-    elif kind=='roof':
-        w,d,h=p['width']/2,p['depth']/2,p['height'];v=[(-w,-d,0),(w,-d,0),(0,-d,h),(-w,d,0),(w,d,0),(0,d,h)]
-        o=mesh(name,v,[(0,1,2),(5,4,3),(0,2,5,3),(2,1,4,5)],roofmat);o.location=(x,z,y)
     elif kind=='fire':
         light=bpy.data.lights.new(name,'POINT');light.energy=180*p.get('scale',1);light.color=(1,.35,.08)
         o=bpy.data.objects.new(name,light);scene.collection.objects.link(o);o.location=(x,z,y+.5)
+    else:build_prop(p,prop_materials,mesh)
+build_wildlife(OUT/'wildlife',prop_materials)
 # Native profile showed 1295 draw calls in the starter view. Batch immutable
 # geometry by material and 16 m sector, retaining spatial culling and all lights.
 # Copy the active mesh before joining so templates shared by another sector are
@@ -143,5 +177,5 @@ blend_path=ROOT/'world-source'/'Varendor_PC_World.blend'
 blend_path.parent.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(blend_path))
 bpy.ops.export_scene.gltf(filepath=str(OUT/'world.glb'),export_format='GLB',export_animations=False,export_cameras=False,export_lights=True,export_yup=True)
-report={'placements':len(layout['placements']),'source':'existing src/main.ts buildWorld + Git model/texture files','material_fallbacks_for_known_P0_ASSET_001':sorted(set(fallback)),'objects':len(scene.objects),'objects_before_batching':original_objects,'static_batches':len(batches),'blend_bytes':blend_path.stat().st_size,'glb_bytes':(OUT/'world.glb').stat().st_size}
+report={'placements':len(layout['placements']),'source':'TZ v2.0 approved territory; src/world/territory-layout.ts + scripts/territory_art.py + licensed Git PBR foliage','territoryVersion':layout['territory']['version'],'trees':len(layout['territory']['trees']),'wildlife':['crow','hare'],'material_fallbacks_for_known_P0_ASSET_001':sorted(set(fallback)),'objects':len(scene.objects),'objects_before_batching':original_objects,'static_batches':len(batches),'blend_bytes':blend_path.stat().st_size,'glb_bytes':(OUT/'world.glb').stat().st_size}
 (OUT/'blender-build.json').write_text(json.dumps(report,indent=2)+'\n');print('VARENDOR_BLENDER_WORLD_READY '+json.dumps(report))

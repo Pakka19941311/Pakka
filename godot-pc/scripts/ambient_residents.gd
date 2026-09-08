@@ -3,15 +3,8 @@ extends RefCounted
 
 # The six residents and their authored activities from browser 1e94a0d1.
 # This is local atmosphere, never a second mover for network-owned service NPCs.
-const LOOKS: Dictionary = {"warm": Vector2(-7, -6.2), "trade": Vector2(1.1, -8.5), "work": Vector2(-16.4, -11.35), "guard": Vector2(-7, -22.2), "talk": Vector2(-7, -5)}
-const ROUTES: Array = [
-	{"name":"Поселенец", "model":"Ranger", "x":-5.2, "z":-14.1, "seed":1, "speed":1.08, "route":[{"x":-7,"z":-6.2,"activity":"warm"},{"x":1.1,"z":-8.5,"activity":"trade"},{"x":-5.2,"z":-14.1,"activity":"talk"}]},
-	{"name":"Подмастерье", "model":"Warrior", "x":-18.5, "z":-12.8, "seed":2, "speed":1.22, "route":[{"x":-17.2,"z":-11.2,"activity":"work"},{"x":-12.5,"z":-8.2,"activity":"talk"}]},
-	{"name":"Дозорный", "model":"Warrior", "x":-12.2, "z":-18.7, "seed":3, "speed":1.0, "route":[{"x":-12.2,"z":-18.7,"activity":"guard"},{"x":-1.8,"z":-18.7,"activity":"guard"}]},
-	{"name":"Жительница", "model":"Monk", "x":3.4, "z":-14.5, "seed":4, "speed":.94, "route":[{"x":1.1,"z":-8.5,"activity":"trade"},{"x":-4.2,"z":-4.6,"activity":"talk"},{"x":-7,"z":-6.2,"activity":"warm"}]},
-	{"name":"Грузчик", "model":"Rogue", "x":4.6, "z":-11.5, "seed":5, "speed":1.34, "route":[{"x":3.0,"z":-2.0,"activity":"work"},{"x":1.1,"z":-8.5,"activity":"trade"},{"x":-3.5,"z":-12.0,"activity":"talk"}]},
-	{"name":"Странник", "model":"Wizard", "x":-13.8, "z":-3.5, "seed":6, "speed":1.12, "route":[{"x":-13.8,"z":-3.5,"activity":"talk"},{"x":-7,"z":-6.2,"activity":"warm"},{"x":-7,"z":-20.2,"activity":"guard"}]},
-]
+var LOOKS: Dictionary = {}
+var ROUTES: Array = []
 
 var collision: VarendorCollision
 var residents: Array[Dictionary] = []
@@ -20,12 +13,18 @@ var clock_ms: float = 0.0
 var navigation_budget: int = 2
 var last_delta: float = 1.0 / 60.0
 
-func setup(world_collision: VarendorCollision) -> void:
+func setup(world_collision: VarendorCollision, territory: Dictionary = {}) -> void:
+	if territory.is_empty(): territory = JSON.parse_string(FileAccess.get_file_as_string("res://generated/territory.json"))
+	ROUTES = territory.residents
+	for key: String in territory.residentLooks:
+		var value: Dictionary = territory.residentLooks[key]
+		LOOKS[key] = Vector2(value.x,value.z)
 	collision = world_collision
 	residents.clear()
 	service_positions.clear()
 	clock_ms = 0
-	for point: Vector2 in [Vector2(-7,-2.6), Vector2(-17.5,-12.6), Vector2(.3,-7.8), Vector2(-7,-20)]:
+	for service: Dictionary in territory.services.values():
+		var point: Vector2 = Vector2(service.x,service.z)
 		service_positions.append(VarendorNavigation.nearest_free(collision, point, .42))
 	for definition: Dictionary in ROUTES:
 		var spawn: Vector2 = VarendorNavigation.nearest_free(collision, Vector2(definition.x, definition.z), .38)
@@ -151,3 +150,4 @@ func sample(alpha: float = 1.0) -> Array:
 		var working: bool = resident.action == "attack"
 		result.append({"id":resident.id,"name":resident.name,"model":resident.model,"kind":"ambient","generation":1,"x":position.x,"z":position.y,"yaw":lerp_angle(float(resident.previous_yaw),float(resident.yaw),clampf(alpha,0,1)),"velocityX":velocity.x,"velocityZ":velocity.y,"speed":resident.speed,"targetHeight":1.92,"alive":true,"dead":false,"grounded":true,"yOffset":0,"locomotionState":"ground","action":resident.action,"state":resident.state,"activity":resident.activity,"actionStartedAt":resident.action_started_at,"actionEndsAt":resident.work_until if working else 0,"hitAt":float(resident.action_started_at)+310 if working else 0,"combatState":"windup" if working else "idle"})
 	return result
+

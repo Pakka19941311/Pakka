@@ -1,6 +1,6 @@
 export type SurfacePoint = Readonly<{ x: number; y: number; z: number }>;
 export type RoadArea = Readonly<{ x: number; z: number; width: number; depth: number; rotation: number }>;
-export const TERRAIN_VERSION = 2;
+export const TERRAIN_VERSION = 3;
 export type TerrainPlatform = RoadArea & Readonly<{ y: number }>;
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 
@@ -21,12 +21,14 @@ export class TerrainSurface {
       const macro = Math.sin(x * 0.025) * 1.3 + Math.cos(z * 0.031) * 1.1 + Math.sin((x + z) * 0.018) * 0.8;
       const detail = (Math.sin(x * 0.31) + Math.cos(z * 0.27)) * 0.11;
       // Existing settlements need level foundations and continuous approaches.
-      const greenfall = Math.max(Math.abs(x + 7) - 19, Math.abs(z + 8.5) - 20);
+      const greenfall = Math.max(Math.abs(x + 7) - 38, Math.abs(z + 5) - 33);
       const asterhold = Math.max(Math.abs(x + 108) - 25, Math.abs(z + 82) - 24);
       const edge = clamp(Math.min(greenfall, asterhold) / 8, 0, 1);
       const blend = edge * edge * (3 - 2 * edge);
       const broadHills = Math.sin(x*.043+1.1)*Math.cos(z*.036)*1.1;
-      this.heights[row * (this.columns + 1) + col] = (macro * .9 + broadHills + detail) * blend;
+      const ridge = Math.pow(clamp((z-112)/28,0,1),2)*(15+6*Math.sin(x*.08)**2);
+      const sideBank = Math.pow(clamp((Math.abs(x)-143)/17,0,1),2)*5;
+      this.heights[row * (this.columns + 1) + col] = (macro * .9 + broadHills + detail) * blend + ridge + sideBank;
     }
   }
 

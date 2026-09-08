@@ -6,6 +6,8 @@ signal moved_to(point: Vector2)
 
 var data: Dictionary
 var terrain: Dictionary
+var territory: Dictionary
+var territory_life: VarendorTerritoryLife
 var camera: Camera3D
 var actors: Dictionary = {}
 var templates: Dictionary = {}
@@ -140,6 +142,8 @@ func setup(game: Dictionary) -> bool:
 	add_child(ambient_player)
 	ambient_player.play()
 	terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
+	territory = JSON.parse_string(FileAccess.get_file_as_string("res://generated/territory.json"))
+	VarendorNpcInteraction.SERVICES = territory.services
 	collision.setup(terrain.colliders)
 	if ResourceLoader.load_threaded_request("res://generated/world.glb") != OK:
 		return false
@@ -153,6 +157,23 @@ func setup(game: Dictionary) -> bool:
 	for mesh: Node in environment_world.find_children("*", "GeometryInstance3D", true, false):
 		if "fern" in str(mesh.name).to_lower() or "shrub" in str(mesh.name).to_lower() or "grass" in str(mesh.name).to_lower():
 			decorations.append(mesh)
+	var wind_materials: Dictionary = {}
+	for instance: Node in environment_world.find_children("*", "MeshInstance3D", true, false):
+		var geometry: MeshInstance3D = instance
+		for surface: int in geometry.mesh.get_surface_count():
+			var source: Material = geometry.get_active_material(surface)
+			if not source is StandardMaterial3D or not str(source.resource_name).begins_with("Territory_Wind_"): continue
+			var key: int = source.get_instance_id()
+			if not wind_materials.has(key):
+				var wind: ShaderMaterial = ShaderMaterial.new()
+				wind.shader = preload("res://scripts/territory_wind.gdshader")
+				wind.set_shader_parameter("base_color",source.albedo_color)
+				wind.set_shader_parameter("textured",source.albedo_texture != null)
+				if source.albedo_texture != null: wind.set_shader_parameter("albedo_map",source.albedo_texture)
+				wind.set_shader_parameter("cutout",source.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED)
+				wind.set_shader_parameter("strength",.11 if "Grass" in source.resource_name else .16 if "Banner" in source.resource_name else .12)
+				wind_materials[key] = wind
+			geometry.set_surface_override_material(surface,wind_materials[key])
 	# Blender exports photometric intensities (5087/9001 cd). Compatibility uses
 	# relative energy here; copying those values clips the whole settlement white.
 	for node: Node in environment_world.find_children("*", "OmniLight3D", true, false):
@@ -162,15 +183,21 @@ func setup(game: Dictionary) -> bool:
 		fire_light.omni_attenuation = 1.6
 	var environment: WorldEnvironment = WorldEnvironment.new()
 	var env: Environment = Environment.new()
-	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("788788")
+	env.background_mode = Environment.BG_SKY
+	var sky: Sky = Sky.new()
+	var sky_material: ShaderMaterial = ShaderMaterial.new()
+	sky_material.shader = preload("res://scripts/territory_sky.gdshader")
+	sky.sky_material = sky_material
+	sky.process_mode = Sky.PROCESS_MODE_REALTIME
+	sky.radiance_size = Sky.RADIANCE_SIZE_128
+	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("bdc9dc")
-	env.ambient_light_energy = .62
+	env.ambient_light_energy = .52
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.fog_enabled = true
 	env.fog_light_color = Color("8b9995")
-	env.fog_density = .0024
+	env.fog_density = .0013
 	environment.environment = env
 	world_environment = env
 	add_child(environment)
@@ -178,14 +205,14 @@ func setup(game: Dictionary) -> bool:
 	sun_light = sun
 	sun.rotation_degrees = Vector3(-48, -35, 0)
 	sun.light_color = Color("ffe3ba")
-	sun.light_energy = 1.65
+	sun.light_energy = 1.4
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 90
 	add_child(sun)
 	camera = Camera3D.new()
 	camera.fov = rad_to_deg(.82)
 	camera.near = .15
-	camera.far = 360
+	camera.far = 520
 	add_child(camera)
 	camera.current = true
 	add_child(camera_controller)
@@ -226,13 +253,16 @@ func setup(game: Dictionary) -> bool:
 		await get_tree().process_frame
 	# Local residents have their own 60Hz motion owner; service NPCs above keep
 	# their static positions. Install each first pose before it can be rendered.
-	ambient_residents.setup(collision)
+	ambient_residents.setup(collision,territory)
 	for resident: Dictionary in ambient_residents.sample():
 		var actor: Node3D = make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
 		initialize_pose(actor,point(resident.x,resident.z))
 		actor.rotation.y = -float(resident.yaw) + PI
 		actor.set_meta("motion",resident)
 		actor.set_meta("pickable",false)
+	territory_life = VarendorTerritoryLife.new()
+	add_child(territory_life)
+	territory_life.setup(self)
 	return true
 
 func height_at(x: float, z: float) -> float:

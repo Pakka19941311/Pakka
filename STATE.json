@@ -6,7 +6,7 @@
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/forward-stop-final-reviewed",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f",
+  "observed_head": "9fe628ab6abb71dea42c962984abd96820fc2e82",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -14,18 +14,10 @@
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
-  "current_phase": "P1",
-  "current_task": "Await owner test of first-frame stopping in released Windows build; city NPC accepted",
+  "current_phase": "P1 — world territory and map",
+  "current_task": "Implement approved world visual and territory organization, then deliver native PC test",
   "next_task_after_authorization": null,
-  "next_action": {
-    "task_id": "P1-05",
-    "substep_id": "P1-05.4",
-    "action": "Await owner stopping test of e4baa58e0239: WASD release, RMB orbit release, LMB arrival and monster approach. NPC accepted; do not begin next TZ/P1 block until owner feedback.",
-    "requires_execution_authorization": false,
-    "requires_data_access": false,
-    "requires_physical_android": false,
-    "requires_owner_pc_test": true
-  },
+  "next_action": "Build and inspect the territory candidate, publish Windows ZIP after scoped runtime gates",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -2014,10 +2006,10 @@
   "schema_version": 2,
   "documentation_review_status": "v2_0_read_in_full_execution_P0_authorized",
   "allowed_scope": [
-    "Core gameplay refactor, regression and runtime acceptance; no new content or UI redesign"
+    "Approved territory/world environment and in-game atlas from TZ v2.0; directly affected geometry, migration and route checks only"
   ],
-  "current_substep": "Forward-stop follow-up released: 108 server tests, 265 Linux graphical checks, 264 packaged Windows headless checks, 46 HTTP checks; all four live stops 0 m travel/excursion. Owner Windows gameplay/GPU test open.",
-  "working_commit": "888dd637bde85ec9c892157728de34508c8545a6",
+  "current_substep": "Territory implemented; native build pending",
+  "working_commit": "9fe628ab6abb71dea42c962984abd96820fc2e82",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -4241,7 +4233,7 @@
     "windows_executable": "passed shipped EXE and portable Node headless; Windows GPU not verified",
     "player_database_accessed": false,
     "owner_visual_acceptance": "pending new package",
-    "p1_next": "Owner reviews P1-11 samples using VIEW_WORLD_SAMPLES.bat; P1-12 requires accepted samples per TZ",
+    "p1_next": "Owner test of territory and M atlas; agree the next block before implementing it",
     "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained",
     "sample_review": "native six-asset scene passed; 18 views inspected; own Blender source/packed PBR/GLB included; owner acceptance pending",
     "session_safety": "generation invalidates old HTTP responses; per-hero command journals survive profile changes",
@@ -4456,10 +4448,10 @@
     "superseded_stopping_build": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f"
   },
   "forward_stop_followup": {
-    "owner_feedback": "NPC work correctly; forward stopping slide remains rejected",
+    "owner_feedback": "все хорошо, скольжение ушло",
     "base_release": "a5d1f39bf4d9",
     "report": "docs/migration/pc/FORWARD_STOP_FIX.md",
-    "status": "released_awaiting_owner_test",
+    "status": "owner-accepted",
     "scope": "First-frame neutral/arrival/approach stopping, sequential input transport, input chronology and prediction history; guard existing NPC service against pending WASD cancellation",
     "build_commit": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f",
     "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-e4baa58e0239/Varendor_Godot_PC_e4baa58e0239.zip",
@@ -4474,8 +4466,8 @@
     "direct_download_verified": true,
     "linux_graphical_screenshots_reviewed": true,
     "windows_gpu_verified": false,
-    "owner_test_required": true,
-    "advance_to_next_tz_block": false,
+    "owner_test_required": false,
+    "advance_to_next_tz_block": true,
     "npc_owner_accepted": true,
     "evidence": [
       "docs/migration/pc/evidence/forward-stop-0.jpg",
@@ -4488,6 +4480,29 @@
       "docs/migration/pc/evidence/forward-stop-transport-before.json",
       "docs/migration/pc/evidence/forward-stop-transport-ci.json",
       "docs/migration/pc/evidence/forward-stop-windows.json"
-    ]
-  }
+    ],
+    "owner_accepted": true
+  },
+  "territory_followup": {
+    "date": "2026-09-08",
+    "branch": "work/godot-p1-recovery",
+    "authorized_by": "На основании утверждённого визуального эталона и организации территории ТЗ делай",
+    "status": "implemented-awaiting-native-build-and-visual-review",
+    "source_document": "Varendor_Migration_TZ_v2_0(4).docx",
+    "source_sha256": "c9ef25a3219a7ca4f41acc4c448a09551957ad9d9ed7ae55709338c61606a89d",
+    "scope": [
+      "approved-territory",
+      "populated-world",
+      "in-game-atlas",
+      "coordinate-migration"
+    ],
+    "local_checks": {
+      "passed": 15,
+      "failed": 0
+    },
+    "map_version": 3,
+    "owner_visual_acceptance": false,
+    "report": "docs/migration/pc/WORLD_TERRITORY.md"
+  },
+  "owner_latest_feedback": "Остановка принята: все хорошо, скольжение ушло. Следующий разрешённый блок — мир и карта по утверждённому визуалу и организации территории ТЗ. Лишние проверки исключить; дальнейшие блоки сначала согласовать."
 }

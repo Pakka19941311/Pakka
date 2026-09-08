@@ -118,7 +118,10 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
-		call_deferred("run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+		call_deferred("run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_territory_qa() -> void:
+	await preload("res://scripts/territory_acceptance.gd").run(self)
 
 func run_stop_npc_qa() -> void:
 	await preload("res://scripts/stop_npc_acceptance.gd").run(self)
@@ -416,6 +419,10 @@ func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer
 			revert_display()
 		close_dialog())
 	active_dialog.window_input.connect(func(event: InputEvent):
+		if event is InputEventKey and event.pressed and event.physical_keycode == KEY_M and active_dialog.get_meta("territory_map",false):
+			active_dialog.set_input_as_handled()
+			close_dialog()
+			return
 		if not rebinding_action.is_empty() and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode != KEY_ESCAPE:
 			active_dialog.set_input_as_handled()
 			assign_movement_binding(event)

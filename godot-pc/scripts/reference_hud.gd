@@ -564,11 +564,18 @@ func skills_dialog() -> void:
 		box.add_child(detail)
 
 func map_dialog() -> void:
-	var box: VBoxContainer = app.dialog("Карта Варендора",Vector2i(720,570))
+	var available: Vector2 = app.get_viewport().get_visible_rect().size
+	var width: int = mini(1010,int(available.x)-64)
+	var height: int = mini(680,int(available.y)-100)
+	var box: VBoxContainer = app.dialog("Карта Варендора",Vector2i(width,height))
+	app.active_dialog.set_meta("territory_map",true)
 	var view: Control = preload("res://scripts/reference_minimap.gd").new()
+	view.name = "TerritoryAtlas"
 	view.world = app.world
 	view.show_labels = true
-	view.custom_minimum_size = Vector2(680,490)
+	view.custom_minimum_size = Vector2(width-28,height-34)
+	view.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	box.add_child(view)
 
 func item_rows(item: Dictionary) -> Array:

@@ -7,12 +7,7 @@ extends RefCounted
 signal service_opened(id: String)
 signal notice(message: String)
 
-const SERVICES: Dictionary = {
-	"npc:shop":{"name":"Торговка Эльза","model":"Ranger","x":.3,"z":-7.8,"role":"Торговля"},
-	"npc:elder":{"name":"Староста Роэн","model":"Warrior","x":-7.0,"z":-2.6,"role":"Задание"},
-	"npc:smith":{"name":"Кузнец Бран","model":"Warrior","x":-17.5,"z":-12.6,"role":"Кузница"},
-	"npc:teleport":{"name":"Проводник Каэль","model":"Wizard","x":-7.0,"z":-20.0,"role":"Переход"}
-}
+static var SERVICES: Dictionary = {}
 const RANGE: float = 3.05 # Server requires <=3.2; reserve movement/rounding margin.
 var world: VarendorWorld
 var network: VarendorNetwork

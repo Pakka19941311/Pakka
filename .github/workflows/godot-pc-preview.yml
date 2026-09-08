@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 env:
-  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-forward-stop]') && 'stop-only' || contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
+  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-world]') && 'world' || contains(github.event.head_commit.message, '[pc-forward-stop]') && 'stop-only' || contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
 
 concurrency:
   group: godot-pc-preview-${{ github.ref }}
@@ -38,7 +38,9 @@ jobs:
           npm ci
       - name: Verify changed gameplay scenarios
         run: |
-          if [ "$VARENDOR_QA_SCOPE" = stop-only ]; then
+          if [ "$VARENDOR_QA_SCOPE" = world ]; then
+            node --experimental-strip-types --test tests/territory.test.mjs
+          elif [ "$VARENDOR_QA_SCOPE" = stop-only ]; then
             node scripts/reference-gameplay-contract.mjs
             node --experimental-strip-types scripts/player-stop-contract.mjs
             node --experimental-strip-types --test tests/player-stop-boundary.test.mjs tests/player-stop-phase.test.mjs tests/reference-server.test.mjs tests/core-gameplay-server.test.mjs tests/native-recovery.test.mjs tests/control-foundation.test.mjs tests/navigation.test.mjs
@@ -65,7 +67,12 @@ jobs:
           node --experimental-strip-types scripts/godot-pc-data.mjs
           "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py
       - name: Build original P1 world samples
-        run: '"$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-samples.py'
+        run: |
+          "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-samples.py
+          mkdir -p qa-artifacts/pc-build
+          cp -r world-source/p1-samples qa-artifacts/pc-build/
+          cp godot-pc/generated/p1-samples.glb qa-artifacts/pc-build/p1-samples/
+          if [ "$VARENDOR_QA_SCOPE" = world ]; then python scripts/package-territory-source.py; fi
       - name: Import and export the native clients
         id: native_export
         run: |
@@ -77,7 +84,7 @@ jobs:
           if [ "$VARENDOR_QA_SCOPE" = stop-only ]; then
             python scripts/network-orbit-qa.py --godot "$GODOT" --output qa-artifacts/pc-linux/forward-stop-transport.json
           fi
-          "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd
+          if [ "$VARENDOR_QA_SCOPE" != world ]; then "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd; fi
           "$GODOT" --headless --path godot-pc --export-release 'Linux QA' "$PWD/qa-artifacts/pc-build/Varendor.x86_64"
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/pc-build/Varendor.exe"
           cp godot-pc/generated/blender-build.json qa-artifacts/pc-build/
@@ -86,7 +93,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical --qa-scope=${{ env.VARENDOR_QA_SCOPE }}
       - name: Verify original samples in native Godot
-        if: ${{ !cancelled() && steps.native_export.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.native_export.outcome == 'success' && env.VARENDOR_QA_SCOPE != 'world' }}
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
@@ -100,6 +107,7 @@ jobs:
             qa-artifacts/pc-build/Varendor.exe
             qa-artifacts/pc-build/blender-build.json
             qa-artifacts/pc-build/p1-samples/
+            qa-artifacts/pc-build/Varendor_World_Source.zip
             qa-artifacts/pc-linux/
           compression-level: 0
           retention-days: 14
