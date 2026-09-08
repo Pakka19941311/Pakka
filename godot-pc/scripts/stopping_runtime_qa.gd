@@ -62,6 +62,7 @@ class StopObserver extends Node:
 			frame.resize(480,320,Image.INTERPOLATE_LANCZOS)
 			frame.convert(Image.FORMAT_RGB8)
 			sheet.blit_rect(frame,Rect2i(0,0,480,320),Vector2i((index%4)*480,(index/4)*320))
+		sheet.save_jpg(directory.path_join("forward-stop-%d.jpg" % case_index),.88)
 		var encoded: String = Marshalls.raw_to_base64(sheet.save_jpg_to_buffer(.88))
 		var chunks: int = ceili(float(encoded.length())/40000)
 		for index: int in range(chunks):
@@ -86,6 +87,7 @@ static func run(app: Node) -> Dictionary:
 	var observations: Array = []
 	var input_trace: Array = []
 	var snapshot_trace: Array = []
+	var captures: Array = []
 	var observer: StopObserver = StopObserver.new()
 	observer.motor = app.world.player_motion
 	observer.world = app.world
@@ -123,6 +125,9 @@ static func run(app: Node) -> Dictionary:
 		if index == 3:
 			observer.await_arrival = true
 			observer.saw_motion = false
+			observer.samples.clear()
+			observer.frames.clear()
+			observer.frame_times.clear()
 			var goal: Vector2 = before
 			for direction_index: int in range(16):
 				var candidate: Vector2 = before+Vector2.from_angle(TAU*direction_index/16.0)*2.0
@@ -188,7 +193,10 @@ static func run(app: Node) -> Dictionary:
 		checks["live_stop_%d_no_late_rendered_slide" % index] = late_frames > 8 and late_excursion < .04 and late_travel < .08
 		checks["live_stop_%d_local_matches_server_endpoint" % index] = app.world.player_motion.position_value.distance_to(Vector2(app.net.hero.x,app.net.hero.z)) < .04
 		observations.append({"sequence":sequence,"case":"destination_arrival" if index == 3 else "orbit_and_run" if index == 2 else "run_strafe_release","queue_peak":queue_peak,"correction_at_release_m":release_correction,"motor_distance_after_release_m":observer.driven_distance,"first_tick_position_delta_m":first_tick_drift,"render_excursion_from_first_frame_m":early_excursion,"late_frames":late_frames,"late_excursion_m":late_excursion,"late_travel_m":late_travel,"capture_times_after_release":observer.frame_times.duplicate(),"samples":trace})
-		observer.save_frames(app.qa_path.get_base_dir(),index)
+		# PNG/JPEG encoding can block a software renderer for seconds. Keep
+		# raw frame references here and encode ONLY after all movement and the
+		# network session have ended; instrumentation must not create an outage.
+		captures.append({"index":index,"frames":observer.frames.duplicate()})
 	checks["live_stop_observations"] = observations
 	checks["live_stop_input_trace"] = input_trace
 	checks["live_stop_snapshot_trace"] = snapshot_trace
@@ -197,4 +205,13 @@ static func run(app: Node) -> Dictionary:
 	if observer.capture_enabled: RenderingServer.frame_post_draw.disconnect(observer.after_draw)
 	observer.queue_free()
 	orbit.queue_free()
+	app.set_meta("stopping_frame_captures",captures)
 	return checks
+
+static func save_captures(app: Node) -> void:
+	var writer: StopObserver = StopObserver.new()
+	for sequence: Dictionary in app.get_meta("stopping_frame_captures",[]):
+		writer.frames.assign(sequence.frames)
+		writer.save_frames(app.qa_path.get_base_dir(),int(sequence.index))
+	writer.free()
+	app.remove_meta("stopping_frame_captures")

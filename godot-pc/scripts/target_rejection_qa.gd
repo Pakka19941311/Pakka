@@ -3,9 +3,11 @@ extends RefCounted
 class HeldNetwork extends VarendorNetwork:
 	signal reply_ready(reply: Dictionary)
 	var requests: Array[Dictionary] = []
-	func request(_path: String, payload = null, _bearer: String = "") -> Dictionary:
-		requests.append(payload.duplicate(true))
-		return await reply_ready
+	func dispatch_input(entry: Dictionary) -> void:
+		requests.append(entry.duplicate(true))
+		if not reply_ready.is_connected(respond): reply_ready.connect(respond)
+	func respond(reply: Dictionary) -> void:
+		input_completed(requests.pop_front(),reply)
 
 static func run() -> Dictionary:
 	var checks: Dictionary = {}

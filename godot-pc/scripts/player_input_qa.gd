@@ -2,9 +2,9 @@ extends RefCounted
 
 class ImmediateNetwork extends VarendorNetwork:
 	var transmitted: Array[Dictionary] = []
-	func request(_path: String, payload = null, _bearer: String = "") -> Dictionary:
-		transmitted.append(payload.duplicate(true))
-		return {}
+	func dispatch_input(entry: Dictionary) -> void:
+		transmitted.append(entry.payload.duplicate(true))
+		input_completed(entry,{})
 
 static func run() -> Dictionary:
 	var checks: Dictionary = {}
@@ -116,6 +116,44 @@ static func run() -> Dictionary:
 	controls.handle_keyboard(forward,true)
 	controls.poll(1.0/60,true)
 	checks["reference_input_typing_focus_does_not_leak_held_wasd"] = controls.movement_axes().is_zero_approx() and world.player_motion.input_direction.is_zero_approx()
+	for fps: int in [360,600]:
+		controls.focus_changed(false)
+		controls.focus_changed(true)
+		client.transmitted.clear()
+		forward.echo = false
+		forward.pressed = true
+		controls.handle_keyboard(forward,true)
+		var prediction_matches_transmitted: bool = true
+		for frame: int in range(fps):
+			world.camera_controller.smoothed_yaw = float(frame) * .9 / fps
+			controls.poll(1.0/fps,true)
+			if not client.transmitted.is_empty():
+				var latest: Dictionary = client.transmitted[-1].intent
+				prediction_matches_transmitted = prediction_matches_transmitted and world.player_motion.input_direction.distance_to(Vector2(latest.x,latest.z)) < .00001
+		var sent_steering: int = client.transmitted.size()
+		checks["input_"+str(fps)+"fps_steering_bounded_by_60hz_motor"] = sent_steering >= 40 and sent_steering <= 61
+		checks["input_"+str(fps)+"fps_prediction_and_network_share_committed_heading"] = prediction_matches_transmitted
+		# Change axes and release again inside a fraction of one motor tick:
+		# neither event may wait behind the camera steering interval.
+		right.pressed = true
+		controls.handle_keyboard(right,true)
+		controls.poll(1.0/(fps*4),true)
+		var expected_diagonal: Vector2 = Vector2.ONE.normalized().rotated(world.camera_controller.smoothed_yaw)
+		checks["input_"+str(fps)+"fps_key_axis_edge_bypasses_steering_interval"] = client.transmitted.size() == sent_steering+1 and world.player_motion.input_direction.distance_to(expected_diagonal) < .00001
+		forward.pressed = false
+		right.pressed = false
+		controls.handle_keyboard(forward,true)
+		controls.handle_keyboard(right,true)
+		controls.poll(1.0/(fps*4),true)
+		checks["input_"+str(fps)+"fps_release_bypasses_steering_interval"] = client.transmitted.size() == sent_steering+2 and world.player_motion.input_direction == Vector2.ZERO and client.transmitted[-1].intent.x == 0 and client.transmitted[-1].intent.z == 0
+		# A complete tap between samples still cancels an autonomous route.
+		world.player_motion.submit({"type":"destination","x":5.0,"z":0.0})
+		forward.pressed = true
+		controls.handle_keyboard(forward,true)
+		forward.pressed = false
+		controls.handle_keyboard(forward,true)
+		controls.poll(1.0/(fps*4),true)
+		checks["input_"+str(fps)+"fps_short_tap_cancels_without_steering_delay"] = world.player_motion.input_mode == "idle" and world.player_motion.destination == null and client.transmitted[-1].intent.type == "cancel"
 	for action: String in saved_events:
 		InputMap.action_erase_events(action)
 		for event: InputEvent in saved_events[action]: InputMap.action_add_event(action,event)

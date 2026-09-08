@@ -111,6 +111,15 @@ jobs:
             qa-artifacts/pc-linux/
             qa-artifacts/reference-browser/
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() && env.VARENDOR_QA_SCOPE == 'stop-only' }}
+        with:
+          name: godot-pc-stop-review
+          path: |
+            qa-artifacts/pc-linux/native-runtime.json
+            qa-artifacts/pc-linux/forward-stop-*.jpg
+            qa-artifacts/pc-linux/forward-stop-transport.json
+          retention-days: 30
 
   windows-package:
     needs: native-build

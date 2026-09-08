@@ -843,7 +843,9 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	if world != null and net != null:
-		if npc_interaction.network != null: npc_interaction.poll(delta)
+		# A fresh WASD edge commits after catch-up. Do not let an NPC window
+		# open first and steal that input; its intent will cancel the approach.
+		if npc_interaction.network != null and not player_input.movement_started: npc_interaction.poll(delta)
 	if status != null and not net.connected and not net.hero.is_empty():
 		status.text = "Соединение потеряно · переподключение…"
 

@@ -51,6 +51,14 @@ try {
   let code;
   try { [code] = await once(child, 'exit'); }
   finally { clearTimeout(timeout); writeFileSync(join(output, 'native-runtime.log'), log); }
+  // Print the small diagnosis before image chunks/long traces so failed CI
+  // remains reviewable even when GitHub truncates a large assertion message.
+  if (existsSync(reportPath)) {
+    const observed = JSON.parse(readFileSync(reportPath, 'utf8'));
+    console.log('VARENDOR_STOP_SUMMARY ' + JSON.stringify({ ok: observed.ok, scope: observed.scope,
+      failed: Object.entries(observed.checks).filter(([key, value]) => value === false && key !== 'native_render').map(([key]) => key),
+      stops: observed.checks.live_stop_observations?.map(({ samples, ...summary }) => summary) }));
+  }
   for (const line of log.split('\n')) if (line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
   assert.equal(code, 0, log.split('\n').filter(line => !line.startsWith('VARENDOR_REVIEW_JPG ') && !line.startsWith('VARENDOR_CORE_JPG ')).join('\n').slice(-16000));
   assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, 'Native client runtime errors');

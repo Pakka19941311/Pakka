@@ -16,10 +16,15 @@ class OrbitDriver extends Node:
 	var ticks: int = 0
 	var released: bool = false
 	var maximum_queue: int = 0
-	var maximum_stop_ms: float = 0
+	var render_poll_count: int = 0
+	var first_render_usec: int = 0
+	var last_render_usec: int = 0
 	func _physics_process(_delta: float) -> void:
 		ticks += 1
 	func _process(delta: float) -> void:
+		render_poll_count += 1
+		last_render_usec = Time.get_ticks_usec()
+		if first_render_usec == 0: first_render_usec = last_render_usec
 		# Match main._process: sample this frame's keys after catch-up physics
 		# and before the camera/world render. Synthetic burst mode stays 60 Hz.
 		if ticks >= 120 and not released:
@@ -35,6 +40,10 @@ class OrbitDriver extends Node:
 func _initialize() -> void: call_deferred("run")
 
 func run() -> void:
+	# Headless Godot otherwise sleeps 6900 us even without low-usage mode,
+	# silently limiting an "unlimited" test to ~144 FPS. Only this QA process
+	# removes that idle sleep; explicit --max-fps and game settings are intact.
+	OS.low_processor_usage_mode_sleep_usec = 0
 	var args: Dictionary = {}
 	for arg: String in OS.get_cmdline_user_args():
 		if "=" in arg: args[arg.get_slice("=",0)] = arg.substr(arg.find("=")+1)
@@ -56,6 +65,7 @@ func run() -> void:
 	var scenario: String = args.get("--transport-probe-scenario", "orbit")
 	var maximum_queue: int = 0
 	var release_ms: float = 0
+	var render_metrics: Dictionary = {}
 	if scenario == "orbit":
 		var world: VarendorWorld = VarendorWorld.new()
 		world.collision.setup([])
@@ -79,6 +89,9 @@ func run() -> void:
 		while not driver.released: await process_frame
 		release_ms = Time.get_unix_time_from_system() * 1000.0
 		maximum_queue = driver.maximum_queue
+		var duration_ms: float = float(driver.last_render_usec-driver.first_render_usec)/1000.0
+		render_metrics = {"poll_count":driver.render_poll_count,"duration_ms":duration_ms,
+			"observed_fps":float(driver.render_poll_count-1)*1000.0/maxf(1.0,duration_ms),"requested_max_fps":Engine.max_fps}
 		driver.free()
 		world.camera_controller.free()
 		world.free()
@@ -106,7 +119,7 @@ func run() -> void:
 		release_ms = Time.get_unix_time_from_system() * 1000.0
 	while client.input_busy: await process_frame
 	if scenario == "lifecycle": await create_timer(.9).timeout
-	var report: Dictionary = {"scenario":scenario,"reserved":reserved,"maximum_queue":maximum_queue,"stop_ack_ms":Time.get_unix_time_from_system()*1000.0-release_ms,"errors":errors}
+	var report: Dictionary = {"scenario":scenario,"reserved":reserved,"maximum_queue":maximum_queue,"stop_ack_ms":Time.get_unix_time_from_system()*1000.0-release_ms,"errors":errors,"render_metrics":render_metrics}
 	client.end_session()
 	client.free()
 	print("VARENDOR_ORBIT_PROBE ",JSON.stringify(report))

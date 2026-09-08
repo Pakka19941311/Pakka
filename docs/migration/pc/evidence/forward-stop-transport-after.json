@@ -1,11 +1,11 @@
 {
   "kind": "compact_summary_of_real_godot_http_capture",
   "source_capture": "orbit-actual-after.json",
-  "source_capture_sha256": "8548dd4bafa53c83a5e4fa73bb36b1d65067b5d909ec778bff5c8aa7197b8bd0",
+  "source_capture_sha256": "69b24632091f93618f1f7e36912b4e9e56ed33cf325efdb0d1062651b7aeb9f3",
   "baseline": null,
   "candidate_status": "working_tree_not_a_verified_release",
   "ok": true,
-  "boolean_checks": 36,
+  "boolean_checks": 46,
   "runs": [
     {
       "scenario": "orbit",
@@ -22,9 +22,15 @@
       "received_count": 61,
       "missing_sequences": [],
       "maximum_pending_queue": 1,
-      "release_delivery_ms": 2.493408203125,
-      "maximum_delivery_ms": 10.0078125,
-      "main_thread_stop_callback_ms": 0.35205078125,
+      "release_delivery_ms": 2.433349609375,
+      "maximum_delivery_ms": 7.872802734375,
+      "probe_stop_ack_ms": 0.398193359375,
+      "render_metrics": {
+        "duration_ms": 2000.972,
+        "observed_fps": 29.9854270824379,
+        "poll_count": 61,
+        "requested_max_fps": 30
+      },
       "errors": []
     },
     {
@@ -38,13 +44,19 @@
         "no_growing_delivery_backlog": true,
         "real_orbit_changes_heading_through_two_seconds": true
       },
-      "submitted_count": 121,
-      "received_count": 121,
+      "submitted_count": 112,
+      "received_count": 112,
       "missing_sequences": [],
       "maximum_pending_queue": 1,
-      "release_delivery_ms": 2.98193359375,
-      "maximum_delivery_ms": 7.8427734375,
-      "main_thread_stop_callback_ms": 0.23095703125,
+      "release_delivery_ms": 2.3203125,
+      "maximum_delivery_ms": 11.96923828125,
+      "probe_stop_ack_ms": 0.715087890625,
+      "render_metrics": {
+        "duration_ms": 1997.168,
+        "observed_fps": 60.0850804739511,
+        "poll_count": 121,
+        "requested_max_fps": 60
+      },
       "errors": []
     },
     {
@@ -58,13 +70,71 @@
         "no_growing_delivery_backlog": true,
         "real_orbit_changes_heading_through_two_seconds": true
       },
-      "submitted_count": 287,
-      "received_count": 287,
+      "submitted_count": 96,
+      "received_count": 96,
       "missing_sequences": [],
-      "maximum_pending_queue": 4,
-      "release_delivery_ms": 3.68408203125,
-      "maximum_delivery_ms": 22.692626953125,
-      "main_thread_stop_callback_ms": 5.637939453125,
+      "maximum_pending_queue": 1,
+      "release_delivery_ms": 4.4677734375,
+      "maximum_delivery_ms": 10.327392578125,
+      "probe_stop_ack_ms": 6.360107421875,
+      "render_metrics": {
+        "duration_ms": 1989.185,
+        "observed_fps": 142.269321355228,
+        "poll_count": 284,
+        "requested_max_fps": 144
+      },
+      "errors": []
+    },
+    {
+      "scenario": "orbit",
+      "fps": 360,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 114,
+      "received_count": 114,
+      "missing_sequences": [],
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 5.41845703125,
+      "maximum_delivery_ms": 9.0791015625,
+      "probe_stop_ack_ms": 2.815185546875,
+      "render_metrics": {
+        "duration_ms": 1978.699,
+        "observed_fps": 321.928701636783,
+        "poll_count": 638,
+        "requested_max_fps": 360
+      },
+      "errors": []
+    },
+    {
+      "scenario": "orbit",
+      "fps": 0,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 116,
+      "received_count": 116,
+      "missing_sequences": [],
+      "maximum_pending_queue": 3,
+      "release_delivery_ms": 2.1484375,
+      "maximum_delivery_ms": 35.66796875,
+      "probe_stop_ack_ms": 5.053955078125,
+      "render_metrics": {
+        "duration_ms": 1982.83,
+        "observed_fps": 423.132593313597,
+        "poll_count": 840,
+        "requested_max_fps": 0
+      },
       "errors": []
     },
     {
@@ -82,9 +152,10 @@
       "received_count": 121,
       "missing_sequences": [],
       "maximum_pending_queue": 3,
-      "release_delivery_ms": 9.35205078125,
-      "maximum_delivery_ms": 17.245849609375,
-      "main_thread_stop_callback_ms": 32.225830078125,
+      "release_delivery_ms": 12.1923828125,
+      "maximum_delivery_ms": 14.184814453125,
+      "probe_stop_ack_ms": 32.217041015625,
+      "render_metrics": {},
       "errors": []
     },
     {
@@ -101,10 +172,11 @@
       "submitted_count": 121,
       "received_count": 121,
       "missing_sequences": [],
-      "maximum_pending_queue": 4,
-      "release_delivery_ms": 6.144287109375,
-      "maximum_delivery_ms": 12.41064453125,
-      "main_thread_stop_callback_ms": 14.4951171875,
+      "maximum_pending_queue": 3,
+      "release_delivery_ms": 6.35009765625,
+      "maximum_delivery_ms": 19.478515625,
+      "probe_stop_ack_ms": 16.415283203125,
+      "render_metrics": {},
       "errors": []
     },
     {
@@ -122,9 +194,10 @@
       "received_count": 121,
       "missing_sequences": [],
       "maximum_pending_queue": 2,
-      "release_delivery_ms": 6.246826171875,
-      "maximum_delivery_ms": 8.73291015625,
-      "main_thread_stop_callback_ms": 20.173828125,
+      "release_delivery_ms": 7.5517578125,
+      "maximum_delivery_ms": 13.21533203125,
+      "probe_stop_ack_ms": 13.120849609375,
+      "render_metrics": {},
       "errors": []
     },
     {
@@ -142,10 +215,11 @@
       "submitted_count": 2,
       "received_count": 2,
       "missing_sequences": [],
-      "maximum_pending_queue": 2,
-      "release_delivery_ms": 3.990478515625,
-      "maximum_delivery_ms": 8.87744140625,
-      "main_thread_stop_callback_ms": 930.6943359375,
+      "maximum_pending_queue": 1,
+      "release_delivery_ms": 4.559814453125,
+      "maximum_delivery_ms": 4.559814453125,
+      "probe_stop_ack_ms": 897.08203125,
+      "render_metrics": {},
       "errors": []
     }
   ]

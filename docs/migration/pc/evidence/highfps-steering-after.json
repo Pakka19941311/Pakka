@@ -1,0 +1,49 @@
+{
+  "kind": "compact_summary_of_real_high_refresh_godot_http_capture",
+  "source_capture": "orbit-unlimited-capped.json",
+  "source_capture_sha256": "9b3a841d3d5830e51226c2e42d3e59b4e2fc1dcc6d9ef2457a88a5e1e0513cd8",
+  "phase": "after",
+  "candidate_status": "working_tree_not_a_verified_release",
+  "scope": "Real PlayerInput.poll and CameraController after physics, sequential production HTTP worker. Only probe headless idle sleep set to 0; game OS settings unchanged.",
+  "difference": "60 Hz camera steering producer limit; physical key changes and neutral release remain immediate.",
+  "ok": true,
+  "boolean_checks": 10,
+  "runs": [
+    {
+      "requested_fps_cap": 360,
+      "observed_engine_fps": 348.0,
+      "submitted_count": 118,
+      "received_count": 118,
+      "all_directions_delivered_in_order": true,
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 2.1708984375,
+      "maximum_delivery_ms": 11.164306640625,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "runtime_errors": []
+    },
+    {
+      "requested_fps_cap": 0,
+      "observed_engine_fps": 375.0,
+      "submitted_count": 115,
+      "received_count": 115,
+      "all_directions_delivered_in_order": true,
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 14.28515625,
+      "maximum_delivery_ms": 14.381591796875,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "runtime_errors": []
+    }
+  ]
+}

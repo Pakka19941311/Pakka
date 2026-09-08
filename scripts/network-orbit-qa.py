@@ -33,7 +33,7 @@ def main():
             file.write(legacy)
             legacy_path = file.name
     reports = []
-    scenarios = [(scenario, fps) for scenario in ['orbit', 'physics-burst'] for fps in [30, 60, 144]]
+    scenarios = [('orbit', fps) for fps in [30, 60, 144, 360, 0]] + [('physics-burst', fps) for fps in [30, 60, 144]]
     if not args.baseline:
         scenarios.append(('lifecycle', 30))
     try:
@@ -86,7 +86,11 @@ def main():
                 'no_growing_delivery_backlog': bool(received) and max(entry['delivery_ms'] for entry in received) < 150,
             }
             if scenario == 'physics-burst': checks['all_120_physics_steering_samples_and_release'] = len(received) == 121
-            if scenario == 'orbit': checks['real_orbit_changes_heading_through_two_seconds'] = len(received) >= 40
+            if scenario == 'orbit':
+                measured = native.get('render_metrics', {})
+                checks['real_orbit_changes_heading_through_two_seconds'] = (len(received) >= 40
+                    and measured.get('duration_ms', 0) >= 1800
+                    and (fps not in [360, 0] or measured.get('observed_fps', 0) > 180))
             if scenario == 'lifecycle':
                 checks['cancel_inflight_worker_without_join_stall'] = native.get('maximum_queue', 9999) < 100
                 checks['new_generation_input_not_blocked_by_old_connection'] = [entry['generation'] for entry in received] == [1, 2]
@@ -96,7 +100,8 @@ def main():
                 row.update(stdout=result.stdout[-3000:], stderr=result.stderr[-3000:])
             reports.append(row)
             print(json.dumps({'scenario': scenario, 'fps': fps, 'checks': checks, 'commands': len(received),
-                              'release_ms': received[-1]['delivery_ms'] if received else None, 'queue': native.get('maximum_queue')}), flush=True)
+                              'release_ms': received[-1]['delivery_ms'] if received else None, 'queue': native.get('maximum_queue'),
+                              'render_metrics': native.get('render_metrics')}), flush=True)
     finally:
         if legacy_path: Path(legacy_path).unlink(missing_ok=True)
     report = {'ok': all(row['ok'] for row in reports), 'baseline': args.baseline, 'runs': reports}

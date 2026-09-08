@@ -6,10 +6,12 @@ extends RefCounted
 var world: VarendorWorld
 var network: VarendorNetwork
 var last_direction: Vector2 = Vector2.ZERO
+var last_axes: Vector2 = Vector2.ZERO
 var elapsed: float = 0.0
 var focused: bool = true
 var pressed_keys: Dictionary = {}
 var movement_started: bool = false
+const STEERING_INTERVAL: float = 1.0 / 60.0
 const MOVE_ACTIONS: Array[StringName] = ["move_left", "move_right", "move_back", "move_forward"]
 
 func setup(value: VarendorWorld, connection: VarendorNetwork) -> void:
@@ -23,16 +25,22 @@ func poll(delta: float, enabled: bool) -> void:
 		stop_manual_prediction()
 		pressed_keys.clear()
 		movement_started = false
-	var direction: Vector2 = Vector2.ZERO
-	if enabled and focused and network.connected:
-		direction = world.camera_controller.movement_direction(movement_axes())
+	var axes: Vector2 = movement_axes() if enabled and focused and network.connected else Vector2.ZERO
+	var axes_changed: bool = axes != last_axes
+	last_axes = axes
+	var direction: Vector2 = world.camera_controller.movement_direction(axes)
 	# Preserve a down/up edge delivered during one slow frame: it must cancel
 	# click-to-move/attack even when no direction remains held at the next tick.
 	if movement_started and direction.is_zero_approx():
 		network.intent({"type":"cancel"})
 	movement_started = false
 	elapsed += delta
-	if direction != last_direction or (not direction.is_zero_approx() and elapsed > .1):
+	# A high-refresh camera can change its world-space heading hundreds of
+	# times per second, although the motor integrates at 60 Hz. Commit steering
+	# at most once per motor tick to BOTH prediction and the network. Physical
+	# key edges and neutral release always bypass this interval immediately.
+	var steering_ready: bool = axes_changed or direction.is_zero_approx() or elapsed >= STEERING_INTERVAL
+	if (direction != last_direction and steering_ready) or (not direction.is_zero_approx() and elapsed > .1):
 		last_direction = direction
 		elapsed = 0
 		network.intent({"type":"direction","x":direction.x,"z":direction.y})
@@ -89,4 +97,5 @@ func focus_changed(value: bool) -> void:
 		stop_manual_prediction()
 		world.camera_controller.release_capture(false)
 		last_direction = Vector2.ZERO
+		last_axes = Vector2.ZERO
 		network.intent({"type":"direction","x":0,"z":0})

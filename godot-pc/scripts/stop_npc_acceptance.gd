@@ -50,5 +50,7 @@ static func run(app: Node) -> void:
 	app.net.set_process(false)
 	app.world.stop_audio()
 	await app.net.request("/api/disconnect",{})
+	app.net.stop_input_transport()
+	preload("res://scripts/stopping_runtime_qa.gd").save_captures(app)
 	await tree.process_frame
 	tree.quit(0 if success else 2)

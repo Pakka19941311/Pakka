@@ -1,0 +1,49 @@
+{
+  "kind": "compact_summary_of_real_high_refresh_godot_http_capture",
+  "source_capture": "orbit-unlimited-unslept.json",
+  "source_capture_sha256": "1b3dc6f9b86389c703eab3c0348343f0088039c2ebb5624e016b48e1dee16d29",
+  "phase": "before",
+  "candidate_status": "working_tree_not_a_verified_release",
+  "scope": "Real PlayerInput.poll and CameraController after physics, sequential production HTTP worker. Only probe headless idle sleep set to 0; game OS settings unchanged.",
+  "difference": "Camera steering emitted every rendered frame, after earlier transport worker fix.",
+  "ok": false,
+  "boolean_checks": 10,
+  "runs": [
+    {
+      "requested_fps_cap": 360,
+      "observed_engine_fps": 339.0,
+      "submitted_count": 650,
+      "received_count": 650,
+      "all_directions_delivered_in_order": true,
+      "maximum_pending_queue": 249,
+      "release_delivery_ms": 1225.0146484375,
+      "maximum_delivery_ms": 1225.0146484375,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": false,
+        "no_growing_delivery_backlog": false,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "runtime_errors": []
+    },
+    {
+      "requested_fps_cap": 0,
+      "observed_engine_fps": 449.0,
+      "submitted_count": 771,
+      "received_count": 771,
+      "all_directions_delivered_in_order": true,
+      "maximum_pending_queue": 412,
+      "release_delivery_ms": 2074.93994140625,
+      "maximum_delivery_ms": 2078.31201171875,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": false,
+        "no_growing_delivery_backlog": false,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "runtime_errors": []
+    }
+  ]
+}
