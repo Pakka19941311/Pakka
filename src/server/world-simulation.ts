@@ -471,6 +471,9 @@ export class WorldSimulation {
       hitAt:skill?this.state.time:this.tickDeadline(timing.windup),endsAt:this.tickDeadline(skill?180:timing.duration),skill:p.skill,monster:false,damage,critical,accuracy:p.stats.accuracy,resourcePaid:Boolean(skill)};
     this.state.pending.push(attack);this.motor(p).stopPlanar();this.action(p,'attack',attack.endsAt);p.combatState='windup';p.hitAt=attack.hitAt;
     this.event('attack',p.id,target.uid,{skill:p.skill,generation:target.generation,impactAt:attack.hitAt,endsAt:attack.endsAt,actorGeneration:p.generation});p.skill=null;p.singleAttack=false;
+    // Ready skills release on this input boundary. A second skill received
+    // before the next physics tick must not consume the first without firing.
+    if(skill&&this.validAttack(attack)){attack.released=true;this.resolveAttack(attack);}
   }
   private validAttack(a:PendingAttack):boolean {
     if(a.summon){const s=this.state.summons.find(s=>s.uid===a.actor),p=this.state.characters[a.owner??''];return Boolean(s&&s.expiresAt>this.state.time&&p&&!p.dead&&p.activeUntil>this.state.time&&p.generation===a.actorGeneration&&this.state.monsters.some(m=>m.uid===a.target&&m.alive&&m.generation===a.generation));}

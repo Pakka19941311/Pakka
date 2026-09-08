@@ -34,6 +34,7 @@ func configure_startup(value: Node) -> void:
 	for key: String in ["display","resolution","ui_scale"]:
 		if not startup_display.has(key): startup_display[key] = 1
 	app.game_settings = startup_display.duplicate()
+	app.get_window().content_scale_factor = [.8,1.0,1.25,1.5][clampi(int(startup_display.ui_scale),0,3)]
 	apply_display()
 
 func apply_display() -> void:
