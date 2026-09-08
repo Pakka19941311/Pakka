@@ -1,0 +1,57 @@
+{
+  "run": "https://github.com/Pakka19941311/Pakka/actions/runs/34252751232",
+  "bytes": 37405,
+  "checks": {
+    "native_search_candidate_burst_latest_and_ordered_events": true,
+    "native_search_candidate_fragment_1": true,
+    "native_search_candidate_fragment_1024": true,
+    "native_search_candidate_fragment_16384": true,
+    "native_search_candidate_fragment_2": true,
+    "native_search_candidate_fragment_3": true,
+    "native_search_candidate_fragment_31": true,
+    "native_search_candidate_fragment_37404": true,
+    "native_search_candidate_fragment_37405": true,
+    "native_search_candidate_fragment_7": true,
+    "native_search_candidate_split_blank_line": true,
+    "released_byte_loop_burst_latest_and_ordered_events": true,
+    "released_byte_loop_fragment_1": true,
+    "released_byte_loop_fragment_1024": true,
+    "released_byte_loop_fragment_16384": true,
+    "released_byte_loop_fragment_2": true,
+    "released_byte_loop_fragment_3": true,
+    "released_byte_loop_fragment_31": true,
+    "released_byte_loop_fragment_37404": true,
+    "released_byte_loop_fragment_37405": true,
+    "released_byte_loop_fragment_7": true,
+    "released_byte_loop_split_blank_line": true
+  },
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "godot": "4.6.3-stable (official)",
+  "ok": true,
+  "timings_ms": {
+    "native_search_candidate_1_packets": {
+      "max": 1.588,
+      "mean": 1.43379166666667,
+      "p50": 1.425,
+      "p95": 1.491
+    },
+    "native_search_candidate_4_packets": {
+      "max": 6.575,
+      "mean": 5.08911666666666,
+      "p50": 5.065,
+      "p95": 5.198
+    },
+    "released_byte_loop_1_packets": {
+      "max": 4.71,
+      "mean": 4.00200833333333,
+      "p50": 3.987,
+      "p95": 4.113
+    },
+    "released_byte_loop_4_packets": {
+      "max": 18.861,
+      "mean": 15.7716333333333,
+      "p50": 15.703,
+      "p95": 16.248
+    }
+  }
+}

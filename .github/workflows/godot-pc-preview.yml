@@ -6,9 +6,10 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 env:
-  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-polish]') && 'polish' || contains(github.event.head_commit.message, '[pc-world]') && 'world' || contains(github.event.head_commit.message, '[pc-forward-stop]') && 'stop-only' || contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
+  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-pacing]') && 'pacing' || contains(github.event.head_commit.message, '[pc-polish]') && 'polish' || contains(github.event.head_commit.message, '[pc-world]') && 'world' || contains(github.event.head_commit.message, '[pc-forward-stop]') && 'stop-only' || contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
 
 concurrency:
   group: godot-pc-preview-${{ github.ref }}
@@ -38,7 +39,9 @@ jobs:
           npm ci
       - name: Verify changed gameplay scenarios
         run: |
-          if [ "$VARENDOR_QA_SCOPE" = polish ]; then
+          if [ "$VARENDOR_QA_SCOPE" = pacing ]; then
+            node --experimental-strip-types --test tests/player-stop-phase.test.mjs
+          elif [ "$VARENDOR_QA_SCOPE" = polish ]; then
             node --experimental-strip-types --test tests/polish-server.test.mjs
           elif [ "$VARENDOR_QA_SCOPE" = world ]; then
             node --experimental-strip-types --test tests/territory.test.mjs
@@ -65,7 +68,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           node scripts/reference-browser-capture.mjs --root "$RUNNER_TEMP/reference-dist" --output qa-artifacts/reference-browser --source-mode rebuilt
       - name: Import changed scripts before world assembly
-        if: ${{ env.VARENDOR_QA_SCOPE == 'polish' }}
+        if: ${{ (env.VARENDOR_QA_SCOPE == 'polish' || env.VARENDOR_QA_SCOPE == 'pacing') }}
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs
           "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee "$RUNNER_TEMP/early-godot-import.log"
@@ -112,16 +115,28 @@ jobs:
           if [ "$VARENDOR_QA_SCOPE" = stop-only ]; then
             python scripts/network-orbit-qa.py --godot "$GODOT" --output qa-artifacts/pc-linux/forward-stop-transport.json
           fi
-          if [ "$VARENDOR_QA_SCOPE" != world ] && [ "$VARENDOR_QA_SCOPE" != polish ]; then "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd; fi
+          if [ "$VARENDOR_QA_SCOPE" != world ] && [ "$VARENDOR_QA_SCOPE" != polish ] && [ "$VARENDOR_QA_SCOPE" != pacing ]; then "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd; fi
           "$GODOT" --headless --path godot-pc --export-release 'Linux QA' "$PWD/qa-artifacts/pc-build/Varendor.x86_64"
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/pc-build/Varendor.exe"
           cp godot-pc/generated/blender-build.json qa-artifacts/pc-build/
+      - name: Require objective paired pacing improvement before release
+        if: ${{ env.VARENDOR_QA_SCOPE == 'pacing' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          probe=$(gh run list --workflow p0-frame-pacing.yml --commit "$GITHUB_SHA" --json databaseId --jq '.[0].databaseId')
+          test -n "$probe"
+          gh run watch "$probe" --exit-status --interval 10
+          gh run download "$probe" --name p0-frame-pacing-evidence --dir qa-artifacts/pacing
+          node scripts/pacing/compare.mjs qa-artifacts/pacing
+          mkdir -p qa-artifacts/pc-linux
+          cp qa-artifacts/pacing/comparison.json qa-artifacts/pc-linux/pacing-comparison.json
       - name: Exercise native Godot graphics and the save adapter
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical --qa-scope=${{ env.VARENDOR_QA_SCOPE }}
       - name: Verify original samples in native Godot
-        if: ${{ !cancelled() && steps.native_export.outcome == 'success' && env.VARENDOR_QA_SCOPE != 'world' && env.VARENDOR_QA_SCOPE != 'polish' }}
+        if: ${{ !cancelled() && steps.native_export.outcome == 'success' && env.VARENDOR_QA_SCOPE != 'world' && env.VARENDOR_QA_SCOPE != 'polish' && env.VARENDOR_QA_SCOPE != 'pacing' }}
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |

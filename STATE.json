@@ -2,7 +2,7 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-08",
-  "state_kind": "p0_frame_pacing_diagnosis_authorized",
+  "state_kind": "p0_frame_pacing_fix_under_measurement",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-p1-recovery",
   "tracked_branch": "work/godot-p1-recovery",
@@ -15,9 +15,9 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать.",
   "current_phase": "P0 — camera/frame pacing bugfix",
-  "current_task": "Measure the released rain scene, establish root cause, then make a scoped correction and Windows build",
+  "current_task": "Pair released and optimized CPU frame pacing, run affected native regression, publish Windows test ZIP",
   "next_task_after_authorization": null,
-  "next_action": "Capture baseline and isolation evidence before choosing a fix; do not modify accepted gameplay or visuals",
+  "next_action": "Require paired frame p95 improvement; build/push authorized; owner Windows GPU acceptance remains open",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -4627,6 +4627,9 @@
     "released_source": "f67687909a95bfbef540c49361f518fd830900b5",
     "report": "docs/migration/pc/P0_FRAME_PACING.md",
     "owner_authorized_fix_push_build": true,
-    "target_windows_gpu_measured": false
+    "target_windows_gpu_measured": false,
+    "diagnostic_cpu_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34252751232",
+    "paired_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34253181867",
+    "correction": "Native SSE delimiter search; retain final quick-slot textures. No movement/camera/weather/quality change."
   }
 }

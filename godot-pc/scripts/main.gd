@@ -116,6 +116,12 @@ func _ready() -> void:
 		refresh_inventory())
 	world.moved_to.connect(func(point: Vector2): net.intent({"type":"destination","x":point.x,"z":point.y}))
 	login.show()
+	for option: String in OS.get_cmdline_user_args():
+		if option.begins_with("--frame-pacing-dir="):
+			var recorder = preload("res://scripts/frame_pacing_recorder.gd").new()
+			recorder.name = "FramePacingRecorder"; recorder.app = self
+			recorder.directory = option.trim_prefix("--frame-pacing-dir=")
+			add_child(recorder)
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--qa="):
 			qa_path = arg.trim_prefix("--qa=")
@@ -124,7 +130,10 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
-		call_deferred("run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+		call_deferred("run_pacing_qa" if "--qa-scope=pacing" in OS.get_cmdline_user_args() else "run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_pacing_qa() -> void:
+	await preload("res://scripts/pacing_acceptance.gd").run(self)
 
 func run_polish_qa() -> void:
 	await preload("res://scripts/polish_acceptance.gd").run(self)
@@ -876,6 +885,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_ESCAPE: player_input.autorun = false
 		if event.physical_keycode == KEY_F3:
+			var recorder: Node = get_node_or_null("FramePacingRecorder")
+			if recorder != null: recorder.start_recording()
 			diagnostics.visible = not diagnostics.visible
 			return
 		if event.physical_keycode == KEY_ESCAPE:

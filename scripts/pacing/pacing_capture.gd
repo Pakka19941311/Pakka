@@ -54,7 +54,7 @@ static func run(app: Node) -> void:
 	var report: Dictionary = {"source":argument("--pacing-source"),"baseline_source":"629cdef571c81473725acc88afe59385e2fcd518","godot":Engine.get_version_info().string,"display":DisplayServer.get_name(),"renderer":RenderingServer.get_current_rendering_method(),"adapter":RenderingServer.get_video_adapter_name(),"cpu":OS.get_processor_name(),"logical_cores":OS.get_processor_count(),"physics_ticks_per_second":Engine.physics_ticks_per_second,"physics_interpolation_enabled":tree.physics_interpolation,"manual_player_interpolation":true,"max_physics_steps_per_frame":Engine.max_physics_steps_per_frame,"low_processor_mode":OS.low_processor_usage_mode,"initial_max_fps":Engine.max_fps,"vsync":DisplayServer.window_get_vsync_mode() if graph else -1,"refresh_hz":DisplayServer.screen_get_refresh_rate() if graph else -1,"scenarios":[],"target_windows_gpu_measured":false,"fixture":"Ranger level 4 with haste, rain; blood-alpha-den / bloodwing-ridge from owner video. Isolated SQLite; explicit deterministic reset/ablation only."}
 	var cases: Array = [
 		{"name":"idle_rain","seconds":5.0},
-		{"name":"run_rain","move":true,"seconds":30.0},
+		{"name":"run_rain","move":true,"seconds":23.0},
 		{"name":"orbit_rain","orbit":true,"seconds":7.0},
 		{"name":"run_orbit_rain","move":true,"orbit":true,"seconds":10.0},
 		{"name":"pursuit_rain","pursuit":true,"seconds":9.0},
@@ -72,7 +72,7 @@ static func run(app: Node) -> void:
 		{"name":"run_4k_rain_off_diagnostic","move":true,"fourk":true,"rain_off":true,"seconds":6.0},
 	]
 	if not graph:
-		cases = [{"name":"run_30hz","move":true,"cap":30,"seconds":8.0},{"name":"run_60hz","move":true,"cap":60,"seconds":30.0},{"name":"run_120hz","move":true,"cap":120,"seconds":12.0},{"name":"orbit_120hz","orbit":true,"cap":120,"seconds":3.0}]
+		cases = [{"name":"run_30hz","move":true,"cap":30,"seconds":8.0},{"name":"run_60hz","move":true,"cap":60,"seconds":23.0},{"name":"run_120hz","move":true,"cap":120,"seconds":12.0},{"name":"orbit_120hz","orbit":true,"cap":120,"seconds":3.0}]
 	if graph:
 		var fourk: bool = argument("--pacing-resolution") == "3838x2158"
 		cases = cases.filter(func(spec: Dictionary): return bool(spec.get("fourk",false)) == fourk)
@@ -87,9 +87,9 @@ static func run(app: Node) -> void:
 		app.player_input.autorun = false
 		camera.release_capture(false)
 		app.net.intent({"type":"cancel"})
-		var reset: Dictionary = await request(app,Vector2(88,70))
+		var reset: Dictionary = await request(app,Vector2(95,85))
 		app.net.accept(reset.snapshot)
-		camera.yaw = 0.0
+		camera.yaw = 1.954203673205095
 		camera.pitch = camera.DEFAULT_PITCH
 		camera.distance = 18.0
 		camera.reset_follow()
@@ -183,6 +183,7 @@ static func run(app: Node) -> void:
 		if graph and spec.name in ["idle_rain","run_4k_rain"]:
 			await RenderingServer.frame_post_draw
 			var picture: Image = viewport.get_texture().get_image()
+			summary["rendered_image_pixels"] = [picture.get_width(),picture.get_height()]
 			picture.save_png(output.path_join(str(spec.name)+".png"))
 		if spec.get("hud_off",false): world.snapshot_presented.connect(hud_listener)
 		weather.sky_material.shader = original_sky

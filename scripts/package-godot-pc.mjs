@@ -29,6 +29,7 @@ export async function packageNative({ root, output, binary, nodeArchive }) {
   cpSync(join(root, 'public/assets/models/monsters-glb/licenses'), join(destination, 'licenses/monsters'), {recursive:true});
   cpSync(join(root, 'qa-artifacts/pc-linux/godot-license.txt'), join(destination, 'licenses/Godot.txt'));
   cpSync(join(root, 'packaging/windows/RUN_VARENDOR_PC.bat'), join(destination, 'RUN_VARENDOR.bat'));
+  cpSync(join(root, 'packaging/windows/TEST_FRAME_PACING.bat'), join(destination, 'TEST_FRAME_PACING.bat'));
   cpSync(join(root, 'packaging/windows/VIEW_WORLD_SAMPLES.bat'), join(destination, 'VIEW_WORLD_SAMPLES.bat'));
   cpSync(join(root, 'qa-artifacts/pc-build/p1-samples'), join(destination, 'world-sources/P1'), {recursive:true});
   cpSync(join(root, 'packaging/windows/README_GODOT_PC_RU.txt'), join(destination, 'README_RU.txt'));
@@ -59,3 +60,4 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   if (!binary || !output) throw Error('Usage: node scripts/package-godot-pc.mjs WINDOWS_EXE OUTPUT_DIR [NODE_ZIP]');
   console.log(JSON.stringify(await packageNative({ root: process.cwd(), output: resolve(output), binary: resolve(binary), nodeArchive })));
 }
+
