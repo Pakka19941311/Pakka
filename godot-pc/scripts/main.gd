@@ -328,6 +328,7 @@ func refresh_quick() -> void:
 		var title: String = action_name(action)
 		var artwork_id: String = action if data.items.has(action) else str(data.classes[hero.get("classId", "knight")].weapon)
 		slot.artwork = load("res://assets/icons/" + artwork_id + ".svg") if not action.is_empty() else null
+		if data.items.has(action): slot.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind({"id":action},data.items[action]))
 		slot.remaining = 0
 		slot.quantity = 0
 		slot.usable = not net.hero.get("dead", false)
@@ -779,7 +780,7 @@ func drop_item(source: Dictionary, destination: Dictionary) -> void:
 		net.command({"type":"storage","direction":"reorder" if source.kind == "storage" else "deposit","item":source.item.duplicate(),"index":int(destination.index)})
 		return
 	if source.kind == "storage":
-		net.command({"type":"storage","direction":"withdraw","item":source.item.duplicate()})
+		net.command({"type":"storage","direction":"withdraw","item":source.item.duplicate(),"index":int(destination.index)})
 		return
 	if source.kind == "equipment" and destination.kind == "equipment": return
 	if destination.kind == "equipment":

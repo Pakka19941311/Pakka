@@ -267,7 +267,8 @@ export class WorldSimulation {
         while(p.storage.length<=target)p.storage.push(null);p.storage[target]=p.inventory.splice(source,1)[0];
       }else if(command.direction==='withdraw'){
         const source=p.storage.findIndex(matches);if(source<0)throw Error('stale-item');if(p.inventory.length>=42)throw Error('bag-full');
-        p.inventory.push(p.storage[source]!);p.storage[source]=null;
+        if(command.index!==undefined&&command.index>=42)throw Error('invalid-storage-slot');
+        p.inventory.splice(Math.min(command.index??p.inventory.length,p.inventory.length),0,p.storage[source]!);p.storage[source]=null;
       }else if(command.direction==='reorder'){
         const source=p.storage.findIndex(matches);if(source<0)throw Error('stale-item');if(command.index===undefined)throw Error('invalid-storage-slot');
         while(p.storage.length<=command.index)p.storage.push(null);[p.storage[source],p.storage[command.index]]=[p.storage[command.index],p.storage[source]];

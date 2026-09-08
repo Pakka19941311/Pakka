@@ -45,7 +45,7 @@ static func run(app: Node) -> void:
 	var reserved: Array = []
 	var listener: Callable = func(value: Dictionary,_sequence: int): reserved.append(value.duplicate(true))
 	app.net.intent_reserved.connect(listener)
-	app.world.target_id = str(app.world.current_snapshot.monsters[0].uid)
+	app.world.target_id = str(app.world.current_snapshot.monsters.filter(func(m): return m.alive and app.world.actors.has(str(m.uid)))[0].uid)
 	app.player_input.left_down = true
 	app.player_input.mouse(mouse(MOUSE_BUTTON_RIGHT,true,Vector2(-10000,-10000)))
 	app.player_input.release_buttons(mouse(MOUSE_BUTTON_LEFT,false,Vector2.ZERO))
@@ -107,9 +107,9 @@ static func run(app: Node) -> void:
 	# and sky shader. World cycle/spawn/loot assertions use server time tests.
 	app.world.set_process(false)
 	var camera: Camera3D = app.world.camera
-	camera.position = app.world.point(18,-10,4.2)
-	camera.look_at(app.world.point(-20,2,8))
-	app.world.weather.qa_override = {"hour":12,"daylight":1,"night":false,"weather":"sun","clouds":.2,"fullMoon":false}
+	camera.position = app.world.point(-12,-12,3.4)
+	camera.look_at(app.world.point(70,28,38))
+	app.world.weather.qa_override = {"hour":8,"daylight":1,"night":false,"weather":"sun","clouds":.2,"fullMoon":false}
 	app.world.weather.daylight = 1
 	await tree.create_timer(.3).timeout
 	checks["sky_shader_active"] = app.world.world_environment.sky.sky_material==app.world.weather.sky_material
@@ -118,7 +118,9 @@ static func run(app: Node) -> void:
 	await tree.create_timer(1).timeout
 	checks["day_rain_emitting"] = app.world.weather.rain.emitting
 	await Shots.capture(app,"polish-rain")
-	app.world.weather.qa_override = {"hour":0,"daylight":0,"night":true,"weather":"clouds","clouds":.2,"fullMoon":true}
+	app.world.weather.qa_override = {"hour":20,"daylight":0,"night":true,"weather":"clouds","clouds":.2,"fullMoon":true}
+	camera.position = app.world.point(-12,-22,3.4)
+	camera.look_at(app.world.point(70,-62,38))
 	app.world.weather.daylight = 0
 	await tree.create_timer(.3).timeout
 	checks["moon_night_light"] = app.world.weather.current.fullMoon and app.world.sun_light.light_energy<.4 and not app.world.weather.rain.emitting

@@ -38,7 +38,7 @@ func configure_startup(value: Node) -> void:
 
 func apply_display() -> void:
 	if DisplayServer.get_name() == "headless": return
-	if OS.get_cmdline_user_args().any(func(v: String): return v.begins_with("--qa=")): return
+	if Array(OS.get_cmdline_user_args()).any(func(v: String): return v.begins_with("--qa=")): return
 	var mode: int = clampi(int(app.game_settings.get("display",1)),0,2)
 	var signature: String = str(mode)+":"+str(app.game_settings.get("resolution",1))
 	if applied_display == signature: return
