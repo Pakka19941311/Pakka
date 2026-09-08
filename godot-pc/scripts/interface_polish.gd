@@ -22,6 +22,7 @@ var chat_tabs: Array = []
 var chat_opacity: HSlider
 var chat_resize: Control
 var chat_send: Button
+var chat_lock: Button
 var elapsed: float = 0.0
 var dragging_quick: bool = false
 var drag_cancelled: bool = false
@@ -75,10 +76,12 @@ func load_layout() -> void:
 	for key: String in ["chat","dock"]:
 		var node: Control = chat_box if key == "chat" else app.reference_hud.dock
 		var state: Dictionary = layout_data.get(key,{})
-		if state.get("size") is Array and key == "chat": node.size = Vector2(state.size[0],state.size[1]).max(Vector2(290,190))
+		if state.get("size") is Array and key == "chat": node.size = Vector2(state.size[0],state.size[1]).max(Vector2(330,190))
 		if state.get("position") is Array: node.position = Vector2(state.position[0],state.position[1])
 		clamp_panel(node)
 	chat_opacity.value = float(layout_data.get("chat",{}).get("opacity",.9))
+	chat_lock.button_pressed = bool(layout_data.get("chat",{}).get("locked",false))
+	app.reference_hud.edit_toggle.text = "Закреплено" if bool(layout_data.get("dock",{}).get("locked",false)) else "Свободно"
 	arrange_chat()
 	app.reference_hud.layout()
 
@@ -265,8 +268,9 @@ func configure_chat() -> void:
 	chat_box.size = Vector2(330,215)
 	var head: Label = app.reference_hud.text(chat_box,"Чат",Vector2(8,2),Vector2(210,22),12)
 	make_draggable(head,chat_box,"chat")
-	app.reference_hud.small_button(chat_box,"Фикс.",Vector2(270,2),Vector2(51,21),func():
+	chat_lock = app.reference_hud.small_button(chat_box,"Фикс.",Vector2(270,2),Vector2(51,21),func():
 		var state: Dictionary = layout_data.get("chat",{}); state.locked = not bool(state.get("locked",false)); layout_data.chat = state; save_layout())
+	chat_lock.toggle_mode = true
 	for index: int in range(3):
 		var channel: String = ["world","trade","system"][index]
 		var button: Button = app.reference_hud.small_button(chat_box,["Мир","Торговля","Система"][index],Vector2(8+index*100,28),Vector2(96,22),func(): chat_channel = channel; render_chat(true))
@@ -287,7 +291,7 @@ func configure_chat() -> void:
 			dragging.active = event.pressed and not bool(layout_data.get("chat",{}).get("locked",false))
 			if not event.pressed: save_layout()
 		elif event is InputEventMouseMotion and dragging.active:
-			chat_box.size = (app.ui.get_global_mouse_position()-chat_box.position).clamp(Vector2(290,190),Vector2(700,500).min(app.ui.size-chat_box.position-Vector2(8,8)))
+			chat_box.size = (app.ui.get_global_mouse_position()-chat_box.position).clamp(Vector2(330,190),Vector2(700,500).min(app.ui.size-chat_box.position-Vector2(8,8)))
 			var state: Dictionary = layout_data.get("chat",{}); state.size = [chat_box.size.x,chat_box.size.y]; layout_data.chat = state; arrange_chat())
 	arrange_chat()
 
@@ -332,5 +336,6 @@ func process(delta: float) -> void:
 	if elapsed > .25:
 		elapsed = 0
 		app.quick_panel_node.visible = bool(app.game_settings.get("quick_visible",true))
+		app.reference_hud.dock.get_node("QuickConsumables").visible = app.quick_panel_node.visible
 		if is_instance_valid(atlas): clamp_panel(atlas)
 		if is_instance_valid(storage_panel): clamp_panel(storage_panel)
