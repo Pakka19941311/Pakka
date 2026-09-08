@@ -2,6 +2,7 @@
 import hashlib
 import json
 import os
+import sys
 from pathlib import Path
 import tarfile
 import urllib.request
@@ -13,6 +14,7 @@ destination = Path(os.environ.get('RUNNER_TEMP', '/tmp'))/'varendor-pc-tools'
 destination.mkdir(parents=True, exist_ok=True)
 paths = {}
 for kind, extension in [('godot', 'zip'), ('export_templates', 'tpz'), ('blender', 'tar.xz')]:
+    if '--runtime-only' in sys.argv and kind != 'godot': continue
     pin = pins[kind]
     # Official GitHub release assets have the same recorded bytes/digests.
     official = {
@@ -45,3 +47,4 @@ for key, value in paths.items(): print(key+'='+value)
 if os.environ.get('GITHUB_ENV'):
     with open(os.environ['GITHUB_ENV'], 'a') as file:
         for key, value in paths.items(): file.write(key+'='+value+'\n')
+

@@ -4,11 +4,11 @@ on:
     branches: [work/godot-p1-recovery]
 permissions:
   contents: read
-concurrency:
-  group: p0-frame-pacing-${{ github.ref }}
-  cancel-in-progress: true
 jobs:
   measure:
+    concurrency:
+      group: p0-frame-pacing-${{ github.ref }}
+      cancel-in-progress: true
     if: ${{ contains(github.event.head_commit.message, '[pacing-probe]') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
