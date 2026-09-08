@@ -12,6 +12,10 @@ window/size/window_width_override=1440
 window/size/window_height_override=810
 window/stretch/mode="canvas_items"
 
+[physics]
+common/physics_ticks_per_second=60
+common/max_physics_steps_per_frame=30
+
 [rendering]
 renderer/rendering_method="gl_compatibility"
 environment/defaults/default_clear_color=Color(0.16, 0.22, 0.26, 1)

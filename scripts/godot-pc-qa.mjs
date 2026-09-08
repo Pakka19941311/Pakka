@@ -49,7 +49,7 @@ try {
   let code;
   try { [code] = await once(child, 'exit'); }
   finally { clearTimeout(timeout); writeFileSync(join(output, 'native-runtime.log'), log); }
-  for (const line of log.split('\n')) if (line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ')) console.log(line);
+  for (const line of log.split('\n')) if (line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
   assert.equal(code, 0, log.split('\n').filter(line => !line.startsWith('VARENDOR_REVIEW_JPG ') && !line.startsWith('VARENDOR_CORE_JPG ')).join('\n').slice(-16000));
   assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, 'Native client runtime errors');
   const native = JSON.parse(readFileSync(reportPath, 'utf8'));

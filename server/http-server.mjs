@@ -19,14 +19,14 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
     try{
       world.advance(now());
       for(const [id,connections] of streams)if(connections.size)world.heartbeat(id);
-      if(now()-broadcastAt>=100){
+      if(now()-broadcastAt>=1000/30){
         broadcastAt=now();
         for(const [id,connections] of streams)for(const connection of connections){
           connection.stream.flush(after=>world.snapshot(id,after),world.state.sequence,world.state.time);
         }
       }
     }catch(error){fatal=error;clearInterval(clock);for(const connections of streams.values())for(const connection of connections)connection.response.destroy();console.error('World persistence failed; mutations stopped:',error.message);}
-  },50);
+  },1000/60);
   const rates=new Map();
   const server=createServer(async(req,res)=>{
     res.setHeader('Cache-Control','no-store');

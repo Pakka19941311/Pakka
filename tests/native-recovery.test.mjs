@@ -21,8 +21,14 @@ function fixture(t, classId='knight', monsterId='wolf', actualMap=false) {
   const m=world.state.monsters.find(m=>m.id===monsterId);
   Object.assign(m,{x:30,z:30,home:{x:30,z:30},hp:MONSTERS[monsterId].hp});
   m.status.stun=100000;world.state.monsters=[m];
-  const advance=(ms)=>{for(let left=ms;left>0;left-=50){world.heartbeat(p.id);world.advance(world.state.time+Math.min(left,50));}};
-  return {world,p,m,advance,collision:topology.collision};
+  const observedEvents=[];let seenSequence=0;
+  const advance=(ms)=>{for(let left=ms;left>0;left-=50){
+    world.heartbeat(p.id);world.advance(world.state.time+Math.min(left,50));
+    // Observe the live stream as a client does. A deterministic DOT roll can
+    // legitimately evict an early release from the bounded server event ring.
+    for(const event of world.events)if(event.sequence>seenSequence){observedEvents.push(event);seenSequence=event.sequence;}
+  }};
+  return {world,p,m,advance,observedEvents,collision:topology.collision};
 }
 
 for(const classId of Object.keys(CLASSES))for(const monsterId of ['wolf','mini']) {
@@ -36,12 +42,12 @@ for(const classId of Object.keys(CLASSES))for(const monsterId of ['wolf','mini']
 
 for(const classId of Object.keys(CLASSES))for(let index=0;index<4;index++) {
   test(`${classId} skill ${index}: authoritative cost, cooldown and visible event`,t=>{
-    const {world,p,m,advance}=fixture(t,classId,'mini');
+    const {world,p,m,advance,observedEvents}=fixture(t,classId,'mini');
     const skill=CLASSES[classId].skills[index];
     const self=Boolean(skill.buff||skill.summon);
     world.input(p.id,1,{type:'attack',entityId:self?'@self':m.uid,skill:index});advance(6000);
     assert.ok(p.cooldowns[index]>1000, 'server accepted the skill');
-    assert.ok(world.events.some(e=>e.actor===p.id&&(self?['buff','summon'].includes(e.kind):e.kind==='release'&&e.skill===index)));
+    assert.ok(observedEvents.some(e=>e.actor===p.id&&(self?['buff','summon'].includes(e.kind):e.kind==='release'&&e.skill===index)));
   });
 }
 

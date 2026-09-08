@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24.20.0
@@ -32,7 +34,19 @@ jobs:
           python scripts/godot-pc-toolchain.py
           npm ci
       - name: Verify changed gameplay scenarios
-        run: node --experimental-strip-types --test tests/core-gameplay-server.test.mjs tests/combat-feedback.test.mjs tests/combat-obstruction.test.mjs tests/native-recovery.test.mjs tests/monster-ai.test.mjs tests/control-foundation.test.mjs
+        run: |
+          node scripts/reference-gameplay-contract.mjs
+          node --experimental-strip-types --test tests/reference-server.test.mjs tests/core-gameplay-server.test.mjs tests/combat-feedback.test.mjs tests/combat-obstruction.test.mjs tests/native-recovery.test.mjs tests/monster-ai.test.mjs tests/control-foundation.test.mjs tests/server-combat-parity.test.mjs tests/persistent-world.test.mjs tests/navigation.test.mjs
+      - name: Capture the approved browser reference from its exact source commit
+        run: |
+          npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
+          npx playwright install --with-deps chromium
+          git worktree add --detach "$RUNNER_TEMP/reference-source" 1e94a0d1ad08a4df8959527e40058f5c89b07e9a
+          ln -s "$GITHUB_WORKSPACE/node_modules" "$RUNNER_TEMP/reference-source/node_modules"
+          cd "$RUNNER_TEMP/reference-source"
+          VARENDOR_QA=0 VARENDOR_BETA=1 "$GITHUB_WORKSPACE/node_modules/.bin/vite" build --outDir "$RUNNER_TEMP/reference-dist"
+          cd "$GITHUB_WORKSPACE"
+          node scripts/reference-browser-capture.mjs --root "$RUNNER_TEMP/reference-dist" --output qa-artifacts/reference-browser --source-mode rebuilt
       - name: Assemble the existing world in Blender
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs
@@ -74,7 +88,9 @@ jobs:
         if: always()
         with:
           name: godot-pc-native-evidence
-          path: qa-artifacts/pc-linux/
+          path: |
+            qa-artifacts/pc-linux/
+            qa-artifacts/reference-browser/
           retention-days: 30
 
   windows-package:

@@ -46,6 +46,10 @@ export interface SimulationStore {
   imported(id: string, original: unknown): string | null;
   commitImport(state: PersistedWorld, character: string, id: string, original: unknown, at: number): void;
 }
+export const WORLD_PHYSICS_HZ = 60;
+const STEP_MS = 1000 / WORLD_PHYSICS_HZ;
+const REFERENCE_DEATH_MS = 420;
+const REFERENCE_CORPSE_MS = 650;
 const SPAWN = { x: -7, z: -11 };
 const distance = (a: Position, b: Position) => Math.hypot(a.x - b.x, a.z - b.z);
 const safe = (p: Position) => Math.hypot(p.x + 7, p.z + 5) < 20.5 || Math.hypot(p.x + 108, p.z + 82) < 16;
@@ -70,13 +74,14 @@ export class WorldSimulation {
   private readonly terrain: TerrainSurface;
   private readonly mapContentVersion: string;
   private lastCheckpoint: number;
+  private physicsEpoch: number;
+  private physicsTick = 0;
   private paths = new Map<string, { goal: Position; points: Position[]; expiresAt: number }>();
   private brains = new Map<string,MonsterAiBrain>();
   private motors=new Map<string,CharacterMotor>();
   private approaching=new Set<string>();
   private firingPositions=new Map<string,{target:string;origin:Position;goal:Position;expiresAt:number}>();
-  private lastSeen=new Map<string,Position>();
-  private threats=new Map<string,{target:string;until:number}>();
+  private patrols=new Map<string,Position[]>();
   private pursuit=new Map<string,{x:number;z:number;since:number}>();
 
   constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSurface; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
@@ -89,6 +94,7 @@ export class WorldSimulation {
     this.state.projectiles??=[];
     for(const actor of [...Object.values(this.state.characters),...this.state.monsters,...this.state.summons])Object.assign(actor,{...motion(this.state.time),...actor});
     this.lastCheckpoint = this.state.time;
+    this.physicsEpoch = this.state.time;
     if (!this.state.monsters.length) for (const region of SPAWN_REGIONS) {
       for (let i=0;i<region.population;i++) this.spawnMonster(region.monsterId, spawnPointInRegion(region,i), `${region.id}:${i}`,region.id,i);
     }
@@ -176,7 +182,6 @@ export class WorldSimulation {
     if(intent.type==='direction'){
       const length=Math.max(1,Math.hypot(intent.x,intent.z));
       if(Math.hypot(intent.x,intent.z)>.01)this.cancelControl(p,false);
-      else if(Math.hypot(p.direction.x,p.direction.z)>.01)this.motor(p).stopPlanar();
       p.direction={x:intent.x/length,z:intent.z/length};return;
     }
     if(intent.type==='destination'){
@@ -288,23 +293,32 @@ export class WorldSimulation {
 
   advance(now: number): void {
     if (!Number.isFinite(now)||now<this.state.time) return;
-    // Active characters have at most 30 seconds of exposure after a disconnected
-    // process. Beyond that, only saved absolute deadlines need offline catch-up.
+    // One fixed 60 Hz lattice matches the accepted browser simulation. HTTP
+    // timing only controls how many full ticks run, never their delta.
     const maxActive=Math.max(this.state.time,...Object.values(this.state.characters).map(p=>p.activeUntil));
     const simulatedUntil=Math.min(now,Math.max(this.state.time+1000,maxActive));
-    while(this.state.time<simulatedUntil){
-      const dt=Math.min(50,simulatedUntil-this.state.time);this.state.time+=dt;this.tick(dt/1000);
+    let next=this.physicsEpoch+(this.physicsTick+1)*STEP_MS;
+    while(next<=simulatedUntil+1e-6){
+      this.physicsTick++;this.state.time=next;this.tick(1/WORLD_PHYSICS_HZ);
+      next=this.physicsEpoch+(this.physicsTick+1)*STEP_MS;
     }
-    if(this.state.time<now){this.state.time=now;this.expireDeadlines();}
+    // Preserve the existing bounded offline catch-up. A sub-tick remainder is
+    // not an offline jump and must never run a shorter physics step.
+    if(now>simulatedUntil+1e-6){
+      this.state.time=now;this.physicsEpoch=now;this.physicsTick=0;this.expireDeadlines();
+    }
     this.state.revision++;
     if(now-this.lastCheckpoint>=1000){this.store.save(this.state);this.lastCheckpoint=now;}
+  }
+  private tickDeadline(delayMs:number):number {
+    return this.physicsEpoch+Math.ceil((this.state.time+delayMs-this.physicsEpoch)/STEP_MS-1e-8)*STEP_MS;
   }
   checkpoint(): void {this.store.save(this.state);this.lastCheckpoint=this.state.time;}
   snapshot(id: string, afterEvent=0): WorldSnapshot {
     const character=this.character(id);
     return structuredClone({protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:classAttackRange(character.classId),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time).map(p=>({id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:classAttackRange(p.classId)})),
-      monsters:this.state.monsters.map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+600?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons,events:this.events.filter(e=>e.sequence>afterEvent)});
+      monsters:this.state.monsters.map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons,events:this.events.filter(e=>e.sequence>afterEvent)});
   }
   private tick(dt: number): void {
     this.expireDeadlines();
@@ -318,7 +332,7 @@ export class WorldSimulation {
       let active=this.state.pending.find(a=>a.actor===p.id);
       if(active&&!this.validAttack(active)){this.cancelAttack(p.id);active=undefined;}
       const motor=this.motor(p);
-      if(active){p.combatState=active.released?'recovery':'windup';const lockedTarget=this.state.monsters.find(m=>m.uid===active!.target);if(lockedTarget)p.yaw=smoothAngle(p.yaw,Math.atan2(lockedTarget.x-p.x,lockedTarget.z-p.z),16,dt);}
+      if(active){p.combatState=active.released?'recovery':'windup';const lockedTarget=this.state.monsters.find(m=>m.uid===active!.target);if(lockedTarget)p.yaw=smoothAngle(p.yaw,Math.atan2(lockedTarget.x-p.x,lockedTarget.z-p.z),9,dt);}
       let direction:Position={x:0,z:0},limit=Infinity;
       if(Math.hypot(p.direction.x,p.direction.z)>.01){direction=p.direction;}
       else if(!active){
@@ -332,14 +346,14 @@ export class WorldSimulation {
           const range=classAttackRange(p.classId);
           const visible=this.lineOfSight(p,target);
           const spacing=combatSpacing(range,this.bodyRadius(p),this.bodyRadius(target));
-          const approachRange=spacing.stoppingDistance;
+          const approachRange=spacing.destinationDistance;
           const d=distance(p,target);if(d>range)this.approaching.add(p.id);
           if(!visible){
             // A blocked shot needs a different angle, never a zero-range chase
             // into the target's body. The usual attack range remains unchanged.
             p.combatState='approach';goal=this.firingPosition(p,target,approachRange);
             if(!goal){this.cancelControl(p);this.event('cancel',p.id,undefined,{reason:'no-free-path'});}
-          }else if(d>(this.approaching.has(p.id)?Math.min(range,approachRange+.01):range)){
+          }else if(d>(this.approaching.has(p.id)?spacing.stoppingDistance:range)){
             p.combatState='approach';goal=approachPoint(p,target,approachRange);
           }else{
             p.combatState='face';this.approaching.delete(p.id);this.firingPositions.delete(p.id);motor.stopPlanar();p.yaw=smoothAngle(p.yaw,Math.atan2(target.x-p.x,target.z-p.z),9,dt);
@@ -347,7 +361,7 @@ export class WorldSimulation {
           }
         }
         if(goal){
-          if(distance(p,goal)<(p.destination?.18:.01)){if(p.destination)p.destination=null;motor.stopPlanar();this.paths.delete(p.id);this.pursuit.delete(p.id);}
+          if(distance(p,goal)<(p.destination?.18:.01)){if(p.destination)p.destination=null;this.paths.delete(p.id);this.pursuit.delete(p.id);}
           else{
             const progress=this.pursuit.get(p.id);
             if(!progress||distance(p,progress)>.2)this.pursuit.set(p.id,{x:p.x,z:p.z,since:this.state.time});
@@ -359,7 +373,8 @@ export class WorldSimulation {
       const before={x:p.x,z:p.z};
       const step=motor.step(direction,p.stats.speed,dt,limit);
       this.move(p,{x:step.dx,z:step.dz},1,.46);p.yOffset=step.height;p.grounded=step.grounded;p.verticalVelocity=step.verticalVelocity;p.locomotionState=step.locomotionState;
-      const travelled=distance(before,p);if(travelled<.0001&&Math.hypot(step.dx,step.dz)>.001)motor.stopPlanar();
+      // Keep acceleration while sliding a wall, as the accepted browser motor does.
+      const travelled=distance(before,p);
       if(!step.grounded)this.action(p,'jump');
       else if(travelled>.001){p.yaw=smoothAngle(p.yaw,Math.atan2(step.facingX,step.facingZ),16,dt);this.action(p,'walk');}
       else if(p.action==='walk'||p.action==='jump')this.action(p,'idle');
@@ -392,7 +407,10 @@ export class WorldSimulation {
   private expireDeadlines(): void {
     for(const m of this.state.monsters) if(!m.alive&&m.respawnAt<=this.state.time){
       Object.assign(m,{...motion(this.state.time),...m.home,hp:monsterDef(m).hp,alive:true,attackReadyAt:this.state.time+(250+this.random()*550),phase:1,generation:m.generation+1,status:{slow:0,stun:0,dot:0,nextDot:0},owner:undefined});
-      m.targetId=null;m.deathAt=undefined;m.corpseUntil=undefined;this.brains.delete(m.uid);this.lastSeen.delete(m.uid);this.threats.delete(m.uid);this.paths.delete(m.uid);
+      m.targetId=null;m.deathAt=undefined;m.corpseUntil=undefined;this.paths.delete(m.uid);
+      m.patrolStep=Math.floor(this.random()*Math.max(1,this.patrolPoints(m).length));
+      const brain=this.brains.get(m.uid)??new MonsterAiBrain();
+      brain.reset(m.home.x*.173+m.home.z*.127+m.generation);this.brains.set(m.uid,brain);
       this.event('respawn',m.uid);
     }
     this.state.summons=this.state.summons.filter(s=>s.expiresAt>this.state.time);
@@ -407,7 +425,7 @@ export class WorldSimulation {
     const critical=this.random()<p.stats.crit/100;
     const damage=Math.max(1,Math.round(base*(skill?.mul??1)*(critical?profile.critMultiplier:1)));
     const attack:PendingAttack={actor:p.id,target:target.uid,generation:target.generation,actorGeneration:p.generation,
-      hitAt:this.state.time+timing.windup,endsAt:this.state.time+timing.duration,skill:p.skill,monster:false,damage,critical,accuracy:p.stats.accuracy};
+      hitAt:this.tickDeadline(timing.windup),endsAt:this.tickDeadline(timing.duration),skill:p.skill,monster:false,damage,critical,accuracy:p.stats.accuracy};
     this.state.pending.push(attack);this.motor(p).stopPlanar();this.action(p,'attack',attack.endsAt);p.combatState='windup';p.hitAt=attack.hitAt;
     this.event('attack',p.id,target.uid,{skill:p.skill,generation:target.generation,impactAt:attack.hitAt,endsAt:attack.endsAt,actorGeneration:p.generation});p.skill=null;
   }
@@ -433,7 +451,7 @@ export class WorldSimulation {
     }
     const p=this.state.characters[a.actor];const target=this.state.monsters.find(m=>m.uid===a.target&&m.alive&&m.generation===a.generation)!;
     const cls=CLASSES[p.classId as ClassId];
-    if(distance(p,target)>classAttackRange(p.classId)+(cls.ranged ? .05 : .25)||!this.lineOfSight(p,target)||!facingTarget(p.yaw,p,target)){this.cancelAttack(p.id);this.event('cancel',p.id,target.uid,{skill:a.skill,reason:'out-of-reach'});return;}
+    if(distance(p,target)>classAttackRange(p.classId)+(cls.ranged ? .05 : .25)||!this.lineOfSight(p,target)){this.cancelAttack(p.id);this.event('cancel',p.id,target.uid,{skill:a.skill,reason:'out-of-reach'});return;}
     const skill=a.skill===null?undefined:cls.skills[a.skill] as Skill;
     if(skill){
       if(p.mp<skill.cost||p.cooldowns[a.skill!]>this.state.time){this.cancelAttack(p.id);return;}
@@ -497,57 +515,58 @@ export class WorldSimulation {
     if(!brain){brain=new MonsterAiBrain(m.home.x*.173+m.home.z*.127+m.patrolIndex*1.91);this.brains.set(m.uid,brain);}
     const candidates=Object.values(this.state.characters).filter(p=>!p.dead&&p.activeUntil>this.state.time&&!safe(p)&&p.buffs.vanish<=this.state.time);
     const active=this.state.pending.find(a=>a.actor===m.uid);
-    const threat=this.threats.get(m.uid);
-    // A committed target remains stable through pursuit and windup. Nearest
-    // visible acquisition runs only while there is no retained target.
+    // Browser acquisition was radial. Navigation resolves obstacles during
+    // chase; line of sight validates the actual attack, not a new search timer.
     const retained=brain.targetId??active?.target;
-    let target=retained?candidates.find(p=>p.id===retained):undefined;
-    if(!retained)target=candidates.find(p=>p.id===threat?.target&&threat.until>this.state.time)
-      ?? candidates.filter(p=>this.lineOfSight(m,p)).sort((a,b)=>distance(m,a)-distance(m,b))[0];
+    const target=retained?candidates.find(p=>p.id===retained):candidates.sort((a,b)=>distance(m,a)-distance(m,b))[0];
     const visible=Boolean(target&&this.lineOfSight(m,target));
-    if(target&&visible)this.lastSeen.set(m.uid,{x:target.x,z:target.z});
-    const points=region&&!region.boss?patrolRouteInRegion(region,m.home,m.patrolIndex):[];
-    const point=points[(m.patrolStep??0)%Math.max(1,points.length)];
-    const previous=brain.state;
-    const decision=brain.update({dt,alive:true,playerSafe:false,targetAvailable:Boolean(target),targetId:target?.id,targetVisible:visible,
-      provoked:Boolean(target&&threat?.target===target.id&&threat.until>this.state.time),
+    const points=this.patrolPoints(m);
+    let point=points[(m.patrolStep??0)%Math.max(1,points.length)];
+    const leashRadius=region?.leashRadius??(boss?18:14);
+    const decision=brain.update({dt,alive:true,playerSafe:false,targetAvailable:Boolean(target),targetId:target?.id,
       playerDistance:target?distance(m,target):1000,homeDistance:distance(m,m.home),
-      atPatrolPoint:!point||distance(m,point)<.55,aggroRadius:region?.aggroRadius??9,
-      leashRadius:region?.leashRadius??14,attackRange:this.monsterRange(m)});
+      atPatrolPoint:!point||distance(m,point)<.55,aggroRadius:region?.aggroRadius??(boss?11:9),
+      leashRadius,attackRange:this.monsterRange(m)});
     m.targetId=decision.targetId;m.combatState='idle';
-    if(previous==='patrol'&&decision.state==='idle')m.patrolStep=(m.patrolStep??0)+1;
+    // The accepted build selects the next patrol point on entering Patrol.
+    if(decision.changed&&decision.state==='patrol'&&points.length){m.patrolStep=((m.patrolStep??0)+1)%points.length;point=points[m.patrolStep];}
     const speed=monsterMovementSpeed(boss)*(m.status.slow>this.state.time?.45:1);
-    if(decision.intent==='return'){
-      this.cancelAttack(m.uid);this.walk(m,m.home,monsterMovementSpeed(boss)*dt*.9,radius,m.uid,dt);return;
-    }
-    if(decision.intent==='search'){
-      this.cancelAttack(m.uid);const last=this.lastSeen.get(m.uid);
-      if(last&&distance(m,last)>.55)this.walk(m,last,speed*dt,radius,m.uid,dt);else this.action(m,'idle');return;
-    }
     if(active){
-      if(this.validAttack(active)&&distance(m,m.home)<(region?.leashRadius??14)){
+      if(this.validAttack(active)&&distance(m,m.home)<leashRadius){
         m.combatState=active.released?'recovery':'windup';
-        if(target)m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),16,dt);return;
+        if(target)m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),9,dt);return;
       }
       this.cancelAttack(m.uid);
     }
     if(target&&(decision.intent==='chase'||decision.intent==='attack')){
-      const range=this.monsterRange(m),spacing=combatSpacing(range,this.bodyRadius(m),this.bodyRadius(target));
-      if(distance(m,target)>range||!visible){
-        m.combatState='approach';this.walk(m,approachPoint(m,target,spacing.stoppingDistance),speed*dt,radius,m.uid,dt);
+      if(decision.intent==='chase'||!visible){
+        m.combatState='approach';this.walk(m,target,speed*dt,radius,m.uid,dt);
       }else{
-        m.combatState='face';this.action(m,'idle');m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),16,dt);
-        if(m.attackReadyAt<=this.state.time&&facingTarget(m.yaw,m,target)){
+        // Rotate during windup, as in the reference, rather than inserting an
+        // extra facing wait before the animation. Contact still checks facing.
+        m.combatState='face';this.action(m,'idle');m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),9,dt);
+        if(m.attackReadyAt<=this.state.time){
           m.attackReadyAt=this.state.time+(boss?1450:2050);
-          const timing=attackTimings(def.model),endsAt=this.state.time+timing.duration,impactAt=this.state.time+timing.windup;
+          const timing=attackTimings(def.model),endsAt=this.tickDeadline(timing.duration),impactAt=this.tickDeadline(timing.windup);
           this.state.pending.push({actor:m.uid,target:target.id,generation:target.generation,actorGeneration:m.generation,hitAt:impactAt,endsAt,skill:null,monster:true});
           this.action(m,'attack',endsAt);m.combatState='windup';m.hitAt=impactAt;
           this.event('attack',m.uid,target.id,{impactAt,endsAt,generation:target.generation,actorGeneration:m.generation});
         }
       }
+    }else if(decision.intent==='return'){
+      this.cancelAttack(m.uid);this.walk(m,m.home,monsterMovementSpeed(boss)*dt*.9,radius,m.uid,dt);
     }else if(decision.intent==='patrol'&&point){
-      if(distance(m,point)>.55)this.walk(m,point,monsterMovementSpeed(boss)*dt*.46,radius,m.uid,dt);else this.action(m,'idle');
-    }else this.action(m,'idle');
+      this.walk(m,point,monsterMovementSpeed(boss)*dt*.46,radius,m.uid,dt);
+    }else{this.paths.delete(m.uid);this.action(m,'idle');}
+  }
+  private patrolPoints(m:WorldMonster):Position[] {
+    let points=this.patrols.get(m.uid);
+    if(!points){
+      const region=SPAWN_REGIONS.find(r=>r.id===m.regionId);
+      points=region&&!region.boss?patrolRouteInRegion(region,m.home,m.patrolIndex).map(point=>this.collision.findNearestFree(point,this.monsterRadius(m))):[];
+      this.patrols.set(m.uid,points);
+    }
+    return points;
   }
   private selfSkill(p:WorldCharacter,index:number,skill:Skill):void {
     if(p.mp<skill.cost||p.cooldowns[index]>this.state.time)return;
@@ -570,22 +589,26 @@ export class WorldSimulation {
       this.action(s,'idle');s.yaw=smoothAngle(s.yaw,Math.atan2(target.x-s.x,target.z-s.z),16,dt);
       if(s.attackReadyAt<=this.state.time&&facingTarget(s.yaw,s,target)){
         s.attackReadyAt=this.state.time+1250;const timing=attackTimings('Skeleton');
-        s.hitAt=this.state.time+timing.windup;this.action(s,'attack',this.state.time+timing.duration);s.combatState='windup';
+        s.hitAt=this.tickDeadline(timing.windup);this.action(s,'attack',this.tickDeadline(timing.duration));s.combatState='windup';
         this.state.pending.push({actor:s.uid,owner:p.id,target:target.uid,generation:target.generation,actorGeneration:p.generation,skill:null,monster:false,summon:true,hitAt:s.hitAt,endsAt:s.actionEndsAt,damage:Math.max(5,Math.round(p.stats.matk*.3))});
         this.event('attack',s.uid,target.uid,{impactAt:s.hitAt,endsAt:s.actionEndsAt,generation:target.generation});
       }
     }
   }
   private damage(m:WorldMonster,amount:number,p:WorldCharacter,critical:boolean):void {
-    if(!m.alive)return;m.hp=Math.max(0,m.hp-amount);m.owner??=p.id;m.hitUntil=this.state.time+180;this.threats.set(m.uid,{target:p.id,until:this.state.time+3000});this.event('hit',p.id,m.uid,{amount,critical,targetHp:m.hp,targetMaxHp:monsterDef(m).hp,targetGeneration:m.generation,generation:m.generation});
+    if(!m.alive)return;m.hp=Math.max(0,m.hp-amount);m.owner??=p.id;m.hitUntil=this.state.time+180;this.event('hit',p.id,m.uid,{amount,critical,targetHp:m.hp,targetMaxHp:monsterDef(m).hp,targetGeneration:m.generation,generation:m.generation});
     const def=monsterDef(m);
     if(m.id==='big'){
       const phase=m.hp/def.hp<=.3?3:m.hp/def.hp<=.65?2:1;
       if(phase>m.phase){m.phase=phase;for(let i=0;i<phase+1;i++){const a=i/(phase+1)*Math.PI*2;this.spawnMonster(phase===2?'wraith':'bat',{x:m.x+Math.cos(a)*4,z:m.z+Math.sin(a)*4},this.identifier());}}
     }
     if(m.hp===0){
-      m.alive=false;m.respawnAt=this.state.time+('boss' in def?bossRespawnSeconds(def.boss as 'mini'|'big',this.random):28+this.random()*20)*1000;
-      m.deathAt=this.state.time;m.corpseUntil=this.state.time+2700;m.targetId=null;m.velocityX=0;m.velocityZ=0;m.combatState='dead';this.brains.get(m.uid)?.forceLifecycle('dead');this.paths.delete(m.uid);this.lastSeen.delete(m.uid);this.threats.delete(m.uid);
+      m.alive=false;
+      m.deathAt=this.state.time;m.corpseUntil=this.state.time+REFERENCE_DEATH_MS+REFERENCE_CORPSE_MS;
+      // Browser MonsterLifecycle starts its existing respawn delay after corpse
+      // display, rather than consuming that delay while the body is visible.
+      m.respawnAt=m.corpseUntil+('boss' in def?bossRespawnSeconds(def.boss as 'mini'|'big',this.random):28+this.random()*20)*1000;
+      m.targetId=null;m.velocityX=0;m.velocityZ=0;m.combatState='dead';this.brains.get(m.uid)?.forceLifecycle('dead');this.paths.delete(m.uid);
       this.cancelAttack(m.uid);this.action(m,'death');this.event('death',m.uid,undefined,{generation:m.generation,endsAt:m.corpseUntil,position:{x:m.x,z:m.z,yOffset:m.yOffset,yaw:m.yaw}});
       for(const player of Object.values(this.state.characters))if(player.target===m.uid)this.cancelControl(player);
       this.state.pending=this.state.pending.filter(a=>a.target!==m.uid);
@@ -604,7 +627,7 @@ export class WorldSimulation {
   }
   private spawnMonster(id:string,point:Position,uid:string,regionId?:string,index=0):void {
     const def=MONSTERS[id as MonsterId];const home=this.collision.findNearestFree(point,id==='big'?1.2:id==='mini'?.9:.42);
-    this.state.monsters.push({...motion(this.state.time),...home,uid,id,home,regionId,patrolIndex:index,hp:def.hp,alive:true,respawnAt:0,attackReadyAt:this.state.time+this.random()*1000,generation:1,phase:1,status:{slow:0,stun:0,dot:0,nextDot:0}});
+    this.state.monsters.push({...motion(this.state.time),...home,uid,id,home,regionId,patrolIndex:index,patrolStep:index%3,hp:def.hp,alive:true,respawnAt:0,attackReadyAt:this.state.time+this.random()*1000,generation:1,phase:1,status:{slow:0,stun:0,dot:0,nextDot:0}});
   }
   private firingPosition(p:WorldCharacter,target:WorldMonster,range:number):Position|null {
     const cached=this.firingPositions.get(p.id);
@@ -640,20 +663,32 @@ export class WorldSimulation {
     this.firingPositions.delete(p.id);return null;
   }
   private waypoint(actor:Position,goal:Position,radius:number,key:string):Position|undefined {
-    // The final centimetres of an attack approach must not be discarded as a
-    // reached navigation waypoint while the target is still out of reach.
-    if(distance(actor,goal)<.2&&!this.collision.isBlocked(goal,radius))return goal;
+    const player=Boolean(this.state.characters[key]);
     let path=this.paths.get(key);
-    if(!path||path.expiresAt<=this.state.time||distance(path.goal,goal)>.7){
-      path={goal:{...goal},points:findNavigationPath(this.collision,actor,goal,{actorRadius:radius,cellSize:.85,margin:24,maxVisited:4500}),expiresAt:this.state.time+650};this.paths.set(key,path);
+    if(!path||(path.expiresAt<=this.state.time&&(distance(path.goal,goal)>.7||!path.points.length))){
+      const points=findNavigationPath(this.collision,actor,goal,{actorRadius:radius,cellSize:.85,margin:player?24:10,maxVisited:4500});
+      path={goal:{...goal},points,expiresAt:this.state.time+(points.length?(player?180:650):1000)};this.paths.set(key,path);
     }
-    while(path.points.length&&distance(actor,path.points[0])<.15)path.points.shift();return path.points[0];
+    // Combat destinations can be close to the body-clearance limit. Do not
+    // discard that final segment before the range check has actually passed.
+    const arrival=(this.state.characters[key]?.combatState==='approach'||this.state.summons.some(s=>s.uid===key))?.01:player?.1:.24;
+    while(path.points.length&&distance(actor,path.points[0])<arrival)path.points.shift();
+    return path.points[0];
   }
   private walk(actor:Position & WorldMotion,goal:Position,step:number,radius:number,key:string,dt=.05):void {
     const point=this.waypoint(actor,goal,radius,key);if(!point){this.action(actor,'idle');return;}
-    const d=distance(actor,point);const before={x:actor.x,z:actor.z};
-    this.move(actor,{x:(point.x-actor.x)/Math.max(.001,d),z:(point.z-actor.z)/Math.max(.001,d)},Math.min(d,step),radius);
-    if(distance(before,actor)>.0001){actor.yaw=smoothAngle(actor.yaw,Math.atan2(point.x-before.x,point.z-before.z),9,dt);this.action(actor,'walk');}else this.action(actor,'idle');
+    const d=Math.max(.0001,distance(actor,point)),before={x:actor.x,z:actor.z};
+    let x=(point.x-actor.x)/d,z=(point.z-actor.z)/d;
+    if(this.state.monsters.some(m=>m===actor))for(const neighbor of this.state.monsters){
+      if(neighbor===actor||!neighbor.alive)continue;
+      const sx=actor.x-neighbor.x,sz=actor.z-neighbor.z,gap=Math.hypot(sx,sz);
+      const desiredGap=this.bodyRadius(actor)+this.bodyRadius(neighbor)+.18;
+      if(gap>.001&&gap<desiredGap){x+=(sx/gap)*(desiredGap-gap)*.85;z+=(sz/gap)*(desiredGap-gap)*.85;}
+    }
+    const length=Math.max(.001,Math.hypot(x,z));
+    this.move(actor,{x:x/length,z:z/length},Math.min(d,step),radius);
+    if(distance(before,actor)>.0001){actor.yaw=smoothAngle(actor.yaw,Math.atan2(point.x-before.x,point.z-before.z),9,dt);this.action(actor,'walk');}
+    else {this.action(actor,'idle');this.paths.delete(key);}
   }
   private move(actor:Position,direction:Position,step:number,radius:number):void {
     let delta={x:direction.x*step,z:direction.z*step};

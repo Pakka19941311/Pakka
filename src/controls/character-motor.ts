@@ -51,12 +51,12 @@ export class CharacterMotor {
     const rate = length > 0.0001 ? 19 : 30;
     const blend = response(rate, dt);
     const targetX = inputX * maxSpeed, targetZ = inputZ * maxSpeed;
-    // Integrate exponential acceleration analytically. The integral, unlike
-    // finalVelocity * dt, is identical when a server interval is subdivided.
-    let dx = targetX * dt + (this.velocityX - targetX) * blend / rate;
-    let dz = targetZ * dt + (this.velocityZ - targetZ) * blend / rate;
+    // Exact approved 1e94a0d1 motor: the simulation owns a fixed 60 Hz step.
+    // Integrate velocity first, as in the reference, then move by that velocity.
     this.velocityX += (targetX - this.velocityX) * blend;
     this.velocityZ += (targetZ - this.velocityZ) * blend;
+    let dx = this.velocityX * dt;
+    let dz = this.velocityZ * dt;
 
     if (length > 0.0001) {
       // The visual yaw already interpolates along the shortest arc in main.
@@ -77,8 +77,8 @@ export class CharacterMotor {
 
     if (!this.onGround) {
       this.jumpTime += dt;
-      this.jumpHeight += this.verticalVelocity * dt - 0.5 * JUMP_GRAVITY * dt * dt;
       this.verticalVelocity -= JUMP_GRAVITY * dt;
+      this.jumpHeight += this.verticalVelocity * dt;
       if (this.jumpHeight <= 0 && this.verticalVelocity <= 0) {
         this.jumpHeight = 0;
         this.verticalVelocity = 0;

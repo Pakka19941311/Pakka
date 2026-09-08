@@ -90,59 +90,77 @@ static func run(controller: CameraController, tree: SceneTree) -> Dictionary:
 	collision.setup([])
 	var probe: CameraController = CameraController.new()
 	parent.add_child(probe)
-	probe.setup(camera, collision, func(_x: float, _z: float) -> float: return 0.0)
-	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	var initial_position: Vector3 = camera.position
-	probe.yaw = .6
-	probe.pitch = .85
-	probe.distance = 12.0
-	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	checks["camera_orbit_and_zoom_do_not_snap_to_goal"] = probe.smoothed_yaw > 0 and probe.smoothed_yaw < .6 and probe.smoothed_pitch > .72 and probe.smoothed_pitch < .85 and probe.smoothed_distance > 12 and probe.smoothed_distance < 21
-	checks["camera_rotation_changes_pose"] = camera.position.distance_to(initial_position) > .05
-	for frame: int in range(90):
-		probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	checks["camera_short_smoothing_settles"] = absf(probe.smoothed_yaw - .6) < .001 and absf(probe.smoothed_distance - 12.0) < .001
+	var terrain: Dictionary = {"height":0.0}
+	probe.setup(camera, collision, func(_x: float, _z: float) -> float: return float(terrain.height))
+	var reference_positions: bool = true
+	var reference_targets: bool = true
+	var reference_angles: bool = true
+	var reference_radius: bool = true
+	var reference_movement: bool = true
+	for frame: Dictionary in JSON.parse_string(FileAccess.get_file_as_string("res://tests/reference-camera-mixed-trace.json")).frames:
+		if frame.has("configure"): probe.configure(frame.configure)
+		if frame.has("orbit"): probe.orbit(Vector2(frame.orbit.x, frame.orbit.y))
+		if frame.has("wheel"): probe.zoom(float(frame.wheel))
+		terrain.height = frame.p.y
+		probe.update_pose(float(frame.dt), Vector3(frame.p.x, frame.p.y, -frame.p.z))
+		var expected: Dictionary = frame.expected
+		var expected_focus: Vector3 = Vector3(expected.focus[0], expected.focus[1], -expected.focus[2])
+		var expected_position: Vector3 = Vector3(expected.position[0], expected.position[1], -expected.position[2])
+		reference_positions = reference_positions and camera.position.distance_to(expected_position) < .0001
+		reference_targets = reference_targets and probe.follow_position.distance_to(expected_focus) < .0001
+		reference_angles = reference_angles and absf(angle_difference(probe.smoothed_yaw, float(expected.alpha) + PI / 2.0)) < .00001 and absf(probe.smoothed_pitch - (PI / 2.0 - float(expected.beta))) < .00001
+		reference_radius = reference_radius and absf(probe.actual_distance - float(expected.radius)) < .00001
+		var expected_forward: Vector2 = Vector2(-cos(float(expected.alpha)), -sin(float(expected.alpha)))
+		reference_movement = reference_movement and probe.movement_direction(Vector2.DOWN).distance_to(expected_forward) < .00001
+	checks["reference_camera_position_matches_browser_trace"] = reference_positions
+	checks["reference_camera_lookahead_and_focus_match_browser_trace"] = reference_targets
+	checks["reference_camera_yaw_pitch_match_browser_trace"] = reference_angles
+	checks["reference_camera_zoom_and_recovery_match_browser_trace"] = reference_radius
+	checks["reference_movement_uses_rendered_camera_angle"] = reference_movement
+
+	probe.configure({"mouseSensitivity":1.0,"zoomSensitivity":1.0,"smoothing":1.0,"invertY":false})
+	probe.distance = 10.5
 	probe.zoom(-100)
-	checks["camera_minimum_zoom_bound"] = is_equal_approx(probe.distance, CameraController.MIN_ZOOM)
-	probe.zoom(100)
-	checks["camera_maximum_zoom_bound"] = is_equal_approx(probe.distance, CameraController.MAX_ZOOM)
+	checks["reference_wheel_notch_changes_desired_zoom_by_065"] = is_equal_approx(probe.distance,9.85)
+	probe.zoom(1000)
+	checks["reference_wheel_event_is_capped_at_240"] = is_equal_approx(probe.distance,11.41)
+	for step: int in range(10): probe.zoom(-240)
+	checks["camera_minimum_zoom_bound"] = is_equal_approx(probe.distance,5.5)
+	for step: int in range(10): probe.zoom(240)
+	checks["camera_maximum_zoom_bound"] = is_equal_approx(probe.distance,18.0)
 	probe.pitch = -100
 	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	checks["camera_pitch_lower_bound"] = is_equal_approx(probe.pitch, CameraController.MIN_PITCH)
+	checks["camera_pitch_lower_bound"] = is_equal_approx(probe.pitch,PI / 2.0 - 1.36)
 	probe.pitch = 100
 	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	checks["camera_pitch_upper_bound"] = is_equal_approx(probe.pitch, CameraController.MAX_PITCH)
-	probe.pitch = .72
+	checks["camera_pitch_upper_bound"] = is_equal_approx(probe.pitch,PI / 2.0 - .72)
+	probe.pitch = CameraController.DEFAULT_PITCH
 	probe.yaw = 0
-	probe.distance = 12
+	probe.distance = 10.5
+	terrain.height = 0.0
 	probe.reset_follow()
 	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	var simulated_time: float = 0.0
-	for frame: int in range(60):
-		simulated_time += 1.0 / 60.0
-		probe.update_pose(1.0 / 60.0, Vector3(simulated_time * 6.2, 0, 0))
-	checks["camera_follow_latency_below_200mm_at_run_speed"] = absf(probe.follow_position.x - 6.2) < .2
-	checks["camera_zoom_keeps_outside_hero"] = camera.position.distance_to(Vector3(6.2, 1.4, 0)) >= CameraController.MIN_ZOOM - .01
+	var grounded_position: Vector3 = camera.position
+	probe.update_pose(1.0 / 60.0, Vector3(0,2.5,0),2.5)
+	checks["reference_jump_does_not_pull_camera_vertical_focus"] = camera.position.distance_to(grounded_position) < .00001 and is_equal_approx(probe.follow_position.y,1.35)
+	probe.update_pose(1.0 / 60.0, Vector3(6.2,0,0))
+	checks["reference_horizontal_follow_has_no_second_filter"] = is_equal_approx(probe.follow_position.x,6.2) and is_equal_approx(probe.follow_position.z,-2.15)
+	checks["reference_default_camera_framing_matches_distance_and_pitch"] = is_equal_approx(probe.actual_distance,10.5) and is_equal_approx(probe.smoothed_pitch,PI/2.0 - 1.06)
 
-	# A wall behind the character must shorten the arm without forcing its
-	# minimum distance through the surface; close walls seek an upper orbit.
 	collision.setup([{"kind":"box", "x":0.0, "z":-4.0, "halfX":5.0, "halfZ":.3, "rotation":0.0, "bottom":0.0, "top":8.0}])
 	probe.reset_follow()
 	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	var ray_length: float = probe.follow_position.distance_to(camera.position)
-	checks["camera_wall_sweep_respects_clearance"] = probe.collision_limited and collision.ray_distance(probe.follow_position, camera.position, CameraController.CAMERA_RADIUS) >= ray_length - .001
-	checks["camera_wall_does_not_put_camera_inside_hero"] = ray_length >= CameraController.BODY_CLEARANCE
-	collision.setup([{"kind":"box", "x":0.0, "z":-1.8, "halfX":5.0, "halfZ":.25, "rotation":0.0, "bottom":0.0, "top":3.0}])
-	probe.reset_follow()
-	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	ray_length = probe.follow_position.distance_to(camera.position)
-	checks["camera_close_wall_uses_clear_upper_orbit"] = not probe.confined_space and probe.resolved_pitch > probe.smoothed_pitch and ray_length >= CameraController.BODY_CLEARANCE and collision.ray_distance(probe.follow_position, camera.position, CameraController.CAMERA_RADIUS) >= ray_length - .001
-
+	checks["reference_camera_body_origin_wall_probe_contracts_immediately"] = probe.collision_limited and probe.actual_distance < 10.5 and camera.position.z < 3.48
+	checks["reference_camera_obstruction_does_not_invent_upper_orbit"] = is_equal_approx(probe.smoothed_pitch, CameraController.DEFAULT_PITCH)
+	var obstructed_distance: float = probe.actual_distance
 	collision.setup([])
+	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
+	checks["reference_camera_obstruction_recovery_response_is_7"] = absf(probe.actual_distance - lerpf(obstructed_distance,10.5,1.0-exp(-7.0/60.0))) < .00001
+
 	probe.setup(camera, collision, func(_x: float, z: float) -> float: return 4.0 if z < -4.0 and z > -6.0 else 0.0)
-	probe.pitch = .25
+	probe.pitch = CameraController.MIN_PITCH
 	probe.reset_follow()
 	probe.update_pose(1.0 / 60.0, Vector3.ZERO)
-	checks["camera_sweeps_terrain_between_pivot_and_endpoint"] = probe.collision_limited and camera.position.z < 4.0
+	checks["camera_sweeps_terrain_between_body_and_endpoint"] = probe.collision_limited and camera.position.z < 4.0
 	parent.queue_free()
 	return checks

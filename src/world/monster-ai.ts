@@ -1,24 +1,18 @@
-export type MonsterAiState = 'spawn' | 'idle' | 'patrol' | 'aggro' | 'chase' | 'attack' | 'search' | 'leash' | 'return' | 'dead' | 'corpse' | 'despawn';
-export type MonsterIntent = 'none' | 'patrol' | 'chase' | 'attack' | 'search' | 'return';
+export type MonsterAiState = 'spawn' | 'idle' | 'patrol' | 'aggro' | 'chase' | 'attack' | 'leash' | 'return' | 'dead' | 'corpse' | 'despawn';
+export type MonsterIntent = 'none' | 'patrol' | 'chase' | 'attack' | 'return';
 
 export type MonsterAiInput = Readonly<{
-  /** Simulation seconds, not render delta or a movement displacement. */
   dt: number;
   alive: boolean;
   playerSafe: boolean;
   targetAvailable?: boolean;
-  /** The caller must supply the retained target while it still exists. */
   targetId?: string;
-  targetVisible?: boolean;
-  provoked?: boolean;
   playerDistance: number;
   homeDistance: number;
   atPatrolPoint: boolean;
   aggroRadius: number;
   leashRadius: number;
   attackRange: number;
-  searchDuration?: number;
-  patrolDuration?: number;
 }>;
 
 export type MonsterAiDecision = Readonly<{
@@ -28,111 +22,83 @@ export type MonsterAiDecision = Readonly<{
   targetId: string | null;
 }>;
 
-const lifecycle = new Set<MonsterAiState>(['dead', 'corpse', 'despawn']);
-const engaged = new Set<MonsterAiState>(['aggro', 'chase', 'attack', 'search']);
-const HOME_ARRIVAL = 0.55;
-
-/** Owns intent and target lifetime. The world owns navigation, attack timing and damage. */
+/** Behaviour port of accepted browser build 1e94a0d1. The server additionally
+ * retains entity identity and fences terminal lifecycle until explicit respawn. */
 export class MonsterAiBrain {
   private stateValue: MonsterAiState = 'spawn';
+  private idleTimer: number;
   private targetValue: string | null = null;
-  private idleTimer = 0;
-  private patrolTimer = 0;
-  private searchTimer = 0;
-  private seed = 0;
-  private pauseSequence = 0;
 
-  constructor(seed = 0) { this.reset(seed); }
+  constructor(seed = 0) {
+    this.idleTimer = 0.65 + Math.abs(Math.sin(seed * 12.9898)) * 2.15;
+  }
 
   reset(seed = 0): void {
     this.stateValue = 'spawn';
     this.targetValue = null;
-    this.seed = Number.isFinite(seed) ? seed : 0;
-    this.pauseSequence = 0;
-    this.idleTimer = this.nextIdlePause();
-    this.patrolTimer = 0;
-    this.searchTimer = 0;
+    this.idleTimer = 0.45 + Math.abs(Math.sin(seed * 7.713)) * 1.85;
   }
 
   forceLifecycle(state: Extract<MonsterAiState, 'dead' | 'corpse' | 'despawn'>): MonsterAiDecision {
     this.targetValue = null;
-    this.patrolTimer = 0;
-    this.searchTimer = 0;
     return this.transition(state, 'none');
   }
 
   update(input: MonsterAiInput): MonsterAiDecision {
-    // Snapshots/ticks during corpse display cannot resurrect AI or regress corpse to dead.
-    if (lifecycle.has(this.stateValue)) return this.transition(this.stateValue, 'none');
+    if (this.stateValue === 'dead' || this.stateValue === 'corpse' || this.stateValue === 'despawn') return this.transition(this.stateValue, 'none');
     if (!input.alive) return this.forceLifecycle('dead');
-    const dt = Number.isFinite(input.dt) ? Math.max(0, input.dt) : 0;
-    const wasEngaged = engaged.has(this.stateValue);
     const sameTarget = !this.targetValue || !input.targetId || this.targetValue === input.targetId;
-    const available = (input.targetAvailable ?? true) && sameTarget;
-    const visible = input.targetVisible ?? true;
-    const safeTarget = available && input.playerSafe;
+    const targetAvailable = (input.targetAvailable ?? true) && sameTarget;
+    const wasEngaged = this.stateValue === 'aggro' || this.stateValue === 'chase' || this.stateValue === 'attack';
+    const mustReturn = input.homeDistance > input.leashRadius
+      || this.stateValue === 'leash'
+      || this.stateValue === 'return';
 
-    if (input.homeDistance > input.leashRadius || this.stateValue === 'leash' || this.stateValue === 'return') {
-      return this.returnHome(input.homeDistance);
-    }
-    if (wasEngaged && (!available || safeTarget)) return this.returnHome(input.homeDistance);
-
-    const inAggro = input.playerDistance <= input.aggroRadius;
-    const retainsAggro = wasEngaged && input.playerDistance <= input.aggroRadius * 1.55;
-    const eligible = available && !safeTarget && (inAggro || retainsAggro || input.provoked === true);
-    if (eligible && visible) {
-      this.targetValue = input.targetId ?? this.targetValue;
-      this.searchTimer = 0;
-      if (!wasEngaged) return this.transition('aggro', input.playerDistance <= input.attackRange ? 'attack' : 'chase');
-      // Small exit hysteresis avoids attack/chase chatter at the edge of the range.
-      const range = input.attackRange + (this.stateValue === 'attack' ? 0.12 : 0);
-      return input.playerDistance <= range ? this.transition('attack', 'attack') : this.transition('chase', 'chase');
-    }
-    if (eligible && (wasEngaged || input.provoked)) {
-      this.targetValue = input.targetId ?? this.targetValue;
-      if (this.stateValue !== 'search') this.searchTimer = input.searchDuration ?? 1.5;
-      else this.searchTimer -= dt;
-      if (this.searchTimer > 0) return this.transition('search', 'search');
-      return this.returnHome(input.homeDistance);
-    }
-    if (wasEngaged) return this.returnHome(input.homeDistance);
-
-    if (this.stateValue === 'spawn') return this.transition('idle', 'none');
-    if (this.stateValue === 'patrol') {
-      this.patrolTimer -= dt;
-      if (!input.atPatrolPoint && this.patrolTimer > 0) return this.transition('patrol', 'patrol');
-      // A blocked patrol point must eventually yield to an idle pause and the next point.
-      this.idleTimer = this.nextIdlePause();
+    // An unavailable target must not freeze patrols, even if its last position is safe.
+    if (mustReturn || (targetAvailable && input.playerSafe)) {
+      this.targetValue = null;
+      if (input.homeDistance > 0.55) {
+        return this.transition(this.stateValue === 'leash' || this.stateValue === 'return' ? 'return' : 'leash', 'return');
+      }
+      this.idleTimer = Math.max(this.idleTimer, 0.8);
       return this.transition('idle', 'none');
     }
-    this.idleTimer -= dt;
+
+    const maintainsAggro = wasEngaged && input.playerDistance <= input.aggroRadius * 1.55;
+    if (targetAvailable && (input.playerDistance <= input.aggroRadius || maintainsAggro)) {
+      this.targetValue = input.targetId ?? this.targetValue;
+      if (!wasEngaged) return this.transition('aggro', input.playerDistance <= input.attackRange ? 'attack' : 'chase');
+      if (input.playerDistance <= input.attackRange) return this.transition('attack', 'attack');
+      return this.transition('chase', 'chase');
+    }
+
+    this.targetValue = null;
+    if (wasEngaged && input.homeDistance > 0.55) return this.transition('leash', 'return');
+    if (this.stateValue === 'spawn') {
+      this.idleTimer = Math.max(this.idleTimer, 0.35);
+      return this.transition('idle', 'none');
+    }
+    if (this.stateValue === 'patrol' && !input.atPatrolPoint) return this.transition('patrol', 'patrol');
+    if (this.stateValue === 'patrol' && input.atPatrolPoint) {
+      this.idleTimer = 1.1 + this.idleTimer % 1.7;
+      return this.transition('idle', 'none');
+    }
+    this.idleTimer -= Math.max(0, input.dt);
     if (this.idleTimer <= 0) {
-      this.patrolTimer = input.patrolDuration ?? 8;
+      // No connected player exists in some server ticks; finite fallback keeps
+      // the reference pause formula usable in the persistent world.
+      const playerDistance = Number.isFinite(input.playerDistance) ? input.playerDistance : 1000;
+      this.idleTimer = 1.0 + Math.abs(Math.sin(input.homeDistance * 2.31 + playerDistance)) * 2.2;
       return this.transition('patrol', 'patrol');
     }
     return this.transition('idle', 'none');
   }
 
-  get state(): MonsterAiState { return this.stateValue; }
+  get state(): MonsterAiState {
+    return this.stateValue;
+  }
+
   get targetId(): string | null { return this.targetValue; }
-
-  private returnHome(homeDistance: number): MonsterAiDecision {
-    this.targetValue = null;
-    this.searchTimer = 0;
-    this.patrolTimer = 0;
-    if (homeDistance > HOME_ARRIVAL) {
-      const returning = this.stateValue === 'leash' || this.stateValue === 'return';
-      return this.transition(returning ? 'return' : 'leash', 'return');
-    }
-    this.idleTimer = this.nextIdlePause();
-    return this.transition('idle', 'none');
-  }
-
-  private nextIdlePause(): number {
-    // Stable per-monster variation, independent of whether a player position is finite.
-    const value = Math.sin(this.seed * 12.9898 + ++this.pauseSequence * 7.713) * 43758.5453;
-    return 1.1 + (value - Math.floor(value)) * 2.2;
-  }
 
   private transition(state: MonsterAiState, intent: MonsterIntent): MonsterAiDecision {
     const changed = state !== this.stateValue;

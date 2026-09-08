@@ -15,6 +15,9 @@ class NPCObserver extends Node:
 	var idle: bool = true
 	var max_speed: float = 0
 	var frames: int = 0
+	var ambient_previous: Dictionary = {}
+	var ambient_samples: Dictionary = {}
+	var ambient_valid: bool = true
 	func begin(value: VarendorWorld) -> void:
 		world = value
 		started = Time.get_ticks_msec()
@@ -23,6 +26,16 @@ class NPCObserver extends Node:
 				anchors[id] = world.actors[id].position
 				previous[id] = world.actors[id].position
 		stable = anchors.size() == 4
+		for resident: Dictionary in world.ambient_residents.residents:
+			var id: String = str(resident.id)
+			if not world.actors.has(id):
+				ambient_valid = false
+				continue
+			var actor: Node3D = world.actors[id]
+			var clock: float = (actor.get_meta("animation_controller") as VarendorAnimationController).last_time
+			ambient_previous[id] = {"position":Vector2(actor.position.x,-actor.position.z),"clock":clock}
+			ambient_samples[id] = {"speed_limit":float(resident.speed),"distance":0.0,"max_speed":0.0,"max_speed_ratio":0.0,"max_step":0.0,"walk_frames":0,"idle_frames":0,"activity_frames":0,"motion_valid":true,"animation_valid":true}
+		ambient_valid = ambient_valid and ambient_samples.size() == 6
 	func _process(delta: float) -> void:
 		if world == null: return
 		frames += 1
@@ -37,6 +50,36 @@ class NPCObserver extends Node:
 			stable = stable and actor.position.distance_to(anchors[id]) < .001
 			idle = idle and str(actor.get_meta("animation_state", "idle")) == "idle"
 			previous[id] = actor.position
+		for id: String in ambient_samples:
+			if not world.actors.has(id):
+				ambient_valid = false
+				continue
+			var actor: Node3D = world.actors[id]
+			var controller: VarendorAnimationController = actor.get_meta("animation_controller")
+			var point: Vector2 = Vector2(actor.position.x,-actor.position.z)
+			var prior: Dictionary = ambient_previous[id]
+			var sample: Dictionary = ambient_samples[id]
+			# The actor was already interpolated once. Match its actual clock
+			# span, including physics catch-up during a slow graphical frame.
+			var elapsed: float = maxf(delta,(controller.last_time-float(prior.clock))/1000.0)
+			var step: float = point.distance_to(prior.position)
+			var speed: float = step / maxf(.00001,elapsed)
+			var limit: float = float(sample.speed_limit)
+			sample.distance += step
+			sample.max_speed = maxf(float(sample.max_speed),speed)
+			sample.max_speed_ratio = maxf(float(sample.max_speed_ratio),speed / limit)
+			sample.max_step = maxf(float(sample.max_step),step)
+			# Quantization allowance is <=two60Hzsteps, never an arbitrary
+			# metres-long teleport margin or a reset of the observed baseline.
+			sample.motion_valid = bool(sample.motion_valid) and actor.position.is_finite() and speed <= limit * 1.1 + .002 and step <= limit * (elapsed + 2.0/60.0) + .002 and absf(actor.position.y-world.height_at(point.x,point.y)) < .02
+			if controller.state == "walk": sample.walk_frames += 1
+			elif controller.state == "idle": sample.idle_frames += 1
+			elif controller.state == "attack": sample.activity_frames += 1
+			# Permit the short approach->work transition in the interpolation
+			# interval; sustained walking must always have the walking gait.
+			if speed > .1 and str(actor.get_meta("motion",{}).get("action","idle")) == "walk":
+				sample.animation_valid = bool(sample.animation_valid) and controller.state == "walk"
+			ambient_previous[id] = {"position":point,"clock":controller.last_time}
 
 static func run(main: Node) -> Dictionary:
 	var checks: Dictionary = {}
@@ -47,6 +90,10 @@ static func run(main: Node) -> Dictionary:
 	checks.merge(await CameraQA.run(main.world.camera_controller, tree))
 	checks.merge(await preload("res://scripts/camera_integration_qa.gd").run(main, tree))
 	checks.merge(preload("res://scripts/player_movement_qa.gd").run())
+	checks.merge(preload("res://scripts/player_pending_qa.gd").run())
+	checks.merge(preload("res://scripts/navigation_qa.gd").run())
+	checks.merge(preload("res://scripts/ambient_residents_qa.gd").run())
+	checks.merge(await preload("res://scripts/reference_world_qa.gd").run(tree))
 	checks.merge(preload("res://scripts/player_input_qa.gd").run())
 	checks.merge(preload("res://scripts/target_rejection_qa.gd").run())
 	checks.merge(preload("res://scripts/snapshot_timeline_qa.gd").run())
@@ -63,6 +110,17 @@ static func run(main: Node) -> Dictionary:
 	checks["npc_60_seconds_no_teleport_or_high_speed"] = observer.stable and observer.max_speed < .001 and observer.frames > 60 and observer.snapshots.size() > 50
 	checks["npc_60_seconds_animation_matches_stationary_service_role"] = observer.idle
 	checks["npc_max_observed_speed_mps"] = observer.max_speed
+	var all_ambient_moved: bool = observer.ambient_valid
+	var ambient_motion: bool = observer.ambient_valid
+	var ambient_animation: bool = observer.ambient_valid
+	for sample: Dictionary in observer.ambient_samples.values():
+		all_ambient_moved = all_ambient_moved and float(sample.distance) > 3.0 and int(sample.walk_frames) >= 2 and int(sample.idle_frames) >= 2
+		ambient_motion = ambient_motion and bool(sample.motion_valid)
+		ambient_animation = ambient_animation and bool(sample.animation_valid)
+	checks["ambient_npc_60_seconds_all_six_really_walk_and_pause"] = all_ambient_moved
+	checks["ambient_npc_60_seconds_no_teleport_or_excess_walking_speed"] = ambient_motion
+	checks["ambient_npc_60_seconds_walk_animation_matches_real_movement"] = ambient_animation
+	checks["ambient_npc_60_seconds_per_resident_observations"] = observer.ambient_samples
 	observer.queue_free()
 	checks["acceptance_human_review"] = "MMORPG feel, perceived blends, mouse comfort and target Windows GPU smoothness require the owner to play; automated inputs and imported pose samples do not establish subjective acceptance."
 	return checks
@@ -149,7 +207,7 @@ static func movement_matrix() -> Dictionary:
 	var arrival: Vector2 = value.position_value
 	var yaw_at_arrival: float = value.yaw
 	for tick: int in range(30): value.physics_step(1.0 / 60)
-	checks["click_move_stops_without_overshoot_or_spinning"] = absf(value.position_value.x - 5) < .1 and value.position_value.x <= 5.001 and value.position_value.distance_to(arrival) < .001 and absf(angle_difference(yaw_at_arrival, value.yaw)) < .001
+	checks["click_move_settles_inside_reference_arrival_radius_without_spinning"] = value.position_value.distance_to(Vector2(5,0)) < .18 and value.position_value.distance_to(arrival) < .001 and absf(angle_difference(yaw_at_arrival, value.yaw)) < .001
 	value.submit({"type":"destination", "x":20, "z":0})
 	value.physics_step(1.0 / 60)
 	value.submit({"type":"direction", "x":0, "z":-1})
@@ -173,8 +231,12 @@ static func movement_matrix() -> Dictionary:
 	collision.setup([{"kind":"box", "x":3.0, "z":0.0, "halfX":.5, "halfZ":2.0, "rotation":0.0, "bottom":0.0, "top":4.0}])
 	value = motor(collision)
 	value.submit({"type":"destination", "x":6, "z":0})
-	for tick: int in range(60): value.physics_step(1.0 / 60)
-	checks["click_prediction_waits_for_navigation_when_wall_blocks_segment"] = value.position_value.is_zero_approx() and value.navigation_path.is_empty()
+	var local_path: bool = not value.navigation_path.is_empty()
+	var path_clear: bool = true
+	for tick: int in range(180):
+		value.physics_step(1.0 / 60)
+		path_clear = path_clear and not collision.blocked(value.position_value)
+	checks["reference_click_navigation_starts_locally_and_routes_around_wall"] = local_path and path_clear and value.position_value.distance_to(Vector2(6,0)) < .18
 	return checks
 
 static func twenty_physics_jumps(live: VarendorWorld, tree: SceneTree) -> Dictionary:

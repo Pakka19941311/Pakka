@@ -21,33 +21,9 @@ function fixture(classId='knight') {
 }
 const planarDistance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z);
 
-test('20 jumps at 20, 60 and 144 Hz follow one ballistic arc and reject every airborne jump',()=>{
-  for(const hz of [20,60,144]){
-    const motor=new CharacterMotor();let cycles=0;
-    while(cycles++<20){
-      assert.equal(motor.requestJump(),true);let time=0,peak=0;const states=new Set();
-      while(!motor.grounded){
-        assert.equal(motor.requestJump(),false);const step=motor.step({x:0,z:0},6,1/hz);time+=1/hz;
-        assert.ok(step.height>=0&&Number.isFinite(step.height));peak=Math.max(peak,step.height);states.add(step.locomotionState);
-        if(!step.grounded)assert.ok(Math.abs(step.height-(JUMP_SPEED*time-.5*JUMP_GRAVITY*time*time))<1e-9);
-        assert.ok(time<1,'no hang');
-      }
-      assert.ok(Math.abs(time-2*JUMP_SPEED/JUMP_GRAVITY)<=1/hz+.00001);
-      assert.ok(peak>1.5);assert.ok(states.has('fall')&&states.has('land'));
-      assert.equal(motor.step({x:0,z:0},6,.15).locomotionState,'ground');
-    }
-  }
-});
-
-test('motor movement integral is FPS independent and diagonal speed equals cardinal speed',()=>{
-  const totals=[];
-  for(const hz of [20,60,144])for(const direction of [{x:1,z:0},{x:1,z:1}]){
-    const motor=new CharacterMotor();let x=0,z=0;
-    for(let i=0;i<hz*2;i++){const step=motor.step(direction,6,1/hz);x+=step.dx;z+=step.dz;}
-    totals.push(Math.hypot(x,z));
-  }
-  assert.ok(Math.max(...totals)-Math.min(...totals)<1e-9);
-});
+// Numerical jump/FPS parity now lives in reference-server.test.mjs and uses
+// traces executed from the accepted browser commit, rather than an analytic
+// variable-delta trajectory that was never used by that build.
 
 test('cancel, destination replacement and target death never reset an airborne motor',()=>{
   const f=fixture();f.world.state.monsters=[];f.input({type:'jump'});f.advance(200);
@@ -79,7 +55,7 @@ for(const classId of Object.keys(CLASSES))test(`${classId} approach stops outsid
   let attack;
   for(let i=0;i<180&&!attack;i++){f.advance(50);attack=f.world.events.find(e=>e.kind==='attack'&&e.actor===f.p.id);assert.ok(planarDistance(f.p,f.m)>=2.075-.01);}
   assert.ok(attack);const d=planarDistance(f.p,f.m),range=classAttackRange(classId);
-  assert.ok(d<=range+.0001);assert.ok(d>=combatSpacing(range,.46,1.615).stoppingDistance-.02);
+  assert.ok(d<=range+.0001);assert.ok(d>=combatSpacing(range,.46,1.615).stoppingDistance-f.p.stats.speed/60-.0001);
   assert.ok(facingTarget(f.p.yaw,f.p,f.m));
 });
 
@@ -105,9 +81,9 @@ test('target death clears all combat intents immediately; ordered impact/death/l
   f.advance(3000);assert.equal(f.world.snapshot(f.p.id).monsters[0].aiState,'despawn');
 });
 
-test('monster turns before windup, retains target, and only damages after visible release',()=>{
-  const f=fixture();f.m.status.stun=0;f.m.z=42.15;f.m.home.z=42.15;f.m.yaw=0;
-  f.advance(50);assert.equal(f.world.events.some(e=>e.kind==='attack'),false,'must not attack 180 degrees backwards');
+test('monster turns during reference windup, retains target, and only damages after visible release',()=>{
+  const f=fixture();f.m.status.stun=0;f.m.z=42.15;f.m.home.z=42.15;f.m.yaw=0;f.m.attackReadyAt=0;
+  f.advance(50);assert.ok(f.world.events.some(e=>e.kind==='attack'),'reference begins visible windup without a separate rotation wait');assert.equal(f.world.events.some(e=>e.kind==='hit'),false,'windup cannot damage backwards');
   f.advance(1500);const attack=f.world.events.find(e=>e.kind==='attack'&&e.actor===f.m.uid),hit=f.world.events.find(e=>e.kind==='hit'&&e.actor===f.m.uid);
   assert.ok(attack&&hit);assert.ok(attack.at<hit.at&&hit.at>=attack.impactAt);assert.ok(f.world.events.some(e=>e.kind==='release'&&e.actor===f.m.uid&&e.at===hit.at));
   assert.equal(f.m.targetId,f.p.id);assert.ok(facingTarget(f.m.yaw,f.m,f.p));

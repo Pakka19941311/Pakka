@@ -57,6 +57,68 @@ static func run() -> Dictionary:
 	world.player_motion.submit({"type":"destination","x":5.0,"z":0.0})
 	controls.poll(1.0/60,false)
 	checks["input_text_focus_does_not_cancel_server_autonomous_destination"] = world.player_motion.input_mode == "destination" and world.player_motion.destination == Vector2(5,0)
+	# Real key edges use the same action matching as the main input route.
+	var saved_events: Dictionary = {}
+	var default_keys: Dictionary = {"move_forward":KEY_W,"move_back":KEY_S,"move_left":KEY_A,"move_right":KEY_D}
+	for action: String in default_keys:
+		saved_events[action] = InputMap.action_get_events(action)
+		InputMap.action_erase_events(action)
+		var binding: InputEventKey = InputEventKey.new()
+		binding.physical_keycode = default_keys[action]
+		InputMap.action_add_event(action,binding)
+	var forward: InputEventKey = InputEventKey.new()
+	forward.physical_keycode = KEY_W
+	forward.pressed = true
+	controls.handle_keyboard(forward,true)
+	world.camera_controller.yaw = 1.0
+	world.camera_controller.smoothed_yaw = .3
+	controls.poll(1.0/60,true)
+	checks["reference_input_wasd_uses_visible_yaw_not_mouse_goal"] = world.player_motion.input_direction.distance_to(Vector2.DOWN.rotated(.3)) < .00001
+	var right: InputEventKey = InputEventKey.new()
+	right.physical_keycode = KEY_D
+	right.pressed = true
+	controls.handle_keyboard(right,true)
+	controls.poll(1.0/60,true)
+	checks["reference_input_diagonal_is_normalized"] = is_equal_approx(world.player_motion.input_direction.length(),1.0)
+	forward.pressed = false
+	right.pressed = false
+	controls.handle_keyboard(forward,true)
+	controls.handle_keyboard(right,true)
+	controls.poll(1.0/60,true)
+	checks["reference_input_key_release_sends_neutral_intent"] = world.player_motion.input_direction.is_zero_approx()
+
+	world.player_motion.submit({"type":"destination","x":5.0,"z":0.0})
+	forward.pressed = true
+	controls.handle_keyboard(forward,true)
+	forward.pressed = false
+	controls.handle_keyboard(forward,true)
+	controls.poll(1.0/60,true)
+	checks["reference_input_same_frame_tap_cancels_autonomous_movement"] = world.player_motion.input_mode == "idle" and world.player_motion.destination == null and world.player_motion.manual_cancel_pending
+
+	forward.pressed = true
+	controls.handle_keyboard(forward,true)
+	controls.poll(1.0/60,true)
+	controls.focus_changed(false)
+	controls.focus_changed(true)
+	forward.echo = true
+	controls.handle_keyboard(forward,true)
+	controls.poll(1.0/60,true)
+	checks["reference_input_focus_restore_rejects_old_held_key_repeat"] = controls.movement_axes().is_zero_approx() and world.player_motion.input_direction.is_zero_approx()
+	forward.pressed = false
+	forward.echo = false
+	controls.handle_keyboard(forward,true)
+	forward.pressed = true
+	controls.handle_keyboard(forward,true)
+	controls.poll(1.0/60,true)
+	checks["reference_input_release_then_fresh_press_restores_movement"] = not controls.movement_axes().is_zero_approx() and not world.player_motion.input_direction.is_zero_approx()
+	controls.poll(1.0/60,false)
+	forward.echo = true
+	controls.handle_keyboard(forward,true)
+	controls.poll(1.0/60,true)
+	checks["reference_input_typing_focus_does_not_leak_held_wasd"] = controls.movement_axes().is_zero_approx() and world.player_motion.input_direction.is_zero_approx()
+	for action: String in saved_events:
+		InputMap.action_erase_events(action)
+		for event: InputEvent in saved_events[action]: InputMap.action_add_event(action,event)
 	client.free()
 	world.camera_controller.free()
 	world.free()

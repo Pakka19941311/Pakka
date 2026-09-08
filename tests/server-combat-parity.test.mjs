@@ -26,7 +26,8 @@ test('skill spends at measured rig release; leaving range during windup costs no
   const gltf=JSON.parse(readFileSync(new URL('../public/assets/models/characters/Wizard.gltf',import.meta.url),'utf8'));
   const clip=gltf.animations.find(a=>a.name==='Spell1');const access=gltf.accessors[clip.samplers[0].input];
   const duration=access.max[0]-access.min[0];
-  assert.ok(Math.abs(event.impactAt-event.at-duration*.56*1000)<.01);
+  const expectedTicks=Math.ceil(duration*.56*60-1e-6);
+  assert.ok(Math.abs(event.impactAt-event.at-expectedTicks*1000/60)<.01,'contact is the first fixed reference tick at or after the rig marker');
   assert.equal(p.mp,p.maxMp);assert.equal(p.cooldowns[0],0);
   m.z=15;w.advance(event.impactAt+1);
   assert.equal(p.mp,p.maxMp);assert.equal(p.cooldowns[0],0);assert.equal(m.hp,10000);
@@ -76,10 +77,10 @@ test('chain lightning retains instantaneous hops and stops at the first occluded
 test('server uses the shared acceleration/jump motor; no unrelated window command is required',t=>{
   const f=fixture(t,'ranger');const {world:w,player:p}=f;w.state.monsters=[];
   const reference=new CharacterMotor();f.input({type:'direction',x:1,z:0});let expected=0;
-  for(let i=0;i<4;i++){expected+=reference.step({x:1,z:0},p.stats.speed,.05).dx;w.advance(w.state.time+50);}
+  for(let i=0;i<4;i++){for(let tick=0;tick<3;tick++)expected+=reference.step({x:1,z:0},p.stats.speed,1/60).dx;w.advance(w.state.time+50);}
   assert.ok(Math.abs(p.x-expected)<1e-9);
   f.input({type:'jump'});reference.requestJump();w.advance(w.state.time+50);
-  const jump=reference.step({x:1,z:0},p.stats.speed,.05);expected+=jump.dx;
+  let jump;for(let tick=0;tick<3;tick++){jump=reference.step({x:1,z:0},p.stats.speed,1/60);expected+=jump.dx;}
   assert.ok(Math.abs(p.x-expected)<1e-9);assert.equal(p.yOffset,jump.height);assert.equal(p.grounded,false);
   assert.throws(()=>f.input({type:'attack',entityId:f.target.uid,skill:0}),/missing-target|airborne/);
   const before=p.x;f.input({type:'direction',x:1,z:0});w.advance(w.state.time+200);assert.ok(p.x>before);

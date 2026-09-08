@@ -57,7 +57,11 @@ function smoothPath(world: CollisionWorld, start: Point2, path: Point2[], actorR
   while (index < path.length) {
     let furthest = index;
     for (let candidate = path.length - 1; candidate >= index; candidate -= 1) {
-      if (segmentIsClear(world, anchor, path[candidate], actorRadius, cellSize * 0.45)) {
+      // The reference's coarse sample can miss a rounded obstacle corner.
+      // Mirror native smoothing: retain ordering but require the public .35
+      // segment contract before accepting a shortcut.
+      if (segmentIsClear(world, anchor, path[candidate], actorRadius, cellSize * 0.45)
+        && pathSegmentIsClear(world, anchor, path[candidate], actorRadius)) {
         furthest = candidate;
         break;
       }

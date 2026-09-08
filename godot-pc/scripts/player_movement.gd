@@ -37,6 +37,11 @@ var jump_sent_sequence: int = -1
 var last_sent_sequence: int = 0
 var intent_pending: bool = false
 var manual_cancel_pending: bool = false
+var facing_direction: Vector2 = Vector2(0, 1)
+var combat_target: String = ""
+var approaching: bool = false
+var navigation_goal: Vector2 = Vector2(INF, INF)
+var navigation_cooldown: float = 0.0
 
 func reconcile(snapshot: Dictionary) -> bool:
 	var hero: Dictionary = snapshot.character
@@ -57,6 +62,7 @@ func reconcile(snapshot: Dictionary) -> bool:
 		grounded = bool(hero.grounded)
 		yaw = float(hero.yaw)
 		previous_yaw = yaw
+		facing_direction = Vector2(sin(yaw), cos(yaw))
 		velocity = Vector2.ZERO
 		visual_correction = Vector2.ZERO
 		history.clear()
@@ -68,6 +74,9 @@ func reconcile(snapshot: Dictionary) -> bool:
 		intent_pending = false
 		manual_cancel_pending = false
 		jump_wait_ground = false
+		combat_target = ""
+		approaching = false
+		navigation_goal = Vector2(INF, INF)
 		return true
 	# Compare the received pose to the prediction at that SAME server time.
 	# Never blend an old server position into the current moving position.
@@ -81,7 +90,9 @@ func reconcile(snapshot: Dictionary) -> bool:
 				reference = reference.lerp(history[index + 1].position, clampf((float(snapshot.time) - float(history[index].time)) / maxf(1, span), 0, 1))
 			found = true
 			break
-	if found or input_mode == "idle":
+	# An ACK predating the newest reserved command describes another control
+	# state. It cannot erase that command's predicted travel while in flight.
+	if int(hero.lastInputSequence) >= last_sent_sequence and (found or input_mode == "idle"):
 		var error: Vector2 = Vector2(hero.x, hero.z) - reference
 		if error.length() > .015:
 			var corrected: Vector2 = collision.resolve(position_value, error)
@@ -96,11 +107,14 @@ func reconcile(snapshot: Dictionary) -> bool:
 		intent_pending = false
 		manual_cancel_pending = false
 		if input_mode != "manual":
-			navigation_path = hero.get("navigationPath", []).duplicate(true)
+			# A locally planned path starts on the input tick. Server paths are
+			# needed for blocked firing lines, not to rewind an already used path.
+			if input_mode == "combat" and not combat_line_clear():
+				navigation_path = hero.get("navigationPath", []).duplicate(true)
 			if hero.get("destination") == null and hero.get("target") == null:
 				input_mode = "idle"
 				destination = null
-				velocity = Vector2.ZERO
+				combat_target = ""
 	if bool(hero.dead):
 		cancel_planar()
 		grounded = true
@@ -129,18 +143,29 @@ func submit(value: Dictionary) -> void:
 				input_direction = requested
 				destination = null
 				navigation_path.clear()
+				combat_target = ""
 				manual_cancel_pending = true
 			elif input_mode == "manual":
-				cancel_planar()
+				# Reference key release uses the motor's natural 30/s friction.
+				input_direction = Vector2.ZERO
+				input_mode = "idle"
 		"destination":
-			cancel_planar()
+			input_direction = Vector2.ZERO
+			combat_target = ""
+			manual_cancel_pending = true
 			input_mode = "destination"
 			destination = collision.nearest_free(Vector2(value.x, value.z))
-			# Only a clear straight segment can be predicted before the vetted
-			# server path arrives; no direct prediction through a hidden obstacle.
-			if segment_clear(position_value, destination): navigation_path = [{"x":destination.x,"z":destination.y}]
+			plan_path(destination, true)
 		"attack":
-			cancel_planar()
+			if str(value.get("entityId", "")) != combat_target:
+				manual_cancel_pending = true
+			input_direction = Vector2.ZERO
+			destination = null
+			navigation_path.clear()
+			navigation_goal = Vector2(INF, INF)
+			navigation_cooldown = 0
+			combat_target = str(value.get("entityId", ""))
+			approaching = false
 			input_mode = "combat"
 		"cancel":
 			cancel_planar()
@@ -156,6 +181,7 @@ func request_jump() -> bool:
 	if not grounded or jump_wait_ground or bool(authoritative.get("dead", false)):
 		return false
 	if input_mode != "manual": cancel_planar()
+	manual_cancel_pending = true
 	grounded = false
 	jump_age = 0
 	land_left = 0
@@ -170,14 +196,29 @@ func cancel_planar() -> void:
 	destination = null
 	navigation_path.clear()
 	input_mode = "idle"
+	combat_target = ""
+	approaching = false
+	navigation_goal = Vector2(INF, INF)
 
 func segment_clear(start: Vector2, goal: Vector2) -> bool:
-	var point: Vector2 = start
-	var steps: int = maxi(1, ceili(start.distance_to(goal) / .3))
-	for index: int in range(1, steps + 1):
-		point = start.lerp(goal, float(index) / steps)
-		if collision.blocked(point): return false
-	return true
+	return VarendorNavigation.path_segment_is_clear(collision, start, goal, radius)
+
+func plan_path(goal: Vector2, force: bool = false) -> void:
+	if force or (navigation_cooldown <= 0 and (navigation_goal.distance_to(goal) > .7 or navigation_path.is_empty())):
+		navigation_path = VarendorNavigation.find_path(collision, position_value, goal, radius, {"cellSize":.85,"margin":24,"maxVisited":4500})
+		navigation_goal = goal
+		navigation_cooldown = .18 if not navigation_path.is_empty() else 1.0
+
+func target_body() -> Dictionary:
+	for body: Dictionary in bodies:
+		if str(body.get("uid", body.get("id", ""))) == combat_target:
+			return body
+	return {}
+
+func combat_line_clear() -> bool:
+	var target: Dictionary = target_body()
+	if target.is_empty(): return false
+	return segment_clear(position_value, Vector2(target.x, target.z))
 
 func physics_step(dt: float) -> void:
 	if authoritative.is_empty() or dt <= 0: return
@@ -185,27 +226,54 @@ func physics_step(dt: float) -> void:
 	previous_height = height
 	previous_yaw = yaw
 	clock_ms += dt * 1000
+	navigation_cooldown = maxf(0, navigation_cooldown - dt)
 	var direction: Vector2 = input_direction if input_mode == "manual" else Vector2.ZERO
 	var remaining: float = INF
+	var face_target: Variant = null
 	var combat_lock: bool = str(authoritative.get("combatState", "idle")) in ["windup", "recovery"] and not manual_cancel_pending and input_mode != "manual"
 	if bool(authoritative.get("dead", false)) or combat_lock:
 		direction = Vector2.ZERO
 		velocity = Vector2.ZERO
 	elif input_mode in ["destination", "combat"]:
-		while not navigation_path.is_empty() and position_value.distance_to(Vector2(navigation_path[0].x, navigation_path[0].z)) < .09:
+		if input_mode == "combat":
+			var target: Dictionary = target_body()
+			if target.is_empty():
+				cancel_planar()
+			else:
+				var center: Vector2 = Vector2(target.x, target.z)
+				var distance: float = position_value.distance_to(center)
+				var attack_range: float = float(authoritative.get("attackRange", 2.6))
+				if distance > attack_range: approaching = true
+				var stop_distance: float = minf(attack_range, maxf(attack_range * (.9 if approaching else 1.0), radius + float(target.get("bodyRadius", .46)) + .04))
+				if combat_line_clear() and distance <= stop_distance:
+					approaching = false
+					velocity = Vector2.ZERO
+					navigation_path.clear()
+					face_target = center
+				elif combat_line_clear():
+					var goal: Vector2 = center + (position_value - center).normalized() * maxf(.35, attack_range * .78)
+					plan_path(goal)
+				# A blocked firing line waits for the server's vetted firing
+				# position; never collapse ranged reach to the monster centre.
+		elif destination != null:
+			if position_value.distance_to(destination) < .18:
+				destination = null
+				navigation_path.clear()
+				input_mode = "idle"
+			else: plan_path(destination)
+		while not navigation_path.is_empty() and position_value.distance_to(Vector2(navigation_path[0].x, navigation_path[0].z)) < (.01 if input_mode == "combat" else .1):
 			navigation_path.pop_front()
 		if not navigation_path.is_empty():
 			var next: Vector2 = Vector2(navigation_path[0].x, navigation_path[0].z)
 			direction = (next - position_value).normalized()
 			remaining = next.distance_to(position_value)
-		else:
-			velocity = Vector2.ZERO
 	if not direction.is_zero_approx(): direction = direction.normalized()
 	var rate: float = 19.0 if not direction.is_zero_approx() else 30.0
 	var blend: float = 1.0 - exp(-rate * dt)
 	var desired: Vector2 = direction * speed
-	var displacement: Vector2 = desired * dt + (velocity - desired) * blend / rate
 	velocity += (desired - velocity) * blend
+	var displacement: Vector2 = velocity * dt
+	if not direction.is_zero_approx(): facing_direction = direction
 	if displacement.length() > remaining:
 		displacement = displacement.limit_length(remaining)
 		velocity = Vector2.ZERO
@@ -215,17 +283,18 @@ func physics_step(dt: float) -> void:
 		if absf(center.x-position_value.x) > spacing+absf(displacement.x) or absf(center.y-position_value.y) > spacing+absf(displacement.y): continue
 		displacement = VarendorActorSpacing.slide(position_value,displacement,center,spacing)
 	var next: Vector2 = collision.resolve(position_value,displacement).clamp(Vector2(-156,-136),Vector2(156,136))
-	if next.distance_to(position_value) < .0001: velocity = Vector2.ZERO
 	position_value = next
 	actual_velocity = (position_value - previous_position) / dt
 	if actual_velocity.length() > .08:
-		yaw = lerp_angle(yaw, atan2(actual_velocity.x, actual_velocity.y), 1 - exp(-16 * dt))
+		yaw = lerp_angle(yaw, atan2(facing_direction.x, facing_direction.y), 1 - exp(-16 * dt))
+	elif face_target != null:
+		yaw = lerp_angle(yaw, atan2(face_target.x-position_value.x, face_target.y-position_value.y), 1 - exp(-9 * dt))
 	elif str(authoritative.get("combatState", "idle")) in ["face", "windup", "recovery"]:
-		yaw = lerp_angle(yaw, float(authoritative.yaw), 1 - exp(-18 * dt))
+		yaw = lerp_angle(yaw, float(authoritative.yaw), 1 - exp(-9 * dt))
 	if not grounded:
 		jump_age += dt
-		height += vertical_velocity * dt - .5 * GRAVITY * dt * dt
 		vertical_velocity -= GRAVITY * dt
+		height += vertical_velocity * dt
 		if height <= 0 and vertical_velocity < 0:
 			height = 0
 			vertical_velocity = 0

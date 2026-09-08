@@ -58,14 +58,15 @@ var inventory_footer: Label
 var inventory_drag: bool = false
 var inventory_drag_offset: Vector2
 var game_settings: Dictionary = {}
-const DEFAULT_BINDINGS: Dictionary = {"move_forward":KEY_W,"move_back":KEY_S,"move_left":KEY_A,"move_right":KEY_D,"orbit_left":KEY_Q,"orbit_right":KEY_E,"jump":KEY_SPACE,"interact":KEY_F}
-const BINDING_NAMES: Dictionary = {"move_forward":"Вперёд","move_back":"Назад","move_left":"Влево","move_right":"Вправо","orbit_left":"Камера влево","orbit_right":"Камера вправо","jump":"Прыжок","interact":"Взаимодействие"}
+const DEFAULT_BINDINGS: Dictionary = {"move_forward":KEY_W,"move_back":KEY_S,"move_left":KEY_A,"move_right":KEY_D,"potion":KEY_Q,"ether":KEY_E,"jump":KEY_SPACE,"interact":KEY_F}
+const BINDING_NAMES: Dictionary = {"move_forward":"Вперёд","move_back":"Назад","move_left":"Влево","move_right":"Вправо","potion":"Зелье здоровья","ether":"Зелье ресурса","jump":"Прыжок","interact":"Взаимодействие"}
 var rebinding_action: String = ""
 var binding_message: Label
 var display_before: Dictionary = {}
 var display_remaining: float = 0.0
 var display_countdown: Label
 var quick_panel_node: PanelContainer
+var reference_hud: VarendorReferenceHud = VarendorReferenceHud.new()
 
 func _ready() -> void:
 	if "--world-samples" in OS.get_cmdline_user_args():
@@ -87,6 +88,7 @@ func _ready() -> void:
 	player_input.setup(world,net)
 	world.snapshot_presented.connect(present_snapshot)
 	build_ui()
+	world.event_presented.connect(reference_hud.combat_event)
 	login.hide()
 	notice("Загрузка мира…")
 	await get_tree().process_frame
@@ -158,126 +160,7 @@ func place_panel(anchor: int, position: Vector2, size: Vector2) -> PanelContaine
 	return panel
 
 func build_ui() -> void:
-	var canvas: CanvasLayer = CanvasLayer.new()
-	add_child(canvas)
-	ui = Control.new()
-	canvas.add_child(ui)
-	ui.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	ui.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	get_viewport().size_changed.connect(keep_inventory_visible)
-	var theme: Theme = Theme.new()
-	theme.default_font_size = 15
-	theme.set_stylebox("panel", "PanelContainer", panel_style())
-	theme.set_stylebox("normal", "Button", panel_style(Color("262c2c"), Color("655b44")))
-	theme.set_stylebox("hover", "Button", panel_style(Color("3a4038"), Color("c6a66c")))
-	theme.set_stylebox("pressed", "Button", panel_style(Color("4c4835"), Color("e0ba76")))
-	theme.set_color("font_color", "Button", Color("dfd6c2"))
-	theme.set_stylebox("panel", "TooltipPanel", panel_style(Color("121719"), Color("b09964")))
-	theme.set_color("font_color", "TooltipLabel", Color("eee3c8"))
-	theme.set_font_size("font_size", "TooltipLabel", 16)
-	ui.theme = theme
-	var hero_panel: PanelContainer = place_panel(Control.PRESET_BOTTOM_LEFT, Vector2(18, -110), Vector2(290, 92))
-	var hero_box: VBoxContainer = VBoxContainer.new()
-	hero_box.add_theme_constant_override("separation", 3)
-	hero_panel.add_child(hero_box)
-	heading = label("VARENDOR", 14, Color("ddc79c"))
-	hero_box.add_child(heading)
-	hp = ProgressBar.new()
-	hp.show_percentage = false
-	hp.custom_minimum_size = Vector2(266, 13)
-	hp.add_theme_stylebox_override("fill", bar_style(Color("923c36")))
-	hp.add_theme_stylebox_override("background", bar_style(Color("24292b")))
-	hero_box.add_child(hp)
-	mp = ProgressBar.new()
-	mp.show_percentage = false
-	mp.custom_minimum_size.y = 10
-	mp.add_theme_stylebox_override("fill", bar_style(Color("375879")))
-	mp.add_theme_stylebox_override("background", bar_style(Color("24292b")))
-	hero_box.add_child(mp)
-	health_text = label("", 11)
-	hero_box.add_child(health_text)
-	xp = ProgressBar.new()
-	xp.show_percentage = false
-	xp.custom_minimum_size.y = 5
-	xp.add_theme_stylebox_override("fill", bar_style(Color("a28d53")))
-	xp.add_theme_stylebox_override("background", bar_style(Color("24292b")))
-	hero_box.add_child(xp)
-	target_panel = place_panel(Control.PRESET_CENTER_TOP, Vector2(-150, 20), Vector2(300, 78))
-	var target_box: VBoxContainer = VBoxContainer.new()
-	target_panel.add_child(target_box)
-	target_text = label("", 15, Color("e3caa1"))
-	target_box.add_child(target_text)
-	target_hp = ProgressBar.new()
-	target_hp.custom_minimum_size = Vector2(274, 14)
-	target_hp.show_percentage = false
-	target_hp.add_theme_stylebox_override("fill", bar_style(Color("8d443f")))
-	target_hp.add_theme_stylebox_override("background", bar_style(Color("24292b")))
-	target_box.add_child(target_hp)
-	target_state = label("", 12)
-	target_box.add_child(target_state)
-	target_panel.hide()
-	var minimap: Control = preload("res://scripts/minimap.gd").new()
-	minimap.world = world
-	ui.add_child(minimap)
-	minimap.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	minimap.position += Vector2(-184, 18)
-	minimap.size = Vector2(166, 154)
-	minimap.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var menu: VBoxContainer = VBoxContainer.new()
-	ui.add_child(menu)
-	menu.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	menu.position += Vector2(-162, -110)
-	menu.add_child(button("Сумка · TAB", toggle_inventory))
-	menu.add_child(button("Меню · Esc", system_menu))
-	var quick_panel: PanelContainer = place_panel(Control.PRESET_CENTER_BOTTOM, Vector2(-230, -112), Vector2(460, 94))
-	quick_panel_node = quick_panel
-	var quick_row: HBoxContainer = HBoxContainer.new()
-	quick_panel.add_child(quick_row)
-	quick_grid = GridContainer.new()
-	quick_grid.columns = 8
-	quick_grid.add_theme_constant_override("h_separation", 3)
-	quick_grid.add_theme_constant_override("v_separation", 3)
-	quick_row.add_child(quick_grid)
-	for index: int in range(32):
-		var slot: VarendorQuickSlot = VarendorQuickSlot.new()
-		slot.focus_mode = Control.FOCUS_NONE
-		slot.pressed.connect(func(): activate(quick[index].action))
-		slot.custom_minimum_size = Vector2(48, 40)
-		slot.gui_input.connect(func(event: InputEvent):
-			if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
-				assign_dialog(index))
-		quick_grid.add_child(slot)
-		quick_buttons.append(slot)
-	quick_row.add_child(button("+", func():
-		full_quick = not full_quick
-		refresh_quick()
-		save_preferences()))
-	refresh_quick()
-	var log_panel: PanelContainer = place_panel(Control.PRESET_BOTTOM_LEFT, Vector2(18, -274), Vector2(290, 150))
-	log_panel.add_theme_stylebox_override("panel", panel_style(Color(.06, .08, .08, .64), Color("514c3b")))
-	var log_box: VBoxContainer = VBoxContainer.new()
-	log_panel.add_child(log_box)
-	log_box.add_child(label("Журнал", 12, Color("b7a580")))
-	log_text = RichTextLabel.new()
-	log_text.custom_minimum_size = Vector2(262, 108)
-	log_text.add_theme_font_size_override("normal_font_size", 12)
-	log_text.scroll_following = true
-	log_box.add_child(log_text)
-	status = label("", 12, Color("c9bb9b"))
-	ui.add_child(status)
-	status.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-	status.position += Vector2(-184, 179)
-	diagnostics = label("", 12)
-	ui.add_child(diagnostics)
-	diagnostics.position = Vector2(18, 18)
-	diagnostics.hide()
-	build_inventory()
-	respawn = button("Возродиться в Гринфолле", func(): net.command({"type":"respawn"}))
-	ui.add_child(respawn)
-	respawn.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	respawn.position += Vector2(-125, -35)
-	respawn.hide()
-	build_login()
+	reference_hud.setup(self)
 
 func build_login() -> void:
 	login = place_panel(Control.PRESET_CENTER, Vector2(-240, -220), Vector2(480, 410))
@@ -315,106 +198,7 @@ func build_login() -> void:
 	box.add_child(create)
 
 func build_inventory() -> void:
-	inventory_panel = place_panel(Control.PRESET_TOP_RIGHT, Vector2(-404, 180), Vector2(384, 530))
-	var box: VBoxContainer = VBoxContainer.new()
-	box.add_theme_constant_override("separation", 6)
-	inventory_panel.add_child(box)
-	var top: HBoxContainer = HBoxContainer.new()
-	box.add_child(top)
-	inventory_title = label("ПЕРСОНАЖ", 16, Color("dfc591"))
-	inventory_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	inventory_title.mouse_filter = Control.MOUSE_FILTER_STOP
-	inventory_title.gui_input.connect(func(event: InputEvent):
-		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-			inventory_drag = event.pressed
-			inventory_drag_offset = get_viewport().get_mouse_position() - inventory_panel.position
-			if not event.pressed:
-				save_preferences()
-		elif event is InputEventMouseMotion and inventory_drag:
-			inventory_panel.position = (get_viewport().get_mouse_position() - inventory_drag_offset).clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO)))
-	top.add_child(inventory_title)
-	top.add_child(button("×", toggle_inventory))
-	var character_area: HBoxContainer = HBoxContainer.new()
-	character_area.add_theme_constant_override("separation", 8)
-	box.add_child(character_area)
-	var stat_panel: PanelContainer = PanelContainer.new()
-	stat_panel.custom_minimum_size = Vector2(154, 235)
-	stat_panel.add_theme_stylebox_override("panel", panel_style(Color("181e20"), Color("454a42")))
-	character_area.add_child(stat_panel)
-	stats_text = label("", 12)
-	stats_text.clip_text = true
-	stats_text.hide()
-	stat_panel.add_child(stats_text)
-	var stat_grid: VBoxContainer = VBoxContainer.new()
-	stat_grid.add_theme_constant_override("separation", 1)
-	stat_panel.add_child(stat_grid)
-	for entry: Array in [["level","Уровень"],["hp","ОЗ"],["mp","Ресурс"],["str","Сила"],["dex","Ловкость"],["int","Интеллект"],["vit","Выносливость"],["spi","Дух"],["attack","Атака"],["matk","Маг. атака"],["def","Защита"],["mdef","Маг. защита"]]:
-		var row: HBoxContainer = HBoxContainer.new()
-		stat_grid.add_child(row)
-		var caption: Label = label(str(entry[1]), 11, Color("b8b3a3"))
-		caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(caption)
-		var value: Label = label("", 11, Color("ece0c4"))
-		value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		row.add_child(value)
-		stat_values[str(entry[0])] = value
-		var line: HSeparator = HSeparator.new()
-		line.custom_minimum_size.y = 1
-		var rule: StyleBoxLine = StyleBoxLine.new()
-		rule.color = Color("454a42")
-		rule.thickness = 1
-		line.add_theme_stylebox_override("separator", rule)
-		stat_grid.add_child(line)
-	var equipment: GridContainer = GridContainer.new()
-	equipment.columns = 3
-	equipment.add_theme_constant_override("h_separation", 3)
-	equipment.add_theme_constant_override("v_separation", 4)
-	character_area.add_child(equipment)
-	# Twelve established slots, positioned like the reference character paper doll.
-	for slot_name: String in ["neck", "head", "ear1", "weapon", "chest", "ear2", "offhand", "gloves", "ring1", "belt", "boots", "ring2"]:
-		var slot: VarendorItemSlot = VarendorItemSlot.new()
-		slot.owner_ui = self
-		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(54, 54)
-		slot.payload = {"kind":"equipment","slot":slot_name,"item":{}}
-		slot.tooltip_text = data.slotNames[slot_name]
-		equipment.add_child(slot)
-		equipment_slots[slot_name] = slot
-	var tabs: HBoxContainer = HBoxContainer.new()
-	box.add_child(tabs)
-	var bag_tab: Label = label("Инвентарь", 13, Color("dfc591"))
-	bag_tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tabs.add_child(bag_tab)
-	tabs.add_child(button("Комплект", func():
-		var details: VBoxContainer = dialog("Бонусы комплекта", Vector2i(390, 180))
-		details.add_child(label("В текущих предметах бонусы комплектов\nне заданы. Характеристики экипировки\nучитываются в окне персонажа.", 15))))
-	var scroll: ScrollContainer = ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(358, 165)
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
-	box.add_child(scroll)
-	var bag: GridContainer = GridContainer.new()
-	bag.columns = 6
-	bag.add_theme_constant_override("h_separation", 3)
-	bag.add_theme_constant_override("v_separation", 3)
-	scroll.add_child(bag)
-	for index: int in range(42):
-		var slot: VarendorItemSlot = VarendorItemSlot.new()
-		slot.owner_ui = self
-		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(53, 53)
-		slot.payload = {"kind":"bag","index":index,"item":{}}
-		bag.add_child(slot)
-		bag_slots.append(slot)
-	inventory_footer = label("Золото: 0      Ячейки: 0 / 42", 12)
-	box.add_child(inventory_footer)
-	var commands: HBoxContainer = HBoxContainer.new()
-	box.add_child(commands)
-	commands.add_child(button("Использовать", use_selected))
-	commands.add_child(button("Продать", sell_selected))
-	commands.add_child(button("Добыча", func(): net.command({"type":"collect"})))
-
-	inventory_panel.hide()
+	reference_hud.build_inventory()
 
 func snapshot_received(snapshot: Dictionary) -> void:
 	world.receive_snapshot(snapshot)
@@ -433,7 +217,6 @@ func present_snapshot(snapshot: Dictionary) -> void:
 	xp.max_value = data.xpNeeded[clampi(int(hero.level), 0, data.xpNeeded.size() - 1)]
 	xp.value = hero.xp
 	xp.tooltip_text = "Опыт: %d / %d · Задание: %d · Побед: %d" % [hero.xp, xp.max_value, hero.quest, hero.kills]
-	health_text.text = "ОЗ %d / %d    %s %d / %d" % [hero.hp, hero.maxHp, data.classes[hero.classId].resource, hero.mp, hero.maxMp]
 	var region: String = ""
 	var nearest: float = INF
 	for location: Dictionary in data.locations:
@@ -443,16 +226,7 @@ func present_snapshot(snapshot: Dictionary) -> void:
 			region = location.name
 	status.text = region
 	respawn.visible = hero.dead
-	inventory_title.text = str(hero.name) + " · Персонаж"
-	inventory_footer.text = "Золото: %d      Ячейки: %d / 42" % [hero.gold, hero.inventory.size()]
-	stats_text.text = "%s\n\nУровень        %d\nОЗ            %d / %d\n%s       %d / %d\n\nСила           %d\nЛовкость       %d\nИнтеллект      %d\nВыносливость   %d\nДух            %d\n\nАтака          %d–%d\nМаг. атака      %d\nЗащита         %d\nМаг. защита     %d" % [hero.name, hero.level, hero.hp, hero.maxHp, data.classes[hero.classId].resource, hero.mp, hero.maxMp, hero.stats.get("str", 0), hero.stats.get("dex", 0), hero.stats.get("int", 0), hero.stats.get("vit", 0), hero.stats.get("spi", 0), hero.stats.get("atkMin", 0), hero.stats.get("atkMax", 0), hero.stats.get("matk", 0), hero.stats.get("def", 0), hero.stats.get("mdef", 0)]
-	for key: String in stat_values:
-		var value: String = str(int(hero.stats.get(key, 0)))
-		if key == "level": value = str(int(hero.level))
-		elif key == "hp": value = "%d/%d" % [hero.hp, hero.maxHp]
-		elif key == "mp": value = "%d/%d" % [hero.mp, hero.maxMp]
-		elif key == "attack": value = "%d–%d" % [hero.stats.atkMin, hero.stats.atkMax]
-		stat_values[key].text = value
+	reference_hud.refresh(hero)
 	var fingerprint: String = JSON.stringify([hero.inventory, hero.equipment, hero.stats, selected_scroll])
 	if fingerprint != inventory_fingerprint:
 		inventory_fingerprint = fingerprint
@@ -476,49 +250,15 @@ func item_name(item: Dictionary) -> String:
 	return str(data.items.get(item.id, {}).get("name", "Неизвестный предмет: " + str(item.id))) + (" +" + str(int(item.plus)) if item.plus > 0 else "")
 
 func item_tip(item: Dictionary) -> String:
-	if item.is_empty():
-		return "Свободная ячейка"
-	var def: Dictionary = data.items.get(item.id, {})
-	var lines: Array = [item_name(item)]
-	if def.has("origin"):
-		lines.append(def.origin)
-	if def.has("desc"):
-		lines.append(def.desc)
-	if def.has("classes"):
-		var names: Array = []
-		for class_id: String in def.classes:
-			names.append(data.classes[class_id].name)
-		lines.append("Класс: " + ", ".join(names))
-	var names: Dictionary = {"atkMin":"Атака (мин.)","atkMax":"Атака (макс.)","matk":"Магическая атака","def":"Защита","mdef":"Магическая защита","hp":"Здоровье","mp":"Ресурс","crit":"Критический шанс","accuracy":"Точность","evasion":"Уклонение","speed":"Скорость"}
-	if data.itemStats.has(item.id):
-		var stats: Dictionary = data.itemStats[item.id][clampi(int(item.plus), 0, 15)]
-		for key: String in stats.total:
-			if stats.total[key] != 0:
-				lines.append("%s: %s + %s = %s" % [names.get(key, key), stats.base.get(key, 0), stats.bonus.get(key, 0), stats.total[key]])
-		if not net.hero.is_empty():
-			var item_slot: String = str(def.get("slot", ""))
-			var compared: Array = ["ring1", "ring2"] if item_slot == "ring" else ["ear1", "ear2"] if item_slot in ["ear", "earring"] else [resolve_slot(item_slot)]
-			for slot: String in compared:
-				var equipped = net.hero.equipment.get(slot)
-				if equipped is Dictionary and equipped.uid != item.uid and data.items.get(equipped.id, {}).get("slot", "") == def.get("slot", "-"):
-					lines.append("\n" + ("Замена: " if slot == resolve_slot(item_slot) else "Вторая ячейка: ") + item_name(equipped))
-					var other: Dictionary = data.itemStats[equipped.id][clampi(int(equipped.plus), 0, 15)].total
-					var keys: Dictionary = other.duplicate()
-					keys.merge(stats.total, true)
-					for key: String in keys:
-						var difference: float = float(stats.total.get(key, 0)) - float(other.get(key, 0))
-						if difference != 0:
-							lines.append("%s: %+.2f" % [names.get(key, key), difference])
-	if data.scrolls.has(item.id):
-		lines.append("Дважды нажмите свиток, затем предмет для заточки.")
-	if not selected_scroll.is_empty() and def.has("slot") and int(item.plus) < 15:
-		var scroll: Dictionary = data.scrolls[selected_scroll.id]
-		var category: String = "weapon" if def.slot == "weapon" else "armor"
-		if scroll.category == category:
-			var chance: float = float(data.chances[category + "_" + scroll.quality][int(item.plus)])
-			lines.append("\nЗаточка: +%d → +%d · Шанс %s%%" % [item.plus, item.plus + 1, chance])
-			lines.append("Безопасная попытка." if chance >= 100 else "При неудаче предмет уничтожается.\nУлучшенный свиток не страхует.")
-	lines.append("Количество: %d · Продажа: %d золота" % [item.count, floorf(float(def.get("value", 0)) * .48) * item.count])
+	var model: Dictionary = reference_hud.tooltip_model(item)
+	if model.is_empty(): return "Свободная ячейка"
+	var lines: Array = [model.title,model.subtitle,model.description]
+	for row: Dictionary in model.rows: lines.append(row.label+": "+str(row.value)+("\n"+str(row.detail) if row.has("detail") else ""))
+	lines.append_array(model.restrictions)
+	lines.append_array(model.actions)
+	for comparison: Dictionary in model.comparisons:
+		lines.append(comparison.title)
+		for row: Dictionary in comparison.rows: lines.append(row.label+": "+str(row.value))
 	return "\n".join(lines)
 
 func resolve_slot(item_slot: String) -> String:
@@ -532,20 +272,22 @@ func resolve_slot(item_slot: String) -> String:
 	return str(slots[0])
 
 func refresh_inventory() -> void:
-	if net.hero.is_empty():
+	var hero: Dictionary = reference_hud.display_hero()
+	if hero.is_empty():
 		return
 	for index: int in range(42):
-		var item: Dictionary = net.hero.inventory[index] if index < net.hero.inventory.size() else {}
+		var item: Dictionary = hero.inventory[index] if index < hero.inventory.size() else {}
 		var slot: VarendorItemSlot = bag_slots[index]
 		slot.payload.item = item.duplicate()
 		slot.update_item(item)
 		slot.tooltip_text = ""
 	for slot_name: String in equipment_slots:
-		var item = net.hero.equipment.get(slot_name)
+		var item = hero.equipment.get(slot_name)
 		var slot: VarendorItemSlot = equipment_slots[slot_name]
 		slot.payload.item = item.duplicate() if item is Dictionary else {}
 		slot.update_item(item if item is Dictionary else {})
 		slot.tooltip_text = "" if item is Dictionary else str(data.slotNames[slot_name])
+	reference_hud.refresh_inventory_state()
 
 func action_name(action: String) -> String:
 	if action.begins_with("skill:"):
@@ -554,43 +296,45 @@ func action_name(action: String) -> String:
 	return {"":"—","attack":"Атака","potion":"Здоровье","ether":"Ресурс","teleport":"Возврат"}.get(action, action)
 
 func refresh_quick() -> void:
+	var hero: Dictionary = reference_hud.display_hero()
 	if quick_panel_node != null:
-		quick_panel_node.position.y = ui.size.y - (202 if full_quick else 112)
-		quick_panel_node.size.y = 184 if full_quick else 94
+		reference_hud.layout()
 	for index: int in range(quick_buttons.size()):
 		var slot: VarendorQuickSlot = quick_buttons[index]
 		var action: String = quick[index].action
-		var key: String = quick[index].key.replace("Shift+", "S+").replace("Digit", "").replace("Key", "")
+		var key: String = quick[index].key.replace("Shift+", "⇧").replace("Digit", "").replace("Key", "")
 		var title: String = action_name(action)
-		var artwork_id: String = action if data.items.has(action) else str(data.classes[net.hero.get("classId", "knight")].weapon)
+		var artwork_id: String = action if data.items.has(action) else str(data.classes[hero.get("classId", "knight")].weapon)
 		slot.artwork = load("res://assets/icons/" + artwork_id + ".svg") if not action.is_empty() else null
 		slot.remaining = 0
 		slot.quantity = 0
 		slot.usable = not net.hero.get("dead", false)
-		if action in ["potion", "ether", "teleport"] and not net.hero.is_empty():
-			for item: Dictionary in net.hero.inventory:
+		if action in ["potion", "ether", "teleport"] and not hero.is_empty():
+			for item: Dictionary in hero.inventory:
 				if item.id == action:
 					slot.quantity += int(item.count)
 			slot.usable = slot.usable and slot.quantity > 0
 		var icon: String = {"":"·","attack":"⚔","potion":"ОЗ","ether":"MP","teleport":"⌂"}.get(action, str(index % 8 + 1))
 		if action.begins_with("skill:"):
 			var skill_index: int = int(action.trim_prefix("skill:"))
-			slot.artwork = load("res://assets/icons/%s_skill_%d.svg" % [net.hero.get("classId", "knight"), skill_index])
-			var skill: Dictionary = data.classes[net.hero.get("classId", "knight")].skills[skill_index]
+			slot.artwork = load("res://assets/icons/%s_skill_%d.svg" % [hero.get("classId", "knight"), skill_index])
+			var skill: Dictionary = data.classes[hero.get("classId", "knight")].skills[skill_index]
 			icon = str(skill.icon)
-			if not net.hero.is_empty():
-				var left: float = maxf(0, (net.hero.cooldowns[skill_index] - float(world.current_snapshot.get("time", net.last_time))) / 1000.0)
+			if not hero.is_empty():
+				var left: float = maxf(0, (hero.cooldowns[skill_index] - float(world.current_snapshot.get("time", net.last_time))) / 1000.0)
 				slot.remaining = left
 				slot.cooldown = float(skill.cd)
-				slot.usable = slot.usable and net.hero.mp >= skill.cost and left <= 0
+				slot.usable = slot.usable and hero.mp >= skill.cost and left <= 0
 				if left > 0:
 					icon = "%.1f" % left
 			title += "\nЦена: %s · Перезарядка: %s с" % [skill.cost, skill.cd]
 		slot.text = ""
+		slot.symbol = str(data.classes[hero.get("classId","knight")].skills[int(action.trim_prefix("skill:"))].icon) if action.begins_with("skill:") else {"":"","attack":"⚔","potion":"♥","ether":"◆","teleport":"⌂"}.get(action,"")
 		slot.key_label = key
 		slot.queue_redraw()
 		slot.tooltip_text = title + "\nПКМ — назначение действия и клавиши"
 		slot.visible = index < 16 or full_quick
+	reference_hud.refresh_consumables()
 
 func load_preferences(id: String) -> void:
 	preference_hero = id
@@ -610,15 +354,19 @@ func load_preferences(id: String) -> void:
 			quick[index].key = key if key in data.quickKeys and key not in used else ""
 			if not quick[index].key.is_empty():
 				used.append(quick[index].key)
-	world.camera_distance = clampf(float(preferences.get("camera_distance", 21)), 9, 30)
+	# One-time migration from the rejected native camera range to the reference.
+	var reference_camera: bool = preferences.get("camera_reference","") == "1e94a0d1"
+	world.camera_distance = clampf(float(preferences.get("camera_distance",10.5)) if reference_camera else 10.5,5.5,18)
+	preferences["camera_reference"] = "1e94a0d1"
 	game_settings = preferences.get("settings", {})
 	configure_input()
 	full_quick = bool(preferences.get("full_quick", false))
-	if preferences.get("inventory_position") is Array and preferences.inventory_position.size() == 2:
+	if preferences.get("hud_reference", "") == "1e94a0d1" and preferences.get("inventory_position") is Array and preferences.inventory_position.size() == 2:
 		inventory_panel.position = Vector2(preferences.inventory_position[0], preferences.inventory_position[1]).clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO))
+	else:
+		inventory_panel.position = Vector2(ui.size.x - 410, 58)
+		keep_inventory_visible()
 	apply_settings()
-	quick_panel_node.position.y = ui.size.y - (202 if full_quick else 112)
-	quick_panel_node.size.y = 184 if full_quick else 94
 	refresh_quick()
 
 func save_preferences() -> void:
@@ -626,9 +374,11 @@ func save_preferences() -> void:
 		return
 	preferences["quickbar"] = quick
 	preferences["camera_distance"] = world.camera_distance
+	preferences["camera_reference"] = "1e94a0d1"
 	preferences["schema"] = 2
 	preferences["full_quick"] = full_quick
 	preferences["inventory_position"] = [inventory_panel.position.x, inventory_panel.position.y]
+	preferences["hud_reference"] = "1e94a0d1"
 	preferences["settings"] = game_settings
 	if not net.save_private_json(preference_path, preferences):
 		notice("Не удалось сохранить назначения клавиш")
@@ -728,7 +478,7 @@ func controls_dialog() -> void:
 				setting_choice(page, "Декоративная растительность", "vegetation", ["24 м", "45 м", "80 м"], 2)
 				setting_choice(page, "Разрешение 3D", "render_scale", ["50%", "75%", "100%"], 2)
 			"Управление":
-				page.add_child(label("ЛКМ по земле — движение. ЛКМ по врагу — атака.\nЗажатая ПКМ — вращение камеры. Колесо — масштаб.\nWASD — движение, Q / E — камера, Пробел — прыжок.\nПКМ по быстрой ячейке — действие и клавиша.", 15))
+				page.add_child(label("ЛКМ по земле — движение. ЛКМ по врагу — атака.\nЗажатая ПКМ — вращение камеры. Колесо — масштаб.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nПКМ по быстрой ячейке — действие и клавиша.", 15))
 				setting_toggle(page, "Инвертировать камеру по вертикали", "invert_y", false)
 				page.add_child(label("Чувствительность мыши"))
 				var slider: HSlider = HSlider.new()
@@ -835,11 +585,15 @@ func configure_input() -> void:
 		var event: InputEventKey = InputEventKey.new()
 		event.physical_keycode = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
 		InputMap.action_add_event(action, event)
+		if action in ["move_forward","move_back","move_left","move_right"] and event.physical_keycode == DEFAULT_BINDINGS[action]:
+			var arrow: InputEventKey = InputEventKey.new()
+			arrow.physical_keycode = {"move_forward":KEY_UP,"move_back":KEY_DOWN,"move_left":KEY_LEFT,"move_right":KEY_RIGHT}[action]
+			InputMap.action_add_event(action, arrow)
 
 func assign_movement_binding(event: InputEventKey) -> void:
 	var key: int = event.physical_keycode
-	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB] or (key >= KEY_1 and key <= KEY_8):
-		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab и 1–8 заняты интерфейсом."
+	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_K, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
+		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, K / M, Enter и 1–8 заняты интерфейсом."
 		return
 	var bindings: Dictionary = game_settings.get("bindings", {}).duplicate()
 	for action: String in DEFAULT_BINDINGS:
@@ -864,8 +618,7 @@ func window_resolutions() -> Array:
 	return values if not values.is_empty() else [Vector2i(1280, 720)]
 
 func keep_inventory_visible() -> void:
-	if inventory_panel != null:
-		inventory_panel.position = inventory_panel.position.clamp(Vector2.ZERO, (ui.size - inventory_panel.size).max(Vector2.ZERO))
+	reference_hud.layout()
 
 func confirm_display(previous: Dictionary) -> void:
 	close_dialog()
@@ -932,13 +685,14 @@ func activate(action: String) -> void:
 		net.intent({"type":"attack","entityId":"@self" if self_cast else world.target_id,"skill":index if index >= 0 else null})
 
 func item_clicked(payload: Dictionary, double_click: bool) -> void:
-	if net.command_busy or net.hero.get("dead", true):
+	if net.command_busy:
 		return
 	selected_item = payload.duplicate(true)
 	if payload.get("kind") == "equipment":
 		chosen_equipment = str(payload.slot)
 	var item: Dictionary = payload.get("item", {})
-	if item.is_empty():
+	reference_hud.refresh_inventory_state()
+	if item.is_empty() or net.hero.get("dead",true):
 		return
 	if not selected_scroll.is_empty() and item.uid != selected_scroll.uid:
 		if can_enhance(item):
@@ -950,6 +704,7 @@ func item_clicked(payload: Dictionary, double_click: bool) -> void:
 		use_selected()
 
 func use_selected() -> void:
+	if net.hero.get("dead",true) or net.command_busy: return
 	var item: Dictionary = selected_item.get("item", {})
 	if item.is_empty():
 		return
@@ -979,6 +734,8 @@ func sell_selected() -> void:
 		close_dialog()))
 
 func drop_item(source: Dictionary, destination: Dictionary) -> void:
+	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(source.item): return
+	if source.kind == "equipment" and destination.kind == "equipment": return
 	if destination.kind == "equipment":
 		net.command({"type":"equip","item":source.item.duplicate(),"slot":destination.slot})
 	elif source.kind == "equipment":
@@ -988,15 +745,20 @@ func drop_item(source: Dictionary, destination: Dictionary) -> void:
 
 func toggle_inventory() -> void:
 	inventory_panel.visible = not inventory_panel.visible
+	if inventory_panel.visible:
+		refresh_inventory()
+		reference_hud.clamp_inventory()
+	elif is_instance_valid(tooltip_panel):
+		tooltip_panel.queue_free()
+		tooltip_panel = null
 
 func notice(message: String) -> void:
 	if not qa_path.is_empty():
 		print("VARENDOR_QA_NOTICE " + message)
 	var translations: Dictionary = {"shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
 	if log_text != null:
-		log_text.append_text(str(translations.get(message, message)) + "\n")
-		if log_text.get_paragraph_count() > 200:
-			log_text.remove_paragraph(0)
+		var translated: String = str(translations.get(message,message))
+		reference_hud.add_log(translated,"loot" if translated.begins_with("Добыча:") else "system")
 	else:
 		print(message)
 
@@ -1035,7 +797,12 @@ func _process(delta: float) -> void:
 		if qa_last_frame_usec > 0:
 			qa_times.append(float(now_usec - qa_last_frame_usec) / 1000.0)
 		qa_last_frame_usec = now_usec
-	player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
+
+func _physics_process(delta: float) -> void:
+	# Parent runs before the world motor: input and movement share the same
+	# 60 Hz lattice, including multiple catch-up ticks during a slow frame.
+	if world != null and net != null:
+		player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
 	if status != null and not net.connected and not net.hero.is_empty():
 		status.text = "Соединение потеряно · переподключение…"
 
@@ -1080,17 +847,31 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 		match event.physical_keycode:
 			KEY_I, KEY_C, KEY_TAB: toggle_inventory()
+			KEY_K: reference_hud.skills_dialog()
+			KEY_M: reference_hud.map_dialog()
+			KEY_ENTER: reference_hud.chat.grab_focus()
 		if event.is_action_pressed("jump"):
 			net.intent({"type":"jump"})
+		elif event.is_action_pressed("potion") and not event.shift_pressed and not event.ctrl_pressed and not event.alt_pressed and not event.meta_pressed:
+			activate("potion")
+		elif event.is_action_pressed("ether") and not event.shift_pressed and not event.ctrl_pressed and not event.alt_pressed and not event.meta_pressed:
+			activate("ether")
 		elif event.is_action_pressed("interact"):
 			interact()
 	if text_focused():
+		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT and not selected_scroll.is_empty():
+		selected_scroll = {}
+		refresh_inventory()
+		get_viewport().set_input_as_handled()
 		return
 	if player_input.mouse(event):
 		get_viewport().set_input_as_handled()
 		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]: save_preferences()
 
 func _input(event: InputEvent) -> void:
+	if world != null and net != null:
+		player_input.handle_keyboard(event, not text_focused() and net.connected and not bool(net.hero.get("dead", true)))
 	if world != null and world.camera_controller.handle_captured_input(event): get_viewport().set_input_as_handled()
 
 func release_orbit(restore: bool = true) -> void:
@@ -1240,6 +1021,7 @@ func run_qa() -> void:
 	checks["stream_active"] = net.stream_requested and net.stream.get_status() == HTTPClient.STATUS_BODY
 	checks.merge(await preload("res://scripts/network_qa.gd").run(get_tree(), world.current_snapshot, qa_path.get_base_dir()))
 	checks.merge(await preload("res://scripts/core_acceptance.gd").run(self))
+	checks.merge(await preload("res://scripts/reference_ui_qa.gd").run(self))
 	# Same actual-map collision vectors are resolved independently by TypeScript.
 	var cases = JSON.parse_string(FileAccess.get_file_as_string("res://generated/collision-qa.json")) if FileAccess.file_exists("res://generated/collision-qa.json") else []
 	checks["shared_collision_vectors"] = not cases.is_empty()
@@ -1296,22 +1078,10 @@ func system_menu() -> void:
 	box.add_child(button("Выйти из игры", quit_game))
 
 func show_item_tip(item: Dictionary, anchor: Control) -> void:
-	if is_instance_valid(tooltip_panel): tooltip_panel.queue_free()
-	tooltip_anchor = anchor
-	if item.is_empty(): return
-	tooltip_panel = PanelContainer.new()
-	tooltip_panel.add_theme_stylebox_override("panel", panel_style(Color("141b1d"), Color("ba9b63")))
-	ui.add_child(tooltip_panel)
-	var content: RichTextLabel = RichTextLabel.new()
-	var text_value: String = item_tip(item)
-	content.text = text_value
-	content.add_theme_font_size_override("normal_font_size", 14)
-	content.custom_minimum_size = Vector2(310, minf(450, text_value.split("\n").size() * 20 + 12))
-	content.scroll_active = true
-	tooltip_panel.add_child(content)
-	var pos: Vector2 = anchor.global_position + Vector2(-340, 0)
-	tooltip_panel.position = pos.clamp(Vector2.ZERO, (ui.size - Vector2(336, content.custom_minimum_size.y + 20)).max(Vector2.ZERO))
-	tooltip_timer = 30
+	reference_hud.show_tooltip(item,anchor)
+
+func fit_reference_tooltip(anchor: Control) -> void:
+	reference_hud.fit_tooltip(anchor)
 
 func leave_item_tip() -> void:
 	tooltip_timer = .2

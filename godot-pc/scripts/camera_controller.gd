@@ -4,31 +4,37 @@ extends Node
 # One owner for the mouse capture lease and camera pose. Input routing is
 # explicit: main._input forwards captured events; main._unhandled_input starts
 # a lease only after GUI controls have had the chance to consume the click.
-const MIN_PITCH: float = .25
-const MAX_PITCH: float = 1.20
-const MIN_ZOOM: float = 9.0
-const MAX_ZOOM: float = 28.0
-const BODY_CLEARANCE: float = 2.4
-const CAMERA_RADIUS: float = .32
-const SURFACE_GAP: float = .08
-const FOLLOW_RESPONSE: float = 35.0
-const ORBIT_RESPONSE: float = 38.0
-const ZOOM_RESPONSE: float = 16.0
+# Behavioral port of browser commit 1e94a0d1 third-person-camera.ts.
+# Babylon alpha = Godot yaw - PI/2; beta = PI/2 - Godot pitch.
+const MIN_PITCH: float = PI / 2.0 - 1.36
+const MAX_PITCH: float = PI / 2.0 - .72
+const DEFAULT_PITCH: float = PI / 2.0 - 1.06
+const MIN_ZOOM: float = 5.5
+const MAX_ZOOM: float = 18.0
+const DEFAULT_ZOOM: float = 10.5
+const OBSTRUCTION_MINIMUM: float = 1.1
+const CAMERA_RADIUS: float = .22
+const LOOK_AHEAD: float = 2.15
+const FOCUS_HEIGHT: float = 1.35
+const FOLLOW_RESPONSE: float = 18.0
+const ORBIT_RESPONSE: float = 16.0
+const ZOOM_RESPONSE: float = 12.0
+const OBSTRUCTION_RESPONSE: float = 7.0
 
 var yaw: float = 0.0
-var pitch: float = .72
-var distance: float = 21.0
+var pitch: float = DEFAULT_PITCH
+var distance: float = DEFAULT_ZOOM
 var sensitivity: float = 1.0
+var zoom_sensitivity: float = 1.0
+var smoothing: float = 1.0
 var invert_y: bool = false
 var captured: bool = false
 var smoothed_yaw: float = 0.0
-var smoothed_pitch: float = .72
-var smoothed_distance: float = 21.0
-var actual_distance: float = 21.0
-var resolved_pitch: float = .72
+var smoothed_pitch: float = DEFAULT_PITCH
+var smoothed_distance: float = DEFAULT_ZOOM
+var actual_distance: float = DEFAULT_ZOOM
 var follow_position: Vector3 = Vector3.ZERO
 var collision_limited: bool = false
-var confined_space: bool = false
 
 var _camera: Camera3D
 var _collision: VarendorCollision
@@ -83,8 +89,7 @@ func handle_captured_input(event: InputEvent) -> bool:
 		# Never use captured event.position, which is the window centre.
 		var motion: Vector2 = event.screen_relative
 		if motion.is_finite():
-			yaw -= motion.x * .0045 * sensitivity
-			pitch = clampf(pitch + motion.y * .0038 * sensitivity * (-1 if invert_y else 1), MIN_PITCH, MAX_PITCH)
+			orbit(motion)
 		return true
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
 		if not event.pressed:
@@ -144,95 +149,76 @@ func _notification(what: int) -> void:
 		_capture_generation += 1
 		_restore_valid = false
 
-func rotate_keyboard(amount: float) -> void:
-	yaw += amount
+func configure(options: Dictionary) -> void:
+	sensitivity = clampf(float(options.get("mouseSensitivity", sensitivity)), .25, 2.5)
+	zoom_sensitivity = clampf(float(options.get("zoomSensitivity", zoom_sensitivity)), .35, 2.2)
+	smoothing = clampf(float(options.get("smoothing", smoothing)), .55, 1.8)
+	invert_y = bool(options.get("invertY", invert_y))
 
-func zoom(steps: float) -> void:
-	distance = clampf(distance + steps * 1.5, MIN_ZOOM, MAX_ZOOM)
+func orbit(relative_motion: Vector2) -> void:
+	if not relative_motion.is_finite(): return
+	yaw -= relative_motion.x * .0048 * sensitivity
+	pitch = clampf(pitch + relative_motion.y * .0038 * sensitivity * (-1 if invert_y else 1), MIN_PITCH, MAX_PITCH)
+
+func zoom(wheel_delta: float) -> void:
+	# Reference DOM wheel delta is +/-100 for a normal wheel notch. Clamp each
+	# incoming event, not the accumulated frame, exactly as PlayerInputController.
+	if not is_finite(wheel_delta): return
+	distance = clampf(distance + clampf(wheel_delta, -240.0, 240.0) * .0065 * zoom_sensitivity, MIN_ZOOM, MAX_ZOOM)
+
+func movement_direction(axes: Vector2) -> Vector2:
+	# Movement follows what is visible, not the yet-unrendered mouse target.
+	return axes.limit_length(1.0).rotated(smoothed_yaw)
 
 func reset_follow() -> void:
 	# Explicit lifecycle reset for spawn/teleport only, never for snapshots.
 	_pose_initialized = false
 
-func update_pose(delta: float, hero_position: Vector3, jump_offset: float = 0.0) -> void:
+func update_pose(delta: float, hero_position: Vector3, _jump_offset: float = 0.0) -> void:
 	if not is_instance_valid(_camera) or not _height_at.is_valid() or delta <= 0:
 		return
 	pitch = clampf(pitch, MIN_PITCH, MAX_PITCH)
 	distance = clampf(distance, MIN_ZOOM, MAX_ZOOM)
-	var dt: float = minf(delta, .25)
-	# Follow the already-rendered character exactly once. The short filter is
-	# independent of server snapshots; jump influences the pivot by 45 percent.
-	var target_pivot: Vector3 = hero_position + Vector3(0, 1.40 - jump_offset * .55, 0)
-	var first_pose: bool = not _pose_initialized
-	if first_pose:
-		follow_position = target_pivot
+	var dt: float = minf(delta, .5)
+	var floor_y: float = float(_height_at.call(hero_position.x, -hero_position.z))
+	if not _pose_initialized:
 		smoothed_yaw = yaw
 		smoothed_pitch = pitch
 		smoothed_distance = distance
 		actual_distance = distance
+		follow_position.y = floor_y + FOCUS_HEIGHT
 		_pose_initialized = true
 	else:
-		follow_position = follow_position.lerp(target_pivot, 1.0 - exp(-FOLLOW_RESPONSE * dt))
-		smoothed_yaw = lerp_angle(smoothed_yaw, yaw, 1.0 - exp(-ORBIT_RESPONSE * dt))
-		smoothed_pitch = lerpf(smoothed_pitch, pitch, 1.0 - exp(-ORBIT_RESPONSE * dt))
-		smoothed_distance = lerpf(smoothed_distance, distance, 1.0 - exp(-ZOOM_RESPONSE * dt))
-	# Filtering across a convex corner must not put the arm origin inside it.
-	var pivot_error: Vector3 = follow_position - target_pivot
-	if pivot_error.length() > .001 and _collision != null:
-		var pivot_clear: float = _collision.ray_distance(target_pivot, follow_position, CAMERA_RADIUS)
-		if pivot_clear < pivot_error.length():
-			follow_position = target_pivot + pivot_error.normalized() * maxf(0.0, pivot_clear - SURFACE_GAP)
-	var ray: Vector3 = _orbit_direction(smoothed_yaw, smoothed_pitch)
-	var permitted: float = _clear_distance(follow_position, ray, smoothed_distance)
-	resolved_pitch = smoothed_pitch
-	confined_space = false
-	# Never force a minimum distance THROUGH a wall. If a close wall would put
-	# the camera inside the hero, first seek a clear higher orbit above the head.
-	if permitted < BODY_CLEARANCE:
-		for index: int in range(1, 9):
-			var candidate_pitch: float = lerpf(smoothed_pitch, 1.48, float(index) / 8.0)
-			var candidate_ray: Vector3 = _orbit_direction(smoothed_yaw, candidate_pitch)
-			var candidate_distance: float = _clear_distance(follow_position, candidate_ray, smoothed_distance)
-			if candidate_distance >= BODY_CLEARANCE:
-				ray = candidate_ray
-				permitted = candidate_distance
-				resolved_pitch = candidate_pitch
-				break
-		confined_space = permitted < BODY_CLEARANCE
-	collision_limited = permitted < smoothed_distance - .01
-	# Immediate obstruction contraction keeps the camera out of walls. Only the
-	# return to its requested zoom is smoothed; smoothing both directions clips.
-	actual_distance = permitted if permitted < actual_distance else lerpf(actual_distance, permitted, 1.0 - exp(-12.0 * dt))
-	var desired: Vector3 = follow_position + ray * actual_distance
-	# Clip the actual camera's frame-to-frame path too: orbit endpoints can both
-	# be free while their chord cuts the corner of a wall or the side of a hill.
-	if not first_pose and not confined_space and _camera.position.distance_to(desired) < 10.0:
-		var displacement: Vector3 = desired - _camera.position
-		if displacement.length() > .0001:
-			var segment_clear: float = _clear_distance(_camera.position, displacement.normalized(), displacement.length())
-			if segment_clear < displacement.length() - .001:
-				var clipped: Vector3 = _camera.position + displacement.normalized() * segment_clear
-				if clipped.distance_to(hero_position + Vector3(0, 1.0, 0)) >= 1.2:
-					desired = clipped
-	_camera.position = desired
-	if _camera.position.distance_squared_to(target_pivot) > .0001:
-		_camera.look_at(target_pivot)
+		smoothed_yaw = lerp_angle(smoothed_yaw, yaw, 1.0 - exp(-ORBIT_RESPONSE * smoothing * dt))
+		smoothed_pitch = lerpf(smoothed_pitch, pitch, 1.0 - exp(-ORBIT_RESPONSE * smoothing * dt))
+		smoothed_distance = lerpf(smoothed_distance, distance, 1.0 - exp(-ZOOM_RESPONSE * smoothing * dt))
+		follow_position.y = lerpf(follow_position.y, floor_y + FOCUS_HEIGHT, 1.0 - exp(-FOLLOW_RESPONSE * dt))
+	# The reference receives the interpolated player XZ and terrain support Y.
+	# No second horizontal filter; jumping does not move the camera pivot.
+	var forward: Vector3 = Vector3(-sin(smoothed_yaw), 0, -cos(smoothed_yaw))
+	follow_position.x = hero_position.x + forward.x * LOOK_AHEAD
+	follow_position.z = hero_position.z + forward.z * LOOK_AHEAD
+	var direction: Vector3 = Vector3(sin(smoothed_yaw) * cos(smoothed_pitch), sin(smoothed_pitch), cos(smoothed_yaw) * cos(smoothed_pitch))
+	var wanted_camera: Vector3 = follow_position + direction * smoothed_distance
+	var permitted: float = _obstruction_distance(hero_position, floor_y, wanted_camera)
+	var radius: float = maxf(OBSTRUCTION_MINIMUM, minf(smoothed_distance, permitted))
+	collision_limited = radius < smoothed_distance - .01
+	actual_distance = radius if radius < actual_distance else lerpf(actual_distance, radius, 1.0 - exp(-OBSTRUCTION_RESPONSE * dt))
+	_camera.position = follow_position + direction * actual_distance
+	_camera.look_at(follow_position)
 
-func _orbit_direction(yaw_value: float, pitch_value: float) -> Vector3:
-	return Vector3(sin(yaw_value) * cos(pitch_value), sin(pitch_value), cos(yaw_value) * cos(pitch_value))
-
-func _clear_distance(origin: Vector3, direction: Vector3, length_value: float) -> float:
-	var obstacle_distance: float = length_value
-	if _collision != null:
-		obstacle_distance = _collision.ray_distance(origin, origin + direction * length_value, CAMERA_RADIUS)
-	var permitted: float = maxf(0.0, obstacle_distance - (SURFACE_GAP if obstacle_distance < length_value else 0.0))
-	# Ground is part of the complete sweep, not an endpoint-only Y clamp that
-	# could push the camera through a wall after the obstruction test.
-	var count: int = maxi(1, ceili(permitted / .25))
-	for index: int in range(1, count + 1):
-		var sample_distance: float = permitted * float(index) / count
-		var location: Vector3 = origin + direction * sample_distance
-		var floor_height: float = float(_height_at.call(location.x, -location.z))
-		if location.y - CAMERA_RADIUS < floor_height:
-			return maxf(0.0, permitted * float(index - 1) / count - SURFACE_GAP)
-	return permitted
+func _obstruction_distance(hero_position: Vector3, floor_y: float, wanted_camera: Vector3) -> float:
+	# Reference main.ts probes from the body (not the 2.15m look-ahead target)
+	# and maps that swept fraction back to the orbit radius. Preserve this to
+	# avoid a different zoom response when running next to walls and hills.
+	var origin: Vector3 = Vector3(hero_position.x, floor_y + 1.25, hero_position.z)
+	var length_value: float = origin.distance_to(wanted_camera)
+	var allowed: float = length_value if _collision == null else _collision.ray_distance(origin, wanted_camera, CAMERA_RADIUS)
+	var sample_distance: float = .5
+	while sample_distance <= allowed:
+		var location: Vector3 = origin.lerp(wanted_camera, sample_distance / maxf(.001, length_value))
+		if location.y < float(_height_at.call(location.x, -location.z)) + .25:
+			allowed = maxf(0.0, sample_distance - .5)
+			break
+		sample_distance += .5
+	return follow_position.distance_to(wanted_camera) * allowed / maxf(.001, length_value)

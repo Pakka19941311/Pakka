@@ -2,9 +2,9 @@ class_name SnapshotTimeline
 extends RefCounted
 
 # The server owns simulation and rewards. This clock only presents immutable
-# snapshots/events on one time axis, normally 100 ms behind the server. Motion
+# snapshots/events on one time axis, one 30 Hz network frame behind the server. Motion
 # samples the same axis instead of starting a new lerp on every HTTP/SSE packet.
-const INTERPOLATION_DELAY_MS: float = 100.0
+const INTERPOLATION_DELAY_MS: float = 1000.0 / 30.0
 const MAX_SNAPSHOTS: int = 32
 const MAX_CLOCK_RATE: float = 1.15
 const DISCONNECT_RESYNC_MS: float = 1000.0

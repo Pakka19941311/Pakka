@@ -75,10 +75,10 @@ test('ranged impact precedes death and loot, dead actor stops immediately and ca
   assert.equal(world.snapshot(p.id).monsters[0].aiState,'dead','lethal impact enters Dead immediately');
   assert.equal(world.state.pending.some(a=>a.actor===m.uid||a.target===m.uid),false);
   const deathPosition={x:m.x,z:m.z},sequence=world.state.sequence;
-  m.status.stun=0;advance(2000);
+  m.status.stun=0;advance(650);
   assert.deepEqual({x:m.x,z:m.z},deathPosition);
   assert.equal(world.snapshot(p.id).monsters[0].aiState,'corpse','after death animation only the noncombat corpse remains');
-  advance(1000);assert.equal(world.snapshot(p.id).monsters[0].aiState,'despawn');
+  advance(450);assert.equal(world.snapshot(p.id).monsters[0].aiState,'despawn');
   assert.equal(world.events.some(e=>e.sequence>sequence&&e.actor===m.uid&&e.kind==='attack'),false);
   assert.equal(world.events.filter(e=>e.kind==='loot').length,1);
 });

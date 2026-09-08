@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
 import { CollisionWorld } from '../src/world/collision-world.ts';
 import { findNavigationPath, pathSegmentIsClear } from '../src/world/navigation.ts';
 
@@ -43,4 +44,25 @@ test('a valid click beside a wall stays reachable when its grid cell rounds insi
     for (const point of path) { assert.equal(pathSegmentIsClear(world, cursor, point, 0.46), true); cursor = point; }
     assert.deepEqual(path.at(-1), goal);
   }
+});
+
+test('server navigation preserves the browser routes and repairs its one proven clipped corner',()=>{
+  const fixture=JSON.parse(readFileSync(new URL('../godot-pc/tests/reference-navigation.json',import.meta.url),'utf8'));
+  let unchanged=0,repaired=0;
+  for(const item of fixture.cases){
+    const world=new CollisionWorld();
+    for(const obstacle of item.obstacles){
+      if(obstacle.kind==='circle')world.addCircle(obstacle.x,obstacle.z,obstacle.radius,obstacle.bottom,obstacle.top);
+      else if(obstacle.blocksMovement===false)world.addOverhang(obstacle.x,obstacle.z,obstacle.halfX,obstacle.halfZ,obstacle.rotation,obstacle.bottom,obstacle.top);
+      else world.addBox(obstacle.x,obstacle.z,obstacle.halfX,obstacle.halfZ,obstacle.rotation,obstacle.bottom,obstacle.top);
+    }
+    const path=findNavigationPath(world,item.start,item.goal,{...item.options,actorRadius:item.radius});
+    if(item.name==='blocked_click_projected_free'){
+      assert.equal(item.referenceSegmentsClear,false);assert.notDeepEqual(path,item.path);
+      assert.deepEqual(path.at(-1),item.path.at(-1));repaired++;
+    }else {assert.deepEqual(path,item.path,item.name);unchanged++;}
+    let cursor=world.findNearestFree(item.start,item.radius);
+    for(const waypoint of path){assert.equal(pathSegmentIsClear(world,cursor,waypoint,item.radius),true,item.name);cursor=waypoint;}
+  }
+  assert.equal(repaired,1);assert.equal(unchanged,fixture.cases.length-1);
 });

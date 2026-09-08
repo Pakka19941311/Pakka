@@ -5,6 +5,7 @@ extends SceneTree
 const Controller = preload("res://scripts/animation_controller.gd")
 var checks: Dictionary = {}
 var bodies: Array[Node3D] = []
+var measurements: Dictionary = {}
 
 func _initialize() -> void:
 	call_deferred("run")
@@ -64,6 +65,9 @@ func run() -> void:
 	fox_fallback(fox)
 	movement(warrior)
 	jump_states(other)
+	reference_parity(warrior, ranger, fox)
+	reference_attack_traces()
+	reference_blend()
 	for model: String in ["Wizard", "Rogue", "Monk", "Skeleton", "Slime", "Dragon", "Bat"]:
 		var actor: Controller = fixture(model)
 		actor.on_event({"kind":"attack", "at":1000, "impactAt":1400, "endsAt":1800}, 1000)
@@ -76,7 +80,7 @@ func run() -> void:
 	for key: String in checks:
 		if checks[key] != true:
 			failed.append(key)
-	print("VARENDOR_ANIMATION_QA " + JSON.stringify({"checks":checks, "failed":failed, "runtime":DisplayServer.get_name()}))
+	print("VARENDOR_ANIMATION_QA " + JSON.stringify({"checks":checks, "failed":failed, "measurements":measurements, "runtime":DisplayServer.get_name()}))
 	for body: Node3D in bodies:
 		body.queue_free()
 	await process_frame
@@ -86,13 +90,14 @@ func rangers(ranger: Controller, other: Controller) -> void:
 	var motion: Dictionary = {"grounded":true, "action":"attack", "actionStartedAt":1000, "actionEndsAt":1800}
 	ranger.on_event({"kind":"attack", "at":1000, "impactAt":1300, "endsAt":1800}, 1000)
 	ranger.update(motion, Vector3.ZERO, 1150, .016)
-	checks["ranger_windup_uses_bow_draw_not_idle"] = "bow_draw" in ranger.current_clip.to_lower() and ranger.state == "attack"
+	checks["reference_ranger_windup_uses_same_bow_shoot_clip"] = "bow_shoot" in ranger.current_clip.to_lower() and ranger.state == "attack" and absf(ranger.player.current_animation_position / ranger.clip_length(ranger.current_clip) - .24) < .001
 	var start_count: int = ranger.starts
 	ranger.update(motion, Vector3.ZERO, 1250, .1)
 	checks["repeated_snapshot_does_not_restart_attack"] = ranger.starts == start_count and ranger.attack_started_at == 1000
 	ranger.on_event({"kind":"release", "at":1300}, 1300)
 	ranger.update(motion, Vector3.ZERO, 1300, .016)
 	checks["ranger_release_uses_shoot_at_contact_pose"] = "bow_shoot" in ranger.current_clip.to_lower() and absf(ranger.player.current_animation_position / ranger.clip_length(ranger.current_clip) - .48) < .001
+	checks["reference_bow_release_does_not_switch_or_restart_clip"] = ranger.starts == start_count
 	start_count = ranger.starts
 	ranger.on_event({"kind":"hit", "at":1320, "hitUntil":1500}, 1320)
 	ranger.update(motion, Vector3.ZERO, 1400, .08)
@@ -101,20 +106,21 @@ func rangers(ranger: Controller, other: Controller) -> void:
 	checks["attack_completes_even_when_snapshot_action_is_stale"] = ranger.state == "idle"
 	var idle: String = ranger.find_clip(["idle_weapon", "idle", "survey", "flying"])
 	other.update({"grounded":false, "verticalVelocity":8.2}, Vector3.ZERO, 1900, .016)
-	checks["one_shot_fallback_does_not_mutate_other_actor_idle_loop"] = ranger.player.get_animation(idle).loop_mode == Animation.LOOP_LINEAR and other.player.get_animation(idle).loop_mode == Animation.LOOP_NONE
+	var run_clip: String = other.find_clip(["run_holding"])
+	checks["one_shot_jump_does_not_mutate_other_actor_idle_loop"] = ranger.player.get_animation(idle).loop_mode == Animation.LOOP_LINEAR and other.player.get_animation(run_clip).loop_mode == Animation.LOOP_NONE
 
 func fox_fallback(fox: Controller) -> void:
 	checks["fox_missing_attack_and_death_clips_are_detected"] = fox.find_clip(["attack", "death"]).is_empty()
 	fox.on_event({"kind":"attack", "at":1000, "impactAt":1400, "endsAt":1800}, 1000)
 	fox.update({"grounded":true}, Vector3.ZERO, 1200, .016)
-	var windup_offset: float = fox.visual.position.z
+	var windup_offset: float = fox.pose_offset.z
 	fox.update({"grounded":true}, Vector3.ZERO, 1400, .2)
-	var impact_offset: float = fox.visual.position.z
+	var impact_offset: float = fox.pose_offset.z
 	fox.update({"grounded":true}, Vector3.ZERO, 1600, .2)
-	checks["fox_lunge_peaks_at_authoritative_impact"] = impact_offset > windup_offset and impact_offset > fox.visual.position.z and absf(impact_offset - fox.height * .13) < .001
+	checks["reference_fox_fallback_lunge_matches_approved_curve"] = impact_offset > windup_offset and impact_offset > fox.pose_offset.z and absf(impact_offset - fox.height * .15) < .001
 	fox.on_event({"kind":"death", "at":1700, "corpseUntil":4700}, 1700)
 	checks["death_immediately_cancels_attack_state"] = fox.state == "death" and fox.attack_ends_at == -1
-	fox.update({"hp":0, "alive":false}, Vector3(10, 0, 0), 2150, .45)
+	fox.update({"hp":0, "alive":false}, Vector3(10, 0, 0), 2350, .65)
 	var angle: float = fox.visual.basis.y.normalized().angle_to(fox.base_visual.basis.y.normalized())
 	checks["fox_fallback_falls_continuously_to_corpse"] = angle > 1.4 and fox.visual.visible and fox.actor.position.is_zero_approx()
 	fox.on_event({"kind":"attack", "at":2200, "impactAt":2500, "endsAt":2900}, 2200)
@@ -158,3 +164,106 @@ func jump_states(actor: Controller) -> void:
 		visited.append(actor.state)
 	checks["jump_fall_land_state_sequence"] = visited == ["idle", "jump_start", "airborne", "fall", "land", "idle"]
 	checks["jump_animation_does_not_apply_body_vertical_motion"] = actor.actor.position.is_zero_approx()
+
+func reference_parity(warrior: Controller, ranger: Controller, fox: Controller) -> void:
+	# Values below come from approved 1e94a0d1 actor-animation.ts and the actual
+	# source glTF samplers. Exercise the imported Godot rigs, not mock clips.
+	checks["reference_shipped_warrior_and_ranger_clip_lengths"] = absf(warrior.clip_length(warrior.find_clip(["sword_attack"])) - 20.0 / 24) < .00001 and absf(ranger.clip_length(ranger.find_clip(["bow_shoot"])) - 15.0 / 24) < .00001
+	checks["reference_model_instance_prefix_normalization"] = Controller.normalized_name("town-resident-Warrior|example-Sword_Attack") == "sword_attack"
+	warrior.reset_alive()
+	warrior.prefer_run = true
+	warrior.update({"grounded":true}, Vector3(.12, 0, 0), 6000, 1.0 / 60)
+	checks["reference_local_player_uses_run_pose_during_acceleration"] = warrior.state == "run" and "run_weapon" in warrior.current_clip.to_lower()
+	warrior.prefer_run = false
+	warrior.reset_alive()
+	var observed: Array[String] = []
+	for speed: float in [1.70, 1.90, 1.70, 1.50]:
+		warrior.update({"grounded":true}, Vector3(speed, 0, 0), 6100, .016)
+		observed.append(warrior.state)
+	checks["reference_npc_gait_hysteresis_avoids_threshold_flicker"] = observed == ["walk", "run", "run", "walk"]
+	warrior.update({"grounded":false, "verticalVelocity":7}, Vector3(3, 0, 0), 6200, .016)
+	var jump_clip: String = warrior.current_clip
+	var jump_pose: Transform3D = warrior.visual.transform
+	var phase_rising: float = warrior.player.current_animation_position / warrior.clip_length(jump_clip)
+	warrior.update({"grounded":false, "verticalVelocity":-5}, Vector3(3, 0, 0), 6600, .4)
+	checks["reference_jump_holds_run_frame_six_percent_rise_and_fall"] = "run_weapon" in jump_clip.to_lower() and warrior.current_clip == jump_clip and absf(phase_rising - .06) < .00001 and absf(warrior.player.current_animation_position / warrior.clip_length(jump_clip) - .06) < .00001
+	checks["reference_jump_has_constant_lean_and_preserves_body"] = warrior.visual.transform.is_equal_approx(jump_pose) and absf(warrior.pose_rotation.x + .08) < .00001 and warrior.actor.position.is_zero_approx()
+	warrior.update({"grounded":true}, Vector3(3, 0, 0), 6750, .016)
+	checks["reference_landing_resumes_gait_without_added_squash_or_pause"] = "run_weapon" in warrior.current_clip.to_lower() and warrior.visual.transform.is_equal_approx(warrior.base_visual)
+	warrior.reset_alive()
+	warrior.update({"grounded":true}, Vector3.ZERO, 7000, .016)
+	warrior.on_event({"kind":"hit", "at":7000}, 7000)
+	warrior.update({"grounded":true}, Vector3.ZERO, 7090, .09)
+	checks["reference_hit_reaction_is_pitch_not_roll"] = absf(warrior.pose_rotation.x - .07) < .00001 and is_zero_approx(warrior.pose_rotation.z)
+	warrior.update({"grounded":true}, Vector3.ZERO, 7150, .06)
+	checks["reference_idle_hit_clip_uses_three_tenths_second_duration"] = warrior.state == "hit" and absf(warrior.player.current_animation_position / warrior.clip_length(warrior.current_clip) - .5) < .00001
+	fox.reset_alive()
+	fox.begin_death(8000, 9070)
+	fox.update({"hp":0}, Vector3.ZERO, 8030, .03)
+	checks["reference_missing_death_rig_starts_visible_fall_immediately"] = fox.state == "death" and fox.pose_rotation.z > .005 and fox.actor.position.is_zero_approx()
+	fox.update({"hp":0}, Vector3.ZERO, 8650, .62)
+	var corpse: Transform3D = fox.visual.transform
+	fox.update({"hp":0}, Vector3.ZERO, 9069, .419)
+	checks["reference_corpse_holds_final_pose_without_added_sink"] = fox.visual.visible and fox.visual.transform.is_equal_approx(corpse) and absf(fox.pose_rotation.z - 1.48) < .00001
+	fox.update({"hp":0}, Vector3.ZERO, 9070, .001)
+	checks["reference_corpse_expires_after_point_four_two_plus_point_six_five"] = fox.corpse_complete and not fox.visual.visible
+
+func reference_attack_traces() -> void:
+	var golden: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/reference-control-traces.json"))
+	var models: Dictionary = {"knight":"Warrior", "mage":"Wizard", "assassin":"Rogue", "ranger":"Ranger", "necro":"Monk"}
+	var maximum_phase_error: float = 0
+	var sampled_frames: int = 0
+	var mismatches: Array[String] = []
+	for trace: Dictionary in golden.attacks:
+		if not models.has(str(trace.class_id)):
+			continue
+		var controller: Controller = fixture(str(models[trace.class_id]))
+		var impact: float = 1000 + float(trace.timings.windup) * 1000
+		var finish: float = impact + float(trace.timings.recovery) * 1000
+		controller.on_event({"kind":"attack", "at":1000, "impactAt":impact, "endsAt":finish}, 1000)
+		for row: Dictionary in trace.rows:
+			# Browser main clears the attack when its complete event is consumed;
+			# the recorded final actor-only phase is not a visible main-loop frame.
+			if "complete" in row.events:
+				continue
+			var now: float = 1000 + float(row.tick) * 1000 / 60
+			controller.update({"grounded":true}, Vector3.ZERO, now, 1.0 / 60)
+			var phase: float = controller.player.current_animation_position / controller.clip_length(controller.current_clip)
+			maximum_phase_error = maxf(maximum_phase_error, absf(phase - float(row.phase)))
+			sampled_frames += 1
+			if not controller.current_clip.to_lower().ends_with(str(row.clip).to_lower()):
+				mismatches.append(str(trace.class_id) + ":" + str(row.tick))
+	measurements["browser_attack_trace_frames"] = sampled_frames
+	measurements["browser_attack_trace_maximum_phase_error"] = maximum_phase_error
+	measurements["browser_attack_trace_clip_mismatches"] = mismatches
+	checks["reference_attack_clip_and_phase_match_executed_browser_traces"] = sampled_frames > 200 and maximum_phase_error < .00001 and mismatches.is_empty()
+
+func bone_pose(controller: Controller) -> Array[Quaternion]:
+	var rig: Skeleton3D = controller.visual.find_children("*", "Skeleton3D", true, false)[0]
+	var pose: Array[Quaternion] = []
+	for index: int in range(rig.get_bone_count()):
+		pose.append(rig.get_bone_pose_rotation(index))
+	return pose
+
+func bone_distance(left: Array[Quaternion], right: Array[Quaternion]) -> float:
+	var result: float = 0
+	for index: int in range(left.size()):
+		result += left[index].angle_to(right[index])
+	return result
+
+func reference_blend() -> void:
+	var actor: Controller = fixture("Warrior")
+	var target: Controller = fixture("Warrior")
+	actor.sample(actor.find_clip(["idle_weapon"]), .3, true, 1)
+	var idle_bones: Array[Quaternion] = bone_pose(actor)
+	target.sample(target.find_clip(["sword_attack"]), .5, false, 1)
+	var target_bones: Array[Quaternion] = bone_pose(target)
+	var full_distance: float = bone_distance(idle_bones, target_bones)
+	actor.sample(actor.find_clip(["sword_attack"]), .5, false, 0)
+	var at_zero: float = bone_distance(idle_bones, bone_pose(actor))
+	actor.sample(actor.find_clip(["sword_attack"]), .5, false, .016)
+	var at_sixteen: float = bone_distance(idle_bones, bone_pose(actor))
+	actor.sample(actor.find_clip(["sword_attack"]), .5, false, .064)
+	var at_eighty: float = bone_distance(target_bones, bone_pose(actor))
+	checks["reference_eighty_millisecond_blend_advances_real_bones_without_pose_snap"] = full_distance > 1 and at_zero < .01 and absf(at_sixteen / full_distance - .2) < .01 and at_eighty < .01
+	measurements["actual_rig_blend_fraction_at_sixteen_ms"] = at_sixteen / full_distance

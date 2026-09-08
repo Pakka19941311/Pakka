@@ -3,7 +3,10 @@ extends RefCounted
 
 # One presentation owner per actor. The server owns combat/lifecycle clocks;
 # movement owns body position. This controller samples only the rig and its
-# local pose, once per rendered frame, using the presentation clock.
+# local pose, once per rendered frame, using the presentation clock. Presentation
+# constants/clip choices follow approved browser 1e94a0d1 actor-animation.ts.
+const REFERENCE_BLEND_SECONDS: float = .08
+const REFERENCE_JUMP_PHASE: float = .06
 const GAITS: Dictionary = {
 	"Warrior": {"height": 2.05, "walk": 1.072079, "run": 3.297988},
 	"Wizard": {"height": 2.05, "walk": .993, "run": 3.057},
@@ -31,6 +34,7 @@ var attack_ends_at: float = -1
 var released: bool = false
 var hit_at: float = -1
 var hit_until: float = -1
+var hit_pose_until: float = -1
 var death_at: float = -1
 var corpse_until: float = -1
 var corpse_complete: bool = false
@@ -43,6 +47,10 @@ var gait_phase: float = 0
 var gait_clip: String = ""
 var idle_phase: float = 0
 var height: float = 2.05
+var prefer_run: bool = false
+var running_gait: bool = false
+var pose_rotation: Vector3 = Vector3.ZERO
+var pose_offset: Vector3 = Vector3.ZERO
 
 func bind(body: Node3D) -> void:
 	actor = body
@@ -69,7 +77,8 @@ func bind(body: Node3D) -> void:
 	actor.set_meta("animation_controller", self)
 
 static func normalized_name(clip: String) -> String:
-	return clip.get_slice("|", clip.get_slice_count("|") - 1).to_lower()
+	var suffix: String = clip.get_slice("|", clip.get_slice_count("|") - 1)
+	return suffix.get_slice("-", suffix.get_slice_count("-") - 1).to_lower()
 
 func find_clip(candidates: Array) -> String:
 	for candidate: String in candidates:
@@ -88,11 +97,15 @@ func reset_alive() -> void:
 	attack_ends_at = -1
 	hit_at = -1
 	hit_until = -1
+	hit_pose_until = -1
 	state = "idle"
 	current_clip = ""
 	was_grounded = true
 	land_until = -1
 	jump_started_at = -1
+	gait_phase = 0
+	idle_phase = 0
+	running_gait = false
 	visual.transform = base_visual
 	visual.visible = true
 
@@ -111,10 +124,16 @@ func on_event(event: Dictionary, presentation_time_ms: float) -> void:
 				begin_attack(event_time - 1, event_time, event_time + 250)
 				released = true
 		elif kind == "hit":
-			hit_at = event_time
-			hit_until = float(event.get("hitUntil", event_time + 180))
+			react_to_hit(event_time, float(event.get("hitUntil", event_time + 180)))
 		elif kind == "cancel":
 			attack_ends_at = -1
+
+func react_to_hit(start: float, finish: float) -> void:
+	hit_at = start
+	hit_until = finish
+	var clip: String = find_clip(["recievehit", "hit"])
+	if state == "idle" and not clip.is_empty():
+		hit_pose_until = start + minf(.3, clip_length(clip)) * 1000
 
 func begin_attack(start: float, impact: float, finish: float) -> void:
 	if death_at >= 0 or start <= attack_started_at:
@@ -133,6 +152,7 @@ func begin_death(start: float, finish: float) -> void:
 	corpse_until = maxf(start + 650, finish)
 	attack_ends_at = -1
 	hit_until = -1
+	hit_pose_until = -1
 	state = "death"
 	state_started_at = start
 	current_clip = ""
@@ -161,8 +181,7 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 		# cannot resurrect the animation after manual input cancelled it.
 		attack_ends_at = -1
 	if float(motion.get("hitUntil", -1)) > hit_until:
-		hit_until = float(motion.hitUntil)
-		hit_at = hit_until - 180
+		react_to_hit(float(motion.hitUntil) - 180, float(motion.hitUntil))
 	var grounded: bool = bool(motion.get("grounded", true))
 	var vertical: float = float(motion.get("verticalVelocity", rendered_velocity.y))
 	var locomotion: String = str(motion.get("locomotionState", "")).to_lower()
@@ -180,49 +199,59 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 	elif presentation_time_ms < land_until:
 		next_state = "land"
 	elif speed > .025:
-		next_state = "run" if speed > 1.8 * height / 2.05 else "walk"
-	elif presentation_time_ms < hit_until:
+		next_state = "run" if use_run_gait(speed) else "walk"
+	elif presentation_time_ms < hit_pose_until:
 		next_state = "hit"
 	set_state(next_state, presentation_time_ms)
 	visual.transform = base_visual
+	pose_rotation = Vector3.ZERO
+	pose_offset = Vector3.ZERO
 	if state == "attack":
 		sample_attack(presentation_time_ms, dt)
 	elif state in ["walk", "run"]:
 		sample_gait(speed, dt)
 	elif state in ["jump_start", "airborne", "fall", "land"]:
-		sample_airborne(vertical, presentation_time_ms, dt)
+		sample_airborne(speed, presentation_time_ms, dt)
 	elif state == "hit":
 		var hit_clip: String = find_clip(["recievehit", "receivehit", "hit", "recievehit_2"])
 		if hit_clip.is_empty():
 			sample_idle(dt)
 		else:
-			sample(hit_clip, clampf((presentation_time_ms - hit_at) / maxf(1, hit_until - hit_at), 0, 1), false, dt)
+			sample(hit_clip, clampf((presentation_time_ms - hit_at) / maxf(1, hit_pose_until - hit_at), 0, 1), false, dt)
 	else:
 		sample_idle(dt)
 	# Hit reaction is additive during locomotion/attack; it does not restart or
 	# cancel a server-owned attack and cannot hide the bow release/sword impact.
 	if presentation_time_ms < hit_until:
 		var reaction: float = sin(clampf((presentation_time_ms - hit_at) / maxf(1, hit_until - hit_at), 0, 1) * PI)
-		visual.rotate_object_local(Vector3.FORWARD, reaction * .075)
+		apply_reference_pose(pose_rotation + Vector3(reaction * .07, 0, 0), pose_offset)
 	actor.set_meta("animation_state", state)
 
 func set_state(value: String, now: float) -> void:
 	if value != state:
+		if value in ["idle", "hit", "attack", "death"]:
+			gait_phase = 0
+			idle_phase = 0
 		state = value
 		state_started_at = now
 
 func sample_idle(dt: float) -> void:
 	var clip: String = find_clip(["idle_weapon", "idle", "survey", "flying"])
 	idle_phase = fposmod(idle_phase + dt / clip_length(clip), 1)
+	gait_phase = idle_phase
 	playback_rate = 1
 	sample(clip, idle_phase, true, dt)
+
+func use_run_gait(speed: float) -> bool:
+	return prefer_run or speed > (1.55 if running_gait else 1.85) * height / 2.05
 
 func sample_gait(speed: float, dt: float) -> void:
 	var profile: Dictionary = GAITS.get(model, {"height": height, "walk": 2.25, "run": 2.25})
 	var run_clip: String = find_clip(["run_weapon", "run_holding", "run", "running", "flying"])
-	var walk_clip: String = find_clip(["walk", "walking", "run", "running", "flying"])
-	var next_gait: String = run_clip if state == "run" and not run_clip.is_empty() else walk_clip
-	var native_speed: float = float(profile.get("run" if next_gait == run_clip and state == "run" else "walk")) * height / float(profile.height)
+	var walk_clip: String = find_clip(["walk", "running", "run", "flying"])
+	running_gait = use_run_gait(speed) and not run_clip.is_empty()
+	var next_gait: String = run_clip if running_gait else walk_clip
+	var native_speed: float = float(profile.get("run" if running_gait else "walk")) * height / float(profile.height)
 	gait_clip = next_gait
 	playback_rate = speed / maxf(.01, native_speed)
 	# Distance-driven phase: feet stop immediately when the actual body stops,
@@ -236,38 +265,41 @@ func contact_fraction() -> float:
 func sample_attack(now: float, dt: float) -> void:
 	var before_impact: bool = now < attack_impact_at and not released
 	var phase: float
-	var clip: String
-	if model == "Ranger":
-		clip = find_clip(["bow_draw"]) if before_impact else find_clip(["bow_shoot"])
-		phase = clampf((now - attack_started_at) / maxf(1, attack_impact_at - attack_started_at), 0, 1) if before_impact else lerpf(.48, 1, clampf((now - attack_impact_at) / maxf(1, attack_ends_at - attack_impact_at), 0, 1))
-	else:
-		clip = find_clip(["spell1", "spell2", "staff_attack"]) if model == "Wizard" else find_clip(["sword_attack", "dagger_attack", "attack", "bite", "punch"])
-		var contact: float = contact_fraction()
-		phase = contact * clampf((now - attack_started_at) / maxf(1, attack_impact_at - attack_started_at), 0, 1) if before_impact else lerpf(contact, 1, clampf((now - attack_impact_at) / maxf(1, attack_ends_at - attack_impact_at), 0, 1))
+	# The reference uses one complete attack clip. Switching Bow_Draw to
+	# Bow_Shoot at release introduced an extra pose discontinuity in the port.
+	var clip: String = find_clip(["spell1", "spell2", "staff_attack"]) if model == "Wizard" else find_clip(["sword_attack", "dagger_attack", "bow_shoot", "attack"])
+	var contact: float = contact_fraction()
+	phase = contact * clampf((now - attack_started_at) / maxf(1, attack_impact_at - attack_started_at), 0, 1) if before_impact else lerpf(contact, 1, clampf((now - attack_impact_at) / maxf(1, attack_ends_at - attack_impact_at), 0, 1))
 	playback_rate = clip_length(clip) / maxf(.001, (attack_ends_at - attack_started_at) / 1000)
 	if clip.is_empty():
-		# Fox has Survey/Walk/Run only. Hold its rig and use a single lunge whose
-		# maximum extension is exactly the authoritative impact timestamp.
+		# Exact approved fallback: hold the rig while the pose wrapper lunges.
 		sample(find_clip(["idle", "survey", "flying"]), 0, false, dt)
-		var lunge: float = sin(clampf((now - attack_started_at) / maxf(1, attack_impact_at - attack_started_at), 0, 1) * PI * .5) if before_impact else cos(clampf((now - attack_impact_at) / maxf(1, attack_ends_at - attack_impact_at), 0, 1) * PI * .5)
-		visual.rotate_object_local(Vector3.RIGHT, -lunge * .2)
-		visual.position.z += lunge * height * .13
+		var lunge: float = sin(minf(1, phase / .84) * PI)
+		apply_reference_pose(Vector3(-lunge * .2, 0, 0), Vector3(0, 0, lunge * height * .15))
 	else:
 		sample(clip, phase, false, dt)
 
-func sample_airborne(vertical: float, now: float, dt: float) -> void:
-	var names: Array = ["jump_start", "jump"] if state == "jump_start" else ["fall", "jump_fall", "jump"] if state == "fall" else ["land", "landing"] if state == "land" else ["jump", "airborne"]
-	var clip: String = find_clip(names)
-	if clip.is_empty():
-		sample(find_clip(["idle_weapon", "idle", "survey", "flying"]), 0, false, dt)
-		if state == "land":
-			var amount: float = sin(clampf((land_until - now) / 160, 0, 1) * PI)
-			visual.scale.y *= 1 - amount * .065
+func sample_airborne(speed: float, _now: float, dt: float) -> void:
+	# Reference jump is a frozen running pose, not an idle pose or a second
+	# animation-driven Y trajectory. Ground contact immediately resumes gait.
+	if state == "land":
+		if speed > .025:
+			sample_gait(speed, dt)
 		else:
-			visual.rotate_object_local(Vector3.RIGHT, clampf(vertical / 8.2, -1, 1) * -.06)
-	else:
-		var duration: float = 160 if state == "land" else clip_length(clip) * 1000
-		sample(clip, clampf((now - state_started_at) / maxf(1, duration), 0, 1), false, dt)
+			sample_idle(dt)
+		return
+	var clip: String = find_clip(["run_weapon", "run_holding", "run", "running", "walk", "flying", "idle_weapon", "idle", "survey"])
+	sample(clip, REFERENCE_JUMP_PHASE, false, dt)
+	apply_reference_pose(Vector3(-.08, 0, 0))
+
+func apply_reference_pose(rotation: Vector3, offset: Vector3 = Vector3.ZERO) -> void:
+	# Browser presentation wrapper pivots at 45% of actor height. Transform only
+	# the normalized visual, preserving authoritative body, scale and grounding.
+	var pivot: Vector3 = base_visual.origin + Vector3(0, height * .45, 0)
+	pose_rotation = rotation
+	pose_offset = offset
+	var turn: Basis = Basis.from_euler(rotation)
+	visual.transform = Transform3D(turn * base_visual.basis, pivot + turn * (base_visual.origin - pivot) + offset)
 
 func sample_death(now: float, dt: float) -> void:
 	state = "death"
@@ -277,15 +309,11 @@ func sample_death(now: float, dt: float) -> void:
 	visual.transform = base_visual
 	if clip.is_empty():
 		sample(find_clip(["idle", "survey", "flying"]), 0, false, dt)
-		var fall: float = smoothstep(0, .45, age)
-		visual.rotate_object_local(Vector3.FORWARD, fall * 1.48)
-		visual.position.y -= height * .16 * fall
+		var fall: float = smoothstep(0, .65, age)
+		apply_reference_pose(Vector3(0, 0, fall * 1.48), Vector3(0, -height * .25 * fall, 0))
 	else:
-		sample(clip, clampf(age / minf(clip_length(clip), .95), 0, 1), false, dt)
-	# Hold a corpse until the server lifecycle expires. The final 450ms sink is
-	# local to the visual rig; it never changes collision/authoritative position.
-	var sink: float = clampf((now - (corpse_until - 450)) / 450, 0, 1)
-	visual.position.y -= height * .65 * sink
+		sample(clip, clampf(age / maxf(.65, clip_length(clip)), 0, 1), false, dt)
+	# Reference removes the held corpse at lifecycle expiry; no added sinking.
 	corpse_complete = now >= corpse_until
 	visual.visible = not corpse_complete
 
@@ -300,7 +328,7 @@ func sample(clip: String, phase: float, looping: bool, dt: float) -> void:
 		current_looping = looping
 		var animation: Animation = player.get_animation(clip)
 		animation.loop_mode = Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
-		player.play(clip, .07)
+		player.play(clip, REFERENCE_BLEND_SECONDS)
 		starts += 1
 	player.speed_scale = 1
 	# Manual processing prevents a second engine animation tick. Advancing blend

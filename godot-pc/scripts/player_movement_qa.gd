@@ -1,20 +1,15 @@
 extends SceneTree
 
-static func fixture() -> VarendorPlayerMovement:
+static func fixture(speed: float = 6.2) -> VarendorPlayerMovement:
 	var motor: VarendorPlayerMovement = VarendorPlayerMovement.new()
 	motor.collision = VarendorCollision.new()
-	motor.reconcile({"time":1000,"character":{"id":"qa","generation":1,"x":0,"z":0,"yOffset":0,"yaw":0,"grounded":true,"dead":false,"lastInputSequence":0,"stats":{"speed":6.2}}})
+	motor.reconcile({"time":1000,"character":{"id":"qa","generation":1,"x":0,"z":0,"yOffset":0,"yaw":0,"grounded":true,"dead":false,"lastInputSequence":0,"stats":{"speed":speed}}})
 	return motor
 
 static func run() -> Dictionary:
 	var checks: Dictionary = {}
-	var distances: Array[float] = []
-	for hz: int in [20,60,144]:
-		var motor: VarendorPlayerMovement = fixture()
-		motor.submit({"type":"direction","x":1,"z":0})
-		for i: int in range(hz*2): motor.physics_step(1.0/hz)
-		distances.append(motor.position_value.x)
-	checks["movement_analytic_partition_independent"] = distances.max()-distances.min() < .0001
+	checks.merge(preload("res://scripts/reference_movement_qa.gd").run())
+	var golden: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/reference-control-traces.json"))
 	var straight: VarendorPlayerMovement = fixture()
 	var diagonal: VarendorPlayerMovement = fixture()
 	straight.submit({"type":"direction","x":1,"z":0})
@@ -26,7 +21,9 @@ static func run() -> Dictionary:
 	straight.submit({"type":"direction","x":0,"z":0})
 	var stopped: Vector2 = straight.position_value
 	for i: int in range(20): straight.physics_step(1.0/60)
-	checks["manual_release_stops_without_slide"] = straight.position_value.distance_to(stopped) < .00001
+	var reference_rows: Array = golden.movement.traces[0].rows
+	var reference_coast: float = (float(reference_rows[79][2])-float(reference_rows[59][2])) * 6.2 / float(golden.classes[0].speed)
+	checks["manual_release_matches_short_reference_deceleration"] = absf(straight.position_value.distance_to(stopped)-reference_coast) < .0001 and straight.actual_velocity.length() < .01
 	var jump: VarendorPlayerMovement = fixture()
 	jump.submit({"type":"destination","x":5,"z":0})
 	jump.request_jump()
@@ -40,20 +37,20 @@ static func run() -> Dictionary:
 	var clicked: VarendorPlayerMovement = fixture()
 	clicked.submit({"type":"destination","x":2,"z":0})
 	for i: int in range(150): clicked.physics_step(1.0/60)
-	checks["click_path_arrives_without_overshoot"] = clicked.position_value.x <= 2.0001 and clicked.position_value.x > 1.85 and clicked.actual_velocity.length() < .01
+	checks["click_path_settles_inside_reference_arrival_radius"] = clicked.position_value.distance_to(Vector2(2,0)) < .18 and clicked.actual_velocity.length() < .01
 	clicked.submit({"type":"destination","x":5,"z":0})
 	clicked.submit({"type":"direction","x":0,"z":1})
 	checks["manual_overrides_click_in_same_input_turn"] = clicked.input_mode == "manual" and clicked.navigation_path.is_empty() and clicked.destination == null
-	var predicted: VarendorPlayerMovement = fixture()
-	predicted.submit({"type":"direction","x":1,"z":0})
+	var predicted: VarendorPlayerMovement = fixture(float(golden.classes[0].speed))
+	predicted.submit({"type":"direction","x":0,"z":1})
 	predicted.sent({"type":"direction"},1)
-	for i: int in range(1,121):
+	for i: int in range(1,61):
 		predicted.physics_step(1.0/60)
 		if i%6==0:
 			var t: float = float(i)/60
-			var x: float = 6.2*(t-(1-exp(-19*t))/19)
-			predicted.reconcile({"time":1000+t*1000,"character":{"id":"qa","generation":1,"x":x,"z":0,"yOffset":0,"yaw":PI/2,"grounded":true,"dead":false,"lastInputSequence":1,"stats":{"speed":6.2}}})
-	checks["snapshot_does_not_apply_movement_twice"] = absf(predicted.position_value.x-distances[1]) < .015
+			var z: float = float(reference_rows[i-1][2])
+			predicted.reconcile({"time":1000+t*1000,"character":{"id":"qa","generation":1,"x":0,"z":z,"yOffset":0,"yaw":0,"grounded":true,"dead":false,"lastInputSequence":1,"stats":{"speed":golden.classes[0].speed}}})
+	checks["snapshot_does_not_apply_movement_twice"] = absf(predicted.position_value.y-float(reference_rows[59][2])) < .0001
 	var sweep: Vector2 = VarendorActorSpacing.slide(Vector2(-3,0),Vector2(6,0),Vector2.ZERO,1)
 	checks["body_sweep_cannot_cross_target_center"] = (Vector2(-3,0)+sweep).x <= -1
 	return checks
@@ -61,4 +58,4 @@ static func run() -> Dictionary:
 func _initialize() -> void:
 	var checks: Dictionary = run()
 	print("VARENDOR_MOVEMENT_QA "+JSON.stringify(checks))
-	quit(0 if checks.values().all(func(value): return value) else 2)
+	quit(0 if checks.values().all(func(value): return not value is bool or value) else 2)

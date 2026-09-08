@@ -5,7 +5,13 @@ export type CombatPoint = Readonly<{x:number;z:number}>;
 export function combatSpacing(attackRange:number, actorRadius:number, targetRadius:number) {
   const contact = actorRadius + targetRadius + 0.04;
   return { contact, reachable:contact <= attackRange,
-    stoppingDistance:Math.min(attackRange, Math.max(attackRange * 0.9, contact)) };
+    stoppingDistance:Math.min(attackRange, Math.max(attackRange * 0.9, contact)),
+    // Browser CombatControl plans toward 78% but stops on the 90% threshold.
+    // The deeper navigation goal avoids braking before entering attack range.
+    // It is an intent, not a teleport endpoint: pursuit ends at stoppingDistance
+    // and swept body collision remains authoritative. Clamping both thresholds
+    // to contact made large Fox variants stop just outside melee reach.
+    destinationDistance:Math.max(0.35, attackRange * 0.78) };
 }
 
 export function approachPoint(actor:CombatPoint, target:CombatPoint, stoppingDistance:number):CombatPoint {
