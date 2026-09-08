@@ -1,0 +1,152 @@
+{
+  "kind": "compact_summary_of_real_godot_http_capture",
+  "source_capture": "orbit-actual-after.json",
+  "source_capture_sha256": "8548dd4bafa53c83a5e4fa73bb36b1d65067b5d909ec778bff5c8aa7197b8bd0",
+  "baseline": null,
+  "candidate_status": "working_tree_not_a_verified_release",
+  "ok": true,
+  "boolean_checks": 36,
+  "runs": [
+    {
+      "scenario": "orbit",
+      "fps": 30,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 61,
+      "received_count": 61,
+      "missing_sequences": [],
+      "maximum_pending_queue": 1,
+      "release_delivery_ms": 2.493408203125,
+      "maximum_delivery_ms": 10.0078125,
+      "main_thread_stop_callback_ms": 0.35205078125,
+      "errors": []
+    },
+    {
+      "scenario": "orbit",
+      "fps": 60,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 1,
+      "release_delivery_ms": 2.98193359375,
+      "maximum_delivery_ms": 7.8427734375,
+      "main_thread_stop_callback_ms": 0.23095703125,
+      "errors": []
+    },
+    {
+      "scenario": "orbit",
+      "fps": 144,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 287,
+      "received_count": 287,
+      "missing_sequences": [],
+      "maximum_pending_queue": 4,
+      "release_delivery_ms": 3.68408203125,
+      "maximum_delivery_ms": 22.692626953125,
+      "main_thread_stop_callback_ms": 5.637939453125,
+      "errors": []
+    },
+    {
+      "scenario": "physics-burst",
+      "fps": 30,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "all_120_physics_steering_samples_and_release": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 3,
+      "release_delivery_ms": 9.35205078125,
+      "maximum_delivery_ms": 17.245849609375,
+      "main_thread_stop_callback_ms": 32.225830078125,
+      "errors": []
+    },
+    {
+      "scenario": "physics-burst",
+      "fps": 60,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "all_120_physics_steering_samples_and_release": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 4,
+      "release_delivery_ms": 6.144287109375,
+      "maximum_delivery_ms": 12.41064453125,
+      "main_thread_stop_callback_ms": 14.4951171875,
+      "errors": []
+    },
+    {
+      "scenario": "physics-burst",
+      "fps": 144,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "all_120_physics_steering_samples_and_release": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 6.246826171875,
+      "maximum_delivery_ms": 8.73291015625,
+      "main_thread_stop_callback_ms": 20.173828125,
+      "errors": []
+    },
+    {
+      "scenario": "lifecycle",
+      "fps": 30,
+      "ok": true,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "cancel_inflight_worker_without_join_stall": true,
+        "new_generation_input_not_blocked_by_old_connection": true
+      },
+      "submitted_count": 2,
+      "received_count": 2,
+      "missing_sequences": [],
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 3.990478515625,
+      "maximum_delivery_ms": 8.87744140625,
+      "main_thread_stop_callback_ms": 930.6943359375,
+      "errors": []
+    }
+  ]
+}

@@ -2,7 +2,8 @@ extends SceneTree
 
 # Packets are captured from the real TypeScript WorldSimulation by
 # scripts/player-stop-contract.mjs. The native prediction must remain stationary
-# after settling even when ACKs for earlier motor phases arrive much later.
+# from the FIRST stopped physics tick, even when ACKs for earlier motor phases
+# arrive much later. No 250/350 ms settling interval may hide residual coast.
 const STEP: float = 1.0 / 60.0
 
 static func replay(trace: Dictionary, fields: Array) -> Dictionary:
@@ -47,8 +48,8 @@ static func replay(trace: Dictionary, fields: Array) -> Dictionary:
 		if motor.actual_velocity.length() > .5: moved = true
 		if moved and stop_tick < 0 and motor.actual_velocity.length() < .01:
 			stop_tick = tick
-		if stop_tick >= 0 and tick == stop_tick+15: anchor = point
-		if stop_tick >= 0 and tick >= stop_tick+15:
+			anchor = point
+		if stop_tick >= 0:
 			maximum_late_excursion = maxf(maximum_late_excursion,point.distance_to(anchor))
 		maximum_correction = maxf(maximum_correction,motor.visual_correction.length())
 	var final: Vector2 = Vector2(trace.final[0],trace.final[1])
@@ -91,6 +92,37 @@ static func authoritative_correction(initial: Dictionary) -> Dictionary:
 	var resets: bool = motor.reconcile(packet) and motor.sent_inputs.is_empty() and motor.visual_correction.is_zero_approx()
 	return {"stop_alignment_preserves_real_authoritative_correction":corrects,"stop_older_ack_cannot_cancel_new_direction":protects,"stop_generation_reset_discards_old_input_timestamps":resets}
 
+static func ahead_server_clock(initial: Dictionary) -> Dictionary:
+	# Independent pinned moving positions, not a second copy of reconciliation.
+	# An ahead server clock can occur after a stalled local frame. ACK age still
+	# describes the same simulated motion; it must not put a hole in local history.
+	var golden: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/reference-control-traces.json"))
+	var rows: Array = golden.movement.traces[3].rows # Continuous forward running jump; planar motion is unchanged.
+	var motor: VarendorPlayerMovement = VarendorPlayerMovement.new()
+	motor.collision = VarendorCollision.new()
+	motor.reconcile(initial)
+	var epoch: float = float(initial.time)
+	var origin: Vector2 = motor.position_value
+	motor.sent({"type":"direction"},1)
+	motor.submit({"type":"direction","x":0,"z":1})
+	for tick: int in range(60): motor.physics_step(STEP)
+	var packet: Dictionary = initial.duplicate(true)
+	packet.character.lastInputSequence = 1
+	packet.character.lastInputAt = epoch + 1100.0
+	packet.character.x = origin.x
+	packet.character.z = origin.y + float(rows[59][2])
+	packet.time = epoch + 2100.0
+	motor.reconcile(packet)
+	for tick: int in range(6): motor.physics_step(STEP)
+	packet.time = epoch + 2200.0
+	packet.character.z = origin.y + float(rows[65][2])
+	motor.reconcile(packet)
+	return {
+		"stop_ahead_server_clock_does_not_create_local_history_hole":absf(motor.clock_ms - epoch - 1100.0) < .01,
+		"stop_ahead_server_clock_does_not_inject_false_render_correction":motor.visual_correction.length() < .0001 and motor.position_value.distance_to(Vector2(packet.character.x,packet.character.z)) < .0001,
+		"stop_ahead_server_clock_measurements":{"physics_elapsed_ms":motor.clock_ms-epoch,"correction_m":motor.visual_correction.length()},
+	}
+
 static func run() -> Dictionary:
 	var contract: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://tests/player-stop-traces.json"))
 	var checks: Dictionary = {}
@@ -98,12 +130,13 @@ static func run() -> Dictionary:
 	for trace: Dictionary in contract.traces:
 		var result: Dictionary = replay(trace,contract.fields)
 		var name: String = str(trace.name)
-		checks["stop_"+name+"_settles_without_late_rebound"] = result.moved_and_stopped and result.late_excursion < .001
+		checks["stop_"+name+"_no_rendered_travel_from_first_stopped_tick"] = result.moved_and_stopped and result.late_excursion < .001
 		checks["stop_"+name+"_does_not_mistake_latency_for_displacement"] = result.maximum_correction < .001
 		checks["stop_"+name+"_reordered_and_duplicate_packets_are_stable"] = result.reordered_stable
 		checks["stop_"+name+"_converges_to_authoritative_position"] = result.final_error < .016
 		measurements[name] = result
 	checks.merge(authoritative_correction(contract.traces[0].initial))
+	checks.merge(ahead_server_clock(contract.traces[0].initial))
 	checks["stop_transport_measurements"] = measurements
 	return checks
 

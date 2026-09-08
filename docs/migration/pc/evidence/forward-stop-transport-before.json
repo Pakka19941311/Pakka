@@ -1,0 +1,143 @@
+{
+  "kind": "compact_summary_of_real_godot_http_capture",
+  "source_capture": "orbit-actual-before.json",
+  "source_capture_sha256": "071104666aa675e4937741e7c337c6beb2d76406bb565927ee83027c76cfa0a4",
+  "baseline": "8f7959ad63a65b5d0d8e92ca03b41276dd115d73",
+  "candidate_status": "previous_released_source",
+  "ok": false,
+  "boolean_checks": 30,
+  "runs": [
+    {
+      "scenario": "orbit",
+      "fps": 30,
+      "ok": false,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": false,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 51,
+      "received_count": 48,
+      "missing_sequences": [
+        2,
+        3,
+        4
+      ],
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 34.474853515625,
+      "maximum_delivery_ms": 42.260498046875,
+      "main_thread_stop_callback_ms": 66.40380859375,
+      "errors": []
+    },
+    {
+      "scenario": "orbit",
+      "fps": 60,
+      "ok": false,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": false,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 93,
+      "received_count": 90,
+      "missing_sequences": [
+        2,
+        3,
+        4
+      ],
+      "maximum_pending_queue": 3,
+      "release_delivery_ms": 34.4814453125,
+      "maximum_delivery_ms": 62.645751953125,
+      "main_thread_stop_callback_ms": 51.73388671875,
+      "errors": []
+    },
+    {
+      "scenario": "orbit",
+      "fps": 144,
+      "ok": false,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": false,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": true,
+        "real_orbit_changes_heading_through_two_seconds": true
+      },
+      "submitted_count": 94,
+      "received_count": 91,
+      "missing_sequences": [
+        2,
+        3,
+        4
+      ],
+      "maximum_pending_queue": 2,
+      "release_delivery_ms": 1.542724609375,
+      "maximum_delivery_ms": 11.2734375,
+      "main_thread_stop_callback_ms": 12.64404296875,
+      "errors": []
+    },
+    {
+      "scenario": "physics-burst",
+      "fps": 30,
+      "ok": false,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": false,
+        "no_growing_delivery_backlog": false,
+        "all_120_physics_steering_samples_and_release": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 73,
+      "release_delivery_ms": 2436.896484375,
+      "maximum_delivery_ms": 2436.896484375,
+      "main_thread_stop_callback_ms": 2466.94287109375,
+      "errors": []
+    },
+    {
+      "scenario": "physics-burst",
+      "fps": 60,
+      "ok": false,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": false,
+        "no_growing_delivery_backlog": false,
+        "all_120_physics_steering_samples_and_release": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 30,
+      "release_delivery_ms": 484.98486328125,
+      "maximum_delivery_ms": 484.98486328125,
+      "main_thread_stop_callback_ms": 499.55078125,
+      "errors": []
+    },
+    {
+      "scenario": "physics-burst",
+      "fps": 144,
+      "ok": false,
+      "checks": {
+        "runtime_completed_without_errors": true,
+        "all_submitted_directions_arrive_in_order": true,
+        "release_received_within_100_ms": true,
+        "no_growing_delivery_backlog": false,
+        "all_120_physics_steering_samples_and_release": true
+      },
+      "submitted_count": 121,
+      "received_count": 121,
+      "missing_sequences": [],
+      "maximum_pending_queue": 28,
+      "release_delivery_ms": 16.59375,
+      "maximum_delivery_ms": 195.31787109375,
+      "main_thread_stop_callback_ms": 21.47216796875,
+      "errors": []
+    }
+  ]
+}

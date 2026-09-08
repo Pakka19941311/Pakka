@@ -5,6 +5,7 @@ extends RefCounted
 # state. Rendering reads an interpolated pose; snapshots reconcile past ticks.
 const GRAVITY: float = 22.0
 const JUMP_SPEED: float = 8.2
+const PHYSICS_STEP: float = 1.0 / 60.0
 var collision: VarendorCollision
 var position_value: Vector2 = Vector2.ZERO
 var previous_position: Vector2 = Vector2.ZERO
@@ -36,6 +37,12 @@ var history: Array = []
 # can happen several physics ticks after the local input begins.
 var sent_inputs: Dictionary = {}
 var visual_correction: Vector2 = Vector2.ZERO
+# Independent client/server 60 Hz lattices round direction-change boundaries
+# separately. After an actual stop, a finite presentation budget of two travel
+# ticks (at most half a body radius) keeps feet fixed; authority/history are exact.
+var rest_anchor_active: bool = false
+var rest_offset_releasing: bool = false
+var correction_must_settle: bool = false
 var jump_wait_ground: bool = false
 var jump_sent_sequence: int = -1
 var last_sent_sequence: int = 0
@@ -68,7 +75,11 @@ func reconcile(snapshot: Dictionary) -> bool:
 		previous_yaw = yaw
 		facing_direction = Vector2(sin(yaw), cos(yaw))
 		velocity = Vector2.ZERO
+		actual_velocity = Vector2.ZERO
 		visual_correction = Vector2.ZERO
+		rest_anchor_active = false
+		rest_offset_releasing = false
+		correction_must_settle = false
 		history.clear()
 		sent_inputs.clear()
 		clock_ms = float(snapshot.time)
@@ -113,9 +124,19 @@ func reconcile(snapshot: Dictionary) -> bool:
 			position_value = corrected
 			previous_position += applied
 			visual_correction -= applied
+			if visual_correction.length() > rest_correction_budget():
+				# A larger correction received at rest must converge to zero,
+				# even after its remainder falls inside the presentation budget.
+				correction_must_settle = correction_must_settle or rest_anchor_active or actual_velocity.is_zero_approx()
+				rest_anchor_active = false
+				rest_offset_releasing = false
 			for frame: Dictionary in history:
 				frame.position += applied
-	clock_ms = maxf(clock_ms, float(snapshot.time))
+	# This is the local simulated-physics clock, not a server-clock estimate.
+	# Moving it forward to an ahead snapshot inserts an unsimulated hole in
+	# history. The next input-age comparison then invents a position error and
+	# replays its correction after stopping. Only physics_step advances it;
+	# generation changes initialize it and lastInputAt aligns the two clocks.
 	if int(hero.lastInputSequence) >= last_sent_sequence:
 		intent_pending = false
 		manual_cancel_pending = false
@@ -129,6 +150,9 @@ func reconcile(snapshot: Dictionary) -> bool:
 				destination = null
 				combat_target = ""
 	if bool(hero.dead):
+		rest_anchor_active = false
+		rest_offset_releasing = false
+		correction_must_settle = true
 		cancel_planar()
 		grounded = true
 		height = 0
@@ -159,9 +183,13 @@ func submit(value: Dictionary) -> void:
 				combat_target = ""
 				manual_cancel_pending = true
 			elif input_mode == "manual":
-				# Reference key release uses the motor's natural 30/s friction.
+				# Release ends planar travel on this input boundary. The approved
+				# reference's friction tail was rejected in the owner stop test.
+				if not actual_velocity.is_zero_approx(): begin_rest_anchor()
 				input_direction = Vector2.ZERO
 				input_mode = "idle"
+				velocity = Vector2.ZERO
+				actual_velocity = Vector2.ZERO
 		"destination":
 			input_direction = Vector2.ZERO
 			combat_target = ""
@@ -205,6 +233,7 @@ func request_jump() -> bool:
 	return true
 
 func cancel_planar() -> void:
+	if not actual_velocity.is_zero_approx(): begin_rest_anchor()
 	input_direction = Vector2.ZERO
 	velocity = Vector2.ZERO
 	actual_velocity = Vector2.ZERO
@@ -214,6 +243,19 @@ func cancel_planar() -> void:
 	combat_target = ""
 	approaching = false
 	navigation_goal = Vector2(INF, INF)
+
+func rest_correction_budget() -> float:
+	# A measured forward -> strafe sequence spans two rounded input boundaries.
+	# This is a capped presentation policy, not a bound on all possible latency.
+	return minf(speed * PHYSICS_STEP * 2.0, radius * .5) + .00001
+
+func begin_rest_anchor() -> void:
+	# Spawn-idle snapshots and repeated packets cannot create fresh anchors.
+	# Only callers crossing a real movement -> stop boundary can begin one.
+	if not grounded or bool(authoritative.get("dead", false)) or correction_must_settle: return
+	if not rest_anchor_active and visual_correction.length() <= rest_correction_budget():
+		rest_anchor_active = true
+		rest_offset_releasing = false
 
 func segment_clear(start: Vector2, goal: Vector2) -> bool:
 	return VarendorNavigation.path_segment_is_clear(collision, start, goal, radius)
@@ -237,6 +279,7 @@ func combat_line_clear() -> bool:
 
 func physics_step(dt: float) -> void:
 	if authoritative.is_empty() or dt <= 0: return
+	var was_moving: bool = not actual_velocity.is_zero_approx()
 	previous_position = position_value
 	previous_height = height
 	previous_yaw = yaw
@@ -283,10 +326,14 @@ func physics_step(dt: float) -> void:
 			direction = (next - position_value).normalized()
 			remaining = next.distance_to(position_value)
 	if not direction.is_zero_approx(): direction = direction.normalized()
-	var rate: float = 19.0 if not direction.is_zero_approx() else 30.0
-	var blend: float = 1.0 - exp(-rate * dt)
-	var desired: Vector2 = direction * speed
-	velocity += (desired - velocity) * blend
+	# No movement intent means no momentum, whether caused by key release,
+	# destination arrival, an invalid target or a completed combat approach.
+	# Acceleration/direction blending while moving and vertical jump physics
+	# remain the accepted reference behavior.
+	if direction.is_zero_approx():
+		velocity = Vector2.ZERO
+	else:
+		velocity += (direction * speed - velocity) * (1.0 - exp(-19.0 * dt))
 	var displacement: Vector2 = velocity * dt
 	if not direction.is_zero_approx(): facing_direction = direction
 	if displacement.length() > remaining:
@@ -300,6 +347,16 @@ func physics_step(dt: float) -> void:
 	var next: Vector2 = collision.resolve(position_value,displacement).clamp(Vector2(-156,-136),Vector2(156,136))
 	position_value = next
 	actual_velocity = (position_value - previous_position) / dt
+	if not actual_velocity.is_zero_approx():
+		# A new real movement phase may establish a new stopped-foot anchor
+		# later. A correction received while resting still drains fully if the
+		# actor stays at rest; tiny decay cannot itself create a new anchor.
+		correction_must_settle = false
+		if rest_anchor_active:
+			rest_anchor_active = false
+			rest_offset_releasing = not visual_correction.is_zero_approx()
+	elif was_moving:
+		begin_rest_anchor()
 	if actual_velocity.length() > .08:
 		yaw = lerp_angle(yaw, atan2(facing_direction.x, facing_direction.y), 1 - exp(-16 * dt))
 	elif face_target != null:
@@ -319,7 +376,22 @@ func physics_step(dt: float) -> void:
 	else:
 		land_left = maxf(0, land_left - dt)
 	locomotion_state = ("land" if land_left > 0 else "ground") if grounded else "jump_start" if jump_age <= .06 else "airborne" if vertical_velocity > 0 else "fall"
-	visual_correction = visual_correction.lerp(Vector2.ZERO, 1 - exp(-22 * dt))
+	if visual_correction.length() > rest_correction_budget():
+		correction_must_settle = correction_must_settle or rest_anchor_active or actual_velocity.is_zero_approx()
+		rest_anchor_active = false
+		rest_offset_releasing = false
+	if not rest_anchor_active:
+		var correction_step: Vector2 = visual_correction * (1.0 - exp(-22 * dt))
+		if rest_offset_releasing and not correction_must_settle:
+			# Discharge the bounded remainder only with real planar travel.
+			# Its maximum half-step cannot reverse the first movement step,
+			# and holding a key against a wall cannot move stationary feet.
+			correction_step = correction_step.limit_length(actual_velocity.length() * dt * .5)
+		visual_correction -= correction_step
+		if visual_correction.length() < .000001:
+			visual_correction = Vector2.ZERO
+			rest_offset_releasing = false
+			correction_must_settle = false
 	history.append({"time":clock_ms,"position":position_value})
 	while history.size() > 180: history.pop_front()
 

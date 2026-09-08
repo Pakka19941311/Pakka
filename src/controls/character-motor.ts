@@ -48,13 +48,17 @@ export class CharacterMotor {
     const length = Math.hypot(direction.x, direction.z);
     const inputX = length > 0.0001 ? direction.x / length : 0;
     const inputZ = length > 0.0001 ? direction.z / length : 0;
-    const rate = length > 0.0001 ? 19 : 30;
-    const blend = response(rate, dt);
     const targetX = inputX * maxSpeed, targetZ = inputZ * maxSpeed;
-    // Exact approved 1e94a0d1 motor: the simulation owns a fixed 60 Hz step.
-    // Integrate velocity first, as in the reference, then move by that velocity.
-    this.velocityX += (targetX - this.velocityX) * blend;
-    this.velocityZ += (targetZ - this.velocityZ) * blend;
+    // Keep the accepted acceleration/turn response, but stop on the first
+    // neutral tick. The owner rejected the reference's 30/s friction coast:
+    // it continued translating an already stopped character after release
+    // and arrival. A planar stop must not reset the independent jump state.
+    if (length <= 0.0001) this.stopPlanar();
+    else {
+      const blend = response(19, dt);
+      this.velocityX += (targetX - this.velocityX) * blend;
+      this.velocityZ += (targetZ - this.velocityZ) * blend;
+    }
     let dx = this.velocityX * dt;
     let dz = this.velocityZ * dt;
 

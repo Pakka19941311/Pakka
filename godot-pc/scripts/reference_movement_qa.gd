@@ -2,6 +2,9 @@ extends SceneTree
 
 # The golden rows were produced by executing the user-approved browser source,
 # independently of this native controller. See scripts/reference-gameplay-contract.mjs.
+# Owner override 2026-09-08: neutral input must stop immediately. Keep the pinned
+# browser file immutable and compare its moving/jump/turn frames exactly; only
+# neutral rows instead assert the last active position and yaw, with zero delta.
 const Movement = preload("res://scripts/player_movement.gd")
 const STEP: float = 1.0 / 60
 const POSITION_TOLERANCE: float = .0001 # Godot Vector2 uses float32.
@@ -39,6 +42,9 @@ static func run() -> Dictionary:
 			var value: Movement = fixture(speed)
 			var tick: int = 0
 			for segment: Dictionary in trace.segments:
+				var neutral: bool = is_zero_approx(float(segment.direction.x)) and is_zero_approx(float(segment.direction.z))
+				var stopped_position: Vector2 = Vector2(trace.rows[tick-1][1],trace.rows[tick-1][2]) if tick > 0 else Vector2.ZERO
+				var stopped_yaw: float = float(trace.rows[tick-1][8]) if tick > 0 else 0.0
 				value.submit({"type":"direction","x":segment.direction.x,"z":segment.direction.z})
 				for local_tick: int in range(int(segment.ticks)):
 					for request: Dictionary in trace.requests:
@@ -48,10 +54,10 @@ static func run() -> Dictionary:
 					var before: Vector2 = value.position_value
 					value.physics_step(STEP)
 					var expected: Array = trace.rows[tick]
-					var position_error: float = value.position_value.distance_to(Vector2(expected[1],expected[2]))
-					var delta_error: float = (value.position_value-before).distance_to(Vector2(expected[4],expected[5]))
+					var position_error: float = value.position_value.distance_to(stopped_position if neutral else Vector2(expected[1],expected[2]))
+					var delta_error: float = (value.position_value-before).distance_to(Vector2.ZERO if neutral else Vector2(expected[4],expected[5]))
 					var height_error: float = absf(value.height-float(expected[3]))
-					var yaw_error: float = absf(angle_difference(value.yaw,float(expected[8])))
+					var yaw_error: float = absf(angle_difference(value.yaw,stopped_yaw if neutral else float(expected[8])))
 					maximum_position_error = maxf(maximum_position_error,maxf(position_error,delta_error))
 					maximum_height_error = maxf(maximum_height_error,height_error)
 					maximum_yaw_error = maxf(maximum_yaw_error,yaw_error)
@@ -61,7 +67,7 @@ static func run() -> Dictionary:
 					yaw_matches = yaw_matches and yaw_error < ANGLE_TOLERANCE
 					tick += 1
 					compared_ticks += 1
-		checks["reference_"+str(profile.class_id)+"_native_position_and_displacement_every_tick"] = positions_match
+		checks["reference_"+str(profile.class_id)+"_native_position_every_tick_with_immediate_stop_override"] = positions_match
 		checks["reference_"+str(profile.class_id)+"_native_jump_height_and_grounded_every_tick"] = heights_match and states_match and requests_match
 		checks["reference_"+str(profile.class_id)+"_native_facing_through_reversal_and_strafe"] = yaw_matches
 	for profile: Dictionary in golden.render_fps.class_traces:

@@ -15,7 +15,9 @@ import { stageNativeServer } from './package-godot-pc.mjs';
 
 const root = process.cwd();
 const [binaryArg, outputArg, ...options] = process.argv.slice(2);
-assert.ok(binaryArg && outputArg, 'Usage: godot-pc-qa.mjs BINARY OUTPUT [--graphical] [--package=DIR]');
+assert.ok(binaryArg && outputArg, 'Usage: godot-pc-qa.mjs BINARY OUTPUT [--graphical] [--package=DIR] [--qa-scope=full|stop-npc|stop-only]');
+const qaScope = options.find(arg => arg.startsWith('--qa-scope='))?.slice('--qa-scope='.length) || 'full';
+assert.ok(['full', 'stop-npc', 'stop-only'].includes(qaScope), `Unknown native QA scope: ${qaScope}`);
 const binary = resolve(binaryArg), output = resolve(outputArg);
 mkdirSync(output, { recursive: true });
 const privateRoot = mkdtempSync(join(tmpdir(), 'varendor-native-qa-'));
@@ -40,8 +42,7 @@ try {
   await assert.rejects(startNativeBridge({ data, legacy, backups }), /уже запущена/);
   checks.push('one process per native saved world');
   const reportPath = join(output, 'native-runtime.json');
-  const scope = options.find(arg => arg.startsWith('--qa-scope='));
-  const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`, ...(scope ? [scope] : [])];
+  const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`, `--qa-scope=${qaScope}`];
   const child = spawn(binary, args, { cwd: stage, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';
   child.stdout.on('data', bytes => { log += bytes; });
@@ -55,12 +56,15 @@ try {
   assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, 'Native client runtime errors');
   const native = JSON.parse(readFileSync(reportPath, 'utf8'));
   assert.equal(native.ok, true);
+  if (qaScope !== 'full') assert.equal(native.scope, qaScope === 'stop-only' ? 'forward-stop-follow-up' : 'stop-npc-stats-follow-up', 'The native client must execute the requested regression scope');
   for (const [key, value] of Object.entries({ classes: 5, item_definitions: 33, quick_slots: 32, bag_slots: 42, equipment_slots: 12 })) assert.equal(native.checks[key], value, key);
   if (options.includes('--graphical')) {
     assert.equal(native.checks.native_render, true);
     assert.ok(existsSync(reportPath.replace(/\.json$/, '.png')));
   }
-  checks.push(native.scope === 'stop-npc-stats-follow-up'
+  checks.push(native.scope === 'forward-stop-follow-up'
+    ? 'exported native client: zero neutral coast, first-frame stopping, frame-independent sequential input delivery, delayed reconciliation and real rig pose checks'
+    : native.scope === 'stop-npc-stats-follow-up'
     ? 'exported native client: stopping and delayed reconciliation, city service interactions, compact stats, persisted quickbar'
     : 'exported native client: world, five classes, HUD 42/12/32, move, reorder, equip, UID, persisted quickbar');
   let bootstrap = JSON.parse(readFileSync(bridge.bootstrapPath, 'utf8'));

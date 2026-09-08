@@ -1,6 +1,8 @@
 class_name VarendorNetwork
 extends Node
 
+const InputTransport = preload("res://scripts/input_transport.gd")
+
 signal snapshot_received(snapshot: Dictionary)
 signal notice(message: String)
 signal profiles_changed
@@ -32,6 +34,7 @@ var retry_in: float = 0.0
 var silence: float = 0.0
 var input_queue: Array = []
 var input_busy: bool = false
+var input_transport: InputTransport
 var expected_content: String = ""
 var expected_map: String = ""
 var incompatible: bool = false
@@ -52,10 +55,9 @@ func request(path: String, data = null, bearer: String = "") -> Dictionary:
 	var http: HTTPRequest = HTTPRequest.new()
 	http.timeout = 7.0
 	# HTTPClient needs several polls to connect, write, and read a response.
-	# Polling each phase from rendered frames made a local input take hundreds
-	# of milliseconds at low FPS, keeping release/turn edges behind old input.
-	# I/O runs independently; request_completed and every queue mutation still
-	# run on the main thread, with one input request in flight at a time.
+	# General profile/item requests use threaded I/O. Movement has its own
+	# sequential worker below, so request_completed cannot throttle input to
+	# one command per rendered frame. The durable item journal is unchanged.
 	http.use_threads = true
 	add_child(http)
 	var headers: PackedStringArray = ["Content-Type: application/json"]
@@ -83,12 +85,14 @@ func accept(value: Dictionary) -> void:
 	if int(value.get("protocol", 0)) != 1 or not value.has("character"):
 		incompatible = true
 		connected = false
+		stop_input_transport()
 		close_stream()
 		notice.emit("Версия сервера несовместима с этой сборкой")
 		return
 	if (not expected_content.is_empty() and value.get("contentVersion", "") != expected_content) or (not expected_map.is_empty() and value.get("mapVersion", "") != expected_map):
 		incompatible = true
 		connected = false
+		stop_input_transport()
 		close_stream()
 		notice.emit("Версии мира и клиента не совпадают. Запустите клиент и сервер из одного пакета.")
 		return
@@ -101,7 +105,7 @@ func accept(value: Dictionary) -> void:
 	last_time = server_time
 	var reconnecting: bool = not connected
 	if not hero.is_empty() and hero.get("generation") != value.character.get("generation"):
-		input_queue.clear()
+		stop_input_transport()
 	hero = value.character
 	sequence = maxi(sequence, int(hero.get("lastInputSequence", 0)))
 	connected = true
@@ -115,6 +119,7 @@ func end_session() -> void:
 	# Invalidate callbacks before changing the selected hero. A pending command
 	# remains in its own durable journal until this hero is resumed later.
 	session_generation += 1
+	stop_input_transport()
 	close_stream()
 	token = ""
 	hero = {}
@@ -253,6 +258,7 @@ func close_stream() -> void:
 	silence = 0
 
 func stream_failed() -> void:
+	stop_input_transport()
 	close_stream()
 	retry_in = 1.0
 	if connected:
@@ -261,34 +267,53 @@ func stream_failed() -> void:
 
 func intent(value: Dictionary) -> void:
 	if not connected: return
-	# Reserve the acknowledgement ID before local prediction. Queued input and
-	# sent input must share an ID; an old ACK cannot cancel a newer local intent.
+	# Reserve the acknowledgement ID before local prediction. All distinct
+	# inputs retain order, including camera-relative steering and release.
 	sequence += 1
-	var entry: Dictionary = {"value":value.duplicate(),"sequence":sequence}
-	intent_reserved.emit(value.duplicate(),sequence)
-	intent_submitted.emit(value.duplicate())
-	# Only redundant held-direction heartbeats may collapse. A turn or neutral
-	# release was already applied by prediction and must reach the server too.
-	# Collapsing all directions discarded corners of the real movement path,
-	# causing an authoritative sideways correction after the player stopped.
-	if value.type == "direction" and not input_queue.is_empty() and same_direction(input_queue.back().value,value):
-		input_queue[input_queue.size()-1] = entry
-	else: input_queue.append(entry)
-	if input_busy: return
-	var generation: int = session_generation
+	var entry: Dictionary = {"value":value.duplicate(true),"sequence":sequence,"session":session_generation,
+		"payload":{"sequence":sequence,"generation":hero.get("generation",0),"intent":value.duplicate(true)}}
+	intent_reserved.emit(value.duplicate(true),sequence)
+	intent_submitted.emit(value.duplicate(true))
+	input_queue.append(entry)
 	input_busy = true
-	while not input_queue.is_empty() and connected:
-		var next: Dictionary = input_queue.pop_front()
-		var response: Dictionary = await request("/api/input", {"sequence":next.sequence,"generation":hero.get("generation",0),"intent":next.value})
-		if generation != session_generation or response.get("stale",false): return
-		if response.has("error"):
-			intent_rejected.emit(next.value.duplicate(),int(next.sequence),str(response.error))
-			notice.emit(str(response.error))
+	dispatch_input(entry)
+
+func dispatch_input(entry: Dictionary) -> void:
+	if input_transport == null:
+		input_transport = InputTransport.new()
+		input_transport.completed.connect(input_completed, CONNECT_DEFERRED)
+		if input_transport.start(server_url, token) != OK:
+			input_transport = null
+			input_completed(entry, {"error":"Не удалось запустить соединение ввода"})
+			return
+	input_transport.enqueue(entry)
+
+func input_completed(entry: Dictionary, response: Dictionary) -> void:
+	# A response queued before a profile change/teleport cannot clear newer
+	# pending input or report an error against the newly selected hero.
+	if int(entry.session) != session_generation or int(entry.payload.generation) != int(hero.get("generation",0)) or response.get("stale",false): return
+	var pending_index: int = -1
+	for index: int in range(input_queue.size()):
+		if input_queue[index].sequence == entry.sequence:
+			pending_index = index
+			break
+	if pending_index < 0: return
+	input_queue.remove_at(pending_index)
+	input_busy = not input_queue.is_empty()
+	if response.has("error"):
+		intent_rejected.emit(entry.value.duplicate(true),int(entry.sequence),str(response.error))
+		notice.emit(str(response.error))
+		if response.get("transport_error", false): stream_failed()
+
+func stop_input_transport() -> void:
+	if input_transport != null:
+		input_transport.stop()
+		input_transport = null
 	input_queue.clear()
 	input_busy = false
 
-func same_direction(first: Dictionary, second: Dictionary) -> bool:
-	return first.get("type", "") == "direction" and second.get("type", "") == "direction" and float(first.get("x",0)) == float(second.get("x",0)) and float(first.get("z",0)) == float(second.get("z",0))
+func _exit_tree() -> void:
+	stop_input_transport()
 
 func pending_path() -> String:
 	return bootstrap_path.get_base_dir().path_join("pending-" + str(hero.get("id", "unknown")) + ".json")

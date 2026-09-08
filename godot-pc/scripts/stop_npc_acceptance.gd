@@ -21,8 +21,11 @@ static func run(app: Node) -> void:
 	checks.merge(preload("res://scripts/player_movement_qa.gd").run())
 	checks.merge(preload("res://scripts/player_pending_qa.gd").run())
 	checks.merge(preload("res://scripts/player_input_qa.gd").run())
+	checks.merge(preload("res://scripts/input_boundary_qa.gd").run(app))
 	checks.merge(preload("res://scripts/network_intent_qa.gd").run())
 	checks.merge(preload("res://scripts/player_stop_qa.gd").run())
+	checks.merge(preload("res://scripts/stop_anchor_qa.gd").run())
+	checks.merge(preload("res://scripts/stop_pose_qa.gd").run(app))
 	checks.merge(preload("res://scripts/navigation_qa.gd").run())
 	checks.merge(await preload("res://scripts/stopping_runtime_qa.gd").run(app))
 	var stop_only: bool = "--qa-scope=stop-only" in OS.get_cmdline_user_args()
@@ -41,7 +44,7 @@ static func run(app: Node) -> void:
 	var success: bool = true
 	for name: String in checks:
 		if checks[name] is bool and name != "native_render" and not checks[name]: success = false
-	var report: Dictionary = {"ok":success,"scope":"stop-transport-only" if stop_only else "stop-npc-stats-follow-up","checks":checks,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"notes":"Actual native input/HTTP/SSE/actor and service UI against isolated synthetic save. Windows headless does not establish Windows GPU behavior or subjective feel."}
+	var report: Dictionary = {"ok":success,"scope":"forward-stop-follow-up" if stop_only else "stop-npc-stats-follow-up","checks":checks,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"notes":"Actual native input/HTTP/SSE/actor against isolated synthetic save; first-tick stop, imported rigs and camera transforms. Windows headless does not establish Windows GPU behavior or subjective feel."}
 	app.net.save_private_json(app.qa_path,report)
 	print("VARENDOR_NATIVE_QA "+JSON.stringify(report))
 	app.net.set_process(false)

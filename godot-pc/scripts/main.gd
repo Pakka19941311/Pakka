@@ -805,6 +805,12 @@ func text_focused() -> bool:
 func _process(delta: float) -> void:
 	if world == null or net == null:
 		return
+	# The frame's catch-up physics belongs to the previously held input.
+	# Commit freshly sampled keys AFTER those ticks and BEFORE world rendering:
+	# applying a release in the first catch-up tick retroactively erases elapsed
+	# movement while the server has already simulated it, causing a later slide.
+	# Only input sampling moves here; the motor still integrates fixed 60 Hz ticks.
+	player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
 	if not display_before.is_empty():
 		display_remaining -= delta
 		if is_instance_valid(display_countdown):
@@ -836,10 +842,7 @@ func _process(delta: float) -> void:
 		qa_last_frame_usec = now_usec
 
 func _physics_process(delta: float) -> void:
-	# Parent runs before the world motor: input and movement share the same
-	# 60 Hz lattice, including multiple catch-up ticks during a slow frame.
 	if world != null and net != null:
-		player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
 		if npc_interaction.network != null: npc_interaction.poll(delta)
 	if status != null and not net.connected and not net.hero.is_empty():
 		status.text = "Соединение потеряно · переподключение…"

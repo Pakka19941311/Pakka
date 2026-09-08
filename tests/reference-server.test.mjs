@@ -27,16 +27,22 @@ test('server uses the accepted 60 Hz physics rate and never steps partial HTTP i
   const at=player.z;world.advance(1020);assert.equal(player.z,at,'remainder is retained instead of a short step');
 });
 
-for(const trace of golden.movement.traces)test(`authoritative physics matches browser trace: ${trace.name}`,()=>{
+for(const trace of golden.movement.traces)test(`authoritative physics matches browser trace with owner immediate-stop override: ${trace.name}`,()=>{
   const {world,player,input}=fixture();let tick=0;
-  for(const segment of trace.segments)for(let i=0;i<segment.ticks;i++,tick++){
+  for(const segment of trace.segments){
+    // Preserve the pinned reference; its deliberate friction tail was rejected
+    // by the owner on 2026-09-08. Every active movement/jump/turn row stays exact.
+    const neutral=segment.direction.x===0&&segment.direction.z===0;
+    const stopped=tick>0?trace.rows[tick-1]:[0,0,0,0,0,0,true,false,0];
+    for(let i=0;i<segment.ticks;i++,tick++){
     if(i===0||tick%6===0)input({type:'direction',...segment.direction});
     if(trace.jump_ticks.includes(tick)||trace.air_jump_attempt_ticks.includes(tick))input({type:'jump'});
     world.heartbeat(player.id);world.advance(1000+(tick+1)*1000/60);
     const expected=trace.rows[tick];
-    close(player.x-40,expected[1],`tick ${tick} x`);close(player.z-40,expected[2],`tick ${tick} z`);
+    close(player.x-40,neutral?stopped[1]:expected[1],`tick ${tick} x`);close(player.z-40,neutral?stopped[2]:expected[2],`tick ${tick} z`);
     close(player.yOffset,expected[3],`tick ${tick} jump`);assert.equal(player.grounded,expected[6]);
-    close(player.yaw,expected[8],`tick ${tick} facing`);
+    close(player.yaw,neutral?stopped[8]:expected[8],`tick ${tick} facing`);
+    }
   }
 });
 
