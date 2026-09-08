@@ -6,7 +6,7 @@
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/forward-stop-final-reviewed",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "9fe628ab6abb71dea42c962984abd96820fc2e82",
+  "observed_head": "72b3e30bd5b5e03974008b81396a19c9b5073c30",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -2009,7 +2009,7 @@
     "Approved territory/world environment and in-game atlas from TZ v2.0; directly affected geometry, migration and route checks only"
   ],
   "current_substep": "Territory implemented; native build pending",
-  "working_commit": "9fe628ab6abb71dea42c962984abd96820fc2e82",
+  "working_commit": "72b3e30bd5b5e03974008b81396a19c9b5073c30",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -4502,7 +4502,16 @@
     },
     "map_version": 3,
     "owner_visual_acceptance": false,
-    "report": "docs/migration/pc/WORLD_TERRITORY.md"
+    "report": "docs/migration/pc/WORLD_TERRITORY.md",
+    "first_native_attempt": {
+      "source": "72b3e30bd5b5e03974008b81396a19c9b5073c30",
+      "ci": "https://github.com/Pakka19941311/Pakka/actions/runs/34222341467",
+      "R01": true,
+      "R02": true,
+      "map_M_zoom_north_close": true,
+      "initial_enemies": 53,
+      "failure": "Test expected a Window for smith; accepted smith opens inventory. Harness corrected to service signal + appropriate UI. No release published."
+    }
   },
   "owner_latest_feedback": "Остановка принята: все хорошо, скольжение ушло. Следующий разрешённый блок — мир и карта по утверждённому визуалу и организации территории ТЗ. Лишние проверки исключить; дальнейшие блоки сначала согласовать."
 }

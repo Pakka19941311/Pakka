@@ -98,6 +98,13 @@ func _draw() -> void:
 	rect_at(1.5,-3,35,25,Color("d0c6a5"))
 	for gate: Dictionary in [world.territory.fort.eastGate,world.territory.fort.westGate,{"x":-86,"z":-82}]: rect_at(gate.x,gate.z,3.4,6,Color("ad8a55"))
 	for b: Dictionary in world.territory.buildings: rect_at(b.x,b.z,b.width,b.depth,Color("78897e"),Color("455a50"))
+	for road: Dictionary in world.territory.roads:
+		for i: int in range(1,road.points.size()):
+			var p: Dictionary = road.points[i]
+			var inside: bool = (absf(p.x+7)<35 and absf(p.z+5)<30) or (absf(p.x+108)<22 and absf(p.z+82)<19)
+			if inside:
+				var a: Dictionary = road.points[i-1]
+				draw_line(map_point(a.x,a.z),map_point(p.x,p.z),Color("d7caaa"),maxf(1,road.width*metre_scale*zoom),true)
 	for x: float in [-42,28]:
 		for z: float in [-35,25]: rect_at(x,z,5.8,5.8,Color("5a7268"),INK)
 	if show_labels:
@@ -106,10 +113,9 @@ func _draw() -> void:
 			draw_circle(p,10,Color("30574b"))
 			text_at(p+Vector2(-7,4),district[2],11,Color("f2ead1"))
 	for landmark: Dictionary in world.territory.landmarks:
-		if landmark.kind == "ridge": continue
 		var p: Vector2 = map_point(landmark.x,landmark.z)
-		var major: bool = landmark.kind in ["fort","town","ruin","forest","den","camp","boss"]
-		if landmark.kind not in ["fort","town"]: draw_circle(p,4 if show_labels else 1.5,Color("a15138") if landmark.kind == "boss" else Color("5b6852"))
+		var major: bool = landmark.kind in ["fort","town","ruin","forest","den","camp","boss","ridge"]
+		if landmark.kind not in ["fort","town","ridge"]: draw_circle(p,4 if show_labels else 1.5,Color("a15138") if landmark.kind == "boss" else Color("5b6852"))
 		if show_labels:
 			var font_size: int = 13 if major else 10
 			var extent: Vector2 = ThemeDB.fallback_font.get_string_size(landmark.name,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size)

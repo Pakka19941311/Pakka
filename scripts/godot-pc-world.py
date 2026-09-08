@@ -11,6 +11,14 @@ sys.path.insert(0,str(ROOT/'scripts'))
 from territory_art import build_prop, build_wildlife
 OUT = ROOT/'godot-pc/generated'
 layout = json.loads((OUT/'layout.json').read_text())
+terrain_data=json.loads((OUT/'terrain.json').read_text())
+def surface_height(x,z):
+    cols,rows=terrain_data['columns'],terrain_data['rows'];heights=terrain_data['heights']
+    gx=max(0,min(cols,(x+terrain_data['width']/2)*cols/terrain_data['width']))
+    gz=max(0,min(rows,(terrain_data['depth']/2-z)*rows/terrain_data['depth']))
+    col,row=min(cols-1,math.floor(gx)),min(rows-1,math.floor(gz));u,v=gx-col,gz-row
+    a,b,c,d=[heights[index] for index in [row*(cols+1)+col,row*(cols+1)+col+1,(row+1)*(cols+1)+col,(row+1)*(cols+1)+col+1]]
+    return a+u*(b-a)+v*(d-b) if u>=v else a+u*(d-c)+v*(c-a)
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
 scene.unit_settings.system = 'METRIC'
@@ -70,16 +78,20 @@ def mesh(name,vertices,faces,material):
 # Coordinate adapter: server x,z -> Godot x,-z; Blender world is x,z,height.
 g=layout['geometry'];vertices=[(g['positions'][i],g['positions'][i+2],g['positions'][i+1]) for i in range(0,len(g['positions']),3)]
 for key,mat in [('groundIndices',ground),('roadIndices',road)]:
-    ix=g[key];obj=mesh('Terrain' if key=='groundIndices' else 'Roads',vertices,[tuple(reversed(ix[i:i+3])) for i in range(0,len(ix),3)],mat)
+    ix=g[key];obj=mesh('Terrain' if key=='groundIndices' else 'Roads',vertices,[tuple(ix[i:i+3]) for i in range(0,len(ix),3)],mat)
     for poly in obj.data.polygons:poly.use_smooth=True
+    colors=obj.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
+    for vertex in obj.data.vertices:
+        x,z=vertex.co.x,vertex.co.y
+        density=max(0,max(1-math.hypot((x-f['x'])/f['rx'],(z-f['z'])/f['rz']) for f in layout['territory']['forests']))
+        shade=.91+.09*math.sin(x*.16+z*.21)*math.sin(z*.31)
+        if key=='groundIndices':color=((.76-.22*density)*shade,(.76-.1*density)*shade,(.62-.19*density)*shade,1)
+        else:color=(1,1,1,1) if (abs(x+7)<35 and abs(z+5)<30) or (abs(x+108)<22 and abs(z+82)<19) else (.9,.79,.62,1)
+        colors.data[vertex.index].color=color
     if key=='roadIndices':
         # One terrain mesh, two material regions: paving inside settlements,
         # packed earth outside. No overlays, fighting faces or painted straight strip.
         earth=pbr('Packed woodland track',ROOT/'public/assets/world/forest_ground_04','diff.jpg')
-        nodes=earth.node_tree.nodes;links=earth.node_tree.links;bsdf=nodes.get('Principled BSDF')
-        texture=next(n for n in nodes if n.type=='TEX_IMAGE')
-        tint=nodes.new('ShaderNodeMixRGB');tint.blend_type='MULTIPLY';tint.inputs[0].default_value=1;tint.inputs[2].default_value=(1.32,1.02,.66,1)
-        links.new(texture.outputs['Color'],tint.inputs[1]);links.new(tint.outputs[0],bsdf.inputs['Base Color'])
         obj.data.materials.append(earth)
         for poly in obj.data.polygons:
             x,y=poly.center.x,poly.center.y
@@ -149,7 +161,7 @@ for i,p in enumerate(layout['placements']):
     elif kind=='fire':
         light=bpy.data.lights.new(name,'POINT');light.energy=180*p.get('scale',1);light.color=(1,.35,.08)
         o=bpy.data.objects.new(name,light);scene.collection.objects.link(o);o.location=(x,z,y+.5)
-    else:build_prop(p,prop_materials,mesh)
+    else:build_prop(p,prop_materials,mesh,surface_height)
 build_wildlife(OUT/'wildlife',prop_materials)
 # Native profile showed 1295 draw calls in the starter view. Batch immutable
 # geometry by material and 16 m sector, retaining spatial culling and all lights.
@@ -176,6 +188,6 @@ for image in bpy.data.images:
 blend_path=ROOT/'world-source'/'Varendor_PC_World.blend'
 blend_path.parent.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(blend_path))
-bpy.ops.export_scene.gltf(filepath=str(OUT/'world.glb'),export_format='GLB',export_animations=False,export_cameras=False,export_lights=True,export_yup=True)
+bpy.ops.export_scene.gltf(filepath=str(OUT/'world.glb'),export_format='GLB',export_animations=False,export_cameras=False,export_lights=True,export_yup=True,export_vertex_color='ACTIVE')
 report={'placements':len(layout['placements']),'source':'TZ v2.0 approved territory; src/world/territory-layout.ts + scripts/territory_art.py + licensed Git PBR foliage','territoryVersion':layout['territory']['version'],'trees':len(layout['territory']['trees']),'wildlife':['crow','hare'],'material_fallbacks_for_known_P0_ASSET_001':sorted(set(fallback)),'objects':len(scene.objects),'objects_before_batching':original_objects,'static_batches':len(batches),'blend_bytes':blend_path.stat().st_size,'glb_bytes':(OUT/'world.glb').stat().st_size}
 (OUT/'blender-build.json').write_text(json.dumps(report,indent=2)+'\n');print('VARENDOR_BLENDER_WORLD_READY '+json.dumps(report))

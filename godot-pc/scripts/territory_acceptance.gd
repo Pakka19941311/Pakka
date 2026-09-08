@@ -26,7 +26,10 @@ static func capture(app: Node,name: String) -> void:
 	var file: FileAccess = FileAccess.open(app.qa_path.get_base_dir().path_join(name+".jpg"),FileAccess.WRITE)
 	file.store_buffer(bytes)
 	file.close()
-	print("VARENDOR_WORLD_JPG "+name+" "+Marshalls.raw_to_base64(bytes))
+	var encoded: String = Marshalls.raw_to_base64(bytes)
+	var count: int = ceili(encoded.length()/8000.0)
+	for index: int in count:
+		print("VARENDOR_WORLD_IMAGE "+JSON.stringify({"name":name,"part":index,"count":count,"data":encoded.substr(index*8000,8000)}))
 	app.qa_interaction = previous
 	app.apply_settings()
 
@@ -45,15 +48,23 @@ static func run(app: Node) -> void:
 	checks["fifty_three_initial_enemies"] = app.world.current_snapshot.monsters.size()==53
 	checks["four_services_six_residents"] = VarendorNpcInteraction.SERVICES.size()==4 and app.world.ambient_residents.residents.size()==6
 	checks["wildlife_two_loaded_species"] = app.world.territory_life.creatures.size()==10
+	var opened: Array[String] = []
+	var service_open: Callable = func(id: String): opened.append(id)
+	app.npc_interaction.service_opened.connect(service_open)
 	# Relocation changed these approaches; accepted NPC behavior is not retested.
 	for id: String in VarendorNpcInteraction.SERVICES:
+		app.inventory_panel.hide()
+		var count: int = opened.size()
 		app.picked(id)
 		var began: int = Time.get_ticks_msec()
-		while not is_instance_valid(app.active_dialog) and Time.get_ticks_msec()-began<20000:
+		while opened.size()==count and Time.get_ticks_msec()-began<20000:
 			await tree.create_timer(.15).timeout
-		checks["relocated_service_"+id] = is_instance_valid(app.active_dialog) and app.npc_interaction.ready_for_service(id,Vector2(app.net.hero.x,app.net.hero.z))
+		var shown: bool = app.inventory_panel.visible if id=="npc:smith" else is_instance_valid(app.active_dialog)
+		checks["relocated_service_"+id] = opened.size()==count+1 and opened[-1]==id and shown and app.npc_interaction.ready_for_service(id,Vector2(app.net.hero.x,app.net.hero.z))
 		app.close_dialog()
+		app.inventory_panel.hide()
 		await tree.process_frame
+	app.npc_interaction.service_opened.disconnect(service_open)
 	# Actual exported player/HTTP/SSE across the new primary route and forest edge.
 	var r01: bool = true
 	for p: Vector2 in [Vector2(20,-5),Vector2(34,-5),Vector2(64,0),Vector2(71,27),Vector2(35,55),Vector2(-47,51),Vector2(-79,54),Vector2(-83,22),Vector2(-80,2),Vector2(-93,-5)]:

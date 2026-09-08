@@ -170,7 +170,7 @@ func setup(game: Dictionary) -> bool:
 				wind.set_shader_parameter("base_color",source.albedo_color)
 				wind.set_shader_parameter("textured",source.albedo_texture != null)
 				if source.albedo_texture != null: wind.set_shader_parameter("albedo_map",source.albedo_texture)
-				wind.set_shader_parameter("cutout",source.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED)
+				wind.set_shader_parameter("cutout","Foliage" in source.resource_name or source.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED)
 				wind.set_shader_parameter("strength",.11 if "Grass" in source.resource_name else .16 if "Banner" in source.resource_name else .12)
 				wind_materials[key] = wind
 			geometry.set_surface_override_material(surface,wind_materials[key])

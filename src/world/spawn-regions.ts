@@ -45,6 +45,8 @@ export function spawnPointInRegion(region: SpawnRegion, index: number): Readonly
 
 export function patrolRouteInRegion(region: SpawnRegion, spawn: Readonly<{ x: number; z: number }>, index: number): Array<{ x: number; z: number }> {
   const points: Array<{ x: number; z: number }> = [];
+  const isolated=region.id==='greyfang-meadow'&&index===0;
+  const patrolCenter=isolated?spawn:region.center;
   for (let waypoint = 0; waypoint < 3; waypoint += 1) {
     const angle = index * 1.37 + waypoint * (Math.PI * 2 / 3) + region.center.x * 0.013;
     const distance = region.patrolRadius * (0.48 + ((index + waypoint * 2) % 5) * 0.085);
@@ -52,13 +54,13 @@ export function patrolRouteInRegion(region: SpawnRegion, spawn: Readonly<{ x: nu
       x: spawn.x + Math.cos(angle) * distance,
       z: spawn.z + Math.sin(angle) * distance,
     };
-    const fromCenterX = desired.x - region.center.x;
-    const fromCenterZ = desired.z - region.center.z;
+    const fromCenterX = desired.x - patrolCenter.x;
+    const fromCenterZ = desired.z - patrolCenter.z;
     const centerDistance = Math.max(0.001, Math.hypot(fromCenterX, fromCenterZ));
-    const territoryLimit = Math.max(region.radius + region.patrolRadius * 0.45, region.patrolRadius);
+    const territoryLimit = isolated?3.2:Math.max(region.radius + region.patrolRadius * 0.45, region.patrolRadius);
     points.push(centerDistance <= territoryLimit ? desired : {
-      x: region.center.x + fromCenterX / centerDistance * territoryLimit,
-      z: region.center.z + fromCenterZ / centerDistance * territoryLimit,
+      x: patrolCenter.x + fromCenterX / centerDistance * territoryLimit,
+      z: patrolCenter.z + fromCenterZ / centerDistance * territoryLimit,
     });
   }
   return points;

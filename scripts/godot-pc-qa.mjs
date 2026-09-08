@@ -45,8 +45,9 @@ try {
   const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`, `--qa-scope=${qaScope}`];
   const child = spawn(binary, args, { cwd: stage, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';
-  child.stdout.on('data', bytes => { log += bytes; });
-  child.stderr.on('data', bytes => { log += bytes; });
+  const outputChunk=bytes=>{log+=bytes;if(/SCRIPT ERROR:|^ERROR:/m.test(log))child.kill();};
+  child.stdout.on('data', outputChunk);
+  child.stderr.on('data', outputChunk);
   const timeout = setTimeout(() => child.kill(), qaScope==='world'?420000:300000);
   let code;
   try { [code] = await once(child, 'exit'); }
@@ -59,8 +60,8 @@ try {
       failed: Object.entries(observed.checks).filter(([key, value]) => value === false && key !== 'native_render').map(([key]) => key),
       stops: observed.checks.live_stop_observations?.map(({ samples, ...summary }) => summary) }));
   }
-  for (const line of log.split('\n')) if (line.startsWith('VARENDOR_WORLD_JPG ') || line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
-  assert.equal(code, 0, log.split('\n').filter(line => !line.startsWith('VARENDOR_REVIEW_JPG ') && !line.startsWith('VARENDOR_CORE_JPG ')).join('\n').slice(-16000));
+  for (const line of log.split('\n')) if (line.startsWith('VARENDOR_WORLD_IMAGE ') || line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
+  assert.equal(code, 0, log.split('\n').filter(line => !line.startsWith('VARENDOR_WORLD_IMAGE ') && !line.startsWith('VARENDOR_REVIEW_JPG ') && !line.startsWith('VARENDOR_CORE_JPG ')).join('\n').slice(-16000));
   assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, 'Native client runtime errors');
   const native = JSON.parse(readFileSync(reportPath, 'utf8'));
   assert.equal(native.ok, true);

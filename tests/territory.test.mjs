@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {buildTerritory} from '../src/world/territory-layout.ts';
 import {ROAD_AXES,START_POINT,SERVICES,RESIDENTS,REGION_CENTERS,LEGACY_REGION_CENTERS,isTerritorySafe} from '../src/world/territory.ts';
-import {SPAWN_REGIONS,spawnPointInRegion} from '../src/world/spawn-regions.ts';
+import {SPAWN_REGIONS,spawnPointInRegion,patrolRouteInRegion} from '../src/world/spawn-regions.ts';
 import {findNavigationPath} from '../src/world/navigation.ts';
 import {mapVersion} from '../src/server/content-manifest.ts';
 import {WorldStore} from '../server/world-store.mjs';
@@ -39,6 +39,7 @@ test('all 53 original monster identities and 10 types spawn outside protected zo
   }
   const wolves=SPAWN_REGIONS.find(r=>r.monsterId==='wolf'),first=spawnPointInRegion(wolves,0);
   for(let i=1;i<wolves.population;i++){const p=spawnPointInRegion(wolves,i);assert.ok(Math.hypot(p.x-first.x,p.z-first.z)>wolves.aggroRadius*2);}
+  for(const p of patrolRouteInRegion(wolves,first,0))assert.ok(Math.hypot(p.x-first.x,p.z-first.z)<=3.21,'first encounter cannot patrol back into the pack');
 });
 test('protected southwest approach connects both settlements without extending into enemy zones',()=>{
   for(const p of ROAD_AXES[0].points)assert.equal(isTerritorySafe(p),true);

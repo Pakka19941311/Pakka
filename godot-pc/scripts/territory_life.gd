@@ -41,7 +41,7 @@ func _process(delta: float) -> void:
 			var offset: Vector2 = (creature.goal as Vector2)-p
 			var speed: float = (4.2 if crow else 3.7) if creature.state == "flee" else .45
 			var movement: Vector2 = offset.normalized()*minf(speed*delta,offset.length())
-			if crow and creature.state == "flee": p += movement
+			if crow and creature.state == "flee" and float(creature.height)>7.5: p += movement
 			else: p = world.collision.resolve(p,movement)
 			creature.yaw = lerp_angle(float(creature.yaw),atan2(movement.x,movement.y),minf(1,delta*9))
 			if offset.length() < .3 or creature.timer <= 0:
@@ -57,7 +57,7 @@ func _process(delta: float) -> void:
 				creature.goal = world.collision.nearest_free((creature.home as Vector2)+Vector2(cos(a),sin(a))*3.0)
 				creature.timer = 8
 		creature.point = p
-		creature.height = move_toward(float(creature.height),2.8 if crow and creature.state == "flee" else 0.0,delta*1.7)
+		creature.height = move_toward(float(creature.height),8.5 if crow and creature.state == "flee" else 0.0,delta*3.3)
 		actor.position = world.point(p.x,p.y)+Vector3(0,float(creature.height),0)
 		actor.rotation.y = -float(creature.yaw)+PI
 		actor.rotation.x = sin(clock*8+float(creature.phase))*.14 if creature.state == "feed" else 0

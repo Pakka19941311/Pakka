@@ -4,7 +4,7 @@ No downloaded model replacements and no changes to the accepted character rigs.
 import bpy, math, random
 from mathutils import Vector, Matrix
 
-def build_prop(p, mats, mesh):
+def build_prop(p, mats, mesh, height_at=None):
     before=set(bpy.data.objects);name=p['name'];kind=p['kind'];h=p.get('height',1)
     w=p.get('width',1);d=p.get('depth',1);rng=random.Random(p.get('seed',17))
     def box(label,center,size,mat='wood'):
@@ -18,7 +18,7 @@ def build_prop(p, mats, mesh):
         a,b=Vector(a),Vector(b);v=b-a;o=cone(label,(a+b)/2,r,r,v.length,mat,8);o.rotation_euler=v.to_track_quat('Z','Y').to_euler();return o
     def roof(label,width,depth,height,z=0,mat='roof'):
         a,b=width/2,depth/2
-        return mesh(name+'-'+label,[(-a,-b,z),(a,-b,z),(0,-b,z+height),(-a,b,z),(a,b,z),(0,b,z+height)],[(0,2,1),(3,4,5),(0,3,5,2),(2,5,4,1)],mats[mat])
+        return mesh(name+'-'+label,[(-a,-b,z),(a,-b,z),(0,-b,z+height),(-a,b,z),(a,b,z),(0,b,z+height)],[(0,1,2),(5,4,3),(0,2,5,3),(2,1,4,5)],mats[mat])
     def slit(x,y,z,width=.38,height=1.15):
         box('dark-window',(x,y,z),(width,.045,height),'dark')
         for dx in [-width/2-.08,width/2+.08]:box('window-jamb',(x+dx,y-.03,z),(.13,.17,height+.26),'stone')
@@ -51,7 +51,7 @@ def build_prop(p, mats, mesh):
             a=i*math.pi/18+.004;b=(i+1)*math.pi/18-.004;v=[]
             for y in [-d/2,d/2]:
                 for radius,angle in [(r,a),(outer,a),(outer,b),(r,b)]:v.append((math.cos(angle)*radius,y,s+math.sin(angle)*radius))
-            mesh(name+'-voussoir',v,[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)],mats['stone'])
+            mesh(name+'-voussoir',v,[(1,2,3,0),(7,6,5,4),(4,5,1,0),(5,6,2,1),(6,7,3,2),(7,4,0,3)],mats['stone'])
         box('gate-cornice',(0,0,s+outer+.12),(w+2.3,d+.35,.3),'stone')
     elif kind=='house':
         style=p.get('style','house')
@@ -156,7 +156,8 @@ def build_prop(p, mats, mesh):
         for i in range(22):
             x=(rng.random()-.5)*p['patch'];y=(rng.random()-.5)*p['patch'];angle=rng.random()*math.tau;height=h*(.6+rng.random()*.5);width=.035
             dx=math.cos(angle)*width;dy=math.sin(angle)*width;n=len(vertices)
-            vertices.extend([(x-dx,y-dy,0),(x+dx,y+dy,0),(x+dx+.08,y+dy,height*.6),(x+.1,y,height)])
+            base=height_at(p['x']+x,p['z']+y)-p['y'] if height_at else 0
+            vertices.extend([(x-dx,y-dy,base),(x+dx,y+dy,base),(x+dx+.08,y+dy,base+height*.6),(x+.1,y,base+height)])
             faces.extend([(n,n+1,n+2),(n,n+2,n+3)]);shade=.72+rng.random()*.26;colors.extend([(shade,shade,shade,0),(shade,shade,shade,0),(shade,shade,shade,.6),(shade,shade,shade,1)])
         o=mesh(name,vertices,faces,mats['grass']);layer=o.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
         for i,c in enumerate(colors):layer.data[i].color=c
