@@ -227,14 +227,7 @@ func present_snapshot(snapshot: Dictionary) -> void:
 	xp.max_value = data.xpNeeded[clampi(int(hero.level), 0, data.xpNeeded.size() - 1)]
 	xp.value = hero.xp
 	xp.tooltip_text = "Опыт: %d / %d · Задание: %d · Побед: %d" % [hero.xp, xp.max_value, hero.quest, hero.kills]
-	var region: String = ""
-	var nearest: float = INF
-	for location: Dictionary in data.locations:
-		var distance: float = Vector2(location.x - hero.x, location.z - hero.z).length_squared()
-		if distance < nearest:
-			nearest = distance
-			region = location.name
-	status.text = region
+	status.text = world.location_name(Vector2(hero.x,hero.z))
 	respawn.visible = hero.dead
 	reference_hud.refresh(hero)
 	var fingerprint: String = JSON.stringify([hero.inventory, hero.equipment, hero.stats, selected_scroll])

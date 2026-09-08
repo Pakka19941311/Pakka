@@ -48,6 +48,10 @@ static func run(app: Node) -> void:
 	checks["fifty_three_initial_enemies"] = app.world.current_snapshot.monsters.size()==53
 	checks["four_services_six_residents"] = VarendorNpcInteraction.SERVICES.size()==4 and app.world.ambient_residents.residents.size()==6
 	checks["wildlife_two_loaded_species"] = app.world.territory_life.creatures.size()==10
+	checks["graded_world_materials"] = app.world.territory_material_audit.graded.size()>=4
+	checks["wind_materials_bound"] = app.world.territory_material_audit.wind_surfaces>0
+	checks["forest_zone_caption"] = app.world.location_name(Vector2(-99,-5))=="Лесная опушка"
+	checks["settlement_zone_captions"] = app.world.location_name(Vector2(12,-9))=="Гринфолл" and app.world.location_name(Vector2(-98,-84))=="Астерхолд"
 	var opened: Array[String] = []
 	var service_open: Callable = func(id: String): opened.append(id)
 	app.npc_interaction.service_opened.connect(service_open)

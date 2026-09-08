@@ -153,14 +153,19 @@ def build_prop(p, mats, mesh, height_at=None):
             for y in [-d/2,d/2]:beam('guy-rope',(x*.85,y,.65),(x*1.1,y*1.1,0),.012,'straw')
     elif kind=='grass':
         vertices=[];faces=[];colors=[]
-        for i in range(22):
-            x=(rng.random()-.5)*p['patch'];y=(rng.random()-.5)*p['patch'];angle=rng.random()*math.tau;height=h*(.6+rng.random()*.5);width=.035
+        for i in range(p.get('blades',28)):
+            x=(rng.random()-.5)*p['patch'];y=(rng.random()-.5)*p['patch'];angle=rng.random()*math.tau;height=h*(.6+rng.random()*.5);width=.009+rng.random()*.005
             dx=math.cos(angle)*width;dy=math.sin(angle)*width;n=len(vertices)
             base=height_at(p['x']+x,p['z']+y)-p['y'] if height_at else 0
             vertices.extend([(x-dx,y-dy,base),(x+dx,y+dy,base),(x+dx+.08,y+dy,base+height*.6),(x+.1,y,base+height)])
             faces.extend([(n,n+1,n+2),(n,n+2,n+3)]);shade=.72+rng.random()*.26;colors.extend([(shade,shade,shade,0),(shade,shade,shade,0),(shade,shade,shade,.6),(shade,shade,shade,1)])
         o=mesh(name,vertices,faces,mats['grass']);layer=o.data.color_attributes.new(name='Color',type='FLOAT_COLOR',domain='POINT')
         for i,c in enumerate(colors):layer.data[i].color=c
+    elif kind=='pebbles':
+        for i in range(5):
+            x=(rng.random()-.5)*p['patch'];y=(rng.random()-.5)*p['patch'];r=.07+rng.random()*.08
+            base=height_at(p['x']+x,p['z']+y)-p['y'] if height_at else 0
+            cone('track-stone',(x,y,base+.025),r,r*.6,.06+rng.random()*.05,'stone',6)
     elif kind=='mountain':
         bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2,radius=1);o=bpy.context.object;o.name=name
         for v in o.data.vertices:

@@ -157,6 +157,33 @@ export function buildTerritory(){
   // Directions and courtyard lanterns are actual geometry, at route junctions.
   for(const p of [[32,-10],[33,51],[-63,-32],[-79,55]]){add('signpost','road-wayfinder',p[0],p[1],2.6);cylinder('wayfinder-post',p[0],p[1],.09,2.5,'wood');}
   for(const p of [[24,-9],[24,-1],[-38,-22],[-38,-14],[-20,-10],[8,9]])add('lantern','courtyard-lantern',p[0],p[1],3.6);
+  // Groundcover is authored after every solid placement. Increasing its detail
+  // cannot reshuffle colliders or migrate the map a second time.
+  for(const tree of trees){
+    if(forestDensity(tree)<.12)continue;
+    for(let i=0;i<3;i++){
+      const a=random()*Math.PI*2,r=1+random()*1.8,x=tree.x+Math.cos(a)*r,z=tree.z+Math.sin(a)*r;
+      if(roadDistance({x,z})<.7||inSettlement({x,z},5))continue;
+      if(Object.values(REGION_CENTERS).some(c=>Math.hypot(x-c.x,z-c.z)<10)||Math.hypot(x+99,z+5)<6)continue;
+      asset(`fern_02/${Math.floor(random()*4)}`,x,z,.32+random()*.34,{centered:true,wind:true});
+    }
+  }
+  for(let i=0;i<5400;i++){
+    const x=-146+random()*292,z=-126+random()*250,p={x,z};
+    const density=forestDensity(p);
+    if(random()>(density>.1?.92:.24)||inSettlement(p,3)||roadDistance(p)<.1)continue;
+    if(Math.abs(terrain.heightAt(x+1,z)-terrain.heightAt(x-1,z))>.8)continue;
+    const clearing=Object.values(REGION_CENTERS).some(c=>Math.hypot(x-c.x,z-c.z)<11)||Math.hypot(x+99,z+5)<6;
+    add('grass','forest-groundcover',x,z,clearing?.1+random()*.07:.2+random()*.17,{seed:10000+i,patch:1.7+random()*.5,blades:72});
+  }
+  for(const route of ROAD_AXES){
+    if(route.kind==='protected')continue;
+    for(let i=3;i<route.points.length;i+=4){
+      const p=route.points[i],a=route.points[i-1],length=Math.hypot(p.x-a.x,p.z-a.z),side=i%2?-1:1;
+      const x=p.x-(p.z-a.z)/length*route.width*.45*side,z=p.z+(p.x-a.x)/length*route.width*.45*side;
+      if(!inSettlement({x,z},2))add('pebbles','roadside-stones',x,z,.12,{seed:i,patch:.7});
+    }
+  }
   const topology=worldTopology(collision,terrain);
   return {terrain,collision,topology,placements,territory:{...TERRITORY,buildings:placements.filter(p=>p.kind==='house').map(p=>({x:p.x,z:p.z,width:p.width,depth:p.depth,name:p.name})),trees:trees.map(p=>({...p}))}};
 }

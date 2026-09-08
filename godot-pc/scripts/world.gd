@@ -8,6 +8,7 @@ var data: Dictionary
 var terrain: Dictionary
 var territory: Dictionary
 var territory_life: VarendorTerritoryLife
+var territory_material_audit: Dictionary = {"graded":[],"wind_surfaces":0}
 var camera: Camera3D
 var actors: Dictionary = {}
 var templates: Dictionary = {}
@@ -158,12 +159,26 @@ func setup(game: Dictionary) -> bool:
 		if "fern" in str(mesh.name).to_lower() or "shrub" in str(mesh.name).to_lower() or "grass" in str(mesh.name).to_lower():
 			decorations.append(mesh)
 	var wind_materials: Dictionary = {}
+	var graded_materials: Dictionary = {}
 	for instance: Node in environment_world.find_children("*", "MeshInstance3D", true, false):
 		var geometry: MeshInstance3D = instance
 		for surface: int in geometry.mesh.get_surface_count():
 			var source: Material = geometry.get_active_material(surface)
-			if not source is StandardMaterial3D or not str(source.resource_name).begins_with("Territory_Wind_"): continue
+			if not source is StandardMaterial3D: continue
 			var key: int = source.get_instance_id()
+			if not graded_materials.has(key):
+				graded_materials[key] = true
+				var material_name: String = str(source.resource_name).to_lower().replace(" ","_")
+				var tint: Color = Color.WHITE
+				if "castle_stone" in material_name or "limewashed_fieldstone" in material_name: tint = Color("b5c1c4")
+				elif "medieval_wood" in material_name: tint = Color("94724f")
+				elif "slate_roof" in material_name: tint = Color("637683")
+				elif "paved_roads" in material_name: tint = Color("b4b8ad")
+				if tint != Color.WHITE:
+					source.albedo_color = tint
+					territory_material_audit.graded.append(str(source.resource_name))
+			if not str(source.resource_name).begins_with("Territory_Wind_"): continue
+			territory_material_audit.wind_surfaces += 1
 			if not wind_materials.has(key):
 				var wind: ShaderMaterial = ShaderMaterial.new()
 				wind.shader = preload("res://scripts/territory_wind.gdshader")
@@ -193,7 +208,7 @@ func setup(game: Dictionary) -> bool:
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color("bdc9dc")
-	env.ambient_light_energy = .52
+	env.ambient_light_energy = .65
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.fog_enabled = true
 	env.fog_light_color = Color("8b9995")
@@ -204,8 +219,8 @@ func setup(game: Dictionary) -> bool:
 	var sun: DirectionalLight3D = DirectionalLight3D.new()
 	sun_light = sun
 	sun.rotation_degrees = Vector3(-48, -35, 0)
-	sun.light_color = Color("ffe3ba")
-	sun.light_energy = 1.4
+	sun.light_color = Color("e9eff5")
+	sun.light_energy = .95
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 90
 	add_child(sun)
@@ -264,6 +279,29 @@ func setup(game: Dictionary) -> bool:
 	add_child(territory_life)
 	territory_life.setup(self)
 	return true
+
+func location_name(p: Vector2) -> String:
+	if territory.is_empty(): return "Варендор"
+	for settlement: Dictionary in [territory.fort,territory.capital]:
+		if absf(p.x-settlement.x)<settlement.width/2 and absf(p.y-settlement.z)<settlement.depth/2:
+			return "Гринфолл" if settlement.x==territory.fort.x else "Астерхолд"
+	for road: Dictionary in territory.roads:
+		if road.kind!="protected": continue
+		for i: int in range(1,road.points.size()):
+			var a: Vector2 = Vector2(road.points[i-1].x,road.points[i-1].z)
+			var b: Vector2 = Vector2(road.points[i].x,road.points[i].z)
+			var direction: Vector2 = b-a
+			var t: float = clampf((p-a).dot(direction)/maxf(.001,direction.length_squared()),0,1)
+			if p.distance_to(a+direction*t)<5.2: return road.name
+	var closest: float = INF
+	var result: String = "Пограничные земли"
+	for landmark: Dictionary in territory.landmarks:
+		if landmark.kind in ["fort","town"]: continue
+		var distance: float = p.distance_squared_to(Vector2(landmark.x,landmark.z))
+		if distance<closest:
+			closest = distance
+			result = landmark.name
+	return result
 
 func height_at(x: float, z: float) -> float:
 	var cols: int = int(terrain.columns)

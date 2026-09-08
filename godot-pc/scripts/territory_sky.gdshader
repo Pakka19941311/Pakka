@@ -12,7 +12,7 @@ void sky() {
     vec2 plane=EYEDIR.xz/max(0.14,EYEDIR.y+0.18);
     float first=smoothstep(0.47,0.72,cloud(plane*1.65+vec2(TIME*0.004,TIME*0.0018)));
     float second=smoothstep(0.51,0.74,cloud(plane*2.7+vec2(TIME*0.0025+37.0,17.0)));
-    float coverage=(first*.68+second*.23)*smoothstep(-0.03,0.3,EYEDIR.y);
+    float coverage=(first*.68+second*.23)*smoothstep(-0.12,0.25,EYEDIR.y);
     COLOR=mix(base,vec3(.78,.8,.77),coverage);
     if(EYEDIR.y<0.0) COLOR=mix(vec3(.37,.43,.41),base,smoothstep(-.08,0.0,EYEDIR.y));
 }
