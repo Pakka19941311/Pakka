@@ -1,0 +1,60 @@
+name: P0 frame pacing diagnosis
+on:
+  push:
+    branches: [work/godot-p1-recovery]
+permissions:
+  contents: read
+concurrency:
+  group: p0-frame-pacing-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  measure:
+    if: ${{ contains(github.event.head_commit.message, '[pacing-probe]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned native runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb libgl1-mesa-dri libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0
+          python scripts/godot-pc-toolchain.py
+          npm ci
+      - uses: actions/cache/restore@v4
+        id: world_cache
+        with:
+          path: |
+            godot-pc/generated/world.glb
+            godot-pc/generated/blender-build.json
+            godot-pc/generated/wildlife/
+            world-source/Varendor_PC_World.blend
+          key: territory-blender-4.5.9-${{ hashFiles('scripts/godot-pc-world.py', 'scripts/territory_art.py', 'src/world/territory-layout.ts', 'src/world/territory.ts', 'public/assets/world/world-topology.json') }}
+      - name: Prepare the unchanged scene and isolated measurement copy
+        run: |
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          if [ "${{ steps.world_cache.outputs.cache-hit }}" != true ]; then "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py; fi
+          cp -a godot-pc "$RUNNER_TEMP/pacing-project"
+          python scripts/pacing/instrument.py "$RUNNER_TEMP/pacing-project"
+          "$GODOT" --headless --path "$RUNNER_TEMP/pacing-project" --editor --import 2>&1 | tee "$RUNNER_TEMP/pacing-import.log"
+          python -c 'import pathlib,os; s=pathlib.Path(os.environ["RUNNER_TEMP"],"pacing-import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-18000:]'
+      - name: Record graphics baseline and diagnostic isolations
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: xvfb-run -a -s '-screen 0 3838x2158x24' node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/graphics
+      - name: Separate render load from 30, 60, 120 Hz motion sampling
+        run: node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/headless --headless
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: p0-frame-pacing-evidence
+          path: qa-artifacts/pacing/
+          retention-days: 30
