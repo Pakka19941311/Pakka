@@ -17,6 +17,8 @@ static func request(app: Node, point: Vector2) -> Dictionary:
 	var http: HTTPRequest = HTTPRequest.new()
 	app.add_child(http)
 	var url: String = argument("--pacing-control") + "&x=" + str(point.x) + "&z=" + str(point.y)
+	http.use_threads = true
+	http.timeout = 15
 	http.request(url)
 	var response: Array = await http.request_completed
 	http.queue_free()
@@ -45,8 +47,8 @@ static func run(app: Node) -> void:
 	var weather: VarendorWorldWeather = world.weather
 	var graph: bool = DisplayServer.get_name() != "headless"
 	if graph:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		DisplayServer.window_set_size(Vector2i(1600,900))
+		app.get_window().mode = Window.MODE_WINDOWED
+		app.get_window().size = Vector2i(1600,900)
 		RenderingServer.viewport_set_measure_render_time(viewport.get_viewport_rid(),true)
 	OS.low_processor_usage_mode = false
 	var output: String = argument("--pacing-output")
@@ -64,6 +66,9 @@ static func run(app: Node) -> void:
 		{"name":"run_rain_off_diagnostic","move":true,"rain_off":true,"seconds":6.0},
 		{"name":"run_sky_static_diagnostic","move":true,"sky_static":true,"seconds":6.0},
 		{"name":"run_hud_disconnected_diagnostic","move":true,"hud_off":true,"seconds":6.0},
+		{"name":"run_shadows_off_diagnostic","move":true,"shadows_off":true,"seconds":6.0},
+		{"name":"run_vegetation_off_diagnostic","move":true,"vegetation_off":true,"seconds":6.0},
+		{"name":"run_3d_halfscale_diagnostic","move":true,"halfscale":true,"seconds":6.0},
 		{"name":"run_4k_rain","move":true,"fourk":true,"seconds":8.0},
 		{"name":"orbit_4k_rain","orbit":true,"fourk":true,"seconds":8.0},
 		{"name":"run_4k_rain_off_diagnostic","move":true,"fourk":true,"rain_off":true,"seconds":6.0},
@@ -87,12 +92,16 @@ static func run(app: Node) -> void:
 		camera.reset_follow()
 		Engine.max_fps = int(spec.get("cap",60))
 		if graph:
-			DisplayServer.window_set_size(Vector2i(3838,2158) if spec.get("fourk",false) else Vector2i(1600,900))
+			app.get_window().mode = Window.MODE_WINDOWED
+			app.get_window().size = Vector2i(3838,2158) if spec.get("fourk",false) else Vector2i(1600,900)
 		weather.qa_override = {"hour":10.0,"daylight":1.0,"night":false,"fullMoon":false,"weather":"rain","clouds":.72}
 		weather.daylight = 1.0
 		weather.set_process(true)
 		weather.rain.visible = not spec.get("rain_off",false)
-		weather.rain.set_process(not spec.get("rain_off",false))
+		weather.rain.process_mode = Node.PROCESS_MODE_DISABLED if spec.get("rain_off",false) else Node.PROCESS_MODE_INHERIT
+		world.sun_light.shadow_enabled = not spec.get("shadows_off",false)
+		viewport.scaling_3d_scale = .5 if spec.get("halfscale",false) else 1.0
+		for mesh: GeometryInstance3D in world.decorations: mesh.visible = not spec.get("vegetation_off",false)
 		var original_sky: Shader = weather.sky_material.shader
 		if spec.get("sky_static",false):
 			var frozen_shader: Shader = Shader.new()
@@ -103,7 +112,8 @@ static func run(app: Node) -> void:
 			weather.set_process(false)
 		var hud_listener: Callable = Callable(app,"present_snapshot")
 		if spec.get("hud_off",false): world.snapshot_presented.disconnect(hud_listener)
-		await tree.create_timer(3.0 if graph else .35).timeout
+		var warm_end: int = Time.get_ticks_usec() + (1200000 if graph else 350000)
+		while Time.get_ticks_usec() < warm_end: await tree.process_frame
 		PacingMetrics.freeze_animation = bool(spec.get("freeze",false))
 		PacingMetrics.rigid_camera = bool(spec.get("rigid",false))
 		PacingMetrics.static_camera = bool(spec.get("static",false))
@@ -124,7 +134,10 @@ static func run(app: Node) -> void:
 		PacingMetrics.active = true
 		print("PACING_BEGIN "+str(spec.name))
 		while float(Time.get_ticks_usec()-start)/1000000.0 < float(spec.seconds):
-			await tree.process_frame
+			if graph: await RenderingServer.frame_post_draw
+			else:
+				await tree.process_frame
+				await tree.create_timer(0).timeout
 			var now: int = Time.get_ticks_usec()
 			var dt: float = float(now-previous_usec)/1000000.0
 			var physics_now: int = Engine.get_physics_frames()
@@ -150,6 +163,7 @@ static func run(app: Node) -> void:
 		summary["actual_seconds"] = float(last-start)/1000000.0
 		summary["fps"] = rows.size()/maxf(.001,float(last-start)/1000000.0)
 		summary["resolution"] = [DisplayServer.window_get_size().x,DisplayServer.window_get_size().y] if graph else [0,0]
+		summary["viewport_pixels"] = [viewport.get_texture().get_width(),viewport.get_texture().get_height()] if graph else [0,0]
 		summary["render_scale"] = viewport.scaling_3d_scale
 		summary["msaa"] = viewport.msaa_3d
 		for field: String in ["frame_ms","engine_process_ms","engine_physics_ms","render_cpu_ms","gpu_ms","draw_calls","resource_count","node_count","physics_steps"]:
@@ -175,8 +189,17 @@ static func run(app: Node) -> void:
 		world.world_environment.sky.process_mode = Sky.PROCESS_MODE_REALTIME
 		weather.set_process(true)
 		weather.rain.visible = true
-		weather.rain.set_process(true)
+		weather.rain.process_mode = Node.PROCESS_MODE_INHERIT
 	var result_file: FileAccess = FileAccess.open(output.path_join("report.json"),FileAccess.WRITE)
 	result_file.store_string(JSON.stringify(report,"  ")); result_file.close()
 	print("PACING_REPORT "+JSON.stringify(report))
+	PacingMetrics.freeze_animation = false
+	PacingMetrics.rigid_camera = false
+	PacingMetrics.static_camera = false
+	app.net.set_process(false)
+	app.world.stop_audio()
+	await app.net.request("/api/disconnect",{})
+	app.net.stop_input_transport()
+	app.net.close_stream()
+	await tree.process_frame
 	tree.quit()

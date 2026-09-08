@@ -58,12 +58,13 @@ try {
   const timeout = setTimeout(()=>child.kill(),600000);
   let code;
   try { [code] = await once(child, 'exit'); } finally { clearTimeout(timeout); writeFileSync(join(output,'runtime.log'),log); }
-  assert.equal(code,0,log.slice(-12000));
+  if(code!==0) { for(const line of log.split('\n')) if(line.startsWith('PACING_RESULT ')) console.log(line); }
+  assert.equal(code,0,log.slice(-8000));
   assert.doesNotMatch(log,/SCRIPT ERROR:|^ERROR:/m);
   assert.ok(existsSync(join(output,'report.json')));
   const report = JSON.parse(readFileSync(join(output,'report.json'),'utf8'));
   const compact = {...report, scenarios:report.scenarios.map(s=>({
-    name:s.name,frames:s.frames,seconds:s.actual_seconds,fps:s.fps,resolution:s.resolution,render_scale:s.render_scale,msaa:s.msaa,
+    name:s.name,frames:s.frames,seconds:s.actual_seconds,fps:s.fps,resolution:s.resolution,viewport_pixels:s.viewport_pixels,render_scale:s.render_scale,msaa:s.msaa,
     frame_ms:s.frame_ms,render_cpu_ms:s.render_cpu_ms,gpu_ms:s.gpu_ms,engine_process_ms:s.engine_process_ms,
     moving:s.moving_frames,held:s.held_moving_frames,camera_held:s.camera_held_while_hero_moving,
     draw_calls:s.draw_calls.mean,resources:s.resource_count,physics_steps:s.physics_steps,

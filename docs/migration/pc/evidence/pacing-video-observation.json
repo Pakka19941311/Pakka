@@ -1,0 +1,21 @@
+{
+  "source": "Запись 2026-09-08 184157.mp4",
+  "source_dimensions": [
+    3838,
+    2158
+  ],
+  "recording_fps": 30,
+  "decoded_transition_count": 379,
+  "analysis_dimensions": [
+    960,
+    540
+  ],
+  "first_window_end_exclusive_seconds": 6.2,
+  "window_transitions": 185,
+  "world_hold_threshold_grayscale_mad": 0.5,
+  "world_hold_count": 109,
+  "simultaneous_rain_sky_hold": 109,
+  "simultaneous_hero_hold": 109,
+  "full_frame_hold": 109,
+  "meaning": "Near-duplicate scene frames include rain/hero, not just world translation. Suggests whole-frame presentation or recording cadence; does not alone identify game FPS or GPU/CPU bottleneck."
+}

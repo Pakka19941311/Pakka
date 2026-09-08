@@ -51,6 +51,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: xvfb-run -a -s '-screen 0 3838x2158x24' node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/graphics
       - name: Separate render load from 30, 60, 120 Hz motion sampling
+        if: ${{ !cancelled() }}
         run: node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/headless --headless
       - uses: actions/upload-artifact@v4
         if: always()
