@@ -472,7 +472,7 @@ func controls_dialog() -> void:
 				setting_choice(page, "Масштаб интерфейса", "ui_scale", ["80%", "100%", "125%", "150%"], 1)
 				setting_choice(page, "Громкость боя", "combat_volume", ["Выкл.", "25%", "50%", "75%", "100%"], 3)
 				setting_choice(page, "Звуки окружения", "ambient_volume", ["Выкл.", "25%", "50%", "75%", "100%"], 2)
-				page.add_child(label("Tab — инвентарь и персонаж.\nEsc — закрыть окно / отменить действие / меню.", 15))
+				page.add_child(wrapped_label("Tab — инвентарь и персонаж.\nEsc — закрыть окно / отменить действие / меню.", 15))
 			"Графика":
 				setting_choice(page, "Профиль", "quality", ["Низкий", "Средний", "Высокий"], 2)
 				setting_choice(page, "Сглаживание MSAA", "msaa", ["Выкл.", "2×", "4×", "8×"], 2)
@@ -482,7 +482,7 @@ func controls_dialog() -> void:
 				setting_choice(page, "Декоративная растительность", "vegetation", ["24 м", "45 м", "80 м"], 2)
 				setting_choice(page, "Разрешение 3D", "render_scale", ["50%", "75%", "100%"], 2)
 			"Управление":
-				page.add_child(label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. K — автобег, N — навыки.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
+				page.add_child(wrapped_label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. K — автобег, N — навыки.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
 				setting_toggle(page, "Инвертировать камеру по вертикали", "invert_y", false)
 				page.add_child(label("Чувствительность мыши"))
 				var slider: HSlider = HSlider.new()
@@ -514,6 +514,12 @@ func controls_dialog() -> void:
 				setting_toggle(page, "Вертикальная синхронизация", "vsync", true)
 				setting_choice(page, "Ограничение кадров", "fps", ["30", "60", "120", "Без ограничения"], 1)
 	box.add_child(button("Вернуться в игру", func(): save_preferences(); close_dialog()))
+
+func wrapped_label(message: String, font_size: int = 15) -> Label:
+	var result: Label = label(message,font_size)
+	result.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	result.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return result
 
 func setting_toggle(parent: Control, title: String, key: String, fallback: bool) -> void:
 	var check: CheckButton = CheckButton.new()

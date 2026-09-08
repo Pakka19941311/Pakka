@@ -245,7 +245,7 @@ export class WorldSimulation {
     if(command.type==='chat'){
       if(!['world','trade'].includes(command.channel)||typeof command.text!=='string')throw Error('invalid-chat');
       const message=command.text.replace(/[\x00-\x1f\x7f]/g,' ').trim();if(!message||message.length>240)throw Error('invalid-chat');
-      const last=this.state.chat!.findLast(m=>m.senderId===p.id);if(last&&this.state.time-last.at<750)throw Error('chat-too-fast');
+      const last=this.state.chat!.filter(m=>m.senderId===p.id).at(-1);if(last&&this.state.time-last.at<750)throw Error('chat-too-fast');
       this.state.chat!.push({id:++this.state.chatSequence!,at:this.state.time,senderId:p.id,name:p.name,channel:command.channel,text:message});
       if(this.state.chat!.length>120)this.state.chat!.shift();return;
     }
@@ -681,7 +681,7 @@ export class WorldSimulation {
   private provoke(m:WorldMonster,p:WorldCharacter):void {
     if(!m.alive||p.dead||safe(p))return;
     const group=m.pairId?this.state.monsters.filter(n=>n.pairId===m.pairId&&n.alive):[m];
-    for(const actor of group){actor.provokedBy=p.id;actor.targetId=p.id;const brain=this.brains.get(actor.uid)??new MonsterAiBrain();brain.engage(p.id);this.brains.set(actor.uid,brain);}
+    for(const actor of group){if(actor.targetId!==p.id)this.cancelAttack(actor.uid);actor.provokedBy=p.id;actor.targetId=p.id;const brain=this.brains.get(actor.uid)??new MonsterAiBrain();brain.engage(p.id);this.brains.set(actor.uid,brain);}
   }
   private updateEnvironment():void {
     const env=worldCycleAt(this.state.time,this.state.cycleEpoch!);

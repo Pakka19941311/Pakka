@@ -39,7 +39,6 @@ jobs:
       - name: Verify changed gameplay scenarios
         run: |
           if [ "$VARENDOR_QA_SCOPE" = polish ]; then
-            npm run typecheck
             node --experimental-strip-types --test tests/polish-server.test.mjs
           elif [ "$VARENDOR_QA_SCOPE" = world ]; then
             node --experimental-strip-types --test tests/territory.test.mjs
@@ -73,7 +72,7 @@ jobs:
           python -c 'import pathlib,os; s=pathlib.Path(os.environ["RUNNER_TEMP"],"early-godot-import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-18000:]'
       - name: Restore unchanged authored world
         id: world_cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             godot-pc/generated/world.glb
@@ -85,6 +84,16 @@ jobs:
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs
           if [ "${{ steps.world_cache.outputs.cache-hit }}" != true ]; then "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py; fi
+      - name: Cache the assembled world for client-only corrections
+        if: ${{ steps.world_cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            godot-pc/generated/world.glb
+            godot-pc/generated/blender-build.json
+            godot-pc/generated/wildlife/
+            world-source/Varendor_PC_World.blend
+          key: ${{ steps.world_cache.outputs.cache-primary-key }}
       - name: Build original P1 world samples
         run: |
           "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-samples.py

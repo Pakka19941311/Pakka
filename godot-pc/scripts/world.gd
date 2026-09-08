@@ -111,6 +111,9 @@ func submit_intent(value: Dictionary) -> void:
 func reject_intent(value: Dictionary, input_sequence: int, error: String) -> void:
 	# An old HTTP rejection must not erase a newer click or manual direction.
 	if input_sequence != player_motion.last_sent_sequence or str(value.get("type", "")) != "attack": return
+	if value.get("skill") != null and actors.has(hero_id):
+		actors[hero_id].set_meta("predicted_skill_until",0)
+		(actors[hero_id].get_meta("animation_controller") as VarendorAnimationController).attack_ends_at = -1
 	if error not in ["target-occluded", "missing-target"] or target_id != str(value.get("entityId", "")): return
 	targeting.clear()
 	player_motion.cancel_planar()
@@ -549,6 +552,12 @@ func _process(delta: float) -> void:
 				motion["combatState"] = "idle"
 				motion["action"] = "walk" if player_motion.actual_velocity.length() > .08 else "idle"
 				motion["actionStartedAt"] = maxf(float(motion.get("actionStartedAt",0)),float(current_snapshot.get("time",0)))
+			if Time.get_ticks_msec() < int(actor.get_meta("predicted_skill_until",0)) and not bool(motion.get("dead",false)):
+				motion["action"] = "attack"
+				motion["combatState"] = "windup"
+				motion["actionStartedAt"] = float(actor.get_meta("predicted_skill_start"))
+				motion["hitAt"] = motion.actionStartedAt+1
+				motion["actionEndsAt"] = motion.actionStartedAt+180
 		elif ambient_poses.has(id):
 			motion = ambient_poses[id]
 			actor.position = point(motion.x,motion.z)
@@ -774,7 +783,13 @@ func update_corpse_fade(actor: Node3D, controller: VarendorAnimationController, 
 
 func predict_skill(index: int) -> void:
 	if not actors.has(hero_id): return
+	var hero: Dictionary = current_snapshot.get("character",{})
+	var skill: Dictionary = data.classes[hero.get("classId","knight")].skills[index]
+	if not skill.has("buff") and not bool(skill.get("summon",false)):
+		if not actors.has(target_id) or actors[hero_id].position.distance_to(actors[target_id].position)>float(hero.get("attackRange",2.6))+.1: return
 	var controller: VarendorAnimationController = actors[hero_id].get_meta("animation_controller")
 	var now: float = timeline.clock_ms
 	controller.begin_attack(now,now+1,now+180)
 	actors[hero_id].set_meta("predicted_skill",index)
+	actors[hero_id].set_meta("predicted_skill_start",now)
+	actors[hero_id].set_meta("predicted_skill_until",Time.get_ticks_msec()+180)
