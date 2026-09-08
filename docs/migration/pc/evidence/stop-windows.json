@@ -1,0 +1,2321 @@
+{
+  "checks": [
+    "verified clone: all five tables, full state and UIDs",
+    "one process per native saved world",
+    "exported native client: stopping and delayed reconciliation, city service interactions, compact stats, persisted quickbar",
+    "enhancement receipt: identical retry after process/package restart, one scroll, same item UID",
+    "original database unchanged; new native quickbar survives restart"
+  ],
+  "graphicalEnvironment": "headless",
+  "native": {
+    "checks": {
+      "air_jump_rejected": true,
+      "bag_slots": 42,
+      "body_sweep_cannot_cross_target_center": true,
+      "cancel_preserves_vertical_physics": true,
+      "classes": 5,
+      "click_path_settles_inside_reference_arrival_radius": true,
+      "connected": true,
+      "diagonal_speed_normalized": true,
+      "equipment_slots": 12,
+      "hero_model_loaded": true,
+      "input_disconnect_stops_manual_prediction_without_network_ack": true,
+      "input_focus_loss_cancels_planar_offline_but_preserves_jump": true,
+      "input_focus_loss_continues_ballistic_vertical_physics_only": true,
+      "input_focus_restore_without_keys_remains_neutral": true,
+      "input_reconnect_with_released_keys_does_not_resume_old_direction": true,
+      "input_text_focus_does_not_cancel_server_autonomous_destination": true,
+      "item_definitions": 33,
+      "jump_cancels_auto_path": true,
+      "live_stop_0_keyboard_really_moved": true,
+      "live_stop_0_local_matches_server_endpoint": true,
+      "live_stop_0_neutral_input_acknowledged": true,
+      "live_stop_0_no_late_rendered_slide": true,
+      "live_stop_1_keyboard_really_moved": true,
+      "live_stop_1_local_matches_server_endpoint": true,
+      "live_stop_1_neutral_input_acknowledged": true,
+      "live_stop_1_no_late_rendered_slide": true,
+      "live_stop_input_trace": [
+        {
+          "clock_ms": 1788853078554.67,
+          "intent": {
+            "type": "cancel"
+          },
+          "sequence": 1,
+          "wall_ms": 0
+        },
+        {
+          "clock_ms": 1788853078888.01,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": 1
+          },
+          "sequence": 2,
+          "wall_ms": 60
+        },
+        {
+          "clock_ms": 1788853079021.33,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": 1
+          },
+          "sequence": 3,
+          "wall_ms": 114
+        },
+        {
+          "clock_ms": 1788853079138,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": 1
+          },
+          "sequence": 4,
+          "wall_ms": 231
+        },
+        {
+          "clock_ms": 1788853079254.67,
+          "intent": {
+            "type": "direction",
+            "x": -1,
+            "z": 0
+          },
+          "sequence": 5,
+          "wall_ms": 350
+        },
+        {
+          "clock_ms": 1788853079371.34,
+          "intent": {
+            "type": "direction",
+            "x": -1,
+            "z": 0
+          },
+          "sequence": 6,
+          "wall_ms": 466
+        },
+        {
+          "clock_ms": 1788853079471.34,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": 0
+          },
+          "sequence": 7,
+          "wall_ms": 564
+        },
+        {
+          "clock_ms": 1788853081088.01,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": -1
+          },
+          "sequence": 8,
+          "wall_ms": 2181
+        },
+        {
+          "clock_ms": 1788853081204.68,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": -1
+          },
+          "sequence": 9,
+          "wall_ms": 2297
+        },
+        {
+          "clock_ms": 1788853081321.34,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": -1
+          },
+          "sequence": 10,
+          "wall_ms": 2414
+        },
+        {
+          "clock_ms": 1788853081404.68,
+          "intent": {
+            "type": "direction",
+            "x": 1,
+            "z": 0
+          },
+          "sequence": 11,
+          "wall_ms": 2497
+        },
+        {
+          "clock_ms": 1788853081521.35,
+          "intent": {
+            "type": "direction",
+            "x": 1,
+            "z": 0
+          },
+          "sequence": 12,
+          "wall_ms": 2614
+        },
+        {
+          "clock_ms": 1788853081621.35,
+          "intent": {
+            "type": "direction",
+            "x": 0,
+            "z": 0
+          },
+          "sequence": 13,
+          "wall_ms": 2714
+        }
+      ],
+      "live_stop_observations": [
+        {
+          "late_excursion_m": 0.00000694285381541704,
+          "late_frames": 76,
+          "late_travel_m": 0.00000729587702608114,
+          "samples": [
+            {
+              "ack": 6,
+              "correction": 0.002191964071244,
+              "pose": [
+                -8.01908683776855,
+                -9.33811950683594
+              ],
+              "seconds_after_release": 0.016,
+              "speed": 2.13181066513062,
+              "state": "run"
+            },
+            {
+              "ack": 7,
+              "correction": 0.000242876529227942,
+              "pose": [
+                -8.15851020812988,
+                -9.33300018310547
+              ],
+              "seconds_after_release": 0.116,
+              "speed": 0.106158770620823,
+              "state": "run"
+            },
+            {
+              "ack": 7,
+              "correction": 0.0000186507531907409,
+              "pose": [
+                -8.16559600830078,
+                -9.33255863189697
+              ],
+              "seconds_after_release": 0.233,
+              "speed": 0.00320485630072653,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 0.00000206656227419444,
+              "pose": [
+                -8.16580581665039,
+                -9.3325309753418
+              ],
+              "seconds_after_release": 0.333,
+              "speed": 0.00017166136240121,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 1.58693580942781e-7,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 0.45,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 1.75837495675069e-8,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 0.55,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 1.350275224965e-9,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 0.666,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 1.03689085095837e-10,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 0.783,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 7.96239723460657e-12,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 0.9,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 6.11441019343628e-13,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 1.016,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 6.77495982492199e-14,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 1.116,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 5.20256530049537e-15,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 1.233,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 3.99510659929457e-16,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 1.35,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 3.06788583701709e-17,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 1.469,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 7,
+              "correction": 2.35586291051992e-18,
+              "pose": [
+                -8.16581726074219,
+                -9.33252811431885
+              ],
+              "seconds_after_release": 1.583,
+              "speed": 0,
+              "state": "idle"
+            }
+          ],
+          "sequence": 7
+        },
+        {
+          "late_excursion_m": 0.00000333786010742188,
+          "late_frames": 76,
+          "late_travel_m": 0.00000333786010742188,
+          "samples": [
+            {
+              "ack": 12,
+              "correction": 0,
+              "pose": [
+                -7.14704132080078,
+                -11.1934404373169
+              ],
+              "seconds_after_release": 0.016,
+              "speed": 2.13178205490112,
+              "state": "run"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00732374191284,
+                -11.1957492828369
+              ],
+              "seconds_after_release": 0.116,
+              "speed": 0.106130160391331,
+              "state": "run"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00036716461182,
+                -11.1958646774292
+              ],
+              "seconds_after_release": 0.219,
+              "speed": 0.00529412878677249,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00001382827759,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 0.333,
+              "speed": 0.00017166136240121,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 0.434,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 0.549,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 0.666,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 0.783,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 0.899,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 1.016,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 1.116,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 1.233,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 1.349,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 1.449,
+              "speed": 0,
+              "state": "idle"
+            },
+            {
+              "ack": 13,
+              "correction": 0,
+              "pose": [
+                -7.00000333786011,
+                -11.1958713531494
+              ],
+              "seconds_after_release": 1.566,
+              "speed": 0,
+              "state": "idle"
+            }
+          ],
+          "sequence": 13
+        }
+      ],
+      "live_stop_snapshot_trace": [
+        {
+          "ack": -1,
+          "clock_ms": 1788853078888.01,
+          "lastInputAt": 0,
+          "position": [
+            -7,
+            -11
+          ],
+          "time": 1788853078804.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 40
+        },
+        {
+          "ack": 1,
+          "clock_ms": 1788853078971.34,
+          "lastInputAt": 1788853078938,
+          "position": [
+            -7,
+            -11
+          ],
+          "time": 1788853078971.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 72
+        },
+        {
+          "ack": 2,
+          "clock_ms": 1788853079021.33,
+          "lastInputAt": 1788853079004.67,
+          "position": [
+            -7,
+            -10.9733549723682
+          ],
+          "time": 1788853079021.33,
+          "velocity": [
+            0,
+            1.59870165790785
+          ],
+          "wall_ms": 102
+        },
+        {
+          "ack": 3,
+          "clock_ms": 1788853079071.33,
+          "lastInputAt": 1788853079054.67,
+          "position": [
+            -7,
+            -10.796589177447
+          ],
+          "time": 1788853079071.33,
+          "velocity": [
+            0,
+            4.23037888723066
+          ],
+          "wall_ms": 153
+        },
+        {
+          "ack": 3,
+          "clock_ms": 1788853079121.33,
+          "lastInputAt": 1788853079054.67,
+          "position": [
+            -7,
+            -10.5476218244147
+          ],
+          "time": 1788853079121.33,
+          "velocity": [
+            0,
+            5.24815643230088
+          ],
+          "wall_ms": 203
+        },
+        {
+          "ack": 4,
+          "clock_ms": 1788853079171.33,
+          "lastInputAt": 1788853079154.67,
+          "position": [
+            -7,
+            -10.2707311669037
+          ],
+          "time": 1788853079171.33,
+          "velocity": [
+            0,
+            5.64177276173034
+          ],
+          "wall_ms": 257
+        },
+        {
+          "ack": 4,
+          "clock_ms": 1788853079204.67,
+          "lastInputAt": 1788853079154.67,
+          "position": [
+            -7,
+            -10.0796080944372
+          ],
+          "time": 1788853079204.67,
+          "velocity": [
+            0,
+            5.7582361537672
+          ],
+          "wall_ms": 286
+        },
+        {
+          "ack": 4,
+          "clock_ms": 1788853079254.67,
+          "lastInputAt": 1788853079154.67,
+          "position": [
+            -7,
+            -9.78872311032697
+          ],
+          "time": 1788853079254.67,
+          "velocity": [
+            0,
+            5.8390415152536
+          ],
+          "wall_ms": 337
+        },
+        {
+          "ack": 4,
+          "clock_ms": 1788853079288,
+          "lastInputAt": 1788853079154.67,
+          "position": [
+            -7,
+            -9.5934593896629
+          ],
+          "time": 1788853079288,
+          "velocity": [
+            0,
+            5.86295024512545
+          ],
+          "wall_ms": 370
+        },
+        {
+          "ack": 5,
+          "clock_ms": 1788853079338,
+          "lastInputAt": 1788853079288,
+          "position": [
+            -7.07270291823496,
+            -9.47039674577394
+          ],
+          "time": 1788853079321.33,
+          "velocity": [
+            -2.76347343618973,
+            3.1121680277899
+          ],
+          "wall_ms": 422
+        },
+        {
+          "ack": 5,
+          "clock_ms": 1788853079371.34,
+          "lastInputAt": 1788853079288,
+          "position": [
+            -7.28142488783393,
+            -9.38501264995627
+          ],
+          "time": 1788853079371.33,
+          "velocity": [
+            -4.68084391685434,
+            1.20360304822988
+          ],
+          "wall_ms": 454
+        },
+        {
+          "ack": 6,
+          "clock_ms": 1788853079421.34,
+          "lastInputAt": 1788853079404.67,
+          "position": [
+            -7.54275100456672,
+            -9.351991117353
+          ],
+          "time": 1788853079421.33,
+          "velocity": [
+            -5.42236973888802,
+            0.465482674705413
+          ],
+          "wall_ms": 504
+        },
+        {
+          "ack": 6,
+          "clock_ms": 1788853079471.34,
+          "lastInputAt": 1788853079404.67,
+          "position": [
+            -7.824421303,
+            -9.33922033603798
+          ],
+          "time": 1788853079471.33,
+          "velocity": [
+            -5.70914819421926,
+            0.18002124601594
+          ],
+          "wall_ms": 553
+        },
+        {
+          "ack": 6,
+          "clock_ms": 1788853079504.67,
+          "lastInputAt": 1788853079404.67,
+          "position": [
+            -8.01695857795982,
+            -9.33544171101736
+          ],
+          "time": 1788853079504.67,
+          "velocity": [
+            -5.79400034382227,
+            0.0955587788996937
+          ],
+          "wall_ms": 586
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079554.67,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.13260105602921,
+            -9.33353445293356
+          ],
+          "time": 1788853079554.67,
+          "velocity": [
+            -1.29281622461711,
+            0.0213220456394936
+          ],
+          "wall_ms": 636
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079588,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.15359660916011,
+            -9.33318817932285
+          ],
+          "time": 1788853079588,
+          "velocity": [
+            -0.475600510249521,
+            0.00784394223451556
+          ],
+          "wall_ms": 669
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079638,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.1630891218133,
+            -9.33303162204567
+          ],
+          "time": 1788853079638,
+          "velocity": [
+            -0.106120818018631,
+            0.00175022008694014
+          ],
+          "wall_ms": 719
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079671.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16481254176316,
+            -9.33300319817681
+          ],
+          "time": 1788853079671.33,
+          "velocity": [
+            -0.0390396672294102,
+            0.00064386998751331
+          ],
+          "wall_ms": 753
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079721.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16559173465123,
+            -9.33299034717293
+          ],
+          "time": 1788853079721.33,
+          "velocity": [
+            -0.00871092720100108,
+            0.00014366681337918
+          ],
+          "wall_ms": 803
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079771.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16576559608513,
+            -9.33298747972638
+          ],
+          "time": 1788853079771.33,
+          "velocity": [
+            -0.00194367058139022,
+            0.00003205639913517
+          ],
+          "wall_ms": 858
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079821.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16580438981472,
+            -9.33298683991257
+          ],
+          "time": 1788853079821.33,
+          "velocity": [
+            -0.00043369152812999,
+            0.00000715274943274
+          ],
+          "wall_ms": 903
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079871.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581304586582,
+            -9.33298669715081
+          ],
+          "time": 1788853079871.33,
+          "velocity": [
+            -0.00009676966012506,
+            0.00000159599416349
+          ],
+          "wall_ms": 953
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079921.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581497729189,
+            -9.33298666529636
+          ],
+          "time": 1788853079921.33,
+          "velocity": [
+            -0.00002159222976416,
+            3.56114391308893e-7
+          ],
+          "wall_ms": 1003
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079971.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581532795333,
+            -9.332986659513
+          ],
+          "time": 1788853079954.67,
+          "velocity": [
+            -0.00000794333740117,
+            1.31007205084188e-7
+          ],
+          "wall_ms": 1053
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853079988,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581545695447,
+            -9.33298665738542
+          ],
+          "time": 1788853079988,
+          "velocity": [
+            -0.00000292219048958,
+            4.81948347896832e-8
+          ],
+          "wall_ms": 1085
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080054.67,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581551527848,
+            -9.3329866564235
+          ],
+          "time": 1788853080038,
+          "velocity": [
+            -6.5202883092752e-7,
+            1.0753744561498e-8
+          ],
+          "wall_ms": 1136
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080088.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581552829233,
+            -9.33298665620886
+          ],
+          "time": 1788853080088,
+          "velocity": [
+            -1.45487248914833e-7,
+            2.39946729152507e-9
+          ],
+          "wall_ms": 1169
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080138.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553119611,
+            -9.33298665616097
+          ],
+          "time": 1788853080138,
+          "velocity": [
+            -3.24625659686717e-8,
+            5.35358424258447e-10
+          ],
+          "wall_ms": 1219
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080188.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553184403,
+            -9.33298665615029
+          ],
+          "time": 1788853080188,
+          "velocity": [
+            -7.24337922974883e-9,
+            1.19477761018061e-10
+          ],
+          "wall_ms": 1272
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080221.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553196166,
+            -9.33298665614835
+          ],
+          "time": 1788853080221.33,
+          "velocity": [
+            -2.66464184051074e-9,
+            4.39115410699742e-11
+          ],
+          "wall_ms": 1303
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080271.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553201485,
+            -9.33298665614747
+          ],
+          "time": 1788853080271.33,
+          "velocity": [
+            -5.9461768842084e-10,
+            9.80548975348938e-12
+          ],
+          "wall_ms": 1352
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080338.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553202671,
+            -9.33298665614727
+          ],
+          "time": 1788853080321.33,
+          "velocity": [
+            -1.32693855903199e-10,
+            2.23820961764432e-12
+          ],
+          "wall_ms": 1419
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080371.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553202936,
+            -9.33298665614723
+          ],
+          "time": 1788853080371.33,
+          "velocity": [
+            -2.96296320811962e-11,
+            5.32907051820075e-13
+          ],
+          "wall_ms": 1453
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080404.67,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553202984,
+            -9.33298665614722
+          ],
+          "time": 1788853080404.67,
+          "velocity": [
+            -1.08713038571295e-11,
+            2.1316282072803e-13
+          ],
+          "wall_ms": 1486
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080454.67,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203006,
+            -9.33298665614722
+          ],
+          "time": 1788853080454.67,
+          "velocity": [
+            -2.45137243837235e-12,
+            0
+          ],
+          "wall_ms": 1536
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080504.67,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203011,
+            -9.33298665614722
+          ],
+          "time": 1788853080504.67,
+          "velocity": [
+            -5.32907051820075e-13,
+            0
+          ],
+          "wall_ms": 1586
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080538.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080538,
+          "velocity": [
+            -2.1316282072803e-13,
+            0
+          ],
+          "wall_ms": 1620
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080588.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080588,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1670
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080621.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080621.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1703
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080671.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080671.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1753
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080704.67,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080704.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1787
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080754.68,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080754.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1836
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080804.68,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080804.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1886
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080854.68,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080854.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1936
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080904.68,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080888,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 1986
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080938.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080921.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 2021
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853080988.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853080971.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 2070
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853081038.01,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853081021.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 2119
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853081071.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853081071.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 2154
+        },
+        {
+          "ack": 7,
+          "clock_ms": 1788853081121.34,
+          "lastInputAt": 1788853079504.67,
+          "position": [
+            -8.16581553203012,
+            -9.33298665614722
+          ],
+          "time": 1788853081121.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 2204
+        },
+        {
+          "ack": 8,
+          "clock_ms": 1788853081171.34,
+          "lastInputAt": 1788853081121.33,
+          "position": [
+            -8.16581553203012,
+            -9.46589116391306
+          ],
+          "time": 1788853081171.33,
+          "velocity": [
+            0,
+            -3.61209537185303
+          ],
+          "wall_ms": 2252
+        },
+        {
+          "ack": 8,
+          "clock_ms": 1788853081221.34,
+          "lastInputAt": 1788853081121.33,
+          "position": [
+            -8.16581553203012,
+            -9.69789555786079
+          ],
+          "time": 1788853081221.33,
+          "velocity": [
+            0,
+            -5.00904083277867
+          ],
+          "wall_ms": 2306
+        },
+        {
+          "ack": 9,
+          "clock_ms": 1788853081271.34,
+          "lastInputAt": 1788853081238,
+          "position": [
+            -8.16581553203012,
+            -9.96822594321472
+          ],
+          "time": 1788853081271.33,
+          "velocity": [
+            0,
+            -5.5492969500472
+          ],
+          "wall_ms": 2355
+        },
+        {
+          "ack": 9,
+          "clock_ms": 1788853081304.68,
+          "lastInputAt": 1788853081238,
+          "position": [
+            -8.16581553203012,
+            -10.1574079591472
+          ],
+          "time": 1788853081304.67,
+          "velocity": [
+            0,
+            -5.70914819421926
+          ],
+          "wall_ms": 2386
+        },
+        {
+          "ack": 9,
+          "clock_ms": 1788853081354.68,
+          "lastInputAt": 1788853081238,
+          "position": [
+            -8.16581553203012,
+            -10.4469461872327
+          ],
+          "time": 1788853081354.67,
+          "velocity": [
+            0,
+            -5.82005718753873
+          ],
+          "wall_ms": 2436
+        },
+        {
+          "ack": 10,
+          "clock_ms": 1788853081404.68,
+          "lastInputAt": 1788853081354.67,
+          "position": [
+            -8.16581553203012,
+            -10.7395272664843
+          ],
+          "time": 1788853081404.67,
+          "velocity": [
+            0,
+            -5.86295024512545
+          ],
+          "wall_ms": 2486
+        },
+        {
+          "ack": 11,
+          "clock_ms": 1788853081454.68,
+          "lastInputAt": 1788853081438,
+          "position": [
+            -8.13917050439832,
+            -11.0066401134784
+          ],
+          "time": 1788853081454.67,
+          "velocity": [
+            1.59870165790785,
+            -4.28083709220772
+          ],
+          "wall_ms": 2536
+        },
+        {
+          "ack": 11,
+          "clock_ms": 1788853081504.68,
+          "lastInputAt": 1788853081438,
+          "position": [
+            -7.9624047094771,
+            -11.1240873082304
+          ],
+          "time": 1788853081504.67,
+          "velocity": [
+            4.23037888723071,
+            -1.65557531828245
+          ],
+          "wall_ms": 2586
+        },
+        {
+          "ack": 11,
+          "clock_ms": 1788853081554.68,
+          "lastInputAt": 1788853081438,
+          "position": [
+            -7.71343735644487,
+            -11.1695089565307
+          ],
+          "time": 1788853081554.67,
+          "velocity": [
+            5.24815643230088,
+            -0.640278892998545
+          ],
+          "wall_ms": 2636
+        },
+        {
+          "ack": 12,
+          "clock_ms": 1788853081588.01,
+          "lastInputAt": 1788853081554.67,
+          "position": [
+            -7.53057624496261,
+            -11.1829483360417
+          ],
+          "time": 1788853081588,
+          "velocity": [
+            5.5492969500472,
+            -0.339872490187894
+          ],
+          "wall_ms": 2669
+        },
+        {
+          "ack": 12,
+          "clock_ms": 1788853081621.35,
+          "lastInputAt": 1788853081554.67,
+          "position": [
+            -7.34139422903012,
+            -11.1900822200897
+          ],
+          "time": 1788853081621.33,
+          "velocity": [
+            5.70914819421926,
+            -0.180410928502752
+          ],
+          "wall_ms": 2703
+        },
+        {
+          "ack": 12,
+          "clock_ms": 1788853081654.68,
+          "lastInputAt": 1788853081554.67,
+          "position": [
+            -7.1488569540703,
+            -11.1938690245004
+          ],
+          "time": 1788853081654.67,
+          "velocity": [
+            5.79400034382232,
+            -0.0957656299431875
+          ],
+          "wall_ms": 2736
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081704.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.03321447600091,
+            -11.1957804111251
+          ],
+          "time": 1788853081704.67,
+          "velocity": [
+            1.29281622461711,
+            -0.021368200345897
+          ],
+          "wall_ms": 2789
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081754.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00741115134932,
+            -11.1962068991287
+          ],
+          "time": 1788853081754.67,
+          "velocity": [
+            0.288466291241321,
+            -0.00476788996529364
+          ],
+          "wall_ms": 2836
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081804.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00165365138745,
+            -11.1963020614653
+          ],
+          "time": 1788853081804.67,
+          "velocity": [
+            0.0643655297620782,
+            -0.00106386005157332
+          ],
+          "wall_ms": 2892
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081838.01,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.0006083443483,
+            -11.1963193387316
+          ],
+          "time": 1788853081838,
+          "velocity": [
+            0.0236787551195938,
+            -0.00039137224128182
+          ],
+          "wall_ms": 2920
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081871.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00022379737889,
+            -11.1963256946827
+          ],
+          "time": 1788853081871.33,
+          "velocity": [
+            0.00871092720105437,
+            -0.0001439778014145
+          ],
+          "wall_ms": 2955
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081921.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00004993594499,
+            -11.1963285683363
+          ],
+          "time": 1788853081921.33,
+          "velocity": [
+            0.00194367058139022,
+            -0.00003212578992162
+          ],
+          "wall_ms": 3003
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853081971.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00001114221539,
+            -11.1963292095351
+          ],
+          "time": 1788853081971.33,
+          "velocity": [
+            0.00043369152812999,
+            -0.00000716823262081
+          ],
+          "wall_ms": 3052
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082021.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.0000024861643,
+            -11.1963293526058
+          ],
+          "time": 1788853082021.33,
+          "velocity": [
+            0.00009676966012506,
+            -0.00000159944889333
+          ],
+          "wall_ms": 3102
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082054.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000091460873,
+            -11.1963293785812
+          ],
+          "time": 1788853082054.67,
+          "velocity": [
+            0.00003559956846643,
+            -5.88404418522259e-7
+          ],
+          "wall_ms": 3136
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082104.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000020407679,
+            -11.1963293903251
+          ],
+          "time": 1788853082104.67,
+          "velocity": [
+            0.00000794333740117,
+            -1.31290711635756e-7
+          ],
+          "wall_ms": 3186
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082154.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000004553568,
+            -11.1963293929456
+          ],
+          "time": 1788853082154.67,
+          "velocity": [
+            0.00000177239817489,
+            -2.92949664526532e-8
+          ],
+          "wall_ms": 3236
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082204.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000001675163,
+            -11.1963293934213
+          ],
+          "time": 1788853082188,
+          "velocity": [
+            6.5202883092752e-7,
+            -1.07769793089574e-8
+          ],
+          "wall_ms": 3286
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082238.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000616258,
+            -11.1963293935963
+          ],
+          "time": 1788853082221.33,
+          "velocity": [
+            2.39868018780953e-7,
+            -3.96461530272063e-9
+          ],
+          "wall_ms": 3320
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082288.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000137505,
+            -11.1963293936755
+          ],
+          "time": 1788853082271.33,
+          "velocity": [
+            5.35217736796767e-8,
+            -8.84625706021325e-10
+          ],
+          "wall_ms": 3369
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082338.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000030681,
+            -11.1963293936931
+          ],
+          "time": 1788853082321.33,
+          "velocity": [
+            1.19423404498775e-8,
+            -1.97388771994156e-10
+          ],
+          "wall_ms": 3419
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082388.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000006845,
+            -11.1963293936971
+          ],
+          "time": 1788853082371.33,
+          "velocity": [
+            2.66469513121592e-9,
+            -4.40181224803382e-11
+          ],
+          "wall_ms": 3469
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082438.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000001527,
+            -11.1963293936979
+          ],
+          "time": 1788853082421.33,
+          "velocity": [
+            5.94564397715658e-10,
+            -9.80548975348938e-12
+          ],
+          "wall_ms": 3519
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082471.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.0000000000034,
+            -11.1963293936981
+          ],
+          "time": 1788853082471.33,
+          "velocity": [
+            1.32693855903199e-10,
+            -2.23820961764432e-12
+          ],
+          "wall_ms": 3553
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082521.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000000075,
+            -11.1963293936982
+          ],
+          "time": 1788853082521.33,
+          "velocity": [
+            2.95763413760142e-11,
+            -5.32907051820075e-13
+          ],
+          "wall_ms": 3603
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082571.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000000016,
+            -11.1963293936982
+          ],
+          "time": 1788853082571.33,
+          "velocity": [
+            6.60804744256893e-12,
+            -1.06581410364015e-13
+          ],
+          "wall_ms": 3653
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082604.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7.00000000000005,
+            -11.1963293936982
+          ],
+          "time": 1788853082604.67,
+          "velocity": [
+            2.45137243837235e-12,
+            0
+          ],
+          "wall_ms": 3686
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082654.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -7,
+            -11.1963293936982
+          ],
+          "time": 1788853082654.67,
+          "velocity": [
+            5.32907051820075e-13,
+            0
+          ],
+          "wall_ms": 3736
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082704.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082704.67,
+          "velocity": [
+            1.06581410364015e-13,
+            0
+          ],
+          "wall_ms": 3787
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082754.68,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082754.67,
+          "velocity": [
+            5.32907051820075e-14,
+            0
+          ],
+          "wall_ms": 3836
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082788.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082788,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 3869
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082821.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082821.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 3902
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082871.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082871.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 3953
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082921.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082921.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4006
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853082971.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853082971.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4052
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853083021.35,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853083021.33,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4102
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853083054.69,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853083054.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4136
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853083104.69,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853083104.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4186
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853083154.69,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853083154.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4236
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853083204.69,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853083204.67,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4286
+        },
+        {
+          "ack": 13,
+          "clock_ms": 1788853083238.02,
+          "lastInputAt": 1788853081654.67,
+          "position": [
+            -6.99999999999999,
+            -11.1963293936982
+          ],
+          "time": 1788853083238,
+          "velocity": [
+            0,
+            0
+          ],
+          "wall_ms": 4320
+        }
+      ],
+      "manual_overrides_click_in_same_input_turn": true,
+      "manual_release_matches_short_reference_deceleration": true,
+      "native_render": false,
+      "navigation_segments_clear_blocked_click_projected_free": true,
+      "navigation_segments_clear_building_detour": true,
+      "navigation_segments_clear_clear_ground": true,
+      "navigation_segments_clear_enclosed_goal": true,
+      "navigation_segments_clear_open_gate": true,
+      "navigation_segments_clear_reference_test_building_detour": true,
+      "navigation_segments_clear_rotated_house": true,
+      "navigation_segments_clear_round_obstacle": true,
+      "navigation_segments_clear_visited_budget_fails_closed": true,
+      "navigation_segments_clear_wall_adjacent_1.47_10": true,
+      "navigation_segments_clear_wall_adjacent_1.47_24": true,
+      "navigation_segments_clear_wall_adjacent_1.47_9": true,
+      "navigation_segments_clear_wall_adjacent_1.5_10": true,
+      "navigation_segments_clear_wall_adjacent_1.5_24": true,
+      "navigation_segments_clear_wall_adjacent_1.5_9": true,
+      "navigation_segments_clear_wall_adjacent_1.6_10": true,
+      "navigation_segments_clear_wall_adjacent_1.6_24": true,
+      "navigation_segments_clear_wall_adjacent_1.6_9": true,
+      "navigation_segments_clear_wall_adjacent_1.7_10": true,
+      "navigation_segments_clear_wall_adjacent_1.7_24": true,
+      "navigation_segments_clear_wall_adjacent_1.7_9": true,
+      "network_coalesced_dispatch_keeps_turn_jump_release_attack_order": true,
+      "network_current_ack_retires_prediction_and_stops_finished_route": true,
+      "network_disconnected_input_neither_predicts_nor_reserves_id": true,
+      "network_dispatch_preserves_reserved_prediction_sequence": true,
+      "network_each_prediction_receives_unique_reserved_id_first": true,
+      "network_identical_heartbeats_coalesce_but_turns_and_neutral_survive": true,
+      "network_old_ack_cannot_cancel_newer_queued_destination": true,
+      "network_queued_intents_are_copied_from_mutable_caller_data": true,
+      "network_queued_prediction_reserves_sequence_before_dispatch": true,
+      "network_queued_wasd_overrides_old_server_attack_state": true,
+      "npc_authoritative_arrival_requests_stop_before_open": true,
+      "npc_death_cancels_pending_service": true,
+      "npc_disconnect_cancels_pending_service": true,
+      "npc_elder_actual_model_click": true,
+      "npc_elder_approach_stop_and_open": true,
+      "npc_elder_body_clear_of_city_props": true,
+      "npc_elder_dialog_accepts_persistent_quest": true,
+      "npc_elder_selection_survives_snapshot_refresh": true,
+      "npc_far_click_builds_clear_stopping_goal_not_npc_center": true,
+      "npc_neutral_keyup_and_instant_self_buff_preserve_approach": true,
+      "npc_predicted_arrival_alone_cannot_open_service": true,
+      "npc_retarget_replaces_previous_service_intent": true,
+      "npc_service_runtime_observations": {
+        "npc:elder": {
+          "ack": 17,
+          "actor": [
+            -7.7391037940979,
+            -2.90614652633667
+          ],
+          "hero": [
+            -5.74997905326035,
+            -4.69776536265659
+          ],
+          "opened": true,
+          "pending": "",
+          "phase": "",
+          "quest_after": 1
+        },
+        "npc:shop": {
+          "ack": 15,
+          "actor": [
+            0.86568546295166,
+            -7.23431491851807
+          ],
+          "hero": [
+            -1.57117355539441,
+            -8.46164536507143
+          ],
+          "opened": true,
+          "pending": "",
+          "phase": ""
+        },
+        "npc:smith": {
+          "ack": 19,
+          "actor": [
+            -17.5,
+            -12.6000003814697
+          ],
+          "hero": [
+            -15.4155493360104,
+            -10.6042513962867
+          ],
+          "opened": true,
+          "pending": "",
+          "phase": ""
+        },
+        "npc:teleport": {
+          "ack": 21,
+          "actor": [
+            -7,
+            -20
+          ],
+          "hero": [
+            -8.78153160765875,
+            -18.0109638663161
+          ],
+          "opened": true,
+          "pending": "",
+          "phase": "",
+          "travel_result": {
+            "generation_after": 2,
+            "generation_before": 1,
+            "gold_after": 240,
+            "gold_before": 265,
+            "hero": [
+              -7,
+              -11
+            ]
+          }
+        }
+      },
+      "npc_shop_actual_model_click": true,
+      "npc_shop_approach_stop_and_open": true,
+      "npc_shop_body_clear_of_city_props": true,
+      "npc_shop_button_buys_once_on_authoritative_server": true,
+      "npc_shop_selection_survives_snapshot_refresh": true,
+      "npc_smith_actual_model_click": true,
+      "npc_smith_approach_stop_and_open": true,
+      "npc_smith_body_clear_of_city_props": true,
+      "npc_smith_existing_scroll_gesture_enhances_same_item_uid": true,
+      "npc_smith_opens_functional_inventory_forge": true,
+      "npc_smith_selection_survives_snapshot_refresh": true,
+      "npc_stale_ack_cannot_open_service_before_stop": true,
+      "npc_stop_ack_opens_once_and_retains_selection": true,
+      "npc_teleport_actual_model_click": true,
+      "npc_teleport_approach_stop_and_open": true,
+      "npc_teleport_body_clear_of_city_props": true,
+      "npc_teleport_button_relocates_and_charges_once": true,
+      "npc_teleport_generation_cancels_old_service": true,
+      "npc_teleport_level_denial_keeps_dialog_and_gold": true,
+      "npc_teleport_selection_survives_snapshot_refresh": true,
+      "npc_wasd_ground_jump_combat_escape_cancel_pending_service": true,
+      "pending_click_current_ack_applies_real_correction": true,
+      "pending_click_duplicate_ack_does_not_repeat_correction": true,
+      "pending_click_old_ack_cannot_inject_render_correction": true,
+      "pending_click_old_ack_cannot_rewind_physics": true,
+      "pending_input_does_not_delay_authoritative_death": true,
+      "pending_input_does_not_delay_generation_reset": true,
+      "quick_slots": 32,
+      "reference_all_nine_stats_fit_without_scrolling": true,
+      "reference_assassin_native_facing_through_reversal_and_strafe": true,
+      "reference_assassin_native_jump_height_and_grounded_every_tick": true,
+      "reference_assassin_native_position_and_displacement_every_tick": true,
+      "reference_assassin_native_render_pose_matches_30_60_144_fps": true,
+      "reference_bag_6x7_scrollable": true,
+      "reference_blocked_click_corner_repaired": true,
+      "reference_centered_three_column_dock": true,
+      "reference_dead_character_inventory_is_readonly": true,
+      "reference_double_click_reequips_same_uid_and_stats": true,
+      "reference_double_click_scroll_enters_target_mode": true,
+      "reference_double_click_unequips_through_server": true,
+      "reference_equipment_order_and_3x4_grid": true,
+      "reference_exact_stat_labels": true,
+      "reference_expanded_dock_reserves_inventory_space": true,
+      "reference_gold_thousands_format": true,
+      "reference_hover_compares_real_server_equipment": true,
+      "reference_hp_mp_ceil_and_fraction_format": true,
+      "reference_hp_mp_xp_bar_heights": true,
+      "reference_input_diagonal_is_normalized": true,
+      "reference_input_focus_restore_rejects_old_held_key_repeat": true,
+      "reference_input_key_release_sends_neutral_intent": true,
+      "reference_input_release_then_fresh_press_restores_movement": true,
+      "reference_input_same_frame_tap_cancels_autonomous_movement": true,
+      "reference_input_typing_focus_does_not_leak_held_wasd": true,
+      "reference_input_wasd_uses_visible_yaw_not_mouse_goal": true,
+      "reference_item_svg_silhouettes_exist": true,
+      "reference_knight_native_facing_through_reversal_and_strafe": true,
+      "reference_knight_native_jump_height_and_grounded_every_tick": true,
+      "reference_knight_native_position_and_displacement_every_tick": true,
+      "reference_knight_native_render_pose_matches_30_60_144_fps": true,
+      "reference_mage_native_facing_through_reversal_and_strafe": true,
+      "reference_mage_native_jump_height_and_grounded_every_tick": true,
+      "reference_mage_native_position_and_displacement_every_tick": true,
+      "reference_mage_native_render_pose_matches_30_60_144_fps": true,
+      "reference_minimap_left_and_log_width": true,
+      "reference_minimap_renders_every_real_catalog_category": true,
+      "reference_native_movement_compared_physics_ticks": 1750,
+      "reference_native_movement_compared_render_frames": 1170,
+      "reference_native_movement_maximum_height_error_meters": 4.44444758773699e-11,
+      "reference_native_movement_maximum_position_error_meters": 0.00000715255737304688,
+      "reference_native_movement_maximum_yaw_error_radians": 4.99751351412669e-11,
+      "reference_native_ui_graphical_capture": "SKIPPED: headless has no graphical evidence",
+      "reference_navigation_building_detour": true,
+      "reference_navigation_clear_ground": true,
+      "reference_navigation_enclosed_goal": true,
+      "reference_navigation_open_gate": true,
+      "reference_navigation_reference_test_building_detour": true,
+      "reference_navigation_rotated_house": true,
+      "reference_navigation_round_obstacle": true,
+      "reference_navigation_visited_budget_fails_closed": true,
+      "reference_navigation_wall_adjacent_1.47_10": true,
+      "reference_navigation_wall_adjacent_1.47_24": true,
+      "reference_navigation_wall_adjacent_1.47_9": true,
+      "reference_navigation_wall_adjacent_1.5_10": true,
+      "reference_navigation_wall_adjacent_1.5_24": true,
+      "reference_navigation_wall_adjacent_1.5_9": true,
+      "reference_navigation_wall_adjacent_1.6_10": true,
+      "reference_navigation_wall_adjacent_1.6_24": true,
+      "reference_navigation_wall_adjacent_1.6_9": true,
+      "reference_navigation_wall_adjacent_1.7_10": true,
+      "reference_navigation_wall_adjacent_1.7_24": true,
+      "reference_navigation_wall_adjacent_1.7_9": true,
+      "reference_necro_native_facing_through_reversal_and_strafe": true,
+      "reference_necro_native_jump_height_and_grounded_every_tick": true,
+      "reference_necro_native_position_and_displacement_every_tick": true,
+      "reference_necro_native_render_pose_matches_30_60_144_fps": true,
+      "reference_nine_character_stats": true,
+      "reference_quick_slot_44x43": true,
+      "reference_quickbar_16_and_32_slots": true,
+      "reference_ranger_native_facing_through_reversal_and_strafe": true,
+      "reference_ranger_native_jump_height_and_grounded_every_tick": true,
+      "reference_ranger_native_position_and_displacement_every_tick": true,
+      "reference_ranger_native_render_pose_matches_30_60_144_fps": true,
+      "reference_reequip_waits_for_presented_items": true,
+      "reference_rmb_cancels_enhancement_without_spending": true,
+      "reference_tooltip_stat_number_format": true,
+      "reference_twenty_native_jumps_match_44_tick_flight_and_peak": true,
+      "reference_unequip_waits_for_presented_items": true,
+      "reference_window_392x564": true,
+      "reference_window_nonmodal_and_close_button": true,
+      "snapshot_does_not_apply_movement_twice": true,
+      "stop_alignment_preserves_real_authoritative_correction": true,
+      "stop_click_rtt_800ms_converges_to_authoritative_position": true,
+      "stop_click_rtt_800ms_does_not_mistake_latency_for_displacement": true,
+      "stop_click_rtt_800ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_click_rtt_800ms_settles_without_late_rebound": true,
+      "stop_generation_reset_discards_old_input_timestamps": true,
+      "stop_manual_jitter_rtt_800ms_converges_to_authoritative_position": true,
+      "stop_manual_jitter_rtt_800ms_does_not_mistake_latency_for_displacement": true,
+      "stop_manual_jitter_rtt_800ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_manual_jitter_rtt_800ms_settles_without_late_rebound": true,
+      "stop_manual_rtt_0ms_converges_to_authoritative_position": true,
+      "stop_manual_rtt_0ms_does_not_mistake_latency_for_displacement": true,
+      "stop_manual_rtt_0ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_manual_rtt_0ms_settles_without_late_rebound": true,
+      "stop_manual_rtt_400ms_converges_to_authoritative_position": true,
+      "stop_manual_rtt_400ms_does_not_mistake_latency_for_displacement": true,
+      "stop_manual_rtt_400ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_manual_rtt_400ms_settles_without_late_rebound": true,
+      "stop_manual_rtt_67ms_converges_to_authoritative_position": true,
+      "stop_manual_rtt_67ms_does_not_mistake_latency_for_displacement": true,
+      "stop_manual_rtt_67ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_manual_rtt_67ms_settles_without_late_rebound": true,
+      "stop_manual_rtt_800ms_converges_to_authoritative_position": true,
+      "stop_manual_rtt_800ms_does_not_mistake_latency_for_displacement": true,
+      "stop_manual_rtt_800ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_manual_rtt_800ms_settles_without_late_rebound": true,
+      "stop_melee_rtt_800ms_converges_to_authoritative_position": true,
+      "stop_melee_rtt_800ms_does_not_mistake_latency_for_displacement": true,
+      "stop_melee_rtt_800ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_melee_rtt_800ms_settles_without_late_rebound": true,
+      "stop_older_ack_cannot_cancel_new_direction": true,
+      "stop_ranger_rtt_800ms_converges_to_authoritative_position": true,
+      "stop_ranger_rtt_800ms_does_not_mistake_latency_for_displacement": true,
+      "stop_ranger_rtt_800ms_reordered_and_duplicate_packets_are_stable": true,
+      "stop_ranger_rtt_800ms_settles_without_late_rebound": true,
+      "stop_transport_measurements": {
+        "click_rtt_800ms": {
+          "final_error": 0.0000170598450495163,
+          "last_ack": 1,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 82
+        },
+        "manual_jitter_rtt_800ms": {
+          "final_error": 0.0000269739830400795,
+          "last_ack": 16,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 102
+        },
+        "manual_rtt_0ms": {
+          "final_error": 0.0000269739830400795,
+          "last_ack": 16,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 102
+        },
+        "manual_rtt_400ms": {
+          "final_error": 0.0000269739830400795,
+          "last_ack": 16,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 102
+        },
+        "manual_rtt_67ms": {
+          "final_error": 0.0000269739830400795,
+          "last_ack": 16,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 102
+        },
+        "manual_rtt_800ms": {
+          "final_error": 0.0000269739830400795,
+          "last_ack": 16,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 102
+        },
+        "melee_rtt_800ms": {
+          "final_error": 0.000118255615234375,
+          "last_ack": 1,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 183
+        },
+        "ranger_rtt_800ms": {
+          "final_error": 0.00003814697265625,
+          "last_ack": 1,
+          "late_excursion": 0,
+          "maximum_correction": 0,
+          "moved_and_stopped": true,
+          "reordered_stable": true,
+          "stop_tick": 78
+        }
+      },
+      "world_loaded": true
+    },
+    "display": "headless",
+    "godot": "4.6.3-stable (official)",
+    "notes": "Actual native input/HTTP/SSE/actor and service UI against isolated synthetic save. Windows headless does not establish Windows GPU behavior or subjective feel.",
+    "ok": true,
+    "scope": "stop-npc-stats-follow-up"
+  },
+  "node": "v24.20.0",
+  "ok": true,
+  "platform": "win32",
+  "scope": "synthetic fixture only; no access to player database or old browser profile",
+  "source": "a5d1f39bf4d9f28e63e638d6b553b1787f67f1fb",
+  "windowsGraphics": false
+}
