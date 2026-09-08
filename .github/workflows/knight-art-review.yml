@@ -5,7 +5,7 @@ on:
     branches: [work/godot-p1-recovery]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   render:
@@ -31,6 +31,33 @@ jobs:
         run: |
           mkdir -p knight-review
           python art/knight-stage1/run_blender_ci.py 2>&1 | tee knight-review/blender.log
+      - name: Package the knight appearance review
+        id: package
+        if: ${{ contains(github.event.head_commit.message, '[knight-package]') }}
+        run: python art/knight-stage1/package_review.py
+      - name: Publish the knight review package and verify its public download
+        if: ${{ contains(github.event.head_commit.message, '[knight-package]') }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KNIGHT_TAG: ${{ steps.package.outputs.tag }}
+          KNIGHT_ZIP: ${{ steps.package.outputs.zip_name }}
+          KNIGHT_SHA_FILE: ${{ steps.package.outputs.sha_name }}
+        run: |
+          gh release create "$KNIGHT_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title 'Varendor Knight 01 — appearance review' \
+            --prerelease --latest=false \
+            --notes-file knight-review/release-notes.md \
+            "knight-review/$KNIGHT_ZIP" \
+            "knight-review/$KNIGHT_SHA_FILE" \
+            knight-review/01_three_quarter.png \
+            knight-review/02_front.png \
+            knight-review/03_back.png \
+            knight-review/04_armor_detail.png \
+            knight-review/model-info.json
+          python art/knight-stage1/package_review.py --verify-download
       - name: Save Blender source and review renders
         uses: actions/upload-artifact@v4
         if: ${{ always() && hashFiles('knight-review/**') != '' }}

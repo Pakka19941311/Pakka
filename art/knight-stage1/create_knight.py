@@ -68,12 +68,12 @@ def material(name, color, metallic=0, rough=.5, texture=0):
         links.new(bump.outputs[0], bs.inputs['Normal'])
     return m
 
-steel = material('Tempered steel | fine forged surface',(.24,.285,.32),.88,.32,.18)
-edge = material('Polished steel edges',(.48,.53,.57),.93,.24,.06)
+steel = material('Tempered steel | fine forged surface',(.18,.215,.245),.88,.43,.09)
+edge = material('Polished steel edges',(.40,.45,.48),.93,.32,.035)
 darksteel = material('Darkened steel and recesses',(.055,.073,.085),.84,.4,.2)
 brass = material('Worn pale brass',(.39,.265,.105),.8,.34,.1)
 leather = material('Dark brown leather',(.044,.027,.021),0,.65,.3)
-cloth = material('Ox-blood woven wool',(.145,.014,.025),0,.85,.35)
+cloth = material('Ox-blood woven wool',(.082,.007,.014),0,.87,.27)
 lining = material('Charcoal padded linen',(.026,.033,.038),0,.9,.4)
 skin = material('Underlying body',(.39,.225,.145),0,.65,.15)
 black = material('Visor darkness',(.004,.006,.008),0,.96)
@@ -142,11 +142,23 @@ def ellipse_line(name,z,rx,ry,cx=0,cy=0,mat=brass,radius=.0022):
     return curve(name,[(cx+rx*math.cos(t*math.tau/96),cy+ry*math.sin(t*math.tau/96),z) for t in range(96)],mat,radius,closed=True)
 
 def plaque(name, outline, y, mat=steel, coll=ARMOR, thickness=.004, bulge=.015):
-    # Outline in x,z; convex raised center for forged plates.
-    cx=sum(p[0] for p in outline)/len(outline); cz=sum(p[1] for p in outline)/len(outline)
-    verts=[(cx,y-bulge,cz)]+[(x,y,z) for x,z in outline]
-    faces=[(0,j+1,(j+1)%len(outline)+1) for j in range(len(outline))]
-    return solid(mesh(name,verts,faces,mat,coll,bevel=.002),thickness)
+    # Concentric quad rings give a continuous forged dome rather than a
+    # pinched triangle fan. Ensure front-facing normals for every outline.
+    outline=list(outline)
+    area=sum(x*outline[(i+1)%len(outline)][1]-outline[(i+1)%len(outline)][0]*z for i,(x,z) in enumerate(outline))
+    if area<0: outline.reverse()
+    n=len(outline)
+    cx=sum(p[0] for p in outline)/n; cz=sum(p[1] for p in outline)/n
+    verts=[]
+    for t in [0,.24,.58,.86]:
+        for x,z in outline:
+            verts.append((x*(1-t)+cx*t,y-bulge*(2*t-t*t),z*(1-t)+cz*t))
+    verts.append((cx,y-bulge,cz))
+    faces=[]
+    for ring in range(3):
+        for j in range(n): faces.append((ring*n+j,ring*n+(j+1)%n,(ring+1)*n+(j+1)%n,(ring+1)*n+j))
+    for j in range(n): faces.append((3*n+j,3*n+(j+1)%n,4*n))
+    return solid(mesh(name,verts,faces,mat,coll),thickness)
 
 # Anatomical foundation, retained as a separate collection for later rigging.
 loft('Body | torso',[(1.00,.14,.10,0,.018),(1.10,.16,.103,0,.02),(1.25,.15,.105,0,.015),(1.43,.215,.12,0,.015),(1.57,.24,.102,0,.02),(1.65,.15,.082,0,.025)],skin,BODY,cap=True)
@@ -159,25 +171,30 @@ for side in [-1,1]:
     tag='R' if side<0 else 'L'
     shoulder=(side*.253,.02,1.565); elbow=(side*.345,.015,1.295); wrist=(side*.405,-.018,1.025)
     tube('Body | upper arm '+tag,shoulder,elbow,.082,.063,skin)
-    tube('Quilted sleeve '+tag,shoulder,elbow,.094,.072,lining)
+    tube('Quilted sleeve '+tag,shoulder,elbow,.086,.060,lining)
     ellipsoid('Elbow articulation '+tag,elbow,(.069,.069,.078),lining)
     tube('Body | forearm '+tag,elbow,wrist,.065,.041,skin)
     tube('Leather sleeve '+tag,elbow,wrist,.071,.047,leather)
     # Fitted upper-arm and forearm armor, following the relaxed arm angle.
     upper=tube('Rerebrace '+tag,(side*.285,.018,1.50),(side*.339,.016,1.325),.093,.076,steel,ARMOR)
     lower=tube('Vambrace '+tag,(side*.358,.01,1.25),(side*.40,-.013,1.065),.078,.055,steel,ARMOR)
-    for z,cx,r in [(1.49,side*.288,.095),(1.335,side*.337,.078),(1.24,side*.36,.079),(1.078,side*.397,.057)]:
-        ellipse_line('Arm rolled rim '+tag,z,r,r,cx,.012,edge,.0025)
+    for a,b,ra,rb in [((side*.285,.018,1.50),(side*.339,.016,1.325),.093,.076),
+                      ((side*.358,.01,1.25),(side*.40,-.013,1.065),.078,.055)]:
+        a,b=Vector(a),Vector(b)
+        rotation=(b-a).to_track_quat('Z','Y')
+        for center,radius in [(a,ra),(b,rb)]:
+            points=[tuple(center+rotation@Vector((radius*math.cos(j*math.tau/96),radius*math.sin(j*math.tau/96),0))) for j in range(96)]
+            curve('Arm rolled rim '+tag,points,edge,.0025,closed=True)
     # Elbow cop and side wing.
-    ellipsoid('Couter '+tag,(side*.345,-.031,1.292),(.081,.081,.074),steel,ARMOR)
+    ellipsoid('Couter '+tag,(side*.345,-.031,1.292),(.074,.057,.069),steel,ARMOR)
     plaque('Couter wing '+tag,[(side*.365,1.35),(side*.453,1.313),(side*.433,1.253),(side*.365,1.241)],-.012,steel)
     # Proportioned padded thigh, knee joint and calf.
     hx=side*.123; kx=side*.137; ax=side*.15
     tube('Body | thigh '+tag,(hx,.025,1.025),(kx,.0,.588),.109,.068,skin)
-    tube('Wool trousers '+tag,(hx,.022,1.02),(kx,.0,.591),.117,.076,lining)
-    ellipsoid('Knee cloth '+tag,(kx,0,.573),(.075,.078,.077),lining)
+    tube('Wool trousers '+tag,(hx,.022,1.02),(kx,.0,.591),.096,.058,lining)
+    ellipsoid('Knee cloth '+tag,(kx,0,.573),(.063,.067,.063),lining)
     tube('Body | calf '+tag,(kx,.018,.552),(ax,.015,.16),.076,.041,skin)
-    tube('Boot leather shaft '+tag,(kx,.018,.545),(ax,.015,.105),.082,.05,leather)
+    tube('Boot leather shaft '+tag,(kx,.018,.545),(ax,.015,.105),.060,.036,leather)
     # Thigh and shin plates use shaped cross sections, not straight cylinders.
     loft('Cuisses '+tag,[(.635,.077,.080,kx,0),(.66,.085,.088,kx,0),(.79,.100,.095,hx,.014),(.94,.111,.102,hx,.017),(.97,.106,.098,hx,.017)],steel,ARMOR,front_keel=.005)
     for z,rx,ry,cx in [(.641,.078,.081,kx),(.962,.108,.099,hx)]: ellipse_line('Thigh border '+tag,z,rx,ry,cx,0,brass,.002)
@@ -188,18 +205,22 @@ for side in [-1,1]:
     plaque('Poleyn '+tag,[(kx-.065,.616),(kx-.072,.57),(kx-.045,.527),(kx+.048,.527),(kx+.071,.57),(kx+.062,.616),(kx,.636)],-.084,steel,bulge=.036)
     curve('Knee ridge '+tag,[(kx,-.09,.632),(kx,-.126,.584),(kx,-.115,.545)],edge,.0025)
     plaque('Poleyn wing '+tag,[(kx+side*.054,.613),(kx+side*.124,.594),(kx+side*.13,.553),(kx+side*.053,.540)],-.002,steel)
-    # Foot and overlapping articulated sabaton lames.
-    ellipsoid('Boot '+tag,(ax,-.061,.081),(.069,.152,.063),leather,CLOTH)
-    for i in range(6):
-        y=-.165+i*.036; width=.061+(.006 if i in [2,3] else 0)
-        verts=[]
-        for yy,z in [(y-.023,.091+i*.006),(y+.022,.107+i*.009)]:
-            for j in range(17):
-                t=math.pi*j/16
-                verts.append((ax+width*math.cos(t),yy,z+.025*math.sin(t)))
-        faces=[(j,j+1,j+18,j+17) for j in range(16)]
-        solid(mesh('Sabaton lame %s %02d'%(tag,i+1),verts,faces,steel,ARMOR),.003)
-        curve('Sabaton lip '+tag,verts[:17],edge,.0018)
+    # Flat leather soles and a continuous fitted metal upper, with raised
+    # transverse seams marking the overlapping sabaton plates.
+    loft('Boot sole '+tag,[(.0,.068,.145,ax,-.060),(.008,.071,.149,ax,-.060),(.025,.071,.149,ax,-.060),(.032,.067,.145,ax,-.060)],leather,CLOTH,cap=True)
+    solid(loft('Sabaton fitted upper '+tag,[(.030,.067,.145,ax,-.060),(.051,.068,.144,ax,-.060),(.077,.063,.136,ax,-.055),(.102,.057,.115,ax,-.034),(.124,.052,.085,ax,-.006),(.157,.052,.057,ax,.010)],steel,ARMOR,n=48),.003)
+    # Seams follow the actual ellipsoid upper; no floating half-cylinder lames.
+    for i in range(5):
+        y=-.170+i*.034
+        pts=[]
+        for j in range(25):
+            u=-1+2*j/24
+            width=.062*math.sqrt(max(.12,1-((y+.055)/.145)**2))
+            x=ax+u*width
+            z=.047+.046*math.sqrt(max(0,1-u*u))+(y+.17)*.21
+            pts.append((x,y,z))
+        curve('Sabaton articulation seam '+tag,pts,darksteel,.0015)
+    ellipse_line('Sabaton ankle lip '+tag,.154,.053,.059,ax,.010,edge,.002)
     # Gloves have separate thumb and four curved fingers for a later hand rig.
     ellipsoid('Glove palm '+tag,(side*.415,-.022,.996),(.051,.040,.064),leather,CLOTH)
     ellipsoid('Gauntlet back '+tag,(side*.414,.009,1.003),(.050,.024,.062),steel,ARMOR)
@@ -242,8 +263,9 @@ for side in [-1,1]:
         angle=.07+v/nv*1.42
         for u in range(nu+1):
             theta=u/nu*math.tau
-            verts.append((side*(.265+.125*math.sin(angle)*math.cos(theta)),.023+.135*math.sin(angle)*math.sin(theta),1.562+.126*math.cos(angle)))
+            verts.append((side*(.265+.125*math.sin(angle)*math.cos(theta)),.023+.135*math.sin(angle)*math.sin(theta),1.562+.109*math.cos(angle)))
     faces=[(v*(nu+1)+u,v*(nu+1)+u+1,(v+1)*(nu+1)+u+1,(v+1)*(nu+1)+u) for v in range(nv) for u in range(nu)]
+    faces.append(tuple(reversed(range(nu))))
     solid(mesh('Pauldron dome '+tag,verts,faces,steel),.005)
     curve('Pauldron rolled rim '+tag,verts[-(nu+1):],brass,.003,closed=True)
     for i in range(3):
@@ -296,7 +318,7 @@ for side in [-1,1]:
         for ix in range(nx+1):
             u=ix/nx
             x=side*(.014+u*(.167+.047*t))
-            y=-.163-.01*t+.016*math.sin(u*math.pi*4+.5)*(.3+t)
+            y=-.171-.013*t+.005*math.sin(u*math.pi*4+.5)*(.3+t)
             zz=z+.025*math.sin(u*math.pi)**2*t*t
             verts.append((x,y,zz))
     faces=[(iz*(nx+1)+ix,iz*(nx+1)+ix+1,(iz+1)*(nx+1)+ix+1,(iz+1)*(nx+1)+ix) for iz in range(nz) for ix in range(nx)]
@@ -308,9 +330,9 @@ for side in [-1,1]:
     for i in range(3):
         z=1.035-i*.06; w=.074-i*.003
         outline=[(cx-w,z+.014),(cx+w,z+.014),(cx+w-.01,z-.053),(cx,z-.066),(cx-w+.01,z-.053)]
-        plaque('Tasset %s %s'%(side,i),outline,-.159-i*.002,steel,bulge=.024)
-        curve('Tasset lip',[(x,-.165-i*.002,zz) for x,zz in outline[2:]],brass,.0018)
-        for dx in [-.047,.047]: rivet('Tasset rivet',(cx+dx,-.173-i*.002,z),.003)
+        plaque('Tasset %s %s'%(side,i),outline,-.202-i*.002,steel,bulge=.015)
+        curve('Tasset lip',[(x,-.204-i*.002,zz) for x,zz in outline[2:]],brass,.0018)
+        for dx in [-.047,.047]: rivet('Tasset rivet',(cx+dx,-.219-i*.002,z),.003)
 
 # Rear cloth, restrained short split panels rather than a rigid cape.
 for side in [-1,1]:
@@ -318,7 +340,7 @@ for side in [-1,1]:
     for iz in range(17):
         t=iz/16
         for ix in range(13):
-            u=ix/12; verts.append((side*(.012+u*(.16+.07*t)),.172+.01*t+.012*math.sin(u*math.pi*4)*t,1.075-.43*t+.018*math.sin(u*math.pi)*t))
+            u=ix/12; verts.append((side*(.012+u*(.16+.07*t)),.201+.012*t+.006*math.sin(u*math.pi*4)*t,1.011-.38*t+.018*math.sin(u*math.pi)*t))
     faces=[(i*13+j,(i+1)*13+j,(i+1)*13+j+1,i*13+j+1) for i in range(16) for j in range(12)]
     solid(smooth(mesh('Back split tabard '+str(side),verts,faces,cloth,CLOTH)),.002)
     curve('Back cloth hem',verts[-13:],brass,.0014,coll=CLOTH)
@@ -355,20 +377,20 @@ verts=[sp(0,0,-.005)]+[sp(x,z) for x,z in outline]
 faces=[(0,i+1,(i+1)%len(outline)+1) for i in range(len(outline))]
 shield=solid(mesh('Shield | curved steel core',verts,faces,darksteel,WEAPONS,bevel=.003),.015)
 inset=[(x*.89,z*.91) for x,z in outline]
-verts=[sp(0,0,-.009)]+[sp(x,z,-.009) for x,z in inset]
+verts=[sp(0,0,-.029)]+[sp(x,z,-.029) for x,z in inset]
 mesh('Shield | ox-blood lacquer face',verts,faces,cloth,WEAPONS)
 curve('Shield | thick steel rim',[sp(x,z,-.006) for x,z in outline],steel,.012,WEAPONS,closed=True)
-curve('Shield | brass inlay border',[sp(x,z,-.012) for x,z in inset],brass,.003,WEAPONS,closed=True)
+curve('Shield | brass inlay border',[sp(x,z,-.037) for x,z in inset],brass,.003,WEAPONS,closed=True)
 for x,z in outline:
     ellipsoid('Shield rim rivet',sp(x*.95,z*.96,-.018),(.005,.003,.005),brass,WEAPONS)
 # Long stylized spear/leaf insignia, made from geometry (no raster dependency).
-plaque('Shield | central silver heraldic blade',[(.492,1.344),(.458,1.253),(.478,1.259),(.478,.977),(.492,.932),(.506,.977),(.506,1.259),(.526,1.253)],-.25,edge,WEAPONS,thickness=.003,bulge=.004)
+plaque('Shield | central silver heraldic blade',[(.492,1.344),(.458,1.253),(.478,1.259),(.478,.977),(.492,.932),(.506,.977),(.506,1.259),(.526,1.253)],-.283,edge,WEAPONS,thickness=.003,bulge=.004)
 for side in [-1,1]:
     for i in range(4):
         x=side*(.031+.022*i); z=.012+i*.031
-        curve('Shield | laurel stem',[sp(x,z,-.022),sp(x+side*.028,z+.025,-.022),sp(x+side*.028,z+.061,-.022)],brass,.003,WEAPONS)
-curve('Shield rear arm strap',[sp(-.09,.08,.047),sp(-.10,.02,.098),sp(.02,-.055,.098),sp(.085,-.09,.041)],leather,.016,WEAPONS)
-curve('Shield rear handle',[sp(-.054,.02,.032),sp(-.027,.012,.104),sp(.037,.012,.104),sp(.073,.02,.032)],leather,.016,WEAPONS)
+        curve('Shield | laurel stem',[sp(x,z,-.051),sp(x+side*.028,z+.025,-.051),sp(x+side*.028,z+.061,-.051)],brass,.003,WEAPONS)
+curve('Shield rear arm strap',[sp(-.16,.045,.04),sp(-.145,.050,.23),sp(-.086,.037,.23),sp(-.07,.02,.04)],leather,.016,WEAPONS)
+curve('Shield rear handle',[sp(-.105,-.11,.028),sp(-.083,-.106,.18),sp(-.071,-.159,.18),sp(-.055,-.165,.028)],leather,.016,WEAPONS)
 
 # Modest dimensional chainmail at visible elbow/neck gaps. Shared mesh rings.
 bpy.ops.mesh.primitive_torus_add(major_segments=12,minor_segments=4,major_radius=.0042,minor_radius=.00085)
@@ -387,6 +409,19 @@ for row in range(4):
         o=bpy.data.objects.new('Mail | neck link',ring_mesh); DETAIL.objects.link(o)
         o.location=(.080*math.cos(theta),.021+.077*math.sin(theta),1.708+row*.007)
         o.rotation_euler=(math.pi/2,0,theta-math.pi/2)
+
+# Fitting allowance for the underlayers. The body stays editable but covered
+# anatomical construction meshes do not compete with the dressed silhouette.
+for obj in BODY.objects:
+    if obj.name.startswith('Body |'):
+        obj.hide_render=True
+    if obj.name == 'Quilted arming doublet':
+        for v in obj.data.vertices:
+            v.co.x*=.90
+            v.co.y=.02+(v.co.y-.02)*.88
+for obj in ARMOR.objects:
+    if obj.name.startswith('Helmet | forged shell'):
+        smooth(obj,1)
 
 # Display origin at the feet; body/slots stay editable and separately named.
 root=bpy.data.objects.new('VARENDOR | Knight 01 - appearance stage',None)
@@ -416,7 +451,7 @@ light('Top steel reflection',(-.3,.4,5),400,(1,.89,.73),2)
 camera_data=bpy.data.cameras.new('Review camera'); camera_data.type='ORTHO'; camera_data.ortho_scale=2.45
 camera=bpy.data.objects.new('Review camera',camera_data); STUDIO.objects.link(camera); scene.camera=camera
 scene.render.engine='CYCLES'
-scene.cycles.device='CPU'; scene.cycles.samples=40; scene.cycles.use_denoising=True
+scene.cycles.device='CPU'; scene.cycles.samples=28; scene.cycles.use_denoising=True
 scene.cycles.max_bounces=6
 scene.render.resolution_x=1400; scene.render.resolution_y=1680; scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG'
