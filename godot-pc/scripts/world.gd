@@ -59,6 +59,7 @@ var click_goal: Variant:
 	set(value): player_motion.destination = value
 var generation: int = -1
 var sun_light: DirectionalLight3D
+var weather: VarendorWorldWeather
 var world_environment: Environment
 var show_names: bool = true
 var decorations: Array[GeometryInstance3D] = []
@@ -224,6 +225,9 @@ func setup(game: Dictionary) -> bool:
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 90
 	add_child(sun)
+	weather = VarendorWorldWeather.new()
+	add_child(weather)
+	weather.setup(self)
 	camera = Camera3D.new()
 	camera.fov = rad_to_deg(.82)
 	camera.near = .15
@@ -387,7 +391,7 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 	root.set_meta("destination", root.position)
 	root.set_meta("action", "")
 	var controller: VarendorAnimationController = VarendorAnimationController.new()
-	controller.prefer_run = id == hero_id
+	controller.prefer_run = id == hero_id or model == "Fox"
 	controller.bind(root)
 	root.set_meta("motion", {})
 	actors[id] = root
@@ -400,7 +404,8 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 	hero_speed = float(hero.stats.get("speed",6.2))
 	if player_motion.identity.is_empty(): player_motion.reconcile(snapshot)
 	targeting.reconcile(snapshot)
-	var keep: Dictionary = {"npc:shop":true,"npc:elder":true,"npc:smith":true,"npc:teleport":true}
+	var keep: Dictionary = {}
+	for service_id: String in VarendorNpcInteraction.SERVICES: keep[service_id] = true
 	for resident: Dictionary in ambient_residents.residents: keep[str(resident.id)] = true
 	var people: Array = snapshot.get("heroes", []).duplicate()
 	# Character is authoritative even when the nearby-heroes list omits self.
@@ -429,6 +434,16 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		keep[id] = true
 		var def: Dictionary = data.monsters[monster.id]
 		var actor: Node3D = make_actor(id, def.model, 2.05 * float(def.get("scale", 1)), def.name + " · %d" % int(def.level), Color("e0a6a0"))
+		if str(monster.id) == "night_zombie" and not actor.has_meta("undead_tint"):
+			for mesh: MeshInstance3D in actor.find_children("*","MeshInstance3D",true,false):
+				if mesh.mesh == null: continue
+				for surface: int in range(mesh.mesh.get_surface_count()):
+					var material: Material = mesh.get_active_material(surface)
+					if material is StandardMaterial3D:
+						var owned: StandardMaterial3D = material.duplicate()
+						owned.albedo_color = Color("7c966b")
+						mesh.set_surface_override_material(surface,owned)
+			actor.set_meta("undead_tint",true)
 		initialize_pose(actor, point(monster.x, monster.z, monster.get("yOffset", 0)))
 		actor.set_meta("pickable", bool(monster.alive))
 		actor.set_meta("yaw", -float(monster.get("yaw", 0)) + PI)
@@ -491,7 +506,6 @@ func present_event(event: Dictionary) -> void:
 		var target: Node3D = actors[str(event.target)]
 		(target.get_meta("animation_controller") as VarendorAnimationController).on_event(event,float(current_snapshot.get("time",0)))
 		show_text(target.position, str(int(event.amount)) if event.has("amount") else "Промах", Color("ef7770") if str(event.target) == hero_id else Color("f5d698"), .85)
-		show_aura(target.position + Vector3(0, .7, 0), Color("ffcf87"))
 		play_sound("melee-impact" if str(event.target) == hero_id else "monster-hit", target.position)
 
 func blocked(position: Vector3) -> bool:
@@ -549,10 +563,11 @@ func _process(delta: float) -> void:
 		var rendered_velocity: Vector3 = (actor.position-before)/maxf(.0001,delta)
 		if id == hero_id: rendered_velocity = Vector3(player_motion.actual_velocity.x,player_motion.vertical_velocity,-player_motion.actual_velocity.y)
 		var controller: VarendorAnimationController = actor.get_meta("animation_controller")
-		controller.prefer_run = id == hero_id
+		controller.prefer_run = id == hero_id or str(actor.get_meta("model","")) == "Fox"
 		var actor_clock: float = ambient_time if ambient_poses.has(id) else timeline.clock_ms if not timeline.current.is_empty() else float(current_snapshot.get("time",0))
 		controller.update(motion,rendered_velocity,actor_clock,delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
 		actor.visible = not controller.corpse_complete
+		update_corpse_fade(actor,controller,actor_clock)
 		(actor.get_meta("label") as Label3D).hide()
 	camera_controller.update_pose(delta,hero_position,jump_offset)
 	update_nameplates()
@@ -738,3 +753,28 @@ func update_effects(delta: float) -> void:
 		if expired or effect.left <= 0:
 			effect.node.queue_free()
 			effects.erase(effect)
+
+func update_corpse_fade(actor: Node3D, controller: VarendorAnimationController, clock: float) -> void:
+	var opacity: float = 1.0 if controller.death_at < 0 else clampf(1.0-(clock-controller.death_at)/3000.0,0,1)
+	if opacity >= 1 and not actor.has_meta("fade_materials"): return
+	if not actor.has_meta("fade_materials"):
+		var materials: Array = []
+		for mesh: MeshInstance3D in actor.find_children("*","MeshInstance3D",true,false):
+			if mesh.mesh == null: continue
+			for i: int in range(mesh.mesh.get_surface_count()):
+				var source: Material = mesh.get_active_material(i)
+				if source is StandardMaterial3D:
+					var owned: StandardMaterial3D = source.duplicate()
+					mesh.set_surface_override_material(i,owned)
+					materials.append({"material":owned,"alpha":source.albedo_color.a,"mode":source.transparency})
+		actor.set_meta("fade_materials",materials)
+	for entry: Dictionary in actor.get_meta("fade_materials"):
+		entry.material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if opacity < 1 else entry.mode
+		entry.material.albedo_color.a = float(entry.alpha)*opacity
+
+func predict_skill(index: int) -> void:
+	if not actors.has(hero_id): return
+	var controller: VarendorAnimationController = actors[hero_id].get_meta("animation_controller")
+	var now: float = timeline.clock_ms
+	controller.begin_attack(now,now+1,now+180)
+	actors[hero_id].set_meta("predicted_skill",index)

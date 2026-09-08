@@ -7,6 +7,7 @@ export type MonsterAiInput = Readonly<{
   playerSafe: boolean;
   targetAvailable?: boolean;
   targetId?: string;
+  provoked?: boolean;
   playerDistance: number;
   homeDistance: number;
   atPatrolPoint: boolean;
@@ -32,6 +33,8 @@ export class MonsterAiBrain {
   constructor(seed = 0) {
     this.idleTimer = 0.65 + Math.abs(Math.sin(seed * 12.9898)) * 2.15;
   }
+
+  engage(id:string):void {this.targetValue=id;if(!['chase','attack'].includes(this.stateValue))this.stateValue='aggro';}
 
   reset(seed = 0): void {
     this.stateValue = 'spawn';
@@ -65,7 +68,7 @@ export class MonsterAiBrain {
     }
 
     const maintainsAggro = wasEngaged && input.playerDistance <= input.aggroRadius * 1.55;
-    if (targetAvailable && (input.playerDistance <= input.aggroRadius || maintainsAggro)) {
+    if (targetAvailable && (input.provoked || input.playerDistance <= input.aggroRadius || maintainsAggro)) {
       this.targetValue = input.targetId ?? this.targetValue;
       if (!wasEngaged) return this.transition('aggro', input.playerDistance <= input.attackRange ? 'attack' : 'chase');
       if (input.playerDistance <= input.attackRange) return this.transition('attack', 'attack');
@@ -106,3 +109,4 @@ export class MonsterAiBrain {
     return { state, intent, changed, targetId: this.targetValue };
   }
 }
+

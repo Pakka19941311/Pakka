@@ -6,7 +6,7 @@ extends RefCounted
 const GEAR_LAYOUT: Array = [["ear1","Серьга I"],["head","Голова"],["ear2","Серьга II"],["neck","Ожерелье"],["chest","Нагрудник"],["offhand","Щит / фокус"],["weapon","Оружие"],["belt","Пояс"],["gloves","Перчатки"],["ring1","Кольцо I"],["boots","Обувь"],["ring2","Кольцо II"]]
 const STAT_LAYOUT: Array = [["level","Уровень"],["xp","Опыт"],["hp","HP"],["mp","MP"],["str","Сила"],["dex","Ловкость"],["int","Интеллект"],["def","Общая защита"],["mdef","Магическая защита"]]
 const ITEM_STAT_LABELS: Dictionary = {"atkMin":"Мин. физ. атака","atkMax":"Макс. физ. атака","matk":"Магическая атака","def":"Физическая защита","mdef":"Магическая защита","hp":"Макс. HP","mp":"Макс. MP","crit":"Критический шанс","accuracy":"Точность","evasion":"Уклонение","speed":"Скорость передвижения"}
-const WINDOW_SIZE: Vector2 = Vector2(392,564)
+const WINDOW_SIZE: Vector2 = Vector2(332,502)
 const DOCK_WIDTH: float = 756.0
 var app: Node
 var dock: Control
@@ -137,10 +137,12 @@ func setup(owner_ui: Node) -> void:
 		app.full_quick = not app.full_quick
 		app.refresh_quick()
 		app.save_preferences())
-	edit_toggle = small_button(quick_content,"Настроить",Vector2(286,3),Vector2(88,18),func():
-		quick_editing = not quick_editing
-		edit_toggle.text = "Готово" if quick_editing else "Настроить"
-		for slot: VarendorQuickSlot in app.quick_buttons: slot.queue_redraw())
+	edit_toggle = small_button(quick_content,"Свободно",Vector2(286,3),Vector2(88,18),func():
+		var state: Dictionary = app.polish.layout_data.get("dock",{})
+		state.locked = not bool(state.get("locked",false))
+		app.polish.layout_data.dock = state
+		edit_toggle.text = "Закреплено" if state.locked else "Свободно"
+		app.polish.save_layout())
 	app.quick_grid = GridContainer.new()
 	app.quick_grid.columns = 8
 	app.quick_grid.add_theme_constant_override("h_separation",3)
@@ -149,7 +151,7 @@ func setup(owner_ui: Node) -> void:
 	for index: int in range(32):
 		var slot: VarendorQuickSlot = VarendorQuickSlot.new()
 		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(44,43)
+		slot.custom_minimum_size = VarendorInterfacePolish.CELL
 		slot.add_theme_stylebox_override("normal",frame(Color("151a20"),Color("695b46")))
 		slot.add_theme_stylebox_override("hover",frame(Color("30363b"),Color("b7ad85")))
 		slot.add_theme_stylebox_override("pressed",frame(Color("44545a"),Color("d5bd88")))
@@ -166,18 +168,15 @@ func setup(owner_ui: Node) -> void:
 	quick_items.name = "QuickConsumables"
 	for index: int in range(2):
 		var action: String = "potion" if index == 0 else "ether"
-		var result: Button = small_button(quick_items,"",Vector2(5,4+index*46),Vector2(88,43),func(): app.activate(action))
-		var texture: TextureRect = TextureRect.new()
-		texture.texture = VarendorReferenceIcons.texture(action)
-		texture.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		texture.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		rect(texture,result,Vector2(3,13),Vector2(24,24))
-		var key_label: Label = text(result,"",Vector2(4,0),Vector2(80,11),9,Color("e5d0a6"))
-		var count_label: Label = text(result,"",Vector2(29,15),Vector2(57,25),10)
-		potion_buttons[action] = {"button":result,"key":key_label,"count":count_label}
+		var result: VarendorQuickSlot = VarendorQuickSlot.new()
+		result.owner_ui = app; result.custom_action = action
+		result.artwork = VarendorReferenceIcons.texture(action)
+		result.pressed.connect(func(): app.activate(action))
+		rect(result,quick_items,Vector2(4+index*47,24),VarendorInterfacePolish.CELL)
+		potion_buttons[action] = result
 	var menu: Panel = panel(dock,Vector2(268,124),Vector2(488,27))
 	menu.name = "ReferenceMenu"
-	for entry: Array in [["C   Герой",app.toggle_inventory],["Tab   Сумка",app.toggle_inventory],["K   Навыки",skills_dialog],["M   Карта",map_dialog],["Esc   Настройки",app.controls_dialog]]:
+	for entry: Array in [["C   Герой",app.toggle_inventory],["Tab   Сумка",app.toggle_inventory],["N   Навыки",skills_dialog],["M   Карта",map_dialog],["Esc   Настройки",app.controls_dialog]]:
 		var index: int = menu.get_child_count()
 		small_button(menu,entry[0],Vector2(4+index*96,3),Vector2(93,20),entry[1],10)
 	app.target_panel = app.place_panel(Control.PRESET_CENTER_TOP,Vector2(-150,36),Vector2(300,76))
@@ -202,12 +201,12 @@ func setup(owner_ui: Node) -> void:
 	app.status = text(map_panel,"Гринфолл",Vector2(5,134),Vector2(178,23),12,Color("e3c88f"))
 	app.status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	app.status.clip_text = true
-	region_panel = panel(app.ui,Vector2(12,178),Vector2(290,24))
-	small_button(region_panel,"Задание и боссы",Vector2(1,1),Vector2(288,22),func():
+	region_panel = panel(app.ui,Vector2(12,178),Vector2(190,24))
+	small_button(region_panel,"Задание и боссы",Vector2(1,1),Vector2(188,22),func():
 		region_expanded = not region_expanded
 		region_text.visible = region_expanded
 		layout())
-	region_text = text(region_panel,"",Vector2(7,28),Vector2(276,86),11,Color("c7bba9"))
+	region_text = text(region_panel,"",Vector2(7,28),Vector2(176,150),11,Color("c7bba9"))
 	region_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	region_text.hide()
 	log_panel = panel(app.ui,Vector2(12,app.ui.size.y-328),Vector2(290,155))
@@ -232,13 +231,13 @@ func setup(owner_ui: Node) -> void:
 	rect(effect_row,app.ui,Vector2(app.ui.size.x-350,10),Vector2(338,35))
 	effect_row.alignment = BoxContainer.ALIGNMENT_END
 	effect_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for key: String in ["guard","vanish"]:
+	for key: String in ["guard","vanish","haste"]:
 		var effect_panel: PanelContainer = PanelContainer.new()
 		effect_panel.add_theme_stylebox_override("panel",frame(Color("20242af0"),Color("8c7353"),6))
 		effect_row.add_child(effect_panel)
 		var effect_label: Label = app.label("",11)
 		effect_panel.add_child(effect_label)
-		effect_panel.tooltip_text = "Входящий урон снижен на 50%" if key == "guard" else "Незаметность для монстров"
+		effect_panel.tooltip_text = "Входящий урон снижен на 50%" if key == "guard" else "Бег +50%, скорость атаки +15%" if key == "haste" else "Незаметность для монстров"
 		effect_labels[key] = {"panel":effect_panel,"label":effect_label}
 		effect_panel.hide()
 	app.diagnostics = text(app.ui,"",Vector2(316,12),Vector2(360,80),12)
@@ -272,14 +271,14 @@ func bar_label(parent: ProgressBar, font_size: int) -> Label:
 	return result
 
 func build_inventory() -> void:
-	app.inventory_panel = app.place_panel(Control.PRESET_TOP_LEFT,Vector2(app.ui.size.x-410,58),WINDOW_SIZE)
+	app.inventory_panel = app.place_panel(Control.PRESET_TOP_LEFT,Vector2(app.ui.size.x-350,58),WINDOW_SIZE)
 	app.inventory_panel.name = "ReferenceCharacterWindow"
 	app.inventory_panel.add_theme_stylebox_override("panel",frame(Color("182024"),Color("817256"),0,3))
 	var content: Control = Control.new()
 	content.mouse_filter = Control.MOUSE_FILTER_PASS
 	app.inventory_panel.add_child(content)
-	var header: Panel = panel(content,Vector2.ZERO,Vector2(390,32),Color("29343a"),Color("65727766"))
-	app.inventory_title = text(header,"Персонаж",Vector2(12,0),Vector2(286,32),16,Color("e4dece"))
+	var header: Panel = panel(content,Vector2.ZERO,Vector2(330,32),Color("29343a"),Color("65727766"))
+	app.inventory_title = text(header,"Персонаж",Vector2(12,0),Vector2(235,32),16,Color("e4dece"))
 	app.inventory_title.mouse_filter = Control.MOUSE_FILTER_STOP
 	app.inventory_title.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -289,19 +288,19 @@ func build_inventory() -> void:
 		elif event is InputEventMouseMotion and app.inventory_drag:
 			app.inventory_panel.position = app.get_viewport().get_mouse_position()-app.inventory_drag_offset
 			clamp_inventory())
-	text(header,"Tab",Vector2(319,5),Vector2(31,22),10,Color("a8b0b0"))
-	var close: Button = small_button(header,"×",Vector2(360,4),Vector2(24,24),app.toggle_inventory,22)
+	text(header,"Tab",Vector2(263,5),Vector2(31,22),10,Color("a8b0b0"))
+	var close: Button = small_button(header,"×",Vector2(301,4),Vector2(24,24),app.toggle_inventory,22)
 	close.name = "CloseInventory"
-	inventory_name = text(content,"",Vector2(11,32),Vector2(216,34),13,Color("e8dfca"))
+	inventory_name = text(content,"",Vector2(11,32),Vector2(163,30),13,Color("e8dfca"))
 	inventory_name.clip_text = true
-	inventory_class = text(content,"",Vector2(224,32),Vector2(155,34),11,Color("9dabae"))
+	inventory_class = text(content,"",Vector2(169,32),Vector2(152,30),11,Color("9dabae"))
 	inventory_class.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	var stat_panel: Panel = panel(content,Vector2(10,72),Vector2(187,210),Color("10171b"),Color("65717642"))
-	stats_heading = text(stat_panel,"Характеристики",Vector2(6,0),Vector2(175,19),10,Color("b6bfbd"))
+	var stat_panel: Panel = panel(content,Vector2(10,66),Vector2(164,185),Color("10171b"),Color("65717642"))
+	stats_heading = text(stat_panel,"Характеристики",Vector2(6,0),Vector2(154,19),10,Color("b6bfbd"))
 	stats_scroll = ScrollContainer.new()
 	stats_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	stats_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
-	rect(stats_scroll,stat_panel,Vector2(5,20),Vector2(177,188))
+	rect(stats_scroll,stat_panel,Vector2(5,20),Vector2(154,164))
 	var stats_box: VBoxContainer = VBoxContainer.new()
 	stats_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	stats_box.add_theme_constant_override("separation",0)
@@ -310,7 +309,7 @@ func build_inventory() -> void:
 		var row: HBoxContainer = HBoxContainer.new()
 		# Nine rows share 188 px below the heading. The previous 22 px rows
 		# needed 198 px, hiding the final defence stat behind a scrollbar.
-		row.custom_minimum_size.y = 20
+		row.custom_minimum_size.y = 18
 		row.draw.connect(func(): row.draw_line(Vector2(0,row.size.y-1),Vector2(row.size.x,row.size.y-1),Color("a5b4b30b"),1))
 		row.add_theme_constant_override("separation",4)
 		stats_box.add_child(row)
@@ -324,7 +323,7 @@ func build_inventory() -> void:
 	app.stats_text = app.label("",11)
 	app.stats_text.hide()
 	stat_panel.add_child(app.stats_text)
-	enhancement_banner = text(stat_panel,"",Vector2(9,9),Vector2(169,192),12,Color("efd29e"))
+	enhancement_banner = text(stat_panel,"",Vector2(9,9),Vector2(146,164),12,Color("efd29e"))
 	enhancement_banner.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	enhancement_banner.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	enhancement_banner.hide()
@@ -332,84 +331,87 @@ func build_inventory() -> void:
 	equipment_grid.columns = 3
 	equipment_grid.add_theme_constant_override("h_separation",3)
 	equipment_grid.add_theme_constant_override("v_separation",3)
-	rect(equipment_grid,content,Vector2(206,72),Vector2(174,210))
+	rect(equipment_grid,content,Vector2(184,66),Vector2(138,185))
 	for entry: Array in GEAR_LAYOUT:
 		var slot: VarendorItemSlot = VarendorItemSlot.new()
 		slot.owner_ui = app
 		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(56,50.25)
-		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		slot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		slot.custom_minimum_size = VarendorInterfacePolish.CELL
+		slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		slot.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 		slot.payload = {"kind":"equipment","slot":entry[0],"item":{}}
 		slot.empty_caption = entry[1]
 		slot.tooltip_text = entry[1]
 		equipment_grid.add_child(slot)
 		app.equipment_slots[entry[0]] = slot
-	text(content,"Сумка",Vector2(11,282),Vector2(150,22),11,Color("c3c5b9"))
-	var bag_hint: Label = text(content,"Двойной клик — действие",Vector2(173,282),Vector2(206,22),9,Color("829194"))
+	text(content,"Сумка",Vector2(11,256),Vector2(150,22),11,Color("c3c5b9"))
+	var bag_hint: Label = text(content,"Двойной клик — действие",Vector2(134,256),Vector2(188,22),9,Color("829194"))
 	bag_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	bag_scroll = ScrollContainer.new()
 	bag_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	bag_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_SHOW_ALWAYS
-	rect(bag_scroll,content,Vector2(10,304),Vector2(370,178))
+	rect(bag_scroll,content,Vector2(10,280),Vector2(312,142))
 	bag_grid = GridContainer.new()
 	bag_grid.columns = 6
 	bag_grid.add_theme_constant_override("h_separation",3)
 	bag_grid.add_theme_constant_override("v_separation",3)
-	bag_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bag_grid.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	bag_scroll.add_child(bag_grid)
 	for index: int in range(42):
 		var slot: VarendorItemSlot = VarendorItemSlot.new()
 		slot.owner_ui = app
 		slot.focus_mode = Control.FOCUS_NONE
-		slot.custom_minimum_size = Vector2(56,56)
-		slot.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		slot.custom_minimum_size = VarendorInterfacePolish.CELL
+		slot.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		slot.payload = {"kind":"bag","index":index,"item":{}}
 		bag_grid.add_child(slot)
 		app.bag_slots.append(slot)
-	app.inventory_footer = text(content,"◈ 0",Vector2(10,486),Vector2(230,18),11,Color("d3bd87"))
-	capacity_label = text(content,"0 / 42",Vector2(268,486),Vector2(112,18),11,Color("a6b1b3"))
+	app.inventory_footer = text(content,"◈ 0",Vector2(10,426),Vector2(230,18),11,Color("d3bd87"))
+	capacity_label = text(content,"0 / 42",Vector2(210,426),Vector2(112,18),11,Color("a6b1b3"))
 	capacity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	selection_label = text(content,"Выберите предмет",Vector2(10,504),Vector2(370,15),10,Color("c0c6be"))
+	selection_label = text(content,"Выберите предмет",Vector2(10,447),Vector2(312,15),10,Color("c0c6be"))
 	selection_label.clip_text = true
 	var action_scroll: ScrollContainer = ScrollContainer.new()
 	action_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
 	action_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	rect(action_scroll,content,Vector2(10,519),Vector2(370,25))
+	rect(action_scroll,content,Vector2(10,464),Vector2(312,22))
 	inventory_actions = HBoxContainer.new()
 	inventory_actions.add_theme_constant_override("separation",4)
 	action_scroll.add_child(inventory_actions)
-	inventory_status = text(content,"Наведение — свойства · двойной клик — действие",Vector2(10,544),Vector2(370,15),9,Color("86979c"))
+	inventory_status = text(content,"Наведение — свойства · двойной клик — действие",Vector2(10,487),Vector2(312,15),9,Color("86979c"))
 	inventory_status.clip_text = true
 	app.inventory_panel.hide()
 
 func layout() -> void:
 	if app == null or app.ui == null or dock == null: return
-	dock_height = 243 if app.full_quick else 151
-	var scale_value: float = minf(1.0,(app.ui.size.x-32)/DOCK_WIDTH)
-	dock.scale = Vector2.ONE*scale_value
+	dock_height = 245 if app.full_quick else 151
+	dock.scale = Vector2.ONE
 	dock.size = Vector2(DOCK_WIDTH,dock_height)
-	dock.position = Vector2((app.ui.size.x-DOCK_WIDTH*scale_value)*.5,app.ui.size.y-10-dock_height*scale_value)
+	var dock_settings: Dictionary = app.polish.layout_data.get("dock",{})
+	if not dock_settings.get("position") is Array: dock.position = Vector2((app.ui.size.x-DOCK_WIDTH)*.5,app.ui.size.y-10-dock_height)
 	hero_panel.position.y = dock_height-115
 	app.quick_panel_node.size.y = dock_height-32
 	dock.get_node("ReferenceMenu").position.y = dock_height-27
 	dock.get_node("QuickConsumables").position.y = dock_height-127
 	row_toggle.text = "2 ряда" if app.full_quick else "4 ряда"
-	log_panel.position.y = maxf(214,app.ui.size.y-dock_height*scale_value-22-155)
-	region_panel.size.y = minf(244,log_panel.position.y-184) if region_expanded else 24
+	if not app.polish.layout_data.get("chat",{}).get("position") is Array: log_panel.position = Vector2(12,maxf(220,app.ui.size.y-dock_height-245))
+	var map_panel: Control = minimap.get_parent()
+	map_panel.position = Vector2(app.ui.size.x-202,12)
+	region_panel.position = Vector2(map_panel.position.x,map_panel.position.y+map_panel.size.y+3)
+	region_panel.size.y = 202 if region_expanded else 24
 	region_text.size.y = maxf(0,region_panel.size.y-28)
-	effect_row.position.x = app.ui.size.x-350
-	var available: float = app.ui.size.y-maxf(96,dock_height*scale_value+24)-8
-	inventory_scale = maxf(.35,minf(1.0,minf((app.ui.size.x-16)/WINDOW_SIZE.x,available/WINDOW_SIZE.y)))
+	effect_row.position = Vector2(app.ui.size.x-555,12)
+	inventory_scale = 1.0
 	if app.inventory_panel != null:
-		app.inventory_panel.scale = Vector2.ONE*inventory_scale
+		app.inventory_panel.scale = Vector2.ONE
 		clamp_inventory()
+	if is_instance_valid(app.active_dialog):
+		app.active_dialog.size = app.active_dialog.size.min(app.ui.size-Vector2(24,24))
+		app.polish.clamp_panel(app.active_dialog)
 
 func clamp_inventory() -> void:
 	if app.inventory_panel == null: return
-	var clear_y: float = maxf(96,dock_height*dock.scale.y+24)
-	var maximum: Vector2 = Vector2(maxf(8,app.ui.size.x-WINDOW_SIZE.x*inventory_scale-8),maxf(8,app.ui.size.y-WINDOW_SIZE.y*inventory_scale-clear_y))
-	app.inventory_panel.position = app.inventory_panel.position.clamp(Vector2(8,8),maximum)
+	app.inventory_panel.position = app.inventory_panel.position.clamp(Vector2(8,8),(app.ui.size-WINDOW_SIZE-Vector2(8,8)).max(Vector2(8,8)))
 
 func refresh(hero: Dictionary) -> void:
 	hud_hero = hero.duplicate(true)
@@ -449,7 +451,7 @@ func refresh(hero: Dictionary) -> void:
 	for key: String in effect_labels:
 		var left: float = maxf(0,(float(hero.get("buffs",{}).get(key,0))-float(app.world.current_snapshot.get("time",0)))/1000)
 		effect_labels[key].panel.visible = left > 0
-		effect_labels[key].label.text = ("◈ Последний рубеж" if key == "guard" else "◌ Исчезновение")+" %.1f с" % left
+		effect_labels[key].label.text = ("◈ Последний рубеж" if key == "guard" else "» Стремительность" if key == "haste" else "◌ Исчезновение")+" %.1f с" % left
 	refresh_inventory_state()
 	refresh_consumables()
 
@@ -468,9 +470,10 @@ func refresh_consumables() -> void:
 			if item.id == action: quantity += int(item.count)
 		var code: int = int(app.game_settings.get("bindings",{}).get(action,KEY_Q if action == "potion" else KEY_E))
 		var key: String = OS.get_keycode_string(code)
-		potion_buttons[action].key.text = key
-		potion_buttons[action].count.text = ("Зелье " if action == "potion" else "Эфир ")+str(quantity)
-		potion_buttons[action].button.disabled = app.net.hero.get("dead",true) or quantity <= 0
+		potion_buttons[action].key_label = key
+		potion_buttons[action].quantity = quantity
+		potion_buttons[action].usable = not app.net.hero.get("dead",true) and quantity > 0
+		potion_buttons[action].queue_redraw()
 
 func refresh_inventory_state() -> void:
 	if app.net.hero.is_empty(): return
@@ -494,7 +497,8 @@ func refresh_inventory_state() -> void:
 	if enhancing: actions.append(["cancel-enhance","Отменить заточку"])
 	else:
 		if not selected.is_empty():
-			if app.selected_item.get("kind") == "equipment": actions.append(["use","Снять"])
+			if app.selected_item.get("kind") == "storage": actions.append(["use","Забрать в сумку"])
+			elif app.selected_item.get("kind") == "equipment": actions.append(["use","Снять"])
 			elif definition.has("slot"): actions.append(["use","Надеть"])
 			elif definition.get("type") == "consumable": actions.append(["use","Использовать"])
 			if app.selected_item.get("kind") == "bag": actions.append(["sell","Продать · %d ◈" % (floorf(float(definition.get("value",0))*.48)*int(selected.count))])
@@ -519,15 +523,13 @@ func refresh_inventory_state() -> void:
 	for slot: VarendorItemSlot in app.equipment_slots.values(): slot.queue_redraw()
 
 func has_item_version(reference: Dictionary) -> bool:
-	for item in app.net.hero.inventory + app.net.hero.equipment.values():
+	for item in app.net.hero.inventory + app.net.hero.equipment.values() + app.net.hero.get("storage",[]):
 		if item is Dictionary and str(item.get("uid","")) == str(reference.get("uid","")):
 			return item.id == reference.id and item.plus == reference.plus and item.count == reference.count
 	return false
 
 func send_chat() -> void:
-	if not chat.text.strip_edges().is_empty(): add_log("[Локально] %s: %s" % [app.net.hero.get("name",""),chat.text.strip_edges()],"system")
-	chat.text = ""
-	chat.release_focus()
+	app.polish.send_chat()
 
 func set_log_filter(value: String) -> void:
 	log_filter = value
@@ -545,38 +547,13 @@ func add_log(message: String, kind: String = "system") -> void:
 	render_log()
 
 func render_log() -> void:
-	app.log_text.clear()
-	for entry: Dictionary in log_entries:
-		if log_filter != "all" and entry.kind != log_filter: continue
-		app.log_text.push_color(Color({"system":"d6b06b","loot":"65c98d","combat":"e17271"}.get(entry.kind,"dddcd0")))
-		app.log_text.add_text(entry.stamp+entry.message+(" ×%d" % entry.count if entry.count > 1 else "")+"\n")
-		app.log_text.pop()
-	for index: int in range(log_filters.size()):
-		log_filters[index].modulate = Color.WHITE if ["all","combat","loot","system"][index] == log_filter else Color("a5a5a5")
+	app.polish.render_chat()
 
 func skills_dialog() -> void:
-	if app.net.hero.is_empty(): return
-	var box: VBoxContainer = app.dialog("Навыки",Vector2i(500,360))
-	for skill: Dictionary in app.data.classes[app.net.hero.classId].skills:
-		box.add_child(app.label(str(skill.name),16,Color("d4b273")))
-		var detail: Label = app.label(str(skill.get("desc",""))+"\nРесурс: %s · Перезарядка: %s с" % [skill.cost,skill.cd],12)
-		detail.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		box.add_child(detail)
+	app.polish.open_skills()
 
 func map_dialog() -> void:
-	var available: Vector2 = app.get_viewport().get_visible_rect().size
-	var width: int = mini(1010,int(available.x)-64)
-	var height: int = mini(680,int(available.y)-100)
-	var box: VBoxContainer = app.dialog("Карта Варендора",Vector2i(width,height))
-	app.active_dialog.set_meta("territory_map",true)
-	var view: Control = preload("res://scripts/reference_minimap.gd").new()
-	view.name = "TerritoryAtlas"
-	view.world = app.world
-	view.show_labels = true
-	view.custom_minimum_size = Vector2(width-28,height-34)
-	view.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_child(view)
+	app.polish.toggle_map()
 
 func item_rows(item: Dictionary) -> Array:
 	var result: Array = []

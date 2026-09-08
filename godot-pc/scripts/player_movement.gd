@@ -140,6 +140,13 @@ func reconcile(snapshot: Dictionary) -> bool:
 	if int(hero.lastInputSequence) >= last_sent_sequence:
 		intent_pending = false
 		manual_cancel_pending = false
+		if input_direction.is_zero_approx() and hero.get("destination") == null and bool(hero.get("autoAttack",false)) and hero.get("target") != null and input_mode in ["idle","combat"]:
+			input_mode = "combat"
+			combat_target = str(hero.target)
+			intent_pending = false
+		elif input_mode == "combat" and not bool(hero.get("autoAttack",false)) and not bool(hero.get("singleAttack",false)) and hero.get("skill") == null and hero.get("combatState","idle") == "idle":
+			input_mode = "idle"
+			combat_target = ""
 		if input_mode != "manual":
 			# A locally planned path starts on the input tick. Server paths are
 			# needed for blocked firing lines, not to rewind an already used path.
@@ -400,3 +407,4 @@ func render_pose(alpha: float) -> Dictionary:
 	# Render correction is swept too; smoothing never displays the hero inside a wall.
 	position = collision.resolve(position_value, position - position_value)
 	return {"x":position.x,"z":position.y,"yOffset":lerpf(previous_height,height,clampf(alpha,0,1)),"yaw":lerp_angle(previous_yaw,yaw,clampf(alpha,0,1)),"velocityX":actual_velocity.x,"velocityZ":actual_velocity.y,"verticalVelocity":vertical_velocity,"locomotionState":locomotion_state}
+

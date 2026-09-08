@@ -10,19 +10,20 @@ export type WorldMotion = { yOffset:number; grounded:boolean; yaw:number; action
 export type WorldCharacter = Position & WorldMotion & {
   id: string; name: string; classId: string; level: number; xp: number; gold: number;
   hp: number; mp: number; maxHp: number; maxMp: number; stats: EquipmentCombatStats;
+  storage?: Array<InventoryItem|null>;
   inventory: InventoryItem[]; equipment: Record<string, InventoryItem | undefined>;
   lootBuffer: InventoryItem[]; betaScrollGrant?: string; legacyScrolls?: number; quest: number; kills: number; bossKills: number;
-  dead: boolean; cooldowns: number[]; attackReadyAt: number; buffs: { guard: number; vanish: number };
+  dead: boolean; cooldowns: number[]; attackReadyAt: number; buffs: { guard: number; vanish: number; haste?:number };
   activeUntil: number; lastInputSequence: number; lastInputAt: number;
   navigationPath?:Position[];
   direction: Position; destination: Position | null; target: string | null; skill: number | null;
-  generation: number; autoAttack?:boolean; bufferedSkill?:{target:string;index:number;expiresAt:number};
+  generation: number; autoAttack?:boolean; singleAttack?:boolean; bufferedSkill?:{target:string;index:number;expiresAt:number};
 };
 export type WorldMonster = Position & WorldMotion & {
   uid: string; id: string; home: Position; regionId?: string; patrolIndex: number; patrolStep?:number;
   hp: number; alive: boolean; respawnAt: number; attackReadyAt: number; generation: number;
   phase: number; status: { slow: number; stun: number; dot: number; nextDot: number; dotOwner?: string };
-  owner?: string; aiState?: MonsterAiState; targetId?:string|null; deathAt?:number; corpseUntil?:number;
+  nightIndex?:number; pairId?:string; provokedBy?:string; owner?: string; aiState?: MonsterAiState; targetId?:string|null; deathAt?:number; corpseUntil?:number;
 };
 export type WorldSummon = Position & WorldMotion & { uid: string; owner: string; expiresAt: number; attackReadyAt: number };
 export type WorldEvent = {
@@ -33,6 +34,7 @@ export type WorldEvent = {
   gold?: number; xp?: number; items?: string[];
 };
 export type WorldSnapshot = {
+  environment?: import("../world/world-cycle.ts").WorldCycleSnapshot; chat?: WorldChatMessage[];
   contentVersion?: string; mapVersion?: string;
   protocol: typeof WORLD_PROTOCOL; time: number; revision: number; character: WorldCharacter;
   heroes: Array<Pick<WorldCharacter, 'id' | 'name' | 'classId' | 'level' | 'x' | 'z' | 'hp' | 'maxHp' | 'dead' | 'equipment' | 'generation' | keyof WorldMotion>>;
@@ -50,11 +52,15 @@ export type WorldCommand =
   | { type: 'teleport'; destination: string }
   | { type: 'respawn' }
   | { type: 'quest' }
-  | { type: 'collect' };
+  | { type: 'collect' }
+  | { type: 'storage'; direction:'deposit'|'withdraw'|'reorder'; item:ItemReference; index?:number }
+  | { type: 'chat'; channel:'world'|'trade'; text:string };
 export type WorldIntent =
   | { type: 'direction'; x: number; z: number }
   | { type: 'destination'; x: number; z: number }
-  | { type: 'attack'; entityId: string; skill: number | null }
+  | { type: 'attack'; entityId: string; skill: number | null; mode?:'single'|'auto' }
   | { type: 'jump' }
-  | { type: 'cancel' };
+  | { type: 'cancel'; preserveAuto?:boolean };
+export type WorldChatMessage={id:number;at:number;senderId:string;name:string;channel:'world'|'trade';text:string};
 export type CommandReceipt = { id: string; ok: boolean; reason?: string; at: number; outcome?: unknown };
+

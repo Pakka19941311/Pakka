@@ -29,6 +29,7 @@ static var cache: Dictionary = {}
 
 static func kind(item: Dictionary, definition: Dictionary = {}, empty_slot: String = "") -> String:
 	var id: String = str(item.get("id", ""))
+	if id == "haste": return "haste"
 	if "staff" in id or "root" in id: return "staff"
 	if "bow" in id: return "bow"
 	if "grimoire" in id: return "book"
@@ -47,6 +48,7 @@ static func kind(item: Dictionary, definition: Dictionary = {}, empty_slot: Stri
 	return "gem"
 
 static func texture(kind_value: String, empty: bool = false) -> Texture2D:
+	if kind_value == "haste": return preload("res://assets/icons/haste.svg")
 	var key: String = kind_value + (":empty" if empty else "")
 	if cache.has(key): return cache[key]
 	var color: String = "#829199" if empty else {"sword":"#d0d6c7","daggers":"#d0d6c7","staff":"#bfa7c9","book":"#bfa7c9","bow":"#c6ad80","ring":"#cbb581","neck":"#cbb581","ear":"#cbb581","scroll":"#cbb99a","potion":"#c6b6b3","ether":"#c6b6b3"}.get(kind_value,"#bbc8c9")

@@ -12,6 +12,9 @@ var texture: Texture2D
 static var textures: Dictionary = {}
 
 func _ready() -> void:
+	size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	custom_minimum_size = VarendorInterfacePolish.CELL
 	add_theme_stylebox_override("normal",VarendorReferenceHud.frame(Color("151e24"),Color("65707780"),0,1))
 	add_theme_stylebox_override("hover",VarendorReferenceHud.frame(Color("29343b"),Color("b7ad85"),0,1))
 	add_theme_stylebox_override("pressed",VarendorReferenceHud.frame(Color("354148"),Color("d5bd88"),0,1))
@@ -37,7 +40,7 @@ func _draw() -> void:
 	draw_style_box(VarendorReferenceHud.frame(background,Color("d5bd88") if selected else Color("65707780") if not item.is_empty() else Color("5968715c"),0,1),bounds)
 	draw_rect(bounds.grow(-1),Color("050a0dbb"),false,1)
 	if texture != null:
-		var dimensions: Vector2 = Vector2.ONE*(31 if item.is_empty() else 39 if payload.kind == "bag" else 37)
+		var dimensions: Vector2 = VarendorInterfacePolish.ICON
 		var origin: Vector2 = (size-dimensions)*.5-Vector2(0,3 if item.is_empty() else 0)
 		draw_texture_rect(texture,Rect2(origin,dimensions),false,Color(1,1,1,.29) if item.is_empty() else Color.WHITE)
 	var font: Font = get_theme_default_font()
@@ -61,10 +64,13 @@ func _get_drag_data(_position: Vector2):
 	if owner_ui.net.hero.get("dead",true) or owner_ui.net.command_busy or not owner_ui.selected_scroll.is_empty(): return null
 	if pressed_payload.is_empty() or pressed_payload.get("item",{}).is_empty() or not owner_ui.reference_hud.has_item_version(pressed_payload.item): return null
 	dragging = true
-	var preview: TextureRect = TextureRect.new()
-	preview.texture = texture
-	preview.custom_minimum_size = Vector2(58, 58)
-	preview.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	var preview: Control = Control.new()
+	var image: TextureRect = TextureRect.new()
+	image.texture = texture
+	image.size = VarendorInterfacePolish.ICON
+	image.position = -VarendorInterfacePolish.ICON*.5
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	preview.add_child(image)
 	set_drag_preview(preview)
 	return pressed_payload.duplicate(true)
 
@@ -73,8 +79,9 @@ func _can_drop_data(_position: Vector2, data) -> bool:
 	if data is not Dictionary or not data.has("item") or data.item.is_empty() or owner_ui.net.command_busy:
 		return false
 	if not owner_ui.reference_hud.has_item_version(data.item): return false
+	if payload.kind == "storage": return data.get("kind") in ["bag","storage"]
 	if payload.kind == "equipment":
-		if data.get("kind") == "equipment": return false
+		if data.get("kind") in ["equipment","storage"]: return false
 		var slot: String = owner_ui.data.items.get(data.item.id, {}).get("slot", "")
 		return str(payload.slot) in (["ring1", "ring2"] if slot == "ring" else ["ear1", "ear2"] if slot in ["ear", "earring"] else [slot])
 	return true

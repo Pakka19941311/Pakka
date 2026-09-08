@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 env:
-  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-world]') && 'world' || contains(github.event.head_commit.message, '[pc-forward-stop]') && 'stop-only' || contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
+  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-polish]') && 'polish' || contains(github.event.head_commit.message, '[pc-world]') && 'world' || contains(github.event.head_commit.message, '[pc-forward-stop]') && 'stop-only' || contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
 
 concurrency:
   group: godot-pc-preview-${{ github.ref }}
@@ -38,7 +38,10 @@ jobs:
           npm ci
       - name: Verify changed gameplay scenarios
         run: |
-          if [ "$VARENDOR_QA_SCOPE" = world ]; then
+          if [ "$VARENDOR_QA_SCOPE" = polish ]; then
+            npm run typecheck
+            node --experimental-strip-types --test tests/polish-server.test.mjs
+          elif [ "$VARENDOR_QA_SCOPE" = world ]; then
             node --experimental-strip-types --test tests/territory.test.mjs
           elif [ "$VARENDOR_QA_SCOPE" = stop-only ]; then
             node scripts/reference-gameplay-contract.mjs
@@ -62,10 +65,26 @@ jobs:
           VARENDOR_QA=0 VARENDOR_BETA=1 "$GITHUB_WORKSPACE/node_modules/.bin/vite" build --outDir "$RUNNER_TEMP/reference-dist"
           cd "$GITHUB_WORKSPACE"
           node scripts/reference-browser-capture.mjs --root "$RUNNER_TEMP/reference-dist" --output qa-artifacts/reference-browser --source-mode rebuilt
+      - name: Import changed scripts before world assembly
+        if: ${{ env.VARENDOR_QA_SCOPE == 'polish' }}
+        run: |
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee "$RUNNER_TEMP/early-godot-import.log"
+          python -c 'import pathlib,os; s=pathlib.Path(os.environ["RUNNER_TEMP"],"early-godot-import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-18000:]'
+      - name: Restore unchanged authored world
+        id: world_cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            godot-pc/generated/world.glb
+            godot-pc/generated/blender-build.json
+            godot-pc/generated/wildlife/
+            world-source/Varendor_PC_World.blend
+          key: territory-blender-4.5.9-${{ hashFiles('scripts/godot-pc-world.py', 'scripts/territory_art.py', 'src/world/territory-layout.ts', 'src/world/territory.ts', 'public/assets/world/world-topology.json') }}
       - name: Assemble the existing world in Blender
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs
-          "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py
+          if [ "${{ steps.world_cache.outputs.cache-hit }}" != true ]; then "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py; fi
       - name: Build original P1 world samples
         run: |
           "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-samples.py
@@ -84,7 +103,7 @@ jobs:
           if [ "$VARENDOR_QA_SCOPE" = stop-only ]; then
             python scripts/network-orbit-qa.py --godot "$GODOT" --output qa-artifacts/pc-linux/forward-stop-transport.json
           fi
-          if [ "$VARENDOR_QA_SCOPE" != world ]; then "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd; fi
+          if [ "$VARENDOR_QA_SCOPE" != world ] && [ "$VARENDOR_QA_SCOPE" != polish ]; then "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd; fi
           "$GODOT" --headless --path godot-pc --export-release 'Linux QA' "$PWD/qa-artifacts/pc-build/Varendor.x86_64"
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/pc-build/Varendor.exe"
           cp godot-pc/generated/blender-build.json qa-artifacts/pc-build/
@@ -93,7 +112,7 @@ jobs:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical --qa-scope=${{ env.VARENDOR_QA_SCOPE }}
       - name: Verify original samples in native Godot
-        if: ${{ !cancelled() && steps.native_export.outcome == 'success' && env.VARENDOR_QA_SCOPE != 'world' }}
+        if: ${{ !cancelled() && steps.native_export.outcome == 'success' && env.VARENDOR_QA_SCOPE != 'world' && env.VARENDOR_QA_SCOPE != 'polish' }}
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |

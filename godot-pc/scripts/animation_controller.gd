@@ -251,7 +251,7 @@ func sample_gait(speed: float, dt: float) -> void:
 	var walk_clip: String = find_clip(["walk", "running", "run", "flying"])
 	running_gait = use_run_gait(speed) and not run_clip.is_empty()
 	var next_gait: String = run_clip if running_gait else walk_clip
-	var native_speed: float = float(profile.get("run" if running_gait else "walk")) * height / float(profile.height)
+	var native_speed: float = float(profile.get("run" if running_gait else "walk")) * (clampf(height / float(profile.height),.55,1.25) if model == "Fox" else height / float(profile.height))
 	gait_clip = next_gait
 	playback_rate = speed / maxf(.01, native_speed)
 	# Distance-driven phase: feet stop immediately when the actual body stops,
@@ -335,3 +335,4 @@ func sample(clip: String, phase: float, looping: bool, dt: float) -> void:
 	# time and then seeking the authoritative phase keeps attacks and feet synced.
 	player.advance(dt)
 	player.seek(clampf(phase, 0, .999999) * clip_length(clip), true)
+

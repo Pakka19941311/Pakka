@@ -5,6 +5,14 @@ export type TerritoryPoint = {x:number;z:number};
 export const TERRITORY_VERSION = 3;
 export const START_POINT = {x:12,z:-9};
 export const SERVICES = {
+  'npc:alchemist':{name:'Алхимик Мира',model:'Monk',x:8,z:-12,role:'Алхимия'},
+  'npc:storage':{name:'Кладовщик Торв',model:'Rogue',x:-7,z:-12,role:'Склад · 500 ячеек'},
+  'npc:asterhold:shop':{name:'Торговец Эдрик',model:'Ranger',x:-98,z:-80,role:'Торговля'},
+  'npc:asterhold:elder':{name:'Старейшина Арден',model:'Warrior',x:-107,z:-80,role:'Задание'},
+  'npc:asterhold:smith':{name:'Кузнец Ульф',model:'Warrior',x:-117,z:-81,role:'Кузница'},
+  'npc:asterhold:teleport':{name:'Хранитель Ивен',model:'Wizard',x:-93,z:-84,role:'Переход'},
+  'npc:asterhold:alchemist':{name:'Алхимик Селин',model:'Monk',x:-109,z:-88,role:'Алхимия'},
+  'npc:asterhold:storage':{name:'Кладовщик Орен',model:'Rogue',x:-116,z:-90,role:'Склад · 500 ячеек'},
   'npc:shop':{name:'Торговка Эльза',model:'Ranger',x:0,z:-8,role:'Торговля'},
   'npc:elder':{name:'Староста Роэн',model:'Warrior',x:18,z:5,role:'Задание'},
   'npc:smith':{name:'Кузнец Бран',model:'Warrior',x:-12,z:7,role:'Кузница'},

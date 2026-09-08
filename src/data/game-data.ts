@@ -21,10 +21,13 @@ export const ITEMS = {
   weapon_scroll_improved:{name:'Свиток оружия · улучшенный',type:'enhance',icon:'▤',value:1850,desc:'Повышенный шанс заточки оружия. Не защищает от уничтожения.'},
   armor_scroll:{name:'Свиток доспехов · обычный',type:'enhance',icon:'▤',value:185,desc:'Доспехи, украшения, щит и фокус. Безопасно до +1.'},
   armor_scroll_improved:{name:'Свиток доспехов · улучшенный',type:'enhance',icon:'▤',value:1850,desc:'Доспехи, украшения, щит и фокус. Безопасно до +2; далее повышенный шанс.'},
+  haste:{name:'Зелье стремительности',type:'consumable',icon:'»',value:100,desc:'На 10 минут: бег +50%, скорость атаки +15%. Повторное использование обновляет время.'},
   potion:{name:'Багровое зелье',type:'consumable',icon:'♥',value:32,desc:'Восстанавливает 45% здоровья.'}, ether:{name:'Эфирное зелье',type:'consumable',icon:'◆',value:40,desc:'Восстанавливает 45% ресурса.'}, scroll:{name:'Свиток улучшения',type:'enhance',icon:'▤',value:185,desc:'Старый тип свитка, выведен из использования.'}, teleport:{name:'Камень возврата',type:'consumable',icon:'◉',value:90,desc:'Возвращает в Гринфолл.'}, wolf_fang:{name:'Клык серого волка',type:'material',icon:'⌁',value:12,origin:'Серые волки'}, black_bone:{name:'Чёрная кость',type:'material',icon:'╱',value:16,origin:'Безымянные мертвецы'}, venom:{name:'Ядовитая железа',type:'material',icon:'✾',value:19,origin:'Теневые пауки'}, iron:{name:'Кровавая руда',type:'material',icon:'◆',value:24,origin:'Одержимые рудокопы'}, boss_seal:{name:'Осколок печати владыки',type:'material',icon:'✺',value:750,origin:'Хозяин Гнилого Леса'}
 };
 
 export const MONSTERS = {
+  night_zombie:{name:'Ночной зомби',model:'Monk',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0x70885b,scale:.8,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['ember_ring',.01],['fang_necklace',.01]]},
+  night_skeleton:{name:'Лунный скелет',model:'Skeleton',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0xc3d1bd,scale:.78,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['ember_ring',.01],['fang_necklace',.01]]},
   wolf:{name:'Пепельный гончий',model:'Fox',level:1,hp:85,atk:10,xp:30,gold:[4,9],tint:0x8b8478,scale:.55,drops:[['wolf_fang',.78],['potion',.12],['wolf_gloves',.035]]},
   exile:{name:'Проклятый изгнанник',model:'Rogue',level:2,hp:110,atk:13,xp:42,gold:[6,13],tint:0x9d6a54,scale:.72,drops:[['ash_belt',.025]]},
   spider:{name:'Теневой слизень',model:'Slime',level:3,hp:125,atk:15,xp:54,gold:[7,15],tint:0x5b426d,scale:.62,drops:[['venom',.74],['ether',.11],['night_leather',.018]]},

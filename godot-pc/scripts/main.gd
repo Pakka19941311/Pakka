@@ -42,7 +42,7 @@ var selected_item: Dictionary = {}
 var last_direction: Vector2 = Vector2.ZERO
 var send_elapsed: float = 0.0
 var inventory_fingerprint: String = ""
-var active_dialog: Window
+var active_dialog: PanelContainer
 var qa_path: String = ""
 var qa_started: bool = false
 var qa_interaction: bool = false
@@ -68,8 +68,10 @@ var display_remaining: float = 0.0
 var display_countdown: Label
 var quick_panel_node: PanelContainer
 var reference_hud: VarendorReferenceHud = VarendorReferenceHud.new()
+var polish: VarendorInterfacePolish = VarendorInterfacePolish.new()
 
 func _ready() -> void:
+	polish.configure_startup(self)
 	if "--world-samples" in OS.get_cmdline_user_args():
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/art_review.tscn")
 		return
@@ -89,6 +91,7 @@ func _ready() -> void:
 	player_input.setup(world,net)
 	world.snapshot_presented.connect(present_snapshot)
 	build_ui()
+	polish.setup(self)
 	world.event_presented.connect(reference_hud.combat_event)
 	login.hide()
 	notice("Загрузка мира…")
@@ -118,7 +121,10 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
-		call_deferred("run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+		call_deferred("run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_polish_qa() -> void:
+	await preload("res://scripts/polish_acceptance.gd").run(self)
 
 func run_territory_qa() -> void:
 	await preload("res://scripts/territory_acceptance.gd").run(self)
@@ -212,6 +218,7 @@ func build_inventory() -> void:
 
 func snapshot_received(snapshot: Dictionary) -> void:
 	world.receive_snapshot(snapshot)
+	polish.refresh(snapshot)
 
 func present_snapshot(snapshot: Dictionary) -> void:
 	var hero: Dictionary = snapshot.character
@@ -300,6 +307,11 @@ func refresh_inventory() -> void:
 	reference_hud.refresh_inventory_state()
 
 func action_name(action: String) -> String:
+	if action.begins_with("item:"):
+		for item: Dictionary in net.hero.get("inventory",[]):
+			if str(item.uid) == action.trim_prefix("item:"): return item_name(item)
+		return "Предмет недоступен"
+	if data.items.has(action): return str(data.items[action].name)
 	if action.begins_with("skill:"):
 		var class_id: String = str(net.hero.get("classId", "knight"))
 		return data.classes[class_id].skills[int(action.trim_prefix("skill:"))].name
@@ -319,11 +331,17 @@ func refresh_quick() -> void:
 		slot.remaining = 0
 		slot.quantity = 0
 		slot.usable = not net.hero.get("dead", false)
-		if action in ["potion", "ether", "teleport"] and not hero.is_empty():
+		if action in ["potion", "ether", "teleport", "haste"] and not hero.is_empty():
 			for item: Dictionary in hero.inventory:
 				if item.id == action:
 					slot.quantity += int(item.count)
 			slot.usable = slot.usable and slot.quantity > 0
+		if action.begins_with("item:"):
+			slot.usable = false
+			for item: Dictionary in hero.get("inventory",[]):
+				if str(item.uid) == action.trim_prefix("item:"):
+					slot.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind(item,data.items.get(item.id,{})))
+					slot.usable = not net.hero.get("dead",false)
 		var icon: String = {"":"·","attack":"⚔","potion":"ОЗ","ether":"MP","teleport":"⌂"}.get(action, str(index % 8 + 1))
 		if action.begins_with("skill:"):
 			var skill_index: int = int(action.trim_prefix("skill:"))
@@ -342,7 +360,7 @@ func refresh_quick() -> void:
 		slot.symbol = str(data.classes[hero.get("classId","knight")].skills[int(action.trim_prefix("skill:"))].icon) if action.begins_with("skill:") else {"":"","attack":"⚔","potion":"♥","ether":"◆","teleport":"⌂"}.get(action,"")
 		slot.key_label = key
 		slot.queue_redraw()
-		slot.tooltip_text = title + "\nПКМ — назначение действия и клавиши"
+		slot.tooltip_text = title + "\nЛКМ и перенос — переставить; вне панели — убрать.\nПКМ — действие и клавиша."
 		slot.visible = index < 16 or full_quick
 	reference_hud.refresh_consumables()
 
@@ -359,7 +377,7 @@ func load_preferences(id: String) -> void:
 				continue
 			var action: String = str(values[index].get("action", ""))
 			var key: String = str(values[index].get("key", ""))
-			if action in ["", "attack", "potion", "ether", "teleport", "skill:0", "skill:1", "skill:2", "skill:3"]:
+			if action.begins_with("item:") or action in ["", "attack", "potion", "ether", "teleport", "haste", "skill:0", "skill:1", "skill:2", "skill:3"]:
 				quick[index].action = action
 			quick[index].key = key if key in data.quickKeys and key not in used else ""
 			if not quick[index].key.is_empty():
@@ -368,7 +386,8 @@ func load_preferences(id: String) -> void:
 	var reference_camera: bool = preferences.get("camera_reference","") == "1e94a0d1"
 	world.camera_distance = clampf(float(preferences.get("camera_distance",10.5)) if reference_camera else 10.5,5.5,18)
 	preferences["camera_reference"] = "1e94a0d1"
-	game_settings = preferences.get("settings", {})
+	game_settings = preferences.get("settings", {}).duplicate(true)
+	for key: String in ["display","resolution","ui_scale"]: game_settings[key] = polish.startup_display.get(key,1)
 	configure_input()
 	full_quick = bool(preferences.get("full_quick", false))
 	if preferences.get("hud_reference", "") == "1e94a0d1" and preferences.get("inventory_position") is Array and preferences.inventory_position.size() == 2:
@@ -377,6 +396,7 @@ func load_preferences(id: String) -> void:
 		inventory_panel.position = Vector2(ui.size.x - 410, 58)
 		keep_inventory_visible()
 	apply_settings()
+	polish.load_layout()
 	refresh_quick()
 
 func save_preferences() -> void:
@@ -390,60 +410,29 @@ func save_preferences() -> void:
 	preferences["inventory_position"] = [inventory_panel.position.x, inventory_panel.position.y]
 	preferences["hud_reference"] = "1e94a0d1"
 	preferences["settings"] = game_settings
+	polish.save_display()
 	if not net.save_private_json(preference_path, preferences):
 		notice("Не удалось сохранить назначения клавиш")
 
 func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer:
-	# Embedded exclusive windows receive their own input events. Return the
-	# cursor before transferring focus so RMB release cannot become stranded.
 	world.camera_controller.release_for_modal()
-	if is_instance_valid(active_dialog):
-		close_dialog()
-	active_dialog = Window.new()
-	active_dialog.title = title
-	active_dialog.size = size + Vector2i(0, 36)
-	active_dialog.transient = true
-	active_dialog.exclusive = true
-	active_dialog.theme = ui.theme
-	add_child(active_dialog)
-	active_dialog.close_requested.connect(func():
-		rebinding_action = ""
-		if not display_before.is_empty():
-			revert_display()
-		close_dialog())
-	active_dialog.window_input.connect(func(event: InputEvent):
-		if event is InputEventKey and event.pressed and event.physical_keycode == KEY_M and active_dialog.get_meta("territory_map",false):
-			active_dialog.set_input_as_handled()
-			close_dialog()
-			return
-		if not rebinding_action.is_empty() and event is InputEventKey and event.pressed and not event.echo and event.physical_keycode != KEY_ESCAPE:
-			active_dialog.set_input_as_handled()
-			assign_movement_binding(event)
-			return
-		if event is InputEventKey and event.pressed and event.physical_keycode in [KEY_ESCAPE, KEY_TAB]:
-			if not display_before.is_empty():
-				revert_display()
-			rebinding_action = ""
-			active_dialog.set_input_as_handled()
-			close_dialog())
-	var panel: PanelContainer = PanelContainer.new()
-	active_dialog.add_child(panel)
-	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var box: VBoxContainer = VBoxContainer.new()
-	box.add_theme_constant_override("separation", 10)
-	panel.add_child(box)
-	var title_bar: HBoxContainer = HBoxContainer.new()
-	box.add_child(title_bar)
-	var heading_label: Label = label(title, 16, Color("dfc591"))
-	heading_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	title_bar.add_child(heading_label)
-	title_bar.add_child(button("×", close_dialog))
-	active_dialog.popup_centered()
-	return box
+	if is_instance_valid(active_dialog): close_dialog()
+	active_dialog = polish.floating(title,Vector2(size)+Vector2(0,40))
+	var shell: VBoxContainer = polish.shell(active_dialog,title,close_dialog,"dialog")
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.name = "DialogScroll"
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	shell.add_child(scroll)
+	var body: VBoxContainer = VBoxContainer.new()
+	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	body.add_theme_constant_override("separation",10)
+	scroll.add_child(body)
+	return body
 
 func assign_dialog(index: int) -> void:
 	var box: VBoxContainer = dialog("Назначение ячейки " + str(index + 1))
-	var actions: Array = ["", "attack", "potion", "ether", "teleport", "skill:0", "skill:1", "skill:2", "skill:3"]
+	var actions: Array = ["", "attack", "potion", "ether", "teleport", "haste", "skill:0", "skill:1", "skill:2", "skill:3"]
 	var action_select: OptionButton = OptionButton.new()
 	for action: String in actions:
 		action_select.add_item(action_name(action))
@@ -479,6 +468,7 @@ func controls_dialog() -> void:
 		match title:
 			"Игра":
 				setting_toggle(page, "Имена над персонажами", "names", true)
+				setting_toggle(page, "Панель быстрого доступа", "quick_visible", true)
 				setting_choice(page, "Масштаб интерфейса", "ui_scale", ["80%", "100%", "125%", "150%"], 1)
 				setting_choice(page, "Громкость боя", "combat_volume", ["Выкл.", "25%", "50%", "75%", "100%"], 3)
 				setting_choice(page, "Звуки окружения", "ambient_volume", ["Выкл.", "25%", "50%", "75%", "100%"], 2)
@@ -492,7 +482,7 @@ func controls_dialog() -> void:
 				setting_choice(page, "Декоративная растительность", "vegetation", ["24 м", "45 м", "80 м"], 2)
 				setting_choice(page, "Разрешение 3D", "render_scale", ["50%", "75%", "100%"], 2)
 			"Управление":
-				page.add_child(label("ЛКМ по земле — движение. ЛКМ по врагу — атака.\nЗажатая ПКМ — вращение камеры. Колесо — масштаб.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nПКМ по быстрой ячейке — действие и клавиша.", 15))
+				page.add_child(label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. K — автобег, N — навыки.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
 				setting_toggle(page, "Инвертировать камеру по вертикали", "invert_y", false)
 				page.add_child(label("Чувствительность мыши"))
 				var slider: HSlider = HSlider.new()
@@ -513,7 +503,7 @@ func controls_dialog() -> void:
 						binding_message = label("Нажмите одну клавишу. Esc — отмена.", 15)
 						prompt.add_child(binding_message)))
 			"Дисплей":
-				setting_choice(page, "Режим экрана", "display", ["Оконный", "Без рамки", "Полный экран"], 0)
+				setting_choice(page, "Режим экрана", "display", ["Оконный", "Без рамки", "Полный экран"], 1)
 				var names: Array = []
 				for resolution: Vector2i in window_resolutions():
 					names.append("%d × %d" % [resolution.x, resolution.y])
@@ -540,7 +530,7 @@ func setting_choice(parent: Control, title: String, key: String, choices: Array,
 	choice.selected = clampi(int(game_settings.get(key, fallback)), 0, choices.size() - 1)
 	parent.add_child(choice)
 	choice.item_selected.connect(func(value: int):
-		var previous: Dictionary = {"display":game_settings.get("display", 0),"resolution":game_settings.get("resolution", 1)}
+		var previous: Dictionary = {"display":game_settings.get("display", 1),"resolution":game_settings.get("resolution", 1)}
 		game_settings[key] = value
 		if key in ["display", "resolution"]:
 			confirm_display(previous)
@@ -581,14 +571,7 @@ func apply_settings() -> void:
 	Engine.max_fps = [30, 60, 120, 0][clampi(int(game_settings.get("fps", 1)), 0, 3)]
 	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if game_settings.get("vsync", true) else DisplayServer.VSYNC_DISABLED)
-		var mode: int = clampi(int(game_settings.get("display", 0)), 0, 2)
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN if mode == 2 else DisplayServer.WINDOW_MODE_WINDOWED)
-		DisplayServer.window_set_flag(DisplayServer.WINDOW_FLAG_BORDERLESS, mode == 1)
-		if mode == 0:
-			var resolutions: Array = window_resolutions()
-			var requested: Vector2i = resolutions[clampi(int(game_settings.get("resolution", 1)), 0, resolutions.size() - 1)]
-			if DisplayServer.window_get_size() != requested:
-				DisplayServer.window_set_size(requested)
+		polish.apply_display()
 	call_deferred("keep_inventory_visible")
 
 func configure_input() -> void:
@@ -606,7 +589,7 @@ func configure_input() -> void:
 
 func assign_movement_binding(event: InputEventKey) -> void:
 	var key: int = event.physical_keycode
-	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_K, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
+	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_K, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
 		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, K / M, Enter и 1–8 заняты интерфейсом."
 		return
 	var bindings: Dictionary = game_settings.get("bindings", {}).duplicate()
@@ -664,18 +647,17 @@ func interact() -> void:
 	npc_interaction.begin(world.target_id)
 
 func open_npc_service(id: String) -> void:
-	if id == "npc:shop":
-		var box: VBoxContainer = dialog("Лавка Эльзы")
-		box.add_child(label("Продажа выбранного предмета — в инвентаре."))
-		for item_id: String in ["potion", "ether", "teleport"]:
-			var buy: Button = button(data.items[item_id].name + " · " + str({"potion":55,"ether":70,"teleport":130}[item_id]) + " золота", func():
-				var before_gold: int = int(net.hero.gold)
-				await net.command({"type":"buy","itemId":item_id})
-				if int(net.hero.gold) < before_gold: notice("Покупка получена: " + str(data.items[item_id].name)))
-			buy.set_meta("npc_action","buy:"+item_id)
-			box.add_child(buy)
-	elif id == "npc:elder":
-		var box: VBoxContainer = dialog("Староста Роэн",Vector2i(480,240))
+	var service: Dictionary = VarendorNpcInteraction.SERVICES.get(id,{})
+	var kind: String = id.get_slice(":",id.get_slice_count(":")-1)
+	if kind in ["shop","alchemist"]:
+		polish.shop(kind,str(service.get("name","Торговля")))
+		return
+	if kind == "storage":
+		polish.open_storage()
+		return
+	id = "npc:"+kind
+	if id == "npc:elder":
+		var box: VBoxContainer = dialog(str(service.get("name","Старейшина")),Vector2i(480,240))
 		var progress: Array[String] = ["За стенами снова слышен вой. Восемь тварей — и я поверю, что ты способен пережить эту ночь.","Очищай дорогу за стенами города. Побеждено тварей: %d / 8." % mini(int(net.hero.kills),8),"Теперь отыщи Кровавого Оборотня в Чёрном лесу.","Спустись к шахте и победи Хозяина Гнилого Леса.","Ты прошёл этот путь. Продолжай охоту и укрепляй своё снаряжение."]
 		var quest_text: Label = label(progress[clampi(int(net.hero.quest),0,4)])
 		quest_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -692,7 +674,7 @@ func open_npc_service(id: String) -> void:
 		refresh_inventory()
 		notice("Бран: дважды нажмите свиток, затем один раз — предмет. Свитки добываются с монстров.")
 	elif id == "npc:teleport":
-		var box: VBoxContainer = dialog("Проводник Каэль", Vector2i(480, 320))
+		var box: VBoxContainer = dialog(str(service.get("name","Переход")), Vector2i(480, 320))
 		box.add_child(label("Переход в столицу бесплатен."))
 		for destination: String in ["Астерхолд", "Гринфолл", "Чёрный лес", "Вход в шахту"]:
 			var price: Array = {"Астерхолд":[0,1],"Гринфолл":[25,1],"Чёрный лес":[90,10],"Вход в шахту":[150,10]}[destination]
@@ -706,7 +688,13 @@ func open_npc_service(id: String) -> void:
 func activate(action: String) -> void:
 	if net.hero.is_empty() or net.hero.dead or not net.connected:
 		return
-	if action in ["potion", "ether", "teleport"]:
+	if action.begins_with("item:"):
+		for item: Dictionary in net.hero.inventory:
+			if str(item.uid) == action.trim_prefix("item:"):
+				selected_item = {"kind":"bag","item":item.duplicate()}; use_selected(); return
+		notice("Предмет недоступен в сумке")
+		return
+	if action in ["potion", "ether", "teleport", "haste"]:
 		for item: Dictionary in net.hero.inventory:
 			if item.id == action:
 				net.command({"type":"use","item":item.duplicate()})
@@ -719,12 +707,18 @@ func activate(action: String) -> void:
 		if not self_cast and (world.target_id.is_empty() or world.target_id.begins_with("npc:")):
 			notice("Выберите противника щелчком мыши")
 			return
-		net.intent({"type":"attack","entityId":"@self" if self_cast else world.target_id,"skill":index if index >= 0 else null})
+		if index >= 0:
+			if float(net.hero.cooldowns[index]) > float(net.last_time) or float(net.hero.mp) < float(skill.cost): return
+			world.predict_skill(index)
+		net.intent({"type":"attack","entityId":"@self" if self_cast else world.target_id,"skill":index if index >= 0 else null,"mode":"auto" if index < 0 else "single"})
 
 func item_clicked(payload: Dictionary, double_click: bool) -> void:
 	if net.command_busy:
 		return
 	selected_item = payload.duplicate(true)
+	if payload.get("kind") == "storage":
+		if double_click and not payload.get("item",{}).is_empty(): net.command({"type":"storage","direction":"withdraw","item":payload.item.duplicate()})
+		return
 	if payload.get("kind") == "equipment":
 		chosen_equipment = str(payload.slot)
 	var item: Dictionary = payload.get("item", {})
@@ -744,6 +738,9 @@ func use_selected() -> void:
 	if net.hero.get("dead",true) or net.command_busy: return
 	var item: Dictionary = selected_item.get("item", {})
 	if item.is_empty():
+		return
+	if selected_item.get("kind") == "storage":
+		net.command({"type":"storage","direction":"withdraw","item":item.duplicate()})
 		return
 	if not data.items.has(item.id):
 		notice("Этот предмет сохранён, но пока не поддерживается клиентом")
@@ -772,6 +769,12 @@ func sell_selected() -> void:
 
 func drop_item(source: Dictionary, destination: Dictionary) -> void:
 	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(source.item): return
+	if destination.kind == "storage":
+		net.command({"type":"storage","direction":"reorder" if source.kind == "storage" else "deposit","item":source.item.duplicate(),"index":int(destination.index)})
+		return
+	if source.kind == "storage":
+		net.command({"type":"storage","direction":"withdraw","item":source.item.duplicate()})
+		return
 	if source.kind == "equipment" and destination.kind == "equipment": return
 	if destination.kind == "equipment":
 		net.command({"type":"equip","item":source.item.duplicate(),"slot":destination.slot})
@@ -792,7 +795,7 @@ func toggle_inventory() -> void:
 func notice(message: String) -> void:
 	if not qa_path.is_empty():
 		print("VARENDOR_QA_NOTICE " + message)
-	var translations: Dictionary = {"shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
+	var translations: Dictionary = {"storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
 	if log_text != null:
 		var translated: String = str(translations.get(message,message))
 		reference_hud.add_log(translated,"loot" if translated.begins_with("Добыча:") else "system")
@@ -800,7 +803,7 @@ func notice(message: String) -> void:
 		print(message)
 
 func text_focused() -> bool:
-	return get_viewport().gui_get_focus_owner() is LineEdit or is_instance_valid(active_dialog) or (login != null and login.visible)
+	return get_viewport().gui_get_focus_owner() is LineEdit or (is_instance_valid(active_dialog) and not active_dialog.get_meta("nonmodal",false)) or (login != null and login.visible)
 
 func _process(delta: float) -> void:
 	if world == null or net == null:
@@ -810,6 +813,7 @@ func _process(delta: float) -> void:
 	# applying a release in the first catch-up tick retroactively erases elapsed
 	# movement while the server has already simulated it, causing a later slide.
 	# Only input sampling moves here; the motor still integrates fixed 60 Hz ticks.
+	polish.process(delta)
 	player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
 	if not display_before.is_empty():
 		display_remaining -= delta
@@ -851,6 +855,7 @@ func _physics_process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_ESCAPE: player_input.autorun = false
 		if event.physical_keycode == KEY_F3:
 			diagnostics.visible = not diagnostics.visible
 			return
@@ -895,7 +900,8 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 		match event.physical_keycode:
 			KEY_I, KEY_C, KEY_TAB: toggle_inventory()
-			KEY_K: reference_hud.skills_dialog()
+			KEY_N: reference_hud.skills_dialog()
+			KEY_K: player_input.autorun = not player_input.autorun
 			KEY_M: reference_hud.map_dialog()
 			KEY_ENTER: reference_hud.chat.grab_focus()
 		if event.is_action_pressed("jump"):
@@ -918,6 +924,20 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]: save_preferences()
 
 func _input(event: InputEvent) -> void:
+	if player_input != null and player_input.release_buttons(event):
+		get_viewport().set_input_as_handled()
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if polish.dragging_quick and event.physical_keycode == KEY_ESCAPE: polish.drag_cancelled = true
+		if is_instance_valid(polish.atlas) and event.physical_keycode in [KEY_M,KEY_ESCAPE]:
+			polish.toggle_map(); get_viewport().set_input_as_handled(); return
+		if is_instance_valid(polish.storage_panel) and event.physical_keycode == KEY_ESCAPE:
+			polish.storage_panel.queue_free(); polish.storage_panel = null; get_viewport().set_input_as_handled(); return
+		if is_instance_valid(active_dialog):
+			if not rebinding_action.is_empty() and event.physical_keycode != KEY_ESCAPE:
+				assign_movement_binding(event); get_viewport().set_input_as_handled(); return
+			if event.physical_keycode in [KEY_ESCAPE,KEY_TAB]:
+				close_dialog(); get_viewport().set_input_as_handled(); return
 	if world != null and net != null:
 		player_input.handle_keyboard(event, not text_focused() and net.connected and not bool(net.hero.get("dead", true)))
 	if world != null and world.camera_controller.handle_captured_input(event): get_viewport().set_input_as_handled()
@@ -1067,7 +1087,7 @@ func run_qa() -> void:
 	checks["movement_binding_persist"] = InputMap.event_is_action(forward_key, "move_forward") and not InputMap.event_is_action(former_key, "move_forward")
 	game_settings["bindings"] = {}
 	configure_input()
-	var prior_display: Dictionary = {"display":game_settings.get("display", 0),"resolution":game_settings.get("resolution", 1)}
+	var prior_display: Dictionary = {"display":game_settings.get("display", 1),"resolution":game_settings.get("resolution", 1)}
 	game_settings["resolution"] = 0
 	confirm_display(prior_display)
 	display_remaining = .1
@@ -1118,13 +1138,12 @@ func run_qa() -> void:
 	get_tree().quit(0 if success else 2)
 
 func close_dialog() -> void:
-	var closing: Window = active_dialog
+	var closing: PanelContainer = active_dialog
 	active_dialog = null
 	rebinding_action = ""
 	if not display_before.is_empty(): revert_display()
 	if is_instance_valid(closing):
 		closing.hide()
-		closing.exclusive = false
 		closing.queue_free()
 
 func system_menu() -> void:
