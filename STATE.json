@@ -6,18 +6,18 @@
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/forward-stop-final-reviewed",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "72b3e30bd5b5e03974008b81396a19c9b5073c30",
+  "observed_head": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
   "client_language_proposed": "typed GDScript",
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
-  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
+  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать.",
   "current_phase": "P1 — world territory and map",
-  "current_task": "Implement approved world visual and territory organization, then deliver native PC test",
+  "current_task": "Approved territory and in-game atlas implemented and Windows test ZIP published; awaiting owner visual review",
   "next_task_after_authorization": null,
-  "next_action": "Build and inspect the territory candidate, publish Windows ZIP after scoped runtime gates",
+  "next_action": "Owner reviews the populated territory and M atlas on PC; agree the next block before implementation. Do not repeat accepted movement/NPC checks.",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -2008,8 +2008,8 @@
   "allowed_scope": [
     "Approved territory/world environment and in-game atlas from TZ v2.0; directly affected geometry, migration and route checks only"
   ],
-  "current_substep": "Territory implemented; native build pending",
-  "working_commit": "72b3e30bd5b5e03974008b81396a19c9b5073c30",
+  "current_substep": "Territory c0f4d7809af9: scoped native/Windows gates passed, public ZIP verified",
+  "working_commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -2053,7 +2053,7 @@
   "build_refs": [
     {
       "commit": "88838a79c9b544a7918ac1064568d00ed4d57be4",
-      "kind": "current Linux production build, no browser runtime",
+      "kind": "historical Linux production build, no browser runtime",
       "evidence": "docs/migration/p0/evidence/build.log.txt"
     },
     {
@@ -2070,17 +2070,24 @@
     },
     {
       "commit": "888dd637bde85ec9c892157728de34508c8545a6",
-      "kind": "current core gameplay refactor; tested Windows Godot + portable server",
+      "kind": "historical core gameplay refactor; tested Windows Godot + portable server",
       "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-888dd637bde8",
       "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-888dd637bde8/Varendor_Godot_PC_888dd637bde8.zip",
       "evidence": "docs/migration/pc/CORE_GAMEPLAY_REFACTOR.md"
     },
     {
       "commit": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f",
-      "kind": "current forward-stop follow-up; city NPC accepted; owner Windows stopping test pending",
+      "kind": "Historical forward-stop follow-up; stopping and city NPC accepted by owner",
       "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-e4baa58e0239",
       "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-e4baa58e0239/Varendor_Godot_PC_e4baa58e0239.zip",
       "evidence": "docs/migration/pc/FORWARD_STOP_FIX.md"
+    },
+    {
+      "commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+      "kind": "Current populated territory and M atlas Windows test build; owner visual acceptance pending",
+      "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
+      "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_Godot_PC_c0f4d7809af9.zip",
+      "evidence": "docs/migration/pc/WORLD_TERRITORY.md"
     }
   ],
   "definitions": {
@@ -4103,21 +4110,23 @@
     }
   ],
   "publication": {
-    "content_commit": "888dd637bde85ec9c892157728de34508c8545a6",
-    "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-888dd637bde8",
-    "branch": "work/godot-migration-p0",
-    "remote_tree_matched_local_index": true,
+    "content_commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+    "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
+    "branch": "work/godot-p1-recovery",
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
     "personal_database_uploaded": false,
     "p1_started": true,
-    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-888dd637bde8",
-    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-888dd637bde8/Varendor_Godot_PC_888dd637bde8.zip",
-    "bytes": 296778603,
-    "sha256": "82f45fb57f65e5f82308c3a500e9a9a49350c4bb50359c8d7f4cfe7e568be379",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_Godot_PC_c0f4d7809af9.zip",
+    "bytes": 334320935,
+    "sha256": "539aecd64ac0d08a5ff0323a2c0d41f16ad6c1572daf9d5f2725bbb163aa55b6",
     "native_windows_headless_passed": true,
     "native_linux_graphics_passed": true,
     "windows_gpu_verified": false,
-    "direct_download_verified": true
+    "direct_download_verified": true,
+    "qa_scope": "territory-world-map",
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34226105212",
+    "source_changes_published_with_base_tree_preserved": true
   },
   "resolved_defects": [
     {
@@ -4233,7 +4242,7 @@
     "windows_executable": "passed shipped EXE and portable Node headless; Windows GPU not verified",
     "player_database_accessed": false,
     "owner_visual_acceptance": "pending new package",
-    "p1_next": "Owner test of territory and M atlas; agree the next block before implementing it",
+    "p1_next": "Owner reviews the populated territory and M atlas on PC; agree the next block before implementation. Do not repeat accepted movement/NPC checks.",
     "source_changes": "mouse / combat / collisions / inventory / settings / SSE / teleport / loot; existing economy and IDs retained",
     "sample_review": "native six-asset scene passed; 18 views inspected; own Blender source/packed PBR/GLB included; owner acceptance pending",
     "session_safety": "generation invalidates old HTTP responses; per-hero command journals survive profile changes",
@@ -4269,7 +4278,8 @@
     "zip_bytes": 295813608,
     "sha256": "43e5042a1167ff8179e3d84e6e6361027943b111b2f0b989ec9d036e3f97ddf3",
     "direct_download_verified": true,
-    "publication": "passed exact source ZIP verification and public re-download"
+    "publication": "passed exact source ZIP verification and public re-download",
+    "status": "historical_recovery_superseded_by_territory_followup"
   },
   "gameplay_feedback_2026_09_07": {
     "status": "historical_build_superseded_by_core_gameplay_refactor",
@@ -4487,7 +4497,7 @@
     "date": "2026-09-08",
     "branch": "work/godot-p1-recovery",
     "authorized_by": "На основании утверждённого визуального эталона и организации территории ТЗ делай",
-    "status": "implemented-awaiting-native-build-and-visual-review",
+    "status": "published-awaiting-owner-visual-review",
     "source_document": "Varendor_Migration_TZ_v2_0(4).docx",
     "source_sha256": "c9ef25a3219a7ca4f41acc4c448a09551957ad9d9ed7ae55709338c61606a89d",
     "scope": [
@@ -4500,7 +4510,6 @@
       "passed": 15,
       "failed": 0
     },
-    "map_version": 3,
     "owner_visual_acceptance": false,
     "report": "docs/migration/pc/WORLD_TERRITORY.md",
     "first_native_attempt": {
@@ -4511,6 +4520,57 @@
       "map_M_zoom_north_close": true,
       "initial_enemies": 53,
       "failure": "Test expected a Window for smith; accepted smith opens inventory. Harness corrected to service signal + appropriate UI. No release published."
+    },
+    "territory_version": 3,
+    "build_commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34226105212",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_Godot_PC_c0f4d7809af9.zip",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
+    "zip_bytes": 334320935,
+    "sha256": "539aecd64ac0d08a5ff0323a2c0d41f16ad6c1572daf9d5f2725bbb163aa55b6",
+    "direct_download_verified": true,
+    "owner_test_required": true,
+    "windows_gpu_verified": false,
+    "native_runtime": {
+      "scope": "territory-world-map",
+      "linux_graphics_passed": true,
+      "linux_boolean_checks_passed": 23,
+      "windows_headless_passed": true,
+      "windows_boolean_checks_passed": 22,
+      "failed": 0,
+      "numeric_ui_counts": "5 existing metadata counts, not additional gameplay acceptance tests",
+      "save_restart_and_map_version_passed": true,
+      "fixture": "isolated synthetic database; player database not accessed"
+    },
+    "world_stats": {
+      "placements": 4592,
+      "trees": 271,
+      "wildlife": [
+        "crow",
+        "hare"
+      ],
+      "static_batches": 1566,
+      "blend_bytes": 529978149,
+      "glb_bytes": 245599972
+    },
+    "evidence": [
+      "docs/migration/pc/evidence/territory-linux-integration.json",
+      "docs/migration/pc/evidence/territory-windows-integration.json",
+      "docs/migration/pc/evidence/territory-blender-build.json",
+      "docs/migration/pc/evidence/territory-publish-result.json"
+    ],
+    "native_screenshots": [
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/territory-courtyard.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/territory-gate.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/territory-forest.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/territory-atlas.jpg"
+    ],
+    "source_archive": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_World_Source.zip",
+    "visual_review": {
+      "reviewed": true,
+      "source": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+      "frames": 4,
+      "result": "Darker slate and stone visible, forest undergrowth present, atlas geography readable. Native Linux Mesa screenshots reviewed; owner PC visual acceptance pending."
     }
   },
   "owner_latest_feedback": "Остановка принята: все хорошо, скольжение ушло. Следующий разрешённый блок — мир и карта по утверждённому визуалу и организации территории ТЗ. Лишние проверки исключить; дальнейшие блоки сначала согласовать."

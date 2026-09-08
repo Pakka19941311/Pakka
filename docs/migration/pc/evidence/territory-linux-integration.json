@@ -1,0 +1,52 @@
+{
+  "checks": [
+    "verified clone: all five tables, full state and UIDs",
+    "one process per native saved world",
+    "exported native client: authored territory, moved service anchors, gates, forest encounter, danger shortcut, M atlas and runtime views",
+    "territory package restart: identical mapVersion, character identity, equipment and inventory; original database unchanged"
+  ],
+  "graphicalEnvironment": "native Godot under Xvfb/Mesa; software rendering",
+  "native": {
+    "checks": {
+      "atlas_north_projection": true,
+      "atlas_zoom": true,
+      "bag_slots": 42,
+      "classes": 5,
+      "connected": true,
+      "equipment_slots": 12,
+      "fifty_three_initial_enemies": true,
+      "first_forest_encounter_server_hit": true,
+      "forest_zone_caption": true,
+      "four_services_six_residents": true,
+      "graded_world_materials": true,
+      "item_definitions": 33,
+      "m_closes_atlas": true,
+      "m_opens_full_atlas": true,
+      "native_render": true,
+      "quick_slots": 32,
+      "r01_gate_road_forest_traversed": true,
+      "r01_return_through_west_gate": true,
+      "r02_danger_shortcut_and_return": true,
+      "relocated_service_npc:elder": true,
+      "relocated_service_npc:shop": true,
+      "relocated_service_npc:smith": true,
+      "relocated_service_npc:teleport": true,
+      "settlement_zone_captions": true,
+      "territory_landmarks": true,
+      "territory_version": true,
+      "wildlife_two_loaded_species": true,
+      "wind_materials_bound": true
+    },
+    "display": "X11",
+    "godot": "4.6.3-stable (official)",
+    "notes": "Changed territory only: actual exported native movement through new gates, relocated services, first forest encounter, danger shortcut, atlas and runtime scene captures. Linux Mesa graphics; Windows headless is not a Windows GPU test.",
+    "ok": true,
+    "scope": "territory-world-map"
+  },
+  "node": "v24.20.0",
+  "ok": true,
+  "platform": "linux",
+  "scope": "isolated synthetic territory fixture only",
+  "source": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+  "windowsGraphics": false
+}
