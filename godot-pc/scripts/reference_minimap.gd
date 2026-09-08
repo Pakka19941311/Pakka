@@ -39,7 +39,8 @@ func _draw() -> void:
 	draw_polyline(road,Color("847252"),maxf(.8,4*ratio),true)
 	for monster: Dictionary in world.current_snapshot.get("monsters",[]):
 		if not monster.get("alive",false): continue
-		var boss: bool = bool(world.data.monsters.get(monster.id,{}).get("boss",false))
+		# Catalog boss is a category string (mini/big), not a Boolean.
+		var boss: bool = world.data.monsters.get(monster.id,{}).get("boss", "") in ["mini", "big"]
 		draw_circle(map_point(float(monster.x),float(monster.z)),maxf(.8,(5 if boss else 2)*ratio),Color("ffb24f") if boss else Color("a93d3d"))
 	var hero: Dictionary = world.current_snapshot.get("character",{})
 	if not hero.is_empty(): draw_circle(map_point(float(hero.x),float(hero.z)),maxf(2,5*ratio),Color("5fd8ff"))
