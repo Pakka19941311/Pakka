@@ -226,9 +226,15 @@ func consume_stream() -> void:
 	var latest: Dictionary = {}
 	var events: Dictionary = {}
 	while stream_scan < stream_bytes.size():
-		if stream_bytes[stream_scan - 1] == 10 and stream_bytes[stream_scan] == 10:
-			var packet: String = stream_bytes.slice(0, stream_scan - 1).get_string_from_utf8()
-			stream_bytes = stream_bytes.slice(stream_scan + 1)
+		# Search in native PackedByteArray code, not one GDScript iteration per
+		# byte of the 35 KB snapshot. Keep the trailing LF for split delimiters.
+		var newline: int = stream_bytes.find(10, maxi(0, stream_scan - 1))
+		if newline < 0 or newline + 1 >= stream_bytes.size():
+			stream_scan = stream_bytes.size()
+			break
+		if stream_bytes[newline + 1] == 10:
+			var packet: String = stream_bytes.slice(0, newline).get_string_from_utf8()
+			stream_bytes = stream_bytes.slice(newline + 2)
 			stream_scan = 1
 			for line: String in packet.split("\n"):
 				if line.begins_with("data:"):
@@ -243,7 +249,7 @@ func consume_stream() -> void:
 						if latest.is_empty() or int(value.get("revision", 0)) > int(latest.get("revision", 0)) or (int(value.get("revision", 0)) == int(latest.get("revision", 0)) and float(value.get("time", 0)) >= float(latest.get("time", 0))):
 							latest = value
 		else:
-			stream_scan += 1
+			stream_scan = newline + 2
 	if not latest.is_empty():
 		var order: Array = events.keys()
 		order.sort()
@@ -380,3 +386,4 @@ func save_private_json(path: String, value: Dictionary) -> bool:
 		if DirAccess.rename_absolute(path, old) != OK:
 			return false
 	return DirAccess.rename_absolute(temp, path) == OK
+

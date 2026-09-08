@@ -25,7 +25,7 @@ def wrap(name, method, label):
     text = text[:body] + '\tvar _pacing_start: int = Time.get_ticks_usec()\n' + text[body:end].rstrip() + '\n\tPacingMetrics.record("' + label + '", _pacing_start)\n\n' + text[end:]
     path.write_text(text)
 
-edit('main.gd', 'func _ready() -> void:\n', 'func _ready() -> void:\n\tif "--pacing" in OS.get_cmdline_user_args():\n\t\tget_tree().create_timer(.1).timeout.connect(_start_pacing)\n')
+edit('main.gd', '\tlogin.show()\n', '\tlogin.show()\n\tif "--pacing" in OS.get_cmdline_user_args():\n\t\tget_tree().create_timer(.1).timeout.connect(_start_pacing)\n')
 with (project / 'scripts/main.gd').open('a') as file:
     file.write('\nfunc _start_pacing() -> void:\n\tawait preload("res://scripts/pacing_capture.gd").run(self)\n')
 # Normal bootstrap still loads the real project, assets, UI and network. Only

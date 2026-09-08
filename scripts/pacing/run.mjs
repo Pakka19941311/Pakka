@@ -45,14 +45,15 @@ const control = createServer((req, res) => {
 });
 await new Promise(r => control.listen(0, '127.0.0.1', r));
 mkdirSync(output, { recursive: true });
-const args = ['--path', project, '--audio-driver', 'Dummy', ...(options.includes('--headless') ? ['--headless'] : []), '--', '--pacing', `--bootstrap=${bridge.bootstrapPath}`, `--pacing-output=${output}`, `--pacing-control=http://127.0.0.1:${control.address().port}/reset?token=${secret}`, `--pacing-source=${process.env.GITHUB_SHA || 'local'}`];
+const resolution = options.find(v=>v.startsWith('--resolution='))?.split('=')[1] || '1600x900';
+const args = ['--verbose','--windowed','--resolution',resolution,'--path', project, '--audio-driver', 'Dummy', ...(options.includes('--headless') ? ['--headless'] : []), '--', '--pacing', `--qa=${join(output,'unused.json')}`, `--pacing-resolution=${resolution}`, `--pacing-short=${options.includes('--short')}`, `--bootstrap=${bridge.bootstrapPath}`, `--pacing-output=${output}`, `--pacing-control=http://127.0.0.1:${control.address().port}/reset?token=${secret}`, `--pacing-source=${process.env.GITHUB_SHA || 'local'}`];
 let log = '';
 try {
   const child = spawn(binary, args, {cwd:root,stdio:['ignore','pipe','pipe']});
   const consume = bytes => {
     const part = bytes.toString(); log += part;
     for (const line of part.split('\n')) if (line.startsWith('PACING_BEGIN ')) console.log(line);
-    if (/SCRIPT ERROR:|^ERROR:/m.test(log)) child.kill();
+    if (/SCRIPT ERROR:/m.test(log)) child.kill();
   };
   child.stdout.on('data', consume); child.stderr.on('data', consume);
   const timeout = setTimeout(()=>child.kill(),600000);

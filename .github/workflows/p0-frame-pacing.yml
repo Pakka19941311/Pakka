@@ -43,16 +43,29 @@ jobs:
           node --experimental-strip-types scripts/godot-pc-data.mjs
           if [ "${{ steps.world_cache.outputs.cache-hit }}" != true ]; then "$BLENDER" --background --factory-startup --threads 2 --python-exit-code 1 --python scripts/godot-pc-world.py; fi
           cp -a godot-pc "$RUNNER_TEMP/pacing-project"
+          cp -a godot-pc "$RUNNER_TEMP/pacing-before"
+          for file in main.gd network.gd; do git show 629cdef571c81473725acc88afe59385e2fcd518:godot-pc/scripts/$file > "$RUNNER_TEMP/pacing-before/scripts/$file"; done
+          python scripts/pacing/instrument.py "$RUNNER_TEMP/pacing-before"
           python scripts/pacing/instrument.py "$RUNNER_TEMP/pacing-project"
+          "$GODOT" --headless --path "$RUNNER_TEMP/pacing-before" --editor --import 2>&1 | tee "$RUNNER_TEMP/pacing-before-import.log"
           "$GODOT" --headless --path "$RUNNER_TEMP/pacing-project" --editor --import 2>&1 | tee "$RUNNER_TEMP/pacing-import.log"
           python -c 'import pathlib,os; s=pathlib.Path(os.environ["RUNNER_TEMP"],"pacing-import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-18000:]'
-      - name: Record graphics baseline and diagnostic isolations
+      - name: Paired baseline and candidate CPU frame pacing on the same runner
+        run: |
+          node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-before" qa-artifacts/pacing/before-headless --headless
+          node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/after-headless --headless
+      - name: Record unchanged rain scene with native graphics
+        if: ${{ !cancelled() }}
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
-        run: xvfb-run -a -s '-screen 0 3838x2158x24' node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/graphics
-      - name: Separate render load from 30, 60, 120 Hz motion sampling
+        run: |
+          xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-before" qa-artifacts/pacing/before-graphics --short
+          xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/after-graphics --short
+      - name: Record actual 3838 x 2158 in a fresh native process
         if: ${{ !cancelled() }}
-        run: node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/headless --headless
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: xvfb-run -a -s '-screen 0 3838x2158x24' node --experimental-strip-types scripts/pacing/run.mjs "$GODOT" "$RUNNER_TEMP/pacing-project" qa-artifacts/pacing/after-4k --resolution=3838x2158 --short
       - uses: actions/upload-artifact@v4
         if: always()
         with:

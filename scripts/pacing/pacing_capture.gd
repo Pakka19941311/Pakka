@@ -47,8 +47,6 @@ static func run(app: Node) -> void:
 	var weather: VarendorWorldWeather = world.weather
 	var graph: bool = DisplayServer.get_name() != "headless"
 	if graph:
-		app.get_window().mode = Window.MODE_WINDOWED
-		app.get_window().size = Vector2i(1600,900)
 		RenderingServer.viewport_set_measure_render_time(viewport.get_viewport_rid(),true)
 	OS.low_processor_usage_mode = false
 	var output: String = argument("--pacing-output")
@@ -74,7 +72,12 @@ static func run(app: Node) -> void:
 		{"name":"run_4k_rain_off_diagnostic","move":true,"fourk":true,"rain_off":true,"seconds":6.0},
 	]
 	if not graph:
-		cases = [{"name":"run_30hz","move":true,"cap":30,"seconds":4.0},{"name":"run_60hz","move":true,"cap":60,"seconds":4.0},{"name":"run_120hz","move":true,"cap":120,"seconds":4.0},{"name":"orbit_120hz","orbit":true,"cap":120,"seconds":3.0}]
+		cases = [{"name":"run_30hz","move":true,"cap":30,"seconds":8.0},{"name":"run_60hz","move":true,"cap":60,"seconds":30.0},{"name":"run_120hz","move":true,"cap":120,"seconds":12.0},{"name":"orbit_120hz","orbit":true,"cap":120,"seconds":3.0}]
+	if graph:
+		var fourk: bool = argument("--pacing-resolution") == "3838x2158"
+		cases = cases.filter(func(spec: Dictionary): return bool(spec.get("fourk",false)) == fourk)
+		if argument("--pacing-short") == "true":
+			cases = cases.filter(func(spec: Dictionary): return spec.name in ["idle_rain","run_rain","orbit_rain","run_orbit_rain","pursuit_rain","run_4k_rain","orbit_4k_rain"])
 	for spec: Dictionary in cases:
 		PacingMetrics.active = false
 		PacingMetrics.freeze_animation = false
@@ -86,14 +89,11 @@ static func run(app: Node) -> void:
 		app.net.intent({"type":"cancel"})
 		var reset: Dictionary = await request(app,Vector2(88,70))
 		app.net.accept(reset.snapshot)
-		camera.yaw = .8
+		camera.yaw = 0.0
 		camera.pitch = camera.DEFAULT_PITCH
-		camera.distance = 10.5
+		camera.distance = 18.0
 		camera.reset_follow()
 		Engine.max_fps = int(spec.get("cap",60))
-		if graph:
-			app.get_window().mode = Window.MODE_WINDOWED
-			app.get_window().size = Vector2i(3838,2158) if spec.get("fourk",false) else Vector2i(1600,900)
 		weather.qa_override = {"hour":10.0,"daylight":1.0,"night":false,"fullMoon":false,"weather":"rain","clouds":.72}
 		weather.daylight = 1.0
 		weather.set_process(true)
@@ -202,4 +202,4 @@ static func run(app: Node) -> void:
 	app.net.stop_input_transport()
 	app.net.close_stream()
 	await tree.process_frame
-	tree.quit()
+	tree.call_deferred("quit")

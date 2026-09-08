@@ -32,6 +32,9 @@ var respawn: Button
 var bag_slots: Array = []
 var equipment_slots: Dictionary = {}
 var quick_buttons: Array = []
+# Keep immutable icon resources alive across snapshot refreshes. Replacing a
+# skill with a temporary weapon texture used to evict/reload it every update.
+var quick_artwork_cache: Dictionary = {}
 var quick: Array = []
 var preferences: Dictionary = {}
 var preference_path: String = ""
@@ -317,6 +320,11 @@ func action_name(action: String) -> String:
 		return data.classes[class_id].skills[int(action.trim_prefix("skill:"))].name
 	return {"":"—","attack":"Атака","potion":"Здоровье","ether":"Ресурс","teleport":"Возврат"}.get(action, action)
 
+func quick_artwork(path: String) -> Texture2D:
+	if not quick_artwork_cache.has(path):
+		quick_artwork_cache[path] = load(path)
+	return quick_artwork_cache[path]
+
 func refresh_quick() -> void:
 	var hero: Dictionary = reference_hud.display_hero()
 	if quick_panel_node != null:
@@ -326,9 +334,14 @@ func refresh_quick() -> void:
 		var action: String = quick[index].action
 		var key: String = quick[index].key.replace("Shift+", "⇧").replace("Digit", "").replace("Key", "")
 		var title: String = action_name(action)
-		var artwork_id: String = action if data.items.has(action) else str(data.classes[hero.get("classId", "knight")].weapon)
-		slot.artwork = load("res://assets/icons/" + artwork_id + ".svg") if not action.is_empty() else null
-		if data.items.has(action): slot.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind({"id":action},data.items[action]))
+		if action.is_empty():
+			slot.artwork = null
+		elif action.begins_with("skill:"):
+			slot.artwork = quick_artwork("res://assets/icons/%s_skill_%d.svg" % [hero.get("classId", "knight"), int(action.trim_prefix("skill:"))])
+		elif data.items.has(action):
+			slot.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind({"id":action},data.items[action]))
+		else:
+			slot.artwork = quick_artwork("res://assets/icons/" + str(data.classes[hero.get("classId", "knight")].weapon) + ".svg")
 		slot.remaining = 0
 		slot.quantity = 0
 		slot.usable = not net.hero.get("dead", false)
@@ -346,7 +359,6 @@ func refresh_quick() -> void:
 		var icon: String = {"":"·","attack":"⚔","potion":"ОЗ","ether":"MP","teleport":"⌂"}.get(action, str(index % 8 + 1))
 		if action.begins_with("skill:"):
 			var skill_index: int = int(action.trim_prefix("skill:"))
-			slot.artwork = load("res://assets/icons/%s_skill_%d.svg" % [hero.get("classId", "knight"), skill_index])
 			var skill: Dictionary = data.classes[hero.get("classId", "knight")].skills[skill_index]
 			icon = str(skill.icon)
 			if not hero.is_empty():
