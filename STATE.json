@@ -2,11 +2,11 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-08",
-  "state_kind": "p0_frame_pacing_windows_test_published_owner_gpu_acceptance_pending",
+  "state_kind": "p2_knight_appearance_review_delivered",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-p1-recovery",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "6ccf00bdb3fc5a530a4d66c0e4bfec836ac68f80",
+  "observed_head": "e34d934ae0298bb37625c4b9cbf98d443a8067c0",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -14,10 +14,10 @@
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать. 08.09.2026 P0: владелец прямо разрешил продолжить с 50c691f, устранить падение native QA, добиться зелёного CI и выпустить Windows ZIP; повторная переделка оптимизаций не требовалась.",
-  "current_phase": "P0 — camera/frame pacing bugfix",
-  "current_task": "Completed CI recovery from 50c691f and published Windows P0 test build 6ccf00b; owner GPU/visual acceptance pending",
+  "current_phase": "P2 — first knight, appearance stage",
+  "current_task": "Original Blender knight appearance review delivered; body under closed armor, separate clothing/armor/sword/shield and four native Blender renders. Await owner visual approval before rigging and animations.",
   "next_task_after_authorization": null,
-  "next_action": "Owner tests the published ZIP in the same rain location; TEST_FRAME_PACING.bat and F3 capture 60 seconds on the gaming PC. Keep scope limited to P0 until owner review.",
+  "next_action": "Review the knight silhouette and equipment with the owner. Then stage 2: game mesh preparation, skeleton, running and melee attacks; stage 3: skill casting and effects. Do not test or change the accepted old model, movement, camera or game graphics during appearance work.",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -4580,7 +4580,7 @@
       "result": "Darker slate and stone visible, forest undergrowth present, atlas geography readable. Native Linux Mesa screenshots reviewed; owner PC visual acceptance pending."
     }
   },
-  "owner_latest_feedback": "Owner confirmed the saved optimizations and asked to continue strictly from work/godot-p1-recovery at 50c691f: fix the failing native graphics/save-adapter test, get green Godot PC preview and a Windows package. Do not redo camera/movement or unrelated gameplay.",
+  "owner_latest_feedback": "Owner authorized creation of a new knight in Blender in near-realistic fantasy MMORPG style, split into model/equipment, running/attack animation, then skills. Explicitly forbade spending time testing the accepted existing model/game. Work resumed after accidental interruptions.",
   "polish_followup": {
     "status": "published-awaiting-owner-test",
     "approved_points": 19,
@@ -4662,5 +4662,65 @@
       "moving_frames_60": 1380,
       "held_moving_frames_60": 0
     }
+  },
+  "knight_art_review": {
+    "status": "delivered_awaiting_owner_visual_approval",
+    "source_commit": "e34d934ae0298bb37625c4b9cbf98d443a8067c0",
+    "source_directory": "art/knight-stage1",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/knight-art-review-e34d934ae029",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/knight-art-review-e34d934ae029/Varendor_Knight_01_e34d934ae029.zip",
+    "bytes": 13418430,
+    "sha256": "4fb4d65e54087c6bee67816c1b87eef8218f1695b17be6823f8a411238b9c56a",
+    "download_verified": true,
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34268712635",
+    "model_info": {
+      "name": "Varendor Knight 01",
+      "stage": "1 - appearance review",
+      "blender": "4.5.9 LTS",
+      "height_m": 1.994,
+      "original_assets": true,
+      "rigged": false,
+      "animated": false,
+      "game_files_modified": false,
+      "collections": {
+        "01 | Body and underclothes": 25,
+        "02 | Steel armor - separate pieces": 61,
+        "03 | Cloth and leather": 35,
+        "04 | Fasteners and engraved trim": 436,
+        "05 | Sword and shield": 43
+      },
+      "mesh_objects": 491,
+      "raw_faces": 77681,
+      "note": "Editable Blender appearance study. Procedural materials; no baked game textures or LOD claimed. Retopology/rig and game delivery are subsequent stages."
+    },
+    "renders": [
+      "01_three_quarter.png",
+      "02_front.png",
+      "03_back.png",
+      "04_armor_detail.png"
+    ],
+    "native_blender_renders_reviewed": [
+      "01_three_quarter.png",
+      "03_back.png"
+    ],
+    "visual_direction": "Closed helmet, tempered steel with restrained brass, dark underclothes, ox-blood cloth, sword and heater shield; first owner-review variant, not approved art direction yet.",
+    "scope_limits": [
+      "No armature or animations yet",
+      "No detailed face under the closed helmet",
+      "No baked game textures, LOD, Godot integration or production-ready topology claimed",
+      "Game runtime files and existing models untouched; no game tests run"
+    ],
+    "next_stages": [
+      {
+        "stage": 2,
+        "work": "Rig/deformation and game mesh preparation, run and melee attack animations",
+        "status": "pending_appearance_approval"
+      },
+      {
+        "stage": 3,
+        "work": "Skill casting animations and effects",
+        "status": "pending"
+      }
+    ]
   }
 }
