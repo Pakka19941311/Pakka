@@ -2,22 +2,22 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-08",
-  "state_kind": "p0_frame_pacing_fix_under_measurement",
+  "state_kind": "p0_frame_pacing_windows_test_published_owner_gpu_acceptance_pending",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-p1-recovery",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "629cdef571c81473725acc88afe59385e2fcd518",
+  "observed_head": "6ccf00bdb3fc5a530a4d66c0e4bfec836ac68f80",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
   "client_language_proposed": "typed GDScript",
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
-  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать.",
+  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать. 08.09.2026 P0: владелец прямо разрешил продолжить с 50c691f, устранить падение native QA, добиться зелёного CI и выпустить Windows ZIP; повторная переделка оптимизаций не требовалась.",
   "current_phase": "P0 — camera/frame pacing bugfix",
-  "current_task": "Pair released and optimized CPU frame pacing, run affected native regression, publish Windows test ZIP",
+  "current_task": "Completed CI recovery from 50c691f and published Windows P0 test build 6ccf00b; owner GPU/visual acceptance pending",
   "next_task_after_authorization": null,
-  "next_action": "Require paired frame p95 improvement; build/push authorized; owner Windows GPU acceptance remains open",
+  "next_action": "Owner tests the published ZIP in the same rain location; TEST_FRAME_PACING.bat and F3 capture 60 seconds on the gaming PC. Keep scope limited to P0 until owner review.",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -2009,7 +2009,7 @@
     "Approved territory/world environment and in-game atlas from TZ v2.0; directly affected geometry, migration and route checks only"
   ],
   "current_substep": "Territory c0f4d7809af9: scoped native/Windows gates passed, public ZIP verified",
-  "working_commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+  "working_commit": "6ccf00bdb3fc5a530a4d66c0e4bfec836ac68f80",
   "last_accepted_gate": null,
   "open_defects": [
     {
@@ -2084,10 +2084,17 @@
     },
     {
       "commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
-      "kind": "Current populated territory and M atlas Windows test build; owner visual acceptance pending",
+      "kind": "Historical populated territory and M atlas Windows test build; superseded by polish and P0 pacing builds",
       "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
       "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_Godot_PC_c0f4d7809af9.zip",
       "evidence": "docs/migration/pc/WORLD_TERRITORY.md"
+    },
+    {
+      "commit": "6ccf00bdb3fc5a530a4d66c0e4bfec836ac68f80",
+      "kind": "Current P0 CPU/frame pacing Windows test build; native CI green, owner Windows GPU acceptance pending",
+      "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-6ccf00bdb3fc",
+      "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-6ccf00bdb3fc/Varendor_Godot_PC_6ccf00bdb3fc.zip",
+      "evidence": "docs/migration/pc/P0_FRAME_PACING.md"
     }
   ],
   "definitions": {
@@ -4110,22 +4117,22 @@
     }
   ],
   "publication": {
-    "content_commit": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
-    "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
+    "content_commit": "6ccf00bdb3fc5a530a4d66c0e4bfec836ac68f80",
+    "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-6ccf00bdb3fc",
     "branch": "work/godot-p1-recovery",
     "source_checkpoint_still": "88838a79c9b544a7918ac1064568d00ed4d57be4",
     "personal_database_uploaded": false,
     "p1_started": true,
-    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-c0f4d7809af9",
-    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_Godot_PC_c0f4d7809af9.zip",
-    "bytes": 334320935,
-    "sha256": "539aecd64ac0d08a5ff0323a2c0d41f16ad6c1572daf9d5f2725bbb163aa55b6",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-6ccf00bdb3fc",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-6ccf00bdb3fc/Varendor_Godot_PC_6ccf00bdb3fc.zip",
+    "bytes": 334375217,
+    "sha256": "5bdd53a1ef2476213784ad4046cecc8a440eac590453ab623ad94e1e2cee5a15",
     "native_windows_headless_passed": true,
     "native_linux_graphics_passed": true,
     "windows_gpu_verified": false,
     "direct_download_verified": true,
-    "qa_scope": "territory-world-map",
-    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34226105212",
+    "qa_scope": "p0-frame-pacing",
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34258899217",
     "source_changes_published_with_base_tree_preserved": true
   },
   "resolved_defects": [
@@ -4573,7 +4580,7 @@
       "result": "Darker slate and stone visible, forest undergrowth present, atlas geography readable. Native Linux Mesa screenshots reviewed; owner PC visual acceptance pending."
     }
   },
-  "owner_latest_feedback": "Owner authorized the 19-point follow-up build and requested one Windows ZIP for testing. Design and filling require owner review and agreement after this test.",
+  "owner_latest_feedback": "Owner confirmed the saved optimizations and asked to continue strictly from work/godot-p1-recovery at 50c691f: fix the failing native graphics/save-adapter test, get green Godot PC preview and a Windows package. Do not redo camera/movement or unrelated gameplay.",
   "polish_followup": {
     "status": "published-awaiting-owner-test",
     "approved_points": 19,
@@ -4622,14 +4629,38 @@
     "advance_to_next_tz_block": false
   },
   "p0_frame_pacing": {
-    "status": "baseline-instrumentation",
+    "status": "cpu_p95_improvement_passed_windows_zip_published_owner_gpu_acceptance_pending",
     "baseline_head": "629cdef571c81473725acc88afe59385e2fcd518",
     "released_source": "f67687909a95bfbef540c49361f518fd830900b5",
     "report": "docs/migration/pc/P0_FRAME_PACING.md",
     "owner_authorized_fix_push_build": true,
     "target_windows_gpu_measured": false,
     "diagnostic_cpu_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34252751232",
-    "paired_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34253181867",
-    "correction": "Native SSE delimiter search; retain final quick-slot textures. No movement/camera/weather/quality change."
+    "paired_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34255861015",
+    "correction": "Native SSE delimiter search; retain final quick-slot textures. No movement/camera/weather/quality change.",
+    "resumed_from": "50c691f51a810c9072de0c0d27ee638e44cb822f",
+    "source_commit": "6ccf00bdb3fc5a530a4d66c0e4bfec836ac68f80",
+    "native_release_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34258899217",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-6ccf00bdb3fc",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-6ccf00bdb3fc/Varendor_Godot_PC_6ccf00bdb3fc.zip",
+    "release_evidence": "docs/migration/pc/evidence/pacing-release-6ccf00b.json",
+    "native_graphics_save_adapter": "passed; fixed NPC QA Window/PanelContainer mismatch and fixture ownership; no production changes after 50c691f",
+    "windows_exe_portable_node": "passed against isolated fixture data",
+    "ci_conclusion": "success",
+    "direct_download_verified": true,
+    "cpu_before_after": {
+      "environment": "Same Linux runner, native Godot 4.6.3 headless real client/server; not owner Windows GPU",
+      "run_60_p95_ms": [
+        25.995,
+        22.491
+      ],
+      "run_120_p95_ms": [
+        17.419,
+        13.709
+      ],
+      "continuous_run_seconds": 23,
+      "moving_frames_60": 1380,
+      "held_moving_frames_60": 0
+    }
   }
 }

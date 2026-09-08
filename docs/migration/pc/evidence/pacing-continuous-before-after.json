@@ -1,0 +1,962 @@
+{
+  "measured_build": "77b6b265e9bb0520f47280f3d8e5569074b64e8d",
+  "baseline_original": "629cdef571c81473725acc88afe59385e2fcd518",
+  "run": "https://github.com/Pakka19941311/Pakka/actions/runs/34255861015",
+  "notes": "Headless real client/server on the same runner; no verbose resource logging. Actual 23 s movement, rain simulation enabled. Not a Windows GPU measurement.",
+  "before": {
+    "adapter": "",
+    "baseline_source": "629cdef571c81473725acc88afe59385e2fcd518",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "display": "headless",
+    "fixture": "Ranger level 4 with haste, rain; blood-alpha-den / bloodwing-ridge from owner video. Isolated SQLite; explicit deterministic reset/ablation only.",
+    "godot": "4.6.3-stable (official)",
+    "initial_max_fps": 60,
+    "logical_cores": 4,
+    "low_processor_mode": false,
+    "manual_player_interpolation": true,
+    "max_physics_steps_per_frame": 30,
+    "physics_interpolation_enabled": false,
+    "physics_ticks_per_second": 60,
+    "refresh_hz": -1,
+    "renderer": "gl_compatibility",
+    "scenarios": [
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 191.962,
+          "mean": 30.5146375000001,
+          "p50": 15.209,
+          "p95": 87.717,
+          "p99": 191.962
+        },
+        "fps": 29.9510861324599,
+        "frame_ms": {
+          "max": 47.395,
+          "mean": 33.3877708333333,
+          "p50": 33.244,
+          "p95": 41.728,
+          "p99": 45.407
+        },
+        "frames": 240,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 240,
+        "msaa": 3,
+        "name": "run_30hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 4.398,
+            "mean": 1.49135833333333,
+            "p95": 2.647
+          },
+          "input_ui": {
+            "max": 0.151,
+            "mean": 0.0372333333333333,
+            "p95": 0.078
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.235,
+            "mean": 0.125975,
+            "p95": 0.188
+          },
+          "network": {
+            "max": 7.155,
+            "mean": 2.61072083333333,
+            "p95": 4.676
+          },
+          "physics": {
+            "max": 1.379,
+            "mean": 0.291804166666667,
+            "p95": 0.389
+          },
+          "quickbar": {
+            "max": 3.563,
+            "mean": 1.19657083333333,
+            "p95": 2.137
+          },
+          "weather": {
+            "max": 0.049,
+            "mean": 0.0211916666666666,
+            "p95": 0.028
+          },
+          "world_process": {
+            "max": 10.26,
+            "mean": 4.70942083333334,
+            "p95": 8.294
+          },
+          "world_snapshot": {
+            "max": 7.233,
+            "mean": 1.96845,
+            "p95": 4.227
+          }
+        },
+        "physics_steps": {
+          "max": 2,
+          "mean": 2,
+          "p50": 2,
+          "p95": 2,
+          "p99": 2
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2635,
+          "mean": 2635,
+          "p50": 2635,
+          "p95": 2635,
+          "p99": 2635
+        },
+        "seconds": 8.013065,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      },
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 30.458,
+          "mean": 13.9866304347826,
+          "p50": 12.956,
+          "p95": 19.501,
+          "p99": 30.458
+        },
+        "fps": 59.9711356316764,
+        "frame_ms": {
+          "max": 33.561,
+          "mean": 16.6746884057971,
+          "p50": 15.86,
+          "p95": 25.995,
+          "p99": 27.214
+        },
+        "frames": 1380,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 1380,
+        "msaa": 3,
+        "name": "run_60hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 3.333,
+            "mean": 0.854076811594202,
+            "p95": 2.448
+          },
+          "input_ui": {
+            "max": 0.114,
+            "mean": 0.0255992753623187,
+            "p95": 0.063
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.26,
+            "mean": 0.13368115942029,
+            "p95": 0.171
+          },
+          "network": {
+            "max": 9.635,
+            "mean": 1.45868478260868,
+            "p95": 4.238
+          },
+          "physics": {
+            "max": 2.826,
+            "mean": 0.169060869565218,
+            "p95": 0.212
+          },
+          "quickbar": {
+            "max": 2.611,
+            "mean": 0.696610144927537,
+            "p95": 1.995
+          },
+          "weather": {
+            "max": 0.039,
+            "mean": 0.015927536231884,
+            "p95": 0.025
+          },
+          "world_process": {
+            "max": 10.723,
+            "mean": 3.55138985507246,
+            "p95": 7.285
+          },
+          "world_snapshot": {
+            "max": 7.665,
+            "mean": 1.13768695652174,
+            "p95": 3.331
+          }
+        },
+        "physics_steps": {
+          "max": 1,
+          "mean": 1,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2635,
+          "mean": 2635,
+          "p50": 2635,
+          "p95": 2635,
+          "p99": 2635
+        },
+        "seconds": 23.01107,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      },
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 69.513,
+          "mean": 18.7689416261292,
+          "p50": 14.337,
+          "p95": 69.513,
+          "p99": 69.513
+        },
+        "fps": 119.896833732087,
+        "frame_ms": {
+          "max": 26.12,
+          "mean": 8.34050382209868,
+          "p50": 8.262,
+          "p95": 17.419,
+          "p99": 18.884
+        },
+        "frames": 1439,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 1438,
+        "msaa": 3,
+        "name": "run_120hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 3.283,
+            "mean": 0.429253648366921,
+            "p95": 2.484
+          },
+          "input_ui": {
+            "max": 0.132,
+            "mean": 0.0195267546907574,
+            "p95": 0.055
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 1.52,
+            "mean": 0.115229325920778,
+            "p95": 0.157
+          },
+          "network": {
+            "max": 6.422,
+            "mean": 0.735025017373174,
+            "p95": 4.24
+          },
+          "physics": {
+            "max": 1.068,
+            "mean": 0.0768429464906185,
+            "p95": 0.191
+          },
+          "quickbar": {
+            "max": 2.734,
+            "mean": 0.344626129256428,
+            "p95": 1.974
+          },
+          "weather": {
+            "max": 0.044,
+            "mean": 0.0124781097984712,
+            "p95": 0.02
+          },
+          "world_process": {
+            "max": 12.908,
+            "mean": 2.45301181375955,
+            "p95": 6.589
+          },
+          "world_snapshot": {
+            "max": 9.533,
+            "mean": 0.569739402362752,
+            "p95": 3.132
+          }
+        },
+        "physics_steps": {
+          "max": 1,
+          "mean": 0.499652536483669,
+          "p50": 0,
+          "p95": 1,
+          "p99": 1
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2635,
+          "mean": 2635,
+          "p50": 2635,
+          "p95": 2635,
+          "p99": 2635
+        },
+        "seconds": 12.001985,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      },
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 70.283,
+          "mean": 31.268475,
+          "p50": 12.142,
+          "p95": 70.283,
+          "p99": 70.283
+        },
+        "fps": 119.775022582582,
+        "frame_ms": {
+          "max": 18.476,
+          "mean": 8.34898611111111,
+          "p50": 8.318,
+          "p95": 17.499,
+          "p99": 18.111
+        },
+        "frames": 360,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 0,
+        "msaa": 3,
+        "name": "orbit_120hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 3.305,
+            "mean": 0.446655555555556,
+            "p95": 2.53
+          },
+          "input_ui": {
+            "max": 0.032,
+            "mean": 0.0139666666666666,
+            "p95": 0.023
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.182,
+            "mean": 0.0862222222222221,
+            "p95": 0.099
+          },
+          "network": {
+            "max": 4.51,
+            "mean": 0.762038888888886,
+            "p95": 4.202
+          },
+          "physics": {
+            "max": 0.271,
+            "mean": 0.073575,
+            "p95": 0.166
+          },
+          "quickbar": {
+            "max": 2.588,
+            "mean": 0.350986111111111,
+            "p95": 1.982
+          },
+          "weather": {
+            "max": 0.025,
+            "mean": 0.0116861111111111,
+            "p95": 0.018
+          },
+          "world_process": {
+            "max": 8.169,
+            "mean": 2.09506388888889,
+            "p95": 6.134
+          },
+          "world_snapshot": {
+            "max": 4.099,
+            "mean": 0.545494444444444,
+            "p95": 3.082
+          }
+        },
+        "physics_steps": {
+          "max": 1,
+          "mean": 0.5,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2635,
+          "mean": 2635,
+          "p50": 2635,
+          "p95": 2635,
+          "p99": 2635
+        },
+        "seconds": 3.005635,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      }
+    ],
+    "source": "77b6b265e9bb0520f47280f3d8e5569074b64e8d",
+    "target_windows_gpu_measured": false,
+    "vsync": -1
+  },
+  "after": {
+    "adapter": "",
+    "baseline_source": "629cdef571c81473725acc88afe59385e2fcd518",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "display": "headless",
+    "fixture": "Ranger level 4 with haste, rain; blood-alpha-den / bloodwing-ridge from owner video. Isolated SQLite; explicit deterministic reset/ablation only.",
+    "godot": "4.6.3-stable (official)",
+    "initial_max_fps": 60,
+    "logical_cores": 4,
+    "low_processor_mode": false,
+    "manual_player_interpolation": true,
+    "max_physics_steps_per_frame": 30,
+    "physics_interpolation_enabled": false,
+    "physics_ticks_per_second": 60,
+    "refresh_hz": -1,
+    "renderer": "gl_compatibility",
+    "scenarios": [
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 191.994,
+          "mean": 25.8237125000001,
+          "p50": 10.305,
+          "p95": 83.606,
+          "p99": 191.994
+        },
+        "fps": 29.9868282856755,
+        "frame_ms": {
+          "max": 40.853,
+          "mean": 33.347975,
+          "p50": 32.953,
+          "p95": 38.624,
+          "p99": 39.908
+        },
+        "frames": 240,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 240,
+        "msaa": 3,
+        "name": "run_30hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 1.996,
+            "mean": 0.592216666666666,
+            "p95": 1.05
+          },
+          "input_ui": {
+            "max": 0.171,
+            "mean": 0.0378999999999999,
+            "p95": 0.077
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.225,
+            "mean": 0.12345,
+            "p95": 0.153
+          },
+          "network": {
+            "max": 2.346,
+            "mean": 1.17227083333333,
+            "p95": 2.118
+          },
+          "physics": {
+            "max": 1.386,
+            "mean": 0.294658333333333,
+            "p95": 0.381
+          },
+          "quickbar": {
+            "max": 0.988,
+            "mean": 0.293720833333333,
+            "p95": 0.525
+          },
+          "weather": {
+            "max": 0.052,
+            "mean": 0.0221416666666666,
+            "p95": 0.029
+          },
+          "world_process": {
+            "max": 9.357,
+            "mean": 3.72029166666666,
+            "p95": 6.522
+          },
+          "world_snapshot": {
+            "max": 5.591,
+            "mean": 1.0530375,
+            "p95": 2.672
+          }
+        },
+        "physics_steps": {
+          "max": 2,
+          "mean": 2,
+          "p50": 2,
+          "p95": 2,
+          "p99": 2
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2642,
+          "mean": 2642,
+          "p50": 2642,
+          "p95": 2642,
+          "p99": 2642
+        },
+        "seconds": 8.003514,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      },
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 21.536,
+          "mean": 10.4283557971014,
+          "p50": 9.959,
+          "p95": 12.936,
+          "p99": 21.536
+        },
+        "fps": 59.9794818016167,
+        "frame_ms": {
+          "max": 27.259,
+          "mean": 16.672368115942,
+          "p50": 15.34,
+          "p95": 22.491,
+          "p99": 23.728
+        },
+        "frames": 1380,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 1380,
+        "msaa": 3,
+        "name": "run_60hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 1.423,
+            "mean": 0.343046376811594,
+            "p95": 1.05
+          },
+          "input_ui": {
+            "max": 0.173,
+            "mean": 0.0285007246376812,
+            "p95": 0.07
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.252,
+            "mean": 0.14076884057971,
+            "p95": 0.186
+          },
+          "network": {
+            "max": 2.66,
+            "mean": 0.677078985507246,
+            "p95": 2.057
+          },
+          "physics": {
+            "max": 1.381,
+            "mean": 0.185949275362319,
+            "p95": 0.248
+          },
+          "quickbar": {
+            "max": 0.727,
+            "mean": 0.178717391304348,
+            "p95": 0.528
+          },
+          "weather": {
+            "max": 0.045,
+            "mean": 0.0193789855072463,
+            "p95": 0.029
+          },
+          "world_process": {
+            "max": 9.671,
+            "mean": 3.27100724637681,
+            "p95": 6.206
+          },
+          "world_snapshot": {
+            "max": 5.681,
+            "mean": 0.645258695652174,
+            "p95": 1.932
+          }
+        },
+        "physics_steps": {
+          "max": 1,
+          "mean": 1,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2642,
+          "mean": 2642,
+          "p50": 2642,
+          "p95": 2642,
+          "p99": 2642
+        },
+        "seconds": 23.007868,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      },
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 63.003,
+          "mean": 14.6708576388891,
+          "p50": 10.194,
+          "p95": 63.003,
+          "p99": 63.003
+        },
+        "fps": 119.968958032109,
+        "frame_ms": {
+          "max": 18.817,
+          "mean": 8.33548958333333,
+          "p50": 8.31,
+          "p95": 13.709,
+          "p99": 15.534
+        },
+        "frames": 1440,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 1439,
+        "msaa": 3,
+        "name": "run_120hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 1.467,
+            "mean": 0.192532638888889,
+            "p95": 1.082
+          },
+          "input_ui": {
+            "max": 0.145,
+            "mean": 0.0219708333333332,
+            "p95": 0.061
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.266,
+            "mean": 0.11815625,
+            "p95": 0.161
+          },
+          "network": {
+            "max": 3.596,
+            "mean": 0.366333333333333,
+            "p95": 2.078
+          },
+          "physics": {
+            "max": 1.116,
+            "mean": 0.0889465277777777,
+            "p95": 0.217
+          },
+          "quickbar": {
+            "max": 0.738,
+            "mean": 0.0962694444444444,
+            "p95": 0.533
+          },
+          "weather": {
+            "max": 0.042,
+            "mean": 0.0147118055555555,
+            "p95": 0.025
+          },
+          "world_process": {
+            "max": 10.713,
+            "mean": 2.40204791666667,
+            "p95": 5.807
+          },
+          "world_snapshot": {
+            "max": 6.042,
+            "mean": 0.354902777777778,
+            "p95": 1.853
+          }
+        },
+        "physics_steps": {
+          "max": 1,
+          "mean": 0.5,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2642,
+          "mean": 2642,
+          "p50": 2642,
+          "p95": 2642,
+          "p99": 2642
+        },
+        "seconds": 12.003105,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      },
+      {
+        "camera_held": 0,
+        "draw_calls": 0,
+        "engine_process_ms": {
+          "max": 68.133,
+          "mean": 29.0606111111107,
+          "p50": 9.721,
+          "p95": 68.133,
+          "p99": 68.133
+        },
+        "fps": 119.764742124886,
+        "frame_ms": {
+          "max": 19.504,
+          "mean": 8.34970277777778,
+          "p50": 8.297,
+          "p95": 14.728,
+          "p99": 15.788
+        },
+        "frames": 360,
+        "gpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "held": 0,
+        "moving": 0,
+        "msaa": 3,
+        "name": "orbit_120hz",
+        "phases": {
+          "hud_snapshot": {
+            "max": 1.246,
+            "mean": 0.207608333333333,
+            "p95": 1.143
+          },
+          "input_ui": {
+            "max": 0.053,
+            "mean": 0.0160499999999999,
+            "p95": 0.029
+          },
+          "minimap_draw": {
+            "max": 0,
+            "mean": 0,
+            "p95": 0
+          },
+          "nameplates": {
+            "max": 0.181,
+            "mean": 0.0902944444444444,
+            "p95": 0.111
+          },
+          "network": {
+            "max": 2.983,
+            "mean": 0.395705555555555,
+            "p95": 2.288
+          },
+          "physics": {
+            "max": 0.292,
+            "mean": 0.0880222222222222,
+            "p95": 0.214
+          },
+          "quickbar": {
+            "max": 0.586,
+            "mean": 0.097925,
+            "p95": 0.543
+          },
+          "weather": {
+            "max": 0.037,
+            "mean": 0.0140138888888889,
+            "p95": 0.025
+          },
+          "world_process": {
+            "max": 6.359,
+            "mean": 2.03696944444444,
+            "p95": 5.307
+          },
+          "world_snapshot": {
+            "max": 1.943,
+            "mean": 0.326680555555556,
+            "p95": 1.82
+          }
+        },
+        "physics_steps": {
+          "max": 1,
+          "mean": 0.5,
+          "p50": 1,
+          "p95": 1,
+          "p99": 1
+        },
+        "render_cpu_ms": {
+          "max": 0,
+          "mean": 0,
+          "p50": 0,
+          "p95": 0,
+          "p99": 0
+        },
+        "render_scale": 1,
+        "resolution": [
+          0,
+          0
+        ],
+        "resources": {
+          "max": 2642,
+          "mean": 2642,
+          "p50": 2642,
+          "p95": 2642,
+          "p99": 2642
+        },
+        "seconds": 3.005893,
+        "viewport_pixels": [
+          0,
+          0
+        ]
+      }
+    ],
+    "source": "77b6b265e9bb0520f47280f3d8e5569074b64e8d",
+    "target_windows_gpu_measured": false,
+    "vsync": -1
+  }
+}
