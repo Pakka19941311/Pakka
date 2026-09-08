@@ -42,10 +42,10 @@ try {
   await assert.rejects(startNativeBridge({ data, legacy, backups }), /уже запущена/);
   checks.push('one process per native saved world');
   const reportPath = join(output, 'native-runtime.json');
-  const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`, `--qa-scope=${qaScope}`];
+  const args = [...(qaScope==='pacing'?['--verbose']:[]),'--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`, `--qa-scope=${qaScope}`];
   const child = spawn(binary, args, { cwd: stage, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';
-  const outputChunk=bytes=>{log+=bytes;if(/SCRIPT ERROR:|^ERROR:/m.test(log))child.kill();};
+  const outputChunk=bytes=>{log+=bytes;if(/SCRIPT ERROR:/m.test(log))child.kill();};
   child.stdout.on('data', outputChunk);
   child.stderr.on('data', outputChunk);
   const timeout = setTimeout(() => child.kill(), ['world','polish'].includes(qaScope)?420000:300000);
@@ -61,8 +61,10 @@ try {
       stops: observed.checks.live_stop_observations?.map(({ samples, ...summary }) => summary) }));
   }
   for (const line of log.split('\n')) if (line.startsWith('VARENDOR_WORLD_IMAGE ') || line.startsWith('VARENDOR_REVIEW_JPG ') || line.startsWith('VARENDOR_CORE_JPG ') || line.startsWith('VARENDOR_REFERENCE_UI_JPG')) console.log(line);
+  const runtimeErrors=log.split('\n').filter(line=>/SCRIPT ERROR:|^ERROR:|^WARNING:|Leaked instance|Resource still in use/.test(line));
+  if(runtimeErrors.length)console.log('NATIVE_RUNTIME_DIAGNOSIS '+runtimeErrors.join('\n'));
   assert.equal(code, 0, log.split('\n').filter(line => !line.startsWith('VARENDOR_WORLD_IMAGE ') && !line.startsWith('VARENDOR_REVIEW_JPG ') && !line.startsWith('VARENDOR_CORE_JPG ')).join('\n').slice(-16000));
-  assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, 'Native client runtime errors');
+  assert.doesNotMatch(log, /SCRIPT ERROR:|^ERROR:/m, runtimeErrors.join('\n'));
   const native = JSON.parse(readFileSync(reportPath, 'utf8'));
   assert.equal(native.ok, true);
   if (qaScope !== 'full') assert.equal(native.scope, qaScope==='pacing'?'p0-frame-pacing':qaScope==='polish'?'pc-polish-19':qaScope==='world'?'territory-world-map':qaScope === 'stop-only' ? 'forward-stop-follow-up' : 'stop-npc-stats-follow-up', 'The native client must execute the requested regression scope');

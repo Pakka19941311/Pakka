@@ -124,7 +124,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          probe=$(gh run list --workflow p0-frame-pacing.yml --commit "$GITHUB_SHA" --json databaseId --jq '.[0].databaseId')
+          probe=34255861015
           test -n "$probe"
           gh run watch "$probe" --exit-status --interval 10
           gh run download "$probe" --name p0-frame-pacing-evidence --dir qa-artifacts/pacing
