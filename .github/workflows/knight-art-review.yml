@@ -1,0 +1,42 @@
+name: Knight art review
+
+on:
+  push:
+    branches: [work/godot-p1-recovery]
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    if: ${{ contains(github.event.head_commit.message, '[knight-art]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    concurrency:
+      group: knight-art-review-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Blender runtime dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libgl1 libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0
+      - name: Build and render the new knight in Blender
+        shell: bash
+        env:
+          OMP_NUM_THREADS: '4'
+        run: |
+          mkdir -p knight-review
+          python art/knight-stage1/run_blender_ci.py 2>&1 | tee knight-review/blender.log
+      - name: Save Blender source and review renders
+        uses: actions/upload-artifact@v4
+        if: ${{ always() && hashFiles('knight-review/**') != '' }}
+        with:
+          name: knight-art-review
+          path: knight-review/
+          if-no-files-found: warn
+          retention-days: 30
+          compression-level: 1
