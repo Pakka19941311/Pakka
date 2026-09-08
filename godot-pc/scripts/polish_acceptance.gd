@@ -112,6 +112,7 @@ static func run(app: Node) -> void:
 	app.world.weather.qa_override = {"hour":8,"daylight":1,"night":false,"weather":"sun","clouds":.2,"fullMoon":false}
 	app.world.weather.daylight = 1
 	await tree.create_timer(.3).timeout
+	app.world.update_nameplates()
 	checks["sky_shader_active"] = app.world.world_environment.sky.sky_material==app.world.weather.sky_material
 	await Shots.capture(app,"polish-day")
 	app.world.weather.qa_override.weather = "rain"; app.world.weather.qa_override.clouds = .9
@@ -119,10 +120,11 @@ static func run(app: Node) -> void:
 	checks["day_rain_emitting"] = app.world.weather.rain.emitting
 	await Shots.capture(app,"polish-rain")
 	app.world.weather.qa_override = {"hour":20,"daylight":0,"night":true,"weather":"clouds","clouds":.2,"fullMoon":true}
-	camera.position = app.world.point(-12,-22,3.4)
-	camera.look_at(app.world.point(70,-62,38))
+	camera.position = app.world.point(-12,-12,3.4)
+	camera.look_at(app.world.point(70,-52,38))
 	app.world.weather.daylight = 0
 	await tree.create_timer(.3).timeout
+	app.world.update_nameplates()
 	checks["moon_night_light"] = app.world.weather.current.fullMoon and app.world.sun_light.light_energy<.4 and not app.world.weather.rain.emitting
 	await Shots.capture(app,"polish-night")
 	var fox: Node3D = app.world.make_actor("qa:fox","Fox",2.05,"",Color.WHITE)
