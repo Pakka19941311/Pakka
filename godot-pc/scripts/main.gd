@@ -959,10 +959,21 @@ func run_qa() -> void:
 	var clicked: Array = []
 	var on_move: Callable = func(value: Vector2): clicked.append(value)
 	world.moved_to.connect(on_move)
-	world.click(world.camera.unproject_position(world.point(ground_goal.x, ground_goal.y)))
-	await get_tree().create_timer(1.2).timeout
+	var click_screen: Vector2 = world.camera.unproject_position(world.point(ground_goal.x, ground_goal.y))
+	var click_picked: String = world.pick_entity(click_screen)
+	var click_server_time: float = float(net.last_time)
+	world.click(click_screen)
+	var click_sequence: int = net.sequence
+	checks["mouse_ground_intent_is_predicted_before_server_ack"] = not clicked.is_empty() and world.player_motion.input_mode == "destination" and not world.player_motion.navigation_path.is_empty()
+	# The public click callback submits asynchronously. A 1.2s wall timer
+	# could expire before HTTP/SSE was polled on a slow software-rendered frame.
+	# Require the actual command ACK and endpoint; never count waiting alone.
+	var click_deadline: int = Time.get_ticks_msec() + 8000
+	while Time.get_ticks_msec() < click_deadline and (int(net.hero.lastInputSequence) < click_sequence or Vector2(net.hero.x,net.hero.z).distance_to(ground_goal) >= .25):
+		await get_tree().process_frame
 	world.moved_to.disconnect(on_move)
-	checks["mouse_ground_destination"] = not clicked.is_empty() and Vector2(net.hero.x, net.hero.z).distance_to(ground_goal) < 1.0
+	checks["mouse_ground_destination"] = not clicked.is_empty() and int(net.hero.lastInputSequence) >= click_sequence and Vector2(net.hero.x, net.hero.z).distance_to(ground_goal) < .25
+	checks["mouse_ground_observation"] = {"goal":[ground_goal.x,ground_goal.y],"screen":[click_screen.x,click_screen.y],"picked_entity":click_picked,"emitted_ground_count":clicked.size(),"input_sequence":click_sequence,"ack":net.hero.lastInputSequence,"server_elapsed_ms":float(net.last_time)-click_server_time,"actual":[net.hero.x,net.hero.z],"distance":Vector2(net.hero.x,net.hero.z).distance_to(ground_goal)}
 	await net.intent({"type":"cancel"})
 	# A model-sized ray pick must work well away from the old 55-pixel centre.
 	var probe: Node3D = world.make_actor("qa:pick", "Fox", 2.8, "", Color.WHITE)
