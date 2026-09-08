@@ -2,11 +2,11 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-08",
-  "state_kind": "pc_polish_19_implementation_authorized",
+  "state_kind": "pc_polish_19_released_awaiting_owner_test",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
-  "observed_local_branch": "work/forward-stop-final-reviewed",
+  "observed_local_branch": "work/godot-p1-recovery",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "c0f4d7809af9bdab0aa0fdd7fbed0eeaafbe3493",
+  "observed_head": "f67687909a95bfbef540c49361f518fd830900b5",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -15,9 +15,9 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать.",
   "current_phase": "P1 — approved gameplay and interface follow-up",
-  "current_task": "Implement and build the owner-authorized 19 corrections for Windows testing",
+  "current_task": "19 corrections implemented; verified Windows test ZIP published",
   "next_task_after_authorization": null,
-  "next_action": "Complete scoped native/Windows tests, publish one verified Windows ZIP; design/filling only after owner review",
+  "next_action": "Owner tests the 19 corrections; agree design and filling before the next block.",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -4573,17 +4573,52 @@
       "result": "Darker slate and stone visible, forest undergrowth present, atlas geography readable. Native Linux Mesa screenshots reviewed; owner PC visual acceptance pending."
     }
   },
-  "owner_latest_feedback": "приступай к сборке , жду ссылку на скачивание для теста",
+  "owner_latest_feedback": "Owner authorized the 19-point follow-up build and requested one Windows ZIP for testing. Design and filling require owner review and agreement after this test.",
   "polish_followup": {
-    "status": "implementation-and-scoped-validation",
+    "status": "published-awaiting-owner-test",
     "approved_points": 19,
     "baseline": "b2820ebd89fe71d175ff131ef3180cb1157d782e",
+    "build_commit": "f67687909a95bfbef540c49361f518fd830900b5",
+    "ci_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34242434984",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/Varendor_Godot_PC_f67687909a95.zip",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-f67687909a95",
+    "zip_bytes": 334361826,
+    "sha256": "49ed629f14f9efd471651f05eb7fc92bb70969ea38b26d78dcbe8fb69ee76e94",
+    "direct_download_verified": true,
     "server_tests": {
-      "passed": 14,
+      "passed": 15,
       "failed": 0
     },
+    "native_runtime": {
+      "scope": "pc-polish-19",
+      "linux_graphics_passed": true,
+      "linux_checks_passed": 26,
+      "windows_headless_passed": true,
+      "windows_checks_passed": 25,
+      "windows_gpu_verified": false
+    },
+    "visual_review": {
+      "frames": 6,
+      "result": "Native frames inspected: aligned equal-sized cells, compact inventory/storage, scrolling settings, map footer, blue sky/sun, rain, and unobstructed full moon/night lighting. Weather scenes use explicit QA overrides.",
+      "reviewed": true,
+      "source": "f67687909a95bfbef540c49361f518fd830900b5"
+    },
+    "native_screenshots": [
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/polish-day.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/polish-inventory-storage.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/polish-map.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/polish-night.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/polish-rain.jpg",
+      "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-f67687909a95/polish-settings.jpg"
+    ],
     "report": "docs/migration/pc/POLISH_19.md",
+    "evidence": [
+      "docs/migration/pc/evidence/polish-linux-integration.json",
+      "docs/migration/pc/evidence/polish-windows-integration.json",
+      "docs/migration/pc/evidence/polish-publish-result.json"
+    ],
     "owner_test_required": true,
-    "windows_gpu_verified": false
+    "windows_gpu_verified": false,
+    "advance_to_next_tz_block": false
   }
 }
