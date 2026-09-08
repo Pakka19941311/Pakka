@@ -19,11 +19,16 @@ jobs:
       - name: Measure the released parser and native-search candidate with the same packet
         run: |
           node --experimental-strip-types scripts/pacing/prepare_sse_benchmark.mjs "$RUNNER_TEMP/sse-probe"
-          "$GODOT" --headless --path "$RUNNER_TEMP/sse-probe" --editor --import
-          "$GODOT" --headless --path "$RUNNER_TEMP/sse-probe" --script res://sse_benchmark.gd
+          timeout 90 "$GODOT" --headless --path "$RUNNER_TEMP/sse-probe" --editor --import
+          timeout 90 "$GODOT" --headless --path "$RUNNER_TEMP/sse-probe" --script res://sse_benchmark.gd
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: p0-frame-cpu-evidence
           path: ${{ runner.temp }}/sse-probe/sse-result.json
           retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: p0-linux-measurement-runtime
+          path: ${{ env.GODOT }}
+          retention-days: 7
