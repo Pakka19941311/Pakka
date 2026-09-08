@@ -14,10 +14,10 @@
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать. 08.09.2026 P0: владелец прямо разрешил продолжить с 50c691f, устранить падение native QA, добиться зелёного CI и выпустить Windows ZIP; повторная переделка оптимизаций не требовалась.",
-  "current_phase": "P2 — first knight, appearance stage",
-  "current_task": "Original Blender knight appearance review delivered; body under closed armor, separate clothing/armor/sword/shield and four native Blender renders. Await owner visual approval before rigging and animations.",
+  "current_phase": "P2 — downloadable knight asset selection",
+  "current_task": "Owner rejected the original procedural Blender knight. Select an existing near-realistic fantasy knight from verified free listings; do not continue the rejected model.",
   "next_task_after_authorization": null,
-  "next_action": "Review the knight silhouette and equipment with the owner. Then stage 2: game mesh preparation, skeleton, running and melee attacks; stage 3: skill casting and effects. Do not test or change the accepted old model, movement, camera or game graphics during appearance work.",
+  "next_action": "Show exact listing previews for The Forgotten Knight and Mixamo Paladin. Download selected source after required provider sign-in, inspect only the new asset, and obtain appearance approval before animation/integration. Do not test or change accepted gameplay, movement, camera, graphics, world or old character.",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -4664,7 +4664,7 @@
     }
   },
   "knight_art_review": {
-    "status": "delivered_awaiting_owner_visual_approval",
+    "status": "rejected_by_owner_do_not_integrate",
     "source_commit": "e34d934ae0298bb37625c4b9cbf98d443a8067c0",
     "source_directory": "art/knight-stage1",
     "release": "https://github.com/Pakka19941311/Pakka/releases/tag/knight-art-review-e34d934ae029",
@@ -4714,12 +4714,47 @@
       {
         "stage": 2,
         "work": "Rig/deformation and game mesh preparation, run and melee attack animations",
-        "status": "pending_appearance_approval"
+        "status": "superseded_by_downloadable_asset_selection"
       },
       {
         "stage": 3,
         "work": "Skill casting animations and effects",
         "status": "pending"
+      }
+    ],
+    "owner_feedback": "Rejected visual quality; switch to downloading an existing character."
+  },
+  "downloadable_knight_selection": {
+    "status": "public_listings_verified_download_requires_sign_in",
+    "game_files_modified": false,
+    "game_tests_run": false,
+    "recommended_visual_candidate": "forgotten-knight",
+    "models_downloaded": false,
+    "candidates": [
+      {
+        "id": "forgotten-knight",
+        "title": "The Forgotten Knight",
+        "author": "dark_igorek",
+        "url": "https://sketchfab.com/3d-models/the-forgotten-knight-d14eb14d83bd4e7ba7cbe443d76a10fd",
+        "preview": "https://media.sketchfab.com/models/d14eb14d83bd4e7ba7cbe443d76a10fd/thumbnails/8156e3bdd3e149d48e23f2977cc08bdf/5b476fc1181b415c81b6a83fd29f245c.jpeg",
+        "license_as_listed": "CC BY 4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "rig": "Author states made and rigged in Blender 4.3; source not yet inspected",
+        "triangles_as_listed": 223700,
+        "animations": "unverified",
+        "download_status": "Download button opens Sketchfab login; no model bytes downloaded",
+        "integration_note": "Requires geometry optimization and inspection of source before game use"
+      },
+      {
+        "id": "mixamo-paladin",
+        "title": "Paladin W/Prop J Nordstrom",
+        "provider": "Adobe Mixamo",
+        "url": "https://www.mixamo.com/#/?page=1&query=pala&type=Character",
+        "preview": "https://www.mixamo.com/api/v1/characters/9669a5a9-964e-4060-85f0-d052a592e0e4/assets/thumbnails/static.png",
+        "license_as_documented": "Adobe FAQ permits royalty-free use of characters and animations in personal and commercial games",
+        "license_url": "https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html",
+        "download_status": "Download button returns Please sign in to download; no model bytes downloaded",
+        "integration_note": "Source textures/skeleton must be inspected after download; public redistribution of standalone source has not been approved"
       }
     ]
   }
