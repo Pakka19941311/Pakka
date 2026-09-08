@@ -1,0 +1,12 @@
+{
+  "ok": false,
+  "observation": "Measured before network.gd transport fix using production HTTPRequest, external loopback HTTP server, and real Godot 4.6.3 at 15 FPS.",
+  "frame_cap": 15,
+  "configuration": {"http_use_threads": false, "coalescing": "all adjacent direction entries"},
+  "received": [
+    {"sequence": 1, "direction": [1, 0], "delivery_ms": 5.959228515625},
+    {"sequence": 2, "direction": [0, -1], "delivery_ms": 266.740234375},
+    {"sequence": 4, "direction": [0, 0], "delivery_ms": 333.88623046875}
+  ],
+  "missing_sequence": 3
+}

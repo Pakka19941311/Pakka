@@ -91,6 +91,7 @@ static func run(main: Node) -> Dictionary:
 	checks.merge(await preload("res://scripts/camera_integration_qa.gd").run(main, tree))
 	checks.merge(preload("res://scripts/player_movement_qa.gd").run())
 	checks.merge(preload("res://scripts/player_pending_qa.gd").run())
+	checks.merge(preload("res://scripts/player_stop_qa.gd").run())
 	checks.merge(preload("res://scripts/navigation_qa.gd").run())
 	checks.merge(preload("res://scripts/ambient_residents_qa.gd").run())
 	checks.merge(await preload("res://scripts/reference_world_qa.gd").run(tree))

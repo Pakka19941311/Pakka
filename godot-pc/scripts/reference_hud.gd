@@ -308,7 +308,9 @@ func build_inventory() -> void:
 	stats_scroll.add_child(stats_box)
 	for entry: Array in STAT_LAYOUT:
 		var row: HBoxContainer = HBoxContainer.new()
-		row.custom_minimum_size.y = 22
+		# Nine rows share 188 px below the heading. The previous 22 px rows
+		# needed 198 px, hiding the final defence stat behind a scrollbar.
+		row.custom_minimum_size.y = 20
 		row.draw.connect(func(): row.draw_line(Vector2(0,row.size.y-1),Vector2(row.size.x,row.size.y-1),Color("a5b4b30b"),1))
 		row.add_theme_constant_override("separation",4)
 		stats_box.add_child(row)

@@ -7,6 +7,9 @@ on:
 permissions:
   contents: write
 
+env:
+  VARENDOR_QA_SCOPE: ${{ contains(github.event.head_commit.message, '[pc-stop-npc]') && 'stop-npc' || 'full' }}
+
 concurrency:
   group: godot-pc-preview-${{ github.ref }}
   cancel-in-progress: true
@@ -35,9 +38,15 @@ jobs:
           npm ci
       - name: Verify changed gameplay scenarios
         run: |
-          node scripts/reference-gameplay-contract.mjs
-          node --experimental-strip-types --test tests/reference-server.test.mjs tests/core-gameplay-server.test.mjs tests/combat-feedback.test.mjs tests/combat-obstruction.test.mjs tests/native-recovery.test.mjs tests/monster-ai.test.mjs tests/control-foundation.test.mjs tests/server-combat-parity.test.mjs tests/persistent-world.test.mjs tests/navigation.test.mjs
+          if [ "$VARENDOR_QA_SCOPE" = stop-npc ]; then
+            node --experimental-strip-types scripts/player-stop-contract.mjs
+            node --experimental-strip-types --test tests/reference-server.test.mjs tests/native-recovery.test.mjs tests/control-foundation.test.mjs tests/navigation.test.mjs
+          else
+            node scripts/reference-gameplay-contract.mjs
+            node --experimental-strip-types --test tests/reference-server.test.mjs tests/core-gameplay-server.test.mjs tests/combat-feedback.test.mjs tests/combat-obstruction.test.mjs tests/native-recovery.test.mjs tests/monster-ai.test.mjs tests/control-foundation.test.mjs tests/server-combat-parity.test.mjs tests/persistent-world.test.mjs tests/navigation.test.mjs
+          fi
       - name: Capture the approved browser reference from its exact source commit
+        if: ${{ env.VARENDOR_QA_SCOPE != 'stop-npc' }}
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.55.0
           npx playwright install --with-deps chromium
@@ -58,6 +67,9 @@ jobs:
         run: |
           mkdir -p qa-artifacts/pc-build
           "$GODOT" --headless --path godot-pc --editor --import
+          if [ "$VARENDOR_QA_SCOPE" = stop-npc ]; then
+            python scripts/network-transport-qa.py --godot "$GODOT" --output qa-artifacts/pc-linux/stop-transport.json
+          fi
           "$GODOT" --headless --path godot-pc --script res://scripts/animation_controller_qa.gd
           "$GODOT" --headless --path godot-pc --export-release 'Linux QA' "$PWD/qa-artifacts/pc-build/Varendor.x86_64"
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/pc-build/Varendor.exe"
@@ -65,7 +77,7 @@ jobs:
       - name: Exercise native Godot graphics and the save adapter
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
-        run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical
+        run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-pc-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical --qa-scope=${{ env.VARENDOR_QA_SCOPE }}
       - name: Verify original samples in native Godot
         if: ${{ !cancelled() && steps.native_export.outcome == 'success' }}
         env:
@@ -121,7 +133,7 @@ jobs:
       - name: Run the shipped Windows executable and portable Node against fixture data
         run: |
           $package = Join-Path $PWD ('qa-artifacts/release/Varendor_Godot_PC_' + $env:GITHUB_SHA.Substring(0,12))
-          & (Join-Path $package 'runtime/node.exe') --experimental-strip-types scripts/godot-pc-qa.mjs (Join-Path $package 'Varendor.exe') qa-artifacts/pc-windows ("--package=" + $package)
+          & (Join-Path $package 'runtime/node.exe') --experimental-strip-types scripts/godot-pc-qa.mjs (Join-Path $package 'Varendor.exe') qa-artifacts/pc-windows ("--package=" + $package) --qa-scope=${{ env.VARENDOR_QA_SCOPE }}
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Publish the test ZIP and verify public download
         env:

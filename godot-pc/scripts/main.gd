@@ -49,6 +49,7 @@ var qa_interaction: bool = false
 var qa_times: Array = []
 var qa_last_frame_usec: int = 0
 var player_input: VarendorPlayerInput = VarendorPlayerInput.new()
+var npc_interaction: VarendorNpcInteraction = VarendorNpcInteraction.new()
 var mouse_orbit: bool:
 	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
@@ -96,6 +97,9 @@ func _ready() -> void:
 		notice("Не удалось загрузить мир. Полностью распакуйте свежий пакет игры.")
 		return
 	world.picked.connect(picked)
+	npc_interaction.setup(world,net)
+	npc_interaction.service_opened.connect(open_npc_service)
+	npc_interaction.notice.connect(notice)
 	net.intent_reserved.connect(world.record_intent)
 	net.intent_submitted.connect(world.submit_intent)
 	net.intent_rejected.connect(world.reject_intent)
@@ -114,7 +118,10 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
-		call_deferred("run_qa")
+		call_deferred("run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_stop_npc_qa() -> void:
+	await preload("res://scripts/stop_npc_acceptance.gd").run(self)
 
 func panel_style(background: Color = Color("191e20"), border: Color = Color("776544")) -> StyleBoxFlat:
 	var box: StyleBoxFlat = StyleBoxFlat.new()
@@ -234,6 +241,13 @@ func present_snapshot(snapshot: Dictionary) -> void:
 	refresh_quick()
 	target_text.text = ""
 	target_panel.hide()
+	target_hp.show()
+	if VarendorNpcInteraction.SERVICES.has(world.target_id):
+		var service: Dictionary = VarendorNpcInteraction.SERVICES[world.target_id]
+		target_panel.show()
+		target_text.text = service.name
+		target_hp.hide()
+		target_state.text = service.role + (" · Подход" if not npc_interaction.pending_id.is_empty() else " · F — поговорить")
 	if not world.target_id.is_empty():
 		for monster: Dictionary in snapshot.get("monsters", []):
 			if str(monster.uid) == world.target_id:
@@ -642,29 +656,52 @@ func revert_display() -> void:
 
 func picked(id: String) -> void:
 	if id.begins_with("npc:"):
-		target_text.text = {"npc:shop":"Торговка Эльза · F","npc:elder":"Староста Роэн · F","npc:smith":"Кузнец Бран · F","npc:teleport":"Проводник Каэль · F"}.get(id, "")
-		interact()
+		npc_interaction.begin(id)
 	else:
 		net.intent({"type":"attack","entityId":id,"skill":null})
 
 func interact() -> void:
-	if world.target_id == "npc:shop":
-		var box: VBoxContainer = dialog("Торговец")
-		box.add_child(label("Для покупки подойдите к торговцу.\nПродажа выбранного предмета — в инвентаре."))
-		for id: String in ["potion", "ether", "teleport"]:
-			box.add_child(button(data.items[id].name + " · " + str({"potion":55,"ether":70,"teleport":130}[id]) + " золота", func(): net.command({"type":"buy","itemId":id})))
-	elif world.target_id == "npc:elder":
-		net.command({"type":"quest"})
-	elif world.target_id == "npc:smith":
+	npc_interaction.begin(world.target_id)
+
+func open_npc_service(id: String) -> void:
+	if id == "npc:shop":
+		var box: VBoxContainer = dialog("Лавка Эльзы")
+		box.add_child(label("Продажа выбранного предмета — в инвентаре."))
+		for item_id: String in ["potion", "ether", "teleport"]:
+			var buy: Button = button(data.items[item_id].name + " · " + str({"potion":55,"ether":70,"teleport":130}[item_id]) + " золота", func():
+				var before_gold: int = int(net.hero.gold)
+				await net.command({"type":"buy","itemId":item_id})
+				if int(net.hero.gold) < before_gold: notice("Покупка получена: " + str(data.items[item_id].name)))
+			buy.set_meta("npc_action","buy:"+item_id)
+			box.add_child(buy)
+	elif id == "npc:elder":
+		var box: VBoxContainer = dialog("Староста Роэн",Vector2i(480,240))
+		var progress: Array[String] = ["За стенами снова слышен вой. Восемь тварей — и я поверю, что ты способен пережить эту ночь.","Очищай дорогу за стенами города. Побеждено тварей: %d / 8." % mini(int(net.hero.kills),8),"Теперь отыщи Кровавого Оборотня в Чёрном лесу.","Спустись к шахте и победи Хозяина Гнилого Леса.","Ты прошёл этот путь. Продолжай охоту и укрепляй своё снаряжение."]
+		var quest_text: Label = label(progress[clampi(int(net.hero.quest),0,4)])
+		quest_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		box.add_child(quest_text)
+		var accept: Button = button("Я очищу дорогу" if int(net.hero.quest) == 0 else "Продолжить",func():
+			if int(net.hero.quest) == 0:
+				await net.command({"type":"quest"})
+				if int(net.hero.quest) == 1: notice("Задание принято: очистить дорогу за городом")
+			if int(net.hero.quest) > 0: close_dialog())
+		accept.set_meta("npc_action","quest")
+		box.add_child(accept)
+	elif id == "npc:smith":
 		inventory_panel.show()
+		refresh_inventory()
 		notice("Бран: дважды нажмите свиток, затем один раз — предмет. Свитки добываются с монстров.")
-	elif world.target_id == "npc:teleport":
-		var box: VBoxContainer = dialog("Хранитель портала", Vector2i(480, 320))
-		box.add_child(label("Для перемещения подойдите к хранителю."))
+	elif id == "npc:teleport":
+		var box: VBoxContainer = dialog("Проводник Каэль", Vector2i(480, 320))
+		box.add_child(label("Переход в столицу бесплатен."))
 		for destination: String in ["Астерхолд", "Гринфолл", "Чёрный лес", "Вход в шахту"]:
-			box.add_child(button(destination, func():
-				net.command({"type":"teleport","destination":destination})
-				close_dialog()))
+			var price: Array = {"Астерхолд":[0,1],"Гринфолл":[25,1],"Чёрный лес":[90,10],"Вход в шахту":[150,10]}[destination]
+			var travel: Button = button(destination + " · %d золота · ур. %d" % [price[0],price[1]], func():
+				var before_generation: int = int(net.hero.generation)
+				await net.command({"type":"teleport","destination":destination})
+				if int(net.hero.generation) != before_generation: close_dialog())
+			travel.set_meta("npc_action","teleport:"+destination)
+			box.add_child(travel)
 
 func activate(action: String) -> void:
 	if net.hero.is_empty() or net.hero.dead or not net.connected:
@@ -803,6 +840,7 @@ func _physics_process(delta: float) -> void:
 	# 60 Hz lattice, including multiple catch-up ticks during a slow frame.
 	if world != null and net != null:
 		player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
+		if npc_interaction.network != null: npc_interaction.poll(delta)
 	if status != null and not net.connected and not net.hero.is_empty():
 		status.text = "Соединение потеряно · переподключение…"
 
@@ -832,6 +870,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				close_dialog()
 			return
 		if text_focused():
+			return
+		# F is also an assignable quickbar key. A selected service NPC owns
+		# interaction here; without an NPC the user's quickbar binding wins.
+		if event.is_action_pressed("interact") and VarendorNpcInteraction.SERVICES.has(world.target_id):
+			interact()
 			return
 		var key: String = ""
 		if event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_8:
@@ -1033,6 +1076,7 @@ func run_qa() -> void:
 	checks.merge(await preload("res://scripts/network_qa.gd").run(get_tree(), world.current_snapshot, qa_path.get_base_dir()))
 	checks.merge(await preload("res://scripts/core_acceptance.gd").run(self))
 	checks.merge(await preload("res://scripts/reference_ui_qa.gd").run(self))
+	checks.merge(await preload("res://scripts/npc_interaction_qa.gd").run(self))
 	# Same actual-map collision vectors are resolved independently by TypeScript.
 	var cases = JSON.parse_string(FileAccess.get_file_as_string("res://generated/collision-qa.json")) if FileAccess.file_exists("res://generated/collision-qa.json") else []
 	checks["shared_collision_vectors"] = not cases.is_empty()

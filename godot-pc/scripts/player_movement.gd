@@ -31,6 +31,10 @@ var generation: int = -1
 var identity: String = ""
 var clock_ms: float = 0.0
 var history: Array = []
+# Reserved sequence → local physics time, before that command is predicted.
+# This is separate from wall/server clock estimation: HTTP input execution
+# can happen several physics ticks after the local input begins.
+var sent_inputs: Dictionary = {}
 var visual_correction: Vector2 = Vector2.ZERO
 var jump_wait_ground: bool = false
 var jump_sent_sequence: int = -1
@@ -66,6 +70,7 @@ func reconcile(snapshot: Dictionary) -> bool:
 		velocity = Vector2.ZERO
 		visual_correction = Vector2.ZERO
 		history.clear()
+		sent_inputs.clear()
 		clock_ms = float(snapshot.time)
 		input_mode = "idle"
 		input_direction = Vector2.ZERO
@@ -78,16 +83,24 @@ func reconcile(snapshot: Dictionary) -> bool:
 		approaching = false
 		navigation_goal = Vector2(INF, INF)
 		return true
-	# Compare the received pose to the prediction at that SAME server time.
-	# Never blend an old server position into the current moving position.
+	# Match the AGE OF THE ACKNOWLEDGED INPUT on each simulator. Their
+	# clocks alone are insufficient: prediction begins at reservation, whereas
+	# the server starts the same command at lastInputAt after transport/queue
+	# delay. Comparing equal clock times mistakes an earlier acceleration,
+	# turn or coast phase for a position error, replaying it after we stop.
+	# The server remains authoritative; only the historical comparison time
+	# changes. Real collision/position discrepancies are still corrected.
+	var sample_time: float = float(snapshot.time)
+	if hero.has("lastInputAt") and sent_inputs.has(int(hero.lastInputSequence)):
+		sample_time += float(sent_inputs[int(hero.lastInputSequence)]) - float(hero.lastInputAt)
 	var reference: Vector2 = position_value
 	var found: bool = false
 	for index: int in range(history.size() - 1, -1, -1):
-		if float(history[index].time) <= float(snapshot.time):
+		if float(history[index].time) <= sample_time + .0001:
 			reference = history[index].position
 			if index + 1 < history.size():
 				var span: float = float(history[index + 1].time) - float(history[index].time)
-				reference = reference.lerp(history[index + 1].position, clampf((float(snapshot.time) - float(history[index].time)) / maxf(1, span), 0, 1))
+				reference = reference.lerp(history[index + 1].position, clampf((sample_time - float(history[index].time)) / maxf(1, span), 0, 1))
 			found = true
 			break
 	# An ACK predating the newest reserved command describes another control
@@ -175,6 +188,8 @@ func submit(value: Dictionary) -> void:
 
 func sent(value: Dictionary, sequence: int) -> void:
 	last_sent_sequence = sequence
+	sent_inputs[sequence] = clock_ms
+	while sent_inputs.size() > 180: sent_inputs.erase(sent_inputs.keys()[0])
 	if value.type == "jump": jump_sent_sequence = sequence
 
 func request_jump() -> bool:

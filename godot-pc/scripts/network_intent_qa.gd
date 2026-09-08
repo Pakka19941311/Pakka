@@ -68,24 +68,28 @@ static func run() -> Dictionary:
 	client.intent_submitted.connect(func(_value: Dictionary): reservation_was_first.append(not reserved.is_empty() and reserved[-1] == client.sequence))
 	client.intent({"type":"direction", "x":1.0, "z":0.0})
 	client.intent({"type":"direction", "x":0.0, "z":1.0})
+	client.intent({"type":"direction", "x":0.0, "z":1.0})
 	var changed_after_submit: Dictionary = {"type":"direction", "x":-1.0, "z":0.0}
 	client.intent(changed_after_submit)
 	changed_after_submit.x = 999
 	client.intent({"type":"jump"})
 	client.intent({"type":"direction", "x":1.0, "z":0.0})
+	client.intent({"type":"direction", "x":1.0, "z":0.0})
 	client.intent({"type":"direction", "x":0.0, "z":-1.0})
+	client.intent({"type":"direction", "x":0.0, "z":0.0})
+	client.intent({"type":"direction", "x":0.0, "z":0.0})
 	client.intent({"type":"attack", "entityId":"fox", "skill":null})
 	var queued_sequences: Array[int] = []
 	for entry: Dictionary in client.input_queue: queued_sequences.append(int(entry.sequence))
-	checks["network_direction_coalescing_keeps_latest_id_and_order_barriers"] = queued_sequences == [3,4,6,7] and client.input_queue[0].value.x == -1 and client.input_queue[2].value.z == -1 and client.input_queue[1].value.type == "jump"
-	checks["network_each_prediction_receives_unique_reserved_id_first"] = reserved == [1,2,3,4,5,6,7] and not reservation_was_first.has(false)
-	for reply: int in range(5): client.respond()
+	checks["network_identical_heartbeats_coalesce_but_turns_and_neutral_survive"] = queued_sequences == [3,4,5,7,8,10,11] and client.input_queue[0].value.z == 1 and client.input_queue[1].value.x == -1 and client.input_queue[4].value.z == -1 and client.input_queue[5].value == {"type":"direction","x":0.0,"z":0.0}
+	checks["network_each_prediction_receives_unique_reserved_id_first"] = reserved == [1,2,3,4,5,6,7,8,9,10,11] and not reservation_was_first.has(false)
+	for reply: int in range(8): client.respond()
 	var sent_sequences: Array[int] = []
 	for request: Dictionary in client.requests: sent_sequences.append(int(request.payload.sequence))
-	checks["network_coalesced_dispatch_keeps_discrete_jump_attack_order"] = sent_sequences == [1,3,4,6,7] and not client.input_busy and client.input_queue.is_empty()
-	checks["network_queued_intents_are_copied_from_mutable_caller_data"] = client.requests[1].payload.intent.x == -1.0
+	checks["network_coalesced_dispatch_keeps_turn_jump_release_attack_order"] = sent_sequences == [1,3,4,5,7,8,10,11] and not client.input_busy and client.input_queue.is_empty()
+	checks["network_queued_intents_are_copied_from_mutable_caller_data"] = client.requests[2].payload.intent.x == -1.0
 	client.end_session()
 	client.intent({"type":"jump"})
-	checks["network_disconnected_input_neither_predicts_nor_reserves_id"] = client.sequence == 0 and reserved.size() == 7 and client.input_queue.is_empty() and client.requests.size() == 5
+	checks["network_disconnected_input_neither_predicts_nor_reserves_id"] = client.sequence == 0 and reserved.size() == 11 and client.input_queue.is_empty() and client.requests.size() == 8
 	client.free()
 	return checks

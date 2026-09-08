@@ -51,6 +51,12 @@ func request(path: String, data = null, bearer: String = "") -> Dictionary:
 	var generation: int = session_generation
 	var http: HTTPRequest = HTTPRequest.new()
 	http.timeout = 7.0
+	# HTTPClient needs several polls to connect, write, and read a response.
+	# Polling each phase from rendered frames made a local input take hundreds
+	# of milliseconds at low FPS, keeping release/turn edges behind old input.
+	# I/O runs independently; request_completed and every queue mutation still
+	# run on the main thread, with one input request in flight at a time.
+	http.use_threads = true
 	add_child(http)
 	var headers: PackedStringArray = ["Content-Type: application/json"]
 	var authorization: String = token if bearer.is_empty() else bearer
@@ -261,7 +267,11 @@ func intent(value: Dictionary) -> void:
 	var entry: Dictionary = {"value":value.duplicate(),"sequence":sequence}
 	intent_reserved.emit(value.duplicate(),sequence)
 	intent_submitted.emit(value.duplicate())
-	if value.type == "direction" and not input_queue.is_empty() and input_queue.back().value.type == "direction":
+	# Only redundant held-direction heartbeats may collapse. A turn or neutral
+	# release was already applied by prediction and must reach the server too.
+	# Collapsing all directions discarded corners of the real movement path,
+	# causing an authoritative sideways correction after the player stopped.
+	if value.type == "direction" and not input_queue.is_empty() and same_direction(input_queue.back().value,value):
 		input_queue[input_queue.size()-1] = entry
 	else: input_queue.append(entry)
 	if input_busy: return
@@ -276,6 +286,9 @@ func intent(value: Dictionary) -> void:
 			notice.emit(str(response.error))
 	input_queue.clear()
 	input_busy = false
+
+func same_direction(first: Dictionary, second: Dictionary) -> bool:
+	return first.get("type", "") == "direction" and second.get("type", "") == "direction" and float(first.get("x",0)) == float(second.get("x",0)) and float(first.get("z",0)) == float(second.get("z",0))
 
 func pending_path() -> String:
 	return bootstrap_path.get_base_dir().path_join("pending-" + str(hero.get("id", "unknown")) + ".json")

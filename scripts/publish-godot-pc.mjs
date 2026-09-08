@@ -42,7 +42,12 @@ with zipfile.ZipFile(target) as z:
 const bytes = readFileSync(archive), checksum = sha(bytes);
 writeFileSync(archive + '.sha256', checksum + '  ' + basename(archive) + '\n');
 const notes = join(output, 'release-notes.md');
-writeFileSync(notes, `Тестовая сборка **Varendor на Godot для Windows x64** после переработки основного игрового цикла.\n\nРаспакуйте ZIP и запустите **RUN_VARENDOR.bat**. Движки и Node устанавливать не нужно.\n\nРазделены ввод, физическое движение, камера, выбор цели, анимации и сетевая временная шкала. Переработаны WASD/click-to-move, прыжок, дистанции атак, синхронизация снаряда/попадания/HP/смерти и AI монстров: патруль, обнаружение, преследование, атака, поиск, возврат и труп.\n\n[Полный технический отчёт и acceptance matrix](https://github.com/${repository}/blob/work/godot-p1-recovery/docs/migration/pc/CORE_GAMEPLAY_REFACTOR.md). **Финальная оценка отзывчивости управления и Windows GPU/FPS остаётся за тестом на игровом ПК.** Автоматические проверки не заменяют эту оценку.\n\nПроверены нативный Godot render в Linux/Mesa и поставляемый Windows EXE + Node без графики. Тест использует отдельную базу: старая SQLite при наличии копируется с проверкой, исходная база не изменяется.\n\nИсходный commit: \`${commit}\`. ZIP: ${bytes.length} байт. SHA-256: \`${checksum}\`.\n`);
+const followup = linux.native.scope === 'stop-npc-stats-follow-up';
+const changes = followup
+  ? 'Исправлены запоздалые сдвиги персонажа после остановки, подход и функции городских NPC. Все девять характеристик помещаются в окне инвентаря без вертикальной прокрутки.'
+  : 'Перенесены управление, камера, движение, бой, поведение монстров, HUD и инвентарь из принятой эталонной сборки Varendor в Godot.';
+const report = followup ? 'STOP_NPC_FOLLOWUP.md' : 'REFERENCE_CONTROL_PORT.md';
+writeFileSync(notes, `Тестовая сборка **Varendor на Godot для Windows x64**.\n\nРаспакуйте ZIP и запустите **RUN_VARENDOR.bat**. Движки и Node устанавливать не нужно.\n\n${changes}\n\n[Проверки и ограничения](https://github.com/${repository}/blob/work/godot-p1-recovery/docs/migration/pc/${report}). После пользовательской проверки этих исправлений — продолжение по ТЗ.\n\nПроверены нативный Godot render в Linux/Mesa и поставляемый Windows EXE + Node без графики. Проверки используют отдельную синтетическую базу; исходная SQLite не изменяется. Оценка ощущений управления и Windows GPU остаётся за тестом на игровом ПК.\n\nИсходный commit: \`${commit}\`. ZIP: ${bytes.length} байт. SHA-256: \`${checksum}\`.\n`);
 const linuxAsset = join(output, 'linux-native-qa.json'), windowsAsset = join(output, 'windows-native-qa.json');
 writeFileSync(linuxAsset, JSON.stringify(linux, null, 2) + '\n');
 writeFileSync(windowsAsset, JSON.stringify(windows, null, 2) + '\n');

@@ -207,9 +207,13 @@ func setup(game: Dictionary) -> bool:
 	add_child(arrival_marker)
 	arrival_marker.scale = Vector3(.65, .65, .65)
 	arrival_marker.visible = false
-	for npc: Dictionary in [{"id":"npc:shop","name":"Торговка Эльза","model":"Ranger","x":.3,"z":-7.8}, {"id":"npc:elder","name":"Староста Роэн","model":"Warrior","x":-7,"z":-2.6}, {"id":"npc:smith","name":"Кузнец Бран","model":"Warrior","x":-17.5,"z":-12.6}, {"id":"npc:teleport","name":"Проводник Каэль","model":"Wizard","x":-7,"z":-20}]:
-		var actor: Node3D = make_actor(npc.id, npc.model, 2.05, npc.name, Color("e2c382"))
-		actor.position = point(npc.x, npc.z)
+	for id: String in VarendorNpcInteraction.SERVICES:
+		var npc: Dictionary = VarendorNpcInteraction.SERVICES[id]
+		var actor: Node3D = make_actor(id, npc.model, 2.05, npc.name, Color("e2c382"))
+		# The approved client placed service actors outside nearby stalls/signs.
+		# Keep their server service anchor, but never spawn a body inside props.
+		var free: Vector2 = collision.nearest_free(Vector2(npc.x,npc.z))
+		actor.position = point(free.x, free.y)
 		actor.set_meta("destination", actor.position)
 		actor.set_meta("previous", actor.position)
 		actor.set_meta("initialized", true)

@@ -7,6 +7,11 @@ func _initialize() -> void:
 
 func standalone() -> void:
 	root.size = Vector2i(1600,900)
+	for argument: String in OS.get_cmdline_user_args():
+		if argument.begins_with("--ui-size="):
+			var dimensions: PackedStringArray = argument.trim_prefix("--ui-size=").split("x")
+			if dimensions.size() == 2:
+				root.size = Vector2i(int(dimensions[0]),int(dimensions[1]))
 	var app = Node3D.new()
 	root.add_child(app)
 	app.set_script(load("res://scripts/main.gd"))
@@ -84,6 +89,11 @@ static func run(app: Node) -> Dictionary:
 	checks["reference_window_392x564"] = app.inventory_panel.size.is_equal_approx(Vector2(392,564))
 	checks["reference_window_nonmodal_and_close_button"] = app.ui.mouse_filter == Control.MOUSE_FILTER_IGNORE and app.inventory_panel.find_child("CloseInventory",true,false) is Button
 	checks["reference_nine_character_stats"] = app.stat_values.keys() == ["level","xp","hp","mp","str","dex","int","def","mdef"]
+	var stats_bounds: Rect2 = hud.stats_scroll.get_global_rect()
+	checks["reference_all_nine_stats_fit_without_scrolling"] = not hud.stats_scroll.get_v_scroll_bar().visible and hud.stats_scroll.scroll_vertical == 0
+	for value: Label in app.stat_values.values():
+		var row_bounds: Rect2 = value.get_parent().get_global_rect()
+		checks.reference_all_nine_stats_fit_without_scrolling = checks.reference_all_nine_stats_fit_without_scrolling and stats_bounds.encloses(row_bounds) and row_bounds.encloses(value.get_global_rect())
 	var expected_equipment: Array = ["ear1","head","ear2","neck","chest","offhand","weapon","belt","gloves","ring1","boots","ring2"]
 	checks["reference_equipment_order_and_3x4_grid"] = app.equipment_slots.keys() == expected_equipment and hud.equipment_grid.columns == 3 and hud.equipment_grid.get_child_count() == 12
 	checks["reference_bag_6x7_scrollable"] = hud.bag_grid.columns == 6 and hud.bag_grid.get_child_count() == 42 and hud.bag_scroll.size.y == 178 and hud.bag_scroll.get_v_scroll_bar().max_value > hud.bag_scroll.size.y

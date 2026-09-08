@@ -1,0 +1,44 @@
+{
+  "ok": true,
+  "frame_cap": 15,
+  "checks": {
+    "real_godot_transport_completed": true,
+    "all_turns_and_neutral_reach_server_in_order": true,
+    "server_received_original_directions": true,
+    "input_arrives_within_two_15fps_frames": true
+  },
+  "received": [
+    {
+      "sequence": 1,
+      "direction": [
+        1.0,
+        0.0
+      ],
+      "delivery_ms": 6.99755859375
+    },
+    {
+      "sequence": 2,
+      "direction": [
+        0.0,
+        -1.0
+      ],
+      "delivery_ms": 2.86962890625
+    },
+    {
+      "sequence": 3,
+      "direction": [
+        -1.0,
+        0.0
+      ],
+      "delivery_ms": 2.67919921875
+    },
+    {
+      "sequence": 4,
+      "direction": [
+        0.0,
+        0.0
+      ],
+      "delivery_ms": 2.836669921875
+    }
+  ]
+}

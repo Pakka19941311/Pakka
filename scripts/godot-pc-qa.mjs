@@ -40,7 +40,8 @@ try {
   await assert.rejects(startNativeBridge({ data, legacy, backups }), /уже запущена/);
   checks.push('one process per native saved world');
   const reportPath = join(output, 'native-runtime.json');
-  const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`];
+  const scope = options.find(arg => arg.startsWith('--qa-scope='));
+  const args = ['--audio-driver', 'Dummy', ...(options.includes('--graphical') ? [] : ['--headless']), '--', `--bootstrap=${bridge.bootstrapPath}`, `--qa=${reportPath}`, ...(scope ? [scope] : [])];
   const child = spawn(binary, args, { cwd: stage, stdio: ['ignore', 'pipe', 'pipe'] });
   let log = '';
   child.stdout.on('data', bytes => { log += bytes; });
@@ -59,7 +60,9 @@ try {
     assert.equal(native.checks.native_render, true);
     assert.ok(existsSync(reportPath.replace(/\.json$/, '.png')));
   }
-  checks.push('exported native client: world, five classes, HUD 42/12/32, move, reorder, equip, UID, persisted quickbar');
+  checks.push(native.scope === 'stop-npc-stats-follow-up'
+    ? 'exported native client: stopping and delayed reconciliation, city service interactions, compact stats, persisted quickbar'
+    : 'exported native client: world, five classes, HUD 42/12/32, move, reorder, equip, UID, persisted quickbar');
   let bootstrap = JSON.parse(readFileSync(bridge.bootstrapPath, 'utf8'));
   let token = bootstrap.profiles[0].token;
   const request = async (path, body) => {
