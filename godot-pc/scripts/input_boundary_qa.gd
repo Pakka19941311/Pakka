@@ -128,8 +128,10 @@ static func npc_boundary(app: Node, key_action: String) -> Dictionary:
 	var opened: Array[String] = []
 	interaction.service_opened.connect(func(id: String):
 		opened.append(id)
-		# Opening any real service window makes main.text_focused() true.
-		fixture.active_dialog = Window.new())
+		# Match main's typed dialog and give the fixture ownership of it.
+		# An incompatible Window is rejected and leaves an orphan viewport.
+		fixture.active_dialog = PanelContainer.new()
+		fixture.add_child(fixture.active_dialog))
 	interaction.begin("npc:shop")
 	client.hero.lastInputSequence = client.sequence
 	var sequence_before: int = client.sequence
@@ -149,6 +151,7 @@ static func npc_boundary(app: Node, key_action: String) -> Dictionary:
 	var result: Dictionary = {
 		"key_action":key_action,"fixture_waited_for_acknowledged_stop":awaiting_acknowledged_stop,
 		"opened_during_catch_up":opened_during_catch_up,"opened_total":opened.size(),
+		"dialog_owned":is_instance_valid(fixture.active_dialog) and fixture.active_dialog.get_parent() == fixture,
 		"manual_committed":manual_committed,"tap_committed":tap_committed,
 		"pending_cleared":interaction.pending_id.is_empty(),"selection_retained":world.target_id == "npc:shop"}
 	free_fixture(fixture)
@@ -181,7 +184,7 @@ static func run(app: Node) -> Dictionary:
 		var result: Dictionary = npc_boundary(app,key_action)
 		npc_observations.append(result)
 		if key_action == "neutral_release":
-			checks["input_boundary_npc_neutral_release_keeps_service_opening"] = result.fixture_waited_for_acknowledged_stop and result.opened_during_catch_up == 1 and result.opened_total == 1 and result.pending_cleared and result.selection_retained
+			checks["input_boundary_npc_neutral_release_keeps_service_opening"] = result.fixture_waited_for_acknowledged_stop and result.opened_during_catch_up == 1 and result.opened_total == 1 and result.dialog_owned and result.pending_cleared and result.selection_retained
 		else:
 			checks["input_boundary_npc_"+key_action+"_cannot_open_before_manual_commit"] = result.fixture_waited_for_acknowledged_stop and result.opened_during_catch_up == 0 and result.opened_total == 0
 			checks["input_boundary_npc_"+key_action+"_commits_input_and_cancels_service"] = result.pending_cleared and (result.manual_committed if key_action == "held" else result.tap_committed)
@@ -192,3 +195,4 @@ static func run(app: Node) -> Dictionary:
 	checks["input_boundary_observations"] = observations
 	checks["input_boundary_npc_observations"] = npc_observations
 	return checks
+
