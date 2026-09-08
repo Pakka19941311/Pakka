@@ -2,11 +2,11 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-08",
-  "state_kind": "pc_forward_stop_followup_in_progress_npc_accepted",
+  "state_kind": "pc_forward_stop_released_awaiting_owner_test_npc_accepted",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
-  "observed_local_branch": "work/stop-npc-delivery-reviewed",
+  "observed_local_branch": "work/forward-stop-final-reviewed",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "8f7959ad63a65b5d0d8e92ca03b41276dd115d73",
+  "observed_head": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -15,12 +15,12 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
   "current_phase": "P1",
-  "current_task": "Fix owner-reported forward sliding from first release frame; city NPC accepted",
+  "current_task": "Await owner test of first-frame stopping in released Windows build; city NPC accepted",
   "next_task_after_authorization": null,
   "next_action": {
     "task_id": "P1-05",
     "substep_id": "P1-05.4",
-    "action": "Complete first-frame stopping regression and deliver tested Windows ZIP. NPC accepted by owner; no next TZ/P1 block before owner tests stop.",
+    "action": "Await owner stopping test of e4baa58e0239: WASD release, RMB orbit release, LMB arrival and monster approach. NPC accepted; do not begin next TZ/P1 block until owner feedback.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
     "requires_physical_android": false,
@@ -2016,7 +2016,7 @@
   "allowed_scope": [
     "Core gameplay refactor, regression and runtime acceptance; no new content or UI redesign"
   ],
-  "current_substep": "101 server, 43 imported animation, 132 Linux graphical and 120 packaged Windows headless checks passed; Windows gameplay feel/GPU acceptance open",
+  "current_substep": "Forward-stop follow-up released: 108 server tests, 265 Linux graphical checks, 264 packaged Windows headless checks, 46 HTTP checks; all four live stops 0 m travel/excursion. Owner Windows gameplay/GPU test open.",
   "working_commit": "888dd637bde85ec9c892157728de34508c8545a6",
   "last_accepted_gate": null,
   "open_defects": [
@@ -2082,6 +2082,13 @@
       "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-888dd637bde8",
       "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-888dd637bde8/Varendor_Godot_PC_888dd637bde8.zip",
       "evidence": "docs/migration/pc/CORE_GAMEPLAY_REFACTOR.md"
+    },
+    {
+      "commit": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f",
+      "kind": "current forward-stop follow-up; city NPC accepted; owner Windows stopping test pending",
+      "url": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-e4baa58e0239",
+      "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-e4baa58e0239/Varendor_Godot_PC_e4baa58e0239.zip",
+      "evidence": "docs/migration/pc/FORWARD_STOP_FIX.md"
     }
   ],
   "definitions": {
@@ -4409,7 +4416,7 @@
     ]
   },
   "stop_npc_followup": {
-    "status": "released_awaiting_owner_test",
+    "status": "npc_accepted_stop_rejected_superseded_by_forward_stop_followup",
     "baseline_build": "9bedf0f5dc83fcac223f7e46b83572cd03e2125c",
     "report": "docs/migration/pc/STOP_NPC_FOLLOWUP.md",
     "scope": [
@@ -4443,13 +4450,44 @@
       "docs/migration/pc/evidence/stop-transport-after.json",
       "docs/migration/pc/evidence/stop-transport-before.json",
       "docs/migration/pc/evidence/stop-windows.json"
-    ]
+    ],
+    "npc_owner_accepted": true,
+    "stopping_owner_accepted": false,
+    "superseded_stopping_build": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f"
   },
   "forward_stop_followup": {
     "owner_feedback": "NPC work correctly; forward stopping slide remains rejected",
     "base_release": "a5d1f39bf4d9",
     "report": "docs/migration/pc/FORWARD_STOP_FIX.md",
-    "status": "in_progress",
-    "scope": "manual release, arrival/approach stop, input transport and prediction history; accepted NPC/UI unchanged"
+    "status": "released_awaiting_owner_test",
+    "scope": "First-frame neutral/arrival/approach stopping, sequential input transport, input chronology and prediction history; guard existing NPC service against pending WASD cancellation",
+    "build_commit": "e4baa58e0239e9ff20c1699f522b7a8bd90d8d2f",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-e4baa58e0239/Varendor_Godot_PC_e4baa58e0239.zip",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-e4baa58e0239",
+    "bytes": 297010060,
+    "sha256": "d7954242162e281b3e5903d2487e986574da2c82ac596702b1ac2d55d1bef61c",
+    "ci": "https://github.com/Pakka19941311/Pakka/actions/runs/34208265783",
+    "linux_graphical_checks": 265,
+    "windows_headless_checks": 264,
+    "server_tests": 108,
+    "http_transport_checks": 46,
+    "direct_download_verified": true,
+    "linux_graphical_screenshots_reviewed": true,
+    "windows_gpu_verified": false,
+    "owner_test_required": true,
+    "advance_to_next_tz_block": false,
+    "npc_owner_accepted": true,
+    "evidence": [
+      "docs/migration/pc/evidence/forward-stop-0.jpg",
+      "docs/migration/pc/evidence/forward-stop-1.jpg",
+      "docs/migration/pc/evidence/forward-stop-2.jpg",
+      "docs/migration/pc/evidence/forward-stop-3.jpg",
+      "docs/migration/pc/evidence/forward-stop-linux.json",
+      "docs/migration/pc/evidence/forward-stop-publish.json",
+      "docs/migration/pc/evidence/forward-stop-transport-after.json",
+      "docs/migration/pc/evidence/forward-stop-transport-before.json",
+      "docs/migration/pc/evidence/forward-stop-transport-ci.json",
+      "docs/migration/pc/evidence/forward-stop-windows.json"
+    ]
   }
 }
