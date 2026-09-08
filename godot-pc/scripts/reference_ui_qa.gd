@@ -47,6 +47,24 @@ func standalone() -> void:
 
 static func run(app: Node) -> Dictionary:
 	var checks: Dictionary = {}
+	# The live world can have every boss on its respawn timer. Render all real
+	# catalog categories so string-valued boss flags cannot escape validation.
+	var map_world: VarendorWorld = VarendorWorld.new()
+	map_world.add_child(map_world.camera_controller)
+	map_world.data = app.data
+	map_world.current_snapshot = {"monsters":[],"character":{"x":-7,"z":-11}}
+	for id: String in app.data.monsters:
+		map_world.current_snapshot.monsters.append({"id":id,"alive":true,"x":10,"z":10})
+	var map_probe: Control = load("res://scripts/reference_minimap.gd").new()
+	map_probe.world = map_world
+	map_probe.size = Vector2(214,164)
+	app.ui.add_child(map_probe)
+	await app.get_tree().process_frame
+	await app.get_tree().process_frame
+	checks["reference_minimap_renders_every_real_catalog_category"] = map_world.current_snapshot.monsters.size() == app.data.monsters.size()
+	map_probe.queue_free()
+	await app.get_tree().process_frame
+	map_world.free()
 	var hud: VarendorReferenceHud = app.reference_hud
 	var previous_visible: bool = app.inventory_panel.visible
 	var previous_full: bool = app.full_quick
