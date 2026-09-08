@@ -2,11 +2,11 @@
   "project": "Varendor",
   "document_version": "2.0",
   "updated_at": "2026-09-08",
-  "state_kind": "pc_reference_control_port_in_validation",
+  "state_kind": "pc_reference_control_port_released_awaiting_owner_test",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
-  "observed_local_branch": "work/godot-p1-recovery",
+  "observed_local_branch": "work/reference-acceptance-reviewed",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "1207704066800b95504111cc829e6cb97ec985fd",
+  "observed_head": "9bedf0f5dc83fcac223f7e46b83572cd03e2125c",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
@@ -15,12 +15,12 @@
   "execution_authorized": true,
   "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми.",
   "current_phase": "P1",
-  "current_task": "Port approved browser reference controls, combat, HUD and inventory into existing Godot world",
+  "current_task": "Owner tests Godot controls, combat, HUD and inventory ported from approved 1e94a0d1 reference",
   "next_task_after_authorization": null,
   "next_action": {
     "task_id": "P1-05",
     "substep_id": "P1-05.4",
-    "action": "Validate reference behavior in native graphical runtime, package Windows and publish tested GitHub download; owner play test remains required.",
+    "action": "Test Windows build 9bedf0f5dc83 against the approved browser behavior; report remaining device/feel defects before resuming new P1 content.",
     "requires_execution_authorization": false,
     "requires_data_access": false,
     "requires_physical_android": false,
@@ -4353,7 +4353,7 @@
     ]
   },
   "reference_control_port": {
-    "status": "implemented_in_validation",
+    "status": "released_for_owner_test",
     "reference_commit": "1e94a0d1ad08a4df8959527e40058f5c89b07e9a",
     "reference_archive_sha256": "315e1acd9bf264c6bad2aee34ef100d7726117a128cb192172dde9288b84e254",
     "report": "docs/migration/pc/REFERENCE_CONTROL_PORT.md",
@@ -4373,8 +4373,39 @@
       "statistics"
     ],
     "new_world_content": false,
-    "local_headless_integrated_boolean_checks": 239,
-    "graphical_validation": "pending",
-    "download": null
+    "local_headless_integrated_boolean_checks": 254,
+    "graphical_validation": "native Linux X11/Mesa; real cursor restoration, UI screenshots and combat stages reviewed",
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-9bedf0f5dc83/Varendor_Godot_PC_9bedf0f5dc83.zip",
+    "build_commit": "9bedf0f5dc83fcac223f7e46b83572cd03e2125c",
+    "baseline": "1207704066800b95504111cc829e6cb97ec985fd",
+    "ci": "https://github.com/Pakka19941311/Pakka/actions/runs/34192932484",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-pc-preview-9bedf0f5dc83",
+    "bytes": 296928785,
+    "sha256": "172958c8dcdb05cb9e5d6abd398ee751c2ab6e9a210900c70f0a8bfb7c1333de",
+    "direct_download_verified": true,
+    "server_tests_passed": 127,
+    "animation_checks": 58,
+    "linux_boolean_checks": 270,
+    "windows_boolean_checks": 254,
+    "browser_reference_captured": true,
+    "graphical_pointer_restore_verified_linux": true,
+    "reference_physics_ticks": 1750,
+    "reference_render_frames": 1170,
+    "reference_attack_frames": 249,
+    "remaining": [
+      "Owner acceptance of movement/camera feel",
+      "Windows GUI/DPI/GPU/FPS play test",
+      "Inherited damaged colormap assets remain outside this controls/UI port"
+    ],
+    "evidence": [
+      "docs/migration/pc/evidence/reference-browser-inventory.jpg",
+      "docs/migration/pc/evidence/reference-browser.json",
+      "docs/migration/pc/evidence/reference-combat-stages.jpg",
+      "docs/migration/pc/evidence/reference-linux.json",
+      "docs/migration/pc/evidence/reference-native-hud.jpg",
+      "docs/migration/pc/evidence/reference-native-inventory.jpg",
+      "docs/migration/pc/evidence/reference-publish.json",
+      "docs/migration/pc/evidence/reference-windows.json"
+    ]
   }
 }
