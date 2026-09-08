@@ -128,6 +128,11 @@ jobs:
           test -n "$probe"
           gh run watch "$probe" --exit-status --interval 10
           gh run download "$probe" --name p0-frame-pacing-evidence --dir qa-artifacts/pacing
+          # These graphics steps already passed with identical production movement,
+          # rain and rendering source; only the measurement shutdown is corrected.
+          gh api repos/Pakka19941311/Pakka/actions/runs/34254532761/jobs > "$RUNNER_TEMP/pacing-render-jobs.json"
+          node --input-type=module -e 'import fs from "node:fs";import assert from "node:assert/strict";const j=JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP+"/pacing-render-jobs.json"));for(const name of ["Record unchanged rain scene with native graphics","Record actual 3838 x 2158 in a fresh native process"])assert.equal(j.jobs[0].steps.find(s=>s.name===name).conclusion,"success");'
+          git diff --exit-code a31582b4cd82cd30906e582d69418dfda8a26638 -- godot-pc/scripts/main.gd godot-pc/scripts/network.gd godot-pc/scripts/world.gd godot-pc/scripts/world_weather.gd godot-pc/scripts/camera_controller.gd
           node scripts/pacing/compare.mjs qa-artifacts/pacing
           mkdir -p qa-artifacts/pc-linux
           cp qa-artifacts/pacing/comparison.json qa-artifacts/pc-linux/pacing-comparison.json

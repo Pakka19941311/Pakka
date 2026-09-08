@@ -86,5 +86,7 @@ static func run(app: Node) -> void:
 	await app.net.request("/api/disconnect",{})
 	app.net.stop_input_transport()
 	preload("res://scripts/stopping_runtime_qa.gd").save_captures(app)
-	await tree.process_frame
+	# Let the Dummy audio mixer release the stopped MP3 playback before exit.
+	# This wait is outside every measured interval.
+	await tree.create_timer(.25).timeout
 	tree.call_deferred("quit",0 if success else 2)

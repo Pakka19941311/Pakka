@@ -46,7 +46,7 @@ const control = createServer((req, res) => {
 await new Promise(r => control.listen(0, '127.0.0.1', r));
 mkdirSync(output, { recursive: true });
 const resolution = options.find(v=>v.startsWith('--resolution='))?.split('=')[1] || '1600x900';
-const args = ['--verbose','--windowed','--resolution',resolution,'--path', project, '--audio-driver', 'Dummy', ...(options.includes('--headless') ? ['--headless'] : []), '--', '--pacing', `--qa=${join(output,'unused.json')}`, `--pacing-resolution=${resolution}`, `--pacing-short=${options.includes('--short')}`, `--bootstrap=${bridge.bootstrapPath}`, `--pacing-output=${output}`, `--pacing-control=http://127.0.0.1:${control.address().port}/reset?token=${secret}`, `--pacing-source=${process.env.GITHUB_SHA || 'local'}`];
+const args = [...(options.includes('--verbose')?['--verbose']:[]),'--windowed','--resolution',resolution,'--path', project, '--audio-driver', 'Dummy', ...(options.includes('--headless') ? ['--headless'] : []), '--', '--pacing', `--qa=${join(output,'unused.json')}`, `--pacing-resolution=${resolution}`, `--pacing-short=${options.includes('--short')}`, `--bootstrap=${bridge.bootstrapPath}`, `--pacing-output=${output}`, `--pacing-control=http://127.0.0.1:${control.address().port}/reset?token=${secret}`, `--pacing-source=${process.env.GITHUB_SHA || 'local'}`];
 let log = '';
 try {
   const child = spawn(binary, args, {cwd:root,stdio:['ignore','pipe','pipe']});
@@ -61,7 +61,9 @@ try {
   try { [code] = await once(child, 'exit'); } finally { clearTimeout(timeout); writeFileSync(join(output,'runtime.log'),log); }
   if(code!==0) { for(const line of log.split('\n')) if(line.startsWith('PACING_RESULT ')) console.log(line); }
   assert.equal(code,0,log.slice(-8000));
-  assert.doesNotMatch(log,/SCRIPT ERROR:|^ERROR:/m);
+  const errors=log.split('\n').filter(line=>/SCRIPT ERROR:|^ERROR:|^WARNING:|Leaked instance|Resource still in use/.test(line));
+  if(errors.length)console.log('PACING_RUNTIME_DIAGNOSIS '+errors.join('\n'));
+  assert.doesNotMatch(log,/SCRIPT ERROR:|^ERROR:/m,errors.join('\n'));
   assert.ok(existsSync(join(output,'report.json')));
   const report = JSON.parse(readFileSync(join(output,'report.json'),'utf8'));
   const compact = {...report, scenarios:report.scenarios.map(s=>({

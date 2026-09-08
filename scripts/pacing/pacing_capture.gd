@@ -202,5 +202,7 @@ static func run(app: Node) -> void:
 	await app.net.request("/api/disconnect",{})
 	app.net.stop_input_transport()
 	app.net.close_stream()
-	await tree.process_frame
+	# Let the Dummy audio mixer release the stopped MP3 playback before exit.
+	# This wait is outside every measured interval.
+	await tree.create_timer(.25).timeout
 	tree.call_deferred("quit")
