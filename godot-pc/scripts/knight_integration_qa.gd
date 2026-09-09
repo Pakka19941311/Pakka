@@ -81,20 +81,34 @@ static func unequip(app: Node, slot: String, model_id: String) -> bool:
 
 static func capture(app: Node, name: String, front: bool = false) -> String:
 	if DisplayServer.get_name() == "headless": return ""
-	var c: VarendorCameraController = app.world.camera_controller
-	var old: Array = [c.yaw,c.smoothed_yaw,c.distance,c.smoothed_distance,c.pitch,c.smoothed_pitch]
+	var functional_profile: bool = app.qa_interaction
+	app.qa_interaction = false
+	app.apply_settings()
+	var gameplay_camera: Camera3D = app.world.camera
+	var inspection: Camera3D = null
 	if front:
+		# Inspection-only camera frames the complete body above the HUD. It does
+		# not change the production follow/orbit/look-ahead settings or gameplay.
 		var actor: Node3D = app.world.actors[app.world.hero_id]
-		var ahead: Vector3 = actor.basis.z
-		c.yaw = atan2(ahead.x,ahead.z)
-		c.smoothed_yaw = c.yaw
-		c.distance = 5.5; c.smoothed_distance = 5.5
-		c.pitch = .30; c.smoothed_pitch = .30
-	await wait_ms(app.get_tree(),160)
+		inspection = Camera3D.new()
+		inspection.fov = 45.0
+		inspection.near = .05
+		inspection.far = gameplay_camera.far
+		inspection.cull_mask = gameplay_camera.cull_mask
+		app.world.add_child(inspection)
+		var ahead: Vector3 = actor.global_basis.z.normalized()
+		inspection.global_position = actor.global_position + ahead*5.5 + Vector3.UP*1.65
+		inspection.look_at(actor.global_position+Vector3.UP*1.05)
+		inspection.make_current()
+	await wait_ms(app.get_tree(),250)
 	await RenderingServer.frame_post_draw
 	var path: String = app.qa_path.get_base_dir().path_join(name+".png")
 	var result: int = app.get_viewport().get_texture().get_image().save_png(path)
-	c.yaw = old[0]; c.smoothed_yaw = old[1]; c.distance = old[2]; c.smoothed_distance = old[3]; c.pitch = old[4]; c.smoothed_pitch = old[5]
+	if inspection != null:
+		gameplay_camera.make_current()
+		inspection.queue_free()
+	app.qa_interaction = functional_profile
+	app.apply_settings()
 	return path.get_file() if result == OK else ""
 
 static func run(app: Node) -> void:
@@ -103,8 +117,10 @@ static func run(app: Node) -> void:
 	if license_file != null:
 		license_file.store_string(Engine.get_license_text()+"\n\n"+JSON.stringify(Engine.get_copyright_info(),"  ")+"\n\n"+JSON.stringify(Engine.get_license_info(),"  "))
 		license_file.close()
-	# Functional tests preserve the user's current graph settings and weather.
-	app.qa_interaction = false
+	# Existing temporary software-renderer functional profile: no preferences
+	# are saved. capture() restores full selected quality for every still image.
+	# World content, current weather and production defaults remain unchanged.
+	app.qa_interaction = true
 	app.apply_settings()
 	# The first graphics frame may compile shaders longer than a profile HTTP
 	# request timeout. Await the existing reconnect/SSE path and an actual actor;
@@ -147,8 +163,8 @@ static func run(app: Node) -> void:
 				if VarendorNavigation.path_segment_is_clear(app.world.collision,start,goal):
 					camera.yaw = yaw; camera.smoothed_yaw = yaw; break
 			keyboard(app,KEY_W,true)
-			await wait_ms(tree,900)
-			checks["native_w_runs_unarmed_body"] = app.world.player_motion.position_value.distance_to(start)>.5 and "run" in observer.clips.get("unarmed-run",[])
+			checks["native_w_runs_unarmed_body"] = await until(app,func(): return app.world.player_motion.position_value.distance_to(start)>.5 and "run" in observer.clips.get("unarmed-run",[]),6000)
+			await wait_ms(tree,350)
 			keyboard(app,KEY_W,false)
 			observer.stage = "stop"; observer.stop_clock = Time.get_ticks_msec()
 			await wait_ms(tree,500)
@@ -203,6 +219,7 @@ static func run(app: Node) -> void:
 				var singles: Array = observer.events.filter(func(e): return e.qa_stage=="single-attack" and e.kind=="attack" and str(e.actor)==app.world.hero_id)
 				checks["single_click_does_not_repeat_server_attack"] = singles.size()==1 and not bool(app.net.hero.get("autoAttack",false))
 				observer.stage = "autoattack"
+				app.world.targeting.select(target)
 				app.activate("attack")
 				checks["one_autoattack_activation_repeats_six_server_attacks"] = await until(app,func(): return observer.events.filter(func(e): return e.qa_stage=="autoattack" and e.kind=="attack" and str(e.actor)==app.world.hero_id and e.get("skill")==null).size()>=6,16000)
 				await wait_ms(tree,100)
@@ -231,12 +248,12 @@ static func run(app: Node) -> void:
 	measurements["live_presentation_attacks"] = observer.attacks
 	measurements["live_server_events"] = observer.events
 	measurements["recorded_frames"] = observer.captured
-	measurements["frame_capture_note"] = "Actual game render captures; readback is diagnostic overhead, not performance evidence."
+	measurements["frame_capture_note"] = "Actual native Mesa gameplay video frames use the existing temporary functional render profile. Full selected quality is restored for PNGs. Readback adds diagnostic overhead; this is not target-PC performance evidence."
 	checks["gameplay_screenshots_saved"] = captures.filter(func(path): return not path.is_empty()).size()>=4 if checks.native_render else true
 	var success: bool = true
 	for name: String in checks:
 		if name != "native_render" and checks[name] is bool and not checks[name]: success = false
-	var report := {"ok":success,"scope":"knight-integration","checks":checks,"measurements":measurements,"captures":captures,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"notes":"Actual main world, input, HTTP/SSE and authoritative inventory/attack events on an isolated beta save. Fixture monster HP is prolonged for combo observation; combat code, timings, damage formulas, world graphics and weather are unchanged. Headless validates behavior only; screenshots require a renderer."}
+	var report := {"ok":success,"scope":"knight-integration","checks":checks,"measurements":measurements,"captures":captures,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"diagnostic_render_profile":"Existing qa_interaction: half render scale, MSAA disabled and shadows disabled only during graphical functional checks; selected full quality restored for every PNG. No preferences saved.","notes":"Actual main world, input, HTTP/SSE and authoritative inventory/attack events on an isolated beta save. Fixture monster HP is prolonged for combo observation; combat code, timings, damage formulas, world content, production settings and weather are unchanged. Headless validates behavior only; native Mesa diagnostic video is not target-PC frame pacing evidence."}
 	app.net.save_private_json(app.qa_path,report)
 	print("VARENDOR_NATIVE_QA "+JSON.stringify(report))
 	if checks.native_render and RenderingServer.frame_post_draw.is_connected(observer.after_draw): RenderingServer.frame_post_draw.disconnect(observer.after_draw)

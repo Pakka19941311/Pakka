@@ -106,7 +106,9 @@ try {
   if (existsSync(reportPath)) native=JSON.parse(readFileSync(reportPath,'utf8'));
   console.log('VARENDOR_KNIGHT_SUMMARY '+JSON.stringify({ok:native?.ok??false,scope:native?.scope,failed:Object.entries(native?.checks??{}).filter(([key,value])=>value===false&&key!=='native_render').map(([key])=>key),exit:result}));
   const errors=log.split('\n').filter(line=>/SCRIPT ERROR:|^ERROR:/m.test(line));
-  assert.equal(result.code,0,errors.join('\n')||log.slice(-16000));
+  const failedChecks=Object.entries(native?.checks??{}).filter(([key,value])=>value===false&&key!=='native_render').map(([key])=>key);
+  const diagnosis=errors.join('\n')||(native?'Native checks failed: '+failedChecks.join(', '):log.split('\n').filter(line=>!line.startsWith('VARENDOR_NATIVE_QA ')).join('\n').slice(-4000));
+  assert.equal(result.code,0,diagnosis);
   assert.equal(errors.length,0,errors.join('\n'));
   assert.ok(native,'Native knight QA report is missing');
   assert.equal(native.scope,'knight-integration','Wrong native regression scope');
@@ -128,7 +130,7 @@ try {
   }
   process.removeListener('SIGINT',sigint);process.removeListener('SIGTERM',sigterm);
   const captures = readdirSync(output,{recursive:true}).filter(file=>file.startsWith('knight-') && /\.(png|jpg|jpeg|mp4)$/i.test(file)).map(file=>relative(output,join(output,file)).split('\\').join('/'));
-  const summary={ok:!failure,source,platform:process.platform,node:process.version,native:native??null,scope:'knight-integration',mode:project?'source Godot gameplay project':'exported native client',graphicalRequested:graphical,windowsGraphics:graphical&&process.platform==='win32'&&native?.checks?.native_render===true,durationMs:Date.now()-started,captures,fixture,requests,notes:['Actual gameplay scene and native launcher adapter with a disposable beta save.','This check covers knight model, equipment, movement and authored animation binding only.','Headless runs do not verify pixels or graphics performance.'],...(failure?{error:failure instanceof Error?failure.message:String(failure)}:{})};
+  const summary={ok:!failure,source,platform:process.platform,node:process.version,native:native??null,scope:'knight-integration',mode:project?'source Godot gameplay project':'exported native client',graphicalRequested:graphical,softwareRenderer:/llvmpipe|softpipe|SwiftShader/i.test(log),windowsGraphics:graphical&&process.platform==='win32'&&native?.checks?.native_render===true,durationMs:Date.now()-started,captures,fixture,requests,notes:['Actual gameplay scene and native launcher adapter with a disposable beta save.','This check covers knight model, equipment, movement and authored animation binding only.','Headless runs do not verify pixels or graphics performance.'],...(failure?{error:failure instanceof Error?failure.message:String(failure)}:{})};
   writeFileSync(summaryPath,JSON.stringify(summary,null,2)+'\n');
   rmSync(privateRoot,{recursive:true,force:true});
   console.log('VARENDOR_KNIGHT_REPORT '+summaryPath);

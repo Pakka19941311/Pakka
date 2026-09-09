@@ -79,6 +79,7 @@ jobs:
       - name: Exercise the integrated knight in native Godot graphics
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
+          LP_NUM_THREADS: '4'
         run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-knight-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical
       - name: Encode actual gameplay captures with their measured wall-clock intervals
         run: python scripts/knight-review-video.py qa-artifacts/pc-linux

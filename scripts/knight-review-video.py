@@ -72,8 +72,12 @@ def main():
         "max_timestamp_error_seconds": max_error,
         "interpolated_frames": 0,
         "speed_changed": False,
-        "source": "actual Godot game viewport captures",
-        "note": "Capture is capped at 10 Hz and has diagnostic GPU readback overhead. Original wall-clock gaps are preserved; this is not an FPS benchmark. The final captured frame has a 1 ms container tail.",
+        "source": "actual Godot game viewport captures in the functional diagnostic graphics profile",
+        "performance_benchmark": False,
+        "packaged_graphics_defaults_changed": False,
+        "diagnostic_render_profile": native.get("diagnostic_render_profile", "not reported"),
+        "native_capture_note": native.get("measurements", {}).get("frame_capture_note", ""),
+        "note": "Linux/Mesa functional recording uses the existing diagnostic graphics profile; separate still screenshots use full quality. Capture is capped at 10 Hz and has diagnostic GPU readback overhead. Original wall-clock gaps are preserved; this is not an FPS benchmark. The final captured frame has a 1 ms container tail.",
         "frames": frames,
     }
     (directory / "knight-gameplay-video.json").write_text(json.dumps(evidence, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
