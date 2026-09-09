@@ -1,5 +1,5 @@
 {
-  "status": "both_sources_downloaded_structural_inspection_complete_awaiting_modular_base_decision",
+  "status": "forgotten_knight_approved_fitted_art_review_ready_paladin_rejected",
   "game_files_modified": false,
   "game_tests_run": false,
   "recommended_visual_candidate": "forgotten-knight",
@@ -17,7 +17,7 @@
       "triangles_as_listed": 223700,
       "animations": "No Action datablocks in downloaded original .blend",
       "download_status": "Original .blend archive downloaded successfully; original source and textures unchanged",
-      "integration_note": "Candidate armor set only pending owner approval and visual inspection. Needs separate or recovered human base, equipment slot separation, geometry preparation, retargeting, weapon attachment and animations.",
+      "integration_note": "Approved armor. Fitted editable assets and animations documented in art/forgotten-knight; source inspection below describes the unmodified original.",
       "original_archive_bytes": 153520615,
       "original_archive_sha256": "403cd40523dc291f8b300a8b1dbc5b9a0a506b9a759c406a77ff002cc0e84258",
       "source_blender_file_version": "3.6 (header BLENDER-v306); listing mentions Blender 4.3",
@@ -52,7 +52,8 @@
         "full_human_body_under_armor": "not established by structural inspection",
         "independent_helmet_and_boots_mesh_objects": false,
         "ready_modular_equipment_base": false
-      }
+      },
+      "owner_decision": "approved"
     },
     {
       "id": "mixamo-paladin",
@@ -63,7 +64,7 @@
       "license_as_documented": "Adobe FAQ permits royalty-free use of characters and animations in personal and commercial games",
       "license_url": "https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html",
       "download_status": "FBX Binary T-pose downloaded successfully from authenticated Mixamo; model unchanged",
-      "integration_note": "Lower-detail alternative; not an established universal modular human base. Source stored for owner use, not publicly redistributed as standalone asset.",
+      "integration_note": "Explicitly rejected by owner. Do not use this model or include it in deliverables.",
       "original_fbx_bytes": 9202096,
       "original_fbx_sha256": "1d661a5aa8b0f45bd16ce00a9355249c56261cc34392e88e404fa0854020d076",
       "inspection": {
@@ -84,11 +85,12 @@
         "structure_inference": "Helmet, clothed humanoid, sword and shield are separate based on counts and bone assignments; semantic object labels are swapped",
         "full_human_body_under_armor": "not established",
         "independent_chest_gloves_boots_mesh_objects": false
-      }
+      },
+      "owner_decision": "rejected_do_not_use"
     }
   ],
-  "native_render_or_deformation_test_run": false,
-  "inspection_method": "Read-only FBX records and Blender DNA; no game tests, rendering or animation execution",
+  "native_render_or_deformation_test_run": true,
+  "inspection_method": "Historical unmodified source inspection retained below; fitted Forgotten Knight geometry, PBR and motions subsequently rendered and exported. See art/forgotten-knight.",
   "public_source_binary_distribution": "No third-party source binaries committed to public Git; owner source packages saved separately",
   "packages": {
     "The_Forgotten_Knight_Source.zip": {
@@ -100,5 +102,6 @@
       "sha256": "b5578db8964293490ccc24945ec7a68d61a14366e797dcd3dd26c11a918034a0"
     }
   },
-  "next_proposed_block": "Download/select a suitable human base and adapt approved Forgotten Knight armor to separate equipment slots; owner approval before asset modification or game integration."
+  "next_proposed_block": "Review actual fitted Forgotten Knight variants and animations before separate gameplay integration.",
+  "owner_selection": "Forgotten Knight armor on MakeHuman/MPFB body approved; all requested animation categories authorized."
 }

@@ -1,0 +1,122 @@
+{
+  "body_height_m": 1.84,
+  "source": "The Forgotten Knight / dark_igorek",
+  "body": "MakeHuman / MPFB2",
+  "fit_method": "weighted anatomical rest-segment mapping, skin clearance, original UV/PBR retained",
+  "meshes": [
+    {
+      "name": "FK_chest_cape",
+      "slot": "chest",
+      "vertices": 418,
+      "triangles": 731,
+      "source": "cloak"
+    },
+    {
+      "name": "FK_chest_cloak_conector_left",
+      "slot": "chest",
+      "vertices": 457,
+      "triangles": 896,
+      "source": "cloak_conector_left"
+    },
+    {
+      "name": "FK_chest_cloak_conector_right",
+      "slot": "chest",
+      "vertices": 457,
+      "triangles": 896,
+      "source": "cloak_conector_right"
+    },
+    {
+      "name": "FK_head_eye_shade",
+      "slot": "head",
+      "vertices": 6,
+      "triangles": 4,
+      "source": "eye_plug"
+    },
+    {
+      "name": "FK_chest_pauldrons_left",
+      "slot": "chest",
+      "vertices": 1487,
+      "triangles": 2958,
+      "source": "hand_top_armor_left"
+    },
+    {
+      "name": "FK_chest_pauldrons_right",
+      "slot": "chest",
+      "vertices": 1487,
+      "triangles": 2958,
+      "source": "hand_top_armor_right"
+    },
+    {
+      "name": "FK_boots_greaves",
+      "slot": "boots",
+      "vertices": 9118,
+      "triangles": 17778,
+      "source": "legs"
+    },
+    {
+      "name": "FK_chest_trousers",
+      "slot": "chest",
+      "vertices": 1349,
+      "triangles": 2604,
+      "source": "legs"
+    },
+    {
+      "name": "FK_chest_tassets",
+      "slot": "chest",
+      "vertices": 15950,
+      "triangles": 31076,
+      "source": "legs_cloak"
+    },
+    {
+      "name": "FK_chest_body",
+      "slot": "chest",
+      "vertices": 9059,
+      "triangles": 17688,
+      "source": "main_body"
+    },
+    {
+      "name": "FK_head_helmet",
+      "slot": "head",
+      "vertices": 4692,
+      "triangles": 8962,
+      "source": "main_body"
+    },
+    {
+      "name": "FK_belt_main",
+      "slot": "belt",
+      "vertices": 352,
+      "triangles": 616,
+      "source": "main_body"
+    },
+    {
+      "name": "FK_gloves_gauntlets",
+      "slot": "gloves",
+      "vertices": 4504,
+      "triangles": 8828,
+      "source": "main_body"
+    },
+    {
+      "name": "FK_chest_top_belt_cloak",
+      "slot": "chest",
+      "vertices": 546,
+      "triangles": 1048,
+      "source": "top_belt_cloak"
+    },
+    {
+      "name": "FK_weapon_sword",
+      "slot": "weapon",
+      "vertices": 938,
+      "triangles": 1784,
+      "source": "sword"
+    }
+  ],
+  "bones": 56,
+  "slots": [
+    "belt",
+    "boots",
+    "chest",
+    "gloves",
+    "head",
+    "weapon"
+  ]
+}

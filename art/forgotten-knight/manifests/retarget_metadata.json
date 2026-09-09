@@ -1,0 +1,474 @@
+{
+  "method": "hybrid semantic rest calibration; source world orientations, fixed target joint lengths; source palm frame propagated through fingers",
+  "target_rest_changed": false,
+  "target_height_m": 1.84,
+  "fps": 30,
+  "leg_translation_scale": 1.0958981864211137,
+  "constant_ground_offset_m": 0.012028803117573261,
+  "sources": [
+    {
+      "path": "/workspace/scratch/1cc39b15ca7f/animation-sources/quaternius_ual_standard/Universal Animation Library[Standard]/Unreal-Godot/UAL1_Standard.glb",
+      "sha256": "69591853d817488edaa8fd9bf8fc1d821eaeaf789f8627b3cd23b41c4ed67997",
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "/workspace/scratch/1cc39b15ca7f/animation-sources/quaternius_ual2_standard/Universal Animation Library 2[Standard]/Unreal-Godot/UAL2_Standard.glb",
+      "sha256": "8cee20ab1bc55130092447e810e26df22dd2803eccc54f52137a7d54d7ab88a8",
+      "license": "CC0-1.0"
+    }
+  ],
+  "mapping": {
+    "mixamorig:Hips": "pelvis",
+    "mixamorig:Spine": "spine_01",
+    "mixamorig:Spine1": "spine_02",
+    "mixamorig:Spine2": "spine_03",
+    "mixamorig:Neck": "neck_01",
+    "mixamorig:Head": "Head",
+    "mixamorig:LeftShoulder": "clavicle_l",
+    "mixamorig:LeftArm": "upperarm_l",
+    "mixamorig:LeftForeArm": "lowerarm_l",
+    "mixamorig:LeftHand": "hand_l",
+    "mixamorig:LeftUpLeg": "thigh_l",
+    "mixamorig:LeftLeg": "calf_l",
+    "mixamorig:LeftFoot": "foot_l",
+    "mixamorig:LeftToeBase": "ball_l",
+    "mixamorig:LeftHandThumb1": "thumb_01_l",
+    "mixamorig:LeftHandThumb2": "thumb_02_l",
+    "mixamorig:LeftHandThumb3": "thumb_03_l",
+    "mixamorig:LeftHandIndex1": "index_01_l",
+    "mixamorig:LeftHandIndex2": "index_02_l",
+    "mixamorig:LeftHandIndex3": "index_03_l",
+    "mixamorig:LeftHandMiddle1": "middle_01_l",
+    "mixamorig:LeftHandMiddle2": "middle_02_l",
+    "mixamorig:LeftHandMiddle3": "middle_03_l",
+    "mixamorig:LeftHandRing1": "ring_01_l",
+    "mixamorig:LeftHandRing2": "ring_02_l",
+    "mixamorig:LeftHandRing3": "ring_03_l",
+    "mixamorig:LeftHandPinky1": "pinky_01_l",
+    "mixamorig:LeftHandPinky2": "pinky_02_l",
+    "mixamorig:LeftHandPinky3": "pinky_03_l",
+    "mixamorig:RightShoulder": "clavicle_r",
+    "mixamorig:RightArm": "upperarm_r",
+    "mixamorig:RightForeArm": "lowerarm_r",
+    "mixamorig:RightHand": "hand_r",
+    "mixamorig:RightUpLeg": "thigh_r",
+    "mixamorig:RightLeg": "calf_r",
+    "mixamorig:RightFoot": "foot_r",
+    "mixamorig:RightToeBase": "ball_r",
+    "mixamorig:RightHandThumb1": "thumb_01_r",
+    "mixamorig:RightHandThumb2": "thumb_02_r",
+    "mixamorig:RightHandThumb3": "thumb_03_r",
+    "mixamorig:RightHandIndex1": "index_01_r",
+    "mixamorig:RightHandIndex2": "index_02_r",
+    "mixamorig:RightHandIndex3": "index_03_r",
+    "mixamorig:RightHandMiddle1": "middle_01_r",
+    "mixamorig:RightHandMiddle2": "middle_02_r",
+    "mixamorig:RightHandMiddle3": "middle_03_r",
+    "mixamorig:RightHandRing1": "ring_01_r",
+    "mixamorig:RightHandRing2": "ring_02_r",
+    "mixamorig:RightHandRing3": "ring_03_r",
+    "mixamorig:RightHandPinky1": "pinky_01_r",
+    "mixamorig:RightHandPinky2": "pinky_02_r",
+    "mixamorig:RightHandPinky3": "pinky_03_r"
+  },
+  "actions": [
+    {
+      "name": "idle",
+      "source_library": 1,
+      "source_clip": "Idle_Loop",
+      "duration_seconds": 2.5,
+      "frames": [
+        0,
+        75
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.24,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "idle_weapon",
+      "source_library": 1,
+      "source_clip": "Sword_Idle",
+      "duration_seconds": 1.6666666666666667,
+      "frames": [
+        0,
+        50
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.04,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "run_weapon",
+      "source_library": 1,
+      "source_clip": "Jog_Fwd_Loop",
+      "duration_seconds": 0.9333333333333333,
+      "frames": [
+        0,
+        28
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.0,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "run",
+      "source_library": 1,
+      "source_clip": "Jog_Fwd_Loop",
+      "duration_seconds": 0.9333333333333333,
+      "frames": [
+        0,
+        28
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.0,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sprint",
+      "source_library": 1,
+      "source_clip": "Sprint_Loop",
+      "duration_seconds": 0.6666666666666666,
+      "frames": [
+        0,
+        20
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.0,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_attack",
+      "source_library": 1,
+      "source_clip": "Sword_Attack",
+      "duration_seconds": 1.5333333333333334,
+      "frames": [
+        0,
+        46
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.2826086956521739,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_attack_combo",
+      "source_library": 2,
+      "source_clip": "Sword_Regular_Combo",
+      "duration_seconds": 3.0,
+      "frames": [
+        0,
+        90
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.4,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_attack_heavy",
+      "source_library": 2,
+      "source_clip": "Sword_Heavy_Combo",
+      "duration_seconds": 4.333333333333333,
+      "frames": [
+        0,
+        130
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.5923076923076923,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "cast_enter",
+      "source_library": 1,
+      "source_clip": "Spell_Simple_Enter",
+      "duration_seconds": 0.5333333333333333,
+      "frames": [
+        0,
+        16
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.0,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "cast_loop",
+      "source_library": 1,
+      "source_clip": "Spell_Simple_Idle_Loop",
+      "duration_seconds": 2.0999998728434246,
+      "frames": [
+        0,
+        63
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.5238095555265854,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "cast_release",
+      "source_library": 1,
+      "source_clip": "Spell_Simple_Shoot",
+      "duration_seconds": 0.5,
+      "frames": [
+        0,
+        15
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.4,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "cast_exit",
+      "source_library": 1,
+      "source_clip": "Spell_Simple_Exit",
+      "duration_seconds": 0.43333333333333335,
+      "frames": [
+        0,
+        13
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 1.0,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "spell1",
+      "source_library": 1,
+      "source_clip": "Spell_Simple_Shoot",
+      "duration_seconds": 0.5,
+      "frames": [
+        0,
+        15
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.4,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "hit",
+      "source_library": 1,
+      "source_clip": "Hit_Chest",
+      "duration_seconds": 0.3333333333333333,
+      "frames": [
+        0,
+        10
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.3,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "hit_head",
+      "source_library": 1,
+      "source_clip": "Hit_Head",
+      "duration_seconds": 0.43333333333333335,
+      "frames": [
+        0,
+        13
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.23076923076923078,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "jump_start",
+      "source_library": 1,
+      "source_clip": "Jump_Start",
+      "duration_seconds": 1.3333333333333333,
+      "frames": [
+        0,
+        40
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.0,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "jump_air",
+      "source_library": 1,
+      "source_clip": "Jump_Loop",
+      "duration_seconds": 2.5,
+      "frames": [
+        0,
+        75
+      ],
+      "loop": true,
+      "forward_hand_peak_phase": 0.5733333333333334,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "jump_land",
+      "source_library": 1,
+      "source_clip": "Jump_Land",
+      "duration_seconds": 1.2666666666666666,
+      "frames": [
+        0,
+        38
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.3684210526315789,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_strike_a",
+      "source_library": 2,
+      "source_clip": "Sword_Regular_A",
+      "duration_seconds": 0.43333333333333335,
+      "frames": [
+        0,
+        13
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.5384615384615384,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_recovery_a",
+      "source_library": 2,
+      "source_clip": "Sword_Regular_A_Rec",
+      "duration_seconds": 0.9666666666666667,
+      "frames": [
+        0,
+        29
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.3793103448275862,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_strike_b",
+      "source_library": 2,
+      "source_clip": "Sword_Regular_B",
+      "duration_seconds": 0.5333333333333333,
+      "frames": [
+        0,
+        16
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.4375,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_recovery_b",
+      "source_library": 2,
+      "source_clip": "Sword_Regular_B_Rec",
+      "duration_seconds": 1.0333333333333334,
+      "frames": [
+        0,
+        31
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.6129032258064516,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "sword_strike_c",
+      "source_library": 2,
+      "source_clip": "Sword_Regular_C",
+      "duration_seconds": 2.0,
+      "frames": [
+        0,
+        60
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.3333333333333333,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    },
+    {
+      "name": "block",
+      "source_library": 2,
+      "source_clip": "Sword_Block",
+      "duration_seconds": 1.2333333333333334,
+      "frames": [
+        0,
+        37
+      ],
+      "loop": false,
+      "forward_hand_peak_phase": 0.13513513513513514,
+      "contact_phase": "requires sword attachment pose review; forward-hand peak is a diagnostic only"
+    }
+  ],
+  "motion_qa": [
+    {
+      "action": "idle",
+      "phase": 0.2,
+      "frame": 15,
+      "body_min_z_m": 0.0012208945117890835
+    },
+    {
+      "action": "idle_weapon",
+      "phase": 0.2,
+      "frame": 10,
+      "body_min_z_m": -0.012275008484721184
+    },
+    {
+      "action": "run_weapon",
+      "phase": 0.15,
+      "frame": 4,
+      "body_min_z_m": -0.0006679822108708322
+    },
+    {
+      "action": "run_weapon",
+      "phase": 0.5,
+      "frame": 14,
+      "body_min_z_m": 0.07488518953323364
+    },
+    {
+      "action": "run_weapon",
+      "phase": 0.8,
+      "frame": 22,
+      "body_min_z_m": 0.2071448266506195
+    },
+    {
+      "action": "sword_attack",
+      "phase": 0.25,
+      "frame": 12,
+      "body_min_z_m": -0.0029190825298428535
+    },
+    {
+      "action": "sword_attack",
+      "phase": 0.5,
+      "frame": 23,
+      "body_min_z_m": -0.011406493373215199
+    },
+    {
+      "action": "sword_attack",
+      "phase": 0.75,
+      "frame": 34,
+      "body_min_z_m": -0.009806700050830841
+    },
+    {
+      "action": "sword_attack_combo",
+      "phase": 0.3,
+      "frame": 27,
+      "body_min_z_m": 0.04370347037911415
+    },
+    {
+      "action": "cast_release",
+      "phase": 0.5,
+      "frame": 8,
+      "body_min_z_m": -6.217599002411589e-05
+    },
+    {
+      "action": "hit",
+      "phase": 0.5,
+      "frame": 5,
+      "body_min_z_m": -0.0059521873481571674
+    },
+    {
+      "action": "jump_start",
+      "phase": 0.5,
+      "frame": 20,
+      "body_min_z_m": 0.17461396753787994
+    },
+    {
+      "action": "jump_air",
+      "phase": 0.5,
+      "frame": 38,
+      "body_min_z_m": -0.08487287163734436
+    },
+    {
+      "action": "jump_land",
+      "phase": 0.5,
+      "frame": 19,
+      "body_min_z_m": 0.021336141973733902
+    }
+  ]
+}

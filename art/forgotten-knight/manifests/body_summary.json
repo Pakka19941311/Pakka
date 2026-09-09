@@ -1,0 +1,103 @@
+{
+  "height_m": 1.84,
+  "forward": "-Y",
+  "up": "+Z",
+  "units": "meters",
+  "recipe": {
+    "macrodetails/caucasian-male-young.target.gz": 0.3333333333333333,
+    "macrodetails/african-male-young.target.gz": 0.3333333333333333,
+    "macrodetails/asian-male-young.target.gz": 0.3333333333333333,
+    "macrodetails/universal-male-young-averagemuscle-averageweight.target.gz": 0.4,
+    "macrodetails/universal-male-young-maxmuscle-averageweight.target.gz": 0.6,
+    "macrodetails/proportions/male-young-averagemuscle-averageweight-idealproportions.target.gz": 0.04,
+    "macrodetails/proportions/male-young-maxmuscle-averageweight-idealproportions.target.gz": 0.06
+  },
+  "source_to_blender_scale": 0.10633379565418402,
+  "source_y_to_ground_shift_m": 0.8705228848821083,
+  "source_commit": "437dd513888a92399d1d3200d2e80859fae55abc",
+  "body_vertices": 13380,
+  "body_polygons": 13378,
+  "triangles": 26756,
+  "bones": 52,
+  "unweighted_vertices": 0,
+  "all_weight_sums_normalized": true,
+  "source_max_influences": 5,
+  "prepared_max_influences": 4,
+  "max_discarded_weight_before_renormalization": 0.035,
+  "bbox_m": [
+    [
+      -0.6050073971336108,
+      0.6050073971336108
+    ],
+    [
+      -0.4011300662659887,
+      0.09774344274926802
+    ],
+    [
+      0.0,
+      1.84
+    ]
+  ],
+  "joint_positions": {
+    "joint-head": [
+      0.0,
+      -0.05063260903066729,
+      1.6807988133764835
+    ],
+    "joint-neck": [
+      0.0,
+      -0.012278008938203116,
+      1.578041377716135
+    ],
+    "joint-l-shoulder": [
+      0.20109466404684856,
+      -0.01900202650639544,
+      1.4669331946370783
+    ],
+    "joint-l-elbow": [
+      0.37738617275389125,
+      -0.01663060564031438,
+      1.2651931730621053
+    ],
+    "joint-l-hand": [
+      0.5205544382801666,
+      -0.22077199876714443,
+      1.128351768377254
+    ],
+    "joint-l-knee": [
+      0.16019806595777472,
+      -0.0285860687316998,
+      0.5381021729079982
+    ],
+    "joint-l-ankle": [
+      0.21028748651564189,
+      -0.016174256433965174,
+      0.07603929727230697
+    ],
+    "joint-r-shoulder": [
+      -0.20109466404684856,
+      -0.01900202650639544,
+      1.4669331946370783
+    ],
+    "joint-r-elbow": [
+      -0.37738617275389125,
+      -0.01663060564031438,
+      1.2651931730621053
+    ],
+    "joint-r-hand": [
+      -0.5205544382801666,
+      -0.22077199876714443,
+      1.128351768377254
+    ],
+    "joint-r-knee": [
+      -0.16019806595777472,
+      -0.0285860687316998,
+      0.5381021729079982
+    ],
+    "joint-r-ankle": [
+      -0.21028748651564189,
+      -0.016174256433965174,
+      0.07603929727230697
+    ]
+  }
+}

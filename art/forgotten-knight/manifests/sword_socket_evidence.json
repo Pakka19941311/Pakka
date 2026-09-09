@@ -1,0 +1,28 @@
+{
+  "source_has_explicit_weapon_socket": false,
+  "source_observed_nodes": "Mannequin mesh, 65-bone humanoid, Armature; no sword or weapon_r object",
+  "target_bone": "mixamorig:RightHand",
+  "attachment_frame": "coordinates relative to bone HEAD matrix, not Blender bone tail-parent offset",
+  "blade_direction_local": [
+    0.49995338916778564,
+    -0.11181935667991638,
+    0.8588030934333801
+  ],
+  "palm_long_axis_local": [
+    0.1394495666027069,
+    0.9890838265419006,
+    0.04760143160820007
+  ],
+  "palm_normal_local": [
+    -0.8547515273094177,
+    0.09596150368452072,
+    0.5100893378257751
+  ],
+  "grip_center_local_m": [
+    0.0022578686475753784,
+    0.08991700410842896,
+    0.010393112897872925
+  ],
+  "basis_explanation": "Blade points from pinky side toward index/thumb side of the fist. Flat blade normal can initially use palm normal. Grip estimate is inside palm and requires visual sword fit check.",
+  "derived_not_author_socket": true
+}

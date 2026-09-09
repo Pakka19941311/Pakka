@@ -1,23 +1,23 @@
 {
   "project": "Varendor",
   "document_version": "2.0",
-  "updated_at": "2026-09-08",
-  "state_kind": "p2_knight_appearance_review_delivered",
+  "updated_at": "2026-09-09",
+  "state_kind": "p2_forgotten_knight_fitted_art_review_complete",
   "repository_url": "https://github.com/Pakka19941311/Pakka",
   "observed_local_branch": "work/godot-p1-recovery",
   "tracked_branch": "work/godot-p1-recovery",
-  "observed_head": "e34d934ae0298bb37625c4b9cbf98d443a8067c0",
+  "observed_head": "8eab0f84efcf582558ac1d7fcdd52f99a1fd832d",
   "delivered_browser_build_head": "9d1429e90213f1a575e883ab8c903d47b750f745",
   "remote_head_revalidated_this_turn": true,
   "engine_direction": "Godot native + Blender approved by owner",
   "client_language_proposed": "typed GDScript",
   "server": "retain TypeScript authoritative simulation",
   "execution_authorized": true,
-  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать. 08.09.2026 P0: владелец прямо разрешил продолжить с 50c691f, устранить падение native QA, добиться зелёного CI и выпустить Windows ZIP; повторная переделка оптимизаций не требовалась.",
-  "current_phase": "P2 — downloaded knight sources, modular equipment assessment",
-  "current_task": "Both knight sources downloaded and structurally inspected. Forgotten Knight has 12 meshes/70 bones but full human body and slot-ready equipment are unproven; Mixamo Paladin has 4 meshes/69 bones with merged clothing. Owner source packages prepared; no asset modifications or game tests.",
+  "execution_note": "07.09.2026: после предъявленных результатов P0 владелец прямо потребовал начать сборку Blender/Godot и выдать тестовые файлы ПК; Mac/Android отложены до устойчивой ПК-версии. Текущий первый PC-тест P1 разрешён, P0 и личное резервирование не объявлены закрытыми. 08.09.2026: остановка принята владельцем. По его прямому указанию выполнен блок мира и карты из утверждённых разделов ТЗ; последующие блоки сначала согласовать. 08.09.2026 P0: владелец прямо разрешил продолжить с 50c691f, устранить падение native QA, добиться зелёного CI и выпустить Windows ZIP; повторная переделка оптимизаций не требовалась. 09.09.2026: владелец утвердил Forgotten Knight и человеческую основу, явно отклонил Paladin и разрешил подгонку доспехов, варианты и анимации стойки, бега, ударов, магии, урона и прыжка. Текущую принятую игру не переделывать и не тестировать заново.",
+  "current_phase": "P2 — approved Forgotten Knight fitted character art and animations",
+  "current_task": "Forgotten Knight fitted character art delivered for owner visual review: editable Blender, 3 equipped GLBs, separate human base, 24 named clips, corrected armed-run carry, three material palettes and 17.3-second 30fps animation video. Package integrity and exports verified. No gameplay integration.",
   "next_task_after_authorization": null,
-  "next_action": "Download/select a suitable human base and adapt approved Forgotten Knight armor to separate equipment slots; owner approval before asset modification or game integration. Preserve the accepted game, controls, movement, camera, graphics and old model.",
+  "next_action": "Deliver fitted armor variants and actual animation video for owner visual review; integrate approved character assets in a separately agreed block.",
   "last_accepted_migration_task": null,
   "migration_completed_tasks": [
     "P0-01"
@@ -4725,7 +4725,7 @@
     "owner_feedback": "Rejected visual quality; switch to downloading an existing character."
   },
   "downloadable_knight_selection": {
-    "status": "both_sources_downloaded_structural_inspection_complete_awaiting_modular_base_decision",
+    "status": "forgotten_knight_approved_fitted_art_review_ready_paladin_rejected",
     "game_files_modified": false,
     "game_tests_run": false,
     "recommended_visual_candidate": "forgotten-knight",
@@ -4743,7 +4743,7 @@
         "triangles_as_listed": 223700,
         "animations": "No Action datablocks in downloaded original .blend",
         "download_status": "Original .blend archive downloaded successfully; original source and textures unchanged",
-        "integration_note": "Candidate armor set only pending owner approval and visual inspection. Needs separate or recovered human base, equipment slot separation, geometry preparation, retargeting, weapon attachment and animations.",
+        "integration_note": "Approved armor. Fitted editable assets and animations documented in art/forgotten-knight; source inspection below describes the unmodified original.",
         "original_archive_bytes": 153520615,
         "original_archive_sha256": "403cd40523dc291f8b300a8b1dbc5b9a0a506b9a759c406a77ff002cc0e84258",
         "source_blender_file_version": "3.6 (header BLENDER-v306); listing mentions Blender 4.3",
@@ -4778,7 +4778,8 @@
           "full_human_body_under_armor": "not established by structural inspection",
           "independent_helmet_and_boots_mesh_objects": false,
           "ready_modular_equipment_base": false
-        }
+        },
+        "owner_decision": "approved"
       },
       {
         "id": "mixamo-paladin",
@@ -4789,7 +4790,7 @@
         "license_as_documented": "Adobe FAQ permits royalty-free use of characters and animations in personal and commercial games",
         "license_url": "https://helpx.adobe.com/creative-cloud/faq/mixamo-faq.html",
         "download_status": "FBX Binary T-pose downloaded successfully from authenticated Mixamo; model unchanged",
-        "integration_note": "Lower-detail alternative; not an established universal modular human base. Source stored for owner use, not publicly redistributed as standalone asset.",
+        "integration_note": "Explicitly rejected by owner. Do not use this model or include it in deliverables.",
         "original_fbx_bytes": 9202096,
         "original_fbx_sha256": "1d661a5aa8b0f45bd16ce00a9355249c56261cc34392e88e404fa0854020d076",
         "inspection": {
@@ -4810,11 +4811,12 @@
           "structure_inference": "Helmet, clothed humanoid, sword and shield are separate based on counts and bone assignments; semantic object labels are swapped",
           "full_human_body_under_armor": "not established",
           "independent_chest_gloves_boots_mesh_objects": false
-        }
+        },
+        "owner_decision": "rejected_do_not_use"
       }
     ],
-    "native_render_or_deformation_test_run": false,
-    "inspection_method": "Read-only FBX records and Blender DNA; no game tests, rendering or animation execution",
+    "native_render_or_deformation_test_run": true,
+    "inspection_method": "Historical unmodified source inspection retained below; fitted Forgotten Knight geometry, PBR and motions subsequently rendered and exported. See art/forgotten-knight.",
     "public_source_binary_distribution": "No third-party source binaries committed to public Git; owner source packages saved separately",
     "packages": {
       "The_Forgotten_Knight_Source.zip": {
@@ -4826,6 +4828,97 @@
         "sha256": "b5578db8964293490ccc24945ec7a68d61a14366e797dcd3dd26c11a918034a0"
       }
     },
-    "next_proposed_block": "Download/select a suitable human base and adapt approved Forgotten Knight armor to separate equipment slots; owner approval before asset modification or game integration."
+    "next_proposed_block": "Review actual fitted Forgotten Knight variants and animations before separate gameplay integration.",
+    "owner_selection": "Forgotten Knight armor on MakeHuman/MPFB body approved; all requested animation categories authorized."
+  },
+  "forgotten_knight_art_v1": {
+    "status": "art_review_delivered_awaiting_owner_feedback",
+    "source_commit": "8eab0f84efcf582558ac1d7fcdd52f99a1fd832d",
+    "documentation": "art/forgotten-knight/README_RU.md",
+    "approved_armor": "Forgotten Knight / Igor Oskolskiy (dark_igorek), CC BY 4.0",
+    "rejected_asset": "Mixamo Paladin",
+    "body": "MakeHuman/MPFB hm08 male, 1.84m, CC0",
+    "rig_bones": 56,
+    "equipment_meshes": 15,
+    "named_animation_clips": 24,
+    "palettes": [
+      "Scarlet",
+      "Northwatch",
+      "Ashwarden"
+    ],
+    "game_files_modified": false,
+    "game_tests_run": false,
+    "gameplay_integration_complete": false,
+    "checks": [
+      "Native Blender rest and action renders",
+      "All four exported GLBs: embedded PBR, 24 clips, finite skin weights",
+      "Actual equipped GLB reimport and palette render",
+      "All six requested motion categories rendered at 30fps; corrected run frames replaced and encoded preview inspected"
+    ],
+    "download_filename": "Varendor_Forgotten_Knight_Art_v1.zip",
+    "owner_review": "pending",
+    "limitations": [
+      "Palettes are color variations of one fitted armor set",
+      "Body uses temporary clay material; helmet-off final skin/hair/eyes not prepared",
+      "Equipment mesh swaps and cast/jump state integration still required",
+      "Sword visibility during casts belongs to the consumer; gameplay damage contact phase not approved"
+    ],
+    "run_carry": "RightArm/RightForeArm/RightHand rotations corrected only in run_weapon; root/legs/left arm/socket/rest unchanged",
+    "master_sha256": "50d6a63c41918dc946206f3922baaf9594cfa461df0a85386b54b5619d34763d",
+    "animation_review": {
+      "master_sha256": "50d6a63c41918dc946206f3922baaf9594cfa461df0a85386b54b5619d34763d",
+      "render_engine": "BLENDER_EEVEE_NEXT",
+      "samples": 2,
+      "fps": 30,
+      "resolution": [
+        512,
+        640
+      ],
+      "unique_frames": 319,
+      "frame_count": 519,
+      "duration_seconds": 17.3,
+      "segments": [
+        {
+          "title": "Стойка / дыхание",
+          "start_frame": 0,
+          "end_frame": 100
+        },
+        {
+          "title": "Бег",
+          "start_frame": 100,
+          "end_frame": 184
+        },
+        {
+          "title": "Удар мечом",
+          "start_frame": 184,
+          "end_frame": 278
+        },
+        {
+          "title": "Каст магии",
+          "start_frame": 278,
+          "end_frame": 366
+        },
+        {
+          "title": "Получение урона",
+          "start_frame": 366,
+          "end_frame": 424
+        },
+        {
+          "title": "Прыжок / приземление",
+          "start_frame": 424,
+          "end_frame": 519
+        }
+      ],
+      "video_file": "Varendor_Forgotten_Knight_Animation_Review.mp4",
+      "video_sha256": "af0d1931419f442d850cad891e79da2709f6ba0f61b6d2c7d7f7e3e12654e100",
+      "visual_review": "Encoded run, attack, cast and jump frames inspected; full weapon visible, corrected run carry keeps helmet clear; no gameplay integration."
+    },
+    "package": {
+      "bytes": 360534521,
+      "sha256": "e08ee1c50838d2cd4966481e591ce169ed14c1b90960f1a103b58739c2a2365a",
+      "entries": 43,
+      "file": "Varendor_Forgotten_Knight_Art_v1.zip",
+      "durably_saved": true
+    }
   }
 }

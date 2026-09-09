@@ -1,0 +1,505 @@
+{
+  "master_file": "Varendor_Forgotten_Knight_Master.blend",
+  "blender": "4.2.3 LTS",
+  "scope": "Character art exports only; not integrated into gameplay",
+  "up_axis": "+Y",
+  "visual_forward_axis": "+Z",
+  "unit": "meter",
+  "preview_rig_lift_removed_m": 0.02,
+  "all_24_actions_in_base_body": true,
+  "outputs": [
+    {
+      "file": "Varendor_Forgotten_Knight_Scarlet.glb",
+      "bytes": 74614620,
+      "sha256": "51451e80d5b5d6e762dc441d6793e4c7741b2b4cfdf2492fd036ae7f43052a6d",
+      "animations": [
+        "block",
+        "cast_enter",
+        "cast_exit",
+        "cast_loop",
+        "cast_release",
+        "hit",
+        "hit_head",
+        "idle",
+        "idle_weapon",
+        "jump_air",
+        "jump_land",
+        "jump_start",
+        "run",
+        "run_weapon",
+        "spell1",
+        "sprint",
+        "sword_attack",
+        "sword_attack_combo",
+        "sword_attack_heavy",
+        "sword_recovery_a",
+        "sword_recovery_b",
+        "sword_strike_a",
+        "sword_strike_b",
+        "sword_strike_c"
+      ],
+      "animation_count": 24,
+      "bones": 56,
+      "skins": 1,
+      "mesh_nodes": [
+        "FK_belt_main",
+        "FK_boots_greaves",
+        "FK_chest_body",
+        "FK_chest_cape",
+        "FK_chest_cloak_conector_left",
+        "FK_chest_cloak_conector_right",
+        "FK_chest_pauldrons_left",
+        "FK_chest_pauldrons_right",
+        "FK_chest_tassets",
+        "FK_chest_top_belt_cloak",
+        "FK_chest_trousers",
+        "FK_gloves_gauntlets",
+        "FK_head_eye_shade",
+        "FK_head_helmet",
+        "FK_weapon_sword"
+      ],
+      "primitives": 18,
+      "primitive_vertices": 62121,
+      "max_skin_weight_sum_error": 1.7881393432617188e-07,
+      "all_float_accessors_finite": true,
+      "all_textures_embedded": true,
+      "materials": [
+        {
+          "name": "center_armor_mat",
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "bottom_armor_mat",
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "details_mat",
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "top_armor_mat",
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "cloak_mat",
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "eye_plug_mat",
+          "base_color_factor": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "base_color_texture": false,
+          "metallic_roughness_texture": false,
+          "normal_texture": false
+        },
+        {
+          "name": "sword_mat",
+          "base_color_factor": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        }
+      ],
+      "palette": "scarlet"
+    },
+    {
+      "file": "Varendor_Forgotten_Knight_Northwatch.glb",
+      "bytes": 74614996,
+      "sha256": "c26549d0c7f315ad77f3dcc03e3d957026f1cbb4b32bee813474bdd12a025ef0",
+      "animations": [
+        "block",
+        "cast_enter",
+        "cast_exit",
+        "cast_loop",
+        "cast_release",
+        "hit",
+        "hit_head",
+        "idle",
+        "idle_weapon",
+        "jump_air",
+        "jump_land",
+        "jump_start",
+        "run",
+        "run_weapon",
+        "spell1",
+        "sprint",
+        "sword_attack",
+        "sword_attack_combo",
+        "sword_attack_heavy",
+        "sword_recovery_a",
+        "sword_recovery_b",
+        "sword_strike_a",
+        "sword_strike_b",
+        "sword_strike_c"
+      ],
+      "animation_count": 24,
+      "bones": 56,
+      "skins": 1,
+      "mesh_nodes": [
+        "FK_belt_main",
+        "FK_boots_greaves",
+        "FK_chest_body",
+        "FK_chest_cape",
+        "FK_chest_cloak_conector_left",
+        "FK_chest_cloak_conector_right",
+        "FK_chest_pauldrons_left",
+        "FK_chest_pauldrons_right",
+        "FK_chest_tassets",
+        "FK_chest_top_belt_cloak",
+        "FK_chest_trousers",
+        "FK_gloves_gauntlets",
+        "FK_head_eye_shade",
+        "FK_head_helmet",
+        "FK_weapon_sword"
+      ],
+      "primitives": 18,
+      "primitive_vertices": 62121,
+      "max_skin_weight_sum_error": 1.7881393432617188e-07,
+      "all_float_accessors_finite": true,
+      "all_textures_embedded": true,
+      "materials": [
+        {
+          "name": "northwatch__center_armor_mat",
+          "base_color_factor": [
+            0.66,
+            0.78,
+            0.96,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "northwatch__bottom_armor_mat",
+          "base_color_factor": [
+            0.7,
+            0.78,
+            0.9,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "northwatch__details_mat",
+          "base_color_factor": [
+            0.7,
+            0.79,
+            0.92,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "northwatch__top_armor_mat",
+          "base_color_factor": [
+            0.62,
+            0.76,
+            1.0,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "northwatch__cloak_mat",
+          "base_color_factor": [
+            0.055,
+            0.17,
+            0.42,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "northwatch__eye_plug_mat",
+          "base_color_factor": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "base_color_texture": false,
+          "metallic_roughness_texture": false,
+          "normal_texture": false
+        },
+        {
+          "name": "northwatch__sword_mat",
+          "base_color_factor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        }
+      ],
+      "palette": "northwatch"
+    },
+    {
+      "file": "Varendor_Forgotten_Knight_Ashwarden.glb",
+      "bytes": 74614984,
+      "sha256": "930ac7affaa6e4b3c03ab2cd017a061d3be1f6b39cc7207aeccf0839b1b00076",
+      "animations": [
+        "block",
+        "cast_enter",
+        "cast_exit",
+        "cast_loop",
+        "cast_release",
+        "hit",
+        "hit_head",
+        "idle",
+        "idle_weapon",
+        "jump_air",
+        "jump_land",
+        "jump_start",
+        "run",
+        "run_weapon",
+        "spell1",
+        "sprint",
+        "sword_attack",
+        "sword_attack_combo",
+        "sword_attack_heavy",
+        "sword_recovery_a",
+        "sword_recovery_b",
+        "sword_strike_a",
+        "sword_strike_b",
+        "sword_strike_c"
+      ],
+      "animation_count": 24,
+      "bones": 56,
+      "skins": 1,
+      "mesh_nodes": [
+        "FK_belt_main",
+        "FK_boots_greaves",
+        "FK_chest_body",
+        "FK_chest_cape",
+        "FK_chest_cloak_conector_left",
+        "FK_chest_cloak_conector_right",
+        "FK_chest_pauldrons_left",
+        "FK_chest_pauldrons_right",
+        "FK_chest_tassets",
+        "FK_chest_top_belt_cloak",
+        "FK_chest_trousers",
+        "FK_gloves_gauntlets",
+        "FK_head_eye_shade",
+        "FK_head_helmet",
+        "FK_weapon_sword"
+      ],
+      "primitives": 18,
+      "primitive_vertices": 62121,
+      "max_skin_weight_sum_error": 1.7881393432617188e-07,
+      "all_float_accessors_finite": true,
+      "all_textures_embedded": true,
+      "materials": [
+        {
+          "name": "ashwarden__center_armor_mat",
+          "base_color_factor": [
+            0.3,
+            0.32,
+            0.37,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "ashwarden__bottom_armor_mat",
+          "base_color_factor": [
+            0.4,
+            0.38,
+            0.37,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "ashwarden__details_mat",
+          "base_color_factor": [
+            0.78,
+            0.57,
+            0.31,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "ashwarden__top_armor_mat",
+          "base_color_factor": [
+            0.33,
+            0.35,
+            0.4,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "ashwarden__cloak_mat",
+          "base_color_factor": [
+            0.11,
+            0.075,
+            0.055,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        },
+        {
+          "name": "ashwarden__eye_plug_mat",
+          "base_color_factor": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "base_color_texture": false,
+          "metallic_roughness_texture": false,
+          "normal_texture": false
+        },
+        {
+          "name": "ashwarden__sword_mat",
+          "base_color_factor": [
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "base_color_texture": true,
+          "metallic_roughness_texture": true,
+          "normal_texture": true
+        }
+      ],
+      "palette": "ashwarden"
+    },
+    {
+      "file": "BaseBody.glb",
+      "bytes": 2703476,
+      "sha256": "55d48b1e889b3c422f40a97228c230692f265de5565da552f71567b57b321c03",
+      "animations": [
+        "block",
+        "cast_enter",
+        "cast_exit",
+        "cast_loop",
+        "cast_release",
+        "hit",
+        "hit_head",
+        "idle",
+        "idle_weapon",
+        "jump_air",
+        "jump_land",
+        "jump_start",
+        "run",
+        "run_weapon",
+        "spell1",
+        "sprint",
+        "sword_attack",
+        "sword_attack_combo",
+        "sword_attack_heavy",
+        "sword_recovery_a",
+        "sword_recovery_b",
+        "sword_strike_a",
+        "sword_strike_b",
+        "sword_strike_c"
+      ],
+      "animation_count": 24,
+      "bones": 56,
+      "skins": 1,
+      "mesh_nodes": [
+        "FK_Base_Body"
+      ],
+      "primitives": 1,
+      "primitive_vertices": 14517,
+      "max_skin_weight_sum_error": 1.7881393432617188e-07,
+      "all_float_accessors_finite": true,
+      "all_textures_embedded": true,
+      "materials": [
+        {
+          "name": "Varendor_Human_Male_ClayPreview",
+          "base_color_factor": [
+            0.33000001311302185,
+            0.25,
+            0.20000000298023224,
+            1
+          ],
+          "base_color_texture": false,
+          "metallic_roughness_texture": false,
+          "normal_texture": false
+        }
+      ],
+      "palette": "anatomical_base"
+    }
+  ],
+  "source_master_sha256": "50d6a63c41918dc946206f3922baaf9594cfa461df0a85386b54b5619d34763d",
+  "run_carry_revision": "outboard_torso_carry_v1",
+  "visual_material_validation": {
+    "method": "Previously reimported and rendered the same geometry/material palettes; this export changes only run_weapon rotations",
+    "repeat_palette_render_run": false,
+    "geometry_and_materials_unchanged": true
+  }
+}

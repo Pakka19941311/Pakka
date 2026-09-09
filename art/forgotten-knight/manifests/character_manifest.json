@@ -1,0 +1,340 @@
+{
+  "palettes": {
+    "scarlet": {
+      "title": "Алый орден",
+      "tints": {}
+    },
+    "northwatch": {
+      "title": "Северная стража",
+      "tints": {
+        "top_armor_mat": [
+          0.62,
+          0.76,
+          1.0
+        ],
+        "center_armor_mat": [
+          0.66,
+          0.78,
+          0.96
+        ],
+        "bottom_armor_mat": [
+          0.7,
+          0.78,
+          0.9
+        ],
+        "details_mat": [
+          0.7,
+          0.79,
+          0.92
+        ],
+        "cloak_mat": [
+          0.055,
+          0.17,
+          0.42
+        ]
+      }
+    },
+    "ashwarden": {
+      "title": "Пепельный дозор",
+      "tints": {
+        "top_armor_mat": [
+          0.33,
+          0.35,
+          0.4
+        ],
+        "center_armor_mat": [
+          0.3,
+          0.32,
+          0.37
+        ],
+        "bottom_armor_mat": [
+          0.4,
+          0.38,
+          0.37
+        ],
+        "details_mat": [
+          0.78,
+          0.57,
+          0.31
+        ],
+        "cloak_mat": [
+          0.11,
+          0.075,
+          0.055
+        ]
+      }
+    }
+  },
+  "source_armor": "The Forgotten Knight / Igor Oskolskiy (dark_igorek), CC BY 4.0",
+  "body": "MakeHuman / MPFB2 hm08, CC0",
+  "animations": "Quaternius UAL1/UAL2 Standard, CC0",
+  "scope": "Editable character art and animation assets; not integrated into gameplay",
+  "fps": 30,
+  "body_height_m": 1.84,
+  "bones": 56,
+  "actions": [
+    {
+      "name": "sword_strike_c",
+      "frames": [
+        0.0,
+        60.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Regular_C"
+    },
+    {
+      "name": "sword_strike_b",
+      "frames": [
+        0.0,
+        16.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Regular_B"
+    },
+    {
+      "name": "sword_strike_a",
+      "frames": [
+        0.0,
+        13.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Regular_A"
+    },
+    {
+      "name": "sword_recovery_b",
+      "frames": [
+        0.0,
+        31.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Regular_B_Rec"
+    },
+    {
+      "name": "sword_recovery_a",
+      "frames": [
+        0.0,
+        29.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Regular_A_Rec"
+    },
+    {
+      "name": "sword_attack_heavy",
+      "frames": [
+        0.0,
+        130.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Heavy_Combo"
+    },
+    {
+      "name": "sword_attack_combo",
+      "frames": [
+        0.0,
+        90.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Regular_Combo"
+    },
+    {
+      "name": "sword_attack",
+      "frames": [
+        0.0,
+        46.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Attack"
+    },
+    {
+      "name": "sprint",
+      "frames": [
+        0.0,
+        20.0
+      ],
+      "loop": true,
+      "source_clip": "Sprint_Loop"
+    },
+    {
+      "name": "spell1",
+      "frames": [
+        0.0,
+        15.0
+      ],
+      "loop": false,
+      "source_clip": "Spell_Simple_Shoot"
+    },
+    {
+      "name": "run_weapon",
+      "frames": [
+        0.0,
+        28.0
+      ],
+      "loop": true,
+      "source_clip": "Jog_Fwd_Loop"
+    },
+    {
+      "name": "run",
+      "frames": [
+        0.0,
+        28.0
+      ],
+      "loop": true,
+      "source_clip": "Jog_Fwd_Loop"
+    },
+    {
+      "name": "jump_start",
+      "frames": [
+        0.0,
+        40.0
+      ],
+      "loop": false,
+      "source_clip": "Jump_Start"
+    },
+    {
+      "name": "jump_land",
+      "frames": [
+        0.0,
+        38.0
+      ],
+      "loop": false,
+      "source_clip": "Jump_Land"
+    },
+    {
+      "name": "jump_air",
+      "frames": [
+        0.0,
+        75.0
+      ],
+      "loop": true,
+      "source_clip": "Jump_Loop"
+    },
+    {
+      "name": "idle_weapon",
+      "frames": [
+        0.0,
+        50.0
+      ],
+      "loop": true,
+      "source_clip": "Sword_Idle"
+    },
+    {
+      "name": "idle",
+      "frames": [
+        0.0,
+        75.0
+      ],
+      "loop": true,
+      "source_clip": "Idle_Loop"
+    },
+    {
+      "name": "hit_head",
+      "frames": [
+        0.0,
+        13.0
+      ],
+      "loop": false,
+      "source_clip": "Hit_Head"
+    },
+    {
+      "name": "hit",
+      "frames": [
+        0.0,
+        10.0
+      ],
+      "loop": false,
+      "source_clip": "Hit_Chest"
+    },
+    {
+      "name": "cast_release",
+      "frames": [
+        0.0,
+        15.0
+      ],
+      "loop": false,
+      "source_clip": "Spell_Simple_Shoot"
+    },
+    {
+      "name": "cast_loop",
+      "frames": [
+        0.0,
+        63.0
+      ],
+      "loop": true,
+      "source_clip": "Spell_Simple_Idle_Loop"
+    },
+    {
+      "name": "cast_exit",
+      "frames": [
+        0.0,
+        13.0
+      ],
+      "loop": false,
+      "source_clip": "Spell_Simple_Exit"
+    },
+    {
+      "name": "cast_enter",
+      "frames": [
+        0.0,
+        16.0
+      ],
+      "loop": false,
+      "source_clip": "Spell_Simple_Enter"
+    },
+    {
+      "name": "block",
+      "frames": [
+        0.0,
+        37.0
+      ],
+      "loop": false,
+      "source_clip": "Sword_Block"
+    }
+  ],
+  "weapon_socket": {
+    "bone": "mixamorig:RightHand",
+    "local_matrix": [
+      [
+        -0.13944993913173676,
+        -0.8547516465187073,
+        -0.4999534487724304,
+        0.0022578686475753784
+      ],
+      [
+        -0.9890843629837036,
+        0.09596151858568192,
+        0.11181937158107758,
+        0.08991700410842896
+      ],
+      [
+        -0.047601498663425446,
+        0.5100893974304199,
+        -0.8588032126426697,
+        0.010393112897872925
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "skin_visibility": "Full anatomical base retained hidden in Blender; equipped GLB excludes covered body",
+  "preview_floor_clearance_m": 0.02,
+  "run_carry": {
+    "revision": "outboard_torso_carry_v1",
+    "action": "run_weapon",
+    "frames": [
+      0,
+      28
+    ],
+    "changed_rotation_bones": [
+      "mixamorig:RightArm",
+      "mixamorig:RightForeArm",
+      "mixamorig:RightHand"
+    ],
+    "other_channels_sha256": "e08cd28e4c70ebdae00a14347bef0ccbd9d2dc4e304dd25acbbaad6bc0b12790",
+    "all_other_channels_unchanged": true,
+    "action_names_unchanged": true
+  }
+}
