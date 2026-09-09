@@ -1,0 +1,33 @@
+{
+  "branch": "work/godot-p1-recovery",
+  "base_commit": "2be5b51b221003e8bba24c3e657e670a4d293c61",
+  "package": "Varendor_Knight_Modular_v2.zip",
+  "scope": "art and standalone review; stopped before game integration",
+  "artifacts": [
+    {
+      "workspace_path": "/workspace/scratch/1cc39b15ca7f/knight-v2/output/Varendor_Knight_Modular_Master.blend",
+      "bytes": 102825328,
+      "sha256": "35b8c13c7f4427df2dc13b7bd5e04fd07c0c9b7407ab7d3f6c167639c0c8b3ad"
+    },
+    {
+      "workspace_path": "/workspace/scratch/1cc39b15ca7f/knight-v2/output/Knight_Modular.glb",
+      "bytes": 84678496,
+      "sha256": "9efe4d883ca8c73c0ed7ef43b03833a5d0cd245271bf7c947a14716cd37ceb81"
+    },
+    {
+      "workspace_path": "/workspace/scratch/1cc39b15ca7f/knight-v2/output/Knight_Starter.glb",
+      "bytes": 11274704,
+      "sha256": "bfbefbd49877f6bc30d167e39a236ca68eab15ce6673cbfdcf8b348f71b419d6"
+    },
+    {
+      "workspace_path": "/workspace/scratch/1cc39b15ca7f/knight-v2/accepted/Accepted_Knight_Master.blend",
+      "bytes": 88137968,
+      "sha256": "50d6a63c41918dc946206f3922baaf9594cfa461df0a85386b54b5619d34763d"
+    }
+  ],
+  "source_makehuman_pack": {
+    "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+    "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107"
+  },
+  "delivery": "The final ZIP includes native sources and exports omitted from Git. See accompanying CODEX_HANDOFF.md and NON_GIT_FILES.md. Accepted V1 preserved separately in Varendor_Knight_Accepted_Baseline.zip."
+}
