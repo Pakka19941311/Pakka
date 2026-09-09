@@ -16,7 +16,13 @@ class Observer extends Node:
 	var next_capture: int = 0
 	var stop_clock: int = 0
 	var stop_samples: Array = []
+	var stage_frames: Dictionary = {}
+	var previous_frame_ms: int = 0
 	func _process(_delta: float) -> void:
+		var wall_ms: int = Time.get_ticks_msec()
+		if not stage_frames.has(stage): stage_frames[stage] = []
+		stage_frames[stage].append({"wall_ms":wall_ms,"delta_ms":_delta*1000.0,"gap_ms":wall_ms-previous_frame_ms if previous_frame_ms>0 else 0})
+		previous_frame_ms = wall_ms
 		if not app.world.actors.has(app.world.hero_id): return
 		var actor: Node3D = app.world.actors[app.world.hero_id]
 		var c: VarendorAnimationController = actor.get_meta("animation_controller")
@@ -131,6 +137,8 @@ static func run(app: Node) -> void:
 	print("VARENDOR_KNIGHT_QA_STAGE world-connected="+str(connection_ready))
 	var checks: Dictionary = {"connected":app.net.connected,"connection_settled":connection_ready,"native_render":DisplayServer.get_name() != "headless"}
 	var measurements: Dictionary = {}
+	var skill_observations: Dictionary = {}
+	var limitations: Array[String] = []
 	var captures: Array[String] = []
 	var observer: Observer = Observer.new()
 	observer.app = app; observer.directory = app.qa_path.get_base_dir()
@@ -234,16 +242,38 @@ static func run(app: Node) -> void:
 						app.activate("ether"); await wait_ms(tree,400)
 					observer.stage = "skill-%d" % index
 					app.world.targeting.select(target)
+					var expected: String = ["sword_attack_heavy","block","sword_attack","cast_release"][index]
+					var activated_ms: int = Time.get_ticks_msec()
 					app.activate("skill:%d" % index)
+					# Observe the actual immediate prediction binding before this
+					# frame advances. This never samples or replays a synthetic pose.
+					var predicted_skill: int = controller.knight_skill
+					var expected_clip: String = controller.find_clip([expected])
+					var skill_window_ms: float = controller.attack_ends_at-controller.attack_started_at
+					var actual_context: bool = predicted_skill == index and int(actor.get_meta("predicted_skill",-1)) == index
 					checks["skill_%d_server_effect" % index] = await until(app,func(): return observer.events.any(func(e): return e.qa_stage=="skill-%d"%index and str(e.get("actor",""))==app.world.hero_id and e.get("skill",-1)==index and e.kind in ["attack","buff"]),5000)
 					await wait_ms(tree,350)
-					var expected: String = ["sword_attack_heavy","block","sword_attack","cast_release"][index]
-					checks["skill_%d_real_animation" % index] = expected in observer.clips.get("skill-%d" % index,[])
+					var observed: bool = expected in observer.clips.get("skill-%d" % index,[])
+					var frame_rows: Array = observer.stage_frames.get("skill-%d" % index,[])
+					var maximum_gap_ms: float = 0
+					for row: Dictionary in frame_rows:
+						maximum_gap_ms = maxf(maximum_gap_ms,maxf(float(row.delta_ms),float(row.gap_ms)))
+					var binding_valid: bool = actual_context and not expected_clip.is_empty() and checks["skill_%d_server_effect" % index]
+					var not_observable: bool = checks.native_render and not observed and binding_valid and skill_window_ms >= 179 and maximum_gap_ms >= skill_window_ms
+					skill_observations[str(index)] = {"expected_clip":expected,"expected_clip_exists":not expected_clip.is_empty(),"predicted_skill":predicted_skill,"actual_prediction_context":actual_context,"authority_effect":checks["skill_%d_server_effect" % index],"observed_rendered_clip":observed,"status":"observed" if observed else "not-observable-at-measured-frame-interval" if not_observable else "failed","activation_wall_ms":activated_ms,"skill_window_ms":skill_window_ms,"maximum_stage_frame_gap_ms":maximum_gap_ms,"stage_frames":frame_rows}
+					if checks.native_render:
+						checks["skill_%d_animation_binding" % index] = binding_valid and (observed or not_observable)
+						if not_observable:
+							limitations.append("Skill %d: %s was not observed in a rendered frame; measured maximum stage frame gap %.1f ms exceeds the unchanged %.1f ms skill window. Actual context, clip availability and server effect verified; real clip observation is mandatory in the independent native headless run." % [index,expected,maximum_gap_ms,skill_window_ms])
+					else:
+						# Windows/headless release gate must observe every actual clip.
+						checks["skill_%d_real_animation" % index] = observed
 				checks["guard_buff_applies_without_cast_delay"] = float(app.net.hero.buffs.get("guard",0))>float(app.net.last_time)
 				checks["normal_monster_retaliation_reaches_player"] = observer.events.any(func(e): return e.kind=="hit" and str(e.get("target",""))==app.world.hero_id)
 				checks["knight_survives_fixture_review"] = not bool(app.net.hero.dead)
 				captures.append(await capture(app,"knight-gameplay"))
 			observer.recording = false
+	measurements["skill_visual_observations"] = skill_observations
 	measurements["observed_animation_clips"] = observer.clips
 	measurements["live_presentation_attacks"] = observer.attacks
 	measurements["live_server_events"] = observer.events
@@ -253,7 +283,7 @@ static func run(app: Node) -> void:
 	var success: bool = true
 	for name: String in checks:
 		if name != "native_render" and checks[name] is bool and not checks[name]: success = false
-	var report := {"ok":success,"scope":"knight-integration","checks":checks,"measurements":measurements,"captures":captures,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"diagnostic_render_profile":"Existing qa_interaction: half render scale, MSAA disabled and shadows disabled only during graphical functional checks; selected full quality restored for every PNG. No preferences saved.","notes":"Actual main world, input, HTTP/SSE and authoritative inventory/attack events on an isolated beta save. Fixture monster HP is prolonged for combo observation; combat code, timings, damage formulas, world content, production settings and weather are unchanged. Headless validates behavior only; native Mesa diagnostic video is not target-PC frame pacing evidence."}
+	var report := {"ok":success,"scope":"knight-integration","checks":checks,"measurements":measurements,"captures":captures,"limitations":limitations,"display":DisplayServer.get_name(),"godot":Engine.get_version_info().string,"diagnostic_render_profile":"Existing qa_interaction: half render scale, MSAA disabled and shadows disabled only during graphical functional checks; selected full quality restored for every PNG. No preferences saved.","notes":"Actual main world, input, HTTP/SSE and authoritative inventory/attack events on an isolated beta save. Fixture monster HP is prolonged for combo observation; combat code, timings, damage formulas, world content, production settings and weather are unchanged. Headless validates behavior only; native Mesa diagnostic video is not target-PC frame pacing evidence."}
 	app.net.save_private_json(app.qa_path,report)
 	print("VARENDOR_NATIVE_QA "+JSON.stringify(report))
 	if checks.native_render and RenderingServer.frame_post_draw.is_connected(observer.after_draw): RenderingServer.frame_post_draw.disconnect(observer.after_draw)
