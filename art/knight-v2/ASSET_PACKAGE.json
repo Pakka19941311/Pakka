@@ -29,5 +29,14 @@
     "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
     "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107"
   },
-  "delivery": "The final ZIP includes native sources and exports omitted from Git. See accompanying CODEX_HANDOFF.md and NON_GIT_FILES.md. Accepted V1 preserved separately in Varendor_Knight_Accepted_Baseline.zip."
+  "delivery": "Original v2 package and runtime GLB are now preserved byte-for-byte as ordered binary parts in Git; assets-manifest.json verifies reconstruction. Earlier workspace paths identify the accepted authoring checkpoint, not required user desktop folders. The integration workflow publishes a Windows game ZIP and the complete source ZIP from this branch.",
+  "integration": {
+    "branch": "work/knight-integration-v2",
+    "base_commit": "e5dfc0d09a6eb0e06c0e0974c43444c5484f4457",
+    "asset_manifest": "art/knight-v2/assets-manifest.json",
+    "restore_command": "node scripts/materialize-knight-assets.mjs --include-source",
+    "runtime_destination": "godot-pc/assets/knight/Knight_Modular.glb",
+    "source_zip_destination": "qa-artifacts/pc-build/Varendor_Knight_Modular_v2.zip",
+    "documentation": "art/knight-v2/INTEGRATION.md"
+  }
 }

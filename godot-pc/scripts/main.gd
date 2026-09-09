@@ -130,7 +130,10 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
-		call_deferred("run_pacing_qa" if "--qa-scope=pacing" in OS.get_cmdline_user_args() else "run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+		call_deferred("run_knight_qa" if "--qa-scope=knight" in OS.get_cmdline_user_args() else "run_pacing_qa" if "--qa-scope=pacing" in OS.get_cmdline_user_args() else "run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_knight_qa() -> void:
+	await preload("res://scripts/knight_integration_qa.gd").run(self)
 
 func run_pacing_qa() -> void:
 	await preload("res://scripts/pacing_acceptance.gd").run(self)

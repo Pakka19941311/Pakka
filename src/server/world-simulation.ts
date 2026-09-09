@@ -157,17 +157,23 @@ export class WorldSimulation {
   private prepareCharacter(name: string, classId: string): WorldCharacter {
     if (!Object.hasOwn(CLASSES,classId) || typeof name !== 'string') throw Error('invalid-character');
     const cls = CLASSES[classId as ClassId];
-    const equipment = {weapon:this.item(cls.weapon),chest:this.item(cls.armor)};
+    const starterGear = {weapon:this.item(cls.weapon),chest:this.item(cls.armor)};
+    // Only new knights begin in their base clothing. Keep the original items
+    // in their bag; persisted/imported equipment is never migrated or stripped.
+    const equipment: Record<string,InventoryItem|undefined> = classId==='knight'?{}:starterGear;
     const calculated = calculateEquipmentStats(classId,cls.stats,1,equipment,itemDef);
     let p: WorldCharacter = {
       ...SPAWN, ...calculated, ...motion(this.state.time), id:this.identifier(),name:name.trim().slice(0,24)||'Странник',classId,
       level:1,xp:0,gold:320,hp:calculated.maxHp,mp:calculated.maxMp,
-      inventory:[this.item('potion',6),this.item('ether',4),this.item('teleport')],equipment,
+      inventory:[this.item('potion',6),this.item('ether',4),this.item('teleport'),...(classId==='knight'?Object.values(starterGear):[])],equipment,
       storage:[],lootBuffer:[],quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
       buffs:{guard:0,vanish:0,haste:0},activeUntil:0,lastInputSequence:-1,lastInputAt:0,
       direction:{x:0,z:0},destination:null,target:null,skill:null,generation:1,
     };
     if (this.beta) {
+      // This preview kit belongs only to a freshly created beta knight. It
+      // enables real inventory review without changing live loot or old saves.
+      if(classId==='knight')p.inventory.push(...['fallen_helm','fallen_helm_open','wolf_gloves','grave_boots','ash_belt'].map(id=>this.item(id)));
       const granted = grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant}, id=>this.item(id));
       p = {...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
     }

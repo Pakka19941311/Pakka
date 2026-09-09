@@ -9,6 +9,8 @@ const REFERENCE_BLEND_SECONDS: float = .08
 const REFERENCE_JUMP_PHASE: float = .06
 const GAITS: Dictionary = {
 	"Warrior": {"height": 2.05, "walk": 1.072079, "run": 3.297988},
+	# Measured planted-toe travel in the actual imported run, at 1.84 m.
+	"ForgottenKnight": {"height": 1.84, "walk": 6.23, "run": 6.23},
 	"Wizard": {"height": 2.05, "walk": .993, "run": 3.057},
 	"Ranger": {"height": 2.05, "walk": 1.041, "run": 3.203},
 	"Rogue": {"height": 2.05, "walk": 1.024, "run": 3.152},
@@ -51,6 +53,19 @@ var prefer_run: bool = false
 var running_gait: bool = false
 var pose_rotation: Vector3 = Vector3.ZERO
 var pose_offset: Vector3 = Vector3.ZERO
+# Asset presentation only. These values never schedule a hit or change its rate.
+var knight_skill: int = -1
+var knight_combo_index: int = 0
+var knight_next_combo: int = 0
+var knight_combo_target: String = ""
+var knight_combo_finish: float = -1
+var knight_previous_combo: Dictionary = {}
+var knight_attack_context: Dictionary = {}
+var knight_auto_active: bool = false
+var knight_hold_until: float = -1
+var knight_rig: Skeleton3D
+var knight_hips: int = -1
+var knight_hips_origin: Vector3 = Vector3.ZERO
 
 func bind(body: Node3D) -> void:
 	actor = body
@@ -75,6 +90,16 @@ func bind(body: Node3D) -> void:
 	for clip: String in player.get_animation_list():
 		clips[normalized_name(clip)] = clip
 	actor.set_meta("animation_controller", self)
+	if model == "ForgottenKnight":
+		for rig: Node in visual.find_children("*", "Skeleton3D", true, false):
+			knight_rig = rig as Skeleton3D
+			for index: int in range(knight_rig.get_bone_count()):
+				if str(knight_rig.get_bone_name(index)).ends_with("Hips"):
+					knight_hips = index
+					knight_hips_origin = knight_rig.get_bone_rest(index).origin
+					break
+			if knight_hips >= 0:
+				break
 
 static func normalized_name(clip: String) -> String:
 	var suffix: String = clip.get_slice("|", clip.get_slice_count("|") - 1)
@@ -106,6 +131,14 @@ func reset_alive() -> void:
 	gait_phase = 0
 	idle_phase = 0
 	running_gait = false
+	knight_skill = -1
+	knight_combo_index = 0
+	knight_next_combo = 0
+	knight_combo_finish = -1
+	knight_hold_until = -1
+	knight_combo_target = ""
+	knight_attack_context.clear()
+	knight_previous_combo.clear()
 	visual.transform = base_visual
 	visual.visible = true
 
@@ -116,17 +149,20 @@ func on_event(event: Dictionary, presentation_time_ms: float) -> void:
 		begin_death(float(event.get("deathAt", event_time)), float(event.get("corpseUntil", event_time + 3000)))
 	elif death_at < 0:
 		if kind == "attack":
-			begin_attack(float(event.get("actionStartedAt", event_time)), float(event.get("impactAt", event_time + 350)), float(event.get("endsAt", event_time + 800)))
+			begin_attack(float(event.get("actionStartedAt", event_time)), float(event.get("impactAt", event_time + 350)), float(event.get("endsAt", event_time + 800)), event)
+		elif kind == "buff" and model == "ForgottenKnight" and int(event.get("skill", -1)) == 3:
+			begin_attack(event_time, event_time + 1, event_time + 180, event)
 		elif kind == "release":
 			released = true
 			# A late join may first see release; recover a bounded recovery pose.
 			if attack_started_at < 0:
-				begin_attack(event_time - 1, event_time, event_time + 250)
+				begin_attack(event_time - 1, event_time, event_time + 250, event)
 				released = true
 		elif kind == "hit":
 			react_to_hit(event_time, float(event.get("hitUntil", event_time + 180)))
 		elif kind == "cancel":
 			attack_ends_at = -1
+			knight_hold_until = -1
 
 func react_to_hit(start: float, finish: float) -> void:
 	hit_at = start
@@ -135,15 +171,61 @@ func react_to_hit(start: float, finish: float) -> void:
 	if state == "idle" and not clip.is_empty():
 		hit_pose_until = start + minf(.3, clip_length(clip)) * 1000
 
-func begin_attack(start: float, impact: float, finish: float) -> void:
-	if death_at >= 0 or start <= attack_started_at:
+func begin_attack(start: float, impact: float, finish: float, context: Dictionary = {}) -> void:
+	if death_at >= 0 or start < attack_started_at:
+		return
+	if start == attack_started_at:
+		# Snapshots can precede their matching event. Enrich that same action with
+		# its skill/target without allocating another combo step or restarting it.
+		if model == "ForgottenKnight" and context.has("skill"):
+			var actual_skill: int = -1 if context.skill == null else int(context.skill)
+			var actual_target: String = str(context.get("target", knight_attack_context.get("resolved_target", "")))
+			if actual_skill != knight_skill or actual_target != str(knight_attack_context.get("resolved_target", "")):
+				knight_next_combo = int(knight_previous_combo.get("next", 0))
+				knight_combo_finish = float(knight_previous_combo.get("finish", -1))
+				knight_combo_target = str(knight_previous_combo.get("target", ""))
+				configure_knight_attack(start, finish, context)
+				current_clip = ""
 		return
 	attack_started_at = start
 	attack_impact_at = maxf(start + 1, impact)
 	attack_ends_at = maxf(attack_impact_at + 1, finish)
 	released = false
+	if model == "ForgottenKnight":
+		knight_previous_combo = {"next":knight_next_combo, "finish":knight_combo_finish, "target":knight_combo_target}
+		configure_knight_attack(start, finish, context)
 	# Consecutive attacks are distinct even when both use the same clip.
 	current_clip = ""
+
+func configure_knight_attack(start: float, finish: float, context: Dictionary) -> void:
+	knight_attack_context = context.duplicate()
+	knight_skill = -1 if context.get("skill", null) == null else int(context.skill)
+	knight_hold_until = -1
+	if knight_skill >= 0:
+		return
+	var target: String = str(context.get("target", actor.get_meta("knight_autoattack_target", "")))
+	knight_attack_context["resolved_target"] = target
+	var chained: bool = bool(actor.get_meta("knight_autoattack_active", true))
+	var contiguous: bool = knight_combo_finish >= 0 and start - knight_combo_finish < 600 and target == knight_combo_target
+	knight_combo_index = knight_next_combo if chained and contiguous else 0
+	knight_next_combo = (knight_combo_index + 1) % 5
+	knight_combo_target = target
+	knight_combo_finish = finish
+	knight_hold_until = finish + minf(350, (finish - start) * .3)
+
+func knight_weapon_equipped() -> bool:
+	return bool(actor.get_meta("knight_weapon_equipped", false))
+
+func stabilize_knight_root() -> void:
+	if knight_rig == null or knight_hips < 0:
+		return
+	# The imported hips include horizontal pose offsets (including at idle).
+	# Keep the gameplay root in place; retain vertical bend/bob and all rotations.
+	# This modifies this instance's sampled pose, never the accepted source clips.
+	var pose: Vector3 = knight_rig.get_bone_pose_position(knight_hips)
+	pose.x = knight_hips_origin.x
+	pose.z = knight_hips_origin.z
+	knight_rig.set_bone_pose_position(knight_hips, pose)
 
 func begin_death(start: float, finish: float) -> void:
 	if death_at >= 0:
@@ -171,11 +253,14 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 	if death_at >= 0:
 		sample_death(presentation_time_ms, dt)
 		return
+	if model == "ForgottenKnight":
+		knight_auto_active = bool(motion.get("autoAttack", actor.get_meta("knight_autoattack_active", false)))
 	var snapshot_start: float = float(motion.get("actionStartedAt", -1))
 	if str(motion.get("action", "")) == "attack" and snapshot_start > attack_started_at:
 		var finish: float = float(motion.get("actionEndsAt", presentation_time_ms + 800))
 		var contact: float = contact_fraction()
-		begin_attack(snapshot_start, float(motion.get("hitAt", motion.get("impactAt", snapshot_start + (finish - snapshot_start) * contact))), finish)
+		var context: Dictionary = {"skill":motion.animationSkill} if model == "ForgottenKnight" and motion.has("animationSkill") else {}
+		begin_attack(snapshot_start, float(motion.get("hitAt", motion.get("impactAt", snapshot_start + (finish - snapshot_start) * contact))), finish, context)
 	if str(motion.get("combatState", "")) in ["idle", "approach", "face"] and snapshot_start >= attack_started_at:
 		# Keep the attack start as a high-water mark so an older snapshot/event
 		# cannot resurrect the animation after manual input cancelled it.
@@ -194,6 +279,8 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 	var next_state: String = "idle"
 	if attack_started_at >= 0 and presentation_time_ms < attack_ends_at:
 		next_state = "attack"
+	elif model == "ForgottenKnight" and knight_skill < 0 and knight_auto_active and speed <= .025 and grounded and presentation_time_ms >= knight_combo_finish and presentation_time_ms < knight_hold_until:
+		next_state = "combo_hold"
 	elif not grounded:
 		next_state = "fall" if vertical < -.05 or locomotion == "fall" else "jump_start" if presentation_time_ms - jump_started_at < 100 else "airborne"
 	elif presentation_time_ms < land_until:
@@ -208,6 +295,8 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 	pose_offset = Vector3.ZERO
 	if state == "attack":
 		sample_attack(presentation_time_ms, dt)
+	elif state == "combo_hold":
+		sample(find_clip(["combo_%02d" % (knight_combo_index + 1)]), 1, false, dt)
 	elif state in ["walk", "run"]:
 		sample_gait(speed, dt)
 	elif state in ["jump_start", "airborne", "fall", "land"]:
@@ -236,7 +325,10 @@ func set_state(value: String, now: float) -> void:
 		state_started_at = now
 
 func sample_idle(dt: float) -> void:
-	var clip: String = find_clip(["idle_weapon", "idle", "survey", "flying"])
+	var choices: Array = ["idle_weapon", "idle", "survey", "flying"]
+	if model == "ForgottenKnight" and not knight_weapon_equipped():
+		choices = ["idle", "idle_weapon"]
+	var clip: String = find_clip(choices)
 	idle_phase = fposmod(idle_phase + dt / clip_length(clip), 1)
 	gait_phase = idle_phase
 	playback_rate = 1
@@ -247,7 +339,10 @@ func use_run_gait(speed: float) -> bool:
 
 func sample_gait(speed: float, dt: float) -> void:
 	var profile: Dictionary = GAITS.get(model, {"height": height, "walk": 2.25, "run": 2.25})
-	var run_clip: String = find_clip(["run_weapon", "run_holding", "run", "running", "flying"])
+	var run_choices: Array = ["run_weapon", "run_holding", "run", "running", "flying"]
+	if model == "ForgottenKnight" and not knight_weapon_equipped():
+		run_choices = ["run", "run_weapon"]
+	var run_clip: String = find_clip(run_choices)
 	var walk_clip: String = find_clip(["walk", "running", "run", "flying"])
 	running_gait = use_run_gait(speed) and not run_clip.is_empty()
 	var next_gait: String = run_clip if running_gait else walk_clip
@@ -260,9 +355,12 @@ func sample_gait(speed: float, dt: float) -> void:
 	sample(gait_clip, gait_phase, true, dt)
 
 func contact_fraction() -> float:
-	return .5 if model == "Warrior" else .56 if model == "Wizard" else .48 if model == "Ranger" else .42
+	return .5 if model in ["Warrior", "ForgottenKnight"] else .56 if model == "Wizard" else .48 if model == "Ranger" else .42
 
 func sample_attack(now: float, dt: float) -> void:
+	if model == "ForgottenKnight":
+		sample_knight_attack(now, dt)
+		return
 	var before_impact: bool = now < attack_impact_at and not released
 	var phase: float
 	# The reference uses one complete attack clip. Switching Bow_Draw to
@@ -279,7 +377,52 @@ func sample_attack(now: float, dt: float) -> void:
 	else:
 		sample(clip, phase, false, dt)
 
+func sample_knight_attack(now: float, dt: float) -> void:
+	var before: bool = now < attack_impact_at and not released
+	var phase: float = .5 * clampf((now - attack_started_at) / maxf(1, attack_impact_at - attack_started_at), 0, 1) if before else lerpf(.5, 1, clampf((now - attack_impact_at) / maxf(1, attack_ends_at - attack_impact_at), 0, 1))
+	var clip: String
+	if knight_skill == 3:
+		# Guard is the knight's only magical skill. Immediate server release uses
+		# its release gesture immediately: never prepend a cosmetic cast delay.
+		if before:
+			var enter: String = find_clip(["cast_enter", "cast_loop", "spell1"])
+			var windup_elapsed: float = maxf(0, now - attack_started_at) / 1000
+			if windup_elapsed < clip_length(enter):
+				sample(enter, windup_elapsed / clip_length(enter), false, dt)
+			else:
+				clip = find_clip(["cast_loop", "cast_enter"])
+				sample(clip, fposmod((windup_elapsed - clip_length(enter)) / clip_length(clip), 1), true, dt)
+			return
+		var recovery: float = clampf((now - attack_impact_at) / maxf(1, attack_ends_at - attack_impact_at), 0, 1)
+		clip = find_clip(["cast_release", "spell1"]) if recovery < .8 else find_clip(["cast_exit", "cast_release"])
+		sample(clip, recovery / .8 if recovery < .8 else (recovery - .8) / .2, false, dt)
+		return
+	elif knight_skill == 0:
+		clip = find_clip(["sword_attack_heavy", "sword_attack"])
+		# Heavy's first strike, bounded to the first authored contact/recovery.
+		phase *= .31
+	elif knight_skill == 1:
+		clip = find_clip(["block", "sword_attack"])
+	elif knight_skill == 2:
+		clip = find_clip(["sword_attack", "sword_strike_c"])
+	else:
+		clip = find_clip(["combo_%02d" % (knight_combo_index + 1), "sword_attack"])
+	playback_rate = clip_length(clip) / maxf(.001, (attack_ends_at - attack_started_at) / 1000)
+	sample(clip, phase, false, dt)
+
 func sample_airborne(speed: float, _now: float, dt: float) -> void:
+	if model == "ForgottenKnight":
+		if state == "land":
+			if speed > .025:
+				sample_gait(speed, dt)
+			else:
+				sample(find_clip(["jump_land", "idle"]), clampf(1 - (land_until - _now) / 160, 0, 1), false, dt)
+		elif state == "jump_start":
+			sample(find_clip(["jump_start", "jump_air"]), clampf((_now - jump_started_at) / 100, 0, 1), false, dt)
+		else:
+			var clip: String = find_clip(["jump_air", "jump_start"])
+			sample(clip, fposmod(maxf(0, _now - jump_started_at - 100) / (clip_length(clip) * 1000), 1), true, dt)
+		return
 	# Reference jump is a frozen running pose, not an idle pose or a second
 	# animation-driven Y trajectory. Ground contact immediately resumes gait.
 	if state == "land":
@@ -335,4 +478,6 @@ func sample(clip: String, phase: float, looping: bool, dt: float) -> void:
 	# time and then seeking the authoritative phase keeps attacks and feet synced.
 	player.advance(dt)
 	player.seek(clampf(phase, 0, .999999) * clip_length(clip), true)
+	if model == "ForgottenKnight":
+		stabilize_knight_root()
 

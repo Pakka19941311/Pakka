@@ -1,0 +1,149 @@
+name: Godot knight integration preview
+
+on:
+  push:
+    branches: [work/knight-integration-v2]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: godot-knight-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-build:
+    if: ${{ contains(github.event.head_commit.message, '[knight-preview]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned existing native toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb ffmpeg libgl1-mesa-dri libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0
+          python scripts/godot-pc-toolchain.py
+          npm ci
+      - name: Verify only the changed knight equipment and authoritative combat contract
+        run: node --experimental-strip-types --test tests/knight-equipment-integration.test.mjs
+      - name: Restore the unchanged approved world
+        id: world_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            godot-pc/generated/world.glb
+            godot-pc/generated/blender-build.json
+            godot-pc/generated/wildlife/
+            world-source/Varendor_PC_World.blend
+          key: territory-blender-4.5.9-${{ hashFiles('scripts/godot-pc-world.py', 'scripts/territory_art.py', 'src/world/territory-layout.ts', 'src/world/territory.ts', 'public/assets/world/world-topology.json') }}
+      - name: Reassemble the approved knight and restore exact packaged world inputs
+        run: |
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          node scripts/materialize-knight-assets.mjs --include-source
+          python scripts/restore-knight-build-inputs.py --blender "$BLENDER"
+      - name: Cache the unchanged world export
+        if: ${{ steps.world_cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            godot-pc/generated/world.glb
+            godot-pc/generated/blender-build.json
+            godot-pc/generated/wildlife/
+            world-source/Varendor_PC_World.blend
+          key: ${{ steps.world_cache.outputs.cache-primary-key }}
+      - name: Import and verify knight rig, equipment and authorized combo phases
+        run: |
+          mkdir -p qa-artifacts/pc-build qa-artifacts/pc-linux
+          "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee qa-artifacts/pc-linux/import.log
+          python -c 'import pathlib; s=pathlib.Path("qa-artifacts/pc-linux/import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-18000:]'
+          "$GODOT" --headless --path godot-pc --script res://scripts/knight_animation_qa.gd 2>&1 | tee qa-artifacts/pc-linux/knight-animation.log
+          python -c 'import pathlib; s=pathlib.Path("qa-artifacts/pc-linux/knight-animation.log").read_text(); assert "SCRIPT ERROR:" not in s and "ERROR:" not in s,s[-18000:]'
+      - name: Export current Linux and Windows clients
+        run: |
+          "$GODOT" --headless --path godot-pc --export-release 'Linux QA' "$PWD/qa-artifacts/pc-build/Varendor.x86_64"
+          "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/pc-build/Varendor.exe"
+          cp godot-pc/generated/blender-build.json qa-artifacts/pc-build/
+      - name: Exercise the integrated knight in native Godot graphics
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-knight-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical
+      - name: Encode actual gameplay captures with their measured wall-clock intervals
+        run: python scripts/knight-review-video.py qa-artifacts/pc-linux
+      - uses: actions/upload-artifact@v4
+        with:
+          name: godot-knight-windows-input
+          path: |
+            qa-artifacts/pc-build/Varendor.exe
+            qa-artifacts/pc-build/blender-build.json
+            qa-artifacts/pc-build/p1-samples/
+            qa-artifacts/pc-build/Varendor_Knight_Modular_v2.zip
+            qa-artifacts/pc-linux/
+          compression-level: 0
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: godot-knight-native-evidence
+          path: qa-artifacts/pc-linux/
+          retention-days: 30
+
+  windows-package:
+    needs: native-build
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: godot-knight-windows-input
+          path: qa-artifacts
+      - name: Package the current Windows executable and portable server
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force godot-pc/generated | Out-Null
+          Copy-Item qa-artifacts/pc-build/blender-build.json godot-pc/generated/blender-build.json
+          node scripts/package-godot-pc.mjs qa-artifacts/pc-build/Varendor.exe qa-artifacts/release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/publish-knight-preview.mjs qa-artifacts --stage
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test the shipped Windows executable, equipment and portable Node
+        run: |
+          $package = Join-Path $PWD ('qa-artifacts/release/Varendor_Godot_PC_' + $env:GITHUB_SHA.Substring(0,12))
+          & (Join-Path $package 'runtime/node.exe') --experimental-strip-types scripts/godot-knight-qa.mjs (Join-Path $package 'Varendor.exe') qa-artifacts/pc-windows ("--package=" + $package)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish tested Windows ZIP and verify its direct download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/publish-knight-preview.mjs qa-artifacts
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: godot-knight-release-evidence
+          path: |
+            qa-artifacts/pc-windows/
+            qa-artifacts/release/publish-result.json
+            qa-artifacts/release/*.sha256
+          retention-days: 30

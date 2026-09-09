@@ -1,6 +1,11 @@
 class_name VarendorWorld
 extends Node3D
 
+# Art selection stays client-only: server class model still owns attack timings.
+const KNIGHT_MODEL: String = "ForgottenKnight"
+const KNIGHT_ASSET: String = "res://assets/knight/Knight_Modular.glb"
+const KNIGHT_SOURCE_HEIGHT: float = 1.84
+
 signal picked(entity_id: String)
 signal moved_to(point: Vector2)
 
@@ -268,9 +273,9 @@ func setup(game: Dictionary) -> bool:
 		actor.set_meta("initialized", true)
 
 	# Load each shared actor template during loading, before exploration.
-	for model: String in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk", "Fox", "Slime", "Skeleton", "Dragon", "Bat"]:
+	for model: String in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk", "Fox", "Slime", "Skeleton", "Dragon", "Bat", KNIGHT_MODEL]:
 		if not templates.has(model):
-			var path: String = "res://generated/actors/" + model + (".gltf" if model in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk"] else ".glb")
+			var path: String = actor_asset_path(model)
 			templates[model] = load(path)
 		await get_tree().process_frame
 	# Local residents have their own 60Hz motion owner; service NPCs above keep
@@ -333,13 +338,17 @@ func height_at(x: float, z: float) -> float:
 func point(x: float, z: float, offset: float = 0.0) -> Vector3:
 	return Vector3(x, height_at(x, z) + offset, -z)
 
+static func actor_asset_path(model: String) -> String:
+	if model == KNIGHT_MODEL: return KNIGHT_ASSET
+	return "res://generated/actors/" + model + (".gltf" if model in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk"] else ".glb")
+
 func make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
 	if actors.has(id):
 		return actors[id]
 	var root: Node3D = Node3D.new()
 	add_child(root)
 	if not templates.has(model):
-		var path: String = "res://generated/actors/" + model + (".gltf" if model in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk"] else ".glb")
+		var path: String = actor_asset_path(model)
 		templates[model] = load(path)
 	var visual: Node3D = (templates[model] as PackedScene).instantiate()
 	root.add_child(visual)
@@ -350,7 +359,12 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 		var box: AABB = (visual.global_transform.affine_inverse() * mesh.global_transform) * mesh.get_aabb()
 		bounds = box if first else bounds.merge(box)
 		first = false
-	if bounds.size.y > .001:
+	if model == KNIGHT_MODEL:
+		# Calibrate to body height, never to sword/cape/helmet bounds. Equipment
+		# replacement cannot resize the hero or move their gameplay root.
+		visual.scale = Vector3.ONE * (size / KNIGHT_SOURCE_HEIGHT)
+		visual.position.y = 0.0
+	elif bounds.size.y > .001:
 		var scale_factor: float = size / bounds.size.y
 		visual.scale = Vector3.ONE * scale_factor
 		visual.position.y = -bounds.position.y * scale_factor
@@ -393,6 +407,10 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 		root.set_meta("player", players[0])
 	root.set_meta("destination", root.position)
 	root.set_meta("action", "")
+	if model == KNIGHT_MODEL:
+		root.set_meta("pick_size", Vector3(.82, size, .68))
+		var equipment: VarendorKnightEquipment = VarendorKnightEquipment.new()
+		equipment.bind(root, visual, data.get("items", {}))
 	var controller: VarendorAnimationController = VarendorAnimationController.new()
 	controller.prefer_run = id == hero_id or model == "Fox"
 	controller.bind(root)
@@ -417,7 +435,15 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 	for person: Dictionary in people:
 		var id: String = str(person.id)
 		keep[id] = true
-		var actor: Node3D = make_actor(id, data.classes[person.classId].model, 2.05, person.name + (" · %d" % int(person.level) if person.has("level") else ""), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
+		var model: String = KNIGHT_MODEL if str(person.classId) == "knight" else str(data.classes[person.classId].model)
+		var actor: Node3D = make_actor(id, model, 2.05, person.name + (" · %d" % int(person.level) if person.has("level") else ""), Color("e8dfcb") if id == hero_id else Color("9bc5cf"))
+		if actor.has_meta("knight_equipment"):
+			# Use the presented inventory snapshot; sampled motion intentionally
+			# contains no equipment and must not reset appearance every frame.
+			(actor.get_meta("knight_equipment") as VarendorKnightEquipment).apply_equipment(person.get("equipment", {}))
+			if person.has("autoAttack"):
+				actor.set_meta("knight_autoattack_active", bool(person.autoAttack))
+				actor.set_meta("knight_autoattack_target", str(person.get("target", "")) if person.get("target") != null else "")
 		initialize_pose(actor, point(person.x, person.z, person.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
 		actor.set_meta("motion", person.duplicate(true))
@@ -481,7 +507,7 @@ func present_event(event: Dictionary) -> void:
 	if actors.has(str(event.actor)):
 		var actor: Node3D = actors[str(event.actor)]
 		if event.has("actorGeneration") and int(actor.get_meta("motion", {}).get("generation",event.actorGeneration)) != int(event.actorGeneration): return
-		if event.kind in ["attack","release","death","cancel"]:
+		if event.kind in ["attack","release","death","cancel","buff"]:
 			(actor.get_meta("animation_controller") as VarendorAnimationController).on_event(event,float(current_snapshot.get("time",0)))
 	event_presented.emit(event)
 	if event.kind == "death" and target_id == str(event.actor): targeting.clear()
@@ -554,6 +580,7 @@ func _process(delta: float) -> void:
 				motion["actionStartedAt"] = maxf(float(motion.get("actionStartedAt",0)),float(current_snapshot.get("time",0)))
 			if Time.get_ticks_msec() < int(actor.get_meta("predicted_skill_until",0)) and not bool(motion.get("dead",false)):
 				motion["action"] = "attack"
+				motion["animationSkill"] = int(actor.get_meta("predicted_skill", -1))
 				motion["combatState"] = "windup"
 				motion["actionStartedAt"] = float(actor.get_meta("predicted_skill_start"))
 				motion["hitAt"] = motion.actionStartedAt+1
@@ -789,7 +816,7 @@ func predict_skill(index: int) -> void:
 		if not actors.has(target_id) or actors[hero_id].position.distance_to(actors[target_id].position)>float(hero.get("attackRange",2.6))+.1: return
 	var controller: VarendorAnimationController = actors[hero_id].get_meta("animation_controller")
 	var now: float = timeline.clock_ms
-	controller.begin_attack(now,now+1,now+180)
+	controller.begin_attack(now,now+1,now+180,{"skill":index})
 	actors[hero_id].set_meta("predicted_skill",index)
 	actors[hero_id].set_meta("predicted_skill_start",now)
 	actors[hero_id].set_meta("predicted_skill_until",Time.get_ticks_msec()+180)
