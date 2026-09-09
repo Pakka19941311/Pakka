@@ -113,24 +113,41 @@ with zipfile.ZipFile(target) as archive:
   writeFileSync(notes, `Тестовая сборка **Varendor — модульный рыцарь** для Windows x64.\n\nРаспакуйте ZIP игры и запустите **RUN_VARENDOR.bat**. Устанавливать Godot или Node не нужно.\n\nПодключены принятый рыцарь, стартовый вид в штанах, сменные доспехи, открытый и закрытый шлемы, бег, прыжок, реакция на урон, каст и комбо автоатаки. Серверные сроки ударов, урон и баланс сохранены.\n\nПроверены импорт и анимации, механики в Linux/Mesa с диагностическим профилем графики, поставляемый Windows EXE и portable Node без графики. Отдельные скриншоты получены при полном качестве; настройки качества самой игры сохранены. Короткие анимации всех четырёх навыков обязательно наблюдаются в Windows-проверке без графики; их игровая длительность не изменялась. Медленный Mesa может не показать промежуточный кадр короткого навыка — такие случаи отдельно отмечены в отчёте. Видео содержит реальные диагностические кадры с исходными временными интервалами и не служит замером FPS. Проверки используют отдельные тестовые данные. Оценка управления и Windows GPU остаётся за тестом на игровом ПК.\n\n[Код и исходники ассета](https://github.com/${repository}/tree/${commit}/art/knight-v2). ${existsSync(sourceArchive) ? 'Отдельный архив Varendor_Knight_Modular_v2.zip содержит исходники Blender, текстуры и экспорты.' : 'GLB восстанавливается из зафиксированных в Git частей; полный исходный пакет хранится по описанию в art/knight-v2.'}\n\nCommit: \`${commit}\`. Windows ZIP: ${bytes} байт. SHA-256: \`${checksum}\`.\n`);
   const gh = args => execFileSync('gh', args, { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 });
   const tag = `godot-knight-preview-${short}`;
-  let release;
-  try { release = JSON.parse(gh(['api', `repos/${repository}/releases/tags/${tag}`])); } catch { /* First publication. */ }
+  const findRelease = () => {
+    // Drafts can have an untagged URL until publication; the tag endpoint may
+    // return 404 even though the draft and all uploaded assets already exist.
+    for (let page = 1; ; page += 1) {
+      const releases = JSON.parse(gh(['api', `repos/${repository}/releases?per_page=100&page=${page}`]));
+      const found = releases.find(value => value.tag_name === tag);
+      if (found) {
+        assert.equal(found.target_commitish, commit, 'Existing release targets different code');
+        return found;
+      }
+      if (releases.length < 100) return undefined;
+    }
+  };
+  let release = findRelease();
   if (release) {
-    assert.equal(release.target_commitish, commit, 'Existing release targets different code');
     if (release.draft) gh(['release', 'upload', tag, ...files, '--clobber', '--repo', repository]);
   } else {
     gh(['release', 'create', tag, ...files, '--repo', repository, '--target', commit, '--draft', '--prerelease', '--latest=false', '--title', 'Varendor — Knight integration Windows test', '--notes-file', notes]);
+    release = findRelease();
   }
-  release = JSON.parse(gh(['api', `repos/${repository}/releases/tags/${tag}`]));
+  assert.ok(release?.id, 'Created draft release was not found in the release collection');
+  const releaseId = release.id;
+  release = JSON.parse(gh(['api', `repos/${repository}/releases/${releaseId}`]));
+  assert.equal(release.target_commitish, commit);
   for (const file of files) {
     const asset = release.assets.find(value => value.name === basename(file));
     assert.equal(asset?.state, 'uploaded', basename(file));
     assert.equal(asset.size, statSync(file).size);
     assert.equal(asset.digest, `sha256:${await shaFile(file)}`);
   }
-  if (release.draft) gh(['release', 'edit', tag, '--repo', repository, '--draft=false', '--latest=false']);
-  release = JSON.parse(gh(['api', `repos/${repository}/releases/tags/${tag}`]));
+  if (release.draft) gh(['api', '--method', 'PATCH', `repos/${repository}/releases/${releaseId}`, '-F', 'draft=false', '-f', 'make_latest=false']);
+  release = JSON.parse(gh(['api', `repos/${repository}/releases/${releaseId}`]));
   assert.equal(release.draft, false);
+  const publicRelease = JSON.parse(gh(['api', `repos/${repository}/releases/tags/${tag}`]));
+  assert.equal(publicRelease.id, releaseId, 'Published tag resolved to a different release');
   const download = release.assets.find(asset => asset.name === basename(archive)).browser_download_url;
   const response = await fetch(download, { signal: AbortSignal.timeout(240000) });
   assert.equal(response.ok, true, 'Public direct ZIP download failed');

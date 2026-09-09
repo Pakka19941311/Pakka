@@ -1,0 +1,39 @@
+name: Publish verified knight release
+
+on:
+  push:
+    branches: [work/knight-integration-v2]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: knight-release-recovery
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: ${{ contains(github.event.head_commit.message, '[knight-release]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: scripts/recover-knight-release.mjs
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+      - name: Verify existing test evidence and publish the already uploaded Windows ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/recover-knight-release.mjs qa-artifacts/knight-publish-recovery
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: godot-knight-publish-recovery
+          path: qa-artifacts/knight-publish-recovery/
+          retention-days: 30
+
