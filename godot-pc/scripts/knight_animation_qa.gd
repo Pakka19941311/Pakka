@@ -35,7 +35,7 @@ func fixture() -> Controller:
 	return controller
 
 func basic(controller: Controller, at: float, duration: float = 1000) -> Dictionary:
-	var event := {"kind":"attack", "at":at, "impactAt":at+duration*.5, "endsAt":at+duration, "skill":null, "target":"qa:dummy"}
+	var event := {"kind":"attack", "at":at, "impactAt":at+duration*.5, "endsAt":at+duration, "readyAt":at+duration+100, "skill":null, "target":"qa:dummy"}
 	controller.on_event(event, at)
 	return event
 
@@ -115,7 +115,9 @@ func run() -> void:
 		actor.update({"grounded":true,"action":"attack","actionStartedAt":at,"actionEndsAt":at+1000}, Vector3.ZERO, at+500, .016)
 		duplicates_ok = duplicates_ok and next == actor.knight_next_combo
 		actor.update({"grounded":true,"autoAttack":true}, Vector3.ZERO, at+1030, .016)
-		checks["combo_gap_holds_authored_boundary_%d" % index] = actor.state == "combo_hold" and actor.player.current_animation_position > .99
+		var tail_pose := pose(actor)
+		actor.update({"grounded":true,"autoAttack":true}, Vector3.ZERO, at+1080, .05)
+		checks["combo_tail_continues_into_next_cut_%d" % index] = actor.state == "combo_link" and actor.player.current_animation_position < .999 and distance(tail_pose,pose(actor)) > .005
 	measurements["authorized_basic_attack_clips"] = sequence
 	checks["one_authorized_attack_one_clip_five_step_wrap"] = sequence == ["combo_01","combo_02","combo_03","combo_04","combo_05","combo_01"]
 	checks["duplicate_events_and_snapshots_never_advance_combo"] = duplicates_ok
@@ -181,9 +183,9 @@ func run() -> void:
 	checks["airborne_uses_real_air_clip"] = clip_name(actor) == "jump_air"
 	actor.update({"grounded":true},Vector3.ZERO,19500,.2)
 	checks["stationary_landing_uses_real_land_clip"] = clip_name(actor) == "jump_land"
-	actor.update({"grounded":true},Vector3.ZERO,19700,.2)
-	actor.on_event({"kind":"hit","at":19700},19700)
-	actor.update({"grounded":true},Vector3.ZERO,19790,.09)
+	actor.update({"grounded":true},Vector3.ZERO,19910,.41)
+	actor.on_event({"kind":"hit","at":19910},19910)
+	actor.update({"grounded":true},Vector3.ZERO,19990,.08)
 	checks["idle_damage_uses_real_hit_clip"] = clip_name(actor) == "hit"
 	actor.begin_death(20000,23000)
 	actor.update({"dead":true},Vector3.ZERO,20650,.65)

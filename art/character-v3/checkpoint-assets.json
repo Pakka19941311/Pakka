@@ -1,0 +1,97 @@
+{
+  "version": 1,
+  "status": "unfinished-animation-work-checkpoint",
+  "baseManifest": "art/knight-v2/assets-manifest.json",
+  "encoding": "git-binary-patch-forward",
+  "files": {
+    "master": {
+      "destination": "art/character-v3/restored/Varendor_Knight_Motion_v3.blend",
+      "baseSourceMember": "knight-v2/output/Varendor_Knight_Modular_Master.blend",
+      "baseBytes": 102825328,
+      "baseSha256": "35b8c13c7f4427df2dc13b7bd5e04fd07c0c9b7407ab7d3f6c167639c0c8b3ad",
+      "bytes": 104507124,
+      "sha256": "7de8563656aa5d31f86a8296dc344f969ad38b31ec90645875e78a10dc0a2ca2",
+      "patchBytes": 2927574,
+      "patchSha256": "a5dd2acf3b26651ff9ca5228565d80091bcec94806045cf832a862b7a09cfa6a",
+      "parts": [
+        {
+          "path": "art/character-v3/payload/master.patch.part000",
+          "bytes": 262144,
+          "sha256": "879fdaa0af5e86e7505c168c23352cf7d30d090dd8a0375b707dce088cb7f06d"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part001",
+          "bytes": 262144,
+          "sha256": "159bc00c57eb56b431f1b57d1d1f3572a7febe80c2aebe484322fe73e68e618f"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part002",
+          "bytes": 262144,
+          "sha256": "7115d8ec5daf66545a477b772f29ca8d2f8c87ac011a18d757593443bb51d030"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part003",
+          "bytes": 262144,
+          "sha256": "c73240855aff0ac3290c728a2e7ba33e83230944708deaeedd034fa50a08756b"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part004",
+          "bytes": 262144,
+          "sha256": "a22b30df12c71158973d0a29a3674b32ba642729a521c1e5cce48c6cd517d87c"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part005",
+          "bytes": 262144,
+          "sha256": "d384ee45eb5dcef90f43847b16fa311872fa2a4ce99cb9759429b6db4c3342ab"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part006",
+          "bytes": 262144,
+          "sha256": "7c2d47c68583180f92ff1dfa5c6ed8dd6840a5d011554ea0b0bb13f8a554b059"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part007",
+          "bytes": 262144,
+          "sha256": "d51309a96495d5e11842d4e920f68eeb6c7c5ebd2167d3e5e6ac9f4554e4b2c5"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part008",
+          "bytes": 262144,
+          "sha256": "125227797b17a505b8283287a74c24f980578afd052231d30f1a1988b8286ec5"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part009",
+          "bytes": 262144,
+          "sha256": "5ab36f6f3d939452853da78148d6894c7b729f21001c44be5a4939c527fe6cdc"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part010",
+          "bytes": 262144,
+          "sha256": "d64a6aef516e62ac9edb12e1efe3a0b86b0ab745beb38ef588ecc6cc395ab798"
+        },
+        {
+          "path": "art/character-v3/payload/master.patch.part011",
+          "bytes": 43990,
+          "sha256": "22063c664e426c364c7be00ae10c9c3f14ba13b8261594188e1b5f1d9519f41f"
+        }
+      ]
+    },
+    "runtime": {
+      "destination": "godot-pc/assets/knight/Knight_Modular.glb",
+      "baseSourceMember": null,
+      "baseBytes": 84678496,
+      "baseSha256": "9efe4d883ca8c73c0ed7ef43b03833a5d0cd245271bf7c947a14716cd37ceb81",
+      "bytes": 84518416,
+      "sha256": "d3ca4d70be8b23d37cab23eb10f94be77fbb9261f08bfe6180dfc51839089166",
+      "patchBytes": 154592,
+      "patchSha256": "331dc45dc53617647baf1302da6af5721e6977ab702c08f57bfc2911ac6a22f0",
+      "parts": [
+        {
+          "path": "art/character-v3/payload/runtime.patch.part000",
+          "bytes": 154592,
+          "sha256": "331dc45dc53617647baf1302da6af5721e6977ab702c08f57bfc2911ac6a22f0"
+        }
+      ]
+    }
+  }
+}

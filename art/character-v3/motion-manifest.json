@@ -1,0 +1,51 @@
+{
+  "version": 3,
+  "blender": "4.2.3 LTS",
+  "source_sha256": "35b8c13c7f4427df2dc13b7bd5e04fd07c0c9b7407ab7d3f6c167639c0c8b3ad",
+  "master_sha256": "7de8563656aa5d31f86a8296dc344f969ad38b31ec90645875e78a10dc0a2ca2",
+  "unchanged_actions": {
+    "block": "4a8000c4a7c4b9b2cbe0995b527d7e0b7324dae0cbf5e976850b649169140daf",
+    "cast_enter": "b1f4bcb12f2794eb521356732da5bfa8e886bb6702a6e27b5aa52807537c7512",
+    "cast_exit": "f3e32dd7377534b5b1e0e9e3dbb0d5bb94c5d9c40b177f00f800ba4635f2ddd3",
+    "cast_loop": "d8704da105913d249137207be4d632b2966d0229600695942913b423218b3a2d",
+    "cast_release": "0af059c2d85c7dda37e4a2811d61abac278e2458b28bc24b4884139a53ac1585",
+    "hit": "0fdf744aef05add69ee6d9b2cac9bbe14d762f914046d3d248c93fbf86877b1b",
+    "hit_head": "4e838627cfb9bd0ba07b508986be72b3b76efb5d18a21931ee3b88170acfc7e2",
+    "run": "57498755d1c2bfb1cb0a14c62e19ef9de26e1ea6eed2d5420e787d101e9de5b4",
+    "run_weapon": "28d8ae6638910f3991e37bab2812363fa602d71b1b00c6598927bd6ae08cced7",
+    "spell1": "0af059c2d85c7dda37e4a2811d61abac278e2458b28bc24b4884139a53ac1585",
+    "sprint": "94ab20a0b566d443316e79c17571fab5e0c959f53a669770f95a9015b4686f29",
+    "sword_attack": "e40cc7a1b46e69c1ebf78689ed9a89a2d0925565ef9ed1f0c91b25186d46e84b",
+    "sword_attack_combo": "98352d40f284496130e6b6ed978270229926bd8a62a4037031f738cd163d8f73",
+    "sword_attack_heavy": "eab1ded7178aaab8a8eddc26ed5f510d765882fc2f2b68f97a8ab906fd13fca1",
+    "sword_recovery_a": "9270ad9f2f79d450be6e8069d3750016673bcfbfa1267d5ab2dae3bc6a9a717e",
+    "sword_recovery_b": "55e264a66f40d90aaed5108a1cf7dfbcedd463aad5203f9a3c6670dd15b28d06",
+    "sword_strike_a": "268b09cc6bbec39e0042c3723cd4d3c4b8999639a55506b3b96473840b44265a",
+    "sword_strike_b": "bcb67222f8f7bf04d0610c330d0f37d0b735dc3cfbb89e17c58ef84f4d0e5724",
+    "sword_strike_c": "a389ed65c94efcd05a2c2bffbe79905553d873de8aab2bda2ca93aeb1e472fb1"
+  },
+  "changed_actions": [
+    "combo_01",
+    "combo_02",
+    "combo_03",
+    "combo_04",
+    "combo_05",
+    "idle",
+    "idle_weapon",
+    "jump_air",
+    "jump_land",
+    "jump_start"
+  ],
+  "combo_master": "combo_flow_master",
+  "contacts_frames": [
+    15,
+    45,
+    75,
+    105,
+    135
+  ],
+  "runtime_contact_phase": 0.5,
+  "server_timing_changed": false,
+  "bones": 56,
+  "runtime_sha256": "d3ca4d70be8b23d37cab23eb10f94be77fbb9261f08bfe6180dfc51839089166"
+}

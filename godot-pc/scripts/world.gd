@@ -576,6 +576,7 @@ func _process(delta: float) -> void:
 			motion["grounded"] = player_motion.grounded
 			if player_motion.input_mode == "manual" or player_motion.manual_cancel_pending:
 				motion["combatState"] = "idle"
+				motion["autoAttack"] = false
 				motion["action"] = "walk" if player_motion.actual_velocity.length() > .08 else "idle"
 				motion["actionStartedAt"] = maxf(float(motion.get("actionStartedAt",0)),float(current_snapshot.get("time",0)))
 			if Time.get_ticks_msec() < int(actor.get_meta("predicted_skill_until",0)) and not bool(motion.get("dead",false)):

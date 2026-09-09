@@ -1,0 +1,2 @@
+# Exact forward binary patches must retain LF even on Windows.
+art/character-v3/payload/*.part* text eol=lf -diff
