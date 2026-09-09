@@ -1,0 +1,345 @@
+{
+  "file": "source/knight(b3_6).blend",
+  "blender_file_version": "306",
+  "pointer_bits": 64,
+  "summary": {
+    "objects": 16,
+    "object_data_types": {
+      "Lamp": 3,
+      "Mesh": 12,
+      "bArmature": 1
+    },
+    "armature_datablocks": 1
+  },
+  "objects": [
+    {
+      "name": "Area",
+      "object_type_id": 10,
+      "data_type": "Lamp",
+      "data_name": "Area",
+      "parent_object": null,
+      "modifiers": []
+    },
+    {
+      "name": "Area.001",
+      "object_type_id": 10,
+      "data_type": "Lamp",
+      "data_name": "Area.001",
+      "parent_object": null,
+      "modifiers": []
+    },
+    {
+      "name": "Area.002",
+      "object_type_id": 10,
+      "data_type": "Lamp",
+      "data_name": "Area.002",
+      "parent_object": null,
+      "modifiers": []
+    },
+    {
+      "name": "cloak",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Plane.063",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 418,
+      "polygon_count": 731,
+      "material_slot_count": 1
+    },
+    {
+      "name": "cloak_conector_left",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Cube.005",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 458,
+      "polygon_count": 896,
+      "material_slot_count": 1
+    },
+    {
+      "name": "cloak_conector_right",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Cube.013",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 458,
+      "polygon_count": 896,
+      "material_slot_count": 1
+    },
+    {
+      "name": "eye_plug",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Plane",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 6,
+      "polygon_count": 2,
+      "material_slot_count": 1
+    },
+    {
+      "name": "hand_top_armor_left",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Nickz_humanMaleAverage.026",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 1487,
+      "polygon_count": 2958,
+      "material_slot_count": 3
+    },
+    {
+      "name": "hand_top_armor_right",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Nickz_humanMaleAverage.025",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 1487,
+      "polygon_count": 2958,
+      "material_slot_count": 3
+    },
+    {
+      "name": "legs",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Plane.022",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 10467,
+      "polygon_count": 20382,
+      "material_slot_count": 1
+    },
+    {
+      "name": "legs_cloak",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Plane.055",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 15950,
+      "polygon_count": 31076,
+      "material_slot_count": 2
+    },
+    {
+      "name": "main_body",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Nickz_humanMaleAverage.014",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 18616,
+      "polygon_count": 36090,
+      "material_slot_count": 3
+    },
+    {
+      "name": "root",
+      "object_type_id": 25,
+      "data_type": "bArmature",
+      "data_name": "root",
+      "parent_object": null,
+      "modifiers": []
+    },
+    {
+      "name": "roses",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "OBJ_RoseStem.011",
+      "parent_object": null,
+      "modifiers": [],
+      "vertex_count": 84609,
+      "polygon_count": 77657,
+      "material_slot_count": 1
+    },
+    {
+      "name": "sword",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Cylinder.007",
+      "parent_object": null,
+      "modifiers": [],
+      "vertex_count": 938,
+      "polygon_count": 1784,
+      "material_slot_count": 1
+    },
+    {
+      "name": "top_belt_cloak",
+      "object_type_id": 1,
+      "data_type": "Mesh",
+      "data_name": "Plane.031",
+      "parent_object": "root",
+      "modifiers": [
+        {
+          "name": "root",
+          "type_id": 8,
+          "structure": "ArmatureModifierData",
+          "target_object": "root"
+        }
+      ],
+      "vertex_count": 546,
+      "polygon_count": 1048,
+      "material_slot_count": 1
+    }
+  ],
+  "armatures": [
+    {
+      "name": "root",
+      "bone_count": 70,
+      "bones": [
+        "root.x",
+        "c_tail_00.x",
+        "spine_01.x",
+        "thigh_stretch.l",
+        "thigh_stretch.r",
+        "leg_stretch.r",
+        "thigh_twist.r",
+        "foot.r",
+        "leg_twist.r",
+        "toes_01.r",
+        "leg_stretch.l",
+        "thigh_twist.l",
+        "foot.l",
+        "leg_twist.l",
+        "toes_01.l",
+        "neck.x",
+        "shoulder.l",
+        "shoulder.r",
+        "arm_stretch.r",
+        "arm_twist.r",
+        "forearm_stretch.r",
+        "forearm_twist.r",
+        "hand.r",
+        "index1_base.r",
+        "middle1_base.r",
+        "pinky1_base.r",
+        "ring1_base.r",
+        "thumb1.r",
+        "thumb2.r",
+        "thumb3.r",
+        "ring1.r",
+        "ring2.r",
+        "ring3.r",
+        "pinky1.r",
+        "pinky2.r",
+        "pinky3.r",
+        "middle1.r",
+        "middle2.r",
+        "middle3.r",
+        "index1.r",
+        "index2.r",
+        "index3.r",
+        "arm_stretch.l",
+        "arm_twist.l",
+        "forearm_stretch.l",
+        "forearm_twist.l",
+        "hand.l",
+        "index1_base.l",
+        "middle1_base.l",
+        "pinky1_base.l",
+        "ring1_base.l",
+        "thumb1.l",
+        "thumb2.l",
+        "thumb3.l",
+        "ring1.l",
+        "ring2.l",
+        "ring3.l",
+        "pinky1.l",
+        "pinky2.l",
+        "pinky3.l",
+        "middle1.l",
+        "middle2.l",
+        "middle3.l",
+        "index1.l",
+        "index2.l",
+        "index3.l",
+        "head.x",
+        "c_tail_01.x",
+        "c_tail_02.x",
+        "c_tail_03.x"
+      ]
+    }
+  ],
+  "materials": [
+    "bottom_armor_mat",
+    "center_armor_mat",
+    "cloak_mat",
+    "details_mat",
+    "Dots Stroke",
+    "eye_plug_mat",
+    "roses_mat",
+    "sword_mat",
+    "top_armor_mat"
+  ],
+  "actions": [],
+  "limitations": [
+    "Read-only DNA inventory; no script execution, scene evaluation or rendering.",
+    "Separate object names do not prove a complete body beneath armor or usable modular equipment.",
+    "Only original datablock structure and Armature modifier targets are established."
+  ]
+}
