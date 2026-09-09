@@ -1,0 +1,3437 @@
+{
+  "status": "APPROVED_NUMBERS_ANALYTICAL_REFERENCE_NOT_GAMEPLAY_TEST",
+  "baseCommit": "f4838500953798e95c4aff02fc0112b775409564",
+  "approvedAssets": [
+    {
+      "id": "ICE",
+      "title": "Ice Golem",
+      "author": "Caboose3d"
+    },
+    {
+      "id": "FOREST",
+      "title": "Forest Monster",
+      "author": "CDmir"
+    },
+    {
+      "id": "G1",
+      "title": "Volcanic Stone Lava Magma Golem",
+      "author": "Pigcraft"
+    },
+    {
+      "id": "G2",
+      "title": "Giant Stone Magma Golem",
+      "author": "Pigcraft"
+    },
+    {
+      "id": "G3",
+      "title": "Hellforged Warden",
+      "author": "MARC ALBURNÀ"
+    },
+    {
+      "id": "U1",
+      "title": "Zombie (Rigged & Animated)",
+      "author": "Aiden Studios"
+    },
+    {
+      "id": "S1",
+      "title": "Skeleton animated",
+      "author": "danielmclogan"
+    },
+    {
+      "id": "L2",
+      "title": "Werewolf",
+      "author": "C-List"
+    },
+    {
+      "id": "B1",
+      "title": "Giant Black Bat – Leathery-Winged Horror Beast",
+      "author": "Pigcraft"
+    },
+    {
+      "id": "P1",
+      "title": "Wraith",
+      "author": "Mateus Schwaab"
+    }
+  ],
+  "oldItemAdjustments": {
+    "executioner": {
+      "atk": [
+        16,
+        22
+      ],
+      "crit": 3,
+      "accuracy": 2
+    },
+    "rotten_root": {
+      "matk": 28,
+      "mp": 30,
+      "accuracy": 2
+    },
+    "dead_king_plate": {
+      "def": 18,
+      "mdef": 4,
+      "hp": 60
+    },
+    "sovereign_seal": {
+      "atk": [
+        5,
+        7
+      ],
+      "matk": 8,
+      "hp": 40
+    }
+  },
+  "monsterProposal": {
+    "fire_golem": {
+      "level": 20,
+      "hp": 650,
+      "atk": 60
+    },
+    "ice_golem": {
+      "level": 22,
+      "hp": 750,
+      "atk": 66
+    },
+    "rift_boss": {
+      "level": 25,
+      "hp": 9000,
+      "atk": 90
+    }
+  },
+  "full": [
+    {
+      "classId": "knight",
+      "plus": 0,
+      "currentStarter": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 59,
+          "atkMax": 67,
+          "matk": 18,
+          "def": 81,
+          "mdef": 19,
+          "crit": 14.7,
+          "accuracy": 83,
+          "evasion": 3.15,
+          "speed": 6.385999999999999
+        },
+        "maxHp": 1597,
+        "maxMp": 200,
+        "base": 63,
+        "hit": 0.9906291618294485,
+        "expected": 67,
+        "dps": 59.24,
+        "interval": 1.13,
+        "expectedHits650": 9.7,
+        "steadySeconds650": 10.97
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 82,
+          "atkMax": 98,
+          "matk": 31,
+          "def": 98,
+          "mdef": 37,
+          "crit": 20.7,
+          "accuracy": 92,
+          "evasion": 3.15,
+          "speed": 6.385999999999999
+        },
+        "maxHp": 1732,
+        "maxMp": 200,
+        "base": 90,
+        "hit": 0.9922889458729603,
+        "expected": 98.55,
+        "dps": 87.14,
+        "interval": 1.13,
+        "expectedHits650": 6.6,
+        "steadySeconds650": 7.46
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 64,
+          "atkMax": 72,
+          "matk": 26,
+          "def": 85,
+          "mdef": 23,
+          "crit": 17.7,
+          "accuracy": 84,
+          "evasion": 3.15,
+          "speed": 6.385999999999999
+        },
+        "maxHp": 1652,
+        "maxMp": 200,
+        "base": 68,
+        "hit": 0.9908299595679533,
+        "expected": 73.34,
+        "dps": 64.85,
+        "interval": 1.13,
+        "expectedHits650": 8.86,
+        "steadySeconds650": 10.02
+      },
+      "golem": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 70,
+          "atkMax": 80,
+          "matk": 2,
+          "def": 100,
+          "mdef": 26,
+          "crit": 13.7,
+          "accuracy": 87,
+          "evasion": 3.15,
+          "speed": 6.385999999999999
+        },
+        "maxHp": 1692,
+        "maxMp": 200,
+        "base": 75,
+        "hit": 0.9914069035093876,
+        "expected": 79.45,
+        "dps": 70.25,
+        "interval": 1.13,
+        "expectedHits650": 8.18,
+        "steadySeconds650": 9.25
+      },
+      "boss": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 74,
+          "atkMax": 84,
+          "matk": 12,
+          "def": 102,
+          "mdef": 27,
+          "crit": 14.7,
+          "accuracy": 88,
+          "evasion": 3.15,
+          "speed": 6.385999999999999
+        },
+        "maxHp": 1727,
+        "maxMp": 200,
+        "base": 79,
+        "hit": 0.9915910358474629,
+        "expected": 84.09,
+        "dps": 74.36,
+        "interval": 1.13,
+        "expectedHits650": 7.73,
+        "steadySeconds650": 8.74
+      },
+      "gainVsStarter": 18.59,
+      "bossGain": 5.85
+    },
+    {
+      "classId": "knight",
+      "plus": 3,
+      "currentStarter": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 66,
+          "atkMax": 74,
+          "matk": 24,
+          "def": 96,
+          "mdef": 19,
+          "crit": 17.7,
+          "accuracy": 85,
+          "evasion": 3.15,
+          "speed": 6.4479999999999995
+        },
+        "maxHp": 1610,
+        "maxMp": 200,
+        "base": 70,
+        "hit": 0.9910264546249845,
+        "expected": 75.51,
+        "dps": 66.77,
+        "interval": 1.13,
+        "expectedHits650": 8.61,
+        "steadySeconds650": 9.74
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 89,
+          "atkMax": 105,
+          "matk": 40,
+          "def": 113,
+          "mdef": 40,
+          "crit": 24.7,
+          "accuracy": 94,
+          "evasion": 3.15,
+          "speed": 6.4479999999999995
+        },
+        "maxHp": 1757,
+        "maxMp": 200,
+        "base": 97,
+        "hit": 0.9926158692703025,
+        "expected": 108.17,
+        "dps": 95.65,
+        "interval": 1.13,
+        "expectedHits650": 6.01,
+        "steadySeconds650": 6.8
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 71,
+          "atkMax": 79,
+          "matk": 35,
+          "def": 100,
+          "mdef": 26,
+          "crit": 21.7,
+          "accuracy": 86,
+          "evasion": 3.15,
+          "speed": 6.4479999999999995
+        },
+        "maxHp": 1670,
+        "maxMp": 200,
+        "base": 75,
+        "hit": 0.9912187391981335,
+        "expected": 82.41,
+        "dps": 72.87,
+        "interval": 1.13,
+        "expectedHits650": 7.89,
+        "steadySeconds650": 8.92
+      },
+      "golem": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 83,
+          "atkMax": 93,
+          "matk": 2,
+          "def": 124,
+          "mdef": 32,
+          "crit": 17.7,
+          "accuracy": 91,
+          "evasion": 3.15,
+          "speed": 6.4479999999999995
+        },
+        "maxHp": 1714,
+        "maxMp": 200,
+        "base": 88,
+        "hit": 0.9921200957744606,
+        "expected": 95.03,
+        "dps": 84.03,
+        "interval": 1.13,
+        "expectedHits650": 6.84,
+        "steadySeconds650": 7.74
+      },
+      "boss": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 87,
+          "atkMax": 97,
+          "matk": 15,
+          "def": 126,
+          "mdef": 33,
+          "crit": 18.7,
+          "accuracy": 92,
+          "evasion": 3.15,
+          "speed": 6.4479999999999995
+        },
+        "maxHp": 1752,
+        "maxMp": 200,
+        "base": 92,
+        "hit": 0.9922889458729603,
+        "expected": 99.83,
+        "dps": 88.27,
+        "interval": 1.13,
+        "expectedHits650": 6.51,
+        "steadySeconds650": 7.36
+      },
+      "gainVsStarter": 25.85,
+      "bossGain": 5.05
+    },
+    {
+      "classId": "mage",
+      "plus": 0,
+      "currentStarter": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 9,
+          "atkMax": 11,
+          "matk": 103,
+          "def": 54,
+          "mdef": 50,
+          "crit": 13.629999999999999,
+          "accuracy": 111,
+          "evasion": 4.05,
+          "speed": 6.696
+        },
+        "maxHp": 823,
+        "maxMp": 946,
+        "base": 103,
+        "hit": 0.9948905142567294,
+        "expected": 109.46,
+        "dps": 74.54,
+        "interval": 1.47,
+        "expectedHits650": 5.94,
+        "steadySeconds650": 8.72
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 13,
+          "atkMax": 16,
+          "matk": 148,
+          "def": 54,
+          "mdef": 50,
+          "crit": 13.629999999999999,
+          "accuracy": 120,
+          "evasion": 4.05,
+          "speed": 6.696
+        },
+        "maxHp": 883,
+        "maxMp": 1036,
+        "base": 148,
+        "hit": 0.9957955179237314,
+        "expected": 157.42,
+        "dps": 107.2,
+        "interval": 1.47,
+        "expectedHits650": 4.13,
+        "steadySeconds650": 6.06
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 10,
+          "atkMax": 12,
+          "matk": 117,
+          "def": 54,
+          "mdef": 50,
+          "crit": 13.629999999999999,
+          "accuracy": 112,
+          "evasion": 4.05,
+          "speed": 6.696
+        },
+        "maxHp": 863,
+        "maxMp": 976,
+        "base": 117,
+        "hit": 0.995,
+        "expected": 124.35,
+        "dps": 84.68,
+        "interval": 1.47,
+        "expectedHits650": 5.23,
+        "steadySeconds650": 7.68
+      },
+      "golem": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 5,
+          "atkMax": 5,
+          "matk": 122,
+          "def": 65,
+          "mdef": 59,
+          "crit": 15.629999999999999,
+          "accuracy": 112,
+          "evasion": 4.05,
+          "speed": 6.696
+        },
+        "maxHp": 848,
+        "maxMp": 1046,
+        "base": 122,
+        "hit": 0.995,
+        "expected": 130.88,
+        "dps": 89.12,
+        "interval": 1.47,
+        "expectedHits650": 4.97,
+        "steadySeconds650": 7.29
+      },
+      "boss": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 11,
+          "atkMax": 13,
+          "matk": 126,
+          "def": 78,
+          "mdef": 60,
+          "crit": 15.629999999999999,
+          "accuracy": 119,
+          "evasion": 4.05,
+          "speed": 6.696
+        },
+        "maxHp": 923,
+        "maxMp": 1031,
+        "base": 126,
+        "hit": 0.9957034517546938,
+        "expected": 135.26,
+        "dps": 92.11,
+        "interval": 1.47,
+        "expectedHits650": 4.81,
+        "steadySeconds650": 7.06
+      },
+      "gainVsStarter": 19.56,
+      "bossGain": 3.36
+    },
+    {
+      "classId": "mage",
+      "plus": 3,
+      "currentStarter": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 12,
+          "atkMax": 14,
+          "matk": 113,
+          "def": 66,
+          "mdef": 53,
+          "crit": 16.63,
+          "accuracy": 113,
+          "evasion": 4.05,
+          "speed": 6.758
+        },
+        "maxHp": 832,
+        "maxMp": 951,
+        "base": 113,
+        "hit": 0.9951071396895615,
+        "expected": 121.8,
+        "dps": 82.94,
+        "interval": 1.47,
+        "expectedHits650": 5.34,
+        "steadySeconds650": 7.84
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 16,
+          "atkMax": 19,
+          "matk": 161,
+          "def": 66,
+          "mdef": 53,
+          "crit": 16.63,
+          "accuracy": 122,
+          "evasion": 4.05,
+          "speed": 6.758
+        },
+        "maxHp": 897,
+        "maxMp": 1049,
+        "base": 161,
+        "hit": 0.9959737741701269,
+        "expected": 173.69,
+        "dps": 118.27,
+        "interval": 1.47,
+        "expectedHits650": 3.74,
+        "steadySeconds650": 5.5
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 13,
+          "atkMax": 15,
+          "matk": 130,
+          "def": 66,
+          "mdef": 53,
+          "crit": 16.63,
+          "accuracy": 114,
+          "evasion": 4.05,
+          "speed": 6.758
+        },
+        "maxHp": 876,
+        "maxMp": 984,
+        "base": 130,
+        "hit": 0.9952119835965071,
+        "expected": 140.14,
+        "dps": 95.43,
+        "interval": 1.47,
+        "expectedHits650": 4.64,
+        "steadySeconds650": 6.81
+      },
+      "golem": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 5,
+          "atkMax": 5,
+          "matk": 135,
+          "def": 83,
+          "mdef": 71,
+          "crit": 20.63,
+          "accuracy": 114,
+          "evasion": 4.05,
+          "speed": 6.758
+        },
+        "maxHp": 860,
+        "maxMp": 1059,
+        "base": 135,
+        "hit": 0.9952119835965071,
+        "expected": 148.21,
+        "dps": 100.93,
+        "interval": 1.47,
+        "expectedHits650": 4.39,
+        "steadySeconds650": 6.44
+      },
+      "boss": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 14,
+          "atkMax": 16,
+          "matk": 139,
+          "def": 96,
+          "mdef": 72,
+          "crit": 20.63,
+          "accuracy": 122,
+          "evasion": 4.05,
+          "speed": 6.758
+        },
+        "maxHp": 942,
+        "maxMp": 1044,
+        "base": 139,
+        "hit": 0.9959737741701269,
+        "expected": 152.72,
+        "dps": 104,
+        "interval": 1.47,
+        "expectedHits650": 4.26,
+        "steadySeconds650": 6.25
+      },
+      "gainVsStarter": 21.69,
+      "bossGain": 3.04
+    },
+    {
+      "classId": "assassin",
+      "plus": 0,
+      "currentStarter": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 59,
+          "atkMax": 67,
+          "matk": 20,
+          "def": 66,
+          "mdef": 21,
+          "crit": 28,
+          "accuracy": 114,
+          "evasion": 14,
+          "speed": 7.440000000000001
+        },
+        "maxHp": 1028,
+        "maxMp": 361,
+        "base": 63,
+        "hit": 0.9952119835965071,
+        "expected": 74.11,
+        "dps": 96.81,
+        "interval": 0.77,
+        "expectedHits650": 8.77,
+        "steadySeconds650": 6.71
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 63,
+          "atkMax": 72,
+          "matk": 33,
+          "def": 66,
+          "mdef": 21,
+          "crit": 28,
+          "accuracy": 114,
+          "evasion": 14,
+          "speed": 7.440000000000001
+        },
+        "maxHp": 1088,
+        "maxMp": 361,
+        "base": 67.5,
+        "hit": 0.9952119835965071,
+        "expected": 79.4,
+        "dps": 103.72,
+        "interval": 0.77,
+        "expectedHits650": 8.19,
+        "steadySeconds650": 6.27
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 60,
+          "atkMax": 68,
+          "matk": 28,
+          "def": 66,
+          "mdef": 21,
+          "crit": 28,
+          "accuracy": 114,
+          "evasion": 14,
+          "speed": 7.440000000000001
+        },
+        "maxHp": 1068,
+        "maxMp": 361,
+        "base": 64,
+        "hit": 0.9952119835965071,
+        "expected": 75.29,
+        "dps": 98.34,
+        "interval": 0.77,
+        "expectedHits650": 8.63,
+        "steadySeconds650": 6.61
+      },
+      "golem": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 70,
+          "atkMax": 80,
+          "matk": 4,
+          "def": 73,
+          "mdef": 21,
+          "crit": 24,
+          "accuracy": 117,
+          "evasion": 19,
+          "speed": 7.440000000000001
+        },
+        "maxHp": 1088,
+        "maxMp": 361,
+        "base": 75,
+        "hit": 0.9955132273124923,
+        "expected": 86.31,
+        "dps": 112.74,
+        "interval": 0.77,
+        "expectedHits650": 7.53,
+        "steadySeconds650": 5.77
+      },
+      "boss": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 74,
+          "atkMax": 84,
+          "matk": 14,
+          "def": 75,
+          "mdef": 21,
+          "crit": 25,
+          "accuracy": 118,
+          "evasion": 20,
+          "speed": 7.440000000000001
+        },
+        "maxHp": 1123,
+        "maxMp": 361,
+        "base": 79,
+        "hit": 0.9956093695990668,
+        "expected": 91.43,
+        "dps": 119.44,
+        "interval": 0.77,
+        "expectedHits650": 7.11,
+        "steadySeconds650": 5.44
+      },
+      "gainVsStarter": 16.45,
+      "bossGain": 5.94
+    },
+    {
+      "classId": "assassin",
+      "plus": 3,
+      "currentStarter": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 66,
+          "atkMax": 74,
+          "matk": 26,
+          "def": 81,
+          "mdef": 21,
+          "crit": 32,
+          "accuracy": 116,
+          "evasion": 15,
+          "speed": 7.502000000000001
+        },
+        "maxHp": 1037,
+        "maxMp": 361,
+        "base": 70,
+        "hit": 0.9954149797839766,
+        "expected": 84.17,
+        "dps": 109.95,
+        "interval": 0.77,
+        "expectedHits650": 7.72,
+        "steadySeconds650": 5.91
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 70,
+          "atkMax": 79,
+          "matk": 42,
+          "def": 81,
+          "mdef": 21,
+          "crit": 32,
+          "accuracy": 116,
+          "evasion": 15,
+          "speed": 7.502000000000001
+        },
+        "maxHp": 1102,
+        "maxMp": 361,
+        "base": 74.5,
+        "hit": 0.9954149797839766,
+        "expected": 89.58,
+        "dps": 117.02,
+        "interval": 0.77,
+        "expectedHits650": 7.26,
+        "steadySeconds650": 5.55
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 67,
+          "atkMax": 75,
+          "matk": 37,
+          "def": 81,
+          "mdef": 21,
+          "crit": 32,
+          "accuracy": 116,
+          "evasion": 15,
+          "speed": 7.502000000000001
+        },
+        "maxHp": 1081,
+        "maxMp": 361,
+        "base": 71,
+        "hit": 0.9954149797839766,
+        "expected": 85.37,
+        "dps": 111.52,
+        "interval": 0.77,
+        "expectedHits650": 7.61,
+        "steadySeconds650": 5.83
+      },
+      "golem": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 83,
+          "atkMax": 93,
+          "matk": 4,
+          "def": 94,
+          "mdef": 21,
+          "crit": 28,
+          "accuracy": 121,
+          "evasion": 23,
+          "speed": 7.502000000000001
+        },
+        "maxHp": 1103,
+        "maxMp": 361,
+        "base": 88,
+        "hit": 0.9958856113046151,
+        "expected": 103.59,
+        "dps": 135.31,
+        "interval": 0.77,
+        "expectedHits650": 6.27,
+        "steadySeconds650": 4.8
+      },
+      "boss": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 87,
+          "atkMax": 97,
+          "matk": 17,
+          "def": 96,
+          "mdef": 21,
+          "crit": 29,
+          "accuracy": 122,
+          "evasion": 24,
+          "speed": 7.502000000000001
+        },
+        "maxHp": 1141,
+        "maxMp": 361,
+        "base": 92,
+        "hit": 0.9959737741701269,
+        "expected": 108.9,
+        "dps": 142.25,
+        "interval": 0.77,
+        "expectedHits650": 5.97,
+        "steadySeconds650": 4.57
+      },
+      "gainVsStarter": 23.07,
+      "bossGain": 5.13
+    },
+    {
+      "classId": "ranger",
+      "plus": 0,
+      "currentStarter": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 62,
+          "atkMax": 71,
+          "matk": 23,
+          "def": 67,
+          "mdef": 25,
+          "crit": 20.23,
+          "accuracy": 127,
+          "evasion": 8.55,
+          "speed": 7.192
+        },
+        "maxHp": 1000,
+        "maxMp": 430,
+        "base": 66.5,
+        "hit": 0.9963870479825574,
+        "expected": 73.63,
+        "dps": 75.29,
+        "interval": 0.98,
+        "expectedHits650": 8.83,
+        "steadySeconds650": 8.63
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 66,
+          "atkMax": 76,
+          "matk": 36,
+          "def": 67,
+          "mdef": 25,
+          "crit": 20.23,
+          "accuracy": 127,
+          "evasion": 8.55,
+          "speed": 7.192
+        },
+        "maxHp": 1060,
+        "maxMp": 430,
+        "base": 71,
+        "hit": 0.9963870479825574,
+        "expected": 78.61,
+        "dps": 80.38,
+        "interval": 0.98,
+        "expectedHits650": 8.27,
+        "steadySeconds650": 8.09
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 63,
+          "atkMax": 72,
+          "matk": 31,
+          "def": 67,
+          "mdef": 25,
+          "crit": 20.23,
+          "accuracy": 127,
+          "evasion": 8.55,
+          "speed": 7.192
+        },
+        "maxHp": 1040,
+        "maxMp": 430,
+        "base": 67.5,
+        "hit": 0.9963870479825574,
+        "expected": 74.74,
+        "dps": 76.42,
+        "interval": 0.98,
+        "expectedHits650": 8.7,
+        "steadySeconds650": 8.51
+      },
+      "golem": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 73,
+          "atkMax": 84,
+          "matk": 7,
+          "def": 83,
+          "mdef": 27,
+          "crit": 16.23,
+          "accuracy": 131,
+          "evasion": 8.55,
+          "speed": 7.192
+        },
+        "maxHp": 1095,
+        "maxMp": 430,
+        "base": 78.5,
+        "hit": 0.9966869083921006,
+        "expected": 85.22,
+        "dps": 87.14,
+        "interval": 0.98,
+        "expectedHits650": 7.63,
+        "steadySeconds650": 7.46
+      },
+      "boss": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 77,
+          "atkMax": 88,
+          "matk": 17,
+          "def": 84,
+          "mdef": 47,
+          "crit": 16.23,
+          "accuracy": 132,
+          "evasion": 8.55,
+          "speed": 7.192
+        },
+        "maxHp": 1130,
+        "maxMp": 505,
+        "base": 82.5,
+        "hit": 0.9967579011133725,
+        "expected": 89.57,
+        "dps": 91.59,
+        "interval": 0.98,
+        "expectedHits650": 7.26,
+        "steadySeconds650": 7.1
+      },
+      "gainVsStarter": 15.74,
+      "bossGain": 5.11
+    },
+    {
+      "classId": "ranger",
+      "plus": 3,
+      "currentStarter": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 69,
+          "atkMax": 78,
+          "matk": 29,
+          "def": 82,
+          "mdef": 25,
+          "crit": 23.23,
+          "accuracy": 130,
+          "evasion": 8.55,
+          "speed": 7.2540000000000004
+        },
+        "maxHp": 1009,
+        "maxMp": 430,
+        "base": 73.5,
+        "hit": 0.9966143611326578,
+        "expected": 82.61,
+        "dps": 84.47,
+        "interval": 0.98,
+        "expectedHits650": 7.87,
+        "steadySeconds650": 7.7
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 73,
+          "atkMax": 83,
+          "matk": 45,
+          "def": 82,
+          "mdef": 25,
+          "crit": 23.23,
+          "accuracy": 130,
+          "evasion": 8.55,
+          "speed": 7.2540000000000004
+        },
+        "maxHp": 1074,
+        "maxMp": 430,
+        "base": 78,
+        "hit": 0.9966143611326578,
+        "expected": 87.67,
+        "dps": 89.64,
+        "interval": 0.98,
+        "expectedHits650": 7.41,
+        "steadySeconds650": 7.25
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 70,
+          "atkMax": 79,
+          "matk": 40,
+          "def": 82,
+          "mdef": 25,
+          "crit": 23.23,
+          "accuracy": 130,
+          "evasion": 8.55,
+          "speed": 7.2540000000000004
+        },
+        "maxHp": 1053,
+        "maxMp": 430,
+        "base": 74.5,
+        "hit": 0.9966143611326578,
+        "expected": 83.73,
+        "dps": 85.62,
+        "interval": 0.98,
+        "expectedHits650": 7.76,
+        "steadySeconds650": 7.59
+      },
+      "golem": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 86,
+          "atkMax": 97,
+          "matk": 7,
+          "def": 107,
+          "mdef": 30,
+          "crit": 19.23,
+          "accuracy": 136,
+          "evasion": 8.55,
+          "speed": 7.2540000000000004
+        },
+        "maxHp": 1113,
+        "maxMp": 430,
+        "base": 91.5,
+        "hit": 0.9970269822124932,
+        "expected": 100.88,
+        "dps": 103.15,
+        "interval": 0.98,
+        "expectedHits650": 6.44,
+        "steadySeconds650": 6.3
+      },
+      "boss": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 90,
+          "atkMax": 101,
+          "matk": 20,
+          "def": 108,
+          "mdef": 53,
+          "crit": 19.23,
+          "accuracy": 137,
+          "evasion": 8.55,
+          "speed": 7.2540000000000004
+        },
+        "maxHp": 1151,
+        "maxMp": 512,
+        "base": 95.5,
+        "hit": 0.9970906878530561,
+        "expected": 105.29,
+        "dps": 107.66,
+        "interval": 0.98,
+        "expectedHits650": 6.17,
+        "steadySeconds650": 6.04
+      },
+      "gainVsStarter": 22.11,
+      "bossGain": 4.37
+    },
+    {
+      "classId": "necro",
+      "plus": 0,
+      "currentStarter": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 10,
+          "atkMax": 12,
+          "matk": 101,
+          "def": 56,
+          "mdef": 48,
+          "crit": 13.8,
+          "accuracy": 111,
+          "evasion": 4.5,
+          "speed": 6.571999999999999
+        },
+        "maxHp": 941,
+        "maxMp": 819,
+        "base": 101,
+        "hit": 0.9948905142567294,
+        "expected": 107.42,
+        "dps": 75.84,
+        "interval": 1.42,
+        "expectedHits650": 6.05,
+        "steadySeconds650": 8.57
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 14,
+          "atkMax": 17,
+          "matk": 114,
+          "def": 56,
+          "mdef": 48,
+          "crit": 13.8,
+          "accuracy": 111,
+          "evasion": 4.5,
+          "speed": 6.571999999999999
+        },
+        "maxHp": 1001,
+        "maxMp": 819,
+        "base": 114,
+        "hit": 0.9948905142567294,
+        "expected": 121.24,
+        "dps": 85.6,
+        "interval": 1.42,
+        "expectedHits650": 5.36,
+        "steadySeconds650": 7.59
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 11,
+          "atkMax": 13,
+          "matk": 109,
+          "def": 56,
+          "mdef": 48,
+          "crit": 13.8,
+          "accuracy": 111,
+          "evasion": 4.5,
+          "speed": 6.571999999999999
+        },
+        "maxHp": 981,
+        "maxMp": 819,
+        "base": 109,
+        "hit": 0.9948905142567294,
+        "expected": 115.93,
+        "dps": 81.84,
+        "interval": 1.42,
+        "expectedHits650": 5.61,
+        "steadySeconds650": 7.94
+      },
+      "golem": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 6,
+          "atkMax": 6,
+          "matk": 120,
+          "def": 67,
+          "mdef": 58,
+          "crit": 15.8,
+          "accuracy": 112,
+          "evasion": 4.5,
+          "speed": 6.571999999999999
+        },
+        "maxHp": 966,
+        "maxMp": 929,
+        "base": 120,
+        "hit": 0.995,
+        "expected": 128.83,
+        "dps": 90.95,
+        "interval": 1.42,
+        "expectedHits650": 5.05,
+        "steadySeconds650": 7.15
+      },
+      "boss": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 12,
+          "atkMax": 14,
+          "matk": 124,
+          "def": 80,
+          "mdef": 59,
+          "crit": 15.8,
+          "accuracy": 119,
+          "evasion": 4.5,
+          "speed": 6.571999999999999
+        },
+        "maxHp": 1041,
+        "maxMp": 919,
+        "base": 124,
+        "hit": 0.9957034517546938,
+        "expected": 133.22,
+        "dps": 94.05,
+        "interval": 1.42,
+        "expectedHits650": 4.88,
+        "steadySeconds650": 6.91
+      },
+      "gainVsStarter": 19.92,
+      "bossGain": 3.41
+    },
+    {
+      "classId": "necro",
+      "plus": 3,
+      "currentStarter": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 13,
+          "atkMax": 15,
+          "matk": 111,
+          "def": 68,
+          "mdef": 51,
+          "crit": 16.8,
+          "accuracy": 113,
+          "evasion": 4.5,
+          "speed": 6.6339999999999995
+        },
+        "maxHp": 950,
+        "maxMp": 823,
+        "base": 111,
+        "hit": 0.9951071396895615,
+        "expected": 119.74,
+        "dps": 84.53,
+        "interval": 1.42,
+        "expectedHits650": 5.43,
+        "steadySeconds650": 7.69
+      },
+      "currentLegacy": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 17,
+          "atkMax": 20,
+          "matk": 127,
+          "def": 68,
+          "mdef": 51,
+          "crit": 16.8,
+          "accuracy": 113,
+          "evasion": 4.5,
+          "speed": 6.6339999999999995
+        },
+        "maxHp": 1015,
+        "maxMp": 823,
+        "base": 127,
+        "hit": 0.9951071396895615,
+        "expected": 136.99,
+        "dps": 96.72,
+        "interval": 1.42,
+        "expectedHits650": 4.74,
+        "steadySeconds650": 6.72
+      },
+      "revisedLegacy": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 14,
+          "atkMax": 16,
+          "matk": 122,
+          "def": 68,
+          "mdef": 51,
+          "crit": 16.8,
+          "accuracy": 113,
+          "evasion": 4.5,
+          "speed": 6.6339999999999995
+        },
+        "maxHp": 994,
+        "maxMp": 823,
+        "base": 122,
+        "hit": 0.9951071396895615,
+        "expected": 131.6,
+        "dps": 92.91,
+        "interval": 1.42,
+        "expectedHits650": 4.94,
+        "steadySeconds650": 7
+      },
+      "golem": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 6,
+          "atkMax": 6,
+          "matk": 133,
+          "def": 85,
+          "mdef": 70,
+          "crit": 20.8,
+          "accuracy": 114,
+          "evasion": 4.5,
+          "speed": 6.6339999999999995
+        },
+        "maxHp": 978,
+        "maxMp": 942,
+        "base": 133,
+        "hit": 0.9952119835965071,
+        "expected": 146.13,
+        "dps": 103.17,
+        "interval": 1.42,
+        "expectedHits650": 4.45,
+        "steadySeconds650": 6.3
+      },
+      "boss": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 15,
+          "atkMax": 17,
+          "matk": 137,
+          "def": 98,
+          "mdef": 71,
+          "crit": 20.8,
+          "accuracy": 122,
+          "evasion": 4.5,
+          "speed": 6.6339999999999995
+        },
+        "maxHp": 1060,
+        "maxMp": 932,
+        "base": 137,
+        "hit": 0.9959737741701269,
+        "expected": 150.64,
+        "dps": 106.35,
+        "interval": 1.42,
+        "expectedHits650": 4.31,
+        "steadySeconds650": 6.11
+      },
+      "gainVsStarter": 22.05,
+      "bossGain": 3.08
+    }
+  ],
+  "isolated": [
+    {
+      "classId": "knight",
+      "from": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 59,
+          "atkMax": 65,
+          "matk": 2,
+          "def": 37,
+          "mdef": 19,
+          "crit": 5.7,
+          "accuracy": 85,
+          "evasion": 3.15,
+          "speed": 5.89
+        },
+        "maxHp": 1447,
+        "maxMp": 200,
+        "base": 62,
+        "hit": 0.9910264546249845,
+        "expected": 63.19,
+        "dps": 55.88,
+        "interval": 1.13,
+        "expectedHits650": 10.29,
+        "steadySeconds650": 11.63
+      },
+      "to": {
+        "stats": {
+          "str": 16,
+          "dex": 7,
+          "int": 2,
+          "vit": 19,
+          "spi": 5,
+          "atkMin": 61,
+          "atkMax": 67,
+          "matk": 2,
+          "def": 37,
+          "mdef": 19,
+          "crit": 8.7,
+          "accuracy": 85,
+          "evasion": 3.15,
+          "speed": 5.89
+        },
+        "maxHp": 1447,
+        "maxMp": 200,
+        "base": 64,
+        "hit": 0.9910264546249845,
+        "expected": 66.18,
+        "dps": 58.52,
+        "interval": 1.13,
+        "expectedHits650": 9.82,
+        "steadySeconds650": 11.11
+      },
+      "gain": 4.72
+    },
+    {
+      "classId": "mage",
+      "from": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 5,
+          "atkMax": 5,
+          "matk": 91,
+          "def": 24,
+          "mdef": 34,
+          "crit": 4.63,
+          "accuracy": 113,
+          "evasion": 4.05,
+          "speed": 6.2
+        },
+        "maxHp": 718,
+        "maxMp": 886,
+        "base": 91,
+        "hit": 0.9951071396895615,
+        "expected": 92.65,
+        "dps": 63.09,
+        "interval": 1.47,
+        "expectedHits650": 7.02,
+        "steadySeconds650": 10.3
+      },
+      "to": {
+        "stats": {
+          "str": 4,
+          "dex": 9,
+          "int": 20,
+          "vit": 8,
+          "spi": 18,
+          "atkMin": 5,
+          "atkMax": 5,
+          "matk": 95,
+          "def": 24,
+          "mdef": 34,
+          "crit": 4.63,
+          "accuracy": 112,
+          "evasion": 4.05,
+          "speed": 6.2
+        },
+        "maxHp": 718,
+        "maxMp": 921,
+        "base": 95,
+        "hit": 0.995,
+        "expected": 96.71,
+        "dps": 65.86,
+        "interval": 1.47,
+        "expectedHits650": 6.72,
+        "steadySeconds650": 9.87
+      },
+      "gain": 4.39
+    },
+    {
+      "classId": "assassin",
+      "from": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 59,
+          "atkMax": 65,
+          "matk": 4,
+          "def": 26,
+          "mdef": 21,
+          "crit": 20,
+          "accuracy": 116,
+          "evasion": 9,
+          "speed": 6.944000000000001
+        },
+        "maxHp": 923,
+        "maxMp": 361,
+        "base": 62,
+        "hit": 0.9954149797839766,
+        "expected": 69.74,
+        "dps": 91.1,
+        "interval": 0.77,
+        "expectedHits650": 9.32,
+        "steadySeconds650": 7.14
+      },
+      "to": {
+        "stats": {
+          "str": 12,
+          "dex": 20,
+          "int": 4,
+          "vit": 10,
+          "spi": 7,
+          "atkMin": 61,
+          "atkMax": 67,
+          "matk": 4,
+          "def": 26,
+          "mdef": 21,
+          "crit": 19,
+          "accuracy": 115,
+          "evasion": 9,
+          "speed": 6.944000000000001
+        },
+        "maxHp": 923,
+        "maxMp": 361,
+        "base": 64,
+        "hit": 0.9953145809147242,
+        "expected": 71.57,
+        "dps": 93.48,
+        "interval": 0.77,
+        "expectedHits650": 9.08,
+        "steadySeconds650": 6.95
+      },
+      "gain": 2.61
+    },
+    {
+      "classId": "ranger",
+      "from": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 62,
+          "atkMax": 69,
+          "matk": 7,
+          "def": 26,
+          "mdef": 25,
+          "crit": 11.23,
+          "accuracy": 124,
+          "evasion": 8.55,
+          "speed": 6.696000000000001
+        },
+        "maxHp": 895,
+        "maxMp": 430,
+        "base": 65.5,
+        "hit": 0.9961444729364801,
+        "expected": 69.28,
+        "dps": 70.84,
+        "interval": 0.98,
+        "expectedHits650": 9.38,
+        "steadySeconds650": 9.18
+      },
+      "to": {
+        "stats": {
+          "str": 9,
+          "dex": 19,
+          "int": 6,
+          "vit": 10,
+          "spi": 10,
+          "atkMin": 64,
+          "atkMax": 71,
+          "matk": 7,
+          "def": 26,
+          "mdef": 25,
+          "crit": 11.23,
+          "accuracy": 123,
+          "evasion": 8.55,
+          "speed": 6.696000000000001
+        },
+        "maxHp": 895,
+        "maxMp": 430,
+        "base": 67.5,
+        "hit": 0.9960600478872302,
+        "expected": 71.39,
+        "dps": 72.99,
+        "interval": 0.98,
+        "expectedHits650": 9.11,
+        "steadySeconds650": 8.9
+      },
+      "gain": 3.04
+    },
+    {
+      "classId": "necro",
+      "from": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 6,
+          "atkMax": 6,
+          "matk": 89,
+          "def": 26,
+          "mdef": 33,
+          "crit": 4.8,
+          "accuracy": 113,
+          "evasion": 4.5,
+          "speed": 6.076
+        },
+        "maxHp": 836,
+        "maxMp": 774,
+        "base": 89,
+        "hit": 0.9951071396895615,
+        "expected": 90.69,
+        "dps": 64.03,
+        "interval": 1.42,
+        "expectedHits650": 7.17,
+        "steadySeconds650": 10.15
+      },
+      "to": {
+        "stats": {
+          "str": 5,
+          "dex": 10,
+          "int": 19,
+          "vit": 10,
+          "spi": 17,
+          "atkMin": 6,
+          "atkMax": 6,
+          "matk": 93,
+          "def": 26,
+          "mdef": 33,
+          "crit": 4.8,
+          "accuracy": 112,
+          "evasion": 4.5,
+          "speed": 6.076
+        },
+        "maxHp": 836,
+        "maxMp": 804,
+        "base": 93,
+        "hit": 0.995,
+        "expected": 94.76,
+        "dps": 66.9,
+        "interval": 1.42,
+        "expectedHits650": 6.86,
+        "steadySeconds650": 9.72
+      },
+      "gain": 4.48
+    }
+  ],
+  "oneHits": [
+    {
+      "classId": "knight",
+      "level": 1,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 1.2,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 1,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 13.47,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 1,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 14.47,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 1,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 16.7,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 1,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 17.45,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 1,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 38.62,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 8,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 10.24,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 8,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 13.48,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 8,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 14.47,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 8,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 17.43,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 8,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 46.05,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 8,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 78.99,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 20,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 14.56,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 20,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 13.58,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 20,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 14.58,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 20,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 17.54,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 20,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 86.96,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 20,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.23,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 25,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 14.67,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 25,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 13.69,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 25,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 35.81,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 25,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 17.65,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 25,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.25,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "knight",
+      "level": 25,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.26,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 1,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.37,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 1,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.38,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 1,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.47,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 1,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.39,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 1,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.41,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 1,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.5,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 8,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.42,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 8,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.43,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 8,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.51,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 8,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.44,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 8,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.45,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 8,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.54,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 20,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.49,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 20,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.5,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 20,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.57,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 20,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.51,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 20,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.52,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 20,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.6,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 25,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.53,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 25,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.54,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 25,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.61,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 25,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.55,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 25,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.56,
+      "wraithAuto": 20.54,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "mage",
+      "level": 25,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.63,
+      "wraithAuto": 20.55,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 1,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 16.06,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 1,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 22.87,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 1,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 23.87,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 1,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 30.82,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 1,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 26.86,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 1,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 38.6,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 8,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 27.25,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 8,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 23.28,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 8,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 24.28,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 8,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 31.23,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 8,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 38.11,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 8,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 67.46,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 20,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 27.87,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 20,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 23.89,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 20,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 24.89,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 20,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 31.85,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 20,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 88.83,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 20,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.6,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 25,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 28.07,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 25,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 24.1,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 25,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 43.72,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 25,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 32.06,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 25,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.61,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "assassin",
+      "level": 25,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.61,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 1,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 9.61,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 1,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 15.31,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 1,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 15.32,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 1,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 22.28,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 1,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 22,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 1,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 51.57,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 8,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 19.64,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 8,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 15.66,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 8,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 15.66,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 8,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 22.63,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 8,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 59.15,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 8,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 88.62,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 20,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 20.16,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 20,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 16.18,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 20,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 42.75,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 20,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 23.15,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 20,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.7,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 20,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.71,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 25,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 20.33,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 25,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 35.29,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 25,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 65.6,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 25,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 23.33,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 25,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.72,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "ranger",
+      "level": 25,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.73,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 1,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.35,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 1,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.37,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 1,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.45,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 1,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.38,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 1,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.39,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 1,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.49,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 8,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.41,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 8,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.42,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 8,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.5,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 8,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.43,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 8,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.44,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 8,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.53,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 20,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.49,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 20,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.5,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 20,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.57,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 20,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.51,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 20,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.52,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 20,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.6,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 25,
+      "plus": 0,
+      "kind": "starter",
+      "wolfAuto": 99.51,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 25,
+      "plus": 0,
+      "kind": "golem",
+      "wolfAuto": 99.52,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 25,
+      "plus": 0,
+      "kind": "boss",
+      "wolfAuto": 99.59,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 25,
+      "plus": 3,
+      "kind": "starter",
+      "wolfAuto": 99.53,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 25,
+      "plus": 3,
+      "kind": "golem",
+      "wolfAuto": 99.54,
+      "wraithAuto": 0,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    },
+    {
+      "classId": "necro",
+      "level": 25,
+      "plus": 3,
+      "kind": "boss",
+      "wolfAuto": 99.61,
+      "wraithAuto": 20.72,
+      "fireGolemAuto": 0,
+      "fireGolemStrongestSingleHit": 0
+    }
+  ],
+  "approval": {
+    "date": "2026-09-09",
+    "branch": "work/character-art-v3",
+    "baseCommit": "f4838500953798e95c4aff02fc0112b775409564",
+    "userApproval": "согласовано все кроме волка, и из оборотней согласован массивный вариант . Оформляй все",
+    "acceptedCardIds": [
+      "G1",
+      "G2",
+      "G3",
+      "U1",
+      "S1",
+      "L2",
+      "B1",
+      "P1"
+    ],
+    "rejectedCardIds": [
+      "W1",
+      "L1"
+    ],
+    "approvedEarlier": [
+      "ICE",
+      "FOREST"
+    ]
+  },
+  "newEquipment": [
+    {
+      "id": "rift_sword",
+      "name": "Меч раскалённого разлома",
+      "slot": "weapon",
+      "classRule": "Рыцарь",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          18,
+          24
+        ],
+        "crit": 3,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "rift_staff",
+      "name": "Посох угасшего вулкана",
+      "slot": "weapon",
+      "classRule": "Маг",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 30,
+        "mp": 35,
+        "accuracy": 2
+      }
+    },
+    {
+      "id": "rift_daggers",
+      "name": "Клинки обсидиановой тени",
+      "slot": "weapon",
+      "classRule": "Ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          16,
+          22
+        ],
+        "crit": 5,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "rift_bow",
+      "name": "Лук ледяного утёса",
+      "slot": "weapon",
+      "classRule": "Рейнджер",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          17,
+          24
+        ],
+        "accuracy": 8
+      }
+    },
+    {
+      "id": "rift_grimoire",
+      "name": "Гримуар стылых душ",
+      "slot": "weapon",
+      "classRule": "Некромант",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 32,
+        "mp": 30,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "rift_plate",
+      "name": "Латы раскалённой твердыни",
+      "slot": "chest",
+      "classRule": "Только рыцарь",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 20,
+        "mdef": 5,
+        "hp": 65
+      }
+    },
+    {
+      "id": "rift_helm",
+      "name": "Шлем базальтового стража",
+      "slot": "head",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 14,
+        "hp": 75
+      }
+    },
+    {
+      "id": "rift_gloves",
+      "name": "Перчатки базальтового стража",
+      "slot": "gloves",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 6,
+        "crit": 3
+      }
+    },
+    {
+      "id": "rift_boots",
+      "name": "Сапоги базальтового стража",
+      "slot": "boots",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 6,
+        "speed": 8
+      }
+    },
+    {
+      "id": "rift_shield",
+      "name": "Щит остывшей магмы",
+      "slot": "offhand",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 5,
+        "mdef": 2,
+        "hp": 15
+      }
+    },
+    {
+      "id": "rift_coat",
+      "name": "Куртка сумеречного странника",
+      "slot": "chest",
+      "classRule": "Маг, рейнджер, некромант; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 14,
+        "hp": 20,
+        "accuracy": 6
+      }
+    },
+    {
+      "id": "rift_robe",
+      "name": "Мантия ледяного святилища",
+      "slot": "chest",
+      "classRule": "Маг, рейнджер, некромант; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 2,
+        "mdef": 19,
+        "mp": 70
+      }
+    },
+    {
+      "id": "shade_chest",
+      "name": "Панцирь Безлунной тени",
+      "slot": "chest",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 13,
+        "hp": 20,
+        "evasion": 6
+      }
+    },
+    {
+      "id": "shade_helm",
+      "name": "Маска Безлунной тени",
+      "slot": "head",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 12,
+        "hp": 55,
+        "evasion": 1
+      }
+    },
+    {
+      "id": "shade_gloves",
+      "name": "Перчатки Безлунной тени",
+      "slot": "gloves",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 5,
+        "crit": 3,
+        "evasion": 1
+      }
+    },
+    {
+      "id": "shade_boots",
+      "name": "Сапоги Безлунной тени",
+      "slot": "boots",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 5,
+        "evasion": 2,
+        "speed": 8
+      }
+    },
+    {
+      "id": "rift_belt",
+      "name": "Пояс древних рун",
+      "slot": "belt",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 8,
+        "hp": 40
+      }
+    },
+    {
+      "id": "rift_ring_blade",
+      "name": "Кольцо пепельного клинка",
+      "slot": "ring",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          2,
+          3
+        ],
+        "crit": 1
+      }
+    },
+    {
+      "id": "rift_ring_soul",
+      "name": "Кольцо морозной души",
+      "slot": "ring",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 9,
+        "crit": 3
+      }
+    },
+    {
+      "id": "rift_neck_blade",
+      "name": "Амулет расколотого клыка",
+      "slot": "neck",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          5,
+          7
+        ],
+        "hp": 20
+      }
+    },
+    {
+      "id": "rift_neck_soul",
+      "name": "Амулет ледяного сердца",
+      "slot": "neck",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 9,
+        "mp": 25
+      }
+    },
+    {
+      "id": "rift_ear_guard",
+      "name": "Серьга базальтовой воли",
+      "slot": "ear",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 2,
+        "hp": 15,
+        "accuracy": 1
+      }
+    },
+    {
+      "id": "rift_ear_soul",
+      "name": "Серьга стылого шёпота",
+      "slot": "ear",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "mdef": 2,
+        "mp": 15,
+        "crit": 1
+      }
+    },
+    {
+      "id": "warden_sword",
+      "name": "Меч Стража Разлома",
+      "slot": "weapon",
+      "classRule": "Рыцарь",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          21,
+          27
+        ],
+        "crit": 4,
+        "accuracy": 4
+      }
+    },
+    {
+      "id": "warden_staff",
+      "name": "Посох Сердца Разлома",
+      "slot": "weapon",
+      "classRule": "Маг",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "matk": 33,
+        "mp": 40,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "warden_daggers",
+      "name": "Клинки Последней трещины",
+      "slot": "weapon",
+      "classRule": "Ассасин",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          19,
+          25
+        ],
+        "crit": 6,
+        "accuracy": 4
+      }
+    },
+    {
+      "id": "warden_bow",
+      "name": "Лук Безмолвного Стража",
+      "slot": "weapon",
+      "classRule": "Рейнджер",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          20,
+          27
+        ],
+        "accuracy": 9
+      }
+    },
+    {
+      "id": "warden_grimoire",
+      "name": "Гримуар Погребённого Стража",
+      "slot": "weapon",
+      "classRule": "Некромант",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "matk": 35,
+        "mp": 40,
+        "accuracy": 4
+      }
+    },
+    {
+      "id": "warden_plate",
+      "name": "Латы Стража Разлома",
+      "slot": "chest",
+      "classRule": "Только рыцарь",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "def": 22,
+        "mdef": 6,
+        "hp": 75
+      }
+    },
+    {
+      "id": "warden_vestment",
+      "name": "Облачение хранителя печати",
+      "slot": "chest",
+      "classRule": "Маг, рейнджер, некромант; ассасин со штрафом",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "def": 15,
+        "mdef": 20,
+        "hp": 30,
+        "mp": 75,
+        "accuracy": 6
+      }
+    },
+    {
+      "id": "warden_shade",
+      "name": "Панцирь Погребённой тени",
+      "slot": "chest",
+      "classRule": "Только ассасин",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "def": 15,
+        "hp": 30,
+        "evasion": 7
+      }
+    },
+    {
+      "id": "warden_seal",
+      "name": "Печать Сердца Разлома",
+      "slot": "neck",
+      "classRule": "Все; без штрафа",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          6,
+          8
+        ],
+        "matk": 10,
+        "hp": 45
+      }
+    }
+  ],
+  "pricesIncluded": false
+}

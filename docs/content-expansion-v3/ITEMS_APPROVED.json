@@ -1,0 +1,946 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-09",
+  "branch": "work/character-art-v3",
+  "baseCommit": "f4838500953798e95c4aff02fc0112b775409564",
+  "userApproval": "согласовано все кроме волка, и из оборотней согласован массивный вариант . Оформляй все",
+  "acceptedCardIds": [
+    "G1",
+    "G2",
+    "G3",
+    "U1",
+    "S1",
+    "L2",
+    "B1",
+    "P1"
+  ],
+  "rejectedCardIds": [
+    "W1",
+    "L1"
+  ],
+  "approvedEarlier": [
+    "ICE",
+    "FOREST"
+  ],
+  "status": "APPROVED_SPEC_NOT_RUNTIME_DATA",
+  "newEquipment": [
+    {
+      "id": "rift_sword",
+      "name": "Меч раскалённого разлома",
+      "slot": "weapon",
+      "classRule": "Рыцарь",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          18,
+          24
+        ],
+        "crit": 3,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "rift_staff",
+      "name": "Посох угасшего вулкана",
+      "slot": "weapon",
+      "classRule": "Маг",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 30,
+        "mp": 35,
+        "accuracy": 2
+      }
+    },
+    {
+      "id": "rift_daggers",
+      "name": "Клинки обсидиановой тени",
+      "slot": "weapon",
+      "classRule": "Ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          16,
+          22
+        ],
+        "crit": 5,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "rift_bow",
+      "name": "Лук ледяного утёса",
+      "slot": "weapon",
+      "classRule": "Рейнджер",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          17,
+          24
+        ],
+        "accuracy": 8
+      }
+    },
+    {
+      "id": "rift_grimoire",
+      "name": "Гримуар стылых душ",
+      "slot": "weapon",
+      "classRule": "Некромант",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 32,
+        "mp": 30,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "rift_plate",
+      "name": "Латы раскалённой твердыни",
+      "slot": "chest",
+      "classRule": "Только рыцарь",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 20,
+        "mdef": 5,
+        "hp": 65
+      }
+    },
+    {
+      "id": "rift_helm",
+      "name": "Шлем базальтового стража",
+      "slot": "head",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 14,
+        "hp": 75
+      }
+    },
+    {
+      "id": "rift_gloves",
+      "name": "Перчатки базальтового стража",
+      "slot": "gloves",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 6,
+        "crit": 3
+      }
+    },
+    {
+      "id": "rift_boots",
+      "name": "Сапоги базальтового стража",
+      "slot": "boots",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 6,
+        "speed": 8
+      }
+    },
+    {
+      "id": "rift_shield",
+      "name": "Щит остывшей магмы",
+      "slot": "offhand",
+      "classRule": "Общие; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 5,
+        "mdef": 2,
+        "hp": 15
+      }
+    },
+    {
+      "id": "rift_coat",
+      "name": "Куртка сумеречного странника",
+      "slot": "chest",
+      "classRule": "Маг, рейнджер, некромант; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 14,
+        "hp": 20,
+        "accuracy": 6
+      }
+    },
+    {
+      "id": "rift_robe",
+      "name": "Мантия ледяного святилища",
+      "slot": "chest",
+      "classRule": "Маг, рейнджер, некромант; ассасин со штрафом",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 2,
+        "mdef": 19,
+        "mp": 70
+      }
+    },
+    {
+      "id": "shade_chest",
+      "name": "Панцирь Безлунной тени",
+      "slot": "chest",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 13,
+        "hp": 20,
+        "evasion": 6
+      }
+    },
+    {
+      "id": "shade_helm",
+      "name": "Маска Безлунной тени",
+      "slot": "head",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 12,
+        "hp": 55,
+        "evasion": 1
+      }
+    },
+    {
+      "id": "shade_gloves",
+      "name": "Перчатки Безлунной тени",
+      "slot": "gloves",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 5,
+        "crit": 3,
+        "evasion": 1
+      }
+    },
+    {
+      "id": "shade_boots",
+      "name": "Сапоги Безлунной тени",
+      "slot": "boots",
+      "classRule": "Только ассасин",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 5,
+        "evasion": 2,
+        "speed": 8
+      }
+    },
+    {
+      "id": "rift_belt",
+      "name": "Пояс древних рун",
+      "slot": "belt",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 8,
+        "hp": 40
+      }
+    },
+    {
+      "id": "rift_ring_blade",
+      "name": "Кольцо пепельного клинка",
+      "slot": "ring",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          2,
+          3
+        ],
+        "crit": 1
+      }
+    },
+    {
+      "id": "rift_ring_soul",
+      "name": "Кольцо морозной души",
+      "slot": "ring",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 9,
+        "crit": 3
+      }
+    },
+    {
+      "id": "rift_neck_blade",
+      "name": "Амулет расколотого клыка",
+      "slot": "neck",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "atk": [
+          5,
+          7
+        ],
+        "hp": 20
+      }
+    },
+    {
+      "id": "rift_neck_soul",
+      "name": "Амулет ледяного сердца",
+      "slot": "neck",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "matk": 9,
+        "mp": 25
+      }
+    },
+    {
+      "id": "rift_ear_guard",
+      "name": "Серьга базальтовой воли",
+      "slot": "ear",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "def": 2,
+        "hp": 15,
+        "accuracy": 1
+      }
+    },
+    {
+      "id": "rift_ear_soul",
+      "name": "Серьга стылого шёпота",
+      "slot": "ear",
+      "classRule": "Все; без штрафа",
+      "source": "Големы 20/22 ур.",
+      "stats": {
+        "mdef": 2,
+        "mp": 15,
+        "crit": 1
+      }
+    },
+    {
+      "id": "warden_sword",
+      "name": "Меч Стража Разлома",
+      "slot": "weapon",
+      "classRule": "Рыцарь",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          21,
+          27
+        ],
+        "crit": 4,
+        "accuracy": 4
+      }
+    },
+    {
+      "id": "warden_staff",
+      "name": "Посох Сердца Разлома",
+      "slot": "weapon",
+      "classRule": "Маг",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "matk": 33,
+        "mp": 40,
+        "accuracy": 3
+      }
+    },
+    {
+      "id": "warden_daggers",
+      "name": "Клинки Последней трещины",
+      "slot": "weapon",
+      "classRule": "Ассасин",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          19,
+          25
+        ],
+        "crit": 6,
+        "accuracy": 4
+      }
+    },
+    {
+      "id": "warden_bow",
+      "name": "Лук Безмолвного Стража",
+      "slot": "weapon",
+      "classRule": "Рейнджер",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          20,
+          27
+        ],
+        "accuracy": 9
+      }
+    },
+    {
+      "id": "warden_grimoire",
+      "name": "Гримуар Погребённого Стража",
+      "slot": "weapon",
+      "classRule": "Некромант",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "matk": 35,
+        "mp": 40,
+        "accuracy": 4
+      }
+    },
+    {
+      "id": "warden_plate",
+      "name": "Латы Стража Разлома",
+      "slot": "chest",
+      "classRule": "Только рыцарь",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "def": 22,
+        "mdef": 6,
+        "hp": 75
+      }
+    },
+    {
+      "id": "warden_vestment",
+      "name": "Облачение хранителя печати",
+      "slot": "chest",
+      "classRule": "Маг, рейнджер, некромант; ассасин со штрафом",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "def": 15,
+        "mdef": 20,
+        "hp": 30,
+        "mp": 75,
+        "accuracy": 6
+      }
+    },
+    {
+      "id": "warden_shade",
+      "name": "Панцирь Погребённой тени",
+      "slot": "chest",
+      "classRule": "Только ассасин",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "def": 15,
+        "hp": 30,
+        "evasion": 7
+      }
+    },
+    {
+      "id": "warden_seal",
+      "name": "Печать Сердца Разлома",
+      "slot": "neck",
+      "classRule": "Все; без штрафа",
+      "source": "Босс 25 ур.",
+      "stats": {
+        "atk": [
+          6,
+          8
+        ],
+        "matk": 10,
+        "hp": 45
+      }
+    }
+  ],
+  "legacyItems": [
+    {
+      "id": "wardens_blade",
+      "name": "Меч северного дозора",
+      "slot": "weapon",
+      "currentStats": {
+        "atk": [
+          12,
+          18
+        ],
+        "accuracy": 1
+      },
+      "approvedStats": {
+        "atk": [
+          12,
+          18
+        ],
+        "accuracy": 1
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "ember_staff",
+      "name": "Посох тлеющего камня",
+      "slot": "weapon",
+      "currentStats": {
+        "matk": 22,
+        "accuracy": 1
+      },
+      "approvedStats": {
+        "matk": 22,
+        "accuracy": 1
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "bone_fangs",
+      "name": "Парные костяные клинки",
+      "slot": "weapon",
+      "currentStats": {
+        "atk": [
+          10,
+          16
+        ],
+        "crit": 5,
+        "accuracy": 2
+      },
+      "approvedStats": {
+        "atk": [
+          10,
+          16
+        ],
+        "crit": 5,
+        "accuracy": 2
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "blackwood_bow",
+      "name": "Лук Чёрного леса",
+      "slot": "weapon",
+      "currentStats": {
+        "atk": [
+          11,
+          18
+        ],
+        "accuracy": 7
+      },
+      "approvedStats": {
+        "atk": [
+          11,
+          18
+        ],
+        "accuracy": 7
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "mourn_grimoire",
+      "name": "Гримуар Последнего вздоха",
+      "slot": "weapon",
+      "currentStats": {
+        "matk": 24,
+        "accuracy": 2
+      },
+      "approvedStats": {
+        "matk": 24,
+        "accuracy": 2
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "militia_plate",
+      "name": "Латы пограничной стражи",
+      "slot": "chest",
+      "currentStats": {
+        "def": 14,
+        "hp": 45
+      },
+      "approvedStats": {
+        "def": 14,
+        "hp": 45
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "oracle_robe",
+      "name": "Мантия пепельного оракула",
+      "slot": "chest",
+      "currentStats": {
+        "mdef": 16,
+        "mp": 60
+      },
+      "approvedStats": {
+        "mdef": 16,
+        "mp": 60
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "night_leather",
+      "name": "Теневой панцирь",
+      "slot": "chest",
+      "currentStats": {
+        "def": 10,
+        "evasion": 5
+      },
+      "approvedStats": {
+        "def": 10,
+        "evasion": 5
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "tracker_coat",
+      "name": "Куртка чёрного следопыта",
+      "slot": "chest",
+      "currentStats": {
+        "def": 11,
+        "accuracy": 5
+      },
+      "approvedStats": {
+        "def": 11,
+        "accuracy": 5
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "bone_raiment",
+      "name": "Облачение костяного хора",
+      "slot": "chest",
+      "currentStats": {
+        "mdef": 15,
+        "mp": 45
+      },
+      "approvedStats": {
+        "mdef": 15,
+        "mp": 45
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "wolf_gloves",
+      "name": "Перчатки Серой стаи",
+      "slot": "gloves",
+      "currentStats": {
+        "def": 5,
+        "crit": 3
+      },
+      "approvedStats": {
+        "def": 5,
+        "crit": 3
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "grave_boots",
+      "name": "Сапоги могильщика",
+      "slot": "boots",
+      "currentStats": {
+        "def": 5,
+        "speed": 8
+      },
+      "approvedStats": {
+        "def": 5,
+        "speed": 8
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "fallen_helm",
+      "name": "Шлем павшего командира",
+      "slot": "head",
+      "currentStats": {
+        "def": 13,
+        "hp": 70
+      },
+      "approvedStats": {
+        "def": 13,
+        "hp": 70
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "ember_ring",
+      "name": "Кольцо тлеющего угля",
+      "slot": "ring",
+      "currentStats": {
+        "matk": 8,
+        "crit": 3
+      },
+      "approvedStats": {
+        "matk": 8,
+        "crit": 3
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "fang_necklace",
+      "name": "Ожерелье волчьих клыков",
+      "slot": "neck",
+      "currentStats": {
+        "atk": [
+          4,
+          6
+        ]
+      },
+      "approvedStats": {
+        "atk": [
+          4,
+          6
+        ]
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "ash_belt",
+      "name": "Пояс Пепельной клятвы",
+      "slot": "belt",
+      "currentStats": {
+        "def": 7,
+        "hp": 35
+      },
+      "approvedStats": {
+        "def": 7,
+        "hp": 35
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "fallen_helm_open",
+      "name": "Открытый шлем павшего командира",
+      "slot": "head",
+      "currentStats": {
+        "def": 13,
+        "hp": 70
+      },
+      "approvedStats": {
+        "def": 13,
+        "hp": 70
+      },
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "executioner",
+      "name": "Клинок Палача",
+      "slot": "weapon",
+      "currentStats": {
+        "atk": [
+          31,
+          44
+        ],
+        "crit": 6,
+        "accuracy": 10
+      },
+      "approvedStats": {
+        "atk": [
+          16,
+          22
+        ],
+        "crit": 3,
+        "accuracy": 2
+      },
+      "baseStatsChangeApproved": true
+    },
+    {
+      "id": "rotten_root",
+      "name": "Посох Гнилого Корня",
+      "slot": "weapon",
+      "currentStats": {
+        "matk": 54,
+        "mp": 90,
+        "accuracy": 10
+      },
+      "approvedStats": {
+        "matk": 28,
+        "mp": 30,
+        "accuracy": 2
+      },
+      "baseStatsChangeApproved": true
+    },
+    {
+      "id": "dead_king_plate",
+      "name": "Панцирь Мёртвого Короля",
+      "slot": "chest",
+      "currentStats": {
+        "def": 31,
+        "mdef": 18,
+        "hp": 120
+      },
+      "approvedStats": {
+        "def": 18,
+        "mdef": 4,
+        "hp": 60
+      },
+      "baseStatsChangeApproved": true
+    },
+    {
+      "id": "sovereign_seal",
+      "name": "Печать древнего владыки",
+      "slot": "neck",
+      "currentStats": {
+        "atk": [
+          8,
+          11
+        ],
+        "matk": 13,
+        "hp": 60
+      },
+      "approvedStats": {
+        "atk": [
+          5,
+          7
+        ],
+        "matk": 8,
+        "hp": 40
+      },
+      "baseStatsChangeApproved": true
+    },
+    {
+      "id": "weapon_scroll",
+      "name": "Свиток оружия · обычный",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "weapon_scroll_improved",
+      "name": "Свиток оружия · улучшенный",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "armor_scroll",
+      "name": "Свиток доспехов · обычный",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "armor_scroll_improved",
+      "name": "Свиток доспехов · улучшенный",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "haste",
+      "name": "Зелье стремительности",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "potion",
+      "name": "Багровое зелье",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "ether",
+      "name": "Эфирное зелье",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "scroll",
+      "name": "Свиток улучшения",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "teleport",
+      "name": "Камень возврата",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "wolf_fang",
+      "name": "Клык серого волка",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "black_bone",
+      "name": "Чёрная кость",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "venom",
+      "name": "Ядовитая железа",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "iron",
+      "name": "Кровавая руда",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    },
+    {
+      "id": "boss_seal",
+      "name": "Осколок печати владыки",
+      "slot": null,
+      "currentStats": {},
+      "approvedStats": {},
+      "baseStatsChangeApproved": false
+    }
+  ],
+  "newMaterials": [
+    {
+      "id": "fire_core",
+      "name": "Огненное ядро",
+      "type": "material",
+      "stats": {}
+    },
+    {
+      "id": "ice_core",
+      "name": "Ледяное ядро",
+      "type": "material",
+      "stats": {}
+    },
+    {
+      "id": "ancient_shard",
+      "name": "Осколок древнего камня",
+      "type": "material",
+      "stats": {}
+    }
+  ],
+  "oldItemAdjustments": {
+    "executioner": {
+      "atk": [
+        16,
+        22
+      ],
+      "crit": 3,
+      "accuracy": 2
+    },
+    "rotten_root": {
+      "matk": 28,
+      "mp": 30,
+      "accuracy": 2
+    },
+    "dead_king_plate": {
+      "def": 18,
+      "mdef": 4,
+      "hp": 60
+    },
+    "sovereign_seal": {
+      "atk": [
+        5,
+        7
+      ],
+      "matk": 8,
+      "hp": 40
+    }
+  },
+  "assassinForeignArmorPenaltyPerItem": {
+    "def": -2,
+    "mdef": -2,
+    "evasion": -2
+  },
+  "knightChestExclusive": true,
+  "weaponRule": "CLASS_SPECIFIC",
+  "neutralJewelryPenalty": false,
+  "pricesStatus": "DRAFT_NOT_APPROVED",
+  "dropRatesStatus": "DRAFT_NOT_APPROVED",
+  "notes": [
+    "Значения относятся к +0; действующая заточка сохраняется.",
+    "Не подменять весь старый предмет объектом approvedStats: UID, заточка, описание, цены и прочие поля должны сохраняться.",
+    "Поле spirit:3 старого гримуара не участвует в текущем расчёте экипировки; здесь перечислены работающие характеристики."
+  ]
+}
