@@ -1,0 +1,183 @@
+{
+  "status": "VISUAL_REVIEW_PENDING",
+  "date": "2026-09-09",
+  "generator": "built-in image_gen",
+  "purpose": "Five class approval sheets; not finalized cropped runtime icons",
+  "layout": {
+    "columns": 6,
+    "rows": 2,
+    "topRow": "book",
+    "bottomRow": "ability",
+    "levels": [
+      10,
+      20,
+      30,
+      40,
+      50,
+      60
+    ]
+  },
+  "classes": [
+    {
+      "id": "knight",
+      "name": "Рыцарь",
+      "color": "#bf7951",
+      "names": [
+        "Мощный удар",
+        "Гордыня",
+        "Стойка",
+        "Зов",
+        "Баланс",
+        "Берсерк"
+      ],
+      "demo": [
+        1,
+        2,
+        4
+      ],
+      "file": "knight.png"
+    },
+    {
+      "id": "necro",
+      "name": "Некромант",
+      "color": "#85ad8b",
+      "names": [
+        "Мощный удар",
+        "Призыв",
+        "Проклятие силой воли",
+        "Призыв голема",
+        "Удар забвения",
+        "Сон"
+      ],
+      "demo": [
+        1,
+        3
+      ],
+      "file": "necro.png"
+    },
+    {
+      "id": "ranger",
+      "name": "Рейнджер",
+      "color": "#a5b773",
+      "names": [
+        "Мощный выстрел",
+        "Трюкач",
+        "Прицел",
+        "Перезарядка",
+        "Дальний воин",
+        "Ловушка"
+      ],
+      "demo": [
+        1,
+        3,
+        4
+      ],
+      "file": "ranger.png"
+    },
+    {
+      "id": "mage",
+      "name": "Маг",
+      "color": "#7ba7c9",
+      "names": [
+        "Мощный удар",
+        "Мастерство",
+        "Усиление",
+        "Сильный воин",
+        "Шторм",
+        "Культ"
+      ],
+      "demo": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "file": "mage.png"
+    },
+    {
+      "id": "assassin",
+      "name": "Ассасин",
+      "color": "#ac8ab5",
+      "names": [
+        "Критический урон",
+        "Уклонение",
+        "Яд",
+        "Убийство",
+        "Побег",
+        "Ссора"
+      ],
+      "demo": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "file": "assassin.png"
+    }
+  ],
+  "universal": {
+    "id": "haste",
+    "name": "Зелье скорости",
+    "file": "haste.png",
+    "nearestToMinimap": true
+  },
+  "noGameplayChanges": true,
+  "images": [
+    {
+      "id": "knight",
+      "path": "knight.png",
+      "width": 2172,
+      "height": 724,
+      "bytes": 2454885,
+      "sha256": "de763673dc0b57c7af5ae37220f86e70de1ee2c2c2f5ca9415cc7accebbfcacc",
+      "gitBlob": "73878ddd3293c6ebe5e609e624d234d63d17edf6"
+    },
+    {
+      "id": "necro",
+      "path": "necro.png",
+      "width": 2172,
+      "height": 724,
+      "bytes": 2640220,
+      "sha256": "54958919fe96fd01aff2ba1ea658cd1c4212eb6ac2e570191833d04a9f2b6de6",
+      "gitBlob": "f0a142e205241e9153ae25f8a024fb5aea90afea"
+    },
+    {
+      "id": "ranger",
+      "path": "ranger.png",
+      "width": 2172,
+      "height": 724,
+      "bytes": 2634203,
+      "sha256": "b7bec1bb1625c24d3bdf4c879fd75679001101ae00921590fcf3b87b0129680f",
+      "gitBlob": "0b32520fa9bc907045a86e9f6e333afe47b280f0"
+    },
+    {
+      "id": "mage",
+      "path": "mage.png",
+      "width": 2172,
+      "height": 724,
+      "bytes": 2727706,
+      "sha256": "b9a553c3e42b07bab76752b210873b61142e72dd640e8e969e70c2c874c3a60d",
+      "gitBlob": "9f9c6ed6f8320c13085ecffa552662f88f3385c2"
+    },
+    {
+      "id": "assassin",
+      "path": "assassin.png",
+      "width": 2172,
+      "height": 724,
+      "bytes": 2566518,
+      "sha256": "82611da1c3d7bc5e0e14c15d22877019ac195ef19fe89565111c81fbb632f7fd",
+      "gitBlob": "44057f02d0c53c799236eee5ea4384b847b3bac7"
+    },
+    {
+      "id": "haste",
+      "path": "haste.png",
+      "width": 1254,
+      "height": 1254,
+      "bytes": 2532032,
+      "sha256": "d2569b8e4b97e9807c47825a70e60461b50c2310498ea37f94b11dc9c7bf62a3",
+      "gitBlob": "4551a67f28c43aa3a419f19d9dc63f4e5e5f07ff"
+    }
+  ],
+  "sourcePixelsUnmodified": true
+}

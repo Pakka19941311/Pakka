@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "scope": "Art review and standalone gallery only; no Godot/server integration",
+  "books": 30,
+  "abilityEmblems": 30,
+  "sharedPotion": 1,
+  "sourceImages": 6,
+  "sourcePixelsUnmodified": true,
+  "technicalChecks": [
+    "PNG signatures, native dimensions and SHA-256",
+    "Five class sheets with six named levels each",
+    "Gallery script syntax"
+  ],
+  "observedInBrowser": [
+    "Large books and ability emblems render separately",
+    "40px previews and responsive two/six-column layout are visible",
+    "Potion applied after Pride/Stance becomes closest to map",
+    "Potion persists as the closest effect after switching to mage",
+    "5-second cooldown initially displays integer 5 and opacity decreases below 0.85"
+  ],
+  "approval": "PENDING_USER_VISUAL_APPROVAL",
+  "runtimeImplemented": false
+}
