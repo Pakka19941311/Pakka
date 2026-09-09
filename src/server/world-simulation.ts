@@ -1,4 +1,8 @@
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
+import {rollLootV3} from '../data/loot-v3.ts';
+import {SKILL_BOOKS} from '../data/skill-books.ts';
+import {BookSystem} from './book-system.ts';
+import type {BookArea,BookTrap} from './book-system.ts';
 import { CLASSES, ITEMS, MONSTERS } from '../data/game-data.ts';
 import { calculateEquipmentStats } from '../core/equipment-stats.ts';
 import type { ItemStatDefinition } from '../core/equipment-stats.ts';
@@ -30,7 +34,7 @@ type ItemId = keyof typeof ITEMS;
 type MonsterId = keyof typeof MONSTERS;
 type Skill = { cost: number; cd: number; mul?: number; fx: string; buff?: string; summon?: boolean; chain?: number; chainRadius?: number; chainFalloff?: number; aoe?: number; stun?: number; slow?: number; dot?: number; knock?: number; leech?: number };
 type PendingAttack = {
-  actor:string; target:string; generation:number; actorGeneration?:number;
+  slam?:Position;actor:string; target:string; generation:number; actorGeneration?:number;
   hitAt:number; endsAt?:number; skill:number|null; monster:boolean; summon?:boolean; owner?:string; released?:boolean;
   damage?:number; critical?:boolean; accuracy?:number; resourcePaid?:boolean;
 };
@@ -42,6 +46,7 @@ export type PersistedWorld = {
   cycleEpoch?:number; nightSpawned?:number; chat?:import('../network/world-protocol.ts').WorldChatMessage[]; chatSequence?:number;
   schema: 1; time: number; revision: number; sequence: number;
   characters: Record<string, WorldCharacter>; monsters: WorldMonster[]; summons: WorldSummon[];
+  bookAreas?:BookArea[];bookTraps?:BookTrap[];
   pending: PendingAttack[]; projectiles?:Projectile[];
 };
 export interface SimulationStore {
@@ -77,6 +82,9 @@ export class WorldSimulation {
   private readonly store: SimulationStore;
   private readonly collision: CollisionWorld;
   private readonly beta: boolean;
+  private readonly xpRate:number;
+  private readonly books:BookSystem;
+  private applyingCommand=false;
   private readonly terrain: TerrainSurface;
   private readonly mapContentVersion: string;
   private lastCheckpoint: number;
@@ -91,7 +99,9 @@ export class WorldSimulation {
   private patrols=new Map<string,Position[]>();
   private pursuit=new Map<string,{x:number;z:number;since:number}>();
 
-  constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSurface; now: number; random?: () => number; identifier: () => string; beta?: boolean}) {
+  constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSurface; now: number; random?: () => number; identifier: () => string; beta?: boolean; xpRate?:number}) {
+    this.xpRate=options.xpRate??1;if(!Number.isFinite(this.xpRate)||this.xpRate<1||this.xpRate>100)throw Error('invalid-xp-rate');
+    this.books=new BookSystem({now:()=>this.state.time,heroes:()=>Object.values(this.state.characters),monsters:()=>this.state.monsters,summons:()=>this.state.summons,areas:()=>this.state.bookAreas??=[],traps:()=>this.state.bookTraps??=[],random:()=>this.random(),uid:()=>this.identifier(),hp:m=>monsterDef(m).hp,safe,visible:(a,b)=>this.lineOfSight(a,b),damage:(m,n,p,c)=>this.damage(m,n,p,c),recalculate:p=>this.recalculate(p),event:(k,a,t,e)=>this.event(k,a,t,e),provoke:(m,p)=>this.provoke(m,p),release:m=>{this.cancelAttack(m.uid);m.provokedBy=undefined;m.targetId=null;m.returnFromTaunt=true;this.brains.delete(m.uid);},cancel:id=>this.cancelAttack(id)});
     this.store = options.store; this.collision = options.collision;
     this.terrain = options.terrain ?? new TerrainSurface();
     this.mapContentVersion=mapVersion(this.collision,this.terrain);
@@ -108,9 +118,11 @@ export class WorldSimulation {
     if (!this.state.monsters.length) for (const region of SPAWN_REGIONS) {
       for (let i=0;i<region.population;i++) this.spawnMonster(region.monsterId, spawnPointInRegion(region,i), `${region.id}:${i}`,region.id,i);
     }
+    // Add approved populations without resetting existing monsters or their deadlines.
+    for(const region of SPAWN_REGIONS)for(let i=0;i<region.population;i++)if(!this.state.monsters.some(m=>m.uid===`${region.id}:${i}`))this.spawnMonster(region.monsterId,spawnPointInRegion(region,i),`${region.id}:${i}`,region.id,i);
     // A process restart breaks all connections. Never renew their exposure deadline.
     for (const p of Object.values(this.state.characters)) {
-      p.storage??=[];p.buffs.haste??=0;this.recalculate(p);
+      p.storage??=[];p.buffs.haste??=0;this.migrateEquipment(p);this.recalculate(p);
       p.activeUntil = Math.min(p.activeUntil, this.state.time + DISCONNECT_GRACE_MS);
       p.direction = {x:0,z:0};p.destination=null;p.target=null;p.skill=null;p.bufferedSkill=undefined;p.autoAttack=false;p.singleAttack=false;
       Object.assign(p,{...motion(this.state.time),yaw:p.yaw,action:p.dead?'death':'idle',combatState:p.dead?'dead':'idle'});
@@ -143,7 +155,7 @@ export class WorldSimulation {
     p.equipment=Object.fromEntries(Object.entries(p.equipment).map(([slot,item])=>[slot,item?remap(item):undefined]));
     const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
     p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
-    this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
+    this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
     const oldPosition={x:p.x,z:p.z};
     Object.assign(p,this.collision.findNearestFree(legacyTerritoryPosition(p),.46));
     this.state.coordinateMigrations??=[];
@@ -209,6 +221,7 @@ export class WorldSimulation {
       this.cancelControl(p,false,true);p.destination=this.collision.findNearestFree({x:intent.x,z:intent.z},.46);return;
     }
     if(intent.type==='cancel'){this.cancelControl(p,true,Boolean(intent.preserveAuto));return;}
+    if(intent.skill!==null)throw Error('book-required');
     if(intent.skill!==null&&(!Number.isInteger(intent.skill)||intent.skill<0||intent.skill>3))throw Error('invalid-skill');
     const skill=intent.skill===null?undefined:CLASSES[p.classId as ClassId].skills[intent.skill] as Skill;
     const self=Boolean(skill?.buff||skill?.summon);
@@ -223,7 +236,7 @@ export class WorldSimulation {
     if(active&&p.target!==target!.uid)this.cancelAttack(p.id);
     p.target=target!.uid;p.skill=intent.skill;p.destination=null;p.direction={x:0,z:0};p.bufferedSkill=undefined;
     if(intent.skill===null){p.autoAttack=intent.mode==='auto';p.singleAttack=!p.autoAttack;}
-    if(skill&&distance(p,target!)<=classAttackRange(p.classId)){p.yaw=Math.atan2(target!.x-p.x,target!.z-p.z);this.beginPlayerAttack(p,target!);}
+    if(skill&&distance(p,target!)<=this.books.range(p)){p.yaw=Math.atan2(target!.x-p.x,target!.z-p.z);this.beginPlayerAttack(p,target!);}
     this.approaching.delete(p.id);this.pursuit.delete(p.id);
   }
 
@@ -235,15 +248,17 @@ export class WorldSimulation {
     const before=structuredClone(this.state);const eventsBefore=[...this.events];
     let receipt: CommandReceipt;
     try {
+      this.applyingCommand=true;
       const outcome=this.applyCommand(this.character(id),command);
       receipt={id:commandId,ok:true,at:this.state.time,...(outcome===undefined?{}:{outcome})};
     } catch (error) {
-      this.state=before;this.events.splice(0,this.events.length,...eventsBefore);
+      this.state=before;this.events.splice(0,this.events.length,...eventsBefore);this.brains.clear();this.paths.clear();
       receipt={id:commandId,ok:false,at:this.state.time,reason:error instanceof Error?error.message:'invalid-command'};
     }
+    this.applyingCommand=false;
     this.state.revision++;
     try {this.store.commit(this.state,id,commandId,command,receipt);}
-    catch (error) {this.state=before;this.events.splice(0,this.events.length,...eventsBefore);throw error;}
+    catch (error) {this.state=before;this.events.splice(0,this.events.length,...eventsBefore);this.brains.clear();this.paths.clear();throw error;}
     return receipt;
   }
 
@@ -261,6 +276,14 @@ export class WorldSimulation {
       return;
     }
     if (p.dead) throw Error('dead');
+    if(command.type==='castBook'){this.books.cast(p,command.bookId,command.targetId,command.point);return;}
+    if(command.type==='bookQuest'){
+      if(distance(p,SERVICES['npc:asterhold:elder'])>3.2)throw Error('elder-unavailable');
+      if(![50,60].includes(command.level)||p.level<command.level)throw Error('book-level');
+      const id=`book_${p.classId}_${command.level}`;p.bookQuests??={};
+      if(p.bookQuests[id]==='claimed')throw Error('already-claimed');
+      if(p.bookQuests[id]==='ready'){this.addItem(p,id);p.bookQuests[id]='claimed';}else p.bookQuests[id]='active';return;
+    }
     if(command.type==='storage'){
       if(!nearService(p,'storage'))throw Error('storage-unavailable');
       p.storage??=[];const reference=command.item;
@@ -308,7 +331,16 @@ export class WorldSimulation {
     if(command.type==='sell'){
       const item=p.inventory.find(i=>i.uid===command.item.uid);
       if(!item||item.id!==command.item.id||item.plus!==command.item.plus||item.count!==command.item.count)throw Error('stale-item');
+      if(SKILL_BOOKS[item.id])throw Error('cannot-sell-book');
       p.gold+=Math.floor(ITEMS[item.id as ItemId].value*.48)*item.count;p.inventory=p.inventory.filter(i=>i.uid!==item.uid);return;
+    }
+    if (command.type==='buy'&&SKILL_BOOKS[command.itemId]) {
+      const book=SKILL_BOOKS[command.itemId];
+      if(distance(p,SERVICES['npc:asterhold:shop'])>3.2||!book.price)throw Error('shop-unavailable');
+      if(book.classId!==p.classId)throw Error('class-restricted');
+      if([...p.inventory,...p.lootBuffer,...(p.storage??[]).filter(Boolean)].some(i=>i?.id===book.id))throw Error('book-already-owned');
+      if(p.gold<book.price)throw Error('insufficient-gold');
+      p.gold-=book.price;this.addItem(p,book.id);return;
     }
     if (command.type==='buy') {
       const cost: Record<string,number>={potion:55,ether:70,teleport:130,haste:100};
@@ -358,11 +390,16 @@ export class WorldSimulation {
   private tickDeadline(delayMs:number):number {
     return this.physicsEpoch+Math.ceil((this.state.time+delayMs-this.physicsEpoch)/STEP_MS-1e-8)*STEP_MS;
   }
-  checkpoint(): void {this.store.save(this.state);this.lastCheckpoint=this.state.time;}
+  checkpoint(): void {if(this.applyingCommand)return;this.store.save(this.state);this.lastCheckpoint=this.state.time;}
   snapshot(id: string, afterEvent=0): WorldSnapshot {
     const character=this.character(id);
-    return structuredClone({protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:classAttackRange(character.classId),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
-      heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time).map(p=>({id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:classAttackRange(p.classId)})),
+    const groundEffects:NonNullable<WorldSnapshot['groundEffects']>=[
+      ...(this.state.bookTraps??[]).filter(t=>t.expiresAt>this.state.time).map(t=>({id:t.id,kind:'trap' as const,owner:t.owner,point:t.point,radius:1.4,expiresAt:t.expiresAt,effect:'trap'})),
+      ...(this.state.bookAreas??[]).filter(a=>a.remaining>0).map(a=>({id:a.owner+':'+a.id,kind:'area' as const,owner:a.owner,point:a.point,radius:a.radius,expiresAt:a.nextAt+(a.remaining-1)*a.interval,effect:a.fx})),
+      ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'}))
+    ];
+    return structuredClone({groundEffects,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
+      heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time).map(p=>({id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
       monsters:this.state.monsters.map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons,events:this.events.filter(e=>e.sequence>afterEvent)});
   }
   private tick(dt: number): void {
@@ -388,7 +425,7 @@ export class WorldSimulation {
         if(target&&!p.destination&&(p.autoAttack||p.singleAttack||p.skill!==null)){
           const skill=p.skill===null?undefined:CLASSES[p.classId as ClassId].skills[p.skill] as Skill;
           if(skill&&(p.mp<skill.cost||p.cooldowns[p.skill!]>this.state.time))p.skill=null;
-          const range=classAttackRange(p.classId);
+          const range=this.books.range(p);
           const visible=this.lineOfSight(p,target);
           const spacing=combatSpacing(range,this.bodyRadius(p),this.bodyRadius(target));
           const approachRange=spacing.destinationDistance;
@@ -450,11 +487,12 @@ export class WorldSimulation {
     }
   }
   private expireDeadlines(): void {
+    this.books.tick();this.state.bookAreas=this.state.bookAreas?.filter(a=>a.remaining>0);this.state.bookTraps=this.state.bookTraps?.filter(t=>t.expiresAt>this.state.time);
     if(this.state.time>=this.nextEnvironmentCheck){this.updateEnvironment();this.nextEnvironmentCheck=this.state.time+1000;}
     for(const p of Object.values(this.state.characters))if(p.buffs.haste&&p.buffs.haste<=this.state.time){p.buffs.haste=0;this.recalculate(p);}
     for(const m of this.state.monsters) if(m.nightIndex===undefined&&!m.alive&&m.respawnAt<=this.state.time){
       Object.assign(m,{...motion(this.state.time),...m.home,hp:monsterDef(m).hp,alive:true,attackReadyAt:this.state.time+(250+this.random()*550),phase:1,generation:m.generation+1,status:{slow:0,stun:0,dot:0,nextDot:0},owner:undefined});
-      m.provokedBy=undefined;m.targetId=null;m.deathAt=undefined;m.corpseUntil=undefined;this.paths.delete(m.uid);
+      m.bookEffects=[];m.bookDots=[];m.returnFromTaunt=false;m.provokedBy=undefined;m.targetId=null;m.deathAt=undefined;m.corpseUntil=undefined;this.paths.delete(m.uid);
       m.patrolStep=Math.floor(this.random()*Math.max(1,this.patrolPoints(m).length));
       const brain=this.brains.get(m.uid)??new MonsterAiBrain();
       brain.reset(m.home.x*.173+m.home.z*.127+m.generation);this.brains.set(m.uid,brain);
@@ -468,11 +506,11 @@ export class WorldSimulation {
     this.provoke(target,p);
     if(skill){p.mp-=skill.cost;p.cooldowns[p.skill!]=this.state.time+skill.cd*1000;}
     const cls=CLASSES[p.classId as ClassId];const profile=classCombatProfile(p.classId,p.level,p.stats);
-    p.attackReadyAt=Math.max(p.attackReadyAt,this.state.time+profile.attackInterval*1000/((p.buffs.haste??0)>this.state.time?1.15:1));
+    p.attackReadyAt=Math.max(p.attackReadyAt,this.state.time+profile.attackInterval*1000/(((p.buffs.haste??0)>this.state.time?1.15:1)*this.books.attackSpeed(p)));
     const timing=attackTimings(cls.model,(p.attackReadyAt-this.state.time)/1000*.92);
     const base=p.classId==='mage'||p.classId==='necro'?p.stats.matk:p.stats.atkMin+this.random()*(p.stats.atkMax-p.stats.atkMin);
     const critical=this.random()<p.stats.crit/100;
-    const damage=Math.max(1,Math.round(base*(skill?.mul??1)*(critical?profile.critMultiplier:1)));
+    const damage=base*(skill?.mul??1)*(critical?profile.critMultiplier:1);
     const attack:PendingAttack={actor:p.id,target:target.uid,generation:target.generation,actorGeneration:p.generation,
       hitAt:skill?this.state.time:this.tickDeadline(timing.windup),endsAt:this.tickDeadline(skill?180:timing.duration),skill:p.skill,monster:false,damage,critical,accuracy:p.stats.accuracy,resourcePaid:Boolean(skill)};
     this.state.pending.push(attack);this.motor(p).stopPlanar();this.action(p,'attack',attack.endsAt);p.combatState='windup';p.hitAt=attack.hitAt;
@@ -494,16 +532,15 @@ export class WorldSimulation {
       this.event('release',s.uid,m.uid,{effect:'slash',durationMs:0,generation:m.generation});this.damage(m,a.damage!,p,false);return;}
     if(a.monster){
       const m=this.state.monsters.find(m=>m.uid===a.actor&&m.alive)!;const p=this.state.characters[a.target];
+      if(a.slam){for(const victim of Object.values(this.state.characters).filter(v=>!v.dead&&v.activeUntil>this.state.time&&!safe(v)&&distance(v,a.slam!)<=4&&this.lineOfSight(m,v)))this.monsterHit(m,victim,1.4);return;}
       if(distance(m,p)>=this.monsterRange(m)+.25||!this.lineOfSight(m,p)||!facingTarget(m.yaw,m,p))return;
       m.combatState='recovery';
-      const base=Math.max(1,Math.round(Math.round(monsterDef(m).atk*(1+(m.phase-1)*.32))-p.stats.def*.2));
-      const amount=p.buffs.guard>this.state.time?Math.max(1,Math.round(base*.5)):base;
-      p.hp=Math.max(0,p.hp-amount);p.hitUntil=this.state.time+180;this.event('release',m.uid,p.id,{effect:'slash',durationMs:0,generation:p.generation});this.event('hit',m.uid,p.id,{amount,targetHp:p.hp,targetMaxHp:p.maxHp,targetGeneration:p.generation,generation:p.generation});
-      if(!p.hp){p.dead=true;p.xp=Math.max(0,p.xp-Math.floor(p.xp*.05));this.cancelControl(p);this.action(p,'death');p.combatState='dead';this.motor(p).reset();p.yOffset=0;p.verticalVelocity=0;p.grounded=true;this.event('death',p.id,undefined,{generation:p.generation,position:{x:p.x,z:p.z,yOffset:p.yOffset,yaw:p.yaw}});this.checkpoint();}return;
+      this.monsterHit(m,p);return;
     }
     const p=this.state.characters[a.actor];const target=this.state.monsters.find(m=>m.uid===a.target&&m.alive&&m.generation===a.generation)!;
     const cls=CLASSES[p.classId as ClassId];
-    if(distance(p,target)>classAttackRange(p.classId)+(cls.ranged ? .05 : .25)||!this.lineOfSight(p,target)){this.cancelAttack(p.id);this.event('cancel',p.id,target.uid,{skill:a.skill,reason:'out-of-reach'});return;}
+
+    if(distance(p,target)>this.books.range(p)+(cls.ranged ? .05 : .25)||!this.lineOfSight(p,target)){this.cancelAttack(p.id);this.event('cancel',p.id,target.uid,{skill:a.skill,reason:'out-of-reach'});return;}
     const skill=a.skill===null?undefined:cls.skills[a.skill] as Skill;
     if(skill){
       if(!a.resourcePaid){if(p.mp<skill.cost||p.cooldowns[a.skill!]>this.state.time){this.cancelAttack(p.id);return;}p.mp-=skill.cost;p.cooldowns[a.skill!]=this.state.time+skill.cd*1000;}
@@ -515,6 +552,15 @@ export class WorldSimulation {
     const strike={actor:p.id,target:target.uid,generation:target.generation,actorGeneration:p.generation,skill:a.skill,damage:a.damage!,critical:Boolean(a.critical),accuracy:a.accuracy!};
     if(!cls.ranged||effect==='lightning'||effect==='slash')this.strike(strike);
     else{this.state.projectiles!.push({...strike,origin,point:{...origin},startedAt:this.state.time,endsAt:this.state.time+280});}
+  }
+  private monsterHit(m:WorldMonster,p:WorldCharacter,multiplier=1):void {
+      const base=Math.max(1,Math.round(monsterDef(m).atk*multiplier*(m.id==='rift_boss'?1:1+(m.phase-1)*.32)-p.stats.def*.2));
+
+      const amount=p.buffs.guard>this.state.time?Math.max(1,Math.round(base*.5)):base;
+      this.books.attacked(p,m);
+      if(this.random()<Math.max(0,Math.min(.75,p.stats.evasion/100))){this.event('miss',m.uid,p.id);return;}
+      p.hp=Math.max(0,p.hp-amount);p.hitUntil=this.state.time+180;this.event('release',m.uid,p.id,{effect:'slash',durationMs:0,generation:p.generation});this.event('hit',m.uid,p.id,{amount,targetHp:p.hp,targetMaxHp:p.maxHp,targetGeneration:p.generation,generation:p.generation});
+      if(!p.hp){p.dead=true;p.xp=Math.max(0,p.xp-Math.floor(p.xp*.05));this.cancelControl(p);this.action(p,'death');p.combatState='dead';this.motor(p).reset();p.yOffset=0;p.verticalVelocity=0;p.grounded=true;this.event('death',p.id,undefined,{generation:p.generation,position:{x:p.x,z:p.z,yOffset:p.yOffset,yaw:p.yaw}});this.checkpoint();}
   }
   private projectileTick(projectile:Projectile):void {
     const target=this.state.monsters.find(m=>m.uid===projectile.target&&m.alive&&m.generation===projectile.generation);
@@ -532,7 +578,7 @@ export class WorldSimulation {
     const skill=a.skill===null?undefined:CLASSES[p.classId as ClassId].skills[a.skill] as Skill;
     const hit=(m:WorldMonster,amount:number,critical=false)=>{
       if(!resolveAttackAccuracy(a.accuracy,this.random()).hit){this.event('miss',p.id,m.uid,{skill:a.skill,generation:m.generation});return false;}
-      this.damage(m,amount,p,critical);return true;
+      this.damage(m,this.books.normalDamage(p,amount)+this.books.value(m,['mage','necro'].includes(p.classId)?'mdefDown':'defDown')*.2,p,critical);if(!['mage','necro'].includes(p.classId))this.books.physicalHit(p,m);return true;
     };
     let primary=false;
     if(skill?.chain){
@@ -561,14 +607,17 @@ export class WorldSimulation {
     const def=monsterDef(m),radius=this.monsterRadius(m),boss='boss' in def;
     if(m.status.dot>this.state.time&&this.random()<dt){const p=this.state.characters[m.status.dotOwner??''];if(p)this.damage(m,Math.max(2,Math.round(p.stats.matk*.08)),p,false);m.status.nextDot=this.state.time;}
     if(!m.alive)return;
-    if(m.status.stun>this.state.time){this.cancelAttack(m.uid);this.action(m,'idle');m.combatState='idle';return;}
+    if(m.returnFromTaunt){this.cancelAttack(m.uid);if(distance(m,m.home)>.6)this.walk(m,m.home,monsterMovementSpeed(boss)*dt,radius,m.uid,dt);else m.returnFromTaunt=false;return;}
+    if(m.status.stun>this.state.time||this.books.value(m,'sleep')){this.cancelAttack(m.uid);this.action(m,'idle');m.combatState='idle';return;}
     let brain=this.brains.get(m.uid);
     if(!brain){brain=new MonsterAiBrain(m.home.x*.173+m.home.z*.127+m.patrolIndex*1.91);this.brains.set(m.uid,brain);}
     const candidates=Object.values(this.state.characters).filter(p=>!p.dead&&p.activeUntil>this.state.time&&!safe(p)&&p.buffs.vanish<=this.state.time);
     const active=this.state.pending.find(a=>a.actor===m.uid);
     // Browser acquisition was radial. Navigation resolves obstacles during
     // chase; line of sight validates the actual attack, not a new search timer.
-    const retained=m.provokedBy??brain.targetId??active?.target;
+    const taunt=this.books.effects(m).find(e=>e.values.taunt);
+    if(taunt&&brain.targetId!==taunt.owner)brain.engage(taunt.owner);
+    const retained=taunt?.owner??m.provokedBy??brain.targetId??active?.target;
     const target=retained?candidates.find(p=>p.id===retained):candidates.sort((a,b)=>distance(m,a)-distance(m,b))[0];
     const visible=Boolean(target&&this.lineOfSight(m,target));
     const points=this.patrolPoints(m);
@@ -579,6 +628,9 @@ export class WorldSimulation {
       atPatrolPoint:!point||distance(m,point)<.55,aggroRadius:region?.aggroRadius??(boss?11:9),
       leashRadius,attackRange:this.monsterRange(m)});
     m.targetId=decision.targetId;m.combatState='idle';
+    if(decision.changed&&decision.intent==='return'&&['fire_golem','ice_golem','rift_boss'].includes(m.id)){
+      this.cancelAttack(m.uid);m.hp=def.hp;m.phase=1;m.owner=undefined;m.bookDots=[];m.bookEffects=[];m.nextSlamAt=undefined;
+    }
     if(m.pairId&&m.targetId&&target&&['chase','attack'].includes(decision.intent)){
       for(const partner of this.state.monsters.filter(p=>p.pairId===m.pairId&&p.uid!==m.uid&&p.alive)){
         const companion=this.brains.get(partner.uid)??new MonsterAiBrain();companion.engage(target.id);this.brains.set(partner.uid,companion);partner.targetId=target.id;
@@ -588,7 +640,7 @@ export class WorldSimulation {
     if(decision.changed&&decision.state==='patrol'&&points.length){m.patrolStep=((m.patrolStep??0)+1)%points.length;point=points[m.patrolStep];}
     if(!target||decision.intent==='return'||decision.state==='idle'){m.provokedBy=undefined;}
     const rage=m.provokedBy?1.25:1;
-    const speed=monsterMovementSpeed(boss)*rage*(m.status.slow>this.state.time?.45:1);
+    const speed=monsterMovementSpeed(boss)*rage*(m.status.slow>this.state.time?.45:1)*(1-this.books.value(m,'slow')/100);
     if(active){
       if(this.validAttack(active)&&distance(m,m.home)<leashRadius){
         m.combatState=active.released?'recovery':'windup';
@@ -604,11 +656,14 @@ export class WorldSimulation {
         // extra facing wait before the animation. Contact still checks facing.
         m.combatState='face';this.action(m,'idle');m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),9,dt);
         if(m.attackReadyAt<=this.state.time){
-          m.attackReadyAt=this.state.time+(boss?1450:2050)/rage;
-          const rawTiming=attackTimings(def.model),timing={duration:rawTiming.duration/rage,windup:rawTiming.windup/rage},endsAt=this.tickDeadline(timing.duration),impactAt=this.tickDeadline(timing.windup);
-          this.state.pending.push({actor:m.uid,target:target.id,generation:target.generation,actorGeneration:m.generation,hitAt:impactAt,endsAt,skill:null,monster:true});
+          m.attackReadyAt=this.state.time+(m.id==='fire_golem'?2500:m.id==='ice_golem'?2800:m.id==='rift_boss'?2400:(boss?1450:2050)/rage)/(1-this.books.value(m,'attackSlow')/100);
+          const slam=m.id==='rift_boss'&&(m.nextSlamAt??0)<=this.state.time;
+          if(slam)m.nextSlamAt=this.state.time+9000;
+          const custom=m.id==='fire_golem'?{duration:1500,windup:900}:m.id==='ice_golem'?{duration:1700,windup:1100}:m.id==='rift_boss'?{duration:slam?1900:1600,windup:slam?1400:1000}:null;
+          const rawTiming=custom??attackTimings(def.model),timing={duration:rawTiming.duration/(custom?1:rage),windup:rawTiming.windup/(custom?1:rage)},endsAt=this.tickDeadline(timing.duration),impactAt=this.tickDeadline(timing.windup);
+          this.state.pending.push({actor:m.uid,target:target.id,generation:target.generation,actorGeneration:m.generation,hitAt:impactAt,endsAt,skill:null,monster:true,...(slam?{slam:{x:m.x,z:m.z}}:{})});
           this.action(m,'attack',endsAt);m.combatState='windup';m.hitAt=impactAt;
-          this.event('attack',m.uid,target.id,{impactAt,endsAt,generation:target.generation,actorGeneration:m.generation});
+          this.event('attack',m.uid,target.id,{impactAt,endsAt,generation:target.generation,actorGeneration:m.generation,...(slam?{effect:'slam',origin:{x:m.x,z:m.z,y:this.terrain.supportAt(m.x,m.z)},durationMs:1400}:{})});
         }
       }
     }else if(decision.intent==='return'){
@@ -635,6 +690,7 @@ export class WorldSimulation {
     else this.event('buff',p.id,undefined,{skill:index});
   }
   private summonTick(s:WorldSummon,dt:number):void {
+    if(this.books.summonTick(s,dt,(a,g,step)=>this.walk(a,g,step,.42,a.uid,dt)))return;
     const p=this.state.characters[s.owner];if(!p||p.dead||p.activeUntil<=this.state.time){this.cancelAttack(s.uid);this.action(s,'idle');return;}
     const active=this.state.pending.find(a=>a.actor===s.uid);
     const target=active?this.state.monsters.find(m=>m.uid===active.target&&m.alive)
@@ -654,8 +710,9 @@ export class WorldSimulation {
     }
   }
   private damage(m:WorldMonster,amount:number,p:WorldCharacter,critical:boolean):void {
-    if(!m.alive)return;this.provoke(m,p);m.hp=Math.max(0,m.hp-amount);m.owner??=p.id;m.hitUntil=this.state.time+180;this.event('hit',p.id,m.uid,{amount,critical,targetHp:m.hp,targetMaxHp:monsterDef(m).hp,targetGeneration:m.generation,generation:m.generation});
+    if(!m.alive)return;for(const e of m.bookEffects??[])if(e.values.taunt&&e.owner===p.id)e.values.struck=1;this.provoke(m,p);m.hp=Math.max(0,m.hp-amount);m.owner??=p.id;m.hitUntil=this.state.time+180;this.event('hit',p.id,m.uid,{amount,critical,targetHp:m.hp,targetMaxHp:monsterDef(m).hp,targetGeneration:m.generation,generation:m.generation});
     const def=monsterDef(m);
+    if(m.id==='rift_boss'&&m.hp>0&&m.hp<=def.hp*.5&&m.phase===1){m.phase=2;this.event('buff',m.uid,undefined,{effect:'rift-rage'});}
     if(m.id==='big'){
       const phase=m.hp/def.hp<=.3?3:m.hp/def.hp<=.65?2:1;
       if(phase>m.phase){m.phase=phase;for(let i=0;i<phase+1;i++){const a=i/(phase+1)*Math.PI*2;this.spawnMonster(phase===2?'wraith':'bat',{x:m.x+Math.cos(a)*4,z:m.z+Math.sin(a)*4},this.identifier());}}
@@ -665,27 +722,26 @@ export class WorldSimulation {
       m.deathAt=this.state.time;m.corpseUntil=this.state.time+REFERENCE_DEATH_MS+REFERENCE_CORPSE_MS;
       // Browser MonsterLifecycle starts its existing respawn delay after corpse
       // display, rather than consuming that delay while the body is visible.
-      m.respawnAt=m.corpseUntil+('boss' in def?bossRespawnSeconds(def.boss as 'mini'|'big',this.random):28+this.random()*20)*1000;
+      m.respawnAt=m.corpseUntil+(m.id==='rift_boss'?3600:m.id.includes('golem')?45+this.random()*15:'boss' in def?bossRespawnSeconds(def.boss as 'mini'|'big',this.random):28+this.random()*20)*1000;
       m.targetId=null;m.velocityX=0;m.velocityZ=0;m.combatState='dead';this.brains.get(m.uid)?.forceLifecycle('dead');this.paths.delete(m.uid);
       this.cancelAttack(m.uid);this.action(m,'death');this.event('death',m.uid,undefined,{generation:m.generation,endsAt:m.corpseUntil,position:{x:m.x,z:m.z,yOffset:m.yOffset,yaw:m.yaw}});
       for(const player of Object.values(this.state.characters))if(player.target===m.uid)this.cancelControl(player);
       this.state.pending=this.state.pending.filter(a=>a.target!==m.uid);
       const owner=this.state.characters[m.owner]??p;owner.kills++;if('boss' in def)owner.bossKills++;
-      const gained=applyExperience(owner.level,owner.xp,def.xp);owner.level=gained.level;owner.xp=gained.xp;
+      const earnedXp=Math.round(def.xp*this.xpRate);const gained=applyExperience(owner.level,owner.xp,earnedXp);owner.level=gained.level;owner.xp=gained.xp;
       if(gained.levelsGained){this.recalculate(owner);if(!owner.dead){owner.hp=owner.maxHp;owner.mp=owner.maxMp;}}
       const gold=Math.floor(def.gold[0]+this.random()*(def.gold[1]-def.gold[0]+1));owner.gold+=gold;
       const items:string[]=[];
-      if(m.nightIndex===undefined){for(const [id,chance] of def.drops)if(id!=='scroll'&&this.random()<Number(chance)){this.addItem(owner,String(id));items.push(String(id));}}
-      else for(const id of rollNightDrops(this.random)){this.addItem(owner,id);items.push(id);}
-      for(const id of m.nightIndex===undefined?rollScrollDrops(m.id,this.random):[]){this.addItem(owner,id);items.push(id);}
+      for(const drop of rollLootV3(m.id,this.random))for(let n=0;n<drop.count;n++){this.addItem(owner,drop.id);items.push(drop.id);}
       if(owner.quest===1&&owner.kills>=8)owner.quest=2;
       if(owner.quest===2&&m.id==='mini')owner.quest=3;
       if(owner.quest===3&&m.id==='big')owner.quest=4;
-      this.event('loot',owner.id,m.uid,{gold,xp:def.xp,items});this.checkpoint();
+      for(const level of [50,60]){const id=`book_${owner.classId}_${level}`;if(owner.bookQuests?.[id]==='active'&&m.id===(level===50?'big':'rift_boss'))owner.bookQuests[id]='ready';}
+      this.event('loot',owner.id,m.uid,{gold,xp:earnedXp,items});this.checkpoint();
     }
   }
   private spawnMonster(id:string,point:Position,uid:string,regionId?:string,index=0):void {
-    const def=MONSTERS[id as MonsterId];const home=this.collision.findNearestFree(point,id==='big'?1.2:id==='mini'?.9:.42);
+    const def=MONSTERS[id as MonsterId];const home=this.collision.findNearestFree(point,id==='rift_boss'?1.5:id.includes('golem')?1:id==='big'?1.2:id==='mini'?.9:.42);
     this.state.monsters.push({...motion(this.state.time),...home,uid,id,home,regionId,patrolIndex:index,patrolStep:index%3,hp:def.hp,alive:true,respawnAt:0,attackReadyAt:this.state.time+this.random()*1000,generation:1,phase:1,status:{slow:0,stun:0,dot:0,nextDot:0}});
   }
   private provoke(m:WorldMonster,p:WorldCharacter):void {
@@ -816,8 +872,8 @@ export class WorldSimulation {
     const length=Math.hypot(start.x-end.x,start.y-end.y,start.z-end.z);
     for(let d=.4;d<length;d+=.4){const t=d/length;const x=start.x+(end.x-start.x)*t,z=start.z+(end.z-start.z)*t,y=start.y+(end.y-start.y)*t;if(y<this.terrain.heightAt(x,z)+.06)return false;}return true;
   }
-  private monsterRadius(m:WorldMonster):number{return m.id==='big'?1.2:m.id==='mini'?.9:.42;}
-  private bodyRadius(actor:Position):number {const m=this.state.monsters.find(m=>m===actor);return m?m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
+  private monsterRadius(m:WorldMonster):number{return m.id==='rift_boss'?1.5:m.id.includes('golem')?1:m.id==='big'?1.2:m.id==='mini'?.9:.42;}
+  private bodyRadius(actor:Position):number {const m=this.state.monsters.find(m=>m===actor);return m?m.id==='rift_boss'?1.65:m.id.includes('golem')?1.05:m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
   private monsterRange(m:WorldMonster):number{return Math.max(1.65,this.bodyRadius(m)+.64);}
   private relocate(p:WorldCharacter,point:Position):void {
     const free=this.collision.findNearestFree(point,.46);
@@ -837,7 +893,10 @@ export class WorldSimulation {
     if(stopPlanar)this.motor(p).stopPlanar();
     p.combatState=p.dead?'dead':'idle';
   }
-  private recalculate(p:WorldCharacter):void {Object.assign(p,calculateEquipmentStats(p.classId,CLASSES[p.classId as ClassId].stats,p.level,p.equipment,itemDef));if((p.buffs.haste??0)>this.state.time)p.stats.speed*=1.5;p.hp=Math.min(p.hp,p.maxHp);p.mp=Math.min(p.mp,p.maxMp);}
+  private recalculate(p:WorldCharacter):void {Object.assign(p,calculateEquipmentStats(p.classId,CLASSES[p.classId as ClassId].stats,p.level,p.equipment,itemDef));this.books.modifyStats(p);if((p.buffs.haste??0)>this.state.time)p.stats.speed*=1.5;p.hp=Math.min(p.hp,p.maxHp);p.mp=Math.min(p.mp,p.maxMp);}
+  private migrateEquipment(p:WorldCharacter):void {
+    for(const [slot,item] of Object.entries(p.equipment)){if(!item)continue;const def=itemDef(item);if(def.classes&&!def.classes.includes(p.classId)){delete p.equipment[slot];if(p.inventory.length<42)p.inventory.push(item);else p.lootBuffer.push(item);}}
+  }
   private addItem(p:WorldCharacter,id:string):void {const item=this.item(id);if(addOrStackItem(p.inventory,item,!('slot' in itemDef(item)))==='full')p.lootBuffer.push(item);}
   private item(id:string,count=1):InventoryItem {if(!Object.hasOwn(ITEMS,id))throw Error('unknown-item');return {id,uid:this.identifier(),plus:0,count};}
   private character(id:string):WorldCharacter {const p=this.state.characters[id];if(!p)throw Error('unknown-character');return p;}

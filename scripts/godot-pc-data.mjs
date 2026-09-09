@@ -1,7 +1,8 @@
 // Derive the native client's presentation inputs from the existing reviewed TS code.
-import { readFileSync, writeFileSync, mkdirSync, cpSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, cpSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { CLASSES, ITEMS, MONSTERS, EQUIP_SLOTS, SLOT_NAMES, LOCATIONS } from '../src/data/game-data.ts';
+import {SKILL_BOOKS,BOOK_TEST_DEFAULTS} from '../src/data/skill-books.ts';
 import { CONTENT_VERSION, mapVersion } from '../src/server/content-manifest.ts';
 import { restoreWorldTopology } from '../src/world/world-topology.ts';
 import { buildTerritory } from '../src/world/territory-layout.ts';
@@ -20,10 +21,14 @@ const topology=JSON.parse(readFileSync('public/assets/world/world-topology.json'
 if(JSON.stringify(topology)!==JSON.stringify(authored.topology))throw Error('Committed topology differs from authored territory; run scripts/build-territory.mjs');
 const restoredTopology=restoreWorldTopology(topology);
 const itemStats=Object.fromEntries(Object.entries(ITEMS).map(([id,def])=>[id,Array.from({length:16},(_,plus)=>itemStatBreakdown(def,plus))]));
-writeFileSync(resolve(output,'game.json'),JSON.stringify({contentVersion:CONTENT_VERSION,mapVersion:mapVersion(restoredTopology.collision,restoredTopology.terrain),classes:CLASSES,items:ITEMS,monsters:MONSTERS,equipSlots:EQUIP_SLOTS,slotNames:SLOT_NAMES,locations:LOCATIONS,quickDefaults:quickDefaults(),quickKeys:QUICK_KEYS,itemStats,scrolls:SCROLLS,chances:ENHANCEMENT_PERCENT,xpNeeded:Array.from({length:MAX_LEVEL+1},(_,i)=>xpNeeded(Math.max(1,i)))}));
+const itemLayout=JSON.parse(readFileSync('art/item-icons-v3/layout.json','utf8'));
+const itemIcons=Object.fromEntries(itemLayout.sheets.flatMap(sheet=>sheet.items.map(item=>[item.id,{file:sheet.file,column:item.column,row:item.row}])));
+writeFileSync(resolve(output,'game.json'),JSON.stringify({contentVersion:CONTENT_VERSION,mapVersion:mapVersion(restoredTopology.collision,restoredTopology.terrain),classes:CLASSES,books:SKILL_BOOKS,bookTestDefaults:BOOK_TEST_DEFAULTS,items:ITEMS,itemIcons,monsters:MONSTERS,equipSlots:EQUIP_SLOTS,slotNames:SLOT_NAMES,locations:LOCATIONS,quickDefaults:quickDefaults(),quickKeys:QUICK_KEYS,itemStats,scrolls:SCROLLS,chances:ENHANCEMENT_PERCENT,xpNeeded:Array.from({length:MAX_LEVEL+1},(_,i)=>xpNeeded(Math.max(1,i)))}));
 writeFileSync(resolve(output,'terrain.json'),JSON.stringify({width:terrain.width,depth:terrain.depth,columns:terrain.columns,rows:terrain.rows,heights:Array.from(terrain.heights),roads:terrain.roads,platforms:topology.platforms,colliders:topology.colliders}));
 writeFileSync(resolve(output,'territory.json'),JSON.stringify(authored.territory));
 writeFileSync(resolve(output,'layout.json'),JSON.stringify({placements,geometry,territory:authored.territory}));
+const itemIconDir=resolve(output,'item-icons');mkdirSync(itemIconDir,{recursive:true});for(const sheet of itemLayout.sheets)cpSync(`art/item-icons-v3/${sheet.file}`,resolve(itemIconDir,sheet.file));
+const iconDir=resolve(output,'book-icons');mkdirSync(iconDir,{recursive:true});for(const name of ['knight','mage','ranger','necro','assassin','haste'])cpSync(`art/skill-books-v1/${name}.png`,resolve(iconDir,name+'.png'));
 for(const name of ['Warrior','Wizard','Ranger','Rogue','Monk']){const p=resolve(output,'actors',name+'.gltf');mkdirSync(dirname(p),{recursive:true});cpSync(`public/assets/models/characters/${name}.gltf`,p);}
 for(const name of ['Fox','Skeleton','Slime','Dragon','Bat'])cpSync(`public/assets/models/monsters-glb/${name}.glb`,resolve(output,'actors',name+'.glb'));
 console.log(JSON.stringify({placements:placements.length,terrainTriangles:(geometry.groundIndices.length+geometry.roadIndices.length)/3,characters:Object.keys(CLASSES).length,itemDefinitions:Object.keys(ITEMS).length,quickSlots:quickDefaults().length}));
@@ -40,3 +45,6 @@ writeFileSync(resolve(output,'collision-qa.json'),JSON.stringify(collisionCases)
 cpSync(resolve(root, "public/assets/audio/sfx"), resolve(output, "audio"), {recursive:true});
 
 cpSync(resolve(root, "public/assets/audio/ambient/forest.mp3"), resolve(output, "audio/forest.mp3"));
+
+// Approved visual replacement preserves the old server animation cadence.
+if(existsSync('art/monsters-v3/forest/ForestLord.glb'))cpSync('art/monsters-v3/forest/ForestLord.glb',resolve(output,'actors/ForestLord.glb'));

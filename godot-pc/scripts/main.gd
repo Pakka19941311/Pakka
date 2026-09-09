@@ -71,9 +71,11 @@ var display_remaining: float = 0.0
 var display_countdown: Label
 var quick_panel_node: PanelContainer
 var reference_hud: VarendorReferenceHud = VarendorReferenceHud.new()
+var book_ui: VarendorBookUI = VarendorBookUI.new()
 var polish: VarendorInterfacePolish = VarendorInterfacePolish.new()
 
 func _ready() -> void:
+	book_ui.app = self
 	polish.configure_startup(self)
 	if "--world-samples" in OS.get_cmdline_user_args():
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/art_review.tscn")
@@ -90,6 +92,7 @@ func _ready() -> void:
 	net.snapshot_received.connect(snapshot_received)
 	net.notice.connect(notice)
 	world = VarendorWorld.new()
+	world.book_ui = book_ui
 	add_child(world)
 	player_input.setup(world,net)
 	world.snapshot_presented.connect(present_snapshot)
@@ -130,7 +133,10 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
-		call_deferred("run_knight_qa" if "--qa-scope=knight" in OS.get_cmdline_user_args() else "run_pacing_qa" if "--qa-scope=pacing" in OS.get_cmdline_user_args() else "run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+		call_deferred("run_content_qa" if "--qa-scope=content" in OS.get_cmdline_user_args() else "run_knight_qa" if "--qa-scope=knight" in OS.get_cmdline_user_args() else "run_pacing_qa" if "--qa-scope=pacing" in OS.get_cmdline_user_args() else "run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_content_qa() -> void:
+	await preload("res://scripts/content_acceptance.gd").run(self)
 
 func run_knight_qa() -> void:
 	await preload("res://scripts/knight_integration_qa.gd").run(self)
@@ -326,6 +332,7 @@ func action_name(action: String) -> String:
 		for item: Dictionary in net.hero.get("inventory",[]):
 			if str(item.uid) == action.trim_prefix("item:"): return item_name(item)
 		return "Предмет недоступен"
+	if data.books.has(action): return str(data.books[action].name)
 	if data.items.has(action): return str(data.items[action].name)
 	if action.begins_with("skill:"):
 		var class_id: String = str(net.hero.get("classId", "knight"))
@@ -351,7 +358,7 @@ func refresh_quick() -> void:
 		elif action.begins_with("skill:"):
 			slot.artwork = quick_artwork("res://assets/icons/%s_skill_%d.svg" % [hero.get("classId", "knight"), int(action.trim_prefix("skill:"))])
 		elif data.items.has(action):
-			slot.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind({"id":action},data.items[action]))
+			slot.artwork = book_ui.item_icon({"id":action})
 		else:
 			slot.artwork = quick_artwork("res://assets/icons/" + str(data.classes[hero.get("classId", "knight")].weapon) + ".svg")
 		slot.remaining = 0
@@ -366,7 +373,7 @@ func refresh_quick() -> void:
 			slot.usable = false
 			for item: Dictionary in hero.get("inventory",[]):
 				if str(item.uid) == action.trim_prefix("item:"):
-					slot.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind(item,data.items.get(item.id,{})))
+					slot.artwork = book_ui.item_icon(item)
 					slot.usable = not net.hero.get("dead",false)
 		var icon: String = {"":"·","attack":"⚔","potion":"ОЗ","ether":"MP","teleport":"⌂"}.get(action, str(index % 8 + 1))
 		if action.begins_with("skill:"):
@@ -381,6 +388,12 @@ func refresh_quick() -> void:
 				if left > 0:
 					icon = "%.1f" % left
 			title += "\nЦена: %s · Перезарядка: %s с" % [skill.cost, skill.cd]
+		if data.books.has(action):
+			var book: Dictionary = data.books[action]
+			slot.remaining = maxf(0,(float(hero.get("bookCooldowns",{}).get(action,0))-float(world.current_snapshot.get("time",net.last_time)))/1000)
+			slot.cooldown = float(book.cd)
+			slot.usable = slot.usable and book_ui.owns(action) and int(hero.get("level",0))>=int(book.level) and str(hero.get("classId",""))==str(book.classId) and float(hero.get("mp",0))>=float(book.cost)
+			title = book_ui.tooltip(action)
 		slot.text = ""
 		slot.symbol = str(data.classes[hero.get("classId","knight")].skills[int(action.trim_prefix("skill:"))].icon) if action.begins_with("skill:") else {"":"","attack":"⚔","potion":"♥","ether":"◆","teleport":"⌂"}.get(action,"")
 		slot.key_label = key
@@ -402,7 +415,7 @@ func load_preferences(id: String) -> void:
 				continue
 			var action: String = str(values[index].get("action", ""))
 			var key: String = str(values[index].get("key", ""))
-			if action.begins_with("item:") or action in ["", "attack", "potion", "ether", "teleport", "haste", "skill:0", "skill:1", "skill:2", "skill:3"]:
+			if action.begins_with("item:") or data.books.has(action) or action in ["", "attack", "potion", "ether", "teleport", "haste"]:
 				quick[index].action = action
 			quick[index].key = key if key in data.quickKeys and key not in used else ""
 			if not quick[index].key.is_empty():
@@ -457,7 +470,9 @@ func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer
 
 func assign_dialog(index: int) -> void:
 	var box: VBoxContainer = dialog("Назначение ячейки " + str(index + 1))
-	var actions: Array = ["", "attack", "potion", "ether", "teleport", "haste", "skill:0", "skill:1", "skill:2", "skill:3"]
+	var actions: Array = ["", "attack", "potion", "ether", "teleport", "haste"]
+	for id: String in data.books:
+		if book_ui.owns(id): actions.append(id)
 	var action_select: OptionButton = OptionButton.new()
 	for action: String in actions:
 		action_select.add_item(action_name(action))
@@ -678,6 +693,8 @@ func interact() -> void:
 	npc_interaction.begin(world.target_id)
 
 func open_npc_service(id: String) -> void:
+	if id == "npc:asterhold:shop": book_ui.shop_classes(); return
+	if id == "npc:asterhold:elder": book_ui.quest_menu(); return
 	var service: Dictionary = VarendorNpcInteraction.SERVICES.get(id,{})
 	var kind: String = id.get_slice(":",id.get_slice_count(":")-1)
 	if kind in ["shop","alchemist"]:
@@ -717,8 +734,10 @@ func open_npc_service(id: String) -> void:
 			box.add_child(travel)
 
 func activate(action: String) -> void:
+	if action.begins_with("skill:"): return
 	if net.hero.is_empty() or net.hero.dead or not net.connected:
 		return
+	if data.books.has(action): book_ui.activate(action); return
 	if action.begins_with("item:"):
 		for item: Dictionary in net.hero.inventory:
 			if str(item.uid) == action.trim_prefix("item:"):
@@ -776,6 +795,8 @@ func use_selected() -> void:
 	if not data.items.has(item.id):
 		notice("Этот предмет сохранён, но пока не поддерживается клиентом")
 		return
+	if data.books.has(item.id):
+		book_ui.activate(item.id); return
 	if data.scrolls.has(item.id):
 		selected_scroll = item.duplicate()
 		refresh_inventory()
@@ -826,7 +847,7 @@ func toggle_inventory() -> void:
 func notice(message: String) -> void:
 	if not qa_path.is_empty():
 		print("VARENDOR_QA_NOTICE " + message)
-	var translations: Dictionary = {"storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
+	var translations: Dictionary = {"book-required":"Умения применяются через книги", "book-level":"Недостаточный уровень для книги", "book-not-owned":"Книга должна находиться в сумке", "book-already-owned":"Эта книга уже куплена", "invalid-target":"Выберите живого противника", "invalid-ally":"Выберите союзника", "out-of-range":"Цель слишком далеко или закрыта препятствием", "safe-zone":"В городе нельзя применять боевые умения", "resource":"Недостаточно ресурса", "cannot-cast":"Дождитесь приземления", "cast-busy":"Дождитесь завершения применения", "cannot-sell-book":"Книга умения не продаётся обратно", "storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
 	if log_text != null:
 		var translated: String = str(translations.get(message,message))
 		reference_hud.add_log(translated,"loot" if translated.begins_with("Добыча:") else "system")
@@ -893,6 +914,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			diagnostics.visible = not diagnostics.visible
 			return
 		if event.physical_keycode == KEY_ESCAPE:
+			if book_ui != null and not book_ui.targeting_book.is_empty():
+				book_ui.targeting_book = ""
+				return
 			if is_instance_valid(active_dialog):
 				close_dialog()
 				return

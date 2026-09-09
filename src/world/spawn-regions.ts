@@ -23,7 +23,12 @@ export const SPAWN_REGIONS: readonly SpawnRegion[] = [
   { id: 'drowned-fen', label: 'Затонувшая топь', monsterId: 'wraith', center: { x: 111, z: 12 }, population: 6, radius: 10, patrolRadius: 7, aggroRadius: 10, leashRadius: 17 },
   { id: 'blood-alpha-den', label: 'Логово Кровавого Оборотня', monsterId: 'mini', center: { x: 109, z: 2 }, population: 1, radius: 0, patrolRadius: 4, aggroRadius: 11, leashRadius: 18, boss: 'mini' },
   { id: 'rotten-lord-pit', label: 'Чертог Хозяина леса', monsterId: 'big', center: { x: 136, z: 101 }, population: 1, radius: 0, patrolRadius: 3, aggroRadius: 13, leashRadius: 21, boss: 'big' },
-].map(region=>({...region,center:REGION_CENTERS[region.id]})) as readonly SpawnRegion[];
+  {id:'fire-golems-east',label:'Раскалённая трещина',monsterId:'fire_golem',center:{x:138,z:-64},population:6,radius:8,patrolRadius:3,aggroRadius:9,leashRadius:16},
+  {id:'fire-golems-south',label:'Пепельная впадина',monsterId:'fire_golem',center:{x:131,z:-103},population:6,radius:8,patrolRadius:3,aggroRadius:9,leashRadius:16},
+  {id:'ice-golems-west',label:'Ледяной уступ',monsterId:'ice_golem',center:{x:-130,z:102},population:6,radius:8,patrolRadius:3,aggroRadius:9,leashRadius:16},
+  {id:'ice-golems-north',label:'Стылое нагорье',monsterId:'ice_golem',center:{x:-92,z:111},population:6,radius:8,patrolRadius:3,aggroRadius:9,leashRadius:16},
+  {id:'rift-warden-arena',label:'Чертог разлома',monsterId:'rift_boss',center:{x:132,z:110},population:1,radius:0,patrolRadius:3,aggroRadius:12,leashRadius:24,boss:'big'},
+].map(region=>({...region,population:region.population+(REGION_CENTERS[region.id]&&!region.boss?3:0),center:REGION_CENTERS[region.id]??region.center})) as readonly SpawnRegion[];
 
 function fractional(value: number): number {
   return value - Math.floor(value);

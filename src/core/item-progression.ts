@@ -10,6 +10,7 @@ export const ITEM_PROGRESSION = {
 } as const;
 
 export type ItemStatDefinition = {
+  classes?:readonly string[];assassinForeign?:boolean;
   slot?: string;
   atk?: readonly [number, number];
   matk?: number;

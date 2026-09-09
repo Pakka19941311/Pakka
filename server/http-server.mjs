@@ -8,11 +8,11 @@ import { createWorldStream } from './world-stream.mjs';
 import { WorldSimulation } from '../src/server/world-simulation.ts';
 import { restoreWorldTopology } from '../src/world/world-topology.ts';
 
-export function startWorldServer({database, collision, terrain, port=4173, host='127.0.0.1', beta=false, allowLocalImport=false, staticRoot, now=Date.now}) {
+export function startWorldServer({database, collision, terrain, port=4173, host='127.0.0.1', beta=false, xpRate=Number(process.env.VARENDOR_XP_RATE??20), allowLocalImport=false, staticRoot, now=Date.now}) {
   const loopback=address=>['127.0.0.1','::1','::ffff:127.0.0.1'].includes(address);
   if(allowLocalImport&&(!beta||!loopback(host)))throw Error('Local import requires a private loopback beta server');
   const store=new WorldStore(database);
-  const world=new WorldSimulation({store,collision,terrain,now:now(),identifier:randomUUID,beta});
+  const world=new WorldSimulation({store,collision,terrain,now:now(),identifier:randomUUID,beta,xpRate});
   const streams=new Map();let broadcastAt=0;
   let fatal=null;
   const clock=setInterval(()=>{

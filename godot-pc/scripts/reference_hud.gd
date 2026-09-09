@@ -170,7 +170,7 @@ func setup(owner_ui: Node) -> void:
 		var action: String = "potion" if index == 0 else "ether"
 		var result: VarendorQuickSlot = VarendorQuickSlot.new()
 		result.owner_ui = app; result.custom_action = action
-		result.artwork = VarendorReferenceIcons.texture(action)
+		result.artwork = app.book_ui.item_icon({"id":action})
 		result.pressed.connect(func(): app.activate(action))
 		rect(result,quick_items,Vector2(4+index*47,24),VarendorInterfacePolish.CELL)
 		potion_buttons[action] = result
@@ -231,15 +231,6 @@ func setup(owner_ui: Node) -> void:
 	rect(effect_row,app.ui,Vector2(app.ui.size.x-350,10),Vector2(338,35))
 	effect_row.alignment = BoxContainer.ALIGNMENT_END
 	effect_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	for key: String in ["guard","vanish","haste"]:
-		var effect_panel: PanelContainer = PanelContainer.new()
-		effect_panel.add_theme_stylebox_override("panel",frame(Color("20242af0"),Color("8c7353"),6))
-		effect_row.add_child(effect_panel)
-		var effect_label: Label = app.label("",11)
-		effect_panel.add_child(effect_label)
-		effect_panel.tooltip_text = "Входящий урон снижен на 50%" if key == "guard" else "Бег +50%, скорость атаки +15%" if key == "haste" else "Незаметность для монстров"
-		effect_labels[key] = {"panel":effect_panel,"label":effect_label}
-		effect_panel.hide()
 	app.diagnostics = text(app.ui,"",Vector2(316,12),Vector2(360,80),12)
 	app.diagnostics.hide()
 	build_inventory()
@@ -366,7 +357,13 @@ func build_inventory() -> void:
 		slot.payload = {"kind":"bag","index":index,"item":{}}
 		bag_grid.add_child(slot)
 		app.bag_slots.append(slot)
-	app.inventory_footer = text(content,"◈ 0",Vector2(10,426),Vector2(230,18),11,Color("d3bd87"))
+	var silver_cell: Panel = panel(content,Vector2(10,424),Vector2(24,22),Color("10171b"),Color("65717642"))
+	var silver_icon: TextureRect = TextureRect.new()
+	silver_icon.texture = app.book_ui.item_icon({"id":"silver"})
+	silver_icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	silver_icon.tooltip_text = "Серебро"
+	rect(silver_icon,silver_cell,Vector2(1,1),Vector2(22,20))
+	app.inventory_footer = text(content,"0",Vector2(40,426),Vector2(162,18),11,Color("d3cdbb"))
 	capacity_label = text(content,"0 / 42",Vector2(210,426),Vector2(112,18),11,Color("a6b1b3"))
 	capacity_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	selection_label = text(content,"Выберите предмет",Vector2(10,447),Vector2(312,15),10,Color("c0c6be"))
@@ -424,7 +421,7 @@ func refresh(hero: Dictionary) -> void:
 	inventory_name.text = hero.name
 	inventory_class.text = "%s · %d ур." % [app.data.classes[hero.classId].name,int(hero.level)]
 	app.inventory_title.text = "Персонаж"
-	app.inventory_footer.text = "◈ " + number(hero.gold)
+	app.inventory_footer.text = number(hero.gold)
 	capacity_label.text = "%d / 42" % hero.inventory.size()
 	for key: String in app.stat_values:
 		var value: String = str(int(hero.stats.get(key,0)))
@@ -436,7 +433,7 @@ func refresh(hero: Dictionary) -> void:
 	var quests: Array = [["Голос границы","Поговорите со старостой Гринфолла."],["Кровь на дороге","Победите тварей рубежа: %d / 8" % mini(int(hero.get("kills",0)),8)],["Вой стаи","Отыщите Кровавого Оборотня в Чёрном лесу."],["Печать владыки","Спуститесь к шахте и победите Хозяина Гнилого Леса."],["Первый след","Вертикальный срез пройден. Продолжайте охоту и заточку."]]
 	var quest: Array = quests[clampi(int(hero.get("quest",0)),0,4)]
 	region_text.text = "Путь странника\n"+quest[0]+"\n"+quest[1]+"\n\nВладыки региона\n"
-	for monster_id: String in ["mini","big"]:
+	for monster_id: String in ["mini","big","rift_boss"]:
 		var definition: Dictionary = app.data.monsters.get(monster_id,{})
 		if definition.is_empty(): continue
 		var state: String = "—"
@@ -448,10 +445,7 @@ func refresh(hero: Dictionary) -> void:
 				state = timer_text(left) if left > 0 else "побеждён"
 			break
 		region_text.text += str(definition.name)+" · "+state+"\n"
-	for key: String in effect_labels:
-		var left: float = maxf(0,(float(hero.get("buffs",{}).get(key,0))-float(app.world.current_snapshot.get("time",0)))/1000)
-		effect_labels[key].panel.visible = left > 0
-		effect_labels[key].label.text = ("◈ Последний рубеж" if key == "guard" else "» Стремительность" if key == "haste" else "◌ Исчезновение")+" %.1f с" % left
+	app.book_ui.refresh_effects(hero,effect_row)
 	refresh_inventory_state()
 	refresh_consumables()
 
@@ -500,8 +494,8 @@ func refresh_inventory_state() -> void:
 			if app.selected_item.get("kind") == "storage": actions.append(["use","Забрать в сумку"])
 			elif app.selected_item.get("kind") == "equipment": actions.append(["use","Снять"])
 			elif definition.has("slot"): actions.append(["use","Надеть"])
-			elif definition.get("type") == "consumable": actions.append(["use","Использовать"])
-			if app.selected_item.get("kind") == "bag": actions.append(["sell","Продать · %d ◈" % (floorf(float(definition.get("value",0))*.48)*int(selected.count))])
+			elif definition.get("type") in ["consumable","book"]: actions.append(["use","Использовать"])
+			if app.selected_item.get("kind") == "bag" and definition.get("type") != "book": actions.append(["sell","Продать · %d ◈" % (floorf(float(definition.get("value",0))*.48)*int(selected.count))])
 		var loot: Array = display_hero().get("lootBuffer",[])
 		if not loot.is_empty(): actions.append(["collect","Забрать добычу (%d)" % loot.size()])
 	var signature: String = JSON.stringify([actions,app.net.hero.get("dead",false),app.net.command_busy])
@@ -581,6 +575,15 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 	var selected_slot: String = comparison_slot(item_slot)
 	var category: String = "Кольцо" if item_slot == "ring" else str(app.data.slotNames.get(item_slot,item_slot)) if not item_slot.is_empty() else "Расходник" if definition.get("type") == "consumable" else "Свиток улучшения" if definition.get("type") == "enhance" else "Материал"
 	var result: Dictionary = {"title":app.item_name(item),"subtitle":category+(" · надето" if kind == "equipment" else "")+(" · %d шт." % int(item.count) if int(item.count)>1 else ""),"description":str(definition.get("desc",""))+("\nИсточник: "+str(definition.origin) if definition.has("origin") else ""),"rows":item_rows(item),"restrictions":[],"actions":[],"comparisons":[]}
+	if definition.get("type") == "book":
+		result.subtitle = "Книга умения · ур. %d" % int(definition.requiredLevel)
+		result.description = app.book_ui.tooltip(item.id)
+		result.actions = ["Перетащите книгу на панель быстрого доступа."]
+	if app.net.hero.get("classId","") == "assassin" and bool(definition.get("assassinForeign",false)):
+		result.restrictions.append("Чужая броня: −2 защита, −2 магзащита, −2 уклонение за эту вещь.")
+		var total_penalty: Dictionary = app.data.itemStats[item.id][clampi(int(item.plus),0,15)].total
+		for stat: String in ["def","mdef","evasion"]:
+			result.rows.append({"key":"penalty_"+stat,"label":ITEM_STAT_LABELS[stat]+" для ассасина","value":stat_number(float(total_penalty.get(stat,0))-2),"delta":-2,"detail":"С учётом фиксированного штрафа этой вещи"})
 	if not item_slot.is_empty(): result.restrictions.append("Без требования уровня.")
 	if definition.has("classes"):
 		var classes: Array = []
@@ -609,6 +612,8 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 			var rows: Array = []
 			for key: String in ITEM_STAT_LABELS:
 				var delta: float = float(total.get(key,0))-float(other_stats.get(key,0))
+				if app.net.hero.get("classId","")=="assassin" and key in ["def","mdef","evasion"]:
+					delta -= 2*(int(bool(definition.get("assassinForeign",false)))-int(bool(app.data.items.get(equipped.get("id",""),{}).get("assassinForeign",false))))
 				if not is_zero_approx(delta): rows.append({"key":key,"label":ITEM_STAT_LABELS[key],"value":("+" if delta>0 else "")+stat_number(delta)+("%" if key in ["crit","speed"] else ""),"delta":delta})
 			if rows.is_empty(): rows.append({"label":"Характеристики","value":"Без изменений"})
 			result.comparisons.append({"title":str(app.data.slotNames.get(slot,slot))+": "+(app.item_name(equipped) if not equipped.is_empty() else "пусто"),"selected":slot==selected_slot,"equipped_rows":item_rows(equipped),"rows":rows})
@@ -711,6 +716,7 @@ static func timer_text(seconds: float) -> String:
 func combat_event(event: Dictionary) -> void:
 	if str(event.get("actor","")) != app.world.hero_id and str(event.get("target","")) != app.world.hero_id: return
 	var kind: String = str(event.get("kind",""))
+	if kind == "loot" and str(event.actor) == app.world.hero_id: app.book_ui.show_loot(event)
 	if kind not in ["hit","miss","death"]: return
 	var incoming: bool = str(event.get("target","")) == app.world.hero_id
 	var other: String = str(event.get("actor","")) if incoming else str(event.get("target",""))

@@ -1,0 +1,27 @@
+name: Content V3 focused checks
+on:
+  push:
+    branches: [work/character-art-v3]
+    paths:
+      - 'src/**'
+      - 'server/**'
+      - 'tests/content-v3.test.mjs'
+      - 'package*.json'
+      - '.github/workflows/content-v3-checks.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  content:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - name: Books, equipment, earned XP, mixed loot, spawns and boss contact
+        run: node --test tests/content-v3.test.mjs

@@ -27,7 +27,7 @@ func update_item(item: Dictionary) -> void:
 	if item.is_empty():
 		texture = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind({}, {},empty_slot),true) if payload.kind == "equipment" else null
 	else:
-		texture = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind(item,owner_ui.data.items.get(item.id,{})))
+		texture = owner_ui.book_ui.item_icon(item)
 	queue_redraw()
 
 func _draw() -> void:

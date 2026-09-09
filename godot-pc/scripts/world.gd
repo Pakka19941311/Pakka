@@ -9,6 +9,8 @@ const KNIGHT_SOURCE_HEIGHT: float = 1.84
 signal picked(entity_id: String)
 signal moved_to(point: Vector2)
 
+var book_ui: VarendorBookUI
+var book_ground: VarendorBookGroundEffects = VarendorBookGroundEffects.new()
 var data: Dictionary
 var terrain: Dictionary
 var territory: Dictionary
@@ -73,6 +75,7 @@ signal snapshot_presented(snapshot: Dictionary)
 signal event_presented(event: Dictionary)
 
 func _init() -> void:
+	book_ground.world = self
 	player_motion.collision = collision
 	targeting.setup(self)
 
@@ -420,6 +423,7 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 
 func apply_snapshot(snapshot: Dictionary) -> void:
 	current_snapshot = snapshot
+	book_ground.apply(snapshot)
 	var hero: Dictionary = snapshot.character
 	hero_id = str(hero.id)
 	hero_speed = float(hero.stats.get("speed",6.2))
@@ -462,7 +466,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		var id: String = str(monster.uid)
 		keep[id] = true
 		var def: Dictionary = data.monsters[monster.id]
-		var actor: Node3D = make_actor(id, def.model, 2.05 * float(def.get("scale", 1)), def.name + " · %d" % int(def.level), Color("e0a6a0"))
+		var actor: Node3D = make_actor(id, str(def.get("visualModel",def.model)), float(def.get("visualHeight",2.05 * float(def.get("scale", 1)))), def.name + " · %d" % int(def.level), Color("e0a6a0"))
 		if str(monster.id) == "night_zombie" and not actor.has_meta("undead_tint"):
 			for mesh: MeshInstance3D in actor.find_children("*","MeshInstance3D",true,false):
 				if mesh.mesh == null: continue
@@ -526,7 +530,7 @@ func present_event(event: Dictionary) -> void:
 		var names: Array = []
 		for item_id: String in event.get("items", []):
 			names.append(str(data.items.get(item_id, {}).get("name", item_id)))
-		var message: String = "+%d золота · +%d опыта" % [event.get("gold", 0), event.get("xp", 0)]
+		var message: String = "+%d серебра · +%d опыта" % [event.get("gold", 0), event.get("xp", 0)]
 		if not names.is_empty():
 			message += "\n" + ", ".join(names)
 		loot_received.emit("Добыча: " + message)
@@ -553,6 +557,7 @@ func record_intent(value: Dictionary, input_sequence: int) -> void:
 
 func _process(delta: float) -> void:
 	if camera == null: return
+	book_ground.update_preview()
 	var before_clock: float = timeline.clock_ms
 	var frame: Dictionary = timeline.advance(delta)
 	if not frame.snapshot.is_empty(): apply_snapshot(frame.snapshot)
@@ -629,6 +634,7 @@ func pick_entity(screen: Vector2) -> String:
 	return targeting.pick(screen)
 
 func click(screen: Vector2) -> bool:
+	if book_ui != null and book_ui.click(screen): return true
 	var selected: String = targeting.pick(screen)
 	if not selected.is_empty():
 		targeting.select(selected)

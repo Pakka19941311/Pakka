@@ -62,6 +62,10 @@ export function calculateEquipmentStats<T extends { plus: number }>(
     gearHp += contribution.hp;
     gearMp += contribution.mp;
   }
+  if(classId==='assassin'){
+    const penalty=Object.values(equipment).filter(item=>item&&definitionFor(item).assassinForeign).length*2;
+    for(const key of ['def','mdef','evasion'] as const)computed[key]=Math.max(0,computed[key]-penalty);
+  }
   const vitals = baseVitals(classId, level, stats);
   return { stats: computed, maxHp: vitals.hp + gearHp, maxMp: vitals.mp + gearMp };
 }

@@ -2,7 +2,7 @@ class_name VarendorInterfacePolish
 extends RefCounted
 
 const CELL: Vector2 = Vector2(44,44)
-const ICON: Vector2 = Vector2(32,32)
+const ICON: Vector2 = Vector2(36,36)
 var app: Node
 var startup_display: Dictionary = {}
 var applied_display: String = ""
@@ -227,7 +227,7 @@ func shop(kind: String, title: String) -> void:
 	for id: String in (["haste"] if kind == "alchemist" else ["potion","ether","teleport"]):
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); body.add_child(row)
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id; cell.custom_minimum_size = CELL
-		cell.artwork = VarendorReferenceIcons.texture(VarendorReferenceIcons.kind({"id":id},app.data.items[id])); row.add_child(cell)
+		cell.artwork = app.book_ui.item_icon({"id":id}); row.add_child(cell)
 		var price: int = int({"haste":100,"potion":55,"ether":70,"teleport":130}[id])
 		var column: VBoxContainer = VBoxContainer.new(); column.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(column)
 		column.add_child(app.label(str(app.data.items[id].name),13))
@@ -235,18 +235,13 @@ func shop(kind: String, title: String) -> void:
 		var buy: Button = app.button("%d ◈" % price,func(): app.net.command({"type":"buy","itemId":id})); buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
 
 func open_skills() -> void:
-	var body: VBoxContainer = app.dialog("Навыки · перетащите на панель",Vector2i(530,370))
-	app.active_dialog.set_meta("nonmodal",true)
-	var list: Array = app.data.classes[app.net.hero.get("classId","knight")].skills
-	for index: int in range(list.size()):
-		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); body.add_child(row)
-		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = "skill:"+str(index); cell.symbol = str(list[index].icon); cell.custom_minimum_size = CELL; row.add_child(cell)
-		row.add_child(app.label("%s\nРесурс %s · восстановление %s с" % [list[index].name,list[index].cost,list[index].cd],13))
+	app.book_ui.catalogue()
 
 func quick_action(data: Dictionary) -> String:
 	if data.has("action"): return str(data.action)
 	var item: Dictionary = data.get("item",{})
 	if item.is_empty(): return ""
+	if app.data.books.has(item.id): return str(item.id)
 	return str(item.id) if app.data.items.get(item.id,{}).get("type","") == "consumable" else "item:"+str(item.uid)
 
 func drop_quick(data: Dictionary, destination: int) -> void:
