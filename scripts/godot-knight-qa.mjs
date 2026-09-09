@@ -115,6 +115,11 @@ try {
   assert.equal(native.ok,true,'Native knight integration checks failed');
   assert.equal(native.checks.connected,true,'Native client must connect to the real adapter');
   if(graphical) assert.equal(native.checks.native_render,true,'Requested graphical run used headless rendering');
+  for(let index=0;index<4;index++) {
+    assert.equal(native.checks[`skill_${index}_server_effect`],true,`Skill ${index} did not reach authority`);
+    const key=graphical?`skill_${index}_animation_binding`:`skill_${index}_real_animation`;
+    assert.equal(native.checks[key],true,graphical?`Skill ${index} binding/measurement evidence missing`:`Headless skill ${index} must observe the real animation; no sampling exemption is allowed`);
+  }
 } catch(error) {
   failure=error;
   console.error('VARENDOR_KNIGHT_FAILURE '+(error instanceof Error?error.message:String(error)));
