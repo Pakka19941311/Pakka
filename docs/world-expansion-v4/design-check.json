@@ -1,0 +1,192 @@
+{
+  "status": "DESIGN_CHECK_ONLY",
+  "scope": "2D home candidates, catalogue, sizes and authored slope targets; no runtime navigation, terrain, patrol or performance validation",
+  "errors": [],
+  "totals": {
+    "oldDay": 102,
+    "plannedDay": 2478,
+    "plannedNight": 2678,
+    "plannedFullMoon": 2878
+  },
+  "ascents": [
+    {
+      "id": "volcano-ascent",
+      "length": 1099.6,
+      "maxGradeDegrees": 16.9
+    },
+    {
+      "id": "ice-ascent",
+      "length": 884.4,
+      "maxGradeDegrees": 13.2
+    }
+  ],
+  "riverCrossingsWithBridges": 2,
+  "fullMoonPairs": 200,
+  "populations": [
+    {
+      "id": "fire_golem",
+      "name": "Огненный голем",
+      "level": 20,
+      "old": 12,
+      "planned": 300,
+      "condition": "always",
+      "zone": "extinct-volcano",
+      "minHomeSpacing": 17,
+      "medianHomeSpacing": 18.1
+    },
+    {
+      "id": "ice_golem",
+      "name": "Ледяной голем",
+      "level": 22,
+      "old": 12,
+      "planned": 300,
+      "condition": "always",
+      "zone": "ice-highlands",
+      "minHomeSpacing": 17,
+      "medianHomeSpacing": 18.3
+    },
+    {
+      "id": "rift_boss",
+      "name": "Страж раскалённого разлома",
+      "level": 25,
+      "old": 1,
+      "planned": 1,
+      "condition": "always",
+      "zone": "extinct-volcano",
+      "minHomeSpacing": null,
+      "medianHomeSpacing": null
+    },
+    {
+      "id": "night_zombie",
+      "name": "Ночной зомби",
+      "level": 4,
+      "old": 8,
+      "planned": 200,
+      "condition": "night",
+      "zone": "necropolis",
+      "minHomeSpacing": 11.2,
+      "medianHomeSpacing": 17.6
+    },
+    {
+      "id": "night_skeleton",
+      "name": "Лунный скелет",
+      "level": 4,
+      "old": 8,
+      "planned": 200,
+      "condition": "full-moon",
+      "zone": "necropolis",
+      "minHomeSpacing": 11.3,
+      "medianHomeSpacing": 17.2
+    },
+    {
+      "id": "wolf",
+      "name": "Пепельный гончий",
+      "level": 1,
+      "old": 10,
+      "planned": 250,
+      "condition": "always",
+      "zone": "fox-forest",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 15.4
+    },
+    {
+      "id": "exile",
+      "name": "Проклятый изгнанник",
+      "level": 2,
+      "old": 9,
+      "planned": 225,
+      "condition": "always",
+      "zone": "exile-camp",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 13.6
+    },
+    {
+      "id": "spider",
+      "name": "Теневой слизень",
+      "level": 3,
+      "old": 9,
+      "planned": 225,
+      "condition": "always",
+      "zone": "blight-marsh",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 13.1
+    },
+    {
+      "id": "undead",
+      "name": "Безымянный мертвец",
+      "level": 4,
+      "old": 10,
+      "planned": 250,
+      "condition": "always",
+      "zone": "necropolis",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 16.7
+    },
+    {
+      "id": "bat",
+      "name": "Пещерный кровопийца",
+      "level": 5,
+      "old": 9,
+      "planned": 225,
+      "condition": "always",
+      "zone": "bloodwing-cave",
+      "minHomeSpacing": 10,
+      "medianHomeSpacing": 10.8
+    },
+    {
+      "id": "cultist",
+      "name": "Сектант Пепла",
+      "level": 6,
+      "old": 9,
+      "planned": 225,
+      "condition": "always",
+      "zone": "ash-coven",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 13.5
+    },
+    {
+      "id": "miner",
+      "name": "Одержимый рудокоп",
+      "level": 7,
+      "old": 10,
+      "planned": 250,
+      "condition": "always",
+      "zone": "broken-mine",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 11.9
+    },
+    {
+      "id": "wraith",
+      "name": "Болотный призрак",
+      "level": 8,
+      "old": 9,
+      "planned": 225,
+      "condition": "always",
+      "zone": "drowned-chapel",
+      "minHomeSpacing": 11,
+      "medianHomeSpacing": 12.2
+    },
+    {
+      "id": "mini",
+      "name": "Кровавый Оборотень",
+      "level": 10,
+      "old": 1,
+      "planned": 1,
+      "condition": "always",
+      "zone": "werewolf-den",
+      "minHomeSpacing": null,
+      "medianHomeSpacing": null
+    },
+    {
+      "id": "big",
+      "name": "Хозяин Гнилого Леса",
+      "level": 14,
+      "old": 1,
+      "planned": 1,
+      "condition": "always",
+      "zone": "rotten-grove",
+      "minHomeSpacing": null,
+      "medianHomeSpacing": null
+    }
+  ]
+}
