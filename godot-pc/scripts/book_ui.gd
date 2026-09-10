@@ -153,6 +153,11 @@ func refresh_effects(hero: Dictionary, row: HBoxContainer) -> void:
 	for effect: Dictionary in effects:
 		if effect_cells.has(effect.id): effect_cells[effect.id].text = str(ceili((float(effect.expiresAt)-now)/1000))
 
+func position_loot() -> void:
+	if not is_instance_valid(loot_panel): return
+	var quick: Rect2 = app.quick_panel_node.get_global_rect()
+	loot_panel.global_position = Vector2(app.ui.get_global_rect().get_center().x - loot_panel.size.x*.5,quick.position.y-loot_panel.size.y-6)
+
 func show_loot(event: Dictionary) -> void:
 	if is_instance_valid(loot_panel): loot_panel.queue_free()
 	loot_generation += 1
@@ -160,7 +165,9 @@ func show_loot(event: Dictionary) -> void:
 	loot_panel = PanelContainer.new()
 	loot_panel.add_theme_stylebox_override("panel",app.panel_style(Color("151b20ed")))
 	app.ui.add_child(loot_panel)
-	loot_panel.position = Vector2(app.ui.size.x-316,app.ui.size.y-365)
+	loot_panel.resized.connect(position_loot)
+	if not app.quick_panel_node.item_rect_changed.is_connected(position_loot): app.quick_panel_node.item_rect_changed.connect(position_loot)
+	if not app.ui.resized.is_connected(position_loot): app.ui.resized.connect(position_loot)
 	var grid: GridContainer = GridContainer.new(); grid.columns = 6
 	grid.add_theme_constant_override("h_separation",4); grid.add_theme_constant_override("v_separation",4); loot_panel.add_child(grid)
 	var counts: Dictionary = {"silver":int(event.get("gold",0))}

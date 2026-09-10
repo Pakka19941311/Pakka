@@ -137,7 +137,13 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
+		if "--qa-scope=hotfix" in OS.get_cmdline_user_args():
+			call_deferred("run_hotfix_qa")
+			return
 		call_deferred("run_content_qa" if "--qa-scope=content" in OS.get_cmdline_user_args() else "run_knight_qa" if "--qa-scope=knight" in OS.get_cmdline_user_args() else "run_pacing_qa" if "--qa-scope=pacing" in OS.get_cmdline_user_args() else "run_polish_qa" if "--qa-scope=polish" in OS.get_cmdline_user_args() else "run_territory_qa" if "--qa-scope=world" in OS.get_cmdline_user_args() else "run_stop_npc_qa" if "--qa-scope=stop-npc" in OS.get_cmdline_user_args() or "--qa-scope=stop-only" in OS.get_cmdline_user_args() else "run_qa")
+
+func run_hotfix_qa() -> void:
+	await preload("res://scripts/hotfix_acceptance.gd").run(self)
 
 func run_content_qa() -> void:
 	await preload("res://scripts/content_acceptance.gd").run(self)
@@ -771,7 +777,8 @@ func item_clicked(payload: Dictionary, double_click: bool) -> void:
 		return
 	selected_item = payload.duplicate(true)
 	if payload.get("kind") == "storage":
-		if double_click and not payload.get("item",{}).is_empty(): net.command({"type":"storage","direction":"withdraw","item":payload.item.duplicate()})
+		reference_hud.refresh_inventory_state()
+		if double_click and not payload.get("item",{}).is_empty(): transfer_storage(payload.item,"withdraw")
 		return
 	if payload.get("kind") == "equipment":
 		chosen_equipment = str(payload.slot)
@@ -794,7 +801,7 @@ func use_selected() -> void:
 	if item.is_empty():
 		return
 	if selected_item.get("kind") == "storage":
-		net.command({"type":"storage","direction":"withdraw","item":item.duplicate()})
+		transfer_storage(item,"withdraw")
 		return
 	if not data.items.has(item.id):
 		notice("Этот предмет сохранён, но пока не поддерживается клиентом")
@@ -823,13 +830,41 @@ func sell_selected() -> void:
 		net.command({"type":"sell","item":item.duplicate()})
 		close_dialog()))
 
+func transfer_storage(item: Dictionary, direction: String, index: int = -1) -> void:
+	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(item): return
+	var command: Dictionary = {"type":"storage","direction":direction,"item":item.duplicate()}
+	if index >= 0: command["index"] = index
+	if int(item.count) <= 1 or direction == "reorder":
+		net.command(command)
+		return
+	var title: String = "Убрать на склад" if direction == "deposit" else "Забрать со склада"
+	var box: VBoxContainer = dialog(title,Vector2i(420,220))
+	box.add_child(label(item_name(item)))
+	box.add_child(label("Количество (доступно %d)" % int(item.count)))
+	var quantity: SpinBox = SpinBox.new()
+	quantity.name = "StorageQuantity"; quantity.min_value = 1; quantity.max_value = int(item.count); quantity.step = 1; quantity.value = int(item.count); quantity.allow_greater = false; quantity.allow_lesser = false
+	box.add_child(quantity)
+	var submit: Callable = func(amount: int):
+		if net.command_busy: return
+		if not reference_hud.has_item_version(item):
+			close_dialog(); notice("Предмет уже изменился. Выберите его заново"); return
+		command["quantity"] = amount
+		net.command(command); close_dialog()
+	var actions: HBoxContainer = HBoxContainer.new(); box.add_child(actions)
+	var confirm: Button = button(title,func(): submit.call(int(quantity.value)))
+	confirm.name = "StorageConfirm"; actions.add_child(confirm)
+	actions.add_child(button("Всё",func(): submit.call(int(item.count))))
+	actions.add_child(button("Отмена",close_dialog))
+	quantity.get_line_edit().text_submitted.connect(func(_text: String): quantity.apply(); submit.call(int(quantity.value)))
+	quantity.get_line_edit().grab_focus(); quantity.get_line_edit().select_all()
+
 func drop_item(source: Dictionary, destination: Dictionary) -> void:
 	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(source.item): return
 	if destination.kind == "storage":
-		net.command({"type":"storage","direction":"reorder" if source.kind == "storage" else "deposit","item":source.item.duplicate(),"index":int(destination.index)})
+		transfer_storage(source.item,"reorder" if source.kind == "storage" else "deposit",int(destination.index))
 		return
 	if source.kind == "storage":
-		net.command({"type":"storage","direction":"withdraw","item":source.item.duplicate(),"index":int(destination.index)})
+		transfer_storage(source.item,"withdraw",int(destination.index))
 		return
 	if source.kind == "equipment" and destination.kind == "equipment": return
 	if destination.kind == "equipment":
@@ -851,7 +886,7 @@ func toggle_inventory() -> void:
 func notice(message: String) -> void:
 	if not qa_path.is_empty():
 		print("VARENDOR_QA_NOTICE " + message)
-	var translations: Dictionary = {"book-required":"Умения применяются через книги", "book-level":"Недостаточный уровень для книги", "book-not-owned":"Книга должна находиться в сумке", "book-already-owned":"Эта книга уже куплена", "invalid-target":"Выберите живого противника", "invalid-ally":"Выберите союзника", "out-of-range":"Цель слишком далеко или закрыта препятствием", "safe-zone":"В городе нельзя применять боевые умения", "resource":"Недостаточно ресурса", "cannot-cast":"Дождитесь приземления", "cast-busy":"Дождитесь завершения применения", "cannot-sell-book":"Книга умения не продаётся обратно", "storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
+	var translations: Dictionary = {"invalid-storage-quantity":"Укажите целое количество от 1 до размера стопки", "book-required":"Умения применяются через книги", "book-level":"Недостаточный уровень для книги", "book-not-owned":"Книга должна находиться в сумке", "book-already-owned":"Эта книга уже куплена", "invalid-target":"Выберите живого противника", "invalid-ally":"Выберите союзника", "out-of-range":"Цель слишком далеко или закрыта препятствием", "safe-zone":"В городе нельзя применять боевые умения", "resource":"Недостаточно ресурса", "cannot-cast":"Дождитесь приземления", "cast-busy":"Дождитесь завершения применения", "cannot-sell-book":"Книга умения не продаётся обратно", "storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
 	if log_text != null:
 		var translated: String = str(translations.get(message,message))
 		reference_hud.add_log(translated,"loot" if translated.begins_with("Добыча:") else "system")

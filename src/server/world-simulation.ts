@@ -9,6 +9,7 @@ import type { ItemStatDefinition } from '../core/equipment-stats.ts';
 import { grantBetaScrolls } from '../core/beta-scrolls.ts';
 import { enhanceItem, rollScrollDrops } from '../core/enhancement-v2.ts';
 import { equipInventoryItem, unequipInventoryItem, reorderInventoryItem } from '../core/inventory-commands.ts';
+import {transferStorage} from '../core/storage-transfers.ts';
 import type { InventoryItem } from '../core/inventory-commands.ts';
 import { addOrStackItem, applyExperience } from '../core/gameplay-session.ts';
 import { bossRespawnSeconds, classAttackRange, classCombatProfile, monsterMovementSpeed } from '../core/game-rules.ts';
@@ -286,22 +287,8 @@ export class WorldSimulation {
     }
     if(command.type==='storage'){
       if(!nearService(p,'storage'))throw Error('storage-unavailable');
-      p.storage??=[];const reference=command.item;
-      const matches=(i:InventoryItem|null|undefined)=>i&&i.uid===reference.uid&&i.id===reference.id&&i.plus===reference.plus&&i.count===reference.count;
-      if(command.index!==undefined&&(!Number.isInteger(command.index)||command.index<0||command.index>=STORAGE_CAPACITY))throw Error('invalid-storage-slot');
-      if(command.direction==='deposit'){
-        const source=p.inventory.findIndex(matches);if(source<0)throw Error('stale-item');
-        let target=command.index??Array.from({length:STORAGE_CAPACITY},(_,i)=>i).find(i=>!p.storage![i]);
-        if(target===undefined)throw Error('storage-full');if(p.storage[target])throw Error('storage-slot-occupied');
-        while(p.storage.length<=target)p.storage.push(null);p.storage[target]=p.inventory.splice(source,1)[0];
-      }else if(command.direction==='withdraw'){
-        const source=p.storage.findIndex(matches);if(source<0)throw Error('stale-item');if(p.inventory.length>=42)throw Error('bag-full');
-        if(command.index!==undefined&&command.index>=42)throw Error('invalid-storage-slot');
-        p.inventory.splice(Math.min(command.index??p.inventory.length,p.inventory.length),0,p.storage[source]!);p.storage[source]=null;
-      }else if(command.direction==='reorder'){
-        const source=p.storage.findIndex(matches);if(source<0)throw Error('stale-item');if(command.index===undefined)throw Error('invalid-storage-slot');
-        while(p.storage.length<=command.index)p.storage.push(null);[p.storage[source],p.storage[command.index]]=[p.storage[command.index],p.storage[source]];
-      }else throw Error('invalid-storage-operation');return;
+      transferStorage(p,command,item=>!('slot' in itemDef(item))&&!SKILL_BOOKS[item.id],()=>this.identifier(),STORAGE_CAPACITY);
+      return;
     }
     if (command.type==='equip' || command.type==='unequip' || command.type==='reorder') {
       let result=command.type==='equip'?equipInventoryItem(p,command.item,itemDef,command.slot)
@@ -849,12 +836,15 @@ export class WorldSimulation {
   private separateActors(dt:number):void {
     const actors=[...Object.values(this.state.characters).filter(p=>!p.dead&&p.activeUntil>this.state.time),...this.state.monsters.filter(m=>m.alive)];
     const budgets=new Map(actors.map(actor=>[actor,dt*1.6]));
+    const radii=actors.map(actor=>this.bodyRadius(actor));
     // Only resolve existing penetration (e.g. a respawn or converging crowd).
     // Swept motion handles new contact; bounded correction cannot teleport an
     // idle actor or push it through static geometry.
     for(let i=0;i<actors.length;i++)for(let j=i+1;j<actors.length;j++){
-      const a=actors[i],b=actors[j],combined=this.bodyRadius(a)+this.bodyRadius(b);
-      const dx=a.x-b.x,dz=a.z-b.z,d=Math.hypot(dx,dz);
+      const a=actors[i],b=actors[j],combined=radii[i]+radii[j];
+      const dx=a.x-b.x,dz=a.z-b.z;
+      if(Math.abs(dx)>=combined||Math.abs(dz)>=combined)continue;
+      const d=Math.hypot(dx,dz);
       if(d>=combined-.001)continue;
       const correction=Math.min((combined-d+.001)*.5,dt*1.6),nx=d>.0001?dx/d:1,nz=d>.0001?dz/d:0;
       for(const [actor,sign] of [[a,1],[b,-1]] as const){

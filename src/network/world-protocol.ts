@@ -59,7 +59,7 @@ export type WorldCommand =
   | { type: 'respawn' }
   | { type: 'quest' }
   | { type: 'collect' }
-  | { type: 'storage'; direction:'deposit'|'withdraw'|'reorder'; item:ItemReference; index?:number }
+  | { type: 'storage'; direction:'deposit'|'withdraw'|'reorder'; item:ItemReference; index?:number; quantity?:number }
   | { type: 'chat'; channel:'world'|'trade'; text:string };
 export type WorldIntent =
   | { type: 'direction'; x: number; z: number }

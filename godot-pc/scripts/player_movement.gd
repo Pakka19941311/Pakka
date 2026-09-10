@@ -389,7 +389,13 @@ func physics_step(dt: float) -> void:
 		rest_offset_releasing = false
 	if not rest_anchor_active:
 		var correction_step: Vector2 = visual_correction * (1.0 - exp(-22 * dt))
-		if rest_offset_releasing and not correction_must_settle:
+		if not actual_velocity.is_zero_approx():
+			# A slow frame can accumulate a correction larger than one stride.
+			# Draining it exponentially used to outrun forward travel and visibly
+			# pull the running hero backwards. Spend at most half the real travel
+			# on presentation catch-up; authoritative position/history stay exact.
+			correction_step = correction_step.limit_length(actual_velocity.length() * dt * .5)
+		elif rest_offset_releasing and not correction_must_settle:
 			# Discharge the bounded remainder only with real planar travel.
 			# Its maximum half-step cannot reverse the first movement step,
 			# and holding a key against a wall cannot move stationary feet.

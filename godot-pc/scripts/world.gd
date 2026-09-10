@@ -19,6 +19,7 @@ var territory_material_audit: Dictionary = {"graded":[],"wind_surfaces":0}
 var camera: Camera3D
 var actors: Dictionary = {}
 var templates: Dictionary = {}
+static var cached_monster_profiles: Dictionary = {}
 var hero_id: String = ""
 var hero_position: Vector3 = Vector3(-7, 0, 11)
 var server_position: Vector3 = hero_position
@@ -276,7 +277,7 @@ func setup(game: Dictionary) -> bool:
 		actor.set_meta("initialized", true)
 
 	# Load each shared actor template during loading, before exploration.
-	for model: String in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk", "Fox", "Slime", "Skeleton", "Dragon", "Bat", KNIGHT_MODEL]:
+	for model: String in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk", "Fox", "Slime", "Skeleton", "Dragon", "Bat", KNIGHT_MODEL] + monster_asset_profiles().keys():
 		if not templates.has(model):
 			var path: String = actor_asset_path(model)
 			templates[model] = load(path)
@@ -429,7 +430,9 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 	return root
 
 static func monster_asset_profiles() -> Dictionary:
-	return JSON.parse_string(FileAccess.get_file_as_string("res://generated/monster-profiles.json"))
+	if cached_monster_profiles.is_empty():
+		cached_monster_profiles = JSON.parse_string(FileAccess.get_file_as_string("res://generated/monster-profiles.json"))
+	return cached_monster_profiles
 
 func apply_snapshot(snapshot: Dictionary) -> void:
 	current_snapshot = snapshot
@@ -622,8 +625,16 @@ func _process(delta: float) -> void:
 		var controller: VarendorAnimationController = actor.get_meta("animation_controller")
 		controller.prefer_run = id == hero_id or str(actor.get_meta("model","")) == "Fox"
 		var actor_clock: float = ambient_time if ambient_poses.has(id) else timeline.clock_ms if not timeline.current.is_empty() else float(current_snapshot.get("time",0))
-		controller.update(motion,rendered_velocity,actor_clock,delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
-		actor.visible = not controller.corpse_complete
+		# Simulation, positions and event clocks continue for every actor. Only
+		# distant rig sampling is throttled; combat and the hero stay full rate.
+		var distance_sq: float = actor.position.distance_squared_to(hero_position)
+		var pose_delta: float = float(actor.get_meta("pose_delta", 0.0)) + (delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
+		var interval: float = 0.0 if id == hero_id or id == target_id or distance_sq < 24.0*24.0 else .1 if distance_sq < 50.0*50.0 else .5
+		if pose_delta >= interval:
+			controller.update(motion,rendered_velocity,actor_clock,pose_delta)
+			pose_delta = 0.0
+		actor.set_meta("pose_delta",pose_delta)
+		actor.visible = not controller.corpse_complete and (id == hero_id or distance_sq < 85.0*85.0)
 		update_corpse_fade(actor,controller,actor_clock)
 		(actor.get_meta("label") as Label3D).hide()
 	camera_controller.update_pose(delta,hero_position,jump_offset)

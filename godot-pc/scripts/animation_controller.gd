@@ -71,13 +71,6 @@ var knight_previous_combo: Dictionary = {}
 var knight_attack_context: Dictionary = {}
 var knight_auto_active: bool = false
 var knight_hold_until: float = -1
-var knight_cycle_end_at: float = -1
-var knight_chained: bool = false
-var knight_vertical: float = 0
-var knight_pose_ready: bool = false
-var knight_transition: Array[Transform3D] = []
-var knight_transition_age: float = 1
-var knight_force_transition: bool = false
 var knight_rig: Skeleton3D
 var knight_hips: int = -1
 var knight_hips_origin: Vector3 = Vector3.ZERO
@@ -151,12 +144,6 @@ func reset_alive() -> void:
 	knight_next_combo = 0
 	knight_combo_finish = -1
 	knight_hold_until = -1
-	knight_cycle_end_at = -1
-	knight_chained = false
-	knight_pose_ready = false
-	knight_transition.clear()
-	knight_transition_age = 1
-	knight_force_transition = false
 	knight_combo_target = ""
 	knight_attack_context.clear()
 	knight_previous_combo.clear()
@@ -164,6 +151,12 @@ func reset_alive() -> void:
 	visual.visible = true
 
 func on_event(event: Dictionary, presentation_time_ms: float) -> void:
+	if event.has("bookId"):
+		if model == "ForgottenKnight":
+			var book: String = str(event.bookId)
+			if book not in ["book_knight_10", "book_knight_60"]: return
+			event = event.duplicate()
+			event["skill"] = 0 if book == "book_knight_10" else 2
 	var kind: String = str(event.get("kind", ""))
 	var event_time: float = float(event.get("at", event.get("time", presentation_time_ms)))
 	if kind == "death":
@@ -184,7 +177,6 @@ func on_event(event: Dictionary, presentation_time_ms: float) -> void:
 		elif kind == "cancel":
 			attack_ends_at = -1
 			knight_hold_until = -1
-			knight_cycle_end_at = -1
 
 func react_to_hit(start: float, finish: float) -> void:
 	hit_at = start
@@ -207,7 +199,7 @@ func begin_attack(start: float, impact: float, finish: float, context: Dictionar
 				knight_combo_finish = float(knight_previous_combo.get("finish", -1))
 				knight_combo_target = str(knight_previous_combo.get("target", ""))
 				configure_knight_attack(start, finish, context)
-				knight_force_transition = true
+				current_clip = ""
 		return
 	attack_started_at = start
 	attack_impact_at = maxf(start + 1, impact)
@@ -217,32 +209,23 @@ func begin_attack(start: float, impact: float, finish: float, context: Dictionar
 		knight_previous_combo = {"next":knight_next_combo, "finish":knight_combo_finish, "target":knight_combo_target}
 		configure_knight_attack(start, finish, context)
 	# Consecutive attacks are distinct even when both use the same clip.
-	if model != "ForgottenKnight":
-		current_clip = ""
-	else:
-		knight_force_transition = not knight_chained
+	current_clip = ""
 
 func configure_knight_attack(start: float, finish: float, context: Dictionary) -> void:
 	knight_attack_context = context.duplicate()
 	knight_skill = -1 if context.get("skill", null) == null else int(context.skill)
 	knight_hold_until = -1
-	knight_chained = false
 	if knight_skill >= 0:
 		return
 	var target: String = str(context.get("target", actor.get_meta("knight_autoattack_target", "")))
 	knight_attack_context["resolved_target"] = target
 	var chained: bool = bool(actor.get_meta("knight_autoattack_active", true))
 	var contiguous: bool = knight_combo_finish >= 0 and start - knight_combo_finish < 600 and target == knight_combo_target
-	knight_chained = chained and contiguous
 	knight_combo_index = knight_next_combo if chained and contiguous else 0
 	knight_next_combo = (knight_combo_index + 1) % 5
 	knight_combo_target = target
 	knight_combo_finish = finish
-	# This is a presentation deadline, never a scheduler for the next hit.
-	# Local snapshots provide the existing server attackReadyAt. The event field
-	# supplies the same deadline to other clients and avoids a frozen recovery.
-	knight_cycle_end_at = maxf(finish + 1, float(context.get("readyAt", finish + (finish-start)*.3)))
-	knight_hold_until = knight_cycle_end_at
+	knight_hold_until = finish + minf(350, (finish - start) * .3)
 
 func knight_weapon_equipped() -> bool:
 	return bool(actor.get_meta("knight_weapon_equipped", false))
@@ -286,17 +269,11 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 		return
 	if model == "ForgottenKnight":
 		knight_auto_active = bool(motion.get("autoAttack", actor.get_meta("knight_autoattack_active", false)))
-		var ready: float = float(motion.get("attackReadyAt", -1))
-		if ready > knight_combo_finish and knight_combo_finish >= 0 and knight_cycle_end_at >= 0 and knight_skill < 0:
-			knight_cycle_end_at = ready
-			knight_hold_until = ready
 	var snapshot_start: float = float(motion.get("actionStartedAt", -1))
 	if str(motion.get("action", "")) == "attack" and snapshot_start > attack_started_at:
 		var finish: float = float(motion.get("actionEndsAt", presentation_time_ms + 800))
 		var contact: float = contact_fraction()
 		var context: Dictionary = {"skill":motion.animationSkill} if model == "ForgottenKnight" and motion.has("animationSkill") else {}
-		if model == "ForgottenKnight" and motion.has("attackReadyAt"):
-			context["readyAt"] = motion.attackReadyAt
 		begin_attack(snapshot_start, float(motion.get("hitAt", motion.get("impactAt", snapshot_start + (finish - snapshot_start) * contact))), finish, context)
 	if str(motion.get("combatState", "")) in ["idle", "approach", "face"] and snapshot_start >= attack_started_at:
 		# Keep the attack start as a high-water mark so an older snapshot/event
@@ -306,19 +283,18 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 		react_to_hit(float(motion.hitUntil) - 180, float(motion.hitUntil))
 	var grounded: bool = bool(motion.get("grounded", true))
 	var vertical: float = float(motion.get("verticalVelocity", rendered_velocity.y))
-	knight_vertical = vertical
 	var locomotion: String = str(motion.get("locomotionState", "")).to_lower()
 	if not grounded and was_grounded:
 		jump_started_at = presentation_time_ms
 	if grounded and not was_grounded:
-		land_until = presentation_time_ms + (clip_length(find_clip(["jump_land"])) * 1000 if model == "ForgottenKnight" else 160)
+		land_until = presentation_time_ms + 160
 	was_grounded = grounded
 	var speed: float = Vector2(rendered_velocity.x, rendered_velocity.z).length()
 	var next_state: String = "idle"
 	if attack_started_at >= 0 and presentation_time_ms < attack_ends_at:
 		next_state = "attack"
 	elif model == "ForgottenKnight" and knight_skill < 0 and knight_auto_active and speed <= .025 and grounded and presentation_time_ms >= knight_combo_finish and presentation_time_ms < knight_hold_until:
-		next_state = "combo_link"
+		next_state = "combo_hold"
 	elif not grounded:
 		next_state = "fall" if vertical < -.05 or locomotion == "fall" else "jump_start" if presentation_time_ms - jump_started_at < 100 else "airborne"
 	elif presentation_time_ms < land_until:
@@ -333,8 +309,8 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 	pose_offset = Vector3.ZERO
 	if state == "attack":
 		sample_attack(presentation_time_ms, dt)
-	elif state == "combo_link":
-		sample_knight_attack(presentation_time_ms, dt)
+	elif state == "combo_hold":
+		sample(find_clip(["combo_%02d" % (knight_combo_index + 1)]), 1, false, dt)
 	elif state in ["walk", "run"]:
 		sample_gait(speed, dt)
 	elif state in ["jump_start", "airborne", "fall", "land"]:
@@ -445,39 +421,21 @@ func sample_knight_attack(now: float, dt: float) -> void:
 		clip = find_clip(["sword_attack", "sword_strike_c"])
 	else:
 		clip = find_clip(["combo_%02d" % (knight_combo_index + 1), "sword_attack"])
-		# Recovery continues across the server's existing inter-attack interval.
-		# Each exported slice belongs to one continuous authored master. The next
-		# slice is entered only after its own authoritative attack is received.
-		if knight_auto_active:
-			var period: float = maxf(1,knight_cycle_end_at-attack_started_at)
-			var segment: float = (attack_impact_at-attack_started_at) if before else (knight_cycle_end_at-attack_impact_at)
-			var age: float = (now-attack_started_at) if before else (now-attack_impact_at)
-			var u: float = clampf(age/maxf(1,segment),0,1)
-			# Hermite time mapping retains exact server contact with equal velocity
-			# at the contact and at both ends; uneven server intervals cannot create
-			# the old abrupt slow recovery -> fast next windup transition.
-			var tangent: float = segment/period
-			phase = (0 if before else .5) + .5*(-2*u*u*u+3*u*u) + tangent*(2*u*u*u-3*u*u+u)
 	playback_rate = clip_length(clip) / maxf(.001, (attack_ends_at - attack_started_at) / 1000)
 	sample(clip, phase, false, dt)
 
 func sample_airborne(speed: float, _now: float, dt: float) -> void:
 	if model == "ForgottenKnight":
 		if state == "land":
-			var duration: float = clip_length(find_clip(["jump_land"]))
-			var phase: float = clampf(1-(land_until-_now)/(duration*1000),0,1)
 			if speed > .025:
 				sample_gait(speed, dt)
-				compress_knight_gait(phase)
 			else:
-				sample(find_clip(["jump_land", "idle"]),phase,false,dt)
-		elif _now-jump_started_at < clip_length(find_clip(["jump_start"]))*1000 and knight_vertical > 0:
-			sample(find_clip(["jump_start", "jump_air"]),clampf((_now-jump_started_at)/(clip_length(find_clip(["jump_start"]))*1000),0,1),false,dt)
+				sample(find_clip(["jump_land", "idle"]), clampf(1 - (land_until - _now) / 160, 0, 1), false, dt)
+		elif state == "jump_start":
+			sample(find_clip(["jump_start", "jump_air"]), clampf((_now - jump_started_at) / 100, 0, 1), false, dt)
 		else:
 			var clip: String = find_clip(["jump_air", "jump_start"])
-			# The descending pose extends the feet before actual ground contact.
-			# No second root trajectory, loop restart, or fixed landing timer.
-			sample(clip,clampf(-knight_vertical/8.2,0,1),false,dt)
+			sample(clip, fposmod(maxf(0, _now - jump_started_at - 100) / (clip_length(clip) * 1000), 1), true, dt)
 		return
 	# Reference jump is a frozen running pose, not an idle pose or a second
 	# animation-driven Y trajectory. Ground contact immediately resumes gait.
@@ -490,55 +448,6 @@ func sample_airborne(speed: float, _now: float, dt: float) -> void:
 	var clip: String = find_clip(["run_weapon", "run_holding", "run", "running", "walk", "flying", "idle_weapon", "idle", "survey"])
 	sample(clip, REFERENCE_JUMP_PHASE, false, dt)
 	apply_reference_pose(Vector3(-.08, 0, 0))
-
-func compress_knight_gait(phase: float) -> void:
-	# Running landings retain distance-driven steps. Bend the legs under a
-	# lowered pelvis while preserving the sampled gait's exact ankle targets.
-	if knight_rig == null or knight_hips < 0:
-		return
-	knight_rig.force_update_all_bone_transforms()
-	var targets: Dictionary = {}
-	for side: String in ["Left", "Right"]:
-		var foot: int = knight_rig.find_bone("mixamorig_"+side+"Foot")
-		if foot < 0: foot = knight_rig.find_bone("mixamorig:"+side+"Foot")
-		if foot >= 0: targets[side] = knight_rig.get_bone_global_pose(foot)
-	var weight: float = smoothstep(0,.25,phase) if phase < .25 else 1-smoothstep(.25,1,phase)
-	var hips_pose: Vector3 = knight_rig.get_bone_pose_position(knight_hips)
-	hips_pose.y -= .135*weight
-	knight_rig.set_bone_pose_position(knight_hips,hips_pose)
-	knight_rig.force_update_all_bone_transforms()
-	for side: String in targets:
-		plant_knight_leg(side,targets[side])
-
-func plant_knight_leg(side: String, target: Transform3D) -> void:
-	var indices: Array[int] = []
-	for suffix: String in ["UpLeg","Leg","Foot"]:
-		var index: int = knight_rig.find_bone("mixamorig_"+side+suffix)
-		if index < 0: index = knight_rig.find_bone("mixamorig:"+side+suffix)
-		if index < 0: return
-		indices.append(index)
-	var upper: Transform3D = knight_rig.get_bone_global_pose(indices[0])
-	var lower: Transform3D = knight_rig.get_bone_global_pose(indices[1])
-	var ankle: Transform3D = knight_rig.get_bone_global_pose(indices[2])
-	var l1: float = upper.origin.distance_to(lower.origin)
-	var l2: float = lower.origin.distance_to(ankle.origin)
-	var direction: Vector3 = (target.origin-upper.origin).normalized()
-	var distance: float = clampf(target.origin.distance_to(upper.origin),.01,l1+l2-.00001)
-	var pole: Vector3 = Vector3(0,0,1)-direction*direction.dot(Vector3(0,0,1))
-	pole = pole.normalized()
-	var along: float = (l1*l1-l2*l2+distance*distance)/(2*distance)
-	var knee: Vector3 = upper.origin+direction*along+pole*sqrt(maxf(0,l1*l1-along*along))
-	rotate_knight_bone(indices[0],Quaternion((lower.origin-upper.origin).normalized(),(knee-upper.origin).normalized())*upper.basis.get_rotation_quaternion())
-	lower = knight_rig.get_bone_global_pose(indices[1])
-	ankle = knight_rig.get_bone_global_pose(indices[2])
-	rotate_knight_bone(indices[1],Quaternion((ankle.origin-lower.origin).normalized(),(target.origin-lower.origin).normalized())*lower.basis.get_rotation_quaternion())
-	rotate_knight_bone(indices[2],target.basis.get_rotation_quaternion())
-
-func rotate_knight_bone(index: int, rotation: Quaternion) -> void:
-	var parent: int = knight_rig.get_bone_parent(index)
-	var parent_rotation: Quaternion = knight_rig.get_bone_global_pose(parent).basis.get_rotation_quaternion() if parent >= 0 else Quaternion.IDENTITY
-	knight_rig.set_bone_pose_rotation(index,(parent_rotation.inverse()*rotation).normalized())
-	knight_rig.force_update_all_bone_transforms()
 
 func apply_reference_pose(rotation: Vector3, offset: Vector3 = Vector3.ZERO) -> void:
 	# Browser presentation wrapper pivots at 45% of actor height. Transform only
@@ -571,21 +480,12 @@ func clip_length(clip: String) -> float:
 func sample(clip: String, phase: float, looping: bool, dt: float) -> void:
 	if player == null or clip.is_empty():
 		return
-	var changing: bool = current_clip != clip or current_looping != looping or knight_force_transition
-	if model == "ForgottenKnight" and changing:
-		var joined_cut: bool = knight_chained and normalized_name(current_clip).begins_with("combo_") and normalized_name(clip).begins_with("combo_") and not knight_force_transition
-		knight_transition.clear()
-		if knight_pose_ready and not joined_cut:
-			for index: int in knight_rig.get_bone_count():
-				knight_transition.append(knight_rig.get_bone_pose(index))
-		knight_transition_age = 0
-		knight_force_transition = false
-	if changing:
+	if current_clip != clip or current_looping != looping:
 		current_clip = clip
 		current_looping = looping
 		var animation: Animation = player.get_animation(clip)
 		animation.loop_mode = Animation.LOOP_LINEAR if looping else Animation.LOOP_NONE
-		player.play(clip, 0 if model == "ForgottenKnight" else REFERENCE_BLEND_SECONDS)
+		player.play(clip, REFERENCE_BLEND_SECONDS)
 		starts += 1
 	player.speed_scale = 1
 	# Manual processing prevents a second engine animation tick. Advancing blend
@@ -594,13 +494,4 @@ func sample(clip: String, phase: float, looping: bool, dt: float) -> void:
 	player.seek(clampf(phase, 0, .999999) * clip_length(clip), true)
 	if model == "ForgottenKnight":
 		stabilize_knight_root()
-		knight_transition_age += maxf(0,dt)
-		if not knight_transition.is_empty() and knight_transition_age < REFERENCE_BLEND_SECONDS:
-			var weight: float = smoothstep(0,REFERENCE_BLEND_SECONDS,knight_transition_age)
-			for index: int in knight_rig.get_bone_count():
-				var blended: Transform3D = knight_transition[index].interpolate_with(knight_rig.get_bone_pose(index),weight)
-				knight_rig.set_bone_pose_position(index,blended.origin)
-				knight_rig.set_bone_pose_rotation(index,blended.basis.get_rotation_quaternion())
-			stabilize_knight_root()
-		knight_pose_ready = true
 
