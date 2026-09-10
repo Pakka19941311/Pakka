@@ -29,13 +29,22 @@ jobs:
           node scripts/materialize-knight-assets.mjs
           python scripts/world_final/materialize_payload.py
           python scripts/world_final/prepare_walk_export.py
-      - name: Import and export Windows preview
+      - name: Import world resources
+        timeout-minutes: 10
         run: |
           mkdir -p qa-artifacts/walk-build
           "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee qa-artifacts/walk-build/import.log
           python -c 'import pathlib; s=pathlib.Path("qa-artifacts/walk-build/import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-16000:]'
+      - name: Export Windows executable
+        timeout-minutes: 10
+        run: |
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/walk-build/Varendor.exe"
-          "$GODOT" --headless --license > qa-artifacts/walk-build/Godot-LICENSE.txt
+          test -s qa-artifacts/walk-build/Varendor.exe
+      - name: Collect exact engine license notices
+        timeout-minutes: 1
+        run: |
+          "$GODOT" --headless --path godot-pc --script "$PWD/scripts/world_final/write_godot_license.gd" -- --license-output="$PWD/qa-artifacts/walk-build/Godot-LICENSE.txt"
+          test -s qa-artifacts/walk-build/Godot-LICENSE.txt
       - uses: actions/upload-artifact@v4
         with:
           name: world-walk-windows-input

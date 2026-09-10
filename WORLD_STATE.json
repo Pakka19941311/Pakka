@@ -195,7 +195,7 @@
     "payload_parts": 246,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D13, preserved D14 candidate, interactive walking preview and curated evidence are published. Actions run 34523422720 is exporting the intermediate Windows preview from 8ef78c79e36bc58de2a9f436216c4d40fba9f8db; Windows binary checks and Release remain pending. No final-world acceptance."
+    "pending": "D13, preserved D14 candidate, interactive walking preview and curated evidence are published. First Actions run 34523422720 was cancelled after export because an unsupported --license call did not exit. Corrected license extraction passed locally; a new Actions build, Windows binary checks and Release remain pending. No final-world acceptance."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -345,6 +345,8 @@
     "scene": "godot-pc/world-final/preview_menu.tscn",
     "ci_commit": "8ef78c79e36bc58de2a9f436216c4d40fba9f8db",
     "workflow_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34523422720",
+    "ci_attempt_status": "cancelled; see docs/world-final/diagnostics/WALK_BUILD_RU.md. Export pack completed, but the original workflow did not complete and no EXE was accepted or published.",
+    "license_step_correction": "Explicit Engine license API script with quit; local headless exit 0 in 0.422s. Separate bounded CI steps; pending new build.",
     "release": "pending",
     "local_graphics_checks": {
       "surface": {
