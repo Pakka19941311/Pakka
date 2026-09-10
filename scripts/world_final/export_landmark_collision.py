@@ -22,7 +22,7 @@ def export_collision(collection, path):
         if not parent:continue
         base=float(parent.get('ground_level',bottom))
         overhead=any(s in name for s in ('_roof','_lintel','_entablature','_limb','_crown'))
-        support=any(s in name for s in ('_deck','_pier','_platform','_plinth','_access_ramp'))
+        support=any(s in name for s in ('_deck','_pier','_platform','_plinth','_access_ramp')) or bool(obj.get('walkable_floor',False))
         blocks=not overhead and not support and top>base+.05 and bottom<base+2.1
         if '_column' in name:blocks=True
         entry={'id':name,'source_mesh':name,'landmark':parent['landmark_id'],

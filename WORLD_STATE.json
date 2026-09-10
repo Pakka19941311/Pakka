@@ -5,12 +5,12 @@
   "baseline_commit": "884b26e35508038506fe29477923e08d78744593",
   "checkpoint_ref": "refs/checkpoints/world-final-start-20260910-884b26e",
   "state_commit": "Resolve the commit containing this file; baseline_commit is the preserved pre-world HEAD.",
-  "current_stage": "C",
+  "current_stage": "D",
   "stages": {
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
-    "C": "partial: independent mine and great_cave native interiors C04, closed walls/ceilings, two loops each, all 18 corridor directions and 7 navigation paths per space traversed; normal-speed graphics passed. Surface architecture remains B blockout and is the next task.",
-    "D": "not started",
+    "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
+    "D": "starting: existing approved nature assets inspected; no final vegetation placed yet",
     "E": "not started",
     "F": "not started",
     "G": "not started",
@@ -61,23 +61,36 @@
     "art/world-final/materials/rock_wall_02/",
     "docs/world-final/INTERIORS_C_RU.md",
     "docs/world-final/evidence/C04-mine/",
-    "docs/world-final/evidence/C04-cave/"
+    "docs/world-final/evidence/C04-cave/",
+    "art/world-final/Varendor_Architecture_C-05.blend",
+    "art/world-final/Varendor_Architecture_C-06.blend",
+    "art/world-final/Varendor_Architecture_C-07.blend",
+    "art/world-final/Varendor_Architecture_C-08.blend",
+    "art/world-final/Varendor_Architecture_C-09.blend",
+    "godot-pc/world-final/architecture_review.gd",
+    "godot-pc/world-final/architecture_motion_review.gd",
+    "scripts/world_final/detail_architecture_blender.py",
+    "scripts/world_final/refine_architecture_blender.py",
+    "scripts/world_final/seat_architecture_blender.py",
+    "scripts/world_final/author_civic_details_blender.py",
+    "scripts/world_final/fix_architecture_normals_blender.py",
+    "docs/world-final/ARCHITECTURE_C_RU.md",
+    "docs/world-final/evidence/C09-architecture/"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "C surface architecture: edit preserved layout-06 native source into a new version; detailed village houses, fortress, shore settlement, shrine, church/necropolis and ruins. Keep all B terrain/road routes and portals fixed; re-export measured collision and validate affected routes with accepted hero. Interior atmosphere/maps/portals/population remain E/F/G.",
+  "next_task": "D: establish real forest/road/rock material sample in existing Godot world, using preserved C09 master. Prepare current approved pine/fern/shrub/rock models for instancing, persist editable placements and masks, measure canopy coverage against 75-90% dense targets. Then extend nature to all biomes without reducing coverage. F/G/H and three E maps remain pending.",
   "not_verified": [
-    "Final surface architecture and scale C",
-    "Detailed reference quality and dense vegetation D",
-    "Interior final prop dressing, atmosphere and separate maps C-E",
-    "Main-game portals, NPC/server/1000 population F-G",
-    "Cold/warm performance and Windows Release H"
+    "Final reference-quality art, dense forest and organic geology D",
+    "World/interior weather, light, water, audio and three maps E",
+    "Main-game portals, NPC/save migration and 1000-population server F-G",
+    "Streaming, full-world cold/warm performance, editing round-trip and Windows Release H"
   ],
   "protected": [
     "Existing hero/animation/controller/camera/combat",
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "d2062416de8de5e550ca53c71c4a125cca245a4f",
+  "last_saved_commit": "7f8980976687e8c4bca4bf1208c46b8efd3f3a0a",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -101,16 +114,23 @@
     "interior_corridor_directions": 36,
     "interior_navigation_paths": 14,
     "interior_normal_speed_walks": 2,
-    "interior_navigation_cache_reused": true
+    "interior_navigation_cache_reused": true,
+    "surface_architecture_routes": 40,
+    "architecture_motion_walks": 4,
+    "architecture_motion_frames": 266,
+    "pier_return_to_settlement": true,
+    "ruin_support_seams": true,
+    "architecture_normals_corrected": 249,
+    "payload_clean_restore_173": true
   },
   "publication": {
-    "content_checkpoint": "d2062416de8de5e550ca53c71c4a125cca245a4f",
+    "content_checkpoint": "7f8980976687e8c4bca4bf1208c46b8efd3f3a0a",
     "binary_blobs_uploaded_and_hash_verified": 27,
-    "native_and_glb_payload_files": 149,
-    "payload_parts": 17,
+    "native_and_glb_payload_files": 173,
+    "payload_parts": 74,
     "main_and_knight_v2_unchanged": true,
     "note": "A follow-up metadata-only commit preserves exact CRLF bytes for geometry JSON so payload hash checks also pass on clean checkout.",
-    "pending": "C04 interiors are the current content checkpoint; resolve commit containing this state for its SHA. Main game still uses prior world."
+    "pending": "C09 architecture is the current checkpoint; resolve containing commit. Main game still uses old world; no final Release yet."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -118,5 +138,6 @@
     "Windows certificate store",
     "shader cache user directory",
     "existing user display-settings JSON"
-  ]
+  ],
+  "backup_current_from_workspace": "outputs/world-final-C09"
 }

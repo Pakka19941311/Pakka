@@ -2,12 +2,12 @@
 No personal saves, engine caches or third-party data are included.
 """
 from pathlib import Path
-import argparse,hashlib,json,zipfile
+import argparse,hashlib,json,zipfile,tarfile,lzma
 
 ROOT=Path(__file__).resolve().parents[2]
 PAYLOAD=ROOT/'art/world-final/payload'
 
-def package(label=None):
+def package(label=None,solid=False):
     geo=ROOT/'godot-pc/world-final/geography'
     interiors=ROOT/'godot-pc/world-final/interiors'
     files=sorted([*geo.rglob('*.glb'),geo/'heightmap.f32',geo/'terrain-data.npz',geo/'terrain.json',geo/'collision.json',geo/'support-surfaces.json',
@@ -24,15 +24,24 @@ def package(label=None):
         assert all(c.isalnum() or c in '-_' for c in label), 'Use a plain version label'
         revision=label
     tag='world-'+revision+'-'+str(len(layers)+1)
-    archive=ROOT/'qa-artifacts/world-final'/(tag+'.zip')
+    archive=ROOT/'qa-artifacts/world-final'/(tag+('.tar.xz' if solid else '.zip'))
     archive.parent.mkdir(parents=True,exist_ok=True)
     entries=[]
-    with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
-        for path in files:
-            rel=path.relative_to(ROOT).as_posix();data=path.read_bytes()
-            info=zipfile.ZipInfo(rel,date_time=(2026,9,10,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
-            z.writestr(info,data)
-            entries.append({'path':rel,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+    for path in files:
+        data=path.read_bytes();entries.append({'path':path.relative_to(ROOT).as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()})
+    if solid:
+        # A shared dictionary avoids duplicating unchanged packed images across
+        # preserved native versions. No source file is transformed or removed.
+        with lzma.open(archive,'wb',preset=9) as stream:
+            with tarfile.open(fileobj=stream,mode='w|',format=tarfile.USTAR_FORMAT) as tar:
+                for path,entry in zip(files,entries):
+                    info=tarfile.TarInfo(entry['path']);info.size=entry['bytes'];info.mtime=1788998400;info.mode=0o644
+                    with path.open('rb') as source:tar.addfile(info,source)
+    else:
+        with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+            for path,entry in zip(files,entries):
+                info=zipfile.ZipInfo(entry['path'],date_time=(2026,9,10,0,0,0));info.compress_type=zipfile.ZIP_DEFLATED
+                z.writestr(info,path.read_bytes())
     PAYLOAD.mkdir(parents=True,exist_ok=True)
     parts=[]
     with archive.open('rb') as f:
@@ -43,13 +52,13 @@ def package(label=None):
             if target.exists() and target.read_bytes()!=data:raise RuntimeError('Version the payload before replacing existing parts')
             target.write_bytes(data)
             parts.append({'path':target.relative_to(ROOT).as_posix(),'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest()});i+=1
-    layers.append({'revision':revision,'archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'parts':parts,'files':entries})
+    layers.append({'revision':revision,'format':'tar.xz' if solid else 'zip','archive_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'parts':parts,'files':entries})
     known.update({entry['path']:entry for entry in entries})
     manifest={'schema':2,'content':'Immutable layers of actual Blender masters and exported GLBs; latest file wins',
-              'archive_format':'ZIP, concatenate each layer parts in order','layers':layers,'files':[known[k] for k in sorted(known)]}
+              'archive_format':'Concatenate each layer parts in order; format defaults to zip for legacy layers','layers':layers,'files':[known[k] for k in sorted(known)]}
     manifest_path.write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps({'changed_files':len(files),'parts_added':len(parts),'archive_bytes':archive.stat().st_size,'layers':len(layers)}),flush=True)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--label')
-    package(parser.parse_args().label)
+    parser=argparse.ArgumentParser();parser.add_argument('--label');parser.add_argument('--solid',action='store_true')
+    args=parser.parse_args();package(args.label,args.solid)

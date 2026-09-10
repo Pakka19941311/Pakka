@@ -1,6 +1,6 @@
 """Restore verified immutable payload layers, preserving unknown/manual changes."""
 from pathlib import Path
-import hashlib,io,json,zipfile,argparse
+import hashlib,io,json,zipfile,tarfile,argparse
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -20,12 +20,20 @@ def restore(destination=ROOT):
         data=b''.join(chunks)
         assert sha(data)==layer['archive_sha256']
         expected={entry['path']:entry for entry in layer['files']}
-        with zipfile.ZipFile(io.BytesIO(data)) as z:
-            assert set(z.namelist())==set(expected)
-            for name in z.namelist():
+        fmt=layer.get('format','zip')
+        assert fmt in ('zip','tar.xz'),fmt
+        container=tarfile.open(fileobj=io.BytesIO(data),mode='r:xz') if fmt=='tar.xz' else zipfile.ZipFile(io.BytesIO(data))
+        with container as z:
+            names=z.getnames() if fmt=='tar.xz' else z.namelist()
+            assert len(names)==len(set(names)) and set(names)==set(expected)
+            for name in names:
                 target=(destination/name).resolve()
                 assert target.is_relative_to(destination.resolve()) and not Path(name).is_absolute()
-                entry=expected[name];b=z.read(name)
+                entry=expected[name]
+                if fmt=='tar.xz':
+                    member=z.getmember(name);assert member.isfile() and member.size==entry['bytes']
+                    b=z.extractfile(member).read()
+                else:b=z.read(name)
                 assert len(b)==entry['bytes'] and sha(b)==entry['sha256'],name
                 known.setdefault(name,set()).add(entry['sha256'])
                 final[name]=(entry,b)

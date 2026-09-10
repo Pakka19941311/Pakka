@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "content": "Immutable layers of actual Blender masters and exported GLBs; latest file wins",
-  "archive_format": "ZIP, concatenate each layer parts in order",
+  "archive_format": "Concatenate each layer parts in order; format defaults to zip for legacy layers",
   "layers": [
     {
       "archive_sha256": "bf7905d4cdf5d79ec900d57986a463caad68c9e6ef8a78b0de4500cef1f6dffe",
@@ -1345,9 +1345,198 @@
           "sha256": "f025c1fa4440d86415d8df20c3bde09ae2bba8fe14eefe9013e3343c56a3bf0f"
         }
       ]
+    },
+    {
+      "revision": "architecture-C09",
+      "format": "tar.xz",
+      "archive_sha256": "4de4641680612af65b1abcc9e5429be4be985315832850fa4d6d097d7d7667ac",
+      "parts": [
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part000",
+          "bytes": 3145728,
+          "sha256": "1177aea95080c3b1f9d5a15c9f59e2c7a78fb73c7bbdae45661c8fb200943666"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part001",
+          "bytes": 3145728,
+          "sha256": "fcf00e9019229b04dae464f9516d319af9a0f2bc667fd3dd73096b9fb3785bf8"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part002",
+          "bytes": 3145728,
+          "sha256": "63fe99619b67f40cc0b396ac7709615f770c75bb4c70fc8f74f05161291f0c27"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part003",
+          "bytes": 3145728,
+          "sha256": "f7bc50cd68e895aa4f9129dd4e29cf099f0cdb0da07bffc76db7926304447c69"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part004",
+          "bytes": 3145728,
+          "sha256": "9f38e055eb37ff95b34163b8e8b1b2b236ee1863a590765c99a00ce78707ae63"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part005",
+          "bytes": 3145728,
+          "sha256": "3822c3b39c9b2a6b89eae8c34509641976c6e2aea57ed81dd888c91980fc8dd0"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part006",
+          "bytes": 3145728,
+          "sha256": "bc593490e02a78f5310c3c92d0363c52d5ae7c801d6958c060e8a45f9037386f"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part007",
+          "bytes": 3145728,
+          "sha256": "c181940538f99efdbb06bdc440c21222b20495a58822aa910c7ec8217efe0b9e"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part008",
+          "bytes": 3145728,
+          "sha256": "2bbda20e376a7a936126515260ddbcccfb80595fdb54395c21dea9d06b68a9e1"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part009",
+          "bytes": 3145728,
+          "sha256": "d9867e2e24276c1e7af8a9d7384130a8e34e1d49a091913e6d5fb7a3d25b75e4"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part010",
+          "bytes": 3145728,
+          "sha256": "b982c80d5313e20f7332dfb0b5670b1e1c6d446946628c1b4b0e463878c6d6a6"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part011",
+          "bytes": 3145728,
+          "sha256": "61c25b5d222e5891bbc8ebebf71297b34a1e6617e3976812cca11365c5fda7ef"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part012",
+          "bytes": 3145728,
+          "sha256": "6c41c63163c1cf46edf620d2524bc6a22626871f1bd79960dd786671033352ae"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part013",
+          "bytes": 3145728,
+          "sha256": "a49be36399e402ef21c279334bed620f688913543f785e5e92185f7ed55238be"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part014",
+          "bytes": 3145728,
+          "sha256": "84c0520e9e9f15cb1e7cd73cc68fe969acf74434b9639512e7d321fe443b19ce"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part015",
+          "bytes": 3145728,
+          "sha256": "4a3e7bb853bf89a102077e8c7ba87159bba551b6cd6c982572e42aab080016a2"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part016",
+          "bytes": 3145728,
+          "sha256": "a0909c5609738b03ddafe7d0bf8a78a0e3ca5a066543af4c715e895d5f59f059"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part017",
+          "bytes": 3145728,
+          "sha256": "995b6a3885c88fbca3a13b6b4b90ce8fa4fbf6b2854480fc29d3db5a1191a8b2"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part018",
+          "bytes": 3145728,
+          "sha256": "d68a9ffee41e8c42f5390ff697e50747d9906d72de85b82b94d59ea52a71ce38"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part019",
+          "bytes": 3145728,
+          "sha256": "f1f2b7639581fc715b2a6c2891c3e0b96b56a7a3a6c490dea2bb00b33bddf4c2"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part020",
+          "bytes": 3145728,
+          "sha256": "cb8ee56ef56092aff7579f3ad1e38c78f3dea71cceefec7ed13a2c3415919492"
+        },
+        {
+          "path": "art/world-final/payload/world-architecture-C09-4.part021",
+          "bytes": 2888484,
+          "sha256": "cc144d32af932c4a105f249fd3f8764b80b20de7df7f318d3093339cfba0660d"
+        }
+      ],
+      "files": [
+        {
+          "path": "art/world-final/Varendor_Architecture_C-05.blend",
+          "bytes": 24750387,
+          "sha256": "e3b8dc8e99825bab5af6bbbc0dbca85dd8043590b0e2849a1d0ae9e24a2e7f17"
+        },
+        {
+          "path": "art/world-final/Varendor_Architecture_C-06.blend",
+          "bytes": 25087436,
+          "sha256": "67f58ad650b49c14379fecc1c0daac87f452a148d74345a6aa207a12e3862d95"
+        },
+        {
+          "path": "art/world-final/Varendor_Architecture_C-07.blend",
+          "bytes": 25920009,
+          "sha256": "f123b25d2a783994805a01da3ac35fb5dc2a08da75536499398b24fd46707da3"
+        },
+        {
+          "path": "art/world-final/Varendor_Architecture_C-08.blend",
+          "bytes": 25963196,
+          "sha256": "ef6d4fe6806a359305bed319fa9cbcfb74196f21b586aac22227b2c431fa7d62"
+        },
+        {
+          "path": "art/world-final/Varendor_Architecture_C-09.blend",
+          "bytes": 25974767,
+          "sha256": "47eaf17cd886ba1163a17b99fdbea13b4ee17a2b1c5064f38469d9fd2219c9d1"
+        },
+        {
+          "path": "godot-pc/world-final/geography/collision.json",
+          "bytes": 1049769,
+          "sha256": "262e2bfd081455b1b6c28782efdf3bcd1d758d7097d76918ff8b91802d7dd53c"
+        },
+        {
+          "path": "godot-pc/world-final/geography/landmarks.glb",
+          "bytes": 14495172,
+          "sha256": "d1ba1d8a97b753b05156d6fa18b4bdff252af9f97ec58df9abbed89dabdcb47e"
+        },
+        {
+          "path": "godot-pc/world-final/geography/support-surfaces.json",
+          "bytes": 2756,
+          "sha256": "9b6bdf0ae9bfc5b37e47aafe3ceb53d12bbcc942b8f059fa28db7a11eee99600"
+        },
+        {
+          "path": "godot-pc/world-final/geography/terrain.json",
+          "bytes": 32586,
+          "sha256": "45eaa865b015d9b92c995f3c39807c542f5cb411b76478d56309479ff409376b"
+        }
+      ]
     }
   ],
   "files": [
+    {
+      "path": "art/world-final/Varendor_Architecture_C-05.blend",
+      "bytes": 24750387,
+      "sha256": "e3b8dc8e99825bab5af6bbbc0dbca85dd8043590b0e2849a1d0ae9e24a2e7f17"
+    },
+    {
+      "path": "art/world-final/Varendor_Architecture_C-06.blend",
+      "bytes": 25087436,
+      "sha256": "67f58ad650b49c14379fecc1c0daac87f452a148d74345a6aa207a12e3862d95"
+    },
+    {
+      "path": "art/world-final/Varendor_Architecture_C-07.blend",
+      "bytes": 25920009,
+      "sha256": "f123b25d2a783994805a01da3ac35fb5dc2a08da75536499398b24fd46707da3"
+    },
+    {
+      "path": "art/world-final/Varendor_Architecture_C-08.blend",
+      "bytes": 25963196,
+      "sha256": "ef6d4fe6806a359305bed319fa9cbcfb74196f21b586aac22227b2c431fa7d62"
+    },
+    {
+      "path": "art/world-final/Varendor_Architecture_C-09.blend",
+      "bytes": 25974767,
+      "sha256": "47eaf17cd886ba1163a17b99fdbea13b4ee17a2b1c5064f38469d9fd2219c9d1"
+    },
     {
       "path": "art/world-final/Varendor_Geography_final-1.0-layout-03.blend",
       "bytes": 18156390,
@@ -2105,8 +2294,8 @@
     },
     {
       "path": "godot-pc/world-final/geography/collision.json",
-      "bytes": 58659,
-      "sha256": "df7d49b64178dff19b698b27edf1132767fb84b70c680f48715f2fa167892c99"
+      "bytes": 1049769,
+      "sha256": "262e2bfd081455b1b6c28782efdf3bcd1d758d7097d76918ff8b91802d7dd53c"
     },
     {
       "path": "godot-pc/world-final/geography/heightmap.f32",
@@ -2115,13 +2304,13 @@
     },
     {
       "path": "godot-pc/world-final/geography/landmarks.glb",
-      "bytes": 274392,
-      "sha256": "e9645dd0b863be649aa283fc254d74e0e7198d59bc38427b1916b14b77479c77"
+      "bytes": 14495172,
+      "sha256": "d1ba1d8a97b753b05156d6fa18b4bdff252af9f97ec58df9abbed89dabdcb47e"
     },
     {
       "path": "godot-pc/world-final/geography/support-surfaces.json",
-      "bytes": 945,
-      "sha256": "43b1fe3ffa07e340845a014867395da9cdc6c28ea4f381b30fd491943d44e6d9"
+      "bytes": 2756,
+      "sha256": "9b6bdf0ae9bfc5b37e47aafe3ceb53d12bbcc942b8f059fa28db7a11eee99600"
     },
     {
       "path": "godot-pc/world-final/geography/terrain-data.npz",
@@ -2130,8 +2319,8 @@
     },
     {
       "path": "godot-pc/world-final/geography/terrain.json",
-      "bytes": 34300,
-      "sha256": "828aacc0b4ffdf592e65747ff42f33b5b24eaab0564ff45ad95d43fdeb4e300e"
+      "bytes": 32586,
+      "sha256": "45eaa865b015d9b92c995f3c39807c542f5cb411b76478d56309479ff409376b"
     },
     {
       "path": "godot-pc/world-final/interiors/great_cave-floor.f32",

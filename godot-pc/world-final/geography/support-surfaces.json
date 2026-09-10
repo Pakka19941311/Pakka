@@ -2,16 +2,6 @@
   "schema": 1,
   "surfaces": [
     {
-      "id": "PIER_deck",
-      "kind": "plane",
-      "x": 372,
-      "z": 25,
-      "halfX": 21.0,
-      "halfZ": 4.5,
-      "y": 41.2,
-      "angle": 1.5707963267948966
-    },
-    {
       "id": "BRIDGE_LAKE_deck",
       "kind": "plane",
       "x": 308,
@@ -51,6 +41,121 @@
       "y": 80,
       "high": 83,
       "angle": 0
+    },
+    {
+      "id": "R01_floor",
+      "kind": "plane",
+      "x": -35,
+      "z": 439,
+      "halfX": 7.5,
+      "halfZ": 6.5,
+      "y": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R01_access_ramp",
+      "kind": "ramp_z",
+      "x": -35,
+      "z": 446.5,
+      "halfX": 1.7,
+      "halfZ": 1,
+      "y": 30.0,
+      "high": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R02_floor",
+      "kind": "plane",
+      "x": -23,
+      "z": 397,
+      "halfX": 7.5,
+      "halfZ": 6.5,
+      "y": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R02_access_ramp",
+      "kind": "ramp_z",
+      "x": -23,
+      "z": 404.5,
+      "halfX": 1.7,
+      "halfZ": 1,
+      "y": 30.0,
+      "high": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R03_floor",
+      "kind": "plane",
+      "x": 63,
+      "z": 436,
+      "halfX": 7.5,
+      "halfZ": 6.5,
+      "y": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R03_access_ramp",
+      "kind": "ramp_z",
+      "x": 63,
+      "z": 443.5,
+      "halfX": 1.7,
+      "halfZ": 1,
+      "y": 30.0,
+      "high": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R04_floor",
+      "kind": "plane",
+      "x": 24,
+      "z": 466,
+      "halfX": 7.5,
+      "halfZ": 6.5,
+      "y": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "R04_access_ramp",
+      "kind": "ramp_z",
+      "x": 24,
+      "z": 473.5,
+      "halfX": 1.7,
+      "halfZ": 1,
+      "y": 29.92481231689453,
+      "high": 30.3,
+      "angle": 0
+    },
+    {
+      "id": "PIER_deck",
+      "kind": "plane",
+      "x": 335,
+      "z": 25,
+      "halfX": 10,
+      "halfZ": 4,
+      "y": 41.2,
+      "angle": 0
+    },
+    {
+      "id": "PIER_landing_deck",
+      "kind": "plane",
+      "x": 378.5,
+      "z": 25,
+      "halfX": 3.5,
+      "halfZ": 2,
+      "y": 48,
+      "angle": 0
+    },
+    {
+      "id": "PIER_access_ramp",
+      "kind": "ramp_z",
+      "x": 360,
+      "z": 25,
+      "halfX": 2,
+      "halfZ": 15,
+      "y": 41.2,
+      "high": 48,
+      "angle": -1.5707963267948966
     }
   ]
 }
