@@ -1,0 +1,2508 @@
+{
+  "command": [
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/tools/Godot_v4.6.3-stable_win64_console.exe",
+    "--path",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc",
+    "--log-file",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/qa-artifacts/world-final/main-after-D08/engine.log",
+    "--verbose",
+    "--headless",
+    "--quit-after",
+    "900"
+  ],
+  "windows_command_line": "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/tools/Godot_v4.6.3-stable_win64_console.exe --path C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc --log-file C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/qa-artifacts/world-final/main-after-D08/engine.log --verbose --headless --quit-after 900",
+  "cwd": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "utc_start": "2026-09-10T17:03:01.163245+00:00",
+  "environment_overrides": {},
+  "project_settings_changed": false,
+  "log_precreated_and_writable": true,
+  "timeout_seconds": 50.0,
+  "visual_check": false,
+  "samples": [
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16973905920,
+        "commit_limit": 36193837056,
+        "commit_available": 11247030272,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 2711552,
+          "peak_working_set": 2711552,
+          "private_bytes": 475136,
+          "peak_pagefile": 475136
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 6606848,
+          "peak_working_set": 6606848,
+          "private_bytes": 1040384,
+          "peak_pagefile": 1040384
+        }
+      ],
+      "elapsed_s": 0.016
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16938754048,
+        "commit_limit": 36193837056,
+        "commit_available": 11218726912,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 54833152,
+          "peak_working_set": 54833152,
+          "private_bytes": 25067520,
+          "peak_pagefile": 25067520
+        }
+      ],
+      "elapsed_s": 0.235
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16858624000,
+        "commit_limit": 36193837056,
+        "commit_available": 11151142912,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 115793920,
+          "peak_working_set": 115793920,
+          "private_bytes": 68829184,
+          "peak_pagefile": 68829184
+        }
+      ],
+      "elapsed_s": 0.438
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16834113536,
+        "commit_limit": 36193837056,
+        "commit_available": 11133353984,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 141701120,
+          "peak_working_set": 141701120,
+          "private_bytes": 94519296,
+          "peak_pagefile": 94519296
+        }
+      ],
+      "elapsed_s": 0.656
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16835047424,
+        "commit_limit": 36193837056,
+        "commit_available": 11136720896,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 135159808,
+          "peak_working_set": 141705216,
+          "private_bytes": 89411584,
+          "peak_pagefile": 94519296
+        }
+      ],
+      "elapsed_s": 0.86
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16838545408,
+        "commit_limit": 36193837056,
+        "commit_available": 11144392704,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 137359360,
+          "peak_working_set": 141705216,
+          "private_bytes": 91287552,
+          "peak_pagefile": 94519296
+        }
+      ],
+      "elapsed_s": 1.078
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16830898176,
+        "commit_limit": 36193837056,
+        "commit_available": 11132358656,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 150949888,
+          "peak_working_set": 155762688,
+          "private_bytes": 102858752,
+          "peak_pagefile": 108748800
+        }
+      ],
+      "elapsed_s": 1.281
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16775536640,
+        "commit_limit": 36193837056,
+        "commit_available": 11087237120,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 192917504,
+          "peak_working_set": 198230016,
+          "private_bytes": 142479360,
+          "peak_pagefile": 147824640
+        }
+      ],
+      "elapsed_s": 1.5
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16737009664,
+        "commit_limit": 36193837056,
+        "commit_available": 11055616000,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 230662144,
+          "peak_working_set": 230662144,
+          "private_bytes": 185536512,
+          "peak_pagefile": 185565184
+        }
+      ],
+      "elapsed_s": 1.703
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16700137472,
+        "commit_limit": 36193837056,
+        "commit_available": 11015983104,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 267141120,
+          "peak_working_set": 267141120,
+          "private_bytes": 218456064,
+          "peak_pagefile": 218488832
+        }
+      ],
+      "elapsed_s": 1.922
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16672886784,
+        "commit_limit": 36193837056,
+        "commit_available": 10980536320,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 294715392,
+          "peak_working_set": 299986944,
+          "private_bytes": 244875264,
+          "peak_pagefile": 249683968
+        }
+      ],
+      "elapsed_s": 2.141
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16630284288,
+        "commit_limit": 36193837056,
+        "commit_available": 10950967296,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 331571200,
+          "peak_working_set": 334790656,
+          "private_bytes": 281292800,
+          "peak_pagefile": 284569600
+        }
+      ],
+      "elapsed_s": 2.344
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16573386752,
+        "commit_limit": 36193837056,
+        "commit_available": 10899431424,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 394608640,
+          "peak_working_set": 394608640,
+          "private_bytes": 348499968,
+          "peak_pagefile": 348549120
+        }
+      ],
+      "elapsed_s": 2.563
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16477356032,
+        "commit_limit": 36193837056,
+        "commit_available": 10809860096,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 483336192,
+          "peak_working_set": 483336192,
+          "private_bytes": 433045504,
+          "peak_pagefile": 433045504
+        }
+      ],
+      "elapsed_s": 2.766
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16417488896,
+        "commit_limit": 36193837056,
+        "commit_available": 10727055360,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 565366784,
+          "peak_working_set": 565366784,
+          "private_bytes": 515469312,
+          "peak_pagefile": 515469312
+        }
+      ],
+      "elapsed_s": 2.985
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16358948864,
+        "commit_limit": 36193837056,
+        "commit_available": 10664763392,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 620376064,
+          "peak_working_set": 623476736,
+          "private_bytes": 570449920,
+          "peak_pagefile": 573636608
+        }
+      ],
+      "elapsed_s": 3.203
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16321540096,
+        "commit_limit": 36193837056,
+        "commit_available": 10644639744,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 647225344,
+          "peak_working_set": 647225344,
+          "private_bytes": 597299200,
+          "peak_pagefile": 597307392
+        }
+      ],
+      "elapsed_s": 3.422
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16284979200,
+        "commit_limit": 36193837056,
+        "commit_available": 10603089920,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 676024320,
+          "peak_working_set": 676024320,
+          "private_bytes": 638423040,
+          "peak_pagefile": 638468096
+        }
+      ],
+      "elapsed_s": 3.625
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16246218752,
+        "commit_limit": 36193837056,
+        "commit_available": 10564337664,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 711520256,
+          "peak_working_set": 711520256,
+          "private_bytes": 676200448,
+          "peak_pagefile": 676245504
+        }
+      ],
+      "elapsed_s": 3.844
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16210370560,
+        "commit_limit": 36193837056,
+        "commit_available": 10534932480,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 736182272,
+          "peak_working_set": 740458496,
+          "private_bytes": 706392064,
+          "peak_pagefile": 706412544
+        }
+      ],
+      "elapsed_s": 4.047
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16174592000,
+        "commit_limit": 36193837056,
+        "commit_available": 10527776768,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 769814528,
+          "peak_working_set": 774909952,
+          "private_bytes": 743477248,
+          "peak_pagefile": 743510016
+        }
+      ],
+      "elapsed_s": 4.266
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16137658368,
+        "commit_limit": 36193837056,
+        "commit_available": 10499715072,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 806055936,
+          "peak_working_set": 807608320,
+          "private_bytes": 757354496,
+          "peak_pagefile": 757383168
+        }
+      ],
+      "elapsed_s": 4.485
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16130781184,
+        "commit_limit": 36193837056,
+        "commit_available": 10482208768,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 841269248,
+          "peak_working_set": 841269248,
+          "private_bytes": 795164672,
+          "peak_pagefile": 795193344
+        }
+      ],
+      "elapsed_s": 4.688
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16106856448,
+        "commit_limit": 36193837056,
+        "commit_available": 10451693568,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 867237888,
+          "peak_working_set": 867237888,
+          "private_bytes": 824815616,
+          "peak_pagefile": 824877056
+        }
+      ],
+      "elapsed_s": 4.906
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16059150336,
+        "commit_limit": 36193837056,
+        "commit_available": 10417803264,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 896172032,
+          "peak_working_set": 909897728,
+          "private_bytes": 877899776,
+          "peak_pagefile": 877948928
+        }
+      ],
+      "elapsed_s": 5.125
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15995158528,
+        "commit_limit": 36193837056,
+        "commit_available": 10367676416,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 955408384,
+          "peak_working_set": 964493312,
+          "private_bytes": 905469952,
+          "peak_pagefile": 914587648
+        }
+      ],
+      "elapsed_s": 5.344
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15953014784,
+        "commit_limit": 36193837056,
+        "commit_available": 10330841088,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 998076416,
+          "peak_working_set": 1010642944,
+          "private_bytes": 948228096,
+          "peak_pagefile": 960860160
+        }
+      ],
+      "elapsed_s": 5.547
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15917109248,
+        "commit_limit": 36193837056,
+        "commit_available": 10295160832,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1027522560,
+          "peak_working_set": 1045852160,
+          "private_bytes": 978726912,
+          "peak_pagefile": 996126720
+        }
+      ],
+      "elapsed_s": 5.766
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15880155136,
+        "commit_limit": 36193837056,
+        "commit_available": 10264948736,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1065209856,
+          "peak_working_set": 1068429312,
+          "private_bytes": 1015508992,
+          "peak_pagefile": 1018757120
+        }
+      ],
+      "elapsed_s": 5.985
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15830020096,
+        "commit_limit": 36193837056,
+        "commit_available": 10222768128,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1105670144,
+          "peak_working_set": 1108312064,
+          "private_bytes": 1062789120,
+          "peak_pagefile": 1062842368
+        }
+      ],
+      "elapsed_s": 6.188
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15797055488,
+        "commit_limit": 36193837056,
+        "commit_available": 10192007168,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1133236224,
+          "peak_working_set": 1136898048,
+          "private_bytes": 1087209472,
+          "peak_pagefile": 1087283200
+        }
+      ],
+      "elapsed_s": 6.406
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15758819328,
+        "commit_limit": 36193837056,
+        "commit_available": 10167869440,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1167519744,
+          "peak_working_set": 1167519744,
+          "private_bytes": 1123717120,
+          "peak_pagefile": 1123721216
+        }
+      ],
+      "elapsed_s": 6.625
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15721287680,
+        "commit_limit": 36193837056,
+        "commit_available": 10132422656,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1192992768,
+          "peak_working_set": 1198694400,
+          "private_bytes": 1144823808,
+          "peak_pagefile": 1149853696
+        }
+      ],
+      "elapsed_s": 6.828
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15711256576,
+        "commit_limit": 36193837056,
+        "commit_available": 10108375040,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1219854336,
+          "peak_working_set": 1225252864,
+          "private_bytes": 1171165184,
+          "peak_pagefile": 1176043520
+        }
+      ],
+      "elapsed_s": 7.047
+    },
+    {
+      "system": {
+        "load_percent": 53,
+        "physical_total": 34046353408,
+        "physical_available": 15679221760,
+        "commit_limit": 36193837056,
+        "commit_available": 10084679680,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1245200384,
+          "peak_working_set": 1248989184,
+          "private_bytes": 1196408832,
+          "peak_pagefile": 1199652864
+        }
+      ],
+      "elapsed_s": 7.266
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15622045696,
+        "commit_limit": 36193837056,
+        "commit_available": 10029551616,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1286389760,
+          "peak_working_set": 1300623360,
+          "private_bytes": 1249959936,
+          "peak_pagefile": 1251618816
+        }
+      ],
+      "elapsed_s": 7.485
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15589167104,
+        "commit_limit": 36193837056,
+        "commit_available": 10004959232,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1321779200,
+          "peak_working_set": 1327030272,
+          "private_bytes": 1272619008,
+          "peak_pagefile": 1277902848
+        }
+      ],
+      "elapsed_s": 7.688
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15561523200,
+        "commit_limit": 36193837056,
+        "commit_available": 9987375104,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 7.906
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15557341184,
+        "commit_limit": 36193837056,
+        "commit_available": 9988878336,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 8.125
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15574421504,
+        "commit_limit": 36193837056,
+        "commit_available": 10005786624,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 8.344
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15574212608,
+        "commit_limit": 36193837056,
+        "commit_available": 10006626304,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 8.563
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15543373824,
+        "commit_limit": 36193837056,
+        "commit_available": 10006806528,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 8.781
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15533920256,
+        "commit_limit": 36193837056,
+        "commit_available": 10001555456,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 8.985
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15508992000,
+        "commit_limit": 36193837056,
+        "commit_available": 10007351296,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 9.203
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15509590016,
+        "commit_limit": 36193837056,
+        "commit_available": 10007535616,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 9.422
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15509778432,
+        "commit_limit": 36193837056,
+        "commit_available": 10007396352,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 9.641
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15514460160,
+        "commit_limit": 36193837056,
+        "commit_available": 10029441024,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 9.844
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15420932096,
+        "commit_limit": 36193837056,
+        "commit_available": 9897553920,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 10.063
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15426691072,
+        "commit_limit": 36193837056,
+        "commit_available": 9918877696,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 10.281
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15426494464,
+        "commit_limit": 36193837056,
+        "commit_available": 9905512448,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 10.5
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15414222848,
+        "commit_limit": 36193837056,
+        "commit_available": 9887760384,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 10.719
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15407341568,
+        "commit_limit": 36193837056,
+        "commit_available": 9885114368,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 10.938
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15406452736,
+        "commit_limit": 36193837056,
+        "commit_available": 9877835776,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 11.141
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15397433344,
+        "commit_limit": 36193837056,
+        "commit_available": 9871745024,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 11.36
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15339769856,
+        "commit_limit": 36193837056,
+        "commit_available": 9820389376,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 11.578
+    },
+    {
+      "system": {
+        "load_percent": 55,
+        "physical_total": 34046353408,
+        "physical_available": 15318163456,
+        "commit_limit": 36193837056,
+        "commit_available": 9794965504,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 11.797
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15338434560,
+        "commit_limit": 36193837056,
+        "commit_available": 9825210368,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1340936192,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1291870208,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 12.016
+    },
+    {
+      "system": {
+        "load_percent": 54,
+        "physical_total": 34046353408,
+        "physical_available": 15470620672,
+        "commit_limit": 36193837056,
+        "commit_available": 9962135552,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 1119232000,
+          "peak_working_set": 1341206528,
+          "private_bytes": 1069740032,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 12.219
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16590041088,
+        "commit_limit": 36193837056,
+        "commit_available": 11090067456,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15908,
+          "parent_pid": 10388,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 23732,
+          "parent_pid": 15908,
+          "exe": "conhost.exe",
+          "working_set": 8220672,
+          "peak_working_set": 8220672,
+          "private_bytes": 1261568,
+          "peak_pagefile": 1261568
+        },
+        {
+          "pid": 21340,
+          "parent_pid": 15908,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 112529408,
+          "peak_working_set": 1341206528,
+          "private_bytes": 60571648,
+          "peak_pagefile": 1292075008
+        }
+      ],
+      "elapsed_s": 12.438
+    }
+  ],
+  "launcher_pid": 15908,
+  "timed_out": false,
+  "exit_code": 0,
+  "elapsed_s": 12.641,
+  "error_lines": [
+    "ERROR: Failed to read the root certificate store.",
+    "ERROR: Parse JSON failed. Error at line 0: Unknown error getting token",
+    "ERROR: Failed to read the root certificate store.",
+    "ERROR: Parse JSON failed. Error at line 0: Unknown error getting token"
+  ],
+  "clean_error_log": false,
+  "crash_detected": false,
+  "operation_completed": true,
+  "peak_process_working_set_bytes": 1341206528,
+  "peak_process_private_bytes": 1291870208,
+  "minimum_available_physical_bytes": 15318163456
+}

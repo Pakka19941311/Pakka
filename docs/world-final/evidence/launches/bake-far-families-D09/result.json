@@ -1,0 +1,3455 @@
+{
+  "command": [
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/tools/Godot_v4.6.3-stable_win64_console.exe",
+    "--path",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc",
+    "--log-file",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/qa-artifacts/world-final/bake-far-families-D09/engine.log",
+    "--verbose",
+    "res://world-final/nature/bake_far_trees.tscn",
+    "--",
+    "--albedo-normal",
+    "--family-atlases",
+    "--curved-leaves"
+  ],
+  "windows_command_line": "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/tools/Godot_v4.6.3-stable_win64_console.exe --path C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc --log-file C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/qa-artifacts/world-final/bake-far-families-D09/engine.log --verbose res://world-final/nature/bake_far_trees.tscn -- --albedo-normal --family-atlases --curved-leaves",
+  "cwd": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "utc_start": "2026-09-10T16:58:05.773183+00:00",
+  "environment_overrides": {},
+  "project_settings_changed": false,
+  "log_precreated_and_writable": true,
+  "timeout_seconds": 60.0,
+  "visual_check": false,
+  "samples": [
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16644239360,
+        "commit_limit": 36193837056,
+        "commit_available": 10725294080,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 2711552,
+          "peak_working_set": 2711552,
+          "private_bytes": 475136,
+          "peak_pagefile": 475136
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 7094272,
+          "peak_working_set": 7094272,
+          "private_bytes": 1171456,
+          "peak_pagefile": 1171456
+        }
+      ],
+      "elapsed_s": 0.031
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16624451584,
+        "commit_limit": 36193837056,
+        "commit_available": 10707935232,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 36274176,
+          "peak_working_set": 36274176,
+          "private_bytes": 15564800,
+          "peak_pagefile": 15564800
+        }
+      ],
+      "elapsed_s": 0.25
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16597184512,
+        "commit_limit": 36193837056,
+        "commit_available": 10690428928,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 64806912,
+          "peak_working_set": 64806912,
+          "private_bytes": 29683712,
+          "peak_pagefile": 29794304
+        }
+      ],
+      "elapsed_s": 0.468
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16571723776,
+        "commit_limit": 36193837056,
+        "commit_available": 10646048768,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 104710144,
+          "peak_working_set": 104710144,
+          "private_bytes": 86409216,
+          "peak_pagefile": 86409216
+        }
+      ],
+      "elapsed_s": 0.687
+    },
+    {
+      "system": {
+        "load_percent": 50,
+        "physical_total": 34046353408,
+        "physical_available": 16743387136,
+        "commit_limit": 36193837056,
+        "commit_available": 10843074560,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 100880384,
+          "peak_working_set": 117784576,
+          "private_bytes": 85839872,
+          "peak_pagefile": 104685568
+        }
+      ],
+      "elapsed_s": 0.906
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16570425344,
+        "commit_limit": 36193837056,
+        "commit_available": 10544685056,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 106905600,
+          "peak_working_set": 117784576,
+          "private_bytes": 122691584,
+          "peak_pagefile": 122691584
+        }
+      ],
+      "elapsed_s": 1.125
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16485175296,
+        "commit_limit": 36193837056,
+        "commit_available": 10436988928,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 159006720,
+          "peak_working_set": 159006720,
+          "private_bytes": 180940800,
+          "peak_pagefile": 180940800
+        }
+      ],
+      "elapsed_s": 1.328
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16456491008,
+        "commit_limit": 36193837056,
+        "commit_available": 10410369024,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 157753344,
+          "peak_working_set": 162480128,
+          "private_bytes": 179740672,
+          "peak_pagefile": 184832000
+        }
+      ],
+      "elapsed_s": 1.546
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16448122880,
+        "commit_limit": 36193837056,
+        "commit_available": 10395774976,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 158519296,
+          "peak_working_set": 162480128,
+          "private_bytes": 178434048,
+          "peak_pagefile": 184832000
+        }
+      ],
+      "elapsed_s": 1.765
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16405540864,
+        "commit_limit": 36193837056,
+        "commit_available": 10334208000,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 173993984,
+          "peak_working_set": 173993984,
+          "private_bytes": 209793024,
+          "peak_pagefile": 209793024
+        }
+      ],
+      "elapsed_s": 1.968
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16481153024,
+        "commit_limit": 36193837056,
+        "commit_available": 10115231744,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 265498624,
+          "peak_working_set": 265502720,
+          "private_bytes": 542867456,
+          "peak_pagefile": 576114688
+        }
+      ],
+      "elapsed_s": 2.187
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16307716096,
+        "commit_limit": 36193837056,
+        "commit_available": 9809244160,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 291987456,
+          "peak_working_set": 299745280,
+          "private_bytes": 587444224,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 2.406
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16281972736,
+        "commit_limit": 36193837056,
+        "commit_available": 9778802688,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 302321664,
+          "peak_working_set": 304336896,
+          "private_bytes": 587005952,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 2.625
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16267653120,
+        "commit_limit": 36193837056,
+        "commit_available": 9764941824,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 302694400,
+          "peak_working_set": 305242112,
+          "private_bytes": 587231232,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 2.843
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16143888384,
+        "commit_limit": 36193837056,
+        "commit_available": 9793486848,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 370794496,
+          "peak_working_set": 404160512,
+          "private_bytes": 589074432,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 3.062
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16146001920,
+        "commit_limit": 36193837056,
+        "commit_available": 9791885312,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 370794496,
+          "peak_working_set": 404160512,
+          "private_bytes": 589074432,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 3.265
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16143953920,
+        "commit_limit": 36193837056,
+        "commit_available": 9791229952,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 370860032,
+          "peak_working_set": 404160512,
+          "private_bytes": 589078528,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 3.484
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16301117440,
+        "commit_limit": 36193837056,
+        "commit_available": 9962156032,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 370860032,
+          "peak_working_set": 404160512,
+          "private_bytes": 589078528,
+          "peak_pagefile": 609603584
+        }
+      ],
+      "elapsed_s": 3.703
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16169254912,
+        "commit_limit": 36193837056,
+        "commit_available": 9842630656,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 378306560,
+          "peak_working_set": 404160512,
+          "private_bytes": 613494784,
+          "peak_pagefile": 618328064
+        }
+      ],
+      "elapsed_s": 3.906
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16147640320,
+        "commit_limit": 36193837056,
+        "commit_available": 9796943872,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376344576,
+          "peak_working_set": 404160512,
+          "private_bytes": 634671104,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 4.125
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16132804608,
+        "commit_limit": 36193837056,
+        "commit_available": 9778802688,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377241600,
+          "peak_working_set": 404160512,
+          "private_bytes": 634830848,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 4.343
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16137011200,
+        "commit_limit": 36193837056,
+        "commit_available": 9790750720,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376999936,
+          "peak_working_set": 404160512,
+          "private_bytes": 635080704,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 4.562
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16136617984,
+        "commit_limit": 36193837056,
+        "commit_available": 9790369792,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376999936,
+          "peak_working_set": 404160512,
+          "private_bytes": 635080704,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 4.765
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16308338688,
+        "commit_limit": 36193837056,
+        "commit_available": 9980780544,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376999936,
+          "peak_working_set": 404160512,
+          "private_bytes": 635084800,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 4.984
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16179056640,
+        "commit_limit": 36193837056,
+        "commit_available": 9829740544,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376999936,
+          "peak_working_set": 404160512,
+          "private_bytes": 635080704,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 5.203
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16187158528,
+        "commit_limit": 36193837056,
+        "commit_available": 9831968768,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 378798080,
+          "peak_working_set": 404160512,
+          "private_bytes": 637214720,
+          "peak_pagefile": 641318912
+        }
+      ],
+      "elapsed_s": 5.421
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16181018624,
+        "commit_limit": 36193837056,
+        "commit_available": 9827053568,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 375566336,
+          "peak_working_set": 404160512,
+          "private_bytes": 632385536,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 5.64
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16181714944,
+        "commit_limit": 36193837056,
+        "commit_available": 9828982784,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 375611392,
+          "peak_working_set": 404160512,
+          "private_bytes": 631484416,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 5.843
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16191782912,
+        "commit_limit": 36193837056,
+        "commit_available": 9831788544,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376090624,
+          "peak_working_set": 404160512,
+          "private_bytes": 632430592,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 6.062
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16187326464,
+        "commit_limit": 36193837056,
+        "commit_available": 9833402368,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376090624,
+          "peak_working_set": 404160512,
+          "private_bytes": 632430592,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 6.281
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16236589056,
+        "commit_limit": 36193837056,
+        "commit_available": 9921445888,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376090624,
+          "peak_working_set": 404160512,
+          "private_bytes": 632434688,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 6.5
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16250175488,
+        "commit_limit": 36193837056,
+        "commit_available": 9921544192,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376090624,
+          "peak_working_set": 404160512,
+          "private_bytes": 632434688,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 6.718
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16186466304,
+        "commit_limit": 36193837056,
+        "commit_available": 9814192128,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 379076608,
+          "peak_working_set": 404160512,
+          "private_bytes": 637755392,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 6.937
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16171343872,
+        "commit_limit": 36193837056,
+        "commit_available": 9785032704,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 382377984,
+          "peak_working_set": 404160512,
+          "private_bytes": 638738432,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 7.14
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16174735360,
+        "commit_limit": 36193837056,
+        "commit_available": 9791262720,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 375967744,
+          "peak_working_set": 404160512,
+          "private_bytes": 632156160,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 7.359
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16171601920,
+        "commit_limit": 36193837056,
+        "commit_available": 9788846080,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 378073088,
+          "peak_working_set": 404160512,
+          "private_bytes": 633810944,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 7.578
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16161959936,
+        "commit_limit": 36193837056,
+        "commit_available": 9789386752,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377405440,
+          "peak_working_set": 404160512,
+          "private_bytes": 628539392,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 7.796
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16264138752,
+        "commit_limit": 36193837056,
+        "commit_available": 9898872832,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377552896,
+          "peak_working_set": 404160512,
+          "private_bytes": 630943744,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 8.0
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16255598592,
+        "commit_limit": 36193837056,
+        "commit_available": 9885470720,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377405440,
+          "peak_working_set": 404160512,
+          "private_bytes": 628543488,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 8.218
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16196235264,
+        "commit_limit": 36193837056,
+        "commit_available": 9821966336,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 376360960,
+          "peak_working_set": 404160512,
+          "private_bytes": 627494912,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 8.437
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16168366080,
+        "commit_limit": 36193837056,
+        "commit_available": 9784221696,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 383082496,
+          "peak_working_set": 404160512,
+          "private_bytes": 636256256,
+          "peak_pagefile": 642494464
+        }
+      ],
+      "elapsed_s": 8.64
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16165355520,
+        "commit_limit": 36193837056,
+        "commit_available": 9777254400,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 379064320,
+          "peak_working_set": 404160512,
+          "private_bytes": 643260416,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 8.859
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16170278912,
+        "commit_limit": 36193837056,
+        "commit_available": 9778421760,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377503744,
+          "peak_working_set": 404160512,
+          "private_bytes": 641843200,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 9.078
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16163491840,
+        "commit_limit": 36193837056,
+        "commit_available": 9781411840,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377413632,
+          "peak_working_set": 404160512,
+          "private_bytes": 641568768,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 9.312
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16167464960,
+        "commit_limit": 36193837056,
+        "commit_available": 9780424704,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377413632,
+          "peak_working_set": 404160512,
+          "private_bytes": 630280192,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 9.515
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16313077760,
+        "commit_limit": 36193837056,
+        "commit_available": 9962766336,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377413632,
+          "peak_working_set": 404160512,
+          "private_bytes": 630284288,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 9.734
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16198909952,
+        "commit_limit": 36193837056,
+        "commit_available": 9829199872,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 377417728,
+          "peak_working_set": 404160512,
+          "private_bytes": 630284288,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 9.953
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16181104640,
+        "commit_limit": 36193837056,
+        "commit_available": 9795850240,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 371290112,
+          "peak_working_set": 404160512,
+          "private_bytes": 624553984,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 10.171
+    },
+    {
+      "system": {
+        "load_percent": 52,
+        "physical_total": 34046353408,
+        "physical_available": 16174231552,
+        "commit_limit": 36193837056,
+        "commit_available": 9794822144,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 372506624,
+          "peak_working_set": 404160512,
+          "private_bytes": 624689152,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 10.375
+    },
+    {
+      "system": {
+        "load_percent": 51,
+        "physical_total": 34046353408,
+        "physical_available": 16427864064,
+        "commit_limit": 36193837056,
+        "commit_available": 10321481728,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074448384,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 15600,
+          "parent_pid": 21012,
+          "exe": "SecurityHealthSystray.exe",
+          "working_set": 13438976,
+          "peak_working_set": 14405632,
+          "private_bytes": 2220032,
+          "peak_pagefile": 2301952
+        },
+        {
+          "pid": 400,
+          "parent_pid": 21012,
+          "exe": "RtkAudUService64.exe",
+          "working_set": 21413888,
+          "peak_working_set": 29335552,
+          "private_bytes": 6086656,
+          "peak_pagefile": 16142336
+        },
+        {
+          "pid": 19368,
+          "parent_pid": 21012,
+          "exe": "MsiTrueColor.exe",
+          "working_set": 27086848,
+          "peak_working_set": 31354880,
+          "private_bytes": 7102464,
+          "peak_pagefile": 7913472
+        },
+        {
+          "pid": 19608,
+          "parent_pid": 17024,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6717440,
+          "peak_working_set": 6717440,
+          "private_bytes": 1323008,
+          "peak_pagefile": 1323008
+        },
+        {
+          "pid": 22844,
+          "parent_pid": 19608,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8224768,
+          "private_bytes": 1269760,
+          "peak_pagefile": 1269760
+        },
+        {
+          "pid": 21012,
+          "parent_pid": 19608,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 233590784,
+          "peak_working_set": 404160512,
+          "private_bytes": 459694080,
+          "peak_pagefile": 647589888
+        }
+      ],
+      "elapsed_s": 10.609
+    }
+  ],
+  "launcher_pid": 19608,
+  "timed_out": false,
+  "exit_code": 0,
+  "elapsed_s": 10.812,
+  "error_lines": [
+    "ERROR: Can't create shader cache folder, no shader caching will happen: user://",
+    "ERROR: Failed to read the root certificate store.",
+    "ERROR: Can't create shader cache folder, no shader caching will happen: user://",
+    "ERROR: Failed to read the root certificate store."
+  ],
+  "clean_error_log": false,
+  "crash_detected": false,
+  "operation_completed": true,
+  "peak_process_working_set_bytes": 404160512,
+  "peak_process_private_bytes": 643260416,
+  "minimum_available_physical_bytes": 16132804608
+}

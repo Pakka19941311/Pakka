@@ -1,0 +1,17 @@
+{
+  "renderer": "Godot 4.6.3 Compatibility, real viewport",
+  "normal_speed_walks": 5,
+  "original_motion_frames": 199,
+  "all_routes_arrived": true,
+  "maximum_planar_stop_drift_m": 0.0,
+  "overview_geometry": "Actual LOD1 meshes; initial route-run overviews used upright distant cards",
+  "final_art_accepted": false,
+  "open_visual_issues": [
+    "Canopy looks brown/noisy at high viewing angles; investigate materials and alpha/mips.",
+    "Near pine wood is excessively dark; inspect source vertex colours before changing materials.",
+    "Forest boundaries and exposed geology need more natural composition.",
+    "Full-world canopy coverage and all LOD transitions have not been accepted."
+  ],
+  "main_game_integrated": false,
+  "main_startup": "headless, exit 0; known certificate-store and display-settings JSON errors remain"
+}

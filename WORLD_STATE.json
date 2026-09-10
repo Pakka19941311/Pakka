@@ -10,7 +10,7 @@
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
-    "D": "partial: D03 native 170x170m forest sample, 920 trees preserved, 82.89% measured canopy, 1025 colliders, normal rendered walk and zero stop drift. Atlas-padding geometry fixed. Sideways camera branch occlusion, full-world vegetation/geology/understorey and LOD work remain.",
+    "D": "partial: persisted full forest masks in native D08 master (9338 trees, 77027 ferns, 5959 shrubs, 390 rocks, 259 deadwood). Five actual Godot walks passed with zero stop drift; 199 original motion frames. Final art remains unaccepted: noisy/brown high-angle crowns, dark trunks, hard forest edges, organic geology/shore/swamp/snow/ancient tree need work.",
     "E": "not started",
     "F": "not started",
     "G": "not started",
@@ -83,12 +83,27 @@
     "godot-pc/world-final/nature/",
     "godot-pc/world-final/nature_review.gd",
     "docs/world-final/NATURE_D_RU.md",
-    "docs/world-final/evidence/D03-forest/"
+    "docs/world-final/evidence/D03-forest/",
+    "godot-pc/world-final/nature_lod_review.gd",
+    "scripts/world_final/build_nature_families_blender.py",
+    "scripts/world_final/prepare_world_nature.py",
+    "art/world-final/Varendor_Nature_D-08A.blend",
+    "art/world-final/Varendor_Nature_D-08B.blend",
+    "art/world-final/Varendor_Nature_D-08.blend",
+    "godot-pc/world-final/world_nature_review.gd",
+    "scripts/world_final/save_world_nature_blender.py",
+    "scripts/world_final/refine_leaf_cards_blender.py",
+    "docs/world-final/diagnostics/BLENDER_D08A_RU.md",
+    "scripts/world_final/collect_world_nature_evidence.py",
+    "scripts/world_final/validate_world_nature.py",
+    "docs/world-final/FORESTS_D08_RU.md",
+    "docs/world-final/evidence/D08-world/",
+    "art/world-final/materials/snow_02/"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "D04: resolve local branch occlusion around the hero in nature visuals without modifying the shared camera/controller or making walls transparent. Then add understorey/deadwood/deciduous silhouettes and far LODs; extend nature and terrain materials across the authored biome masks. Keep 75-90% dense canopy. E/F/G/H are still pending; do not publish old-main Windows build as completed new world.",
+  "next_task": "Continue D visual quality: inspect source bark vertex colours and canopy alpha/mips against real Godot D08 frames; correct demonstrated causes in new native/material revision without thinning forests. Then E atmosphere/maps, F existing-game integration, G exact 1000 population, H final checks and Actions Release. No final-world Release yet.",
   "not_verified": [
-    "D03 sideways camera orbit can still hide hero behind branches; preserve this evidence and fix locally in nature rendering before final nature acceptance",
+    "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
     "World/interior weather, light, water, audio and three maps E",
     "Main-game portals, NPC/save migration and 1000-population server F-G",
@@ -99,7 +114,7 @@
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "fe376db76855a7f782f92506c8e1811425bbdc57",
+  "last_saved_commit": "8834d0587f5fa76866f54505661a86006dd248d7",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -135,22 +150,41 @@
     "forest_sample_tree_count": 920,
     "forest_sample_motor_walk": true,
     "forest_sample_frames": 161,
-    "forest_sample_stop_drift_m": 0.0
+    "forest_sample_stop_drift_m": 0.0,
+    "world_forest_placements": 92973,
+    "original_sample_placements_unchanged": 2560,
+    "world_forest_colliders": 9987,
+    "world_forest_normal_walks": 5,
+    "world_forest_motion_frames": 199,
+    "world_forest_max_stop_drift_m": 0.0,
+    "payload_clean_restore_314": true,
+    "main_after_D08": "headless exit 0; known nonfatal errors retained"
   },
   "publication": {
-    "content_checkpoint": "fe376db76855a7f782f92506c8e1811425bbdc57",
-    "native_and_glb_payload_files": 280,
-    "payload_parts": 100,
+    "content_checkpoint": "8834d0587f5fa76866f54505661a86006dd248d7",
+    "native_and_glb_payload_files": 314,
+    "payload_parts": 128,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D03 intermediate source/evidence checkpoint: resolve containing commit. Full nature/main-world integration and final Release remain pending."
+    "pending": "D04-D08 checkpoint content; resolve the commit containing this file. Full nature, main-game integration and Release remain pending."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
   "known_nonfatal_log_errors": [
     "Windows certificate store",
     "shader cache user directory",
-    "existing user display-settings JSON"
+    "existing user display-settings JSON",
+    "D04 static/orbit only: one RefCounted with zero references reported at exit; not diagnosed as a Godot crash"
   ],
-  "backup_current_from_workspace": "outputs/world-final-D03"
+  "backup_current_from_workspace": "outputs/world-final-D08",
+  "blender_D08A_incident": {
+    "report": "docs/world-final/diagnostics/BLENDER_D08A_RU.md",
+    "original_D03_preserved": true,
+    "failed_run_counted_success": false,
+    "isolated_repeat_exit": 0,
+    "isolated_repeat_seconds": 15.531,
+    "D08B_leaf_visual": "real Godot frames, geometry improved; full-world acceptance pending",
+    "D08_native_source": "art/world-final/Varendor_Nature_D-08.blend",
+    "D08_native_sha256": "3b34b2da06456989539dc5152d844385a1de668dc3ea175b7b00f6b2fe95f47c"
+  }
 }

@@ -8,6 +8,7 @@ uniform sampler2D trail_normal : hint_normal, filter_linear_mipmap_anisotropic, 
 uniform sampler2D rock_diff : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform sampler2D rock_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform vec4 sample_bounds = vec4(-730.0,-145.0,-560.0,25.0);
+uniform bool forest_only=false;
 varying vec3 world_position;
 varying vec4 terrain_color;
 void vertex(){world_position=(MODEL_MATRIX*vec4(VERTEX,1.0)).xyz;terrain_color=COLOR;}
@@ -16,6 +17,7 @@ void fragment(){
     vec2 edge=min(coords,vec2(1.0)-coords);
     float sample_weight=smoothstep(0.0,0.018,min(edge.x,edge.y));
     vec3 mask=texture(ground_mask,coords).rgb;
+    if(forest_only)sample_weight*=mask.g;
     vec2 uv=vec2(world_position.x,-world_position.z)/3.6;
     vec3 woodland=texture(forest_diff,uv).rgb*vec3(.64,.68,.59);
     vec3 mud=texture(trail_diff,uv*.9).rgb*vec3(.75,.72,.66);

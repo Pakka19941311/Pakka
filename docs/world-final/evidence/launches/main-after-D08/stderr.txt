@@ -1,0 +1,7 @@
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+ERROR: Parse JSON failed. Error at line 0: Unknown error getting token
+   at: parse_string (core/io/json.cpp:624)
+   GDScript backtrace (most recent call first):
+       [0] configure_startup (res://scripts/interface_polish.gd:33)
+       [1] _ready (res://scripts/main.gd:83)

@@ -1,0 +1,26 @@
+{
+  "bounds_xz": [
+    -800,
+    -700,
+    800,
+    700
+  ],
+  "mask": "ground-world-D08.png",
+  "forest_masks": [
+    "living_forest",
+    "rotten_forest",
+    "southern_treeline",
+    "snow_treeline",
+    "swamp_deadwood"
+  ],
+  "preserved_sample": "authored-D03.json",
+  "placements": "placements-D08.json",
+  "manual_edit_rule": "Edit stable placement entries; build refuses overwrite. Native point attributes preserve indices and transforms. Runtime never regenerates.",
+  "density_controls": {
+    "dense_minimum_trunk_distance_m": 3.8,
+    "ordinary_m": 5.1,
+    "edge_m": 7.4,
+    "dead_forest_m": 6.6
+  },
+  "canopy_actual_verification_pending": true
+}

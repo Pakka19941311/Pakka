@@ -1,6 +1,11 @@
 extends "res://world-final/geography_motion_review.gd"
 const NatureLayer = preload("res://world-final/nature/nature_layer.gd")
 var frame_times: Array[int]=[]
+var nature_visual: Node3D
+
+func _process(dt: float) -> void:
+	super._process(dt)
+	if loaded and is_instance_valid(nature_visual):nature_visual.update_focus(actor.global_position,camera.global_position,not overview)
 
 func record_frame() -> void:
 	frame_times.append(Time.get_ticks_msec())
@@ -10,7 +15,7 @@ func run_review() -> void:
 	if DisplayServer.get_name()=="headless":get_tree().quit(4);return
 	DirAccess.make_dir_recursive_absolute(output_dir)
 	status.text="VARENDOR · D01 · загрузка лесного участка"
-	var nature: Node3D = NatureLayer.new();add_child(nature)
+	var nature: Node3D = NatureLayer.new();nature.distant_trees="--distant-trees" in OS.get_cmdline_user_args();add_child(nature);nature_visual=nature
 	await nature.build()
 	var ground: ShaderMaterial = nature.ground_material()
 	for node: Node in find_children("*","MeshInstance3D",true,false):
@@ -18,7 +23,7 @@ func run_review() -> void:
 	var added: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/collision-"+str(nature.data.revision)+".json")).obstacles
 	obstacles.append_array(added);collision.setup(obstacles)
 	camera_collision.setup(obstacles.filter(func(o:Dictionary):return not str(o.source_mesh).contains("_access_ramp")))
-	var report: Dictionary={"stage":nature.data.revision,"scope":"170x170m forest sample","full_world":false,"headless":false,"counts":nature.data.counts,"colliders":added.size(),"normal_speed_m_s":6.2,"walks":[]}
+	var report: Dictionary={"stage":"D07-focus-and-LOD","distant_trees":nature.distant_trees,"geometry_revision":nature.data.revision,"scope":"170x170m forest sample","full_world":false,"headless":false,"counts":nature.data.counts,"colliders":added.size(),"normal_speed_m_s":6.2,"walks":[]}
 	if "--nature-static" in OS.get_cmdline_user_args():
 		overview=false;camera.fov=rad_to_deg(.82)
 		reset_actor(Vector2(-671.5762,33.5799));motor.input_mode="manual"
@@ -27,10 +32,19 @@ func run_review() -> void:
 			status.text="VARENDOR · "+str(nature.data.revision)+" · проверка контуров хвои"
 			for i: int in range(30):await get_tree().process_frame
 			await capture(view.id)
+		if "--focus-orbit" in OS.get_cmdline_user_args():
+			follow.yaw=.52;follow.reset_follow()
+			for i: int in range(540):
+				follow.yaw=.52+float(i)/539.0*1.45
+				await get_tree().physics_frame
+				if i%6==0:await record_frame()
+			report["orbit_frames"]=movie_frame;report["frame_times_ms"]=frame_times
+			report["orbit_description"]="Existing camera controller follows a gradual yaw orbit around the stationary hero; only front tree pixels within the projected body cone are dithered."
 		report["routes_checked_this_run"]=false;report["all_pass"]=null
+		report["focus_materials"]=nature.focus_materials.size()
 		var visual_file: FileAccess=FileAccess.open(output_dir.path_join("nature-appearance.json"),FileAccess.WRITE)
 		visual_file.store_string(JSON.stringify(report,"  "));visual_file.close()
-		get_tree().quit(0);return
+		get_tree().call_deferred("quit",0);return
 	status.text="VARENDOR · "+str(nature.data.revision)+" · лесной участок 170 × 170 м"
 	camera.position=Vector3(-645,240,110);camera.look_at(Vector3(-645,70,-60));camera.fov=55
 	for i: int in range(25):await get_tree().process_frame
@@ -70,4 +84,4 @@ func run_review() -> void:
 	var f: FileAccess=FileAccess.open(output_dir.path_join("nature-review.json"),FileAccess.WRITE)
 	f.store_string(JSON.stringify(report,"  "));f.close()
 	print("NATURE_REVIEW "+JSON.stringify(report))
-	get_tree().quit(0 if report.all_pass else 3)
+	get_tree().call_deferred("quit",0 if report.all_pass else 3)

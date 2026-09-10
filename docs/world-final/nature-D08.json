@@ -1,0 +1,63 @@
+{
+  "revision": "D08",
+  "scope": "Full authored forest masks and snow/swamp treelines; final geology/material/atmosphere work remains",
+  "counts": {
+    "tree": 9338,
+    "fern": 77027,
+    "shrub": 5959,
+    "rock": 390,
+    "deadwood": 259
+  },
+  "zones": [
+    {
+      "id": "living_forest",
+      "polygon_area_m2": 217575.0,
+      "new_trees": 3929,
+      "new_total": 46141
+    },
+    {
+      "id": "rotten_forest",
+      "polygon_area_m2": 82950.0,
+      "new_trees": 785,
+      "new_total": 3684
+    },
+    {
+      "id": "southern_treeline",
+      "polygon_area_m2": 139750.0,
+      "new_trees": 2792,
+      "new_total": 33281
+    },
+    {
+      "id": "snow_treeline",
+      "polygon_area_m2": 201625.0,
+      "new_trees": 430,
+      "new_total": 1099
+    },
+    {
+      "id": "swamp_deadwood",
+      "polygon_area_m2": 156087.5,
+      "new_trees": 482,
+      "new_total": 1446
+    }
+  ],
+  "full_world": false,
+  "bounds_xz": [
+    -800,
+    -700,
+    800,
+    700
+  ],
+  "seed": 202609108,
+  "sample_preserved_ids": 2560,
+  "layout_sha256": "470dec5939ee21155532c5b99ad2f6762f9ce23235004cb50c9baefa8daaa19c",
+  "families_source": "art/world-final/Varendor_Nature_D-08B.blend",
+  "actual_canopy_verified": false,
+  "native_source": "art/world-final/Varendor_Nature_D-08.blend",
+  "native_sha256": "3b34b2da06456989539dc5152d844385a1de668dc3ea175b7b00f6b2fe95f47c",
+  "native_editing": {
+    "point_cells": 2246,
+    "new_saved_points": 90413,
+    "retained_sample_placements": 2560,
+    "round_trip_verified": false
+  }
+}

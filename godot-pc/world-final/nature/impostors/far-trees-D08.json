@@ -1,0 +1,92 @@
+{
+  "assets": {
+    "alder_understorey_0": {
+      "center": [
+        0.0681279897689819,
+        2.26618385314941,
+        -0.0014345645904541
+      ],
+      "size_m": 5.04485126852989,
+      "source_glb": "assets/alder_understorey_0_D08_lod0.glb",
+      "source_native": "art/world-final/Varendor_Nature_D-08A.blend",
+      "source_native_sha256": "b0de7fd6f5be0f060520ef8e16583e5ed337466bad8739804a507695e638d138",
+      "source_sha256": "062b9ba7d95d413fffd51b256593f0f627cbbadfd3b09a6de6d8fb1033a6013f",
+      "texture": "res://world-final/nature/impostors/alder_understorey_0_D08.png",
+      "vectors": "res://world-final/nature/impostors/alder_understorey_0_D08_vectors.png"
+    },
+    "alder_understorey_1": {
+      "center": [
+        -0.0389162302017212,
+        3.21724724769592,
+        0.0134865045547485
+      ],
+      "size_m": 7.09345873653889,
+      "source_glb": "assets/alder_understorey_1_D08_lod0.glb",
+      "source_native": "art/world-final/Varendor_Nature_D-08A.blend",
+      "source_native_sha256": "b0de7fd6f5be0f060520ef8e16583e5ed337466bad8739804a507695e638d138",
+      "source_sha256": "f19d8e1190aa2442c9bb2b58ffac1174323e7e591ce0760d0520e16db269683e",
+      "texture": "res://world-final/nature/impostors/alder_understorey_1_D08.png",
+      "vectors": "res://world-final/nature/impostors/alder_understorey_1_D08_vectors.png"
+    },
+    "dead_pine_0": {
+      "center": [
+        0.548114418983459,
+        9.90777587890625,
+        0.277804255485535
+      ],
+      "size_m": 21.5744440573454,
+      "source_glb": "assets/dead_pine_0_D08_lod0.glb",
+      "source_native": "art/world-final/Varendor_Nature_D-08A.blend",
+      "source_native_sha256": "b0de7fd6f5be0f060520ef8e16583e5ed337466bad8739804a507695e638d138",
+      "source_sha256": "4a69f597c23040a63bf22e4382c4b6759cc13f907a57e0b596f4773a7898d886",
+      "texture": "res://world-final/nature/impostors/dead_pine_0_D08.png",
+      "vectors": "res://world-final/nature/impostors/dead_pine_0_D08_vectors.png"
+    },
+    "dead_pine_1": {
+      "center": [
+        0.186392784118652,
+        7.04517030715942,
+        -0.298872828483582
+      ],
+      "size_m": 15.4048405149579,
+      "source_glb": "assets/dead_pine_1_D08_lod0.glb",
+      "source_native": "art/world-final/Varendor_Nature_D-08A.blend",
+      "source_native_sha256": "b0de7fd6f5be0f060520ef8e16583e5ed337466bad8739804a507695e638d138",
+      "source_sha256": "88a13901ddcba511f3681c9e277ec3f6f7c391f66c2e5a02ddcf8fc5e9042af0",
+      "texture": "res://world-final/nature/impostors/dead_pine_1_D08.png",
+      "vectors": "res://world-final/nature/impostors/dead_pine_1_D08_vectors.png"
+    },
+    "dead_pine_2": {
+      "center": [
+        -0.0515766143798828,
+        8.51138877868652,
+        0.364011287689209
+      ],
+      "size_m": 18.5875206568837,
+      "source_glb": "assets/dead_pine_2_D08_lod0.glb",
+      "source_native": "art/world-final/Varendor_Nature_D-08A.blend",
+      "source_native_sha256": "b0de7fd6f5be0f060520ef8e16583e5ed337466bad8739804a507695e638d138",
+      "source_sha256": "42c3cfb4172f67e1f76a3c25008e8150aadaf96e61568c3a959d2c528a4d237d",
+      "texture": "res://world-final/nature/impostors/dead_pine_2_D08.png",
+      "vectors": "res://world-final/nature/impostors/dead_pine_2_D08_vectors.png"
+    }
+  },
+  "distant_only": true,
+  "encoding_note": "The half-value probe confirms a shader-output round trip, not a universal linear color space. Compatibility converts shader albedo through its own sRGB pipeline; sample baked data without another transfer transform.",
+  "lighting_baked": false,
+  "linear_half_probe_rgba": [
+    0.501960813999176,
+    0.501960813999176,
+    0.501960813999176,
+    1.0
+  ],
+  "normal_parity_source": "https://github.com/godotengine/godot/blob/4.6-stable/drivers/gles3/shaders/scene.glsl",
+  "renderer": "Godot actual source meshes, 8 azimuths",
+  "revision": "D08",
+  "rgb_encoding": "shader_native",
+  "tile_resolution": [
+    256,
+    256
+  ],
+  "views": 8
+}
