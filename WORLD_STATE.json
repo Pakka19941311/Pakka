@@ -114,7 +114,7 @@
     "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "FIRST finish GitHub Actions Windows intermediate world-walk Release and give direct ZIP link. THEN resume D14 ancient tree actual Godot approach/hollow/return inspection, refine unfinished nature; continue E-H.",
+  "next_task": "Intermediate Windows walkthrough is published: deliver the direct ZIP link and collect owner visual feedback under PROJECT_RULES.md. Technical continuation after this checkpoint remains D14 ancient tree actual Godot approach/hollow/return inspection, unfinished nature D, then E-H. Do not rebuild the verified walkthrough unless a concrete defect requires it.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
@@ -166,25 +166,25 @@
     "forest_sample_tree_count": 920,
     "forest_sample_motor_walk": true,
     "forest_sample_frames": 161,
-    "forest_sample_stop_drift_m": 0.0,
+    "forest_sample_stop_drift_m": 0,
     "world_forest_placements": 92973,
     "original_sample_placements_unchanged": 2560,
     "world_forest_colliders": 9987,
     "world_forest_normal_walks": 5,
     "world_forest_motion_frames": 199,
-    "world_forest_max_stop_drift_m": 0.0,
+    "world_forest_max_stop_drift_m": 0,
     "payload_clean_restore_314": true,
     "main_after_D08": "headless exit 0; known nonfatal errors retained",
     "forest_after_import_fixes_frames": 152,
     "forest_after_import_fixes_canopy": 0.829587331097905,
-    "forest_after_import_fixes_stop_drift_m": 0.0,
+    "forest_after_import_fixes_stop_drift_m": 0,
     "main_after_D10": "headless exit 0, known certificate/display JSON errors retained",
     "groundcover_native_points": 362189,
     "groundcover_native_edit_roundtrip": true,
     "groundcover_collision_routes": 15,
     "groundcover_normal_walks": 6,
     "groundcover_motion_frames": 228,
-    "groundcover_stop_drift_m": 0.0,
+    "groundcover_stop_drift_m": 0,
     "payload_clean_restore_504": true,
     "main_after_D11": "headless 900, exit 0; known certificate/display JSON errors retained",
     "payload_clean_restore_923": true
@@ -195,7 +195,7 @@
     "payload_parts": 246,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D13, preserved D14 candidate, interactive walking preview and curated evidence are published. First Actions run 34523422720 was cancelled after export because an unsupported --license call did not exit. Corrected license extraction passed locally; a new Actions build, Windows binary checks and Release remain pending. No final-world acceptance."
+    "pending": "Intermediate Windows walkthrough published and verified at world-walk-687f980175f4. Owner visual test and unfinished D14/D-E-H work remain; no final-world acceptance."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -252,7 +252,7 @@
     "native_point_roundtrip_verified": true,
     "rendered_walks": 6,
     "recorded_frames": 228,
-    "stop_drift_m": 0.0,
+    "stop_drift_m": 0,
     "report": "docs/world-final/GROUNDCOVER_D11_RU.md",
     "failed_launches_preserved": true
   },
@@ -269,7 +269,7 @@
     "native_source": "art/world-final/Varendor_Nature_D-13.blend",
     "native_sha256": "e7a6bfde9e27fed27286269e4edc513d8d6e69a294cf87a1b8f62c148ae1f03f",
     "rendered_walks": 3,
-    "rendered_frames": 128.0,
+    "rendered_frames": 128,
     "stop_drift_m": 0,
     "evidence": "docs/world-final/evidence/D13-geology"
   },
@@ -343,11 +343,11 @@
   "intermediate_walk": {
     "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
     "scene": "godot-pc/world-final/preview_menu.tscn",
-    "ci_commit": "8ef78c79e36bc58de2a9f436216c4d40fba9f8db",
-    "workflow_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34523422720",
-    "ci_attempt_status": "cancelled; see docs/world-final/diagnostics/WALK_BUILD_RU.md. Export pack completed, but the original workflow did not complete and no EXE was accepted or published.",
-    "license_step_correction": "Explicit Engine license API script with quit; local headless exit 0 in 0.422s. Separate bounded CI steps; pending new build.",
-    "release": "pending",
+    "ci_commit": "687f980175f4245c0a18fcea8c2c8828e471ce76",
+    "workflow_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34527455754",
+    "ci_attempt_status": "success: corrected export and Windows check-and-publish jobs completed 2026-09-10T20:56:23Z; verified from Actions jobs and Windows logs during chat recovery.",
+    "license_step_correction": "Explicit Engine license API script with quit; passed corrected Actions export job.",
+    "release": "https://github.com/Pakka19941311/Pakka/releases/tag/world-walk-687f980175f4",
     "local_graphics_checks": {
       "surface": {
         "checks": {
@@ -367,7 +367,7 @@
         "ok": true,
         "personal_saves_opened": false,
         "space": "surface",
-        "stop_drift_m": 0.0
+        "stop_drift_m": 0
       },
       "mine": {
         "checks": {
@@ -385,7 +385,7 @@
         "ok": true,
         "personal_saves_opened": false,
         "space": "mine",
-        "stop_drift_m": 0.0
+        "stop_drift_m": 0
       },
       "great_cave": {
         "checks": {
@@ -403,14 +403,87 @@
         "ok": true,
         "personal_saves_opened": false,
         "space": "great_cave",
-        "stop_drift_m": 0.0
+        "stop_drift_m": 0
       }
     },
-    "ci_windows_binary_checks": "pending",
+    "ci_windows_binary_checks": "passed: exact exported Windows executable, surface/mine/great_cave, movement/stop/pause/load; headless, not Windows GPU visual acceptance.",
     "limits": [
       "D13 art unfinished",
       "No population, combat, NPC, inventory or map in exploration mode",
       "Existing main game retained with its working systems; scene selection changes only in disposable CI checkout"
-    ]
+    ],
+    "download": "https://github.com/Pakka19941311/Pakka/releases/download/world-walk-687f980175f4/Varendor_World_Walk_687f980175f4.zip",
+    "zip_bytes": 1062196733,
+    "sha256": "a44e9bfaea5213bc1cfe1dfc1a3bb32d0f31661369a4ed342ece03d7c9ee263b",
+    "direct_download_verified": true,
+    "direct_download_verification_source": "Successful Actions job 103043351424: public ZIP downloaded and SHA-256 compared with packaged archive; recovery checked the job result, source script and uploaded Release digest. No redundant rebuild or download.",
+    "windows_binary_reports": [
+      {
+        "checks": {
+          "actor": true,
+          "chunks": true,
+          "forest_count": true,
+          "grass_count": true,
+          "height_bytes": true,
+          "movement": true,
+          "pause_resume": true,
+          "space_loaded": true,
+          "stop": true
+        },
+        "distance_m": 10.262186050415,
+        "full_world_acceptance": false,
+        "headless": true,
+        "ok": true,
+        "personal_saves_opened": false,
+        "space": "surface",
+        "stop_drift_m": 0
+      },
+      {
+        "checks": {
+          "actor": true,
+          "cached_navigation": true,
+          "height_bytes": true,
+          "movement": true,
+          "pause_resume": true,
+          "space_loaded": true,
+          "stop": true
+        },
+        "distance_m": 10.2626276016235,
+        "full_world_acceptance": false,
+        "headless": true,
+        "ok": true,
+        "personal_saves_opened": false,
+        "space": "mine",
+        "stop_drift_m": 0
+      },
+      {
+        "checks": {
+          "actor": true,
+          "cached_navigation": true,
+          "height_bytes": true,
+          "movement": true,
+          "pause_resume": true,
+          "space_loaded": true,
+          "stop": true
+        },
+        "distance_m": 10.2626276016235,
+        "full_world_acceptance": false,
+        "headless": true,
+        "ok": true,
+        "personal_saves_opened": false,
+        "space": "great_cave",
+        "stop_drift_m": 0
+      }
+    ],
+    "owner_visual_acceptance": "pending; deliver intermediate walkthrough for owner test according to PROJECT_RULES.md.",
+    "delivery_evidence": "docs/world-final/evidence/walk-preview/published-687f980.json"
+  },
+  "recovery_verification": {
+    "source_commit": "687f980175f4245c0a18fcea8c2c8828e471ce76",
+    "method": "Repository WORLD_STATE, latest commit, Actions jobs, raw Windows job log, and Release metadata; the exact end of the named chat was not available through conversation search.",
+    "completed": "Recovered the already-successful pending Windows delivery and reconciled stale release status. No game code or assets changed, no old test suite rerun.",
+    "code_commit": "687f980175f4245c0a18fcea8c2c8828e471ce76",
+    "documentation_commit": "Resolve the commit containing this record.",
+    "pending_stage": "D14 and final world D-H; existing authoring assets and limitations retained."
   }
 }

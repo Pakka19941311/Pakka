@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "kind": "intermediate-world-walk-published",
+  "build_commit": "687f980175f4245c0a18fcea8c2c8828e471ce76",
+  "workflow_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34527455754",
+  "windows_job": "https://github.com/Pakka19941311/Pakka/actions/runs/34527455754/job/103043351424",
+  "ci_conclusion": "success",
+  "windows_reports": [
+    {
+      "checks": {
+        "actor": true,
+        "chunks": true,
+        "forest_count": true,
+        "grass_count": true,
+        "height_bytes": true,
+        "movement": true,
+        "pause_resume": true,
+        "space_loaded": true,
+        "stop": true
+      },
+      "distance_m": 10.262186050415,
+      "full_world_acceptance": false,
+      "headless": true,
+      "ok": true,
+      "personal_saves_opened": false,
+      "space": "surface",
+      "stop_drift_m": 0
+    },
+    {
+      "checks": {
+        "actor": true,
+        "cached_navigation": true,
+        "height_bytes": true,
+        "movement": true,
+        "pause_resume": true,
+        "space_loaded": true,
+        "stop": true
+      },
+      "distance_m": 10.2626276016235,
+      "full_world_acceptance": false,
+      "headless": true,
+      "ok": true,
+      "personal_saves_opened": false,
+      "space": "mine",
+      "stop_drift_m": 0
+    },
+    {
+      "checks": {
+        "actor": true,
+        "cached_navigation": true,
+        "height_bytes": true,
+        "movement": true,
+        "pause_resume": true,
+        "space_loaded": true,
+        "stop": true
+      },
+      "distance_m": 10.2626276016235,
+      "full_world_acceptance": false,
+      "headless": true,
+      "ok": true,
+      "personal_saves_opened": false,
+      "space": "great_cave",
+      "stop_drift_m": 0
+    }
+  ],
+  "release": "https://github.com/Pakka19941311/Pakka/releases/tag/world-walk-687f980175f4",
+  "download": "https://github.com/Pakka19941311/Pakka/releases/download/world-walk-687f980175f4/Varendor_World_Walk_687f980175f4.zip",
+  "zip_bytes": 1062196733,
+  "sha256": "a44e9bfaea5213bc1cfe1dfc1a3bb32d0f31661369a4ed342ece03d7c9ee263b",
+  "direct_download_verified_in_ci": true,
+  "zip_integrity_verified_in_ci": true,
+  "recovery_verification": "Read existing workflow and packaging script, successful jobs, exact JSON results in Windows job logs, and current Release metadata. No claim of a new local execution or GPU test.",
+  "windows_gpu_acceptance": false,
+  "final_world_acceptance": false,
+  "owner_test_pending": true
+}

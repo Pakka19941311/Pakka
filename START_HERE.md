@@ -1,3 +1,15 @@
+# Текущая выдача: прогулка по новому миру D13
+
+[Скачать Windows ZIP — 1,06 ГБ](https://github.com/Pakka19941311/Pakka/releases/download/world-walk-687f980175f4/Varendor_World_Walk_687f980175f4.zip) → распаковать → `RUN_VARENDOR.bat`.
+
+Актуальная ветка — `work/character-art-v3`. Проверенная сборка: `687f980175f4245c0a18fcea8c2c8828e471ce76`; [успешный Actions](https://github.com/Pakka19941311/Pakka/actions/runs/34527455754). Поверхность, шахта и пещера прошли проверки поставляемого EXE на Windows без графического окна; публичный ZIP скачан и сверен по SHA-256 в CI. Это промежуточный режим прогулки, визуальная приёмка владельцем ожидается; весь мир завершённым не объявлен.
+
+Для продолжения нового мира сначала читать [WORLD_STATE.json](WORLD_STATE.json), [итог выдачи](docs/world-final/INTERMEDIATE_WALK_RU.md), [ТЗ финального мира](docs/world-final/spec/VARENDOR_WORLD_FINAL_TZ.md) и [PROJECT_RULES.md](PROJECT_RULES.md). Следующая разработка: D14 — проверить древнее дерево в Godot (подход, дупло, возврат), затем незавершённые D–H. План населения: 997 обычных монстров и 3 босса, всего 1000. Исторический корневой STATE.json и записи ниже не являются текущей очередью нового мира.
+
+---
+
+# История прежних выдач
+
 ## 2026-09-08 — текущая выдача: населённая территория и карта
 
 [Скачать Windows ZIP `c0f4d7809af9`](https://github.com/Pakka19941311/Pakka/releases/download/godot-pc-preview-c0f4d7809af9/Varendor_Godot_PC_c0f4d7809af9.zip) — 334,3 МБ. Распаковать в отдельную папку и запустить `RUN_VARENDOR.bat`. Карта: **M**, колесо — масштаб, перетаскивание — обзор, M/Esc — закрыть.
