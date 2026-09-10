@@ -4,13 +4,9 @@ func run_review() -> void:
 	var numerical_only: bool = "--tree-numerical-only" in OS.get_cmdline_user_args()
 	if DisplayServer.get_name()=="headless" and not numerical_only:get_tree().quit(4);return
 	DirAccess.make_dir_recursive_absolute(output_dir)
-	var old: Node=find_child("ANCIENT_TREE",true,false)
-	assert(old!=null,"Expected existing ancient tree landmark")
-	old.get_parent().remove_child(old);old.queue_free()
-	obstacles=obstacles.filter(func(o: Dictionary):return o.landmark!="ANCIENT_TREE")
-	var tree: Node3D=load("res://world-final/nature/assets/ancient_tree_D14.glb").instantiate();add_child(tree)
-	var extra: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/ancient-tree-collision-D14.json")).obstacles
-	obstacles.append_array(extra)
+	obstacles=load("res://world-final/landmark_overrides.gd").install_ancient_tree(self,obstacles)
+	var tree: Node3D=find_child("ANCIENT_TREE",true,false)
+	var extra: Array=tree.collision_obstacles()
 	var details: Node3D=load("res://world-final/nature/groundcover_layer.gd").new()
 	details.authored_revision="D13";details.geology_material_revision="D13";details.grass_shader="res://world-final/nature/grass_lit_D13.gdshader";add_child(details);await details.build()
 	obstacles.append_array(JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/groundcover-collision-D13.json")).obstacles)

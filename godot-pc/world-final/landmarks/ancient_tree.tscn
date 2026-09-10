@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://world-final/landmarks/ancient_tree.gd" id="1"]
+[ext_resource type="PackedScene" path="res://world-final/nature/assets/ancient_tree_D14.glb" id="2"]
+
+[node name="ANCIENT_TREE" type="Node3D"]
+position = Vector3(-170, 122, -450)
+script = ExtResource("1")
+metadata/stable_id = "ANCIENT_TREE"
+metadata/source_revision = "D14"
+metadata/source_master = "art/world-final/Varendor_Ancient_Tree_D-14.blend"
+
+[node name="AuthoredModel" parent="." instance=ExtResource("2")]
+position = Vector3(170, -122, 450)

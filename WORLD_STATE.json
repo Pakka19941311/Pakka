@@ -341,7 +341,9 @@
     "backup": "outputs/world-preview-recovery; native and GLB verified",
     "resume_runtime": "Separate clean Linux checkout from 5fd680c; Godot 4.6.3 exact hash verified. Local graphics unavailable (X server listening sockets restricted); actual graphics to run on the existing GitHub Actions infrastructure. No graphical test claimed yet.",
     "numerical_collision_review": "docs/world-final/evidence/D14-tree/collision-review.json",
-    "route_source": "godot-pc/world-final/ancient-tree-routes.json"
+    "route_source": "godot-pc/world-final/ancient-tree-routes.json",
+    "editable_scene": "godot-pc/world-final/landmarks/ancient_tree.tscn",
+    "editable_scene_evidence": "docs/world-final/evidence/D14-tree/editable-scene-review.json"
   },
   "intermediate_walk": {
     "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
