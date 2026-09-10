@@ -1,6 +1,7 @@
 extends "res://world-final/nature_review.gd"
 @export var nature_revision: String="D08"
 @export var geology_material_revision: String=""
+@export var surface_style: String=""
 ## Full authored forest distribution in the existing geography scene.
 func run_review() -> void:
 	if DisplayServer.get_name()=="headless":get_tree().quit(4);return
@@ -22,7 +23,7 @@ func run_review() -> void:
 		for material: ShaderMaterial in nature.focus_materials:material.shader=shader
 	var ground: ShaderMaterial=nature.world_ground_material()
 	if "--surface-D10" in OS.get_cmdline_user_args():ground=load("res://world-final/materials/surface_materials.gd").terrain()
-	if not geology_material_revision.is_empty():ground=load("res://world-final/materials/geology_material_D12.gd").terrain(geology_material_revision)
+	if not geology_material_revision.is_empty():ground=load("res://world-final/materials/geology_material_D12.gd").terrain(geology_material_revision,surface_style)
 	for node: Node in find_children("*","MeshInstance3D",true,false):
 		if str(node.name).begins_with("cell_"):node.material_override=ground
 	var added: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/collision-"+nature_revision+".json")).obstacles

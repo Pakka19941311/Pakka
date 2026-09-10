@@ -36,7 +36,7 @@ func run_review() -> void:
 		await capture(view.id)
 	if "--tree-static-only" in OS.get_cmdline_user_args():get_tree().call_deferred("quit",0);return
 	nature.set_overview_geometry(false);overview=false;camera.fov=rad_to_deg(.82)
-	var points: Array=[[-194.0,-425.0],[-181.0,-433.0],[-170.0,-440.0],[-170.0,-449.0]]
+	var points: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/ancient-tree-routes.json")).approach_xz
 	var walks: Array=[]
 	for reverse: bool in [false,true]:
 		var route: Array=points.duplicate()

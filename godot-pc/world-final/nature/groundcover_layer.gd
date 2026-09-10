@@ -3,6 +3,7 @@ extends Node3D
 const ROOT: String="res://world-final/nature/"
 @export var authored_revision: String="D11"
 @export var geology_material_revision: String=""
+@export var surface_style: String=""
 @export var grass_shader: String=ROOT+"grass_mesh.gdshader"
 var data: Dictionary
 var batch_count: int=0
@@ -51,7 +52,7 @@ func build() -> void:
 		built+=1
 		if built%32==0:await get_tree().process_frame
 	var surface: ShaderMaterial=load("res://world-final/materials/surface_materials.gd").terrain()
-	if not geology_material_revision.is_empty():surface=load("res://world-final/materials/geology_material_D12.gd").terrain(geology_material_revision)
+	if not geology_material_revision.is_empty():surface=load("res://world-final/materials/geology_material_D12.gd").terrain(geology_material_revision,surface_style)
 	for cliff: Dictionary in data.cliff_meshes:
 		var node: Node3D=load(ROOT+cliff.path).instantiate();add_child(node)
 		if node is MeshInstance3D:node.material_override=surface

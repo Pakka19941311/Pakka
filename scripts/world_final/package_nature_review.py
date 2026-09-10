@@ -9,11 +9,13 @@ import zipfile
 root = Path(__file__).resolve().parents[2]
 output = root / 'qa-artifacts/world-final'
 source = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
-files = sorted(path for directory in ['d14-import', 'd14-launch', 'd14-images']
+files = sorted(path for directory in ['d14-import', 'd14-launch', 'd14-images', 'd15-launch', 'd15-images', 'd14-native']
                for path in (output / directory).rglob('*') if path.is_file())
 record = {
     'source_commit': source,
     'workflow_outcome': os.environ.get('REVIEW_OUTCOME', 'unknown'),
+    'surface_outcome': os.environ.get('SURFACE_OUTCOME', 'not-run'),
+    'native_outcome': os.environ.get('NATIVE_OUTCOME', 'not-run'),
     'renderer_profile': 'Godot 4.6.3, GL compatibility, Linux Xvfb, Mesa software rendering',
     'owner_windows_gpu_test': False,
     'final_art_acceptance': False,

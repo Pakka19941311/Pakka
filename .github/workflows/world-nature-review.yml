@@ -43,11 +43,24 @@ jobs:
         continue-on-error: true
         run: |
           xvfb-run -a -s '-screen 0 1600x900x24' python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/world-final/d14-launch --timeout 480 -- res://world-final/ancient_tree_D14_review.tscn -- --world-B-output="$PWD/qa-artifacts/world-final/d14-images"
+      - name: Review D15 mountain and ground material candidate
+        id: surface
+        continue-on-error: true
+        run: |
+          xvfb-run -a -s '-screen 0 1600x900x24' python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/world-final/d15-launch --timeout 600 -- res://world-final/surface_D15_review.tscn -- --world-B-output="$PWD/qa-artifacts/world-final/d15-images" --geology-routes --pine-palette-D10 --foliage-aa
+      - name: Verify preserved editable native tree
+        id: native
+        continue-on-error: true
+        run: |
+          python scripts/godot-pc-toolchain.py --blender-only
+          "$RUNNER_TEMP/varendor-pc-tools/blender-4.5.9-linux-x64/blender" -b --factory-startup --python-exit-code 1 --python scripts/world_final/verify_ancient_tree_native_blender.py
       - name: Preserve real render evidence, including failed attempts
         if: always() && steps.import.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           REVIEW_OUTCOME: ${{ steps.motion.outcome }}
+          SURFACE_OUTCOME: ${{ steps.surface.outcome }}
+          NATIVE_OUTCOME: ${{ steps.native.outcome }}
         run: |
           python scripts/world_final/package_nature_review.py
           gh release create "world-nature-${GITHUB_SHA:0:12}" qa-artifacts/world-final/nature-review.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --latest=false --title "VARENDOR D14 — native review evidence" --notes-file qa-artifacts/world-final/nature-review-notes.md
@@ -58,4 +71,7 @@ jobs:
           path: qa-artifacts/world-final/
       - name: Require successful motion checks
         if: always()
-        run: test '${{ steps.motion.outcome }}' = success
+        run: |
+          test '${{ steps.motion.outcome }}' = success
+          test '${{ steps.surface.outcome }}' = success
+          test '${{ steps.native.outcome }}' = success

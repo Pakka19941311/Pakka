@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "revision": "D15-candidate",
+  "scope": "Materials only; terrain, roads, forest and grass point IDs are unchanged.",
+  "uniforms": {
+    "snow_slope_start": 0.07,
+    "snow_slope_end": 0.36,
+    "snow_breakup": 0.13,
+    "stone_fine_scale": 3.7,
+    "stone_macro_scale": 23.0,
+    "field_tint_low": [0.48, 0.53, 0.45],
+    "field_tint_high": [0.64, 0.65, 0.55],
+    "stone_tint": [0.76, 0.82, 0.88],
+    "snow_tint": [0.76, 0.83, 0.90]
+  },
+  "rationale": "Snow collects on shelves and fades between roughly 22 and 50 degrees; steep mountain faces expose cool rock. Shared terrain/cliff material avoids bright detached cliff islands; desaturated ground reduces the yellow blanket near snow paths.",
+  "visual_verified": false,
+  "native_blender_parity_verified": false
+}

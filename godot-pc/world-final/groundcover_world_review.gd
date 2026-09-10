@@ -5,6 +5,7 @@ var details: Node3D
 
 func run_review() -> void:
 	details=load("res://world-final/nature/groundcover_layer.gd").new()
+	details.surface_style=surface_style
 	details.authored_revision=groundcover_revision;details.geology_material_revision=geology_material_revision;details.grass_shader=grass_shader_path;add_child(details)
 	await details.build()
 	var cliff_obstacles: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/groundcover-collision-"+groundcover_revision+".json")).obstacles

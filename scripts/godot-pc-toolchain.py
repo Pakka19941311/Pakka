@@ -14,6 +14,7 @@ destination = Path(os.environ.get('RUNNER_TEMP', '/tmp'))/'varendor-pc-tools'
 destination.mkdir(parents=True, exist_ok=True)
 paths = {}
 for kind, extension in [('godot', 'zip'), ('export_templates', 'tpz'), ('blender', 'tar.xz')]:
+    if '--blender-only' in sys.argv and kind != 'blender': continue
     if '--runtime-only' in sys.argv and kind != 'godot': continue
     if '--no-blender' in sys.argv and kind == 'blender': continue
     pin = pins[kind]
@@ -48,4 +49,3 @@ for key, value in paths.items(): print(key+'='+value)
 if os.environ.get('GITHUB_ENV'):
     with open(os.environ['GITHUB_ENV'], 'a') as file:
         for key, value in paths.items(): file.write(key+'='+value+'\n')
-

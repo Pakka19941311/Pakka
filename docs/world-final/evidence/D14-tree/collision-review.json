@@ -1,0 +1,127 @@
+{
+  "kind": "D14-targeted-numerical-collision",
+  "before": {
+    "all_pass": false,
+    "headless": true,
+    "visual_verified": false,
+    "walks": [
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -169.989044189453,
+          448.882751464844
+        ],
+        "reverse": false,
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": false,
+        "nearby_obstacles": [
+          "D08_tree_004453",
+          "D14_trunk_wall_9",
+          "D14_trunk_wall_10",
+          "D14_Buttress_Root_6_support_6",
+          "D14_Buttress_Root_7_support_6",
+          "D14_Buttress_Root_7_support_9",
+          "D14_Buttress_Root_7_support_12",
+          "D14_Buttress_Root_8_support_6",
+          "D08_tree_003986",
+          "D14_Root_Tendril_8_support_6",
+          "D08_tree_004012",
+          "D14_trunk_wall_14",
+          "D14_trunk_wall_15",
+          "D14_Buttress_Root_8_support_9",
+          "D14_Buttress_Root_8_support_12",
+          "D14_Buttress_Root_8_support_15",
+          "D14_Root_Tendril_8_support_0",
+          "D14_Root_Tendril_8_support_2",
+          "D14_Root_Tendril_8_support_4",
+          "D14_Buttress_Root_9_support_6",
+          "D14_Buttress_Root_9_support_9",
+          "D14_Buttress_Root_9_support_12",
+          "D14_Buttress_Root_9_support_15",
+          "D14_Root_Tendril_9_support_0",
+          "D14_Root_Tendril_9_support_2",
+          "D08_tree_004243"
+        ],
+        "position_server": [
+          -169.999572753906,
+          442.054962158203
+        ],
+        "reverse": true,
+        "stop_drift_m": 0.0
+      }
+    ]
+  },
+  "after": {
+    "all_pass": true,
+    "collision_controls": {
+      "existing_tree_still_solid": true,
+      "hollow_floor_accessible": true,
+      "hollow_wall_still_solid": true
+    },
+    "headless": true,
+    "visual_verified": false,
+    "walks": [
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -170.03630065918,
+          448.912994384766
+        ],
+        "reverse": false,
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -193.897796630859,
+          425.062744140625
+        ],
+        "reverse": true,
+        "stop_drift_m": 0.0
+      }
+    ]
+  },
+  "full_scene": {
+    "all_walks_pass": true,
+    "final_art_accepted": false,
+    "forest_removed": 0,
+    "frames": 0,
+    "headless": true,
+    "main_integrated": false,
+    "native_source": "art/world-final/Varendor_Ancient_Tree_D-14.blend",
+    "numerical_only": true,
+    "revision": "D14",
+    "tree_colliders": 123,
+    "walks": [
+      {
+        "arrived": true,
+        "first_frame": 0,
+        "last_frame": -1,
+        "last_position_server": [
+          -170.03630065918,
+          448.912994384766
+        ],
+        "reverse": false,
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "first_frame": 0,
+        "last_frame": -1,
+        "last_position_server": [
+          -193.897796630859,
+          425.062744140625
+        ],
+        "reverse": true,
+        "stop_drift_m": 0.0
+      }
+    ]
+  },
+  "change": "Authored approach waypoints pass west of preserved D08_tree_003986. No collider, tree, control or physical parameter removed or changed.",
+  "graphical_review": "pending"
+}

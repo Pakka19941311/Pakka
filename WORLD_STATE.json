@@ -335,11 +335,13 @@
     "native_launch": "native-ancient-tree-D14 exit0 in2.078s",
     "import": "import-ancient-D14 exit0 in10.297s",
     "rendered_review": false,
-    "collision_review": false,
+    "collision_review": "Targeted motor checks and complete headless scene pass in both directions; graphical review pending.",
     "main_integrated": false,
     "note": "Preview removes only the old ANCIENT_TREE landmark and its colliders; retains D13 nature. Planned approach/hollow/return route is not yet run.",
     "backup": "outputs/world-preview-recovery; native and GLB verified",
-    "resume_runtime": "Separate clean Linux checkout from 5fd680c; Godot 4.6.3 exact hash verified. Local graphics unavailable (X server listening sockets restricted); actual graphics to run on the existing GitHub Actions infrastructure. No graphical test claimed yet."
+    "resume_runtime": "Separate clean Linux checkout from 5fd680c; Godot 4.6.3 exact hash verified. Local graphics unavailable (X server listening sockets restricted); actual graphics to run on the existing GitHub Actions infrastructure. No graphical test claimed yet.",
+    "numerical_collision_review": "docs/world-final/evidence/D14-tree/collision-review.json",
+    "route_source": "godot-pc/world-final/ancient-tree-routes.json"
   },
   "intermediate_walk": {
     "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
@@ -487,5 +489,14 @@
     "documentation_commit": "Resolve the commit containing this record.",
     "pending_stage": "D14 graphical/collision review, remaining D, then E-H without repeated approvals of fixed requirements."
   },
-  "execution_authority": "FINAL 1.0 sections 1 and 17 plus latest owner request supersede historical stop-after-preview instructions. Intermediate walkthrough feedback does not block already-authorized environment development."
+  "execution_authority": "FINAL 1.0 sections 1 and 17 plus latest owner request supersede historical stop-after-preview instructions. Intermediate walkthrough feedback does not block already-authorized environment development.",
+  "D15": {
+    "status": "material_candidate_not_promoted",
+    "profile": "godot-pc/world-final/materials/surface-profile-D15.json",
+    "shader": "godot-pc/world-final/materials/terrain_D15.gdshader",
+    "review_scene": "godot-pc/world-final/surface_D15_review.tscn",
+    "change": "Earlier snow fade on steep faces, cooler exposed stone, less yellow soil; shared terrain/cliff profile. No terrain or placement changes.",
+    "import": "Godot 4.6.3 Linux headless editor import passed, exit 0, no script/parse errors. Graphical shader and visual acceptance pending.",
+    "native_parity": false
+  }
 }
