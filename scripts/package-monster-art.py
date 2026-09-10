@@ -5,6 +5,11 @@ root=Path(__file__).resolve().parents[1];out=Path(sys.argv[1]).resolve();out.mkd
 lock=json.loads((art/'source-lock.json').read_text(encoding='utf8'))
 files=[art/'source-lock.json',art/'README_RU.md',art/'sources'/lock['archive']['file']]
 for name in [m['name'] for m in lock['models']]:
+ report=json.loads((art/'runtime'/(name+'.json')).read_text(encoding='utf8'))
+ for kind,ext in [('editable','.blend'),('runtime','.glb')]:
+  p=art/kind/(name+ext)
+  with p.open('rb') as f:assert hashlib.file_digest(f,'sha256').hexdigest()==report[kind]['sha256'],str(p)
+  assert p.stat().st_size==report[kind]['bytes'],str(p)
  files.extend([art/'editable'/(name+'.blend'),art/'runtime'/(name+'.glb'),art/'runtime'/(name+'.json')])
 files.extend(p for p in (art/'editable/textures').rglob('*.png'))
 files.extend([art/'forest/ForestLord.blend',art/'forest/ForestLord.glb',art/'forest/build.json',art/'forest/source-lock.json',art/'forest/README_RU.md'])

@@ -55,7 +55,7 @@ static func run(app: Node) -> void:
 		checks.bag_to_quickbar = app.quick[0].action == "book_knight_10" and app.quick[5].action == "book_knight_60"
 		app.activate("book_knight_20")
 		checks.buff_20 = await until(app,func(): return app.net.hero.get("bookCooldowns",{}).has("book_knight_20"))
-		await app.get_tree().create_timer(.4).timeout
+		checks.ready_for_buff_30 = await until(app,func(): return not app.net.command_busy and float(app.net.hero.get("bookCastReadyAt",0))+50 <= float(app.world.current_snapshot.time))
 		app.activate("book_knight_30")
 		checks.buff_30 = await until(app,func(): return app.net.hero.get("bookCooldowns",{}).has("book_knight_30"))
 		app.activate("haste")
@@ -65,11 +65,11 @@ static func run(app: Node) -> void:
 		app.inventory_panel.hide()
 		var marker: FileAccess = FileAccess.open(app.qa_path.get_base_dir().path_join("phase.json"),FileAccess.WRITE)
 		marker.store_string('{"stage":"combat"}');marker.close()
-		checks.combat_fixture = await until(app,func(): return absf(float(app.net.hero.x)+75)<2)
+		checks.combat_fixture = await until(app,func(): return absf(float(app.net.hero.x)+75)<2 and absf(float(app.net.hero.z)-5)<2,15000)
 		var target: String = str(app.world.current_snapshot.monsters[0].uid)
 		app.world.target_id = target
 		app.activate("attack")
-		await app.get_tree().create_timer(1).timeout
+		checks.ready_for_direct_book = await until(app,func(): return not app.net.command_busy and float(app.net.hero.get("bookCastReadyAt",0))+50 <= float(app.world.current_snapshot.time))
 		app.activate("book_knight_10")
 		checks.direct_book = await until(app,func(): return app.net.hero.get("bookCooldowns",{}).has("book_knight_10"))
 		checks.integer_cooldown = await until(app,func():

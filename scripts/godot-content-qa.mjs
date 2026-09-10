@@ -30,7 +30,11 @@ try{
  let moved=false;
  watcher=setInterval(()=>{
   if(!moved&&existsSync(phase)&&JSON.parse(readFileSync(phase,'utf8')).stage==='combat'){
-   moved=true;Object.assign(hero,{x:-75,z:5,direction:{x:0,z:0},destination:null,target:null,autoAttack:false,generation:hero.generation+1});world.motors.delete(hero.id);world.checkpoint();
+   // A rejected transaction restores a cloned state. Never keep mutating a
+   // pre-command object reference when moving the disposable test character.
+   const current=world.state.characters[hero.id];assert.ok(current);
+   moved=true;Object.assign(current,{x:-75,z:5,direction:{x:0,z:0},destination:null,target:null,autoAttack:false,generation:current.generation+1});world.motors.delete(current.id);world.checkpoint();
+   writeFileSync(join(output,'combat-fixture.json'),JSON.stringify({hero:{id:current.id,x:current.x,z:current.z},target:world.state.monsters.find(m=>m.uid===target.uid),time:world.state.time},null,2));
   }
  },50);
  const env={...process.env,APPDATA:join(temporary,'appdata'),LOCALAPPDATA:join(temporary,'localappdata'),XDG_DATA_HOME:join(temporary,'godot-data')};
@@ -39,8 +43,10 @@ try{
  child=spawn(binary,[...(project?['--path',resolve(project)]:[]),'--verbose','--audio-driver','Dummy',...(graphical?['--windowed','--resolution','1600x900']:['--headless']),'--',`--bootstrap=${bridge.bootstrapPath}`,`--qa=${report}`,'--qa-scope=content'],{cwd:project?resolve(project):stage,env,windowsHide:true,stdio:['ignore','pipe','pipe']});
  const consume=b=>{const text=b.toString();log+=text;appendFileSync(logPath,text);if(text.includes('SCRIPT ERROR:'))child.kill();};child.stdout.on('data',consume);child.stderr.on('data',consume);
  timer=setTimeout(()=>child.kill(),180000);
- const code=await new Promise((done,reject)=>{child.once('error',reject);child.once('close',done);});assert.equal(code,0,log.slice(-4000));
- assert.ok(existsSync(report),'Native report missing');native=JSON.parse(readFileSync(report,'utf8'));
+ const code=await new Promise((done,reject)=>{child.once('error',reject);child.once('close',done);});
+ if(existsSync(report))native=JSON.parse(readFileSync(report,'utf8'));
+ assert.equal(code,0,JSON.stringify(native?.checks??{})+'\n'+log.slice(-4000));
+ assert.ok(native,'Native report missing');
  assert.equal(native.ok,true,JSON.stringify(native.checks));
  const errors=log.split('\n').filter(line=>/SCRIPT ERROR:|^ERROR:/.test(line)&&!(project&&process.platform==='win32'&&line.trim()==='ERROR: Failed to read the root certificate store.'));
  assert.deepEqual(errors,[]);if(graphical)assert.equal(native.checks.native_render,true);

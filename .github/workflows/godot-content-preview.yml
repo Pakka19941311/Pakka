@@ -48,16 +48,44 @@ jobs:
             godot-pc/generated/wildlife/
             world-source/Varendor_PC_World.blend
           key: territory-blender-4.5.9-${{ hashFiles('scripts/godot-pc-world.py', 'scripts/territory_art.py', 'src/world/territory-layout.ts', 'src/world/territory.ts', 'public/assets/world/world-topology.json') }}
+      - name: Restore unchanged approved monster outputs
+        id: monster_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            art/monsters-v3/editable/
+            art/monsters-v3/runtime/
+            art/monsters-v3/forest/ForestLord.blend
+            art/monsters-v3/forest/ForestLord.glb
+            art/monsters-v3/forest/build.json
+            qa-artifacts/monster-sources/forest-monster.7z
+          key: monsters-blender-4.5.9-${{ hashFiles('scripts/build-monsters-v3.py', 'scripts/build-forest-monster.py', 'art/monsters-v3/source-lock.json', 'art/monsters-v3/forest/source-lock.json') }}
       - name: Restore the current knight checkpoint and build approved monsters
         run: |
           node --experimental-strip-types scripts/godot-pc-data.mjs
           node scripts/materialize-knight-assets.mjs --include-source
           python scripts/restore-knight-build-inputs.py --blender "$BLENDER"
           python scripts/restore-character-v3-checkpoint.py
-          python scripts/materialize-monsters-v3.py --blender "$BLENDER"
-          python scripts/materialize-forest-monster.py --blender "$BLENDER"
+          if [ '${{ steps.monster_cache.outputs.cache-hit }}' = 'true' ]; then
+            python scripts/materialize-monsters-v3.py --blender "$BLENDER" --sources-only
+          else
+            python scripts/materialize-monsters-v3.py --blender "$BLENDER"
+            python scripts/materialize-forest-monster.py --blender "$BLENDER"
+          fi
           node --experimental-strip-types scripts/godot-pc-data.mjs
           python scripts/package-monster-art.py qa-artifacts/pc-build
+      - name: Preserve completed Blender outputs for native-check repairs
+        if: steps.monster_cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            art/monsters-v3/editable/
+            art/monsters-v3/runtime/
+            art/monsters-v3/forest/ForestLord.blend
+            art/monsters-v3/forest/ForestLord.glb
+            art/monsters-v3/forest/build.json
+            qa-artifacts/monster-sources/forest-monster.7z
+          key: monsters-blender-4.5.9-${{ hashFiles('scripts/build-monsters-v3.py', 'scripts/build-forest-monster.py', 'art/monsters-v3/source-lock.json', 'art/monsters-v3/forest/source-lock.json') }}
       - name: Import actual native assets
         run: |
           mkdir -p qa-artifacts/pc-build qa-artifacts/pc-linux
