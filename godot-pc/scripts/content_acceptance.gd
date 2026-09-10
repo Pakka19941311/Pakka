@@ -22,6 +22,9 @@ static func run(app: Node) -> void:
 	if DisplayServer.get_name() != "headless":
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_size(Vector2i(1600,900))
+		if OS.get_environment("LIBGL_ALWAYS_SOFTWARE") == "1":
+			app.qa_interaction = true
+			app.apply_settings()
 	var checks: Dictionary = {"native_render":DisplayServer.get_name() != "headless"}
 	checks.connected = await until(app,func(): return app.net.connected and app.world.actors.has(app.world.hero_id),45000)
 	if checks.connected:
@@ -69,7 +72,13 @@ static func run(app: Node) -> void:
 		var target: String = str(app.world.current_snapshot.monsters[0].uid)
 		app.world.target_id = target
 		app.activate("attack")
+		checks.autoattack_started = await until(app,func(): return bool(app.net.hero.get("autoAttack",false)) and app.world.current_snapshot.monsters.any(func(m: Dictionary): return str(m.uid)==target and float(m.hp)<100000),12000)
 		checks.ready_for_direct_book = await until(app,func(): return not app.net.command_busy and float(app.net.hero.get("bookCastReadyAt",0))+50 <= float(app.world.current_snapshot.time))
+		# A long software-rendered frame can resynchronize presentation and clear
+		# selection. Select the living enemy for the book as a player can; do not
+		# send a second autoattack intent or manufacture a successful book cast.
+		app.world.targeting.select(target)
+		checks.book_enemy_selected = app.world.target_id == target
 		app.activate("book_knight_10")
 		checks.direct_book = await until(app,func(): return app.net.hero.get("bookCooldowns",{}).has("book_knight_10"))
 		checks.integer_cooldown = await until(app,func():
@@ -86,7 +95,7 @@ static func run(app: Node) -> void:
 	for key: String in checks:
 		if key != "native_render" and not checks[key]: ok = false
 	var file: FileAccess = FileAccess.open(app.qa_path,FileAccess.WRITE)
-	file.store_string(JSON.stringify({"scope":"content-v3","ok":ok,"checks":checks},"  "));file.close()
+	file.store_string(JSON.stringify({"scope":"content-v3","ok":ok,"checks":checks,"diagnostic_render_profile":app.qa_interaction,"render_scale":app.get_viewport().scaling_3d_scale},"  "));file.close()
 	app.net.set_process(false)
 	app.world.stop_audio()
 	await app.net.request("/api/disconnect",{})
