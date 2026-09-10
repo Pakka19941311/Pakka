@@ -75,6 +75,10 @@ var book_ui: VarendorBookUI = VarendorBookUI.new()
 var polish: VarendorInterfacePolish = VarendorInterfacePolish.new()
 
 func _ready() -> void:
+	if "--qa-scope=monsters" in OS.get_cmdline_user_args():
+		set_process(false)
+		get_tree().call_deferred("change_scene_to_file", "res://scenes/monster_qa.tscn")
+		return
 	book_ui.app = self
 	polish.configure_startup(self)
 	if "--world-samples" in OS.get_cmdline_user_args():

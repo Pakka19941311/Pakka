@@ -1,11 +1,14 @@
-extends SceneTree
+extends Node
 
 var output: String = "user://monster-qa"
 var report: Dictionary = {"ok":true,"scope":"approved-monster-models","models":{},"native_render":false}
 var stage: Node3D
 var camera: Camera3D
+var root: Window
 
-func _initialize() -> void:
+func _ready() -> void:
+	root = get_tree().root
+	print("MONSTER_QA_BEGIN exported scene entry")
 	for argument: String in OS.get_cmdline_user_args():
 		if argument.begins_with("--monster-output="): output = argument.trim_prefix("--monster-output=")
 	DirAccess.make_dir_recursive_absolute(output)
@@ -82,7 +85,7 @@ func run() -> void:
 			for frame: int in range(61):
 				var t: float = frame/30.0
 				controller.update({"grounded":true,"alive":phase!="death","hp":100},Vector3(0,0,1.2) if phase == "walk" else Vector3.ZERO,now+t*1000,1.0/30)
-				await process_frame
+				await get_tree().process_frame
 				var pose: Array = measure(rigs)
 				if phase == "idle" and frame == 30 and model not in ["WraithV3","GiantBat","ForestLord"]:
 					var feet: Dictionary = {}
@@ -105,6 +108,6 @@ func run() -> void:
 			now += 3500
 		result.pose_motion_metres = measured;result.renderer_draw_calls = RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME)
 		report.models[model] = result;report.ok = report.ok and result.ok
-		actor.queue_free();await process_frame
+		actor.queue_free();await get_tree().process_frame
 	var file: FileAccess = FileAccess.open(output.path_join("monster-models.json"),FileAccess.WRITE);file.store_string(JSON.stringify(report,"\t"));file.close()
-	print("MONSTER_QA "+JSON.stringify(report));quit(0 if report.ok else 1)
+	print("MONSTER_QA "+JSON.stringify(report));get_tree().quit(0 if report.ok else 1)
