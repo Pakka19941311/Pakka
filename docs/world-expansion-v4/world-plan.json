@@ -1,6 +1,6 @@
 {
-  "schema": 1,
-  "status": "visual-proposal-not-runtime",
+  "schema": 2,
+  "status": "approved-layout-art-map-preview-not-runtime",
   "date": "2026-09-10",
   "branch": "work/character-art-v3",
   "baseline": "96dd25319eab2de99aba226b7ab07e0010214a8d",
@@ -1954,8 +1954,37 @@
     "defaultViewMetres": 180,
     "caveViewMetres": 100,
     "hideUndetectedEnemies": true,
-    "source": "same reviewed world geometry and support layer as game",
+    "source": "same detailed atlas, layer and coordinate transform as full map",
     "buffOrder": "speed potion first; others by application order; row to the left of the top-right minimap"
+  },
+  "approval": {
+    "date": "2026-09-10",
+    "layout": "approved",
+    "mapRequirement": "Full map and minimap must reproduce the approved world image",
+    "requiresAnotherLayoutApproval": false
+  },
+  "cartography": {
+    "preview": {
+      "surface": "world-concept.png",
+      "cave": "cave-map-art.png",
+      "metricAccuracy": "illustrative-concept-not-surveyed-terrain"
+    },
+    "sharedAtlasForFullMapAndMinimap": true,
+    "sharedWorldToImageTransform": true,
+    "production": {
+      "source": "detailed orthographic bake of the actual built world per terrain layer",
+      "projection": "north-up, +z at top; identical bounds and version for both maps",
+      "detail": "terrain, vegetation, buildings, water, roads and entrances; no flat biome polygon replacement",
+      "excludeFromBackground": [
+        "characters",
+        "monsters",
+        "loot",
+        "weather",
+        "UI"
+      ],
+      "delivery": "tiled atlas with mip levels; update on geometry-version changes"
+    },
+    "technicalDrawing": "world-plan.svg is an authoring reference, never the player-facing map background"
   },
   "river": [
     [
