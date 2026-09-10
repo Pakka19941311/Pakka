@@ -1,0 +1,1622 @@
+{
+  "sourceCommit": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+  "release": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-content-preview-30571757e06e",
+  "download": "https://github.com/Pakka19941311/Pakka/releases/download/godot-content-preview-30571757e06e/Varendor_Godot_PC_30571757e06e.zip",
+  "bytes": 545756544,
+  "sha256": "f0b15d875de2ca79f100746cfaebf2909bd9eadada14c4cc8806394806344c82",
+  "qaScope": "content-v3-hotfix",
+  "hotfixNativeChecksPassed": true,
+  "linuxNativeGraphicsPassed": true,
+  "windowsNativeHeadlessPassed": true,
+  "windowsGpuVerified": false,
+  "directDownloadVerified": true,
+  "editableMonsterModels": 10,
+  "sourceArchive": "https://github.com/Pakka19941311/Pakka/releases/download/godot-content-preview-30571757e06e/Varendor_Monsters_v3.zip",
+  "workflow": "https://github.com/Pakka19941311/Pakka/actions/runs/34456057480",
+  "linuxJob": 102802613456,
+  "windowsJob": 102805787044,
+  "linuxArtifact": 10143898857,
+  "windowsArtifact": 10144099451,
+  "downloadedZIPVerifiedLocally": true,
+  "crcVerified": true,
+  "packageManifestFilesVerified": 67,
+  "extraLocalExportedGpuChecks": {
+    "native": {
+      "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+      "checks": {
+        "combat_ready": true,
+        "connected": true,
+        "knight_books_do_not_shoot": true,
+        "loot_near_quickbar": true,
+        "melee_combo_all_five": true,
+        "native_render": true,
+        "no_cast_or_bow_in_autoattack": true,
+        "route_ready": true,
+        "run_0_distance": true,
+        "run_0_no_rubberband": true,
+        "run_1_distance": true,
+        "run_1_no_rubberband": true,
+        "stop_0": true,
+        "stop_1": true,
+        "storage_double_click": true,
+        "storage_partial_deposit": true,
+        "storage_partial_withdraw": true,
+        "storage_selection_action": true
+      },
+      "ok": true,
+      "render_scale": 1.0,
+      "scope": "owner-seven-hotfixes",
+      "stop_metres": {
+        "run_0_backstep": 0.0,
+        "run_1_backstep": 0.0,
+        "stop_0": 0.0,
+        "stop_1": 0.0
+      }
+    },
+    "performance": {
+      "run_0": {
+        "meanFPS": 59.04,
+        "frameP95Ms": 28.66
+      },
+      "run_1": {
+        "meanFPS": 55.94,
+        "frameP95Ms": 29.51
+      },
+      "autoattack": {
+        "meanFPS": 40.8,
+        "frameP95Ms": 45.45
+      }
+    },
+    "portableNode": "v24.20.0",
+    "wrapperOk": false,
+    "wrapperError": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   'ERROR: Failed to read the root certificate store.\\r'\n+ ]\n- []\n",
+    "engineErrors": [
+      "ERROR: Failed to read the root certificate store."
+    ],
+    "note": "All native gameplay checks passed in the public exported EXE. The strict wrapper rejects the agent sandbox root-certificate-store error. CI Windows passed the same wrapper without this error. No other engine errors were present.",
+    "nativeReportSHA256": "7efdd100b4eb2b605b83ec110d8aa091feb3b5440fc79ba1c7e623a96e14fb9c"
+  },
+  "ciReports": {
+    "linux": {
+      "content": {
+        "ok": true,
+        "source": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+        "node": "v24.20.0",
+        "graphical": true,
+        "platform": "linux",
+        "native": {
+          "checks": {
+            "all_effect_icons": true,
+            "all_item_icons": true,
+            "autoattack_started": true,
+            "bag_to_quickbar": true,
+            "book_enemy_selected": true,
+            "buff_20": true,
+            "buff_30": true,
+            "buy_10": true,
+            "buy_20": true,
+            "buy_30": true,
+            "buy_40": true,
+            "class_menu": true,
+            "combat_fixture": true,
+            "connected": true,
+            "cooldown_ready": true,
+            "direct_book": true,
+            "exact_prices": true,
+            "haste_first": true,
+            "integer_cooldown": true,
+            "native_render": true,
+            "no_free_skills": true,
+            "owned_10": true,
+            "owned_20": true,
+            "owned_30": true,
+            "owned_40": true,
+            "ready_for_buff_30": true,
+            "ready_for_direct_book": true
+          },
+          "diagnostic_render_profile": true,
+          "ok": true,
+          "render_scale": 0.5,
+          "scope": "content-v3"
+        },
+        "events": [
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "bookId": "book_knight_20",
+            "skill": 1,
+            "impactAt": 1789029752283.3333,
+            "endsAt": 1789029752633.3333,
+            "readyAt": 0,
+            "at": 1789029752283.3333,
+            "sequence": 1
+          },
+          {
+            "kind": "buff",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "bookId": "book_knight_20",
+            "effect": "guard",
+            "durationMs": 120000,
+            "at": 1789029752283.3333,
+            "sequence": 2
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "bookId": "book_knight_30",
+            "skill": 2,
+            "impactAt": 1789029752850,
+            "endsAt": 1789029753200,
+            "readyAt": 0,
+            "at": 1789029752850,
+            "sequence": 3
+          },
+          {
+            "kind": "buff",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "bookId": "book_knight_30",
+            "effect": "guard",
+            "durationMs": 120000,
+            "at": 1789029752850,
+            "sequence": 4
+          },
+          {
+            "kind": "buff",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "at": 1789029752933.3333,
+            "sequence": 5
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029755433.3333,
+            "endsAt": 1789029755850,
+            "readyAt": 1789029755921.1702,
+            "actorGeneration": 2,
+            "at": 1789029755016.6667,
+            "sequence": 6
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029755433.3333,
+            "sequence": 7
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99932,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029755433.3333,
+            "sequence": 8
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "bookId": "book_knight_10",
+            "skill": 0,
+            "impactAt": 1789029755700,
+            "endsAt": 1789029756050,
+            "readyAt": 1789029755921.1702,
+            "at": 1789029755700,
+            "sequence": 9
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "effect": "slash",
+            "durationMs": 0,
+            "generation": 1,
+            "at": 1789029755700,
+            "sequence": 10
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 102,
+            "critical": true,
+            "targetHp": 99830,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029755700,
+            "sequence": 11
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029756350,
+            "endsAt": 1789029756766.6667,
+            "readyAt": 1789029756837.8367,
+            "actorGeneration": 2,
+            "at": 1789029755933.3333,
+            "sequence": 12
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029756350,
+            "sequence": 13
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99762,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029756350,
+            "sequence": 14
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029757266.6667,
+            "endsAt": 1789029757683.3333,
+            "readyAt": 1789029757754.5034,
+            "actorGeneration": 2,
+            "at": 1789029756850,
+            "sequence": 15
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029757266.6667,
+            "sequence": 16
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99694,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029757266.6667,
+            "sequence": 17
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029758183.3333,
+            "endsAt": 1789029758600,
+            "readyAt": 1789029758671.1702,
+            "actorGeneration": 2,
+            "at": 1789029757766.6667,
+            "sequence": 18
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029758183.3333,
+            "sequence": 19
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99626,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029758183.3333,
+            "sequence": 20
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029759100,
+            "endsAt": 1789029759516.6667,
+            "readyAt": 1789029759587.8367,
+            "actorGeneration": 2,
+            "at": 1789029758683.3333,
+            "sequence": 21
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029759100,
+            "sequence": 22
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99558,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029759100,
+            "sequence": 23
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029760016.6667,
+            "endsAt": 1789029760433.3333,
+            "readyAt": 1789029760504.5034,
+            "actorGeneration": 2,
+            "at": 1789029759600,
+            "sequence": 24
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029760016.6667,
+            "sequence": 25
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99490,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029760016.6667,
+            "sequence": 26
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029760933.3333,
+            "endsAt": 1789029761350,
+            "readyAt": 1789029761421.1702,
+            "actorGeneration": 2,
+            "at": 1789029760516.6667,
+            "sequence": 27
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029760933.3333,
+            "sequence": 28
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99422,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029760933.3333,
+            "sequence": 29
+          },
+          {
+            "kind": "attack",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789029761850,
+            "endsAt": 1789029762266.6667,
+            "readyAt": 1789029762337.8367,
+            "actorGeneration": 2,
+            "at": 1789029761433.3333,
+            "sequence": 30
+          },
+          {
+            "kind": "release",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -82.22480808551752,
+              "z": 2.4429498201694066,
+              "y": -0.025528283130574314
+            },
+            "destination": {
+              "x": -84.33860265687571,
+              "z": 1.7029232415734035,
+              "y": 0.0383449483568199
+            },
+            "at": 1789029761850,
+            "sequence": 31
+          },
+          {
+            "kind": "hit",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99354,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789029761850,
+            "sequence": 32
+          },
+          {
+            "kind": "cancel",
+            "actor": "88c20991-f6b5-4a01-9ab1-012c097b4f38",
+            "at": 1789029762150,
+            "sequence": 33
+          }
+        ],
+        "localSandboxCertificateWarning": false,
+        "rawReportSHA256": "657814f289b15793d05efddb3f04de25a2d0d22cd2c622c3e8ed4651fe86817b"
+      },
+      "monster": {
+        "ok": true,
+        "source": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+        "node": "v24.20.0",
+        "platform": "linux",
+        "graphical": true,
+        "native": {
+          "models": {
+            "FireGolem": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 3.1,
+              "idle_foot_pivots_metres": {
+                "L": 0.278850466012955,
+                "R": 0.278850466012955
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.24376916885376,
+                "death": 2.65735006332397,
+                "idle": 0.052627757191658,
+                "walk": 0.789631903171539
+              },
+              "renderer_draw_calls": 4,
+              "triangles": 24000
+            },
+            "ForestLord": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 5.2,
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.37007594108582,
+                "death": 4.20792055130005,
+                "idle": 0.348206877708435,
+                "walk": 1.21746575832367
+              },
+              "renderer_draw_calls": 6,
+              "triangles": 6582
+            },
+            "GiantBat": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 1.6,
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 0.691393077373505,
+                "death": 2.15537595748901,
+                "idle": 0.387792229652405,
+                "walk": 0.360774636268616
+              },
+              "renderer_draw_calls": 4,
+              "triangles": 22000
+            },
+            "HellforgedWarden": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 2.8,
+              "idle_foot_pivots_metres": {
+                "L": 0.153970927000046,
+                "R": 0.153970927000046
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.7265088558197,
+                "death": 4.49637889862061,
+                "idle": 0.0634165704250336,
+                "walk": 0.730537176132202
+              },
+              "renderer_draw_calls": 16,
+              "triangles": 32780
+            },
+            "IceGolem": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 3.1,
+              "idle_foot_pivots_metres": {
+                "L": 0.232487246394157,
+                "R": 0.232487246394157
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.79119801521301,
+                "death": 2.65641164779663,
+                "idle": 0.0668950155377388,
+                "walk": 0.766994714736938
+              },
+              "renderer_draw_calls": 10,
+              "triangles": 7268
+            },
+            "RiftWarden": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 5.1,
+              "idle_foot_pivots_metres": {
+                "L": 0.458800405263901,
+                "R": 0.458800405263901
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 4.22226095199585,
+                "death": 4.3767557144165,
+                "idle": 0.0881980359554291,
+                "walk": 1.30846917629242
+              },
+              "renderer_draw_calls": 4,
+              "triangles": 36000
+            },
+            "SkeletonV3": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 1.92,
+              "idle_foot_pivots_metres": {
+                "L": 0.120971500873566,
+                "R": 0.120971083641052
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 1.08386957645416,
+                "death": 0.785133123397827,
+                "idle": 0.0224101450294256,
+                "walk": 0.501908123493195
+              },
+              "renderer_draw_calls": 14,
+              "triangles": 7101
+            },
+            "Werewolf": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 3.2,
+              "idle_foot_pivots_metres": {
+                "L": 0.383384376764297,
+                "R": 0.383383840322495
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 1.56762862205505,
+                "death": 2.7125678062439,
+                "idle": 0.0388438366353512,
+                "walk": 1.01942551136017
+              },
+              "renderer_draw_calls": 4,
+              "triangles": 26000
+            },
+            "WraithV3": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 2.15,
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 1.15573048591614,
+                "death": 1.99253857135773,
+                "idle": 0.0491840243339539,
+                "walk": 1.10600960254669
+              },
+              "renderer_draw_calls": 6,
+              "triangles": 2364
+            },
+            "Zombie": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 1.92,
+              "idle_foot_pivots_metres": {
+                "L": 0.19756606221199,
+                "R": 0.143834933638573
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 0.95899909734726,
+                "death": 1.78494942188263,
+                "idle": 0.0328530557453632,
+                "walk": 0.369694203138351
+              },
+              "renderer_draw_calls": 20,
+              "triangles": 28897
+            }
+          },
+          "native_render": true,
+          "ok": true,
+          "scope": "approved-monster-models"
+        },
+        "rawReportSHA256": "9686f6f13edee7d8fb495e8e4478bbef5a0e8dd2d2f75aa24606c1e7fe50d6b4"
+      },
+      "hotfix": {
+        "ok": true,
+        "source": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+        "node": "v24.20.0",
+        "platform": "linux",
+        "graphical": true,
+        "native": {
+          "adapter": "llvmpipe (LLVM 20.1.2, 256 bits)",
+          "checks": {
+            "combat_ready": true,
+            "connected": true,
+            "knight_books_do_not_shoot": true,
+            "loot_near_quickbar": true,
+            "melee_combo_all_five": true,
+            "native_render": true,
+            "no_cast_or_bow_in_autoattack": true,
+            "route_ready": true,
+            "run_0_distance": true,
+            "run_0_no_rubberband": true,
+            "run_1_distance": true,
+            "run_1_no_rubberband": true,
+            "stop_0": true,
+            "stop_1": true,
+            "storage_double_click": true,
+            "storage_partial_deposit": true,
+            "storage_partial_withdraw": true,
+            "storage_selection_action": true
+          },
+          "ok": true,
+          "render_scale": 0.5,
+          "scope": "owner-seven-hotfixes",
+          "stop_metres": {
+            "run_0_backstep": 0,
+            "run_1_backstep": 0,
+            "stop_0": 0,
+            "stop_1": 0
+          }
+        },
+        "serverTimerGapMs": {
+          "p95": 30.042646000001696,
+          "p99": 38.112198000002536,
+          "max": 50.0398539999951
+        },
+        "playerSavesOpened": false,
+        "rawReportSHA256": "c8e711541ba9ede822d965cdfd885349a33b148b93a785caecf23ca4b91239b7"
+      }
+    },
+    "windows": {
+      "content": {
+        "ok": true,
+        "source": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+        "node": "v24.20.0",
+        "graphical": false,
+        "platform": "win32",
+        "native": {
+          "checks": {
+            "all_effect_icons": true,
+            "all_item_icons": true,
+            "autoattack_started": true,
+            "bag_to_quickbar": true,
+            "book_enemy_selected": true,
+            "buff_20": true,
+            "buff_30": true,
+            "buy_10": true,
+            "buy_20": true,
+            "buy_30": true,
+            "buy_40": true,
+            "class_menu": true,
+            "combat_fixture": true,
+            "connected": true,
+            "cooldown_ready": true,
+            "direct_book": true,
+            "exact_prices": true,
+            "haste_first": true,
+            "integer_cooldown": true,
+            "native_render": false,
+            "no_free_skills": true,
+            "owned_10": true,
+            "owned_20": true,
+            "owned_30": true,
+            "owned_40": true,
+            "ready_for_buff_30": true,
+            "ready_for_direct_book": true
+          },
+          "diagnostic_render_profile": false,
+          "ok": true,
+          "render_scale": 1,
+          "scope": "content-v3"
+        },
+        "events": [
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "bookId": "book_knight_20",
+            "skill": 1,
+            "impactAt": 1789030196474.3333,
+            "endsAt": 1789030196824.3333,
+            "readyAt": 0,
+            "at": 1789030196474.3333,
+            "sequence": 1
+          },
+          {
+            "kind": "buff",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "bookId": "book_knight_20",
+            "effect": "guard",
+            "durationMs": 120000,
+            "at": 1789030196474.3333,
+            "sequence": 2
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "bookId": "book_knight_30",
+            "skill": 2,
+            "impactAt": 1789030197107.6667,
+            "endsAt": 1789030197457.6667,
+            "readyAt": 0,
+            "at": 1789030197107.6667,
+            "sequence": 3
+          },
+          {
+            "kind": "buff",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "bookId": "book_knight_30",
+            "effect": "guard",
+            "durationMs": 120000,
+            "at": 1789030197107.6667,
+            "sequence": 4
+          },
+          {
+            "kind": "buff",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "at": 1789030197141,
+            "sequence": 5
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030198174.3333,
+            "endsAt": 1789030198591,
+            "readyAt": 1789030198662.1702,
+            "actorGeneration": 2,
+            "at": 1789030197757.6667,
+            "sequence": 6
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030198174.3333,
+            "sequence": 7
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99932,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030198174.3333,
+            "sequence": 8
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "bookId": "book_knight_10",
+            "skill": 0,
+            "impactAt": 1789030198257.6667,
+            "endsAt": 1789030198607.6667,
+            "readyAt": 1789030198662.1702,
+            "at": 1789030198257.6667,
+            "sequence": 9
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "effect": "slash",
+            "durationMs": 0,
+            "generation": 1,
+            "at": 1789030198257.6667,
+            "sequence": 10
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 102,
+            "critical": true,
+            "targetHp": 99830,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030198257.6667,
+            "sequence": 11
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030199091,
+            "endsAt": 1789030199507.6667,
+            "readyAt": 1789030199578.8367,
+            "actorGeneration": 2,
+            "at": 1789030198674.3333,
+            "sequence": 12
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030199091,
+            "sequence": 13
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99762,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030199091,
+            "sequence": 14
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030200007.6667,
+            "endsAt": 1789030200424.3333,
+            "readyAt": 1789030200495.5034,
+            "actorGeneration": 2,
+            "at": 1789030199591,
+            "sequence": 15
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030200007.6667,
+            "sequence": 16
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99694,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030200007.6667,
+            "sequence": 17
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030200924.3333,
+            "endsAt": 1789030201341,
+            "readyAt": 1789030201412.1702,
+            "actorGeneration": 2,
+            "at": 1789030200507.6667,
+            "sequence": 18
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030200924.3333,
+            "sequence": 19
+          },
+          {
+            "kind": "miss",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "at": 1789030200924.3333,
+            "sequence": 20
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030201841,
+            "endsAt": 1789030202257.6667,
+            "readyAt": 1789030202328.8367,
+            "actorGeneration": 2,
+            "at": 1789030201424.3333,
+            "sequence": 21
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030201841,
+            "sequence": 22
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99626,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030201841,
+            "sequence": 23
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030202757.6667,
+            "endsAt": 1789030203174.3333,
+            "readyAt": 1789030203245.5034,
+            "actorGeneration": 2,
+            "at": 1789030202341,
+            "sequence": 24
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030202757.6667,
+            "sequence": 25
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99558,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030202757.6667,
+            "sequence": 26
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030203674.3333,
+            "endsAt": 1789030204091,
+            "readyAt": 1789030204162.1702,
+            "actorGeneration": 2,
+            "at": 1789030203257.6667,
+            "sequence": 27
+          },
+          {
+            "kind": "release",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "actorGeneration": 2,
+            "effect": "slash",
+            "durationMs": 0,
+            "origin": {
+              "x": -76.6514159894041,
+              "z": 4.193035706558139,
+              "y": -0.14648065562553647
+            },
+            "destination": {
+              "x": -78.61227203793936,
+              "z": 3.234863552539926,
+              "y": -0.08625753865343899
+            },
+            "at": 1789030203674.3333,
+            "sequence": 28
+          },
+          {
+            "kind": "hit",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "amount": 68,
+            "critical": false,
+            "targetHp": 99490,
+            "targetMaxHp": 85,
+            "targetGeneration": 1,
+            "generation": 1,
+            "at": 1789030203674.3333,
+            "sequence": 29
+          },
+          {
+            "kind": "attack",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "target": "greyfang-meadow:0",
+            "skill": null,
+            "generation": 1,
+            "impactAt": 1789030204591,
+            "endsAt": 1789030205007.6667,
+            "readyAt": 1789030205078.8367,
+            "actorGeneration": 2,
+            "at": 1789030204174.3333,
+            "sequence": 30
+          },
+          {
+            "kind": "cancel",
+            "actor": "82795eda-d97e-4dad-8dbb-ec264e71fbff",
+            "at": 1789030204307.6667,
+            "sequence": 31
+          }
+        ],
+        "localSandboxCertificateWarning": false,
+        "rawReportSHA256": "102d1977dcd85897f6c1296aebbdf6ee004c2edc0ab01113f779f6ad7d6a6935"
+      },
+      "monster": {
+        "ok": true,
+        "source": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+        "node": "v24.20.0",
+        "platform": "win32",
+        "graphical": false,
+        "native": {
+          "models": {
+            "FireGolem": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 3.1,
+              "idle_foot_pivots_metres": {
+                "L": 0.278850466012955,
+                "R": 0.278850466012955
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.24376916885376,
+                "death": 2.65735006332397,
+                "idle": 0.052627757191658,
+                "walk": 0.789631903171539
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 24000
+            },
+            "ForestLord": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 5.2,
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.37007594108582,
+                "death": 4.20792055130005,
+                "idle": 0.348206877708435,
+                "walk": 1.21746575832367
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 6582
+            },
+            "GiantBat": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 1.6,
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 0.691393077373505,
+                "death": 2.15537595748901,
+                "idle": 0.387792229652405,
+                "walk": 0.360774636268616
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 22000
+            },
+            "HellforgedWarden": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 2.8,
+              "idle_foot_pivots_metres": {
+                "L": 0.153970927000046,
+                "R": 0.153970927000046
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.7265088558197,
+                "death": 4.49637889862061,
+                "idle": 0.0634165704250336,
+                "walk": 0.730537176132202
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 32780
+            },
+            "IceGolem": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 3.1,
+              "idle_foot_pivots_metres": {
+                "L": 0.232487246394157,
+                "R": 0.232487246394157
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 2.79119801521301,
+                "death": 2.65641164779663,
+                "idle": 0.0668950155377388,
+                "walk": 0.766994714736938
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 7268
+            },
+            "RiftWarden": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 5.1,
+              "idle_foot_pivots_metres": {
+                "L": 0.458800405263901,
+                "R": 0.458800405263901
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 4.22226095199585,
+                "death": 4.3767557144165,
+                "idle": 0.0881980359554291,
+                "walk": 1.30846917629242
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 36000
+            },
+            "SkeletonV3": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 1.92,
+              "idle_foot_pivots_metres": {
+                "L": 0.120971500873566,
+                "R": 0.120971083641052
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 1.08386957645416,
+                "death": 0.785133123397827,
+                "idle": 0.0224101450294256,
+                "walk": 0.501908123493195
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 7101
+            },
+            "Werewolf": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 3.2,
+              "idle_foot_pivots_metres": {
+                "L": 0.383384376764297,
+                "R": 0.383383840322495
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 1.56762862205505,
+                "death": 2.7125678062439,
+                "idle": 0.0388438366353512,
+                "walk": 1.01942551136017
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 26000
+            },
+            "WraithV3": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 2.15,
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 1.15573048591614,
+                "death": 1.99253857135773,
+                "idle": 0.0491840243339539,
+                "walk": 1.10600960254669
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 2364
+            },
+            "Zombie": {
+              "clips": {
+                "attack": "Attack",
+                "death": "Death",
+                "idle": "Idle",
+                "walk": "Walk"
+              },
+              "height": 1.92,
+              "idle_foot_pivots_metres": {
+                "L": 0.19756606221199,
+                "R": 0.143834933638573
+              },
+              "ok": true,
+              "pose_motion_metres": {
+                "attack": 0.95899909734726,
+                "death": 1.78494942188263,
+                "idle": 0.0328530557453632,
+                "walk": 0.369694203138351
+              },
+              "renderer_draw_calls": 0,
+              "triangles": 28897
+            }
+          },
+          "native_render": false,
+          "ok": true,
+          "scope": "approved-monster-models"
+        },
+        "rawReportSHA256": "fd8810d7b4f965cfe81dc3cf74df6ad1fef550b6273fa5d5e8c82e3f89133a2c"
+      },
+      "hotfix": {
+        "ok": true,
+        "source": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+        "node": "v24.20.0",
+        "platform": "win32",
+        "graphical": false,
+        "native": {
+          "adapter": "",
+          "checks": {
+            "combat_ready": true,
+            "connected": true,
+            "knight_books_do_not_shoot": true,
+            "loot_near_quickbar": true,
+            "melee_combo_all_five": true,
+            "native_render": false,
+            "no_cast_or_bow_in_autoattack": true,
+            "route_ready": true,
+            "run_0_distance": true,
+            "run_0_no_rubberband": true,
+            "run_1_distance": true,
+            "run_1_no_rubberband": true,
+            "stop_0": true,
+            "stop_1": true,
+            "storage_double_click": true,
+            "storage_partial_deposit": true,
+            "storage_partial_withdraw": true,
+            "storage_selection_action": true
+          },
+          "ok": true,
+          "render_scale": 1,
+          "scope": "owner-seven-hotfixes",
+          "stop_metres": {
+            "run_0_backstep": 0,
+            "run_1_backstep": 0,
+            "stop_0": 0,
+            "stop_1": 0
+          }
+        },
+        "serverTimerGapMs": {
+          "p95": 27.066999999999098,
+          "p99": 30.496899999998277,
+          "max": 43.034999999999854
+        },
+        "playerSavesOpened": false,
+        "rawReportSHA256": "3480bc7140fad8988de3780cc15052a5dd1f776716e594d0152ebb88197d89e8"
+      }
+    }
+  }
+}

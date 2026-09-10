@@ -1,0 +1,14 @@
+✔ partial deposit and withdrawal conserve counts and identities across a SQLite restart (85.1068ms)
+✔ full bag accepts a compatible stack but rejects new gear without deleting storage (32.738ms)
+✔ invalid quantities, stale references and occupied cells never mutate either container (47.3775ms)
+✔ failed durable write rolls back both halves, then retry succeeds once (47.1408ms)
+✔ storage remains proximity gated and whole equipment can be reordered and returned (33.4244ms)
+✔ legacy unknown items remain withdrawable and are never merged speculatively (27.0539ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 499.7807

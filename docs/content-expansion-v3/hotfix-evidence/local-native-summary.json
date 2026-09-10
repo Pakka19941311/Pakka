@@ -1,0 +1,2249 @@
+{
+  "releaseCandidate": "30571757e06e76a2c5b11e6da99ee09e9e3514cf",
+  "renderedClientSource": "a3f88178d98c99f69816ca5962761d3755671156",
+  "clientSourceUnchangedInFinalCommit": true,
+  "nativeWindowsGpu": {
+    "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+    "checks": {
+      "combat_ready": true,
+      "connected": true,
+      "knight_books_do_not_shoot": true,
+      "loot_near_quickbar": true,
+      "melee_combo_all_five": true,
+      "native_render": true,
+      "no_cast_or_bow_in_autoattack": true,
+      "route_ready": true,
+      "run_0_distance": true,
+      "run_0_no_rubberband": true,
+      "run_1_distance": true,
+      "run_1_no_rubberband": true,
+      "stop_0": true,
+      "stop_1": true,
+      "storage_double_click": true,
+      "storage_partial_deposit": true,
+      "storage_partial_withdraw": true,
+      "storage_selection_action": true
+    },
+    "ok": true,
+    "render_scale": 1.0,
+    "scope": "owner-seven-hotfixes",
+    "stop_metres": {
+      "run_0_backstep": 0.0,
+      "run_1_backstep": 0.0,
+      "stop_0": 0.0,
+      "stop_1": 0.0
+    },
+    "phases": {
+      "autoattack": {
+        "frames": 306,
+        "meanFPS": 25.406,
+        "timings": {
+          "frame_ms": {
+            "p50": 36.789,
+            "p95": 54.838,
+            "p99": 63.787
+          },
+          "process_ms": {
+            "p50": 53.935,
+            "p95": 436.563,
+            "p99": 436.563
+          },
+          "physics_ms": {
+            "p50": 1.488,
+            "p95": 2.946,
+            "p99": 2.946
+          },
+          "gpu_ms": {
+            "p50": 4.508,
+            "p95": 6.612,
+            "p99": 8.422
+          },
+          "render_cpu_ms": {
+            "p50": 8.055,
+            "p95": 11.267,
+            "p99": 13.053
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_10": {
+        "frames": 16,
+        "meanFPS": 21.805,
+        "timings": {
+          "frame_ms": {
+            "p50": 46.024,
+            "p95": 58.612,
+            "p99": 58.612
+          },
+          "process_ms": {
+            "p50": 50.795,
+            "p95": 638.204,
+            "p99": 638.204
+          },
+          "physics_ms": {
+            "p50": 13.45,
+            "p95": 13.45,
+            "p99": 13.45
+          },
+          "gpu_ms": {
+            "p50": 4.5,
+            "p95": 7.223,
+            "p99": 7.223
+          },
+          "render_cpu_ms": {
+            "p50": 8.399,
+            "p95": 10.338,
+            "p99": 10.338
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_20": {
+        "frames": 20,
+        "meanFPS": 26.94,
+        "timings": {
+          "frame_ms": {
+            "p50": 37.134,
+            "p95": 63.44,
+            "p99": 63.44
+          },
+          "process_ms": {
+            "p50": 59.761,
+            "p95": 59.761,
+            "p99": 59.761
+          },
+          "physics_ms": {
+            "p50": 13.45,
+            "p95": 13.45,
+            "p99": 13.45
+          },
+          "gpu_ms": {
+            "p50": 4.719,
+            "p95": 7.03,
+            "p99": 7.03
+          },
+          "render_cpu_ms": {
+            "p50": 8.126,
+            "p95": 10.97,
+            "p99": 10.97
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_30": {
+        "frames": 20,
+        "meanFPS": 27.829,
+        "timings": {
+          "frame_ms": {
+            "p50": 37.878,
+            "p95": 53.779,
+            "p99": 53.779
+          },
+          "process_ms": {
+            "p50": 59.761,
+            "p95": 59.761,
+            "p99": 59.761
+          },
+          "physics_ms": {
+            "p50": 13.041,
+            "p95": 13.041,
+            "p99": 13.041
+          },
+          "gpu_ms": {
+            "p50": 5.23,
+            "p95": 6.385,
+            "p99": 6.385
+          },
+          "render_cpu_ms": {
+            "p50": 8.23,
+            "p95": 10.783,
+            "p99": 10.783
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_40": {
+        "frames": 19,
+        "meanFPS": 26.442,
+        "timings": {
+          "frame_ms": {
+            "p50": 38.143,
+            "p95": 53.497,
+            "p99": 53.497
+          },
+          "process_ms": {
+            "p50": 49.778,
+            "p95": 49.778,
+            "p99": 49.778
+          },
+          "physics_ms": {
+            "p50": 12.499,
+            "p95": 12.499,
+            "p99": 12.499
+          },
+          "gpu_ms": {
+            "p50": 4.602,
+            "p95": 6.802,
+            "p99": 6.802
+          },
+          "render_cpu_ms": {
+            "p50": 8.228,
+            "p95": 12.444,
+            "p99": 12.444
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_50": {
+        "frames": 19,
+        "meanFPS": 26.575,
+        "timings": {
+          "frame_ms": {
+            "p50": 36.909,
+            "p95": 52.951,
+            "p99": 52.951
+          },
+          "process_ms": {
+            "p50": 49.485,
+            "p95": 49.778,
+            "p99": 49.778
+          },
+          "physics_ms": {
+            "p50": 14.312,
+            "p95": 14.312,
+            "p99": 14.312
+          },
+          "gpu_ms": {
+            "p50": 4.393,
+            "p95": 6.128,
+            "p99": 6.128
+          },
+          "render_cpu_ms": {
+            "p50": 7.942,
+            "p95": 11.183,
+            "p99": 11.183
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_60": {
+        "frames": 19,
+        "meanFPS": 26.621,
+        "timings": {
+          "frame_ms": {
+            "p50": 36.228,
+            "p95": 59.175,
+            "p99": 59.175
+          },
+          "process_ms": {
+            "p50": 49.485,
+            "p95": 49.56,
+            "p99": 49.56
+          },
+          "physics_ms": {
+            "p50": 14.312,
+            "p95": 14.312,
+            "p99": 14.312
+          },
+          "gpu_ms": {
+            "p50": 3.927,
+            "p95": 6.071,
+            "p99": 6.071
+          },
+          "render_cpu_ms": {
+            "p50": 7.666,
+            "p95": 10.682,
+            "p99": 10.682
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "loot": {
+        "frames": 10,
+        "meanFPS": 27.397,
+        "timings": {
+          "frame_ms": {
+            "p50": 37.44,
+            "p95": 62.081,
+            "p99": 62.081
+          },
+          "process_ms": {
+            "p50": 49.56,
+            "p95": 49.56,
+            "p99": 49.56
+          },
+          "physics_ms": {
+            "p50": 12.195,
+            "p95": 12.195,
+            "p99": 12.195
+          },
+          "gpu_ms": {
+            "p50": 5.43,
+            "p95": 9.689,
+            "p99": 9.689
+          },
+          "render_cpu_ms": {
+            "p50": 8.193,
+            "p95": 14.801,
+            "p99": 14.801
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "run_0": {
+        "frames": 418,
+        "meanFPS": 34.725,
+        "timings": {
+          "frame_ms": {
+            "p50": 27.721,
+            "p95": 49.111,
+            "p99": 65.833
+          },
+          "process_ms": {
+            "p50": 45.454,
+            "p95": 65.305,
+            "p99": 65.305
+          },
+          "physics_ms": {
+            "p50": 1.47,
+            "p95": 1.967,
+            "p99": 1.967
+          },
+          "gpu_ms": {
+            "p50": 4.59,
+            "p95": 6.937,
+            "p99": 8.313
+          },
+          "render_cpu_ms": {
+            "p50": 7.814,
+            "p95": 11.413,
+            "p99": 12.876
+          }
+        },
+        "maxCorrectionMetres": 0.195921510457993,
+        "startXZ": [
+          -110.0,
+          -105.0
+        ],
+        "endXZ": [
+          -39.6838150024414,
+          -105.0
+        ]
+      },
+      "run_1": {
+        "frames": 493,
+        "meanFPS": 38.963,
+        "timings": {
+          "frame_ms": {
+            "p50": 23.365,
+            "p95": 40.539,
+            "p99": 46.22
+          },
+          "process_ms": {
+            "p50": 39.987,
+            "p95": 642.86,
+            "p99": 642.86
+          },
+          "physics_ms": {
+            "p50": 1.564,
+            "p95": 2.172,
+            "p99": 2.888
+          },
+          "gpu_ms": {
+            "p50": 4.188,
+            "p95": 6.025,
+            "p99": 7.135
+          },
+          "render_cpu_ms": {
+            "p50": 7.347,
+            "p95": 9.66,
+            "p99": 11.178
+          }
+        },
+        "maxCorrectionMetres": 0.196219563484192,
+        "startXZ": [
+          -39.3871612548828,
+          -105.0
+        ],
+        "endXZ": [
+          -109.928085327148,
+          -105.0
+        ]
+      },
+      "stop_0": {
+        "frames": 77,
+        "meanFPS": 34.6,
+        "timings": {
+          "frame_ms": {
+            "p50": 29.125,
+            "p95": 43.627,
+            "p99": 50.051
+          },
+          "process_ms": {
+            "p50": 45.123,
+            "p95": 54.249,
+            "p99": 54.249
+          },
+          "physics_ms": {
+            "p50": 1.541,
+            "p95": 1.934,
+            "p99": 1.934
+          },
+          "gpu_ms": {
+            "p50": 4.638,
+            "p95": 6.672,
+            "p99": 8.873
+          },
+          "render_cpu_ms": {
+            "p50": 8.006,
+            "p95": 11.162,
+            "p99": 12.209
+          }
+        },
+        "maxCorrectionMetres": 9.7082847787533e-06,
+        "startXZ": [
+          -39.4363441467285,
+          -105.0
+        ],
+        "endXZ": [
+          -39.3871612548828,
+          -105.0
+        ]
+      },
+      "stop_1": {
+        "frames": 91,
+        "meanFPS": 41.106,
+        "timings": {
+          "frame_ms": {
+            "p50": 23.776,
+            "p95": 39.042,
+            "p99": 56.417
+          },
+          "process_ms": {
+            "p50": 43.131,
+            "p95": 45.105,
+            "p99": 45.105
+          },
+          "physics_ms": {
+            "p50": 1.536,
+            "p95": 2.888,
+            "p99": 2.888
+          },
+          "gpu_ms": {
+            "p50": 4.102,
+            "p95": 5.514,
+            "p99": 8.092
+          },
+          "render_cpu_ms": {
+            "p50": 7.276,
+            "p95": 9.261,
+            "p99": 15.679
+          }
+        },
+        "maxCorrectionMetres": 0.112658903002739,
+        "startXZ": [
+          -110.081756591797,
+          -105.0
+        ],
+        "endXZ": [
+          -110.083679199219,
+          -105.0
+        ]
+      },
+      "storage": {
+        "frames": 26,
+        "meanFPS": 16.888,
+        "timings": {
+          "frame_ms": {
+            "p50": 44.292,
+            "p95": 129.76,
+            "p99": 255.333
+          },
+          "process_ms": {
+            "p50": 283.36,
+            "p95": 283.36,
+            "p99": 283.36
+          },
+          "physics_ms": {
+            "p50": 2.117,
+            "p95": 2.117,
+            "p99": 2.117
+          },
+          "gpu_ms": {
+            "p50": 7.179,
+            "p95": 10.769,
+            "p99": 11.456
+          },
+          "render_cpu_ms": {
+            "p50": 10.317,
+            "p95": 13.534,
+            "p99": 18.216
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -7.0,
+          -10.5
+        ],
+        "endXZ": [
+          -7.0,
+          -10.5
+        ]
+      }
+    },
+    "rawNativeReportSHA256": "4479417c70eb030ee541f2f82b801bbe9265b895375bbdb3604ad041c99de90c",
+    "machine": "Local Windows / RTX 3070 Laptop GPU / Godot 4.6.3 / 1600x900 / full render scale"
+  },
+  "sameRouteWithoutDistantAnimationBudget": {
+    "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+    "checks": {
+      "combat_ready": true,
+      "connected": true,
+      "knight_books_do_not_shoot": true,
+      "loot_near_quickbar": true,
+      "melee_combo_all_five": true,
+      "native_render": true,
+      "no_cast_or_bow_in_autoattack": true,
+      "route_ready": true,
+      "run_0_distance": true,
+      "run_0_no_rubberband": true,
+      "run_1_distance": true,
+      "run_1_no_rubberband": true,
+      "stop_0": true,
+      "stop_1": true,
+      "storage_double_click": true,
+      "storage_partial_deposit": true,
+      "storage_partial_withdraw": true,
+      "storage_selection_action": true
+    },
+    "ok": true,
+    "render_scale": 1.0,
+    "scope": "owner-seven-hotfixes",
+    "stop_metres": {
+      "run_0_backstep": 0.0,
+      "run_1_backstep": 0.0,
+      "stop_0": 0.0,
+      "stop_1": 0.0
+    },
+    "phases": {
+      "autoattack": {
+        "frames": 257,
+        "meanFPS": 21.389,
+        "timings": {
+          "frame_ms": {
+            "p50": 43.271,
+            "p95": 63.27,
+            "p99": 76.259
+          },
+          "process_ms": {
+            "p50": 62.076,
+            "p95": 356.722,
+            "p99": 356.722
+          },
+          "physics_ms": {
+            "p50": 1.511,
+            "p95": 2.895,
+            "p99": 2.895
+          },
+          "gpu_ms": {
+            "p50": 4.586,
+            "p95": 7.335,
+            "p99": 8.367
+          },
+          "render_cpu_ms": {
+            "p50": 8.09,
+            "p95": 10.991,
+            "p99": 12.875
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_10": {
+        "frames": 14,
+        "meanFPS": 18.794,
+        "timings": {
+          "frame_ms": {
+            "p50": 56.264,
+            "p95": 71.254,
+            "p99": 71.254
+          },
+          "process_ms": {
+            "p50": 65.851,
+            "p95": 660.455,
+            "p99": 660.455
+          },
+          "physics_ms": {
+            "p50": 1.117,
+            "p95": 1.117,
+            "p99": 1.117
+          },
+          "gpu_ms": {
+            "p50": 4.432,
+            "p95": 5.934,
+            "p99": 5.934
+          },
+          "render_cpu_ms": {
+            "p50": 8.32,
+            "p95": 10.036,
+            "p99": 10.036
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_20": {
+        "frames": 15,
+        "meanFPS": 20.279,
+        "timings": {
+          "frame_ms": {
+            "p50": 51.645,
+            "p95": 67.905,
+            "p99": 67.905
+          },
+          "process_ms": {
+            "p50": 65.851,
+            "p95": 65.851,
+            "p99": 65.851
+          },
+          "physics_ms": {
+            "p50": 1.117,
+            "p95": 20.094,
+            "p99": 20.094
+          },
+          "gpu_ms": {
+            "p50": 4.867,
+            "p95": 6.125,
+            "p99": 6.125
+          },
+          "render_cpu_ms": {
+            "p50": 8.014,
+            "p95": 9.322,
+            "p99": 9.322
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_30": {
+        "frames": 15,
+        "meanFPS": 19.936,
+        "timings": {
+          "frame_ms": {
+            "p50": 47.818,
+            "p95": 75.183,
+            "p99": 75.183
+          },
+          "process_ms": {
+            "p50": 58.779,
+            "p95": 63.382,
+            "p99": 63.382
+          },
+          "physics_ms": {
+            "p50": 20.094,
+            "p95": 20.094,
+            "p99": 20.094
+          },
+          "gpu_ms": {
+            "p50": 5.0,
+            "p95": 6.287,
+            "p99": 6.287
+          },
+          "render_cpu_ms": {
+            "p50": 8.288,
+            "p95": 10.155,
+            "p99": 10.155
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_40": {
+        "frames": 13,
+        "meanFPS": 18.004,
+        "timings": {
+          "frame_ms": {
+            "p50": 53.189,
+            "p95": 73.853,
+            "p99": 73.853
+          },
+          "process_ms": {
+            "p50": 63.382,
+            "p95": 63.382,
+            "p99": 63.382
+          },
+          "physics_ms": {
+            "p50": 1.395,
+            "p95": 1.395,
+            "p99": 1.395
+          },
+          "gpu_ms": {
+            "p50": 5.472,
+            "p95": 7.418,
+            "p99": 7.418
+          },
+          "render_cpu_ms": {
+            "p50": 8.726,
+            "p95": 12.829,
+            "p99": 12.829
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_50": {
+        "frames": 13,
+        "meanFPS": 17.868,
+        "timings": {
+          "frame_ms": {
+            "p50": 52.36,
+            "p95": 82.885,
+            "p99": 82.885
+          },
+          "process_ms": {
+            "p50": 86.263,
+            "p95": 86.263,
+            "p99": 86.263
+          },
+          "physics_ms": {
+            "p50": 1.387,
+            "p95": 1.395,
+            "p99": 1.395
+          },
+          "gpu_ms": {
+            "p50": 5.359,
+            "p95": 8.247,
+            "p99": 8.247
+          },
+          "render_cpu_ms": {
+            "p50": 10.015,
+            "p95": 12.953,
+            "p99": 12.953
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_60": {
+        "frames": 14,
+        "meanFPS": 19.185,
+        "timings": {
+          "frame_ms": {
+            "p50": 51.814,
+            "p95": 94.002,
+            "p99": 94.002
+          },
+          "process_ms": {
+            "p50": 86.263,
+            "p95": 86.263,
+            "p99": 86.263
+          },
+          "physics_ms": {
+            "p50": 1.387,
+            "p95": 14.67,
+            "p99": 14.67
+          },
+          "gpu_ms": {
+            "p50": 5.092,
+            "p95": 6.971,
+            "p99": 6.971
+          },
+          "render_cpu_ms": {
+            "p50": 8.548,
+            "p95": 11.207,
+            "p99": 11.207
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "loot": {
+        "frames": 8,
+        "meanFPS": 22.4,
+        "timings": {
+          "frame_ms": {
+            "p50": 45.824,
+            "p95": 52.295,
+            "p99": 52.295
+          },
+          "process_ms": {
+            "p50": 73.639,
+            "p95": 73.639,
+            "p99": 73.639
+          },
+          "physics_ms": {
+            "p50": 14.67,
+            "p95": 14.67,
+            "p99": 14.67
+          },
+          "gpu_ms": {
+            "p50": 5.736,
+            "p95": 6.988,
+            "p99": 6.988
+          },
+          "render_cpu_ms": {
+            "p50": 9.21,
+            "p95": 9.611,
+            "p99": 9.611
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "run_0": {
+        "frames": 392,
+        "meanFPS": 32.654,
+        "timings": {
+          "frame_ms": {
+            "p50": 26.792,
+            "p95": 54.538,
+            "p99": 81.79
+          },
+          "process_ms": {
+            "p50": 42.427,
+            "p95": 77.491,
+            "p99": 874.573
+          },
+          "physics_ms": {
+            "p50": 1.367,
+            "p95": 1.779,
+            "p99": 1.779
+          },
+          "gpu_ms": {
+            "p50": 4.226,
+            "p95": 6.564,
+            "p99": 7.908
+          },
+          "render_cpu_ms": {
+            "p50": 7.409,
+            "p95": 10.033,
+            "p99": 13.222
+          }
+        },
+        "maxCorrectionMetres": 0.21079982817173,
+        "startXZ": [
+          -110.0,
+          -105.0
+        ],
+        "endXZ": [
+          -42.2437210083008,
+          -105.0
+        ]
+      },
+      "run_1": {
+        "frames": 419,
+        "meanFPS": 33.146,
+        "timings": {
+          "frame_ms": {
+            "p50": 27.242,
+            "p95": 45.77,
+            "p99": 56.672
+          },
+          "process_ms": {
+            "p50": 45.002,
+            "p95": 614.391,
+            "p99": 614.391
+          },
+          "physics_ms": {
+            "p50": 1.483,
+            "p95": 2.536,
+            "p99": 3.748
+          },
+          "gpu_ms": {
+            "p50": 4.264,
+            "p95": 6.154,
+            "p99": 7.046
+          },
+          "render_cpu_ms": {
+            "p50": 7.435,
+            "p95": 9.646,
+            "p99": 10.988
+          }
+        },
+        "maxCorrectionMetres": 0.197102844715118,
+        "startXZ": [
+          -41.9084739685059,
+          -105.0
+        ],
+        "endXZ": [
+          -112.340721130371,
+          -105.0
+        ]
+      },
+      "stop_0": {
+        "frames": 62,
+        "meanFPS": 27.569,
+        "timings": {
+          "frame_ms": {
+            "p50": 35.32,
+            "p95": 50.666,
+            "p99": 59.267
+          },
+          "process_ms": {
+            "p50": 76.437,
+            "p95": 83.644,
+            "p99": 83.644
+          },
+          "physics_ms": {
+            "p50": 1.557,
+            "p95": 1.684,
+            "p99": 1.684
+          },
+          "gpu_ms": {
+            "p50": 4.608,
+            "p95": 7.498,
+            "p99": 7.845
+          },
+          "render_cpu_ms": {
+            "p50": 7.937,
+            "p95": 12.036,
+            "p99": 12.918
+          }
+        },
+        "maxCorrectionMetres": 0.0981979370117188,
+        "startXZ": [
+          -41.9260787963867,
+          -105.0
+        ],
+        "endXZ": [
+          -41.9084739685059,
+          -105.0
+        ]
+      },
+      "stop_1": {
+        "frames": 81,
+        "meanFPS": 36.681,
+        "timings": {
+          "frame_ms": {
+            "p50": 27.493,
+            "p95": 41.413,
+            "p99": 47.127
+          },
+          "process_ms": {
+            "p50": 42.575,
+            "p95": 44.191,
+            "p99": 44.191
+          },
+          "physics_ms": {
+            "p50": 1.57,
+            "p95": 3.748,
+            "p99": 3.748
+          },
+          "gpu_ms": {
+            "p50": 4.076,
+            "p95": 5.658,
+            "p99": 8.216
+          },
+          "render_cpu_ms": {
+            "p50": 7.426,
+            "p95": 9.109,
+            "p99": 12.068
+          }
+        },
+        "maxCorrectionMetres": 0.00590320909395814,
+        "startXZ": [
+          -112.538871765137,
+          -105.0
+        ],
+        "endXZ": [
+          -112.625411987305,
+          -105.0
+        ]
+      },
+      "storage": {
+        "frames": 26,
+        "meanFPS": 15.261,
+        "timings": {
+          "frame_ms": {
+            "p50": 53.314,
+            "p95": 131.514,
+            "p99": 262.054
+          },
+          "process_ms": {
+            "p50": 263.495,
+            "p95": 263.495,
+            "p99": 263.495
+          },
+          "physics_ms": {
+            "p50": 1.388,
+            "p95": 1.719,
+            "p99": 1.719
+          },
+          "gpu_ms": {
+            "p50": 7.928,
+            "p95": 10.819,
+            "p99": 12.506
+          },
+          "render_cpu_ms": {
+            "p50": 11.327,
+            "p95": 15.902,
+            "p99": 17.095
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -7.0,
+          -10.5
+        ],
+        "endXZ": [
+          -7.0,
+          -10.5
+        ]
+      }
+    },
+    "rawNativeReportSHA256": "4920ecf580cc8a1ca569eaf8e3423da2e9973cc5bf320908d811c1426dfd5cbe",
+    "machine": "Local Windows / RTX 3070 Laptop GPU / Godot 4.6.3 / 1600x900 / full render scale"
+  },
+  "stressBeforeCorrectionLimit": {
+    "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+    "checks": {
+      "combat_ready": true,
+      "connected": true,
+      "knight_books_do_not_shoot": true,
+      "loot_near_quickbar": true,
+      "melee_combo_all_five": true,
+      "native_render": true,
+      "no_cast_or_bow_in_autoattack": true,
+      "route_ready": true,
+      "run_0_distance": true,
+      "run_0_no_rubberband": false,
+      "run_1_distance": true,
+      "run_1_no_rubberband": true,
+      "stop_0": true,
+      "stop_1": true,
+      "storage_double_click": true,
+      "storage_partial_deposit": true,
+      "storage_partial_withdraw": true,
+      "storage_selection_action": true
+    },
+    "ok": false,
+    "render_scale": 1.0,
+    "scope": "owner-seven-hotfixes",
+    "stop_metres": {
+      "run_0_backstep": 0.207862854003906,
+      "run_1_backstep": 0.0,
+      "stop_0": 0.0,
+      "stop_1": 0.0
+    },
+    "phases": {
+      "autoattack": {
+        "frames": 648,
+        "meanFPS": 53.962,
+        "timings": {
+          "frame_ms": {
+            "p50": 16.938,
+            "p95": 30.574,
+            "p99": 37.884
+          },
+          "process_ms": {
+            "p50": 33.892,
+            "p95": 41.74,
+            "p99": 343.995
+          },
+          "physics_ms": {
+            "p50": 0.951,
+            "p95": 1.816,
+            "p99": 1.816
+          },
+          "gpu_ms": {
+            "p50": 3.33,
+            "p95": 6.216,
+            "p99": 6.955
+          },
+          "render_cpu_ms": {
+            "p50": 4.996,
+            "p95": 7.449,
+            "p99": 9.833
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_10": {
+        "frames": 35,
+        "meanFPS": 49.663,
+        "timings": {
+          "frame_ms": {
+            "p50": 19.835,
+            "p95": 33.87,
+            "p99": 42.415
+          },
+          "process_ms": {
+            "p50": 23.093,
+            "p95": 23.093,
+            "p99": 23.093
+          },
+          "physics_ms": {
+            "p50": 0.734,
+            "p95": 0.734,
+            "p99": 0.734
+          },
+          "gpu_ms": {
+            "p50": 3.557,
+            "p95": 6.473,
+            "p99": 6.739
+          },
+          "render_cpu_ms": {
+            "p50": 4.812,
+            "p95": 8.033,
+            "p99": 9.246
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_20": {
+        "frames": 36,
+        "meanFPS": 50.597,
+        "timings": {
+          "frame_ms": {
+            "p50": 20.598,
+            "p95": 32.677,
+            "p99": 32.825
+          },
+          "process_ms": {
+            "p50": 33.757,
+            "p95": 33.757,
+            "p99": 33.757
+          },
+          "physics_ms": {
+            "p50": 9.101,
+            "p95": 9.101,
+            "p99": 9.101
+          },
+          "gpu_ms": {
+            "p50": 6.217,
+            "p95": 6.428,
+            "p99": 8.88
+          },
+          "render_cpu_ms": {
+            "p50": 5.075,
+            "p95": 7.751,
+            "p99": 11.291
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_30": {
+        "frames": 29,
+        "meanFPS": 40.734,
+        "timings": {
+          "frame_ms": {
+            "p50": 23.435,
+            "p95": 41.23,
+            "p99": 43.394
+          },
+          "process_ms": {
+            "p50": 33.757,
+            "p95": 36.083,
+            "p99": 36.083
+          },
+          "physics_ms": {
+            "p50": 9.101,
+            "p95": 9.101,
+            "p99": 9.101
+          },
+          "gpu_ms": {
+            "p50": 3.57,
+            "p95": 5.129,
+            "p99": 5.166
+          },
+          "render_cpu_ms": {
+            "p50": 5.625,
+            "p95": 8.098,
+            "p99": 8.369
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_40": {
+        "frames": 32,
+        "meanFPS": 43.728,
+        "timings": {
+          "frame_ms": {
+            "p50": 21.041,
+            "p95": 40.289,
+            "p99": 40.941
+          },
+          "process_ms": {
+            "p50": 36.083,
+            "p95": 36.083,
+            "p99": 36.083
+          },
+          "physics_ms": {
+            "p50": 1.306,
+            "p95": 1.306,
+            "p99": 1.306
+          },
+          "gpu_ms": {
+            "p50": 3.614,
+            "p95": 5.033,
+            "p99": 6.149
+          },
+          "render_cpu_ms": {
+            "p50": 6.182,
+            "p95": 8.353,
+            "p99": 8.667
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_50": {
+        "frames": 24,
+        "meanFPS": 34.169,
+        "timings": {
+          "frame_ms": {
+            "p50": 25.913,
+            "p95": 52.338,
+            "p99": 54.097
+          },
+          "process_ms": {
+            "p50": 42.481,
+            "p95": 42.481,
+            "p99": 42.481
+          },
+          "physics_ms": {
+            "p50": 0.78,
+            "p95": 1.306,
+            "p99": 1.306
+          },
+          "gpu_ms": {
+            "p50": 4.469,
+            "p95": 6.889,
+            "p99": 6.961
+          },
+          "render_cpu_ms": {
+            "p50": 6.456,
+            "p95": 7.889,
+            "p99": 8.743
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_60": {
+        "frames": 36,
+        "meanFPS": 50.935,
+        "timings": {
+          "frame_ms": {
+            "p50": 17.767,
+            "p95": 39.485,
+            "p99": 40.963
+          },
+          "process_ms": {
+            "p50": 42.294,
+            "p95": 42.481,
+            "p99": 42.481
+          },
+          "physics_ms": {
+            "p50": 12.324,
+            "p95": 12.324,
+            "p99": 12.324
+          },
+          "gpu_ms": {
+            "p50": 6.798,
+            "p95": 7.062,
+            "p99": 7.089
+          },
+          "render_cpu_ms": {
+            "p50": 5.258,
+            "p95": 6.347,
+            "p99": 8.36
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "loot": {
+        "frames": 19,
+        "meanFPS": 58.225,
+        "timings": {
+          "frame_ms": {
+            "p50": 16.658,
+            "p95": 25.214,
+            "p99": 25.214
+          },
+          "process_ms": {
+            "p50": 42.294,
+            "p95": 42.294,
+            "p99": 42.294
+          },
+          "physics_ms": {
+            "p50": 12.324,
+            "p95": 12.324,
+            "p99": 12.324
+          },
+          "gpu_ms": {
+            "p50": 5.948,
+            "p95": 8.489,
+            "p99": 8.489
+          },
+          "render_cpu_ms": {
+            "p50": 4.876,
+            "p95": 10.832,
+            "p99": 10.832
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "run_0": {
+        "frames": 146,
+        "meanFPS": 11.398,
+        "timings": {
+          "frame_ms": {
+            "p50": 83.412,
+            "p95": 97.652,
+            "p99": 108.204
+          },
+          "process_ms": {
+            "p50": 40.578,
+            "p95": 249.447,
+            "p99": 855.592
+          },
+          "physics_ms": {
+            "p50": 1.685,
+            "p95": 1.922,
+            "p99": 16.04
+          },
+          "gpu_ms": {
+            "p50": 14.638,
+            "p95": 17.006,
+            "p99": 23.008
+          },
+          "render_cpu_ms": {
+            "p50": 4.74,
+            "p95": 8.467,
+            "p99": 11.616
+          }
+        },
+        "maxCorrectionMetres": 0.896614074707031,
+        "startXZ": [
+          -110.0,
+          -105.0
+        ],
+        "endXZ": [
+          -38.1199378967285,
+          -105.0
+        ]
+      },
+      "run_1": {
+        "frames": 145,
+        "meanFPS": 11.577,
+        "timings": {
+          "frame_ms": {
+            "p50": 83.562,
+            "p95": 102.731,
+            "p99": 107.409
+          },
+          "process_ms": {
+            "p50": 41.691,
+            "p95": 56.395,
+            "p99": 613.021
+          },
+          "physics_ms": {
+            "p50": 1.778,
+            "p95": 2.067,
+            "p99": 2.067
+          },
+          "gpu_ms": {
+            "p50": 14.952,
+            "p95": 18.074,
+            "p99": 24.098
+          },
+          "render_cpu_ms": {
+            "p50": 4.413,
+            "p95": 8.531,
+            "p99": 12.682
+          }
+        },
+        "maxCorrectionMetres": 0.28947702050209,
+        "startXZ": [
+          -37.6716270446777,
+          -105.0
+        ],
+        "endXZ": [
+          -107.512336730957,
+          -105.0
+        ]
+      },
+      "stop_0": {
+        "frames": 27,
+        "meanFPS": 12.037,
+        "timings": {
+          "frame_ms": {
+            "p50": 85.242,
+            "p95": 92.971,
+            "p99": 95.16
+          },
+          "process_ms": {
+            "p50": 43.83,
+            "p95": 44.824,
+            "p99": 44.824
+          },
+          "physics_ms": {
+            "p50": 1.866,
+            "p95": 1.962,
+            "p99": 1.962
+          },
+          "gpu_ms": {
+            "p50": 17.951,
+            "p95": 18.076,
+            "p99": 18.11
+          },
+          "render_cpu_ms": {
+            "p50": 4.377,
+            "p95": 6.378,
+            "p99": 8.016
+          }
+        },
+        "maxCorrectionMetres": 0.0824544429779053,
+        "startXZ": [
+          -37.7116279602051,
+          -105.0
+        ],
+        "endXZ": [
+          -37.6716270446777,
+          -105.0
+        ]
+      },
+      "stop_1": {
+        "frames": 27,
+        "meanFPS": 11.911,
+        "timings": {
+          "frame_ms": {
+            "p50": 85.628,
+            "p95": 98.52,
+            "p99": 99.356
+          },
+          "process_ms": {
+            "p50": 48.079,
+            "p95": 56.395,
+            "p99": 56.395
+          },
+          "physics_ms": {
+            "p50": 1.429,
+            "p95": 8.452,
+            "p99": 8.452
+          },
+          "gpu_ms": {
+            "p50": 13.533,
+            "p95": 13.757,
+            "p99": 15.199
+          },
+          "render_cpu_ms": {
+            "p50": 4.185,
+            "p95": 7.958,
+            "p99": 10.895
+          }
+        },
+        "maxCorrectionMetres": 0.0820802077651024,
+        "startXZ": [
+          -108.087745666504,
+          -105.0
+        ],
+        "endXZ": [
+          -108.087745666504,
+          -105.0
+        ]
+      },
+      "storage": {
+        "frames": 33,
+        "meanFPS": 24.948,
+        "timings": {
+          "frame_ms": {
+            "p50": 33.569,
+            "p95": 89.064,
+            "p99": 246.486
+          },
+          "process_ms": {
+            "p50": 250.049,
+            "p95": 250.049,
+            "p99": 250.049
+          },
+          "physics_ms": {
+            "p50": 2.991,
+            "p95": 2.991,
+            "p99": 2.991
+          },
+          "gpu_ms": {
+            "p50": 7.251,
+            "p95": 10.376,
+            "p99": 10.38
+          },
+          "render_cpu_ms": {
+            "p50": 8.207,
+            "p95": 11.385,
+            "p99": 11.516
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -7.0,
+          -10.5
+        ],
+        "endXZ": [
+          -7.0,
+          -10.5
+        ]
+      }
+    },
+    "rawNativeReportSHA256": "3221ed2cb6f900215fd35171e08b20586b509230af84a76fbd68231b2e5c296d",
+    "machine": "Local Windows / RTX 3070 Laptop GPU / Godot 4.6.3 / 1600x900 / full render scale"
+  },
+  "stressAfterCorrectionLimit": {
+    "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+    "checks": {
+      "combat_ready": true,
+      "connected": true,
+      "knight_books_do_not_shoot": true,
+      "loot_near_quickbar": true,
+      "melee_combo_all_five": true,
+      "native_render": true,
+      "no_cast_or_bow_in_autoattack": true,
+      "route_ready": true,
+      "run_0_distance": true,
+      "run_0_no_rubberband": true,
+      "run_1_distance": true,
+      "run_1_no_rubberband": true,
+      "stop_0": true,
+      "stop_1": true,
+      "storage_double_click": true,
+      "storage_partial_deposit": true,
+      "storage_partial_withdraw": true,
+      "storage_selection_action": true
+    },
+    "ok": true,
+    "render_scale": 1.0,
+    "scope": "owner-seven-hotfixes",
+    "stop_metres": {
+      "run_0_backstep": 0.0,
+      "run_1_backstep": 0.0,
+      "stop_0": 0.0,
+      "stop_1": 0.0
+    },
+    "phases": {
+      "autoattack": {
+        "frames": 667,
+        "meanFPS": 55.576,
+        "timings": {
+          "frame_ms": {
+            "p50": 16.319,
+            "p95": 30.039,
+            "p99": 38.623
+          },
+          "process_ms": {
+            "p50": 36.508,
+            "p95": 274.171,
+            "p99": 274.171
+          },
+          "physics_ms": {
+            "p50": 0.971,
+            "p95": 1.581,
+            "p99": 1.827
+          },
+          "gpu_ms": {
+            "p50": 3.577,
+            "p95": 6.28,
+            "p99": 7.181
+          },
+          "render_cpu_ms": {
+            "p50": 4.872,
+            "p95": 7.264,
+            "p99": 10.074
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_10": {
+        "frames": 41,
+        "meanFPS": 56.665,
+        "timings": {
+          "frame_ms": {
+            "p50": 16.681,
+            "p95": 27.666,
+            "p99": 31.062
+          },
+          "process_ms": {
+            "p50": 605.441,
+            "p95": 605.441,
+            "p99": 605.441
+          },
+          "physics_ms": {
+            "p50": 0.623,
+            "p95": 0.852,
+            "p99": 0.852
+          },
+          "gpu_ms": {
+            "p50": 6.121,
+            "p95": 6.671,
+            "p99": 9.329
+          },
+          "render_cpu_ms": {
+            "p50": 4.939,
+            "p95": 6.832,
+            "p99": 7.389
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_20": {
+        "frames": 33,
+        "meanFPS": 46.355,
+        "timings": {
+          "frame_ms": {
+            "p50": 21.019,
+            "p95": 36.309,
+            "p99": 40.742
+          },
+          "process_ms": {
+            "p50": 28.984,
+            "p95": 28.984,
+            "p99": 28.984
+          },
+          "physics_ms": {
+            "p50": 0.852,
+            "p95": 0.852,
+            "p99": 0.852
+          },
+          "gpu_ms": {
+            "p50": 3.344,
+            "p95": 4.786,
+            "p99": 4.852
+          },
+          "render_cpu_ms": {
+            "p50": 5.06,
+            "p95": 7.56,
+            "p99": 7.96
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_30": {
+        "frames": 38,
+        "meanFPS": 54.765,
+        "timings": {
+          "frame_ms": {
+            "p50": 16.862,
+            "p95": 33.096,
+            "p99": 51.644
+          },
+          "process_ms": {
+            "p50": 44.098,
+            "p95": 44.098,
+            "p99": 44.098
+          },
+          "physics_ms": {
+            "p50": 0.817,
+            "p95": 0.852,
+            "p99": 0.852
+          },
+          "gpu_ms": {
+            "p50": 3.339,
+            "p95": 4.401,
+            "p99": 5.236
+          },
+          "render_cpu_ms": {
+            "p50": 5.098,
+            "p95": 7.025,
+            "p99": 8.075
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_40": {
+        "frames": 36,
+        "meanFPS": 50.506,
+        "timings": {
+          "frame_ms": {
+            "p50": 17.851,
+            "p95": 41.439,
+            "p99": 42.416
+          },
+          "process_ms": {
+            "p50": 44.098,
+            "p95": 44.098,
+            "p99": 44.098
+          },
+          "physics_ms": {
+            "p50": 0.817,
+            "p95": 0.892,
+            "p99": 0.892
+          },
+          "gpu_ms": {
+            "p50": 6.303,
+            "p95": 7.278,
+            "p99": 13.448
+          },
+          "render_cpu_ms": {
+            "p50": 4.972,
+            "p95": 8.4,
+            "p99": 17.845
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_50": {
+        "frames": 38,
+        "meanFPS": 54.232,
+        "timings": {
+          "frame_ms": {
+            "p50": 18.999,
+            "p95": 31.42,
+            "p99": 32.678
+          },
+          "process_ms": {
+            "p50": 39.73,
+            "p95": 39.73,
+            "p99": 39.73
+          },
+          "physics_ms": {
+            "p50": 0.892,
+            "p95": 0.892,
+            "p99": 0.892
+          },
+          "gpu_ms": {
+            "p50": 3.409,
+            "p95": 4.345,
+            "p99": 6.132
+          },
+          "render_cpu_ms": {
+            "p50": 5.006,
+            "p95": 7.163,
+            "p99": 8.394
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "book_knight_60": {
+        "frames": 40,
+        "meanFPS": 56.269,
+        "timings": {
+          "frame_ms": {
+            "p50": 17.166,
+            "p95": 27.761,
+            "p99": 49.083
+          },
+          "process_ms": {
+            "p50": 45.811,
+            "p95": 45.811,
+            "p99": 45.811
+          },
+          "physics_ms": {
+            "p50": 9.559,
+            "p95": 9.559,
+            "p99": 9.559
+          },
+          "gpu_ms": {
+            "p50": 3.407,
+            "p95": 5.233,
+            "p99": 5.699
+          },
+          "render_cpu_ms": {
+            "p50": 5.004,
+            "p95": 7.202,
+            "p99": 7.583
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "loot": {
+        "frames": 21,
+        "meanFPS": 64.332,
+        "timings": {
+          "frame_ms": {
+            "p50": 14.072,
+            "p95": 25.098,
+            "p99": 27.511
+          },
+          "process_ms": {
+            "p50": 45.811,
+            "p95": 45.811,
+            "p99": 45.811
+          },
+          "physics_ms": {
+            "p50": 9.559,
+            "p95": 9.559,
+            "p99": 9.559
+          },
+          "gpu_ms": {
+            "p50": 3.386,
+            "p95": 3.635,
+            "p99": 3.661
+          },
+          "render_cpu_ms": {
+            "p50": 4.874,
+            "p95": 6.06,
+            "p99": 6.386
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -75.0,
+          5.0
+        ],
+        "endXZ": [
+          -75.0,
+          5.0
+        ]
+      },
+      "run_0": {
+        "frames": 146,
+        "meanFPS": 11.396,
+        "timings": {
+          "frame_ms": {
+            "p50": 83.123,
+            "p95": 98.666,
+            "p99": 106.374
+          },
+          "process_ms": {
+            "p50": 43.888,
+            "p95": 857.956,
+            "p99": 857.956
+          },
+          "physics_ms": {
+            "p50": 1.498,
+            "p95": 5.257,
+            "p99": 5.257
+          },
+          "gpu_ms": {
+            "p50": 14.829,
+            "p95": 16.965,
+            "p99": 24.854
+          },
+          "render_cpu_ms": {
+            "p50": 4.762,
+            "p95": 7.782,
+            "p99": 10.457
+          }
+        },
+        "maxCorrectionMetres": 0.7984619140625,
+        "startXZ": [
+          -110.0,
+          -105.0
+        ],
+        "endXZ": [
+          -38.0155830383301,
+          -105.0
+        ]
+      },
+      "run_1": {
+        "frames": 145,
+        "meanFPS": 11.567,
+        "timings": {
+          "frame_ms": {
+            "p50": 83.888,
+            "p95": 95.549,
+            "p99": 106.743
+          },
+          "process_ms": {
+            "p50": 40.285,
+            "p95": 609.489,
+            "p99": 609.489
+          },
+          "physics_ms": {
+            "p50": 1.5,
+            "p95": 4.622,
+            "p99": 4.622
+          },
+          "gpu_ms": {
+            "p50": 14.951,
+            "p95": 18.096,
+            "p99": 18.336
+          },
+          "render_cpu_ms": {
+            "p50": 4.707,
+            "p95": 7.564,
+            "p99": 13.596
+          }
+        },
+        "maxCorrectionMetres": 0.196403503417969,
+        "startXZ": [
+          -37.5734710693359,
+          -105.0
+        ],
+        "endXZ": [
+          -107.379470825195,
+          -105.0
+        ]
+      },
+      "stop_0": {
+        "frames": 27,
+        "meanFPS": 11.955,
+        "timings": {
+          "frame_ms": {
+            "p50": 84.322,
+            "p95": 94.382,
+            "p99": 101.427
+          },
+          "process_ms": {
+            "p50": 48.341,
+            "p95": 49.794,
+            "p99": 49.794
+          },
+          "physics_ms": {
+            "p50": 1.567,
+            "p95": 2.145,
+            "p99": 2.145
+          },
+          "gpu_ms": {
+            "p50": 18.029,
+            "p95": 18.236,
+            "p99": 18.285
+          },
+          "render_cpu_ms": {
+            "p50": 4.736,
+            "p95": 9.015,
+            "p99": 11.098
+          }
+        },
+        "maxCorrectionMetres": 0.0824652314186096,
+        "startXZ": [
+          -37.6072387695313,
+          -105.0
+        ],
+        "endXZ": [
+          -37.5734710693359,
+          -105.0
+        ]
+      },
+      "stop_1": {
+        "frames": 27,
+        "meanFPS": 12.013,
+        "timings": {
+          "frame_ms": {
+            "p50": 82.947,
+            "p95": 91.084,
+            "p99": 96.794
+          },
+          "process_ms": {
+            "p50": 42.185,
+            "p95": 47.811,
+            "p99": 47.811
+          },
+          "physics_ms": {
+            "p50": 1.473,
+            "p95": 5.86,
+            "p99": 5.86
+          },
+          "gpu_ms": {
+            "p50": 13.582,
+            "p95": 13.809,
+            "p99": 13.878
+          },
+          "render_cpu_ms": {
+            "p50": 4.3,
+            "p95": 6.568,
+            "p99": 6.733
+          }
+        },
+        "maxCorrectionMetres": 0.00237014563754201,
+        "startXZ": [
+          -107.882759094238,
+          -105.0
+        ],
+        "endXZ": [
+          -107.905136108398,
+          -105.0
+        ]
+      },
+      "storage": {
+        "frames": 29,
+        "meanFPS": 20.866,
+        "timings": {
+          "frame_ms": {
+            "p50": 34.36,
+            "p95": 111.816,
+            "p99": 268.243
+          },
+          "process_ms": {
+            "p50": 268.786,
+            "p95": 268.786,
+            "p99": 268.786
+          },
+          "physics_ms": {
+            "p50": 1.719,
+            "p95": 63.106,
+            "p99": 63.106
+          },
+          "gpu_ms": {
+            "p50": 7.311,
+            "p95": 8.374,
+            "p99": 8.747
+          },
+          "render_cpu_ms": {
+            "p50": 8.23,
+            "p95": 11.717,
+            "p99": 11.772
+          }
+        },
+        "maxCorrectionMetres": 0.0,
+        "startXZ": [
+          -7.0,
+          -10.5
+        ],
+        "endXZ": [
+          -7.0,
+          -10.5
+        ]
+      }
+    },
+    "rawNativeReportSHA256": "f990d7785f5065760e73152dcb51043654696996b21cbe8a08db8969b736cd9a",
+    "machine": "Local Windows / RTX 3070 Laptop GPU / Godot 4.6.3 / 1600x900 / full render scale"
+  },
+  "stressConditions": {
+    "maxFPS": 12,
+    "injectedRenderStallMs": 800,
+    "forwardSeconds": 12,
+    "backwardSeconds": 12
+  },
+  "comparisonLimits": "Single paired local run, not a universal FPS promise. Control uses identical current client, assets, route and server; only distance animation budget/visibility removed. Old af8e run used another heading and is excluded from this paired comparison.",
+  "serverBenchmark": {
+    "monsters": 102,
+    "ticks": 600,
+    "before": {
+      "medianMs": 2.4918,
+      "p95Ms": 3.5651
+    },
+    "after": {
+      "medianMs": 1.8852,
+      "p95Ms": 2.9562
+    },
+    "scope": "WorldSimulation/actual topology/fixed time and random seed; excludes SQLite and transport"
+  }
+}
