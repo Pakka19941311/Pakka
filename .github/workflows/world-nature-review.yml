@@ -5,7 +5,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: world-nature-${{ github.ref }}
+  group: world-nature-${{ github.ref }}-${{ contains(github.event.head_commit.message, '[world-nature]') && 'review' || github.sha }}
   cancel-in-progress: false
 jobs:
   review:
