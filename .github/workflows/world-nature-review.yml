@@ -1,0 +1,61 @@
+name: Varendor world nature native review
+on:
+  push:
+    branches: [work/character-art-v3]
+permissions:
+  contents: write
+concurrency:
+  group: world-nature-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  review:
+    if: ${{ contains(github.event.head_commit.message, '[world-nature]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      LIBGL_ALWAYS_SOFTWARE: '1'
+      LP_NUM_THREADS: '4'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore exact authored inputs and runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb libgl1-mesa-dri libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0
+          python scripts/godot-pc-toolchain.py --runtime-only
+          npm ci --no-audit --no-fund
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          node scripts/materialize-knight-assets.mjs
+          python scripts/world_final/materialize_payload.py
+      - name: Import the actual project
+        id: import
+        timeout-minutes: 10
+        run: |
+          python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/world-final/d14-import --timeout 540 -- --headless --editor --import
+          python -c 'import pathlib; s=pathlib.Path("qa-artifacts/world-final/d14-import/engine.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-16000:]'
+      - name: Render existing D14 approach, hollow and return
+        id: motion
+        continue-on-error: true
+        run: |
+          xvfb-run -a -s '-screen 0 1600x900x24' python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/world-final/d14-launch --timeout 480 -- res://world-final/ancient_tree_D14_review.tscn -- --world-B-output="$PWD/qa-artifacts/world-final/d14-images"
+      - name: Preserve real render evidence, including failed attempts
+        if: always() && steps.import.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEW_OUTCOME: ${{ steps.motion.outcome }}
+        run: |
+          python scripts/world_final/package_nature_review.py
+          gh release create "world-nature-${GITHUB_SHA:0:12}" qa-artifacts/world-final/nature-review.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --latest=false --title "VARENDOR D14 — native review evidence" --notes-file qa-artifacts/world-final/nature-review-notes.md
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nature-native-evidence
+          path: qa-artifacts/world-final/
+      - name: Require successful motion checks
+        if: always()
+        run: test '${{ steps.motion.outcome }}' = success

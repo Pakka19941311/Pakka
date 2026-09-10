@@ -9,6 +9,8 @@ import ctypes
 from ctypes import wintypes as w
 import datetime
 import json
+import os
+import signal
 from pathlib import Path
 import subprocess
 import time
@@ -16,7 +18,16 @@ import time
 
 def memory_sampler():
     if not hasattr(ctypes, 'WinDLL'):
-        return lambda pid: {'unavailable': 'Windows memory sampler on another OS'}
+        def sample_linux(pid):
+            record = {'pid': pid, 'sampler': 'proc-status'}
+            try:
+                fields = dict(line.split(':', 1) for line in Path(f'/proc/{pid}/status').read_text().splitlines() if ':' in line)
+                for source, target in [('VmRSS', 'working_set'), ('VmHWM', 'peak_working_set')]:
+                    if source in fields: record[target] = int(fields[source].split()[0]) * 1024
+            except (OSError, ValueError):
+                record['memory_unavailable'] = True
+            return {'system': None, 'processes': [record]}
+        return sample_linux
     kernel = ctypes.WinDLL('kernel32', use_last_error=True)
     psapi = ctypes.WinDLL('psapi', use_last_error=True)
     class MemoryStatus(ctypes.Structure):
@@ -128,7 +139,8 @@ def main():
     start = time.monotonic()
     with (output / 'stdout.log').open('wb') as out, (output / 'stderr.log').open('wb') as err:
         process = subprocess.Popen(command, cwd=cwd, stdout=out, stderr=err,
-                                   creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+                                   creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
+                                   start_new_session=os.name != 'nt')
         result['launcher_pid'] = process.pid
         result['timed_out'] = False
         (output / 'launch.json').write_text(json.dumps({k:v for k,v in result.items() if k!='samples'}, indent=2), encoding='utf-8')
@@ -141,12 +153,21 @@ def main():
                 result['timed_out'] = True
                 selected = {p['pid'] for p in reading.get('processes', [])}
                 result['close_requested_pids'] = close_windows_for_processes(selected)
+                if os.name != 'nt':
+                    # Only this launch's new process group is terminated.
+                    try: os.killpg(process.pid, signal.SIGTERM)
+                    except ProcessLookupError: pass
                 try:
                     process.wait(timeout=5)
                 except subprocess.TimeoutExpired:
-                    stopped = subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True)
-                    result['termination_attempt'] = {'exit_code': stopped.returncode,
-                        'stderr': stopped.stderr.decode('utf-8', errors='replace')}
+                    if os.name == 'nt':
+                        stopped = subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True)
+                        result['termination_attempt'] = {'exit_code': stopped.returncode,
+                            'stderr': stopped.stderr.decode('utf-8', errors='replace')}
+                    else:
+                        try: os.killpg(process.pid, signal.SIGKILL)
+                        except ProcessLookupError: pass
+                        result['termination_attempt'] = {'signal': 'SIGKILL', 'process_group': process.pid}
                 break
             time.sleep(0.2)
         try:

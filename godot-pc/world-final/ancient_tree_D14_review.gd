@@ -1,7 +1,8 @@
 extends "res://world-final/nature_review.gd"
 
 func run_review() -> void:
-	if DisplayServer.get_name()=="headless":get_tree().quit(4);return
+	var numerical_only: bool = "--tree-numerical-only" in OS.get_cmdline_user_args()
+	if DisplayServer.get_name()=="headless" and not numerical_only:get_tree().quit(4);return
 	DirAccess.make_dir_recursive_absolute(output_dir)
 	var old: Node=find_child("ANCIENT_TREE",true,false)
 	assert(old!=null,"Expected existing ancient tree landmark")
@@ -51,12 +52,12 @@ func run_review() -> void:
 			var budget: int=ceili(motor.position_value.distance_to(walk_target)/6.2*60)+150
 			while motor.position_value.distance_to(walk_target)>.16 and budget>0:
 				await get_tree().physics_frame;budget-=1;recorded_physics+=1
-				if recorded_physics%6==0:await record_frame()
+				if recorded_physics%6==0 and not numerical_only:await record_frame()
 			if budget<=0:arrived=false;break
 		walking=false;await get_tree().physics_frame;var stopped: Vector2=motor.position_value
 		for i: int in range(30):await get_tree().physics_frame
 		await capture("hollow-exit-stop" if reverse else "hollow-entry-stop")
 		walks.append({"reverse":reverse,"arrived":arrived,"stop_drift_m":stopped.distance_to(motor.position_value),"last_position_server":[stopped.x,stopped.y],"first_frame":first,"last_frame":movie_frame-1})
-	var report: Dictionary={"revision":"D14","headless":false,"native_source":"art/world-final/Varendor_Ancient_Tree_D-14.blend","forest_removed":0,"tree_colliders":extra.size(),"walks":walks,"frames":movie_frame,"all_walks_pass":walks.all(func(w: Dictionary):return w.arrived and w.stop_drift_m<.000001),"final_art_accepted":false,"main_integrated":false}
+	var report: Dictionary={"revision":"D14","headless":DisplayServer.get_name()=="headless","numerical_only":numerical_only,"native_source":"art/world-final/Varendor_Ancient_Tree_D-14.blend","forest_removed":0,"tree_colliders":extra.size(),"walks":walks,"frames":movie_frame,"all_walks_pass":walks.all(func(w: Dictionary):return w.arrived and w.stop_drift_m<.000001),"final_art_accepted":false,"main_integrated":false}
 	var file: FileAccess=FileAccess.open(output_dir.path_join("ancient-tree-review.json"),FileAccess.WRITE);file.store_string(JSON.stringify(report,"  "));file.close()
 	print("ANCIENT_TREE_REVIEW "+JSON.stringify(report));get_tree().call_deferred("quit",0 if report.all_walks_pass else 3)

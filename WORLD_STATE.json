@@ -114,7 +114,7 @@
     "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Intermediate Windows walkthrough is published: deliver the direct ZIP link and collect owner visual feedback under PROJECT_RULES.md. Technical continuation after this checkpoint remains D14 ancient tree actual Godot approach/hollow/return inspection, unfinished nature D, then E-H. Do not rebuild the verified walkthrough unless a concrete defect requires it.",
+  "next_task": "Continue D14 actual Godot approach/hollow/return review and correct defects, then finish remaining D nature/materials before E-H. Owner 2026-09-11 explicitly requested continuous execution of FINAL 1.0; sections 1 and 17 authorize continuation without repeated approval.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
@@ -338,7 +338,8 @@
     "collision_review": false,
     "main_integrated": false,
     "note": "Preview removes only the old ANCIENT_TREE landmark and its colliders; retains D13 nature. Planned approach/hollow/return route is not yet run.",
-    "backup": "outputs/world-preview-recovery; native and GLB verified"
+    "backup": "outputs/world-preview-recovery; native and GLB verified",
+    "resume_runtime": "Separate clean Linux checkout from 5fd680c; Godot 4.6.3 exact hash verified. Local graphics unavailable (X server listening sockets restricted); actual graphics to run on the existing GitHub Actions infrastructure. No graphical test claimed yet."
   },
   "intermediate_walk": {
     "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
@@ -475,7 +476,7 @@
         "stop_drift_m": 0
       }
     ],
-    "owner_visual_acceptance": "pending; deliver intermediate walkthrough for owner test according to PROJECT_RULES.md.",
+    "owner_visual_acceptance": "Not claimed; feedback on the intermediate preview does not block authorized D-H work.",
     "delivery_evidence": "docs/world-final/evidence/walk-preview/published-687f980.json"
   },
   "recovery_verification": {
@@ -484,6 +485,7 @@
     "completed": "Recovered the already-successful pending Windows delivery and reconciled stale release status. No game code or assets changed, no old test suite rerun.",
     "code_commit": "687f980175f4245c0a18fcea8c2c8828e471ce76",
     "documentation_commit": "Resolve the commit containing this record.",
-    "pending_stage": "D14 and final world D-H; existing authoring assets and limitations retained."
-  }
+    "pending_stage": "D14 graphical/collision review, remaining D, then E-H without repeated approvals of fixed requirements."
+  },
+  "execution_authority": "FINAL 1.0 sections 1 and 17 plus latest owner request supersede historical stop-after-preview instructions. Intermediate walkthrough feedback does not block already-authorized environment development."
 }
