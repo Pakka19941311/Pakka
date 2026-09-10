@@ -10,7 +10,7 @@
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
-    "D": "starting: existing approved nature assets inspected; no final vegetation placed yet",
+    "D": "partial: D03 native 170x170m forest sample, 920 trees preserved, 82.89% measured canopy, 1025 colliders, normal rendered walk and zero stop drift. Atlas-padding geometry fixed. Sideways camera branch occlusion, full-world vegetation/geology/understorey and LOD work remain.",
     "E": "not started",
     "F": "not started",
     "G": "not started",
@@ -75,11 +75,20 @@
     "scripts/world_final/author_civic_details_blender.py",
     "scripts/world_final/fix_architecture_normals_blender.py",
     "docs/world-final/ARCHITECTURE_C_RU.md",
-    "docs/world-final/evidence/C09-architecture/"
+    "docs/world-final/evidence/C09-architecture/",
+    "art/world-final/Varendor_Nature_D-01.blend",
+    "art/world-final/Varendor_Nature_D-02.blend",
+    "art/world-final/Varendor_Nature_D-03.blend",
+    "art/world-final/nature-source/",
+    "godot-pc/world-final/nature/",
+    "godot-pc/world-final/nature_review.gd",
+    "docs/world-final/NATURE_D_RU.md",
+    "docs/world-final/evidence/D03-forest/"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "D: establish real forest/road/rock material sample in existing Godot world, using preserved C09 master. Prepare current approved pine/fern/shrub/rock models for instancing, persist editable placements and masks, measure canopy coverage against 75-90% dense targets. Then extend nature to all biomes without reducing coverage. F/G/H and three E maps remain pending.",
+  "next_task": "D04: resolve local branch occlusion around the hero in nature visuals without modifying the shared camera/controller or making walls transparent. Then add understorey/deadwood/deciduous silhouettes and far LODs; extend nature and terrain materials across the authored biome masks. Keep 75-90% dense canopy. E/F/G/H are still pending; do not publish old-main Windows build as completed new world.",
   "not_verified": [
+    "D03 sideways camera orbit can still hide hero behind branches; preserve this evidence and fix locally in nature rendering before final nature acceptance",
     "Final reference-quality art, dense forest and organic geology D",
     "World/interior weather, light, water, audio and three maps E",
     "Main-game portals, NPC/save migration and 1000-population server F-G",
@@ -90,7 +99,7 @@
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "7f8980976687e8c4bca4bf1208c46b8efd3f3a0a",
+  "last_saved_commit": "fe376db76855a7f782f92506c8e1811425bbdc57",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -121,16 +130,20 @@
     "pier_return_to_settlement": true,
     "ruin_support_seams": true,
     "architecture_normals_corrected": 249,
-    "payload_clean_restore_173": true
+    "payload_clean_restore_173": true,
+    "forest_sample_canopy": 0.828851913444059,
+    "forest_sample_tree_count": 920,
+    "forest_sample_motor_walk": true,
+    "forest_sample_frames": 161,
+    "forest_sample_stop_drift_m": 0.0
   },
   "publication": {
-    "content_checkpoint": "7f8980976687e8c4bca4bf1208c46b8efd3f3a0a",
-    "binary_blobs_uploaded_and_hash_verified": 27,
-    "native_and_glb_payload_files": 173,
-    "payload_parts": 74,
+    "content_checkpoint": "fe376db76855a7f782f92506c8e1811425bbdc57",
+    "native_and_glb_payload_files": 280,
+    "payload_parts": 100,
     "main_and_knight_v2_unchanged": true,
-    "note": "A follow-up metadata-only commit preserves exact CRLF bytes for geometry JSON so payload hash checks also pass on clean checkout.",
-    "pending": "C09 architecture is the current checkpoint; resolve containing commit. Main game still uses old world; no final Release yet."
+    "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
+    "pending": "D03 intermediate source/evidence checkpoint: resolve containing commit. Full nature/main-world integration and final Release remain pending."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -139,5 +152,5 @@
     "shader cache user directory",
     "existing user display-settings JSON"
   ],
-  "backup_current_from_workspace": "outputs/world-final-C09"
+  "backup_current_from_workspace": "outputs/world-final-D03"
 }

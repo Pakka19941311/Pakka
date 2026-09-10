@@ -1,0 +1,20 @@
+{
+  "geometry_defect": "Opaque atlas padding was inside old rectangular twig cards; D03 clips the card UV footprint around the existing alpha island. Original texture pixels are unchanged.",
+  "source_wood": "Recovered original bark/trunk/dead-branch buffer views, separate D02 native master; originals retained.",
+  "canopy_measured_fraction": 0.828851913444059,
+  "target": [
+    0.75,
+    0.9
+  ],
+  "normal_walk_pass": true,
+  "frames": 161,
+  "renderer": "Godot 4.6.3 Compatibility, actual viewport capture",
+  "main_startup": "exit 0, headless only",
+  "still_open": [
+    "Cross-trail camera orbit can hide the hero behind branches; solve locally in nature visuals, preserve existing camera control.",
+    "Understorey needs roots, litter, deadwood and more varied grouping.",
+    "No whole-world vegetation, snow/cliff/swamp nature or ancient-tree final sculpt yet.",
+    "No main-game world migration or final performance acceptance."
+  ],
+  "full_world_acceptance": false
+}

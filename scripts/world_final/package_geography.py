@@ -10,8 +10,12 @@ PAYLOAD=ROOT/'art/world-final/payload'
 def package(label=None,solid=False):
     geo=ROOT/'godot-pc/world-final/geography'
     interiors=ROOT/'godot-pc/world-final/interiors'
+    nature=ROOT/'godot-pc/world-final/nature'
+    nature_source=ROOT/'art/world-final/nature-source'
     files=sorted([*geo.rglob('*.glb'),geo/'heightmap.f32',geo/'terrain-data.npz',geo/'terrain.json',geo/'collision.json',geo/'support-surfaces.json',
                   *interiors.glob('*.glb'),*interiors.glob('*.f32'),*interiors.glob('*.json'),*interiors.glob('*.tres'),
+                  *nature.rglob('*.glb'),*nature.glob('*.json'),
+                  *nature_source.rglob('*.bin'),*nature_source.rglob('*.glb'),
                   *sorted((ROOT/'art/world-final').glob('*.blend'))])
     manifest_path=ROOT/'art/world-final/payload-manifest.json'
     previous=json.loads(manifest_path.read_text('utf-8')) if manifest_path.exists() else None

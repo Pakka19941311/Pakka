@@ -1,0 +1,58 @@
+{
+  "bounds_xz": [
+    -730,
+    -145,
+    -560,
+    25
+  ],
+  "mask": "ground-sample-D01.png",
+  "mask_size": [
+    680,
+    680
+  ],
+  "channels": [
+    "trail",
+    "forest",
+    "slope_rock",
+    "one"
+  ],
+  "textures": [
+    {
+      "path": "godot-pc/world-final/nature/textures/forest_diff.jpg",
+      "source": "public/assets/world/forest_ground_04/diff.jpg",
+      "sha256": "30f264c69c054bbc84a09d5621684ef919cd13a084a776788be831014639ebe9",
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "godot-pc/world-final/nature/textures/forest_normal.jpg",
+      "source": "public/assets/world/forest_ground_04/nor_gl.jpg",
+      "sha256": "2f8911571bae5661cdd45624db8d05c4d1a66f12b2f530abb2f794a3a02b7576",
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "godot-pc/world-final/nature/textures/trail_diff.jpg",
+      "source": "public/assets/world/brown_mud/diff.jpg",
+      "sha256": "e5072ea8551924a8e7df65b2366f71d80a7fbf7334ef73ad03b8615515623f5a",
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "godot-pc/world-final/nature/textures/trail_normal.jpg",
+      "source": "public/assets/world/brown_mud/nor_gl.jpg",
+      "sha256": "b29427b89bfbbcf969cd6db63ab4042bee376fd84febd91cb2931cb2c217af56",
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "godot-pc/world-final/nature/textures/rock_diff.jpg",
+      "source": "art/world-final/materials/rock_wall_02/rock_wall_02_diff_1k.jpg",
+      "sha256": "4f1d2f80c07e502f5a5ecb4e58388cbf7f4cb33f507e39d024a17ea6d24539b5",
+      "license": "CC0-1.0"
+    },
+    {
+      "path": "godot-pc/world-final/nature/textures/rock_normal.jpg",
+      "source": "art/world-final/materials/rock_wall_02/rock_wall_02_nor_gl_1k.jpg",
+      "sha256": "81888d4950cb395cfba7e47691299470034a9e0d97e553957d21531e8720bb71",
+      "license": "CC0-1.0"
+    }
+  ],
+  "source_manifest": "docs/assets/world-source-manifest.json"
+}
