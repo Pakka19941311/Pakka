@@ -1,0 +1,31 @@
+{
+  "status": "FAILED",
+  "exit_code": 1,
+  "session_id": 98316,
+  "command": [
+    "../tools/Godot_v4.6.3-stable_win64_console.exe",
+    "--headless",
+    "--path",
+    "godot-pc",
+    "--quit-after",
+    "60",
+    "--log-file",
+    "../qa-artifacts/world-final/baseline-start.log"
+  ],
+  "cwd": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "stage": "headless main-scene startup, not import/editor/export/visual animation review",
+  "reported_crashing_process": "Godot_v4.6.3-stable_win64.exe",
+  "reported_invalid_read_address": "0x0000000000000058",
+  "output_provenance": "Transcribed from exec session 98316; engine log was not created.",
+  "output": [
+    "ERROR: Could not create directory: 'user://C:'.",
+    "at: make_dir_recursive (core/io/dir_access.cpp:178)",
+    "CrashHandlerException: Program crashed with signal 11",
+    "Engine version: Godot Engine v4.6.3.stable.official (7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3)",
+    "Backtrace: 15 frames without PE/COFF debug info."
+  ],
+  "original_peak_memory": "not measured; do not infer from invalid-read message",
+  "windows_fault_module": "not available: no matching Application Error event found for this launch",
+  "windows_exception_code": "not available: signal 11 is engine output, not a Windows exception code",
+  "missing_log_directory_confirmed": true
+}

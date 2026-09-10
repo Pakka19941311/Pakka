@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "checkpointId": "world-final-start-20260910-884b26e",
+  "createdUtc": "2026-09-10T12:00:35.326180+00:00",
+  "branch": "work/character-art-v3",
+  "baseCommit": "884b26e35508038506fe29477923e08d78744593",
+  "baseTree": "1d25c327d365d252716b13f75bcc094e9b249ed1",
+  "remoteCommitVerified": "884b26e35508038506fe29477923e08d78744593",
+  "trackedWorktreeClean": true,
+  "untrackedFileCount": 12,
+  "localBackupFromWorkspace": "outputs/world-final-start-20260910-884b26e",
+  "untrackedSnapshot": "docs/world-final/checkpoint/untracked-snapshot.json",
+  "authoredWorld": [
+    {
+      "path": "world-source/Varendor_PC_World.blend",
+      "present": true,
+      "bytes": 529978149,
+      "sha256": "d8e5ae612e75a8364ce18dca2d48980652c20d14408a2101cab5c887614bc5a2",
+      "copiedAndVerified": true
+    },
+    {
+      "path": "godot-pc/generated/world.glb",
+      "present": true,
+      "bytes": 245600236,
+      "sha256": "4f532c1335829be340e3b4e29f0faf81540d552bdc0f704a16b2887ab172b042",
+      "copiedAndVerified": true
+    },
+    {
+      "path": "godot-pc/generated/terrain.json",
+      "present": true,
+      "bytes": 465333,
+      "sha256": "0a563361e210e2620f207b338146ff82a2f424ec4897dc77677dd98adcaccb60",
+      "copiedAndVerified": true
+    },
+    {
+      "path": "godot-pc/generated/territory.json",
+      "present": true,
+      "bytes": 36670,
+      "sha256": "47213217cb453c04e3978403905cd07265a2eb74de5eabe4217d931ebeaecac4",
+      "copiedAndVerified": true
+    },
+    {
+      "path": "godot-pc/generated/layout.json",
+      "present": true,
+      "bytes": 4256049,
+      "sha256": "6ec512b2d2ff57be5d107ef12fd3300e37e45bf7c616d607f1884fd10f21bc14",
+      "copiedAndVerified": true
+    },
+    {
+      "path": "godot-pc/generated/blender-build.json",
+      "present": true,
+      "bytes": 422,
+      "sha256": "65c6ad0c1caf86c74aa8d36dde82d9241a4b8e660d93530acd3639b658f0611f",
+      "copiedAndVerified": true
+    }
+  ],
+  "protectedCode": [
+    {
+      "path": "godot-pc/scripts/animation_controller.gd",
+      "sha256": "aabf5ddeb8f1f79fbae47d1cb9ff933fa88a81b49bd1ad6d4a8b89acb9dd554f"
+    },
+    {
+      "path": "godot-pc/scripts/camera_controller.gd",
+      "sha256": "1402776bd1a8d7a98a71f0b08a161e7b5ffcd15e6b852ab335c5182c5d119aaa"
+    },
+    {
+      "path": "godot-pc/scripts/knight_equipment.gd",
+      "sha256": "68f8b8a387257a288820311eb49a2f754a48f87ea95326143f5a45edbea95ed2"
+    },
+    {
+      "path": "src/server/world-simulation.ts",
+      "sha256": "1558100c526d5adaa8d8bf835b826e8d5eeaea9df44c64d1671118dfe43c05a9"
+    },
+    {
+      "path": "src/data/game-data.ts",
+      "sha256": "cd282b1beac73cb29a2841c59145ea9b43f284fabf08dde66bf488107a84c20e"
+    }
+  ],
+  "parallelWork": {
+    "otherActiveCodexTaskForRepository": false,
+    "worktreeCount": 1,
+    "gitLockFound": false,
+    "processCommandLineInspection": "unavailable: Win32_Process access denied; no active Blender/Godot/git process appeared in Get-Process"
+  },
+  "privateSaveDataPublished": false
+}

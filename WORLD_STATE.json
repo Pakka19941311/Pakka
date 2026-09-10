@@ -1,0 +1,43 @@
+{
+  "schema": 1,
+  "specification": "docs/world-final/spec/VARENDOR_WORLD_FINAL_TZ.md",
+  "branch": "work/character-art-v3",
+  "baseline_commit": "884b26e35508038506fe29477923e08d78744593",
+  "checkpoint_ref": "refs/checkpoints/world-final-start-20260910-884b26e",
+  "state_commit": "Resolve the commit containing this file; baseline_commit is the preserved pre-world HEAD.",
+  "current_stage": "B",
+  "stages": {
+    "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
+    "B": "not yet built: layout contains authored road elevations, water boundaries and 46 landmark placements; no new playable terrain yet",
+    "C": "not started",
+    "D": "not started",
+    "E": "not started",
+    "F": "not started",
+    "G": "not started",
+    "H": "not started"
+  },
+  "crash_investigation": {
+    "report": "docs/world-final/diagnostics/GODOT_CRASH_RU.md",
+    "original_check": "failed, exit 1; never counted as successful",
+    "minimal_correction": "scripts/godot_run_checked.py preflights an existing writable absolute log file",
+    "retest": "same Godot 4.6.3, current project headless startup 60 and 900 frames exited 0 without crash",
+    "remaining_log_errors": ["Windows root certificate store read", "Existing user display-settings JSON parsing"],
+    "visual_check": false,
+    "backup_from_workspace": "outputs/godot-crash-20260910T121037Z"
+  },
+  "authored_files": [
+    "godot-pc/world-final/world_layout.json",
+    "docs/world-final/REFERENCE_ANNOTATED.svg",
+    "docs/world-final/LAYOUT_PLAN.svg",
+    "docs/world-final/LANDMARK_REGISTRY.csv"
+  ],
+  "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
+  "next_task": "Build continuous 1600x1400 m terrain in 128 m chunks with 2 m support grid from the authored layout; correct route grades and bridge decks; export editable Blender source and GLB, then validate the existing movement controller on the main links in Godot.",
+  "not_verified": [
+    "New terrain geometry, collisions and route traversal",
+    "Godot overview/gameplay frames matching final reference",
+    "Final population distribution and separate interior runtime layers",
+    "New world performance and final Windows release"
+  ],
+  "protected": ["Existing hero/animation/controller/camera/combat", "NPC and inventory/equipment/enchant/storage/save data", "main and work/knight-integration-v2 branches"]
+}

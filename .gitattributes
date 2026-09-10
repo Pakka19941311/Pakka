@@ -1,2 +1,5 @@
 # Exact forward binary patches must retain LF even on Windows.
 art/character-v3/payload/*.part* text eol=lf -diff
+# Preserve supplied package hashes and raw incident evidence byte-for-byte.
+docs/world-final/spec/** -text whitespace=-blank-at-eol
+docs/world-final/diagnostics/godot-20260910/* -text whitespace=-blank-at-eol

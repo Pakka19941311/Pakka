@@ -1,0 +1,74 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Unrecognized output string "misc2" in mapping:
+030000008a2e0000dd10000000000000,Hand Held Legend GC Ultimate,a:b0,b:b2,back:b17,dpdown:b5,dpleft:b6,dpright:b7,dpup:b4,guide:b18,leftshoulder:b10,leftstick:b8,lefttrigger:a3,leftx:a0,lefty:a1,misc1:b19,misc2:b24,paddle1:b13,paddle2:b12,rightshoulder:b11,rightstick:b9,righttrigger:a4,rightx:a2,righty:a5,start:b16,x:b1,y:b3,platform:Windows,
+Unrecognized output string "misc2" in mapping:
+030000000d0f00000202000000000000,Horipad O Nintendo Switch 2 Controller,a:b1,b:b0,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,misc1:b13,misc2:b14,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b3,y:b2,platform:Windows,
+Unrecognized output string "misc2" in mapping:
+030000000d0f00009601000000000000,Horipad Steam,a:b0,b:b1,back:b10,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b6,leftstick:b13,lefttrigger:b8,leftx:a0,lefty:a1,misc2:b2,paddle1:b5,paddle2:b15,paddle3:b18,paddle4:b19,rightshoulder:b7,rightstick:b14,righttrigger:b9,rightx:a3,righty:a4,start:b11,x:b3,y:b4,platform:Windows,
+Unrecognized output string "misc2" in mapping:
+030000007e0500006920000000000000,Nintendo Switch 2 Pro Controller,a:b0,b:b1,back:b14,dpdown:b8,dpleft:b10,dpright:b9,dpup:b11,guide:b16,leftshoulder:b12,leftstick:b15,lefttrigger:b13,leftx:a0,lefty:a1~,misc1:b17,misc2:b20,paddle1:b18,paddle2:b19,rightshoulder:b4,rightstick:b7,righttrigger:b5,rightx:a2,righty:a3~,start:b6,x:b2,y:b3,platform:Windows,
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 2475187701
+EDITOR API HASH: 3867286884
+SceneTreeFTI: traversal method DEFAULT
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+Loaded builtin CA certificates
+Loading resource: res://main.tscn
+Loading resource: res://scripts/main.gd
+Loading resource: res://scripts/territory_wind.gdshader
+Loading resource: res://scripts/territory_sky.gdshader
+Loading resource: res://assets/icons/haste.svg
+Loading resource: res://.godot/imported/haste.svg-25145bce45727f09a163302c0b086228.ctex
+Loading resource: res://scripts/polish_sky.gdshader
+ERROR: Parse JSON failed. Error at line 0: Unknown error getting token
+   at: parse_string (core/io/json.cpp:624)
+   GDScript backtrace (most recent call first):
+       [0] configure_startup (res://scripts/interface_polish.gd:33)
+       [1] _ready (res://scripts/main.gd:83)
+Loading resource: res://generated/item-icons/atlas-1.png
+Loading resource: res://.godot/imported/atlas-1.png-6d7cbdf407291b0ede235348c4be868a.ctex
+Loading resource: res://generated/item-icons/atlas-4.png
+Loading resource: res://.godot/imported/atlas-4.png-7c0fce195486e5ec4b79c768aa5523e8.ctex
+Loading resource: res://assets/icons/wardens_blade.svg
+Loading resource: res://.godot/imported/wardens_blade.svg-7958c1623f767e3f9781c02733af91fa.ctex
+Loading resource: res://generated/audio/sword-swing.ogg
+Loading resource: res://.godot/imported/sword-swing.ogg-f72a981b8af0d5f499114f1a2072dad4.oggvorbisstr
+Loading resource: res://generated/audio/melee-impact.ogg
+Loading resource: res://.godot/imported/melee-impact.ogg-8702f8ce39a09a98843ced3bbd62d2d2.oggvorbisstr
+Loading resource: res://generated/audio/monster-hit.ogg
+Loading resource: res://.godot/imported/monster-hit.ogg-e869ddfd9beff838a7cbb37dbc121112.oggvorbisstr
+Loading resource: res://generated/audio/monster-death.ogg
+Loading resource: res://.godot/imported/monster-death.ogg-2e7ab18aea1543abbe233520bd55a929.oggvorbisstr
+Loading resource: res://generated/audio/monster-aggro.ogg
+Loading resource: res://.godot/imported/monster-aggro.ogg-9276eb87aa339944a238b96fc0e23665.oggvorbisstr
+Loading resource: res://generated/audio/coin.ogg
+Loading resource: res://.godot/imported/coin.ogg-793e5839aa517112aea3fa7bda8dfcbe.oggvorbisstr
+Loading resource: res://generated/audio/forest.mp3
+Loading resource: res://.godot/imported/forest.mp3-dbb79478fbbfc6601ea3ca56f9b2f025.mp3str
+Loading resource: res://generated/world.glb
+Loading resource: res://.godot/imported/world.glb-16f25a32046f3987447d763e7859cd63.scn
+Loading resource: res://generated/world_diff.jpg
+Loading resource: res://.godot/imported/world_diff.jpg-413e372e341dc335da9078564b55f26b.ctex
+Loading resource: res://generated/world_cobblestone_floor_001_albedo.jpg
+Loading resource: res://.godot/imported/world_cobblestone_floor_001_albedo.jpg-57b4689385d75ae99bff05e9ea87d627.ctex
+Loading resource: res://generated/world_cobblestone_floor_001_roughness.png
+Loading resource: res://.godot/imported/world_cobblestone_floor_001_roughness.png-c21d6979ce1fa0abb62210058bbb8f73.ctex
+Loading resource: res://generated/world_cobblestone_floor_001_normal.jpg
+Loading resource: res://.godot/imported/world_cobblestone_floor_001_normal.jpg-1d2d5f402b799dec6d8ca6f2178a1cd9.ctex
+Loading resource: res://generated/world_castle_wall_slates_albedo.jpg
+Loading resource: res://.godot/imported/world_castle_wall_slates_albedo.jpg-875af21415fd281c51a4756e40373dae.ctex
+Loading resource: res://generated/world_castle_wall_slates_roughness.png
+Loading resource: res://.godot/imported/world_castle_wall_slates_roughness.png-c8571fc9afa389c8766ff4a32bf89c69.ctex
+Loading resource: res://generated/world_castle_wall_slates_normal.jpg
+Loading resource: res://.godot/imported/world_castle_wall_slates_normal.jpg-4d1c19ecc802f1dbdc165baa37562799.ctex
+Loading resource: res://generated/world_roof_slates_02_albedo.jpg
+Loading resource: res://.godot/imported/world_roof_slates_02_albedo.jpg-cf3de82d6eee3c6779bd56ce22c1fd1a.ctex
+Loading resource: res://generated/world_roof_slates_02_roughness.png
+Loading resource: res://.godot/imported/world_roof_slates_02_roughness.png-c61afa44cfce262583151cf82be42c9b.ctex
+Loading resource: res://generated/world_roof_slates_02_normal.jpg
+Loading resource: res://.godot/imported/world_roof_slates_02_normal.jpg-6dfeb84a0c51282037d702e8d9b3680a.ctex

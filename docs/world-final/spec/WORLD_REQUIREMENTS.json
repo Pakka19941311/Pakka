@@ -1,0 +1,524 @@
+{
+  "schema_version": "1.0",
+  "document_type": "design_specification_not_runtime_configuration",
+  "revision": "FINAL 1.0",
+  "date": "2026-09-10",
+  "project": "Varendor",
+  "implementation_status": "This package contains requirements, not implemented world content.",
+  "primary_spec": "VARENDOR_WORLD_FINAL_TZ.md",
+  "reference": {
+    "path": "reference/varendor_world_reference.png",
+    "sha256": "cd2ac360f3f314dafb631e7b213e569c810ff9fad62c3665bad2e8b4dea31690",
+    "pixels": [
+      1476,
+      1287
+    ],
+    "unmodified_user_image": true
+  },
+  "hard_constraints": {
+    "width_m": 1600,
+    "depth_m": 1400,
+    "area_m2": 2240000,
+    "location_count": 12,
+    "approved_species_count": 15,
+    "regular_population_capacity": 997,
+    "boss_population_capacity": 3,
+    "total_population_capacity": 1000,
+    "bosses_included_in_total": true,
+    "cave_and_mine_are_separate": true,
+    "keep_existing_gameplay_and_saves": true,
+    "do_not_thin_vegetation_to_reduce_monsters": true,
+    "free_to_acquire_commercially_usable_assets_only": true
+  },
+  "species_catalog_contract": {
+    "source": "Actual latest approved project bestiary and stable identifiers",
+    "species_ids": null,
+    "boss_membership_in_15": "Resolve against approved bestiary; do not infer 18 species or invent names.",
+    "missing_catalog_policy": "Continue independent environment work; final population acceptance requires verified catalog."
+  },
+  "coordinates": {
+    "units_per_meter": 1,
+    "up_axis": "Y",
+    "east_axis": "+X",
+    "south_axis": "+Z",
+    "north_is_image_top": true,
+    "surface_bounds": {
+      "min_x": -800,
+      "max_x": 800,
+      "min_z": -700,
+      "max_z": 700
+    },
+    "surface_minimap": {
+      "u": "(world_x + 800) / 1600",
+      "v": "(world_z + 700) / 1400",
+      "preserve_aspect_ratio": true
+    },
+    "image_projection_warning": "Artistic oblique view; image percentages are not a linear terrain projection."
+  },
+  "locations": [
+    {
+      "id": "L01",
+      "name_ru": "Посёлок — Гринфолл",
+      "regular": 0,
+      "bosses": 0,
+      "safe": true,
+      "subzones": [],
+      "total": 0,
+      "space_id": "surface"
+    },
+    {
+      "id": "L02",
+      "name_ru": "Крепость — Астерхолд",
+      "regular": 0,
+      "bosses": 0,
+      "safe": true,
+      "subzones": [],
+      "total": 0,
+      "space_id": "surface"
+    },
+    {
+      "id": "L03",
+      "name_ru": "Западный лес и гнилая чаща",
+      "regular": 249,
+      "bosses": 1,
+      "safe": false,
+      "subzones": [
+        {
+          "id": "living_forest",
+          "space_id": "surface",
+          "regular": 160,
+          "bosses": 0
+        },
+        {
+          "id": "rotten_forest",
+          "space_id": "surface",
+          "regular": 89,
+          "bosses": 1
+        }
+      ],
+      "total": 250,
+      "space_id": "surface"
+    },
+    {
+      "id": "L04",
+      "name_ru": "Снежные горы",
+      "regular": 79,
+      "bosses": 1,
+      "safe": false,
+      "subzones": [],
+      "total": 80,
+      "space_id": "surface"
+    },
+    {
+      "id": "L05",
+      "name_ru": "Шахта",
+      "regular": 100,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [
+        {
+          "id": "mine_exterior",
+          "space_id": "surface",
+          "regular": 30,
+          "bosses": 0
+        },
+        {
+          "id": "mine_interior",
+          "space_id": "mine",
+          "regular": 70,
+          "bosses": 0
+        }
+      ],
+      "total": 100,
+      "space_id": "mixed_surface_and_mine"
+    },
+    {
+      "id": "L06",
+      "name_ru": "Озеро и берега",
+      "regular": 60,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "safe_exclusions": [
+        "lakeside_settlement",
+        "pier",
+        "settlement_approaches"
+      ],
+      "total": 60,
+      "space_id": "surface"
+    },
+    {
+      "id": "L07",
+      "name_ru": "Большая пещера",
+      "regular": 110,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "space_id": "great_cave",
+      "total": 110
+    },
+    {
+      "id": "L08",
+      "name_ru": "Восточное святилище",
+      "regular": 60,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 60,
+      "space_id": "surface"
+    },
+    {
+      "id": "L09",
+      "name_ru": "Вулкан и кратер",
+      "regular": 89,
+      "bosses": 1,
+      "safe": false,
+      "subzones": [],
+      "total": 90,
+      "space_id": "surface"
+    },
+    {
+      "id": "L10",
+      "name_ru": "Южные руины",
+      "regular": 70,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 70,
+      "space_id": "surface"
+    },
+    {
+      "id": "L11",
+      "name_ru": "Юго-западное болото",
+      "regular": 90,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 90,
+      "space_id": "surface"
+    },
+    {
+      "id": "L12",
+      "name_ru": "Юго-восточный некрополь",
+      "regular": 90,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 90,
+      "space_id": "surface"
+    }
+  ],
+  "spaces": [
+    {
+      "id": "surface",
+      "regular": 817,
+      "bosses": 3,
+      "total": 820
+    },
+    {
+      "id": "mine",
+      "regular": 70,
+      "bosses": 0,
+      "total": 70
+    },
+    {
+      "id": "great_cave",
+      "regular": 110,
+      "bosses": 0,
+      "total": 110
+    }
+  ],
+  "boss_habitats": [
+    "L03",
+    "L04",
+    "L09"
+  ],
+  "approximate_design_anchors": [
+    {
+      "id": "village",
+      "location_id": "L01",
+      "image_percent_xy": [
+        19,
+        71
+      ],
+      "world_xz_m": [
+        -490,
+        340
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "fortress",
+      "location_id": "L02",
+      "image_percent_xy": [
+        44,
+        57
+      ],
+      "world_xz_m": [
+        -100,
+        150
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "western_forest",
+      "location_id": "L03",
+      "image_percent_xy": [
+        23,
+        40
+      ],
+      "world_xz_m": [
+        -450,
+        -60
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "ancient_tree",
+      "location_id": "L03",
+      "image_percent_xy": [
+        41,
+        15
+      ],
+      "world_xz_m": [
+        -170,
+        -450
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "snow_region",
+      "location_id": "L04",
+      "image_percent_xy": [
+        13,
+        9
+      ],
+      "world_xz_m": [
+        -560,
+        -530
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "mine_entrance",
+      "location_id": "L05",
+      "image_percent_xy": [
+        53,
+        20
+      ],
+      "world_xz_m": [
+        35,
+        -420
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "lake_center",
+      "location_id": "L06",
+      "image_percent_xy": [
+        63,
+        42
+      ],
+      "world_xz_m": [
+        220,
+        -70
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "lakeside_settlement",
+      "location_id": "L06",
+      "image_percent_xy": [
+        74,
+        47
+      ],
+      "world_xz_m": [
+        420,
+        40
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "great_cave_entrance",
+      "location_id": "L07",
+      "image_percent_xy": [
+        65,
+        30
+      ],
+      "world_xz_m": [
+        245,
+        -280
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "eastern_sanctuary",
+      "location_id": "L08",
+      "image_percent_xy": [
+        89,
+        40
+      ],
+      "world_xz_m": [
+        620,
+        -100
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "volcano_crater",
+      "location_id": "L09",
+      "image_percent_xy": [
+        85,
+        11
+      ],
+      "world_xz_m": [
+        545,
+        -490
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "southern_ruins",
+      "location_id": "L10",
+      "image_percent_xy": [
+        51,
+        79
+      ],
+      "world_xz_m": [
+        10,
+        425
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "swamp",
+      "location_id": "L11",
+      "image_percent_xy": [
+        11,
+        84
+      ],
+      "world_xz_m": [
+        -620,
+        490
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "necropolis",
+      "location_id": "L12",
+      "image_percent_xy": [
+        82,
+        74
+      ],
+      "world_xz_m": [
+        510,
+        365
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    }
+  ],
+  "encounter_design": {
+    "typical_group_size": [
+      2,
+      5
+    ],
+    "isolated_group_size": [
+      1,
+      2
+    ],
+    "special_dangerous_group_size": [
+      6,
+      10
+    ],
+    "values_are_starting_guidelines": true,
+    "group_size_does_not_imply_group_aggro": true,
+    "required_empty_intervals": true,
+    "spacing_based_on_actual_aggro_and_assistance": true,
+    "safe_main_route": [
+      "L01",
+      "L02"
+    ]
+  },
+  "life_cycle": {
+    "capacity_not_always_active_nodes": true,
+    "no_instant_replacement_after_death": true,
+    "preserve_state_across_streaming": true,
+    "preserve_existing_respawn_rules": true,
+    "decorative_animals_npcs_pets_temporary_summons_excluded": true,
+    "all_alive_validation_in_isolated_clean_test_only": true
+  },
+  "forest_canopy_coverage_starting_percent": {
+    "dense": [
+      75,
+      90
+    ],
+    "normal": [
+      50,
+      75
+    ],
+    "edge": [
+      25,
+      50
+    ],
+    "clearing": [
+      0,
+      20
+    ]
+  },
+  "technical_starting_points": {
+    "streaming_cell_m": 128,
+    "adjustable_after_profiling": true,
+    "desktop_target_resolution": "1920x1080",
+    "desktop_target_fps": 60,
+    "warm_run_p95_target_ms": 20,
+    "warm_run_p99_target_ms": 33.3,
+    "targets_are_not_measured_results": true,
+    "versions_to_verify_in_actual_project": [
+      "Godot",
+      "Blender",
+      "renderer",
+      "terrain_system"
+    ]
+  },
+  "implementation_phases": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H"
+  ],
+  "acceptance_ids": [
+    "WORLD-01",
+    "WORLD-02",
+    "WORLD-03",
+    "WORLD-04",
+    "WORLD-05",
+    "WORLD-06",
+    "WORLD-07",
+    "WORLD-08",
+    "WORLD-09",
+    "WORLD-10",
+    "WORLD-11",
+    "WORLD-12",
+    "WORLD-13",
+    "WORLD-14",
+    "WORLD-15",
+    "WORLD-16",
+    "WORLD-17",
+    "WORLD-18",
+    "WORLD-19",
+    "WORLD-20",
+    "WORLD-21",
+    "WORLD-22",
+    "WORLD-23",
+    "WORLD-24",
+    "WORLD-25",
+    "WORLD-26",
+    "WORLD-27",
+    "WORLD-28"
+  ],
+  "authority_note": "Hard numbers in this contract and the main specification agree. Approximate anchors and tuning values are explicitly adjustable; do not reallocate location population totals without an explicit revision."
+}

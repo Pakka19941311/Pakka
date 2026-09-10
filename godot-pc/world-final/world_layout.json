@@ -1,0 +1,2994 @@
+{
+  "schema": 1,
+  "revision": "final-1.0-layout-01",
+  "status": "authored-layout-stage-A",
+  "coordinates": {
+    "units_per_meter": 1,
+    "up_axis": "Y",
+    "east_axis": "+X",
+    "south_axis": "+Z",
+    "north_is_image_top": true,
+    "surface_bounds": {
+      "min_x": -800,
+      "max_x": 800,
+      "min_z": -700,
+      "max_z": 700
+    },
+    "surface_minimap": {
+      "u": "(world_x + 800) / 1600",
+      "v": "(world_z + 700) / 1400",
+      "preserve_aspect_ratio": true
+    },
+    "image_projection_warning": "Artistic oblique view; image percentages are not a linear terrain projection."
+  },
+  "constraints": {
+    "width_m": 1600,
+    "depth_m": 1400,
+    "area_m2": 2240000,
+    "location_count": 12,
+    "approved_species_count": 15,
+    "regular_population_capacity": 997,
+    "boss_population_capacity": 3,
+    "total_population_capacity": 1000,
+    "bosses_included_in_total": true,
+    "cave_and_mine_are_separate": true,
+    "keep_existing_gameplay_and_saves": true,
+    "do_not_thin_vegetation_to_reduce_monsters": true,
+    "free_to_acquire_commercially_usable_assets_only": true
+  },
+  "reference": {
+    "path": "docs/world-final/spec/reference/varendor_world_reference.png",
+    "sha256": "cd2ac360f3f314dafb631e7b213e569c810ff9fad62c3665bad2e8b4dea31690",
+    "projection": "oblique, landmarks manually interpreted; not a height map"
+  },
+  "locations": [
+    {
+      "id": "L01",
+      "name_ru": "Астерхолд",
+      "regular": 0,
+      "bosses": 0,
+      "safe": true,
+      "subzones": [],
+      "total": 0,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -565,
+          285
+        ],
+        [
+          -435,
+          270
+        ],
+        [
+          -405,
+          375
+        ],
+        [
+          -555,
+          415
+        ],
+        [
+          -595,
+          350
+        ]
+      ]
+    },
+    {
+      "id": "L02",
+      "name_ru": "Гринфолл",
+      "regular": 0,
+      "bosses": 0,
+      "safe": true,
+      "subzones": [],
+      "total": 0,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -205,
+          70
+        ],
+        [
+          -40,
+          55
+        ],
+        [
+          15,
+          150
+        ],
+        [
+          -10,
+          245
+        ],
+        [
+          -180,
+          255
+        ],
+        [
+          -230,
+          160
+        ]
+      ]
+    },
+    {
+      "id": "L03",
+      "name_ru": "Западный лес и гнилая чаща",
+      "regular": 249,
+      "bosses": 1,
+      "safe": false,
+      "subzones": [
+        {
+          "id": "living_forest",
+          "space_id": "surface",
+          "regular": 160,
+          "bosses": 0
+        },
+        {
+          "id": "rotten_forest",
+          "space_id": "surface",
+          "regular": 89,
+          "bosses": 1
+        }
+      ],
+      "total": 250,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -790,
+          -255
+        ],
+        [
+          -620,
+          -290
+        ],
+        [
+          -400,
+          -300
+        ],
+        [
+          -300,
+          -570
+        ],
+        [
+          -100,
+          -580
+        ],
+        [
+          -55,
+          -345
+        ],
+        [
+          -285,
+          -170
+        ],
+        [
+          -245,
+          70
+        ],
+        [
+          -305,
+          235
+        ],
+        [
+          -510,
+          270
+        ],
+        [
+          -770,
+          160
+        ]
+      ]
+    },
+    {
+      "id": "L04",
+      "name_ru": "Снежные горы",
+      "regular": 79,
+      "bosses": 1,
+      "safe": false,
+      "subzones": [],
+      "total": 80,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -800,
+          -700
+        ],
+        [
+          -310,
+          -700
+        ],
+        [
+          -280,
+          -450
+        ],
+        [
+          -440,
+          -300
+        ],
+        [
+          -670,
+          -235
+        ],
+        [
+          -790,
+          -300
+        ]
+      ]
+    },
+    {
+      "id": "L05",
+      "name_ru": "Шахта",
+      "regular": 100,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [
+        {
+          "id": "mine_exterior",
+          "space_id": "surface",
+          "regular": 30,
+          "bosses": 0
+        },
+        {
+          "id": "mine_interior",
+          "space_id": "mine",
+          "regular": 70,
+          "bosses": 0
+        }
+      ],
+      "total": 100,
+      "space_id": "mixed_surface_and_mine",
+      "outline_xz": [
+        [
+          -95,
+          -590
+        ],
+        [
+          140,
+          -590
+        ],
+        [
+          185,
+          -405
+        ],
+        [
+          110,
+          -310
+        ],
+        [
+          -70,
+          -315
+        ]
+      ]
+    },
+    {
+      "id": "L06",
+      "name_ru": "Озеро и берега",
+      "regular": 60,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "safe_exclusions": [
+        "lakeside_settlement",
+        "pier",
+        "settlement_approaches"
+      ],
+      "total": 60,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -110,
+          -220
+        ],
+        [
+          120,
+          -290
+        ],
+        [
+          395,
+          -255
+        ],
+        [
+          485,
+          -110
+        ],
+        [
+          505,
+          115
+        ],
+        [
+          330,
+          200
+        ],
+        [
+          105,
+          135
+        ],
+        [
+          -110,
+          25
+        ]
+      ]
+    },
+    {
+      "id": "L07",
+      "name_ru": "Большая пещера",
+      "regular": 110,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "space_id": "great_cave",
+      "total": 110,
+      "outline_xz": [
+        [
+          195,
+          -320
+        ],
+        [
+          285,
+          -330
+        ],
+        [
+          315,
+          -255
+        ],
+        [
+          235,
+          -235
+        ],
+        [
+          180,
+          -265
+        ]
+      ]
+    },
+    {
+      "id": "L08",
+      "name_ru": "Восточное святилище",
+      "regular": 60,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 60,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          475,
+          -215
+        ],
+        [
+          790,
+          -220
+        ],
+        [
+          800,
+          120
+        ],
+        [
+          545,
+          160
+        ],
+        [
+          455,
+          30
+        ]
+      ]
+    },
+    {
+      "id": "L09",
+      "name_ru": "Вулкан и кратер",
+      "regular": 89,
+      "bosses": 1,
+      "safe": false,
+      "subzones": [],
+      "total": 90,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          255,
+          -700
+        ],
+        [
+          800,
+          -700
+        ],
+        [
+          800,
+          -155
+        ],
+        [
+          660,
+          -125
+        ],
+        [
+          465,
+          -170
+        ],
+        [
+          305,
+          -300
+        ]
+      ]
+    },
+    {
+      "id": "L10",
+      "name_ru": "Южные руины",
+      "regular": 70,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 70,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -180,
+          290
+        ],
+        [
+          150,
+          265
+        ],
+        [
+          270,
+          450
+        ],
+        [
+          235,
+          610
+        ],
+        [
+          -60,
+          665
+        ],
+        [
+          -225,
+          465
+        ]
+      ]
+    },
+    {
+      "id": "L11",
+      "name_ru": "Юго-западное болото",
+      "regular": 90,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 90,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          -800,
+          230
+        ],
+        [
+          -625,
+          310
+        ],
+        [
+          -510,
+          410
+        ],
+        [
+          -370,
+          455
+        ],
+        [
+          -335,
+          700
+        ],
+        [
+          -800,
+          700
+        ]
+      ]
+    },
+    {
+      "id": "L12",
+      "name_ru": "Юго-восточный некрополь",
+      "regular": 90,
+      "bosses": 0,
+      "safe": false,
+      "subzones": [],
+      "total": 90,
+      "space_id": "surface",
+      "outline_xz": [
+        [
+          370,
+          230
+        ],
+        [
+          800,
+          175
+        ],
+        [
+          800,
+          700
+        ],
+        [
+          215,
+          700
+        ],
+        [
+          250,
+          515
+        ],
+        [
+          330,
+          375
+        ]
+      ]
+    }
+  ],
+  "anchors": [
+    {
+      "id": "village",
+      "location_id": "L01",
+      "image_percent_xy": [
+        19,
+        71
+      ],
+      "world_xz_m": [
+        -490,
+        340
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "fortress",
+      "location_id": "L02",
+      "image_percent_xy": [
+        44,
+        57
+      ],
+      "world_xz_m": [
+        -100,
+        150
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "western_forest",
+      "location_id": "L03",
+      "image_percent_xy": [
+        23,
+        40
+      ],
+      "world_xz_m": [
+        -450,
+        -60
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "ancient_tree",
+      "location_id": "L03",
+      "image_percent_xy": [
+        41,
+        15
+      ],
+      "world_xz_m": [
+        -170,
+        -450
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "snow_region",
+      "location_id": "L04",
+      "image_percent_xy": [
+        13,
+        9
+      ],
+      "world_xz_m": [
+        -560,
+        -530
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "mine_entrance",
+      "location_id": "L05",
+      "image_percent_xy": [
+        53,
+        20
+      ],
+      "world_xz_m": [
+        35,
+        -420
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "lake_center",
+      "location_id": "L06",
+      "image_percent_xy": [
+        63,
+        42
+      ],
+      "world_xz_m": [
+        220,
+        -70
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "lakeside_settlement",
+      "location_id": "L06",
+      "image_percent_xy": [
+        74,
+        47
+      ],
+      "world_xz_m": [
+        420,
+        40
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "great_cave_entrance",
+      "location_id": "L07",
+      "image_percent_xy": [
+        65,
+        30
+      ],
+      "world_xz_m": [
+        245,
+        -280
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "eastern_sanctuary",
+      "location_id": "L08",
+      "image_percent_xy": [
+        89,
+        40
+      ],
+      "world_xz_m": [
+        620,
+        -100
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "volcano_crater",
+      "location_id": "L09",
+      "image_percent_xy": [
+        85,
+        11
+      ],
+      "world_xz_m": [
+        545,
+        -490
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "southern_ruins",
+      "location_id": "L10",
+      "image_percent_xy": [
+        51,
+        79
+      ],
+      "world_xz_m": [
+        10,
+        425
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "swamp",
+      "location_id": "L11",
+      "image_percent_xy": [
+        11,
+        84
+      ],
+      "world_xz_m": [
+        -620,
+        490
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    },
+    {
+      "id": "necropolis",
+      "location_id": "L12",
+      "image_percent_xy": [
+        82,
+        74
+      ],
+      "world_xz_m": [
+        510,
+        365
+      ],
+      "status": "proposed_adjustable_blockout_not_measured"
+    }
+  ],
+  "roads": [
+    {
+      "id": "safe-village-fort",
+      "kind": "protected",
+      "width": 5.5,
+      "points_xyz": [
+        [
+          -490,
+          35,
+          340
+        ],
+        [
+          -410,
+          38,
+          325
+        ],
+        [
+          -355,
+          43,
+          275
+        ],
+        [
+          -280,
+          50,
+          230
+        ],
+        [
+          -215,
+          57,
+          240
+        ],
+        [
+          -170,
+          65,
+          253
+        ],
+        [
+          -100,
+          70,
+          243
+        ],
+        [
+          -100,
+          70,
+          214
+        ],
+        [
+          -100,
+          70,
+          150
+        ]
+      ]
+    },
+    {
+      "id": "fort-lake",
+      "kind": "main",
+      "width": 5,
+      "points_xyz": [
+        [
+          -100,
+          70,
+          243
+        ],
+        [
+          0,
+          62,
+          241
+        ],
+        [
+          92,
+          54,
+          196
+        ],
+        [
+          186,
+          49,
+          145
+        ],
+        [
+          274,
+          48,
+          143
+        ],
+        [
+          307,
+          48,
+          144
+        ],
+        [
+          341,
+          48,
+          142
+        ],
+        [
+          390,
+          48,
+          109
+        ],
+        [
+          420,
+          48,
+          40
+        ]
+      ]
+    },
+    {
+      "id": "west-spine",
+      "kind": "main",
+      "width": 4,
+      "points_xyz": [
+        [
+          -280,
+          50,
+          230
+        ],
+        [
+          -315,
+          58,
+          130
+        ],
+        [
+          -370,
+          69,
+          62
+        ],
+        [
+          -420,
+          77,
+          -35
+        ],
+        [
+          -414,
+          90,
+          -143
+        ],
+        [
+          -360,
+          104,
+          -255
+        ],
+        [
+          -250,
+          110,
+          -326
+        ],
+        [
+          -95,
+          120,
+          -340
+        ],
+        [
+          35,
+          125,
+          -420
+        ]
+      ]
+    },
+    {
+      "id": "living-forest-loop",
+      "kind": "trail",
+      "width": 1.5,
+      "points_xyz": [
+        [
+          -370,
+          69,
+          62
+        ],
+        [
+          -485,
+          60,
+          105
+        ],
+        [
+          -600,
+          64,
+          65
+        ],
+        [
+          -675,
+          70,
+          -30
+        ],
+        [
+          -610,
+          84,
+          -115
+        ],
+        [
+          -515,
+          89,
+          -190
+        ],
+        [
+          -414,
+          90,
+          -143
+        ]
+      ]
+    },
+    {
+      "id": "rotten-approach",
+      "kind": "secondary",
+      "width": 2.5,
+      "points_xyz": [
+        [
+          -250,
+          110,
+          -326
+        ],
+        [
+          -255,
+          114,
+          -385
+        ],
+        [
+          -200,
+          122,
+          -430
+        ],
+        [
+          -170,
+          122,
+          -450
+        ]
+      ]
+    },
+    {
+      "id": "snow-ascent",
+      "kind": "ascent",
+      "width": 3,
+      "points_xyz": [
+        [
+          -414,
+          90,
+          -143
+        ],
+        [
+          -470,
+          105,
+          -210
+        ],
+        [
+          -575,
+          128,
+          -261
+        ],
+        [
+          -650,
+          150,
+          -320
+        ],
+        [
+          -493,
+          182,
+          -368
+        ],
+        [
+          -629,
+          208,
+          -426
+        ],
+        [
+          -465,
+          233,
+          -482
+        ],
+        [
+          -540,
+          252,
+          -550
+        ]
+      ]
+    },
+    {
+      "id": "mine-cave-link",
+      "kind": "secondary",
+      "width": 3,
+      "points_xyz": [
+        [
+          35,
+          125,
+          -420
+        ],
+        [
+          95,
+          118,
+          -365
+        ],
+        [
+          100,
+          95,
+          -315
+        ],
+        [
+          165,
+          66,
+          -300
+        ],
+        [
+          210,
+          49,
+          -286
+        ],
+        [
+          245,
+          48,
+          -280
+        ]
+      ]
+    },
+    {
+      "id": "dry-cave-approach",
+      "kind": "secondary",
+      "width": 3,
+      "points_xyz": [
+        [
+          -100,
+          70,
+          243
+        ],
+        [
+          -195,
+          61,
+          120
+        ],
+        [
+          -172,
+          55,
+          18
+        ],
+        [
+          -125,
+          48,
+          -74
+        ],
+        [
+          -110,
+          47,
+          -162
+        ],
+        [
+          8,
+          48,
+          -229
+        ],
+        [
+          107,
+          48,
+          -276
+        ],
+        [
+          185,
+          48,
+          -289
+        ],
+        [
+          245,
+          48,
+          -280
+        ]
+      ]
+    },
+    {
+      "id": "lake-sanctuary",
+      "kind": "main",
+      "width": 4,
+      "points_xyz": [
+        [
+          420,
+          48,
+          40
+        ],
+        [
+          497,
+          53,
+          40
+        ],
+        [
+          561,
+          65,
+          -3
+        ],
+        [
+          598,
+          79,
+          -76
+        ],
+        [
+          620,
+          80,
+          -100
+        ]
+      ]
+    },
+    {
+      "id": "volcano-ascent",
+      "kind": "ascent",
+      "width": 3.5,
+      "points_xyz": [
+        [
+          561,
+          65,
+          -3
+        ],
+        [
+          650,
+          85,
+          -84
+        ],
+        [
+          687,
+          106,
+          -177
+        ],
+        [
+          490,
+          145,
+          -239
+        ],
+        [
+          680,
+          180,
+          -293
+        ],
+        [
+          494,
+          216,
+          -353
+        ],
+        [
+          716,
+          251,
+          -408
+        ],
+        [
+          668,
+          275,
+          -491
+        ],
+        [
+          628,
+          288,
+          -582
+        ],
+        [
+          538,
+          289,
+          -620
+        ],
+        [
+          463,
+          250,
+          -551
+        ],
+        [
+          498,
+          221,
+          -498
+        ],
+        [
+          545,
+          216,
+          -490
+        ]
+      ]
+    },
+    {
+      "id": "south-ruins",
+      "kind": "main",
+      "width": 4,
+      "points_xyz": [
+        [
+          -100,
+          70,
+          243
+        ],
+        [
+          -65,
+          57,
+          310
+        ],
+        [
+          5,
+          40,
+          362
+        ],
+        [
+          10,
+          30,
+          425
+        ]
+      ]
+    },
+    {
+      "id": "swamp-path",
+      "kind": "secondary",
+      "width": 2,
+      "points_xyz": [
+        [
+          -490,
+          35,
+          340
+        ],
+        [
+          -553,
+          29,
+          411
+        ],
+        [
+          -621,
+          16,
+          448
+        ],
+        [
+          -649,
+          15,
+          506
+        ],
+        [
+          -575,
+          14,
+          559
+        ]
+      ]
+    },
+    {
+      "id": "necropolis-road",
+      "kind": "main",
+      "width": 4,
+      "points_xyz": [
+        [
+          10,
+          30,
+          425
+        ],
+        [
+          121,
+          27,
+          412
+        ],
+        [
+          221,
+          25,
+          433
+        ],
+        [
+          289,
+          25,
+          437
+        ],
+        [
+          321,
+          25,
+          438
+        ],
+        [
+          351,
+          25,
+          438
+        ],
+        [
+          407,
+          27,
+          422
+        ],
+        [
+          478,
+          28,
+          368
+        ],
+        [
+          510,
+          28,
+          365
+        ],
+        [
+          620,
+          31,
+          310
+        ],
+        [
+          660,
+          32,
+          280
+        ]
+      ]
+    },
+    {
+      "id": "eastern-grave-approach",
+      "kind": "secondary",
+      "width": 2.5,
+      "points_xyz": [
+        [
+          420,
+          48,
+          40
+        ],
+        [
+          479,
+          40,
+          151
+        ],
+        [
+          513,
+          33,
+          244
+        ],
+        [
+          510,
+          28,
+          365
+        ]
+      ]
+    }
+  ],
+  "water": {
+    "lake": {
+      "level": 40,
+      "polygon": [
+        [
+          -55,
+          -100
+        ],
+        [
+          -20,
+          -145
+        ],
+        [
+          40,
+          -163
+        ],
+        [
+          75,
+          -194
+        ],
+        [
+          80,
+          -225
+        ],
+        [
+          140,
+          -251
+        ],
+        [
+          205,
+          -251
+        ],
+        [
+          249,
+          -267
+        ],
+        [
+          294,
+          -242
+        ],
+        [
+          340,
+          -212
+        ],
+        [
+          379,
+          -164
+        ],
+        [
+          417,
+          -127
+        ],
+        [
+          433,
+          -70
+        ],
+        [
+          420,
+          -15
+        ],
+        [
+          386,
+          22
+        ],
+        [
+          357,
+          52
+        ],
+        [
+          341,
+          84
+        ],
+        [
+          311,
+          111
+        ],
+        [
+          277,
+          106
+        ],
+        [
+          254,
+          75
+        ],
+        [
+          237,
+          35
+        ],
+        [
+          187,
+          28
+        ],
+        [
+          160,
+          -1
+        ],
+        [
+          128,
+          -10
+        ],
+        [
+          89,
+          -8
+        ],
+        [
+          47,
+          -25
+        ],
+        [
+          8,
+          -34
+        ],
+        [
+          -31,
+          -61
+        ]
+      ]
+    },
+    "river": {
+      "centerline_xyz": [
+        [
+          306,
+          40,
+          105
+        ],
+        [
+          310,
+          38,
+          146
+        ],
+        [
+          337,
+          30,
+          206
+        ],
+        [
+          324,
+          27,
+          263
+        ],
+        [
+          366,
+          23,
+          310
+        ],
+        [
+          350,
+          21,
+          371
+        ],
+        [
+          319,
+          18,
+          438
+        ],
+        [
+          288,
+          15,
+          501
+        ],
+        [
+          340,
+          10,
+          590
+        ],
+        [
+          322,
+          5,
+          700
+        ]
+      ],
+      "width": 19
+    },
+    "swamp": {
+      "level": 13,
+      "polygon": [
+        [
+          -800,
+          230
+        ],
+        [
+          -625,
+          310
+        ],
+        [
+          -510,
+          410
+        ],
+        [
+          -370,
+          455
+        ],
+        [
+          -335,
+          700
+        ],
+        [
+          -800,
+          700
+        ]
+      ]
+    }
+  },
+  "platforms": [
+    {
+      "id": "village",
+      "x": -490,
+      "z": 340,
+      "y": 35,
+      "size": [
+        132,
+        102
+      ],
+      "blend": 40
+    },
+    {
+      "id": "fortress",
+      "x": -100,
+      "z": 150,
+      "y": 70,
+      "size": [
+        166,
+        148
+      ],
+      "blend": 50
+    },
+    {
+      "id": "ancient_tree",
+      "x": -170,
+      "z": -450,
+      "y": 122,
+      "size": [
+        68,
+        66
+      ],
+      "blend": 35
+    },
+    {
+      "id": "mine_entrance",
+      "x": 35,
+      "z": -420,
+      "y": 125,
+      "size": [
+        60,
+        55
+      ],
+      "blend": 24
+    },
+    {
+      "id": "great_cave_entrance",
+      "x": 245,
+      "z": -280,
+      "y": 48,
+      "size": [
+        58,
+        44
+      ],
+      "blend": 14
+    },
+    {
+      "id": "lakeside_settlement",
+      "x": 420,
+      "z": 40,
+      "y": 48,
+      "size": [
+        85,
+        94
+      ],
+      "blend": 22
+    },
+    {
+      "id": "eastern_sanctuary",
+      "x": 620,
+      "z": -100,
+      "y": 80,
+      "size": [
+        100,
+        95
+      ],
+      "blend": 30
+    },
+    {
+      "id": "snow_boss",
+      "x": -540,
+      "z": -550,
+      "y": 252,
+      "size": [
+        74,
+        68
+      ],
+      "blend": 24
+    },
+    {
+      "id": "volcano_crater",
+      "x": 545,
+      "z": -490,
+      "y": 216,
+      "size": [
+        100,
+        90
+      ],
+      "blend": 32
+    },
+    {
+      "id": "southern_ruins",
+      "x": 10,
+      "z": 425,
+      "y": 30,
+      "size": [
+        115,
+        94
+      ],
+      "blend": 24
+    },
+    {
+      "id": "necropolis_church",
+      "x": 660,
+      "z": 280,
+      "y": 32,
+      "size": [
+        65,
+        80
+      ],
+      "blend": 30
+    }
+  ],
+  "objects": [
+    {
+      "id": "V01",
+      "location_id": "L01",
+      "kind": "civic_house",
+      "position": [
+        -489,
+        35,
+        334
+      ],
+      "rotation_y_deg": 5,
+      "size": [
+        14,
+        13,
+        18
+      ],
+      "reference_pixel": [
+        304,
+        914
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V02",
+      "location_id": "L01",
+      "kind": "house",
+      "position": [
+        -528,
+        35,
+        315
+      ],
+      "rotation_y_deg": -18,
+      "size": [
+        10,
+        9,
+        14
+      ],
+      "reference_pixel": [
+        234,
+        888
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V03",
+      "location_id": "L01",
+      "kind": "house",
+      "position": [
+        -525,
+        35,
+        351
+      ],
+      "rotation_y_deg": 15,
+      "size": [
+        10,
+        7,
+        12
+      ],
+      "reference_pixel": [
+        243,
+        926
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V04",
+      "location_id": "L01",
+      "kind": "house",
+      "position": [
+        -447,
+        35,
+        325
+      ],
+      "rotation_y_deg": 18,
+      "size": [
+        13,
+        8,
+        10
+      ],
+      "reference_pixel": [
+        371,
+        895
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V05",
+      "location_id": "L01",
+      "kind": "shed",
+      "position": [
+        -427,
+        35,
+        346
+      ],
+      "rotation_y_deg": 20,
+      "size": [
+        8,
+        5,
+        9
+      ],
+      "reference_pixel": [
+        402,
+        916
+      ],
+      "reference_confidence": "medium",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V06",
+      "location_id": "L01",
+      "kind": "shed",
+      "position": [
+        -498,
+        35,
+        290
+      ],
+      "rotation_y_deg": 45,
+      "size": [
+        8,
+        5,
+        10
+      ],
+      "reference_pixel": [
+        286,
+        857
+      ],
+      "reference_confidence": "medium",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V07",
+      "location_id": "L01",
+      "kind": "house",
+      "position": [
+        -465,
+        35,
+        288
+      ],
+      "rotation_y_deg": -20,
+      "size": [
+        9,
+        7,
+        11
+      ],
+      "reference_pixel": [
+        346,
+        855
+      ],
+      "reference_confidence": "medium",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V08",
+      "location_id": "L01",
+      "kind": "shed",
+      "position": [
+        -480,
+        35,
+        370
+      ],
+      "rotation_y_deg": 5,
+      "size": [
+        8,
+        5,
+        7
+      ],
+      "reference_pixel": [
+        327,
+        951
+      ],
+      "reference_confidence": "medium",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "V01_TOWER",
+      "location_id": "L01",
+      "kind": "tower",
+      "position": [
+        -489,
+        35,
+        323
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        6,
+        18,
+        6
+      ],
+      "reference_pixel": [
+        327,
+        875
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": "V01",
+      "manual": true
+    },
+    {
+      "id": "FORT",
+      "location_id": "L02",
+      "kind": "fortress",
+      "position": [
+        -100,
+        70,
+        150
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        166,
+        24,
+        148
+      ],
+      "reference_pixel": [
+        647,
+        739
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "F_KEEP",
+      "location_id": "L02",
+      "kind": "house",
+      "position": [
+        -128,
+        70,
+        118
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        12,
+        22
+      ],
+      "reference_pixel": [
+        598,
+        696
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": "FORT",
+      "manual": true
+    },
+    {
+      "id": "F_HALL",
+      "location_id": "L02",
+      "kind": "house",
+      "position": [
+        -78,
+        70,
+        116
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        12,
+        22
+      ],
+      "reference_pixel": [
+        691,
+        727
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": "FORT",
+      "manual": true
+    },
+    {
+      "id": "F_STABLE",
+      "location_id": "L02",
+      "kind": "house",
+      "position": [
+        -152,
+        70,
+        153
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        12,
+        22
+      ],
+      "reference_pixel": [
+        553,
+        739
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": "FORT",
+      "manual": true
+    },
+    {
+      "id": "F_STORE",
+      "location_id": "L02",
+      "kind": "house",
+      "position": [
+        -62,
+        70,
+        168
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        12,
+        22
+      ],
+      "reference_pixel": [
+        696,
+        754
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": "FORT",
+      "manual": true
+    },
+    {
+      "id": "ANCIENT_TREE",
+      "location_id": "L03",
+      "kind": "ancient_tree",
+      "position": [
+        -170,
+        122,
+        -450
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        42,
+        48,
+        40
+      ],
+      "reference_pixel": [
+        610,
+        224
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SNOW_SUMMIT_W",
+      "location_id": "L04",
+      "kind": "peak",
+      "position": [
+        -675,
+        280,
+        -585
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        140,
+        75,
+        135
+      ],
+      "reference_pixel": [
+        144,
+        100
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SNOW_SUMMIT_E",
+      "location_id": "L04",
+      "kind": "peak",
+      "position": [
+        -430,
+        272,
+        -613
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        110,
+        66,
+        110
+      ],
+      "reference_pixel": [
+        291,
+        95
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SNOW_ARENA",
+      "location_id": "L04",
+      "kind": "arena",
+      "position": [
+        -540,
+        252,
+        -550
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        74,
+        1,
+        68
+      ],
+      "reference_pixel": [
+        166,
+        150
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "MINE_PORTAL",
+      "location_id": "L05",
+      "kind": "mine_portal",
+      "position": [
+        35,
+        125,
+        -420
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        18,
+        16,
+        12
+      ],
+      "reference_pixel": [
+        786,
+        255
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "MINE_UPPER",
+      "location_id": "L05",
+      "kind": "mine_portal",
+      "position": [
+        64,
+        155,
+        -490
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        10,
+        10,
+        8
+      ],
+      "reference_pixel": [
+        820,
+        194
+      ],
+      "reference_confidence": "medium",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "MINE_SCAFFOLD",
+      "location_id": "L05",
+      "kind": "scaffold",
+      "position": [
+        11,
+        125,
+        -434
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        24,
+        17,
+        12
+      ],
+      "reference_pixel": [
+        749,
+        263
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "CAVE_MOUTH",
+      "location_id": "L07",
+      "kind": "cave_mouth",
+      "position": [
+        245,
+        48,
+        -280
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        42,
+        36,
+        32
+      ],
+      "reference_pixel": [
+        945,
+        387
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SH01",
+      "location_id": "L06",
+      "kind": "house",
+      "position": [
+        409,
+        48,
+        58
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        12,
+        10,
+        12
+      ],
+      "reference_pixel": [
+        1054,
+        618
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SH02",
+      "location_id": "L06",
+      "kind": "house",
+      "position": [
+        442,
+        48,
+        68
+      ],
+      "rotation_y_deg": -18,
+      "size": [
+        10,
+        7,
+        14
+      ],
+      "reference_pixel": [
+        1106,
+        619
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SH03",
+      "location_id": "L06",
+      "kind": "house",
+      "position": [
+        467,
+        48,
+        24
+      ],
+      "rotation_y_deg": -25,
+      "size": [
+        10,
+        9,
+        12
+      ],
+      "reference_pixel": [
+        1142,
+        586
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SH04",
+      "location_id": "L06",
+      "kind": "house",
+      "position": [
+        387,
+        48,
+        29
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        8,
+        7,
+        11
+      ],
+      "reference_pixel": [
+        1020,
+        603
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SH05",
+      "location_id": "L06",
+      "kind": "house",
+      "position": [
+        468,
+        48,
+        61
+      ],
+      "rotation_y_deg": 35,
+      "size": [
+        8,
+        6,
+        9
+      ],
+      "reference_pixel": [
+        1160,
+        617
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SH_TOWER",
+      "location_id": "L06",
+      "kind": "tower",
+      "position": [
+        433,
+        48,
+        5
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        8,
+        20,
+        8
+      ],
+      "reference_pixel": [
+        1095,
+        563
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "PIER",
+      "location_id": "L06",
+      "kind": "pier",
+      "position": [
+        372,
+        41.2,
+        25
+      ],
+      "rotation_y_deg": 90,
+      "size": [
+        9,
+        1.2,
+        42
+      ],
+      "reference_pixel": [
+        975,
+        608
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "BRIDGE_LAKE",
+      "location_id": "L06",
+      "kind": "bridge",
+      "position": [
+        308,
+        48,
+        144
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        66,
+        12,
+        8
+      ],
+      "reference_pixel": [
+        929,
+        694
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "BRIDGE_GRAVES",
+      "location_id": "L12",
+      "kind": "bridge",
+      "position": [
+        321,
+        25,
+        438
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        64,
+        8,
+        6
+      ],
+      "reference_pixel": [
+        935,
+        904
+      ],
+      "reference_confidence": "medium",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "SANCTUARY",
+      "location_id": "L08",
+      "kind": "sanctuary",
+      "position": [
+        620,
+        80,
+        -100
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        96,
+        38,
+        88
+      ],
+      "reference_pixel": [
+        1300,
+        524
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "VOLCANO_RIM",
+      "location_id": "L09",
+      "kind": "crater",
+      "position": [
+        545,
+        216,
+        -490
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        450,
+        78,
+        400
+      ],
+      "reference_pixel": [
+        1232,
+        172
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "RUIN_TOWER",
+      "location_id": "L10",
+      "kind": "ruined_tower",
+      "position": [
+        38,
+        30,
+        397
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        18,
+        26,
+        16
+      ],
+      "reference_pixel": [
+        804,
+        981
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "R01",
+      "location_id": "L10",
+      "kind": "ruined_house",
+      "position": [
+        -35,
+        30,
+        439
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        8,
+        12
+      ],
+      "reference_pixel": [
+        698,
+        1021
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "R02",
+      "location_id": "L10",
+      "kind": "ruined_house",
+      "position": [
+        -23,
+        30,
+        397
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        8,
+        12
+      ],
+      "reference_pixel": [
+        724,
+        980
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "R03",
+      "location_id": "L10",
+      "kind": "ruined_house",
+      "position": [
+        63,
+        30,
+        436
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        8,
+        12
+      ],
+      "reference_pixel": [
+        858,
+        1016
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "R04",
+      "location_id": "L10",
+      "kind": "ruined_house",
+      "position": [
+        24,
+        30,
+        466
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        14,
+        8,
+        12
+      ],
+      "reference_pixel": [
+        794,
+        1058
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "GRAVE_CHURCH",
+      "location_id": "L12",
+      "kind": "church",
+      "position": [
+        660,
+        32,
+        280
+      ],
+      "rotation_y_deg": 180,
+      "size": [
+        32,
+        55,
+        64
+      ],
+      "reference_pixel": [
+        1373,
+        859
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "GRAVE_GATE",
+      "location_id": "L12",
+      "kind": "ruined_gate",
+      "position": [
+        590,
+        27,
+        495
+      ],
+      "rotation_y_deg": -12,
+      "size": [
+        24,
+        18,
+        6
+      ],
+      "reference_pixel": [
+        1371,
+        1060
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "GRAVE_STATUE",
+      "location_id": "L12",
+      "kind": "statue",
+      "position": [
+        422,
+        28,
+        498
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        8,
+        22,
+        8
+      ],
+      "reference_pixel": [
+        1093,
+        1082
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "C01",
+      "location_id": "L12",
+      "kind": "crypt",
+      "position": [
+        472,
+        28,
+        310
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        10,
+        10,
+        13
+      ],
+      "reference_pixel": [
+        1114,
+        895
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "C02",
+      "location_id": "L12",
+      "kind": "crypt",
+      "position": [
+        558,
+        28,
+        272
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        10,
+        10,
+        13
+      ],
+      "reference_pixel": [
+        1248,
+        842
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "C03",
+      "location_id": "L12",
+      "kind": "crypt",
+      "position": [
+        404,
+        28,
+        405
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        10,
+        10,
+        13
+      ],
+      "reference_pixel": [
+        1052,
+        961
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "C04",
+      "location_id": "L12",
+      "kind": "crypt",
+      "position": [
+        590,
+        28,
+        443
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        10,
+        10,
+        13
+      ],
+      "reference_pixel": [
+        1324,
+        1000
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    },
+    {
+      "id": "C05",
+      "location_id": "L12",
+      "kind": "crypt",
+      "position": [
+        655,
+        28,
+        530
+      ],
+      "rotation_y_deg": 0,
+      "size": [
+        10,
+        10,
+        13
+      ],
+      "reference_pixel": [
+        1425,
+        1100
+      ],
+      "reference_confidence": "high",
+      "status": "authored-placement-pending-mesh",
+      "parent_landmark": null,
+      "manual": true
+    }
+  ],
+  "masks": [
+    {
+      "id": "living_forest",
+      "location_id": "L03",
+      "kind": "forest",
+      "polygon": [
+        [
+          -790,
+          -220
+        ],
+        [
+          -650,
+          -250
+        ],
+        [
+          -470,
+          -285
+        ],
+        [
+          -350,
+          -230
+        ],
+        [
+          -280,
+          -70
+        ],
+        [
+          -300,
+          130
+        ],
+        [
+          -400,
+          235
+        ],
+        [
+          -660,
+          210
+        ],
+        [
+          -785,
+          90
+        ]
+      ],
+      "canopy": [
+        0.5,
+        0.9
+      ]
+    },
+    {
+      "id": "rotten_forest",
+      "location_id": "L03",
+      "kind": "dead_forest",
+      "polygon": [
+        [
+          -425,
+          -325
+        ],
+        [
+          -310,
+          -500
+        ],
+        [
+          -230,
+          -595
+        ],
+        [
+          -70,
+          -565
+        ],
+        [
+          -45,
+          -400
+        ],
+        [
+          -165,
+          -285
+        ],
+        [
+          -300,
+          -250
+        ]
+      ],
+      "canopy": [
+        0.45,
+        0.75
+      ]
+    },
+    {
+      "id": "southern_treeline",
+      "location_id": "L10",
+      "kind": "forest",
+      "polygon": [
+        [
+          -390,
+          440
+        ],
+        [
+          -260,
+          300
+        ],
+        [
+          -120,
+          310
+        ],
+        [
+          110,
+          580
+        ],
+        [
+          215,
+          695
+        ],
+        [
+          -240,
+          690
+        ]
+      ],
+      "canopy": [
+        0.45,
+        0.75
+      ]
+    },
+    {
+      "id": "western_clearing",
+      "location_id": "L03",
+      "kind": "clearing",
+      "polygon": [
+        [
+          -690,
+          50
+        ],
+        [
+          -595,
+          5
+        ],
+        [
+          -535,
+          50
+        ],
+        [
+          -566,
+          120
+        ],
+        [
+          -645,
+          125
+        ]
+      ],
+      "canopy": [
+        0,
+        0.2
+      ]
+    },
+    {
+      "id": "forest_middle_glade",
+      "location_id": "L03",
+      "kind": "clearing",
+      "polygon": [
+        [
+          -570,
+          -160
+        ],
+        [
+          -506,
+          -207
+        ],
+        [
+          -454,
+          -175
+        ],
+        [
+          -478,
+          -115
+        ],
+        [
+          -548,
+          -116
+        ]
+      ],
+      "canopy": [
+        0,
+        0.15
+      ]
+    }
+  ],
+  "spaces": [
+    {
+      "id": "surface",
+      "regular": 817,
+      "bosses": 3,
+      "total": 820
+    },
+    {
+      "id": "mine",
+      "regular": 70,
+      "bosses": 0,
+      "total": 70
+    },
+    {
+      "id": "great_cave",
+      "regular": 110,
+      "bosses": 0,
+      "total": 110
+    }
+  ],
+  "seed": 149762,
+  "cell_metres": 128,
+  "support_grid_metres": 2,
+  "overview_camera": {
+    "position": [
+      1030,
+      1150,
+      1370
+    ],
+    "target": [
+      0,
+      55,
+      -50
+    ],
+    "fov": 42,
+    "projection": "perspective",
+    "status": "initial-must-compare-Godot-frame"
+  },
+  "decisions": [
+    {
+      "id": "names",
+      "reason": "Preserve existing canon/service IDs per FINAL §6: southwest settlement Asterhold, central fortress Greenfall; physical reference positions unchanged."
+    },
+    {
+      "id": "axis",
+      "reason": "Authoring is Godot X/Y/Z with +Z south. Existing server +z north remains; convert server z = -Godot Z at the existing boundary."
+    },
+    {
+      "id": "boss-catalog",
+      "reason": "Existing bosses are big (Forest Lord), mini (massive Werewolf), rift_boss. No approved separate snow boss exists; resolve L04 placement with this catalog without inventing a species. Environment work is independent.",
+      "status": "population-stage-review"
+    },
+    {
+      "id": "capacity",
+      "reason": "Supersedes v4 draft totals. Final capacity is 997 ordinary + 3 bosses, including mine 70 and great_cave 110."
+    }
+  ]
+}
