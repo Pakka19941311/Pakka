@@ -60,7 +60,7 @@
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "4dcf07348cff169881ab3beaf16494d57769ff37",
+  "last_saved_commit": "121331d5de6cfc3356abd1c0d2a7d7df224f9a60",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -74,5 +74,13 @@
     "old_motion_regression_10": true,
     "actual_Godot_frames": "docs/world-final/evidence/B-02",
     "final_visual_acceptance": false
+  },
+  "publication": {
+    "content_checkpoint": "121331d5de6cfc3356abd1c0d2a7d7df224f9a60",
+    "binary_blobs_uploaded_and_hash_verified": 27,
+    "native_and_glb_payload_files": 149,
+    "payload_parts": 17,
+    "main_and_knight_v2_unchanged": true,
+    "note": "A follow-up metadata-only commit preserves exact CRLF bytes for geometry JSON so payload hash checks also pass on clean checkout."
   }
 }
