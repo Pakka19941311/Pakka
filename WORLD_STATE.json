@@ -10,7 +10,7 @@
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
-    "D": "partial: native D08 full forests; D09 fixes black instanced bark with explicit white instance tint. D10 native terrain material master saved, measured biome masks and PBR snow/rock/ash surfaces in Godot review. Mipmap profiles and pine import LOD corrections visually checked; normal forest walk passed (152 frames, 0m stop drift, canopy 82.96%). Organic rock silhouettes, grass/shore/swamp detail, natural forest edges and ancient tree remain. Final art not accepted.",
+    "D": "partial: D08 full forest preserved; D10 materials published; D11 adds 362189 saved grass points and 151 fitted cliff meshes. Corrected native D11D reopened and point-edit round-trip verified. 15 new-collision routes and six rendered walks passed, zero stop drift. Grass palette/borders, coherent mountain silhouettes, shore/swamp/ancient tree and final art remain unfinished.",
     "E": "not started",
     "F": "not started",
     "G": "not started",
@@ -106,24 +106,30 @@
     "godot-pc/world-final/materials/",
     "godot-pc/world-final/tree_material_diagnostic.gd",
     "art/world-final/Varendor_Surface_D-10.blend",
-    "docs/world-final/evidence/D09-materials/"
+    "docs/world-final/evidence/D09-materials/",
+    "art/world-final/Varendor_Groundcover_D-11D.blend",
+    "docs/world-final/GROUNDCOVER_D11_RU.md",
+    "docs/world-final/evidence/D11-groundcover/",
+    "godot-pc/world-final/groundcover_world_review.gd",
+    "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Continue D with organic cliff ensembles, ground vegetation, irregular forest edges, swamp/shore/ancient-tree detail. D08 forest checkpoint cbaa901 is published; D09-D10 material checkpoint is the current saved content. Keep review-only palette/AA separate until art/performance decision. Then E atmosphere and maps, F main-game/NPC/save migration, G 1000 monsters, H final checks/Actions Release. Main still uses old world.",
+  "next_task": "Publish the staged D11 source/evidence checkpoint, then refine D12 art: coherent ridge/scarp silhouettes (current isolated rocks are not accepted), grass shading and irregular wetland/forest transitions, shore and ancient tree. Keep all saved forest density. Then E atmosphere/maps, F main/NPC/portals/saves, G exact 1000 population, H performance and Actions Release.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
     "World/interior weather, light, water, audio and three maps E",
     "Main-game portals, NPC/save migration and 1000-population server F-G",
     "Streaming, full-world cold/warm performance, editing round-trip and Windows Release H",
-    "D09-D10 newer native/material work remains local beyond the D08 staged checkpoint; native exact shader parity, final AA/performance, full forest canopy coverage and terrain gameplay close views remain incomplete."
+    "D09-D10 published at 0308312; native exact shader parity, final AA/performance, full forest canopy coverage and terrain gameplay close views remain incomplete.",
+    "D11: native point edits pass; native cliff-edit re-export, coherent rock masses, dark grass and abrupt patch borders, final full-world art/streaming remain. D12 color/normal probes are not promoted."
   ],
   "protected": [
     "Existing hero/animation/controller/camera/combat",
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "cbaa901f04af9e464da02bb3e941024b051733a2",
+  "last_saved_commit": "0308312b66d2f8ffd131896716b98b9d05fc7793",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -171,15 +177,23 @@
     "forest_after_import_fixes_frames": 152,
     "forest_after_import_fixes_canopy": 0.829587331097905,
     "forest_after_import_fixes_stop_drift_m": 0.0,
-    "main_after_D10": "headless exit 0, known certificate/display JSON errors retained"
+    "main_after_D10": "headless exit 0, known certificate/display JSON errors retained",
+    "groundcover_native_points": 362189,
+    "groundcover_native_edit_roundtrip": true,
+    "groundcover_collision_routes": 15,
+    "groundcover_normal_walks": 6,
+    "groundcover_motion_frames": 228,
+    "groundcover_stop_drift_m": 0.0,
+    "payload_clean_restore_504": true,
+    "main_after_D11": "headless 900, exit 0; known certificate/display JSON errors retained"
   },
   "publication": {
-    "content_checkpoint": "cbaa901f04af9e464da02bb3e941024b051733a2",
-    "native_and_glb_payload_files": 315,
-    "payload_parts": 149,
+    "content_checkpoint": "0308312b66d2f8ffd131896716b98b9d05fc7793",
+    "native_and_glb_payload_files": 504,
+    "payload_parts": 192,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D09-D10 checkpoint content; resolve the commit containing this file. Final nature, game migration and Release are not complete."
+    "pending": "D11 content pending publication; last published checkpoint is 0308312."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -189,7 +203,7 @@
     "existing user display-settings JSON",
     "D04 static/orbit only: one RefCounted with zero references reported at exit; not diagnosed as a Godot crash"
   ],
-  "backup_current_from_workspace": "outputs/world-final-D10",
+  "backup_current_from_workspace": "outputs/world-final-D11",
   "blender_D08A_incident": {
     "report": "docs/world-final/diagnostics/BLENDER_D08A_RU.md",
     "original_D03_preserved": true,
@@ -212,5 +226,32 @@
     "main_game_integrated": false,
     "D08_index_publication_pending": false,
     "normal_forest_walk": "passed: 152 frames, zero stop drift, canopy 0.8295873311"
+  },
+  "D11_in_progress": {
+    "counts": {
+      "grass_tufts": 362189,
+      "grass_cells": 3549,
+      "cliffs": 151,
+      "by_asset": {
+        "grass_meadow": 105349,
+        "grass_dry": 26466,
+        "grass_shade": 99471,
+        "grass_short": 66203,
+        "sedge_wet": 64700
+      }
+    },
+    "existing_forest_removed": 0,
+    "library_native": "art/world-final/Varendor_Groundcover_D-11B.blend",
+    "placement_file": "godot-pc/world-final/nature/groundcover-placements-D11.json",
+    "visual_verified": "Inspected; specific art defects remain. Not final acceptance.",
+    "main_integrated": false,
+    "native_source": "art/world-final/Varendor_Groundcover_D-11D.blend",
+    "native_sha256": "606b414db4a255fa23074c6bbcbeff17719b677d20bf66189d1472409d3e5dc4",
+    "native_point_roundtrip_verified": true,
+    "rendered_walks": 6,
+    "recorded_frames": 228,
+    "stop_drift_m": 0.0,
+    "report": "docs/world-final/GROUNDCOVER_D11_RU.md",
+    "failed_launches_preserved": true
   }
 }

@@ -1,0 +1,1397 @@
+{
+  "revision": "D11",
+  "grass_point_fields": [
+    "x",
+    "y",
+    "z",
+    "yaw",
+    "scale",
+    "height_dx",
+    "height_dz",
+    "stable_index"
+  ],
+  "counts": {
+    "grass_tufts": 362189,
+    "grass_cells": 3549,
+    "cliffs": 151,
+    "by_asset": {
+      "grass_meadow": 105349,
+      "grass_dry": 26466,
+      "grass_shade": 99471,
+      "grass_short": 66203,
+      "sedge_wet": 64700
+    }
+  },
+  "existing_forest_removed": 0,
+  "existing_heightmap_changed": false,
+  "main_game_integrated": false,
+  "visual_verified": false,
+  "source_layout_sha256": "470dec5939ee21155532c5b99ad2f6762f9ce23235004cb50c9baefa8daaa19c",
+  "native_source": "art/world-final/Varendor_Groundcover_D-11D.blend",
+  "native_sha256": "606b414db4a255fa23074c6bbcbeff17719b677d20bf66189d1472409d3e5dc4",
+  "cliff_meshes": [
+    {
+      "id": "D11_cliff_000",
+      "zone": "snow",
+      "path": "assets/D11_cliff_000_surface.glb",
+      "sha256": "4a2589df780f5778f42932dbd2d2d8a05d8aed045dbf6ed5ba4f597749607134",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 105.25174372411178
+    },
+    {
+      "id": "D11_cliff_001",
+      "zone": "snow",
+      "path": "assets/D11_cliff_001_surface.glb",
+      "sha256": "9a0541d67c64e4c9e9b3796ba94d3640a9045b818998f86e4b836f749b057c89",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 97.97869378748425
+    },
+    {
+      "id": "D11_cliff_002",
+      "zone": "snow",
+      "path": "assets/D11_cliff_002_surface.glb",
+      "sha256": "ac98255f68baf0e171fb454e65d7b73a186fcd23b7abc7b5855b42ad007913b1",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 71.710702145097
+    },
+    {
+      "id": "D11_cliff_003",
+      "zone": "snow",
+      "path": "assets/D11_cliff_003_surface.glb",
+      "sha256": "15da095c17d5bfc27c2c394988ddcc7823a2079e6dc097c09bb329d2e5cbe170",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 51.38922700896397
+    },
+    {
+      "id": "D11_cliff_004",
+      "zone": "snow",
+      "path": "assets/D11_cliff_004_surface.glb",
+      "sha256": "c250e02d4df1be5b4eeebf6d923bb0db03a6c544837213a9daca125c80291da8",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 12.238527806349815
+    },
+    {
+      "id": "D11_cliff_005",
+      "zone": "snow",
+      "path": "assets/D11_cliff_005_surface.glb",
+      "sha256": "3a020d14ebfa362538bc2f2680431d2716658c13e6601d57d4f064804b3b6188",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 18.622443507132267
+    },
+    {
+      "id": "D11_cliff_006",
+      "zone": "snow",
+      "path": "assets/D11_cliff_006_surface.glb",
+      "sha256": "4eb4ea1e21bfbd53b4d6bbf43919ccae6e5d5a26a78bb3d8f4912f5e5913e6b9",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 30.969459304000665
+    },
+    {
+      "id": "D11_cliff_007",
+      "zone": "snow",
+      "path": "assets/D11_cliff_007_surface.glb",
+      "sha256": "4a1adaf804969f82d54df45d54fdca384cb256b65162f4ea3ad94f1f2aa81c2a",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 15.427468490719363
+    },
+    {
+      "id": "D11_cliff_008",
+      "zone": "snow",
+      "path": "assets/D11_cliff_008_surface.glb",
+      "sha256": "d03a679d5badf8b54cd3f6bc1a45fc5f2d7758edf70308a613afb9b4e7b383d3",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 9.491639831861246
+    },
+    {
+      "id": "D11_cliff_009",
+      "zone": "snow",
+      "path": "assets/D11_cliff_009_surface.glb",
+      "sha256": "b6b0ddbdd7f0fda2f9f3450f2d8dcd2ea8a69ddd2b2d72412c430d646d476f13",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 23.788426018313416
+    },
+    {
+      "id": "D11_cliff_010",
+      "zone": "snow",
+      "path": "assets/D11_cliff_010_surface.glb",
+      "sha256": "32ecf811f40f5b21c519b23ce9c8baf52bdf940ec328583ddfcc1720a334ee7d",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 69.35133572580062
+    },
+    {
+      "id": "D11_cliff_011",
+      "zone": "snow",
+      "path": "assets/D11_cliff_011_surface.glb",
+      "sha256": "e99f2bdcd0317cf35bd2fd58cea864ce838a6ee0869fee6de1c2242878254bdf",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 77.34886816975205
+    },
+    {
+      "id": "D11_cliff_012",
+      "zone": "snow",
+      "path": "assets/D11_cliff_012_surface.glb",
+      "sha256": "2737389849bc9c95156fad4277ed8b797b9324615fe1d7db3b97a2cfdc148371",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 34.04127238147196
+    },
+    {
+      "id": "D11_cliff_013",
+      "zone": "snow",
+      "path": "assets/D11_cliff_013_surface.glb",
+      "sha256": "4cd252ae2271b8cbb5e498b55c15cd2421212212f092895781b16f0dfb515545",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 15.899821712206805
+    },
+    {
+      "id": "D11_cliff_014",
+      "zone": "snow",
+      "path": "assets/D11_cliff_014_surface.glb",
+      "sha256": "979fceedd54724f92cd6abeae8591d24e63de0396ddc0416383cc60c98b49602",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 90.01430631427482
+    },
+    {
+      "id": "D11_cliff_015",
+      "zone": "snow",
+      "path": "assets/D11_cliff_015_surface.glb",
+      "sha256": "e5c080f39445b9f5ab5d20484424db68d50df6b06e0e35491505d2a445db255d",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 22.161298986577624
+    },
+    {
+      "id": "D11_cliff_016",
+      "zone": "snow",
+      "path": "assets/D11_cliff_016_surface.glb",
+      "sha256": "ba6ef52f29750f448cc424f06f0691eef17a8b42258eb5bf797c2b1d3ff06d4d",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 23.127670312795825
+    },
+    {
+      "id": "D11_cliff_017",
+      "zone": "snow",
+      "path": "assets/D11_cliff_017_surface.glb",
+      "sha256": "c4f7970db15c4ff97134e5aa1f038e07ec7106338b976d5aaab9ebf207cbbdfe",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 58.952680417652104
+    },
+    {
+      "id": "D11_cliff_018",
+      "zone": "snow",
+      "path": "assets/D11_cliff_018_surface.glb",
+      "sha256": "d49902cebc4808bc2a4c7969344920df8b7b912bcadef44c5a1d7c9e9b8c7027",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 175.6109890392828
+    },
+    {
+      "id": "D11_cliff_019",
+      "zone": "snow",
+      "path": "assets/D11_cliff_019_surface.glb",
+      "sha256": "afaf65ac42106be112d1e7d10c90595434242b5512a54919830dae4e96892606",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 54.76961395450029
+    },
+    {
+      "id": "D11_cliff_020",
+      "zone": "snow",
+      "path": "assets/D11_cliff_020_surface.glb",
+      "sha256": "723d9fe25c472743a967b93a3073ceccb8460114ff9ea46dd2b0d725866230c5",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 78.81538799302176
+    },
+    {
+      "id": "D11_cliff_021",
+      "zone": "snow",
+      "path": "assets/D11_cliff_021_surface.glb",
+      "sha256": "9b6b21148c921a661083ab2129a45afcb72b1edf5a5fa7093c507a920cd8c7a1",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 87.19708198276598
+    },
+    {
+      "id": "D11_cliff_022",
+      "zone": "snow",
+      "path": "assets/D11_cliff_022_surface.glb",
+      "sha256": "f77c3612f683c813809bb693d927a092aea33b33514dc56b44373620c3acb4df",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 135.6311847149987
+    },
+    {
+      "id": "D11_cliff_023",
+      "zone": "snow",
+      "path": "assets/D11_cliff_023_surface.glb",
+      "sha256": "117b15f6b946db5d015782da9ffcd29680fe74a527324c3aa254ae6be0bbccb5",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.7408093935091813,
+      "road_margin_m": 11.65421951034018
+    },
+    {
+      "id": "D11_cliff_024",
+      "zone": "snow",
+      "path": "assets/D11_cliff_024_surface.glb",
+      "sha256": "fc216365bf1f76b55424f7a4cff8020d2371d2c34528d88da5aa369e88cb256a",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -1.049983553540926,
+      "road_margin_m": 69.73973844849122
+    },
+    {
+      "id": "D11_cliff_025",
+      "zone": "snow",
+      "path": "assets/D11_cliff_025_surface.glb",
+      "sha256": "a0e54d5a1de350b097edd4cb2363aebfdf390a9beaf31b2e1cb899e2da8b916e",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 9.233634106621388
+    },
+    {
+      "id": "D11_cliff_026",
+      "zone": "snow",
+      "path": "assets/D11_cliff_026_surface.glb",
+      "sha256": "9efd540e04c944e491049a45aa1e637d108ef525d530f142c3357c6c49457d11",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 56.70683209457209
+    },
+    {
+      "id": "D11_cliff_027",
+      "zone": "snow",
+      "path": "assets/D11_cliff_027_surface.glb",
+      "sha256": "efc8b375b766fa9441aac44c59aaa9f2830efe3e7f4de7e12a3554633e78a31b",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 72.48115676025235
+    },
+    {
+      "id": "D11_cliff_028",
+      "zone": "snow",
+      "path": "assets/D11_cliff_028_surface.glb",
+      "sha256": "b8739b983e295c722e13018e384e0490bbc93d226a231574fd74f91c99caf698",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 32.333603775996934
+    },
+    {
+      "id": "D11_cliff_029",
+      "zone": "snow",
+      "path": "assets/D11_cliff_029_surface.glb",
+      "sha256": "7455f38dfac2427b1dd0889ba3996a126691aefba8b8bfa9133d2d2d220ce8ee",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.160000000000025,
+      "road_margin_m": 41.712495221778866
+    },
+    {
+      "id": "D11_cliff_030",
+      "zone": "snow",
+      "path": "assets/D11_cliff_030_surface.glb",
+      "sha256": "c164d349d3e83b0237dee64255f027d71fd21834306b4cb3aa780ee74460e0d1",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.160000000000025,
+      "road_margin_m": 74.18280799760146
+    },
+    {
+      "id": "D11_cliff_031",
+      "zone": "snow",
+      "path": "assets/D11_cliff_031_surface.glb",
+      "sha256": "4e8d5e859e8f8f12dee5e63e4ffa570b758f9f4bba1d871963cb2d9f8f7b8e13",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 19.435289464181928
+    },
+    {
+      "id": "D11_cliff_032",
+      "zone": "snow",
+      "path": "assets/D11_cliff_032_surface.glb",
+      "sha256": "2c43ce490307f0bd0afbc18c152ebcdffa5274ad38bc4582e655d32e975133cb",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 86.75655973126088
+    },
+    {
+      "id": "D11_cliff_033",
+      "zone": "snow",
+      "path": "assets/D11_cliff_033_surface.glb",
+      "sha256": "0ffe7e638da4204f276f15fd2d32bf9eff1d8d126b54b929555a9bbd9bf5badc",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -1.1861129906955057,
+      "road_margin_m": 28.3000607113063
+    },
+    {
+      "id": "D11_cliff_034",
+      "zone": "snow",
+      "path": "assets/D11_cliff_034_surface.glb",
+      "sha256": "1e11009b2a6ad926b86e51f7a34fbd8caa2a8ea4e5923ef66f6c31b020a70122",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -1.2588886693602603,
+      "road_margin_m": 62.74568011833449
+    },
+    {
+      "id": "D11_cliff_035",
+      "zone": "snow",
+      "path": "assets/D11_cliff_035_surface.glb",
+      "sha256": "9d70c122933ae20b0975c6fbebcfd7a2ffc1710a9f7d67c920ea5ed5e952efa6",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 104.41001261828232
+    },
+    {
+      "id": "D11_cliff_036",
+      "zone": "snow",
+      "path": "assets/D11_cliff_036_surface.glb",
+      "sha256": "659b0799519e26a68d56102327914d2f02899956b98431c440505c5bfabf7d3c",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.160000000000025,
+      "road_margin_m": 104.37607924231827
+    },
+    {
+      "id": "D11_cliff_037",
+      "zone": "snow",
+      "path": "assets/D11_cliff_037_surface.glb",
+      "sha256": "4a80e657ebf45631982437d9799fc638f741bb688c76b991d5b92671a3d56fc2",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 191.3219626340964
+    },
+    {
+      "id": "D11_cliff_038",
+      "zone": "snow",
+      "path": "assets/D11_cliff_038_surface.glb",
+      "sha256": "35b81a5a53f534a63df1dc022b0450a1efaa7656aac68929c4c431ca6aa36873",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 143.5095697271707
+    },
+    {
+      "id": "D11_cliff_039",
+      "zone": "snow",
+      "path": "assets/D11_cliff_039_surface.glb",
+      "sha256": "3c132c0a8cefc63cc8027ff9f656fb922be2c1d114d7ef4f443f560ff3d18173",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 92.61485571334762
+    },
+    {
+      "id": "D11_cliff_040",
+      "zone": "snow",
+      "path": "assets/D11_cliff_040_surface.glb",
+      "sha256": "a82c358ec123e8650e009335809926917c9cfa453e9993df330e5d5f53e0606c",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 85.6428174488972
+    },
+    {
+      "id": "D11_cliff_041",
+      "zone": "snow",
+      "path": "assets/D11_cliff_041_surface.glb",
+      "sha256": "82a1fbec05d4222c8b392b364d4c317503dde305006e66c606a27715ecd64857",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 25.22474789489032
+    },
+    {
+      "id": "D11_cliff_042",
+      "zone": "snow",
+      "path": "assets/D11_cliff_042_surface.glb",
+      "sha256": "bfa09fe982e178ee3cef0fb2859854fe651bf16ae2a163a5451028443e7ee82d",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 113.99833695955006
+    },
+    {
+      "id": "D11_cliff_043",
+      "zone": "snow",
+      "path": "assets/D11_cliff_043_surface.glb",
+      "sha256": "36e226de085f210f05418fcba5cc4655847bf7086e3694491a8467db5bcc8542",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -4.111726667264065,
+      "road_margin_m": 60.619744889586315
+    },
+    {
+      "id": "D11_cliff_044",
+      "zone": "snow",
+      "path": "assets/D11_cliff_044_surface.glb",
+      "sha256": "b18ffa85fcda6d22ee87c8d9affcf65b4c539eb0b935871b551c5ac45c1a45dc",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -1.673351898091596,
+      "road_margin_m": 166.17646757127625
+    },
+    {
+      "id": "D11_cliff_045",
+      "zone": "snow",
+      "path": "assets/D11_cliff_045_surface.glb",
+      "sha256": "fa7cfbc4be945d4dfb11aa1243bf5e16c23b895c9387d4bcb15f1c4d1369dfa3",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 39.339764133335606
+    },
+    {
+      "id": "D11_cliff_046",
+      "zone": "snow",
+      "path": "assets/D11_cliff_046_surface.glb",
+      "sha256": "a90a256bb0e40a5ea7033d1dc0fef50c26934e8e1267695db5aa98691a43ce90",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 234.71288353204523
+    },
+    {
+      "id": "D11_cliff_047",
+      "zone": "snow",
+      "path": "assets/D11_cliff_047_surface.glb",
+      "sha256": "db7bd94dc11c090de6d424926f56e369cc94643f0079a43070eb30ce20584881",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 94.00815662570113
+    },
+    {
+      "id": "D11_cliff_048",
+      "zone": "snow",
+      "path": "assets/D11_cliff_048_surface.glb",
+      "sha256": "5fc1c630a0ba29655dd37bdaeec29de38368dd4e0cda01b8457eacf6395e06e9",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 109.47641437484153
+    },
+    {
+      "id": "D11_cliff_049",
+      "zone": "snow",
+      "path": "assets/D11_cliff_049_surface.glb",
+      "sha256": "a00eaf54e98b74af3723bf22fcb35fa4a44c9cc5264abf0ad7d144156da405dd",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 148.03697204022995
+    },
+    {
+      "id": "D11_cliff_050",
+      "zone": "snow",
+      "path": "assets/D11_cliff_050_surface.glb",
+      "sha256": "f0c828bb15ae34029b56b056f8dd731958b67cef78052edd98813c4a9d036fa1",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 16.512788775152746
+    },
+    {
+      "id": "D11_cliff_051",
+      "zone": "snow",
+      "path": "assets/D11_cliff_051_surface.glb",
+      "sha256": "81071643447794f594836c75843e1f91311e4ee865fcf17ad2d76b8699917c50",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.24628561432834317,
+      "road_margin_m": 91.6824515772932
+    },
+    {
+      "id": "D11_cliff_052",
+      "zone": "snow",
+      "path": "assets/D11_cliff_052_surface.glb",
+      "sha256": "b04c04c4e4bcc04a0f2616e31901d1e9c448b28f8d91882fbc06001aed991571",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 91.63563442608512
+    },
+    {
+      "id": "D11_cliff_053",
+      "zone": "snow",
+      "path": "assets/D11_cliff_053_surface.glb",
+      "sha256": "e1b85e8d08751e993699f6f5fbfb652e189449a4de2486bbc525f727877c8dfb",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.160000000000025,
+      "road_margin_m": 65.33657699244083
+    },
+    {
+      "id": "D11_cliff_054",
+      "zone": "snow",
+      "path": "assets/D11_cliff_054_surface.glb",
+      "sha256": "82fde8151f61fc3afa69f40c04c5cf0ad3aabbbc9a9dd02a397715ac7a25fc67",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -6.289385319161653,
+      "road_margin_m": 9.327418065838788
+    },
+    {
+      "id": "D11_cliff_055",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_055_surface.glb",
+      "sha256": "0c52390037443f3c71a1689cdd5671715bdcc45a8c43962357553bd3069101f6",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.6784744580673561,
+      "road_margin_m": 53.056753367257144
+    },
+    {
+      "id": "D11_cliff_056",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_056_surface.glb",
+      "sha256": "80c1433a725b975be9d8aeb44bfc37346d76a01058c61c491e9bce040a5f22db",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 48.69794849522161
+    },
+    {
+      "id": "D11_cliff_057",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_057_surface.glb",
+      "sha256": "29421c15e87d1df7fba5382bef0cf8c69a6298ca59dd3462bbaba9701fa6d0bf",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 88.372166902131
+    },
+    {
+      "id": "D11_cliff_058",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_058_surface.glb",
+      "sha256": "844ce55d6fa99844a4840fa177e4b2014bea4a7c094620640221fdc3f0357589",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 17.22776822423601
+    },
+    {
+      "id": "D11_cliff_059",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_059_surface.glb",
+      "sha256": "3b1013c480e90e5c0c34e35083db814a941e086b8b9341526a366d804afd1069",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 13.909292971188751
+    },
+    {
+      "id": "D11_cliff_060",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_060_surface.glb",
+      "sha256": "32ab8251b5194c0a127ef5dfa2f05061cc869bff46aed737b4d048f5818ea2be",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -5.298710793577641,
+      "road_margin_m": 24.43080278630576
+    },
+    {
+      "id": "D11_cliff_061",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_061_surface.glb",
+      "sha256": "efd98e8f84d885351f8ff68b45d9ecccee5e2ec74ec0ff520d5779632b91cf0d",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 6.7108057763646904
+    },
+    {
+      "id": "D11_cliff_062",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_062_surface.glb",
+      "sha256": "897a04a82cd3b4a89798a21e1a673946bf5214b3d435c315069260c7836f8c09",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.2379089205351761,
+      "road_margin_m": 31.19257616903823
+    },
+    {
+      "id": "D11_cliff_063",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_063_surface.glb",
+      "sha256": "e12a0ab9a2b9f91561c34467325fc7e5defd454e6b6f15a10137124c0c5a6301",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 8.869342188560037
+    },
+    {
+      "id": "D11_cliff_064",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_064_surface.glb",
+      "sha256": "a4c772d40870c26f62b27e532ea25760a56375c3e1cd260cc796413f34f97aba",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 19.576726673159104
+    },
+    {
+      "id": "D11_cliff_065",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_065_surface.glb",
+      "sha256": "099890b5c2e18ab31e5be3d46cbccc9ec1573e1ecf6751a2a56a4bd171711441",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 67.68635898888445
+    },
+    {
+      "id": "D11_cliff_066",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_066_surface.glb",
+      "sha256": "33b8c5f2838c82506771a96dc29df5b66854aff86daa231dd98125294404ae0b",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 79.41074006295443
+    },
+    {
+      "id": "D11_cliff_067",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_067_surface.glb",
+      "sha256": "1bcb818772cb6a9948e4e13011899f7e12b2972b2117540a0d1414e7255827d7",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.5007410729133994,
+      "road_margin_m": 9.909931134159134
+    },
+    {
+      "id": "D11_cliff_068",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_068_surface.glb",
+      "sha256": "af36098e2f3830fd4c70eb5409f9c7743183b9dadd419d340997e1d52131089d",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 34.277716083478545
+    },
+    {
+      "id": "D11_cliff_069",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_069_surface.glb",
+      "sha256": "1313a6700cba2756706cbd729f0dfcb2fc787bce8acc272acb874b626372a95e",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 25.085532180138976
+    },
+    {
+      "id": "D11_cliff_070",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_070_surface.glb",
+      "sha256": "e201bd0bbe7541ef2602ba921ce677351161eb6f82c6b0d3dd58fc147fb1cd49",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 13.196697665183635
+    },
+    {
+      "id": "D11_cliff_071",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_071_surface.glb",
+      "sha256": "93505493fd216cc7ee6d37a31464247cdaa24c2d553a0f2b61e24b0514145196",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 14.116124793910181
+    },
+    {
+      "id": "D11_cliff_072",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_072_surface.glb",
+      "sha256": "d2b9315572a1f47640beb470e1f1aa1298389d29db0cc22b230da0314355f8e2",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 30.42385407503813
+    },
+    {
+      "id": "D11_cliff_073",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_073_surface.glb",
+      "sha256": "2e1aedce501abaf7004315f40272cae4a33f8942a07de518c9f0443b7e6cd4ce",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 53.51575449682018
+    },
+    {
+      "id": "D11_cliff_074",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_074_surface.glb",
+      "sha256": "19a874a76f42b02c0ab7a053481750ee0fb9d6efe3dac4c28558ea651203f62b",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 122.20579323263485
+    },
+    {
+      "id": "D11_cliff_075",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_075_surface.glb",
+      "sha256": "0b8694269b7cf41ab79113976bf21f934d8ed6eec0e2ad13877abf4ec4520809",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 18.72181265491006
+    },
+    {
+      "id": "D11_cliff_076",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_076_surface.glb",
+      "sha256": "cb83212d0f56a8f880f1dd9453f62e063588aab1b36f04d5255a71b19c7e56e1",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 3.3982717283663106
+    },
+    {
+      "id": "D11_cliff_077",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_077_surface.glb",
+      "sha256": "e136e645ab98eaff53b798434271d42e738db4e1cb01160b4e70ec3da56bbc55",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 41.018692171537666
+    },
+    {
+      "id": "D11_cliff_078",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_078_surface.glb",
+      "sha256": "e3dd0628b0e8a7b3fb0e7ea07dcaae9e5ba0fb9018877e7bfa7c2fb65545a189",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 50.839631827884816
+    },
+    {
+      "id": "D11_cliff_079",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_079_surface.glb",
+      "sha256": "8e84abd5c0688df649a534dd91ebf410abe279324b643d6fe1b4da4c04458813",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 105.77891273915023
+    },
+    {
+      "id": "D11_cliff_080",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_080_surface.glb",
+      "sha256": "0c079f0a42563e9a12eb85ff2dfa881ad1469ee283a8390774d8268eb71b2399",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 17.081445879921127
+    },
+    {
+      "id": "D11_cliff_081",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_081_surface.glb",
+      "sha256": "3bb8e9252ef084561ac51af5b89e6af2e95952c445420bdd2b10e6ccbc0dff7a",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 79.46417017236368
+    },
+    {
+      "id": "D11_cliff_082",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_082_surface.glb",
+      "sha256": "5b3b39b9bed6c3c8d9f8e351f822561f22fd474e5e4749429260ce92f0164d87",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.160000000000025,
+      "road_margin_m": 8.46056892131622
+    },
+    {
+      "id": "D11_cliff_083",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_083_surface.glb",
+      "sha256": "c115746b85fd9784bc1c98168fc6e8e2f5c8cd5f1fb1360536b1fa281a1a5ffc",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 55.182464613351634
+    },
+    {
+      "id": "D11_cliff_084",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_084_surface.glb",
+      "sha256": "d05ff7c0e073d2d71113c3052b21880e2b71b1ed2844f25cebafea60d42303ed",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 13.073414817594042
+    },
+    {
+      "id": "D11_cliff_085",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_085_surface.glb",
+      "sha256": "4a11ffb3dde3a88ae10fef32a1e60e1d5205a76897b756fa026fb88d979de988",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 41.84835829055528
+    },
+    {
+      "id": "D11_cliff_086",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_086_surface.glb",
+      "sha256": "26c600b5dfe3e61c2085fc8f376c62d33fd6572564c4d3864dd8705bd929bc04",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 13.962302409004721
+    },
+    {
+      "id": "D11_cliff_087",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_087_surface.glb",
+      "sha256": "7f93134c8ee128ac4a1f92bcf3ee2611080e805ff37dcf528e947586810e7ee7",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 87.4704067538483
+    },
+    {
+      "id": "D11_cliff_088",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_088_surface.glb",
+      "sha256": "a41cdde9351543dc8dcf3d2bc53b403bd7961b3ab35ab819a36aefd750e0a8e0",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -13.28432758153673,
+      "road_margin_m": 10.774226140892768
+    },
+    {
+      "id": "D11_cliff_089",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_089_surface.glb",
+      "sha256": "45dcdcb79988b599098733707443d1025b404ec4407aa27d2dd9dbee5ea0060e",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 37.79971722720593
+    },
+    {
+      "id": "D11_cliff_090",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_090_surface.glb",
+      "sha256": "29080b379f9ed83cf48d1c1b22245431c47ddfb6b70edc53f9ad4f77a52d06b8",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -1.9221737647035013,
+      "road_margin_m": 8.220359201226415
+    },
+    {
+      "id": "D11_cliff_091",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_091_surface.glb",
+      "sha256": "4e850eb23eca170985c79abeab9707315dc5af87b52e5b9e89502f045c88a3c1",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 57.14956019691257
+    },
+    {
+      "id": "D11_cliff_092",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_092_surface.glb",
+      "sha256": "a440591af80727c72d63b665a0c020ddbf40d9fbbfdd617826dc88a01ecb2b3a",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 102.54943205861926
+    },
+    {
+      "id": "D11_cliff_093",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_093_surface.glb",
+      "sha256": "8ec747b74cc294141b90fc7f0700b2543395d5980ea68f2ff90063e9f8dc764a",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 7.771889723087977
+    },
+    {
+      "id": "D11_cliff_094",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_094_surface.glb",
+      "sha256": "992911e25c6f9f3fdcbb04aecce20a54ed244637eb160d72059ac587f8f242e9",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 5.471807316827153
+    },
+    {
+      "id": "D11_cliff_095",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_095_surface.glb",
+      "sha256": "3a4dc9641e35c801d87bcd4c5e58e4573e7603b1c234b4bf268caeef4636852e",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 10.349117344461224
+    },
+    {
+      "id": "D11_cliff_096",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_096_surface.glb",
+      "sha256": "6445218ca1340a21d3c5e987ee60d6fe9feaca7db77fceff678bca232117a9e8",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 108.01555228506203
+    },
+    {
+      "id": "D11_cliff_097",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_097_surface.glb",
+      "sha256": "46a983a533a714522b6ef08c85ba1135b5997a075bf7273c67c2eda85e867f90",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 7.8723011523105555
+    },
+    {
+      "id": "D11_cliff_098",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_098_surface.glb",
+      "sha256": "b4cd5b2538cdb0fbdb9a07cf4aa8f18a56624ac056d92d3ee62ce4101ce8bd0a",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 4.225755762371865
+    },
+    {
+      "id": "D11_cliff_099",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_099_surface.glb",
+      "sha256": "662d145f5b34ae16d54bfdc388c236d87c713242973dae53cd123d5412cfc9db",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 6.7548955625082385
+    },
+    {
+      "id": "D11_cliff_100",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_100_surface.glb",
+      "sha256": "61542af5cc117421ed268c793019a4df6e234e19728e9a54081c9970cc97cde8",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 108.91134620677904
+    },
+    {
+      "id": "D11_cliff_101",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_101_surface.glb",
+      "sha256": "49b5944132257ffa43d3c6c95e0b8619f211985ab97c2719602b4be5205afeb0",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -1.640960833415221,
+      "road_margin_m": 20.693805490895237
+    },
+    {
+      "id": "D11_cliff_102",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_102_surface.glb",
+      "sha256": "55e40efc3538342ebbbd39bb35a981fea17f237bb46125db89c019f9093c9517",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 11.433038318014571
+    },
+    {
+      "id": "D11_cliff_103",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_103_surface.glb",
+      "sha256": "17bd5116897697b41a43bf86d6070150b89708bca0fdebd9568541bd1e4db952",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -4.5442807092208,
+      "road_margin_m": 26.54456454796023
+    },
+    {
+      "id": "D11_cliff_104",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_104_surface.glb",
+      "sha256": "e2c5fa7bf155c7c6a8a50e666f8296ea542c32c5580a5233dfaea83af892e996",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 41.18380879996173
+    },
+    {
+      "id": "D11_cliff_105",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_105_surface.glb",
+      "sha256": "dc1735aeeaecdfd0bcee7618648391f1ccd67c2cacbf397c8f1b793904d0e6a6",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 30.89107980003515
+    },
+    {
+      "id": "D11_cliff_106",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_106_surface.glb",
+      "sha256": "872199d241fc363291368370a7c7c25635cffd1fa6ebe1911f25c8d5b3d37c68",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -1.611662559487229,
+      "road_margin_m": 15.320677994824985
+    },
+    {
+      "id": "D11_cliff_107",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_107_surface.glb",
+      "sha256": "d00aa35eec8f7908beb8d2a71b053ac5f138368c43cbe37c56fa1d05f49b6573",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 17.125772796466553
+    },
+    {
+      "id": "D11_cliff_108",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_108_surface.glb",
+      "sha256": "ff24b407aed95c2c1e3f245432fcd691d7e59da932812b7a63e8f9265c7da38b",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 122.70356721920608
+    },
+    {
+      "id": "D11_cliff_109",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_109_surface.glb",
+      "sha256": "170426c5497e8f66e458f72b50f81520685b70c6b0643ab2d5f4c6ba5fe02221",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 12.276332795977432
+    },
+    {
+      "id": "D11_cliff_110",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_110_surface.glb",
+      "sha256": "f0db8874a5466df55ec9766eb2fbbffcbb3db7caa72d6a17718679ca05236cdc",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 14.577118454491487
+    },
+    {
+      "id": "D11_cliff_111",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_111_surface.glb",
+      "sha256": "fddb93bd2527bfa3667c787ac035f2884d259a9ab4973e95fd4645462946be61",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 10.039994938438152
+    },
+    {
+      "id": "D11_cliff_112",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_112_surface.glb",
+      "sha256": "a68a99a6f0e80c12cc0c334c30807c8cae57f3ec3130dc0cd1e142cc32aa85c2",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 63.723475823534244
+    },
+    {
+      "id": "D11_cliff_113",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_113_surface.glb",
+      "sha256": "2056c0db4deecab529f60ae2eae98b767088ab26e6d3edea5a9c920d3d3623c7",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 7.405808596263878
+    },
+    {
+      "id": "D11_cliff_114",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_114_surface.glb",
+      "sha256": "220feb8183e25eb6b5880382f567d527a179fe86b55b1d27d69465e9c5408187",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 51.488326908784735
+    },
+    {
+      "id": "D11_cliff_115",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_115_surface.glb",
+      "sha256": "1c7f694163491b17b01f83c30c4048b73ee053c29d443e653cae2ba3e680f928",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 8.928822123737884
+    },
+    {
+      "id": "D11_cliff_116",
+      "zone": "volcano",
+      "path": "assets/D11_cliff_116_surface.glb",
+      "sha256": "8450bed39b116c3112536aeb33667fc62e36eeb62a8ebd67a1eb5f3b89041652",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 62.28429320344906
+    },
+    {
+      "id": "D11_cliff_117",
+      "zone": "mine",
+      "path": "assets/D11_cliff_117_surface.glb",
+      "sha256": "ab7c79164195278c8cbedaefdd4fab55e12fdbbdc99d93892cbb7b4353a3ea96",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 14.428225570925793
+    },
+    {
+      "id": "D11_cliff_118",
+      "zone": "mine",
+      "path": "assets/D11_cliff_118_surface.glb",
+      "sha256": "c4816691df688597467df629f79d16aa65dfe7fe64d95127dc85b163f48cac49",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 66.3041707610289
+    },
+    {
+      "id": "D11_cliff_119",
+      "zone": "mine",
+      "path": "assets/D11_cliff_119_surface.glb",
+      "sha256": "279b8fb25261f26fb6f3d872a7a16caf9a7bd1b31348080db17159f6d1b9ec41",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 31.512741623691838
+    },
+    {
+      "id": "D11_cliff_120",
+      "zone": "mine",
+      "path": "assets/D11_cliff_120_surface.glb",
+      "sha256": "8e04a5a770489fbe9b35a9364d19eadb0474c80561f9b85b9730c786d82246bb",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 106.39552270853122
+    },
+    {
+      "id": "D11_cliff_121",
+      "zone": "mine",
+      "path": "assets/D11_cliff_121_surface.glb",
+      "sha256": "8337486fbe5e6e21f5dfeee25ab8fc4515dcc0456279ac8e72c5a939627209c0",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 89.36342501416732
+    },
+    {
+      "id": "D11_cliff_122",
+      "zone": "mine",
+      "path": "assets/D11_cliff_122_surface.glb",
+      "sha256": "a6dfedde4b598ff8b058282cc720e209aa95db54a0d9c7716a50eacc7ecd2473",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 86.92838210139547
+    },
+    {
+      "id": "D11_cliff_123",
+      "zone": "mine",
+      "path": "assets/D11_cliff_123_surface.glb",
+      "sha256": "3fa34cb1c186c0a5b16f894c00a4ed66af2c104abf854d9ca5519b910139f836",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 118.29665290604487
+    },
+    {
+      "id": "D11_cliff_124",
+      "zone": "mine",
+      "path": "assets/D11_cliff_124_surface.glb",
+      "sha256": "1bc204fb1c10a8cc048479d3c645a0d0d479f33297e31504626030f09e64149b",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 120.82454164576865
+    },
+    {
+      "id": "D11_cliff_125",
+      "zone": "mine",
+      "path": "assets/D11_cliff_125_surface.glb",
+      "sha256": "fe05fe57ebb07d7251a2f4c7838369ce0fccb1455108b92562d24e555d5966a1",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 27.201173394072423
+    },
+    {
+      "id": "D11_cliff_126",
+      "zone": "mine",
+      "path": "assets/D11_cliff_126_surface.glb",
+      "sha256": "a119d9e542da3184d411b03231ec6f86beb2c1ac95a852db945eb1945aa9a887",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 21.27787018430577
+    },
+    {
+      "id": "D11_cliff_127",
+      "zone": "mine",
+      "path": "assets/D11_cliff_127_surface.glb",
+      "sha256": "4efc70e4ae10f8d0cd754cd30881699be25361818b1120c0a800aca0a234f746",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 9.418669058129122
+    },
+    {
+      "id": "D11_cliff_128",
+      "zone": "mine",
+      "path": "assets/D11_cliff_128_surface.glb",
+      "sha256": "cd346022ae812fb0b1a2918786c9e9e34634b7d41108b38ed7a3b1df68b7cf4d",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 80.10413305011004
+    },
+    {
+      "id": "D11_cliff_129",
+      "zone": "mine",
+      "path": "assets/D11_cliff_129_surface.glb",
+      "sha256": "793a99ba78a1e9a73963b19b8a68b799753c1e47e2328e76ed57ab843a10e068",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.45818870224651675,
+      "road_margin_m": 17.580547703011273
+    },
+    {
+      "id": "D11_cliff_130",
+      "zone": "mine",
+      "path": "assets/D11_cliff_130_surface.glb",
+      "sha256": "9300dd714b185eeff9e5ab238afc4a7920f777e3bbea2c0557ad963046c87f1c",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 106.87152724682748
+    },
+    {
+      "id": "D11_cliff_131",
+      "zone": "mine",
+      "path": "assets/D11_cliff_131_surface.glb",
+      "sha256": "ccce66889d7d5f56e3e36e64959730fde0125920300dc645608966c584d3f68f",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 60.14390671439427
+    },
+    {
+      "id": "D11_cliff_132",
+      "zone": "mine",
+      "path": "assets/D11_cliff_132_surface.glb",
+      "sha256": "889bb3ccb021f664581bad8a76903d337dc55bf7f65d20adcc8892141f6ce4cd",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 22.66012636538708
+    },
+    {
+      "id": "D11_cliff_133",
+      "zone": "mine",
+      "path": "assets/D11_cliff_133_surface.glb",
+      "sha256": "a66a3d0955d5e519da1753ae12c790493224a19f5dce847a8eb189f661748a0f",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 112.98669832620119
+    },
+    {
+      "id": "D11_cliff_134",
+      "zone": "mine",
+      "path": "assets/D11_cliff_134_surface.glb",
+      "sha256": "81d3bb822317a41998ed323a286809a034a4c3fd82b42de405749462a7956a03",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 63.48457626806552
+    },
+    {
+      "id": "D11_cliff_135",
+      "zone": "lake",
+      "path": "assets/D11_cliff_135_surface.glb",
+      "sha256": "306cf09460c5e23c96509aa2752f77fa42c3f4c0e54f591d9b96170c215e8cdb",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 97.0343973989511
+    },
+    {
+      "id": "D11_cliff_136",
+      "zone": "lake",
+      "path": "assets/D11_cliff_136_surface.glb",
+      "sha256": "25ac9f88414d92b72e88b1066f775a8daffa183bfd02c043fab0b1cfb3aba85a",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 72.67894409559149
+    },
+    {
+      "id": "D11_cliff_137",
+      "zone": "lake",
+      "path": "assets/D11_cliff_137_surface.glb",
+      "sha256": "3fb9619e6c3a09a7762f3eea8280eec8d12dee9d5c0e38c3e43e087728f6a6f4",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 118.808013624245
+    },
+    {
+      "id": "D11_cliff_138",
+      "zone": "lake",
+      "path": "assets/D11_cliff_138_surface.glb",
+      "sha256": "6c65fe966c713f0e25015a3c82fd694cb03a7173da4d21b9bbc2b5457cb72893",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 39.267837654849416
+    },
+    {
+      "id": "D11_cliff_139",
+      "zone": "lake",
+      "path": "assets/D11_cliff_139_surface.glb",
+      "sha256": "9527c40d1f9704efea435f08e1ad0d1c9e350cba5d39b1eaa42b97535f6893d7",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 87.32951972550983
+    },
+    {
+      "id": "D11_cliff_140",
+      "zone": "lake",
+      "path": "assets/D11_cliff_140_surface.glb",
+      "sha256": "298551798f96fba610b079b77986625fc7f0314df739c63fa58fc1b5ca9afd18",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 116.46742312351273
+    },
+    {
+      "id": "D11_cliff_141",
+      "zone": "lake",
+      "path": "assets/D11_cliff_141_surface.glb",
+      "sha256": "1fb55bffb947e02f99461946c86205892bd814cb1931b8cffbdd6c5719412094",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 127.87204911478524
+    },
+    {
+      "id": "D11_cliff_142",
+      "zone": "lake",
+      "path": "assets/D11_cliff_142_surface.glb",
+      "sha256": "d5c81eab6d76a0e17d864d4f74896f37961e7e81570870b1555d20f14812315b",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 92.10318488978369
+    },
+    {
+      "id": "D11_cliff_143",
+      "zone": "lake",
+      "path": "assets/D11_cliff_143_surface.glb",
+      "sha256": "dc5848ec82062b7b48269b35a9ae35f3e390af250c4ac64e25d37c9acb32d493",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 45.56997163428208
+    },
+    {
+      "id": "D11_cliff_144",
+      "zone": "lake",
+      "path": "assets/D11_cliff_144_surface.glb",
+      "sha256": "b2e094861a6a63d38ee5ab5a2ecfe083c63beeb23946959451bdccc082a77b9d",
+      "triangles": 9079,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 139.66326192809646
+    },
+    {
+      "id": "D11_cliff_145",
+      "zone": "lake",
+      "path": "assets/D11_cliff_145_surface.glb",
+      "sha256": "4e69930bf8df3c24a86799e5f54698f8e71394cc80e48aea1a90143b06460d8b",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 73.12053084226254
+    },
+    {
+      "id": "D11_cliff_146",
+      "zone": "lake",
+      "path": "assets/D11_cliff_146_surface.glb",
+      "sha256": "71525146671b93eb8b9204aaf3d7e9174cceb59ed0d3c7cfcc8c65aa7cfe70f4",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 126.83613908358129
+    },
+    {
+      "id": "D11_cliff_147",
+      "zone": "lake",
+      "path": "assets/D11_cliff_147_surface.glb",
+      "sha256": "f3d91cd2fd968569be19be5b999f19671938920f81245ad8a946dff0c65f1616",
+      "triangles": 8106,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 21.241418518358543
+    },
+    {
+      "id": "D11_cliff_148",
+      "zone": "lake",
+      "path": "assets/D11_cliff_148_surface.glb",
+      "sha256": "e7759bc0eb43188e96e2db3e1252c6dd42574cb29940231d6768e0b07df21af9",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 10.36913466845536
+    },
+    {
+      "id": "D11_cliff_149",
+      "zone": "lake",
+      "path": "assets/D11_cliff_149_surface.glb",
+      "sha256": "87533b33661b384cee6b7e3b57fd9f74264b71fa8b046a9de91943f268a7d27b",
+      "triangles": 6009,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 8.322476026112792
+    },
+    {
+      "id": "D11_cliff_150",
+      "zone": "lake",
+      "path": "assets/D11_cliff_150_surface.glb",
+      "sha256": "b8861b02dde4839232b267ec8a162dc1546e649f30656bd750f8463ee89c03a1",
+      "triangles": 4897,
+      "max_crop_edge_above_ground_m": -0.1599999999999966,
+      "road_margin_m": 98.18354747599011
+    }
+  ],
+  "native_link_dependencies": [
+    "art/world-final/Varendor_Surface_D-10.blend"
+  ],
+  "native_roundtrip_verified": true
+}

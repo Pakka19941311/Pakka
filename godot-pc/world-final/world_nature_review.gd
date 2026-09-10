@@ -47,12 +47,15 @@ func run_review() -> void:
 	nature.set_overview_geometry(false)
 	actor.visible=true;overview=false;camera.fov=rad_to_deg(.82)
 	var walks: Array=[{"id":"forest-sample","points":[[-671.5762,-33.5799],[-669.5329,-37.1492],[-648.3,-64.9163]]}]
+	var selected_roads: Array=["snow-ascent","living-forest-loop","rotten-approach","south-ruins"]
+	if "--groundcover-routes" in OS.get_cmdline_user_args():selected_roads.append("volcano-ascent")
 	for road: Dictionary in layout.roads:
-		if road.id not in ["snow-ascent","living-forest-loop","rotten-approach","south-ruins"]:continue
+		if road.id not in selected_roads:continue
 		var index: int=0
 		for candidate: int in range(road.points_xyz.size()-1):
 			var start: Array=road.points_xyz[candidate];var end: Array=road.points_xyz[candidate+1]
 			if road.id=="snow-ascent" and start[1]<150:continue
+			if road.id=="volcano-ascent" and start[1]<200:continue
 			if Vector2(start[0],start[2]).distance_to(Vector2(end[0],end[2]))>25:index=candidate;break
 		var a: Array=road.points_xyz[index];var b: Array=road.points_xyz[index+1]
 		var from: Vector2=Vector2(a[0],a[2]);var to: Vector2=Vector2(b[0],b[2]);to=from+from.direction_to(to)*minf(25,from.distance_to(to))
