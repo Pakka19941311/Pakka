@@ -13,6 +13,7 @@ var _queue: Array[Dictionary] = []
 var _stopping: bool = false
 var _url: String
 var _token: String
+var _last_response_ms: int = 0
 
 func start(url: String, bearer: String) -> Error:
 	_url = url
@@ -62,12 +63,17 @@ func _request(http: HTTPClient, payload: Dictionary) -> Dictionary:
 	var address: String = _url.trim_prefix("http://").trim_prefix("https://").trim_suffix("/")
 	var host: String = address.get_slice(":", 0)
 	var port: int = int(address.get_slice(":", 1)) if ":" in address else (443 if _url.begins_with("https://") else 80)
-	http.close()
-	if http.connect_to_host(host, port, TLSOptions.client() if _url.begins_with("https://") else null) != OK:
-		return {"error":"Нет соединения с сервером","transport_error":true}
+	# Reuse the ordered connection. Reconnecting for every camera steering sample
+	# let handshake latency queue the neutral release behind old movement.
+	# Node closes idle keep-alive sockets after five seconds. Renew an idle
+	# socket before sending, so the next attack/cancel is not lost to that close.
+	if http.get_status() != HTTPClient.STATUS_CONNECTED or Time.get_ticks_msec()-_last_response_ms > 3500:
+		http.close()
+		if http.connect_to_host(host, port, TLSOptions.client() if _url.begins_with("https://") else null) != OK:
+			return {"error":"Нет соединения с сервером","transport_error":true}
 	while http.get_status() != HTTPClient.STATUS_CONNECTED:
 		if not _poll(http, deadline): return _failure(http)
-	var headers: PackedStringArray = ["Content-Type: application/json", "Connection: close"]
+	var headers: PackedStringArray = ["Content-Type: application/json", "Connection: keep-alive"]
 	if not _token.is_empty(): headers.append("Authorization: Bearer " + _token)
 	if http.request(HTTPClient.METHOD_POST, "/api/input", headers, JSON.stringify(payload)) != OK:
 		return _failure(http)
@@ -83,6 +89,7 @@ func _request(http: HTTPClient, payload: Dictionary) -> Dictionary:
 	if status == 401: return {"error":"Доступ к герою истёк. Откройте «Герои» и повторите вход."}
 	var json: JSON = JSON.new()
 	if json.parse(body.get_string_from_utf8()) != OK or json.data is not Dictionary: return {"error":"Сервер вернул некорректный ответ","transport_error":true}
+	_last_response_ms = Time.get_ticks_msec()
 	return json.data
 
 func _poll(http: HTTPClient, deadline: int) -> bool:

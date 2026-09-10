@@ -136,7 +136,7 @@ export class CollisionWorld {
   }
 
   findNearestFree(point: Point2, actorRadius: number): Point2 {
-    if (!this.isBlocked(point, actorRadius)) return point;
+    if (!this.isBlocked(point, actorRadius)) return {x:point.x,z:point.z};
     for (let ring = 1; ring <= 8; ring += 1) {
       const radius = ring * 0.8;
       const samples = 12 + ring * 4;
@@ -146,7 +146,7 @@ export class CollisionWorld {
         if (!this.isBlocked(candidate, actorRadius)) return candidate;
       }
     }
-    return point;
+    return {x:point.x,z:point.z};
   }
 
   get size(): number {

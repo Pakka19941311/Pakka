@@ -8,6 +8,7 @@ import { WorldStore } from './server/world-store.mjs';
 import { startWorldServer } from './server/http-server.mjs';
 import { restoreWorldTopology } from './src/world/world-topology.ts';
 import { backupWorld } from './scripts/p0-backup-world.mjs';
+import { teleportProgressRecovery } from './src/core/teleport-progress-repair.ts';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const readJson = path => JSON.parse(readFileSync(path, 'utf8'));
@@ -54,6 +55,28 @@ export async function startNativeBridge({ data, legacy, backups, port = 0 }) {
   let service;
   try {
     const { database, migration } = await prepareNativeData({ data, legacy, backups });
+    // The old launcher profile predates this process. Capture it before writing
+    // a new bootstrap, and only repair the specific leaked teleport metadata.
+    const oldBootstrap=join(data,'bootstrap.json');
+    let previousProfiles=[];
+    if(existsSync(oldBootstrap))try{const old=readJson(oldBootstrap);if(Array.isArray(old.profiles))previousProfiles=old.profiles;}catch{}
+    const recoveryStore=new WorldStore(database);
+    let repairs=[];
+    try{
+      const state=recoveryStore.load();
+      for(const hero of Object.values(state?.characters??{})){
+        const recovery=teleportProgressRecovery(hero,previousProfiles.find(p=>p.id===hero.id));
+        if(recovery)repairs.push({id:hero.id,...recovery});
+      }
+      if(repairs.length){
+        const verified=await backupWorld(database,backups);
+        for(const repair of repairs){const hero=state.characters[repair.id];Object.assign(hero,repair.to);delete hero.cost;}
+        state.teleportProgressRepairs??=[];
+        state.teleportProgressRepairs.push({at:Date.now(),backup:verified.filename,repairs});
+        recoveryStore.save(state);
+        console.log('Восстановлен подтверждённый прогресс после ошибки телепорта. Персонажей:',repairs.length,'Резервная копия:',verified.filename);
+      }
+    }finally{recoveryStore.close();}
     const store = new WorldStore(database);
     const profiles = [];
     try {
@@ -69,7 +92,7 @@ export async function startNativeBridge({ data, legacy, backups, port = 0 }) {
     await once(service.server, 'listening');
     const url = `http://127.0.0.1:${service.server.address().port}`;
     const bootstrapPath = join(data, 'bootstrap.json');
-    const saveMessage = migration.kind === 'verified-legacy-clone'
+    const saveMessage = repairs.length ? 'Восстановлен подтверждённый уровень после ошибки телепорта. Предметы сохранены; исходная база скопирована в резерв.' : migration.kind === 'verified-legacy-clone'
       ? 'Найдена и проверена копия прежнего мира. Оригинал сохранён отдельно. Назначения прежнего браузера не импортированы.'
       : migration.kind === 'new-native-test'
         ? 'Отдельный тестовый мир. Прежняя база по стандартному пути не найдена; личные сохранения не восстановлены.'

@@ -137,6 +137,9 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
+		if "--qa-scope=sliding" in OS.get_cmdline_user_args():
+			call_deferred("run_sliding_qa")
+			return
 		if "--qa-scope=hotfix" in OS.get_cmdline_user_args():
 			call_deferred("run_hotfix_qa")
 			return
@@ -144,6 +147,9 @@ func _ready() -> void:
 
 func run_hotfix_qa() -> void:
 	await preload("res://scripts/hotfix_acceptance.gd").run(self)
+
+func run_sliding_qa() -> void:
+	await preload("res://scripts/sliding_acceptance.gd").run(self)
 
 func run_content_qa() -> void:
 	await preload("res://scripts/content_acceptance.gd").run(self)

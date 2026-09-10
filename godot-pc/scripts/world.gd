@@ -99,6 +99,8 @@ func receive_snapshot(snapshot: Dictionary) -> void:
 	if reset:
 		last_event = 0
 		hero_position = server_position
+		if actors.has(str(snapshot.character.id)):
+			actors[str(snapshot.character.id)].position = hero_position
 		camera_controller.reset_follow()
 		targeting.clear()
 
@@ -348,6 +350,9 @@ static func actor_asset_path(model: String) -> String:
 
 func make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
 	if actors.has(id):
+		var existing: Node3D = actors[id]
+		(existing.get_meta("screen_label") as Label).text = title
+		(existing.get_meta("label") as Label3D).text = title
 		return actors[id]
 	var root: Node3D = Node3D.new()
 	add_child(root)
@@ -621,7 +626,12 @@ func _process(delta: float) -> void:
 				actor.position = point(pose.x,pose.z,pose.get("yOffset",0))
 				actor.rotation.y = -float(pose.get("yaw",0)) + PI
 		var rendered_velocity: Vector3 = (actor.position-before)/maxf(.0001,delta)
-		if id == hero_id: rendered_velocity = Vector3(player_motion.actual_velocity.x,player_motion.vertical_velocity,-player_motion.actual_velocity.y)
+		if id == hero_id:
+			# Gait covers the distance actually drawn, including bounded network
+			# correction; raw motor speed used to make the feet skate during it.
+			# A neutral input owns idle on the release frame.
+			if player_motion.actual_velocity.is_zero_approx(): rendered_velocity = Vector3.ZERO
+			rendered_velocity.y = player_motion.vertical_velocity
 		var controller: VarendorAnimationController = actor.get_meta("animation_controller")
 		controller.prefer_run = id == hero_id or str(actor.get_meta("model","")) == "Fox"
 		var actor_clock: float = ambient_time if ambient_poses.has(id) else timeline.clock_ms if not timeline.current.is_empty() else float(current_snapshot.get("time",0))

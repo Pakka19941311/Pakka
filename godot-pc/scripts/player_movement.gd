@@ -197,6 +197,9 @@ func submit(value: Dictionary) -> void:
 				input_mode = "idle"
 				velocity = Vector2.ZERO
 				actual_velocity = Vector2.ZERO
+				# The last catch-up tick is already simulated. Do not interpolate
+				# its leftover travel on the next frame with an idle animation.
+				previous_position = position_value
 		"destination":
 			input_direction = Vector2.ZERO
 			combat_target = ""
@@ -244,6 +247,7 @@ func cancel_planar() -> void:
 	input_direction = Vector2.ZERO
 	velocity = Vector2.ZERO
 	actual_velocity = Vector2.ZERO
+	previous_position = position_value
 	destination = null
 	navigation_path.clear()
 	input_mode = "idle"

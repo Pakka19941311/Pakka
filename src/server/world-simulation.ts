@@ -869,7 +869,8 @@ export class WorldSimulation {
     const free=this.collision.findNearestFree(point,.46);
     if(this.collision.isBlocked(free,.46))throw Error('no-free-arrival');
     this.cancelControl(p);this.motor(p).reset();this.paths.delete(p.id);this.pursuit.delete(p.id);this.approaching.delete(p.id);
-    Object.assign(p,free,motion(this.state.time),{generation:p.generation+1});
+    // Destination metadata (notably its required level) is never character data.
+    Object.assign(p,{x:free.x,z:free.z},motion(this.state.time),{generation:p.generation+1});
   }
   private motor(p:WorldCharacter):CharacterMotor {let motor=this.motors.get(p.id);if(!motor){motor=new CharacterMotor();this.motors.set(p.id,motor);}return motor;}
   private action(actor:WorldMotion,action:WorldMotion['action'],endsAt=0):void {if(actor.action!==action||action==='attack'){actor.action=action;actor.actionStartedAt=this.state.time;actor.actionEndsAt=endsAt;}}

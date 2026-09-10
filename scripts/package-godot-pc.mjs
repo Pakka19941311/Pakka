@@ -12,6 +12,7 @@ export function stageNativeServer(root, destination) {
   const dependencies = serverDependencyFiles(root);
   for (const file of dependencies) copy(file);
   copy('scripts/p0-backup-world.mjs');
+  copy('src/core/teleport-progress-repair.ts');
   copy('public/assets/world/world-topology.json');
   copy('packaging/windows/launch-native.mjs', 'launch-native.mjs');
   writeFileSync(resolve(destination, 'package.json'), '{"private":true,"type":"module"}\n');
