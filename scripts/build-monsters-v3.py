@@ -9,7 +9,7 @@ from mathutils import Vector, Matrix, Quaternion
 from math import sin, cos, pi
 ROOT=Path(__file__).resolve().parents[1]
 args=sys.argv[sys.argv.index('--')+1:]; SOURCE=Path(args[0]).resolve()
-NAMES=args[1:] or ['IceGolem','FireGolem','RiftWarden','HellforgedWarden','Werewolf','GiantBat','Zombie','SkeletonV3','WraithV3']
+NAMES=args[1:] or ['SkeletonV3','WraithV3','Zombie','IceGolem','FireGolem','RiftWarden','HellforgedWarden','Werewolf','GiantBat']
 OUT=ROOT/'art/monsters-v3'; (OUT/'runtime').mkdir(parents=True,exist_ok=True);(OUT/'editable').mkdir(parents=True,exist_ok=True)
 HEIGHT={'IceGolem':3.1,'FireGolem':3.1,'RiftWarden':5.1,'HellforgedWarden':2.8,'Werewolf':3.2,'GiantBat':1.6,'Zombie':1.92,'SkeletonV3':1.92,'WraithV3':2.15}
 TRIS={'FireGolem':24000,'RiftWarden':36000,'Werewolf':26000,'GiantBat':22000}
@@ -28,6 +28,27 @@ def mat(name,color,metal=0,rough=.8):
 def clear_anim(rig):
  rig.animation_data_create();rig.animation_data.action=None
  for t in list(rig.animation_data.nla_tracks):rig.animation_data.nla_tracks.remove(t)
+
+def action_bags(action):
+ # Blender 4.4+ glTF may place the armature in a later slot of one shared
+ # action. The legacy action.fcurves proxy sees only slot zero (often an Empty).
+ if bpy.app.version >= (4,4,0):
+  for layer in action.layers:
+   for strip in layer.strips:
+    if strip.type=='KEYFRAME':
+     for bag in strip.channelbags:yield next(s for s in action.slots if s.handle==bag.slot_handle),bag.fcurves
+ else:yield None,action.fcurves
+
+def action_curves(action):return [fc for slot,curves in action_bags(action) for fc in curves]
+
+def assign_action(rig,action):
+ rig.animation_data_create();rig.animation_data.action=action
+ if action is not None and bpy.app.version >= (4,4,0):
+  candidates=[slot for slot,curves in action_bags(action) if any('pose.bones[' in fc.data_path for fc in curves)]
+  if candidates:
+   assert len(candidates)==1,(action.name,'ambiguous armature slots')
+   rig.animation_data.action_slot=candidates[0]
+  elif len(action.slots)==1:rig.animation_data.action_slot=action.slots[0]
 def fit_rig(name,mesh,h):
  # Coordinates are fractions of body height, measured from the approved source views.
  # Blender forward -Y, Z up. Separate fitting for squat, digitigrade and winged bodies.
@@ -100,7 +121,7 @@ def author_clips(name,rig,aliases,h,base,keep):
  frames={'Idle':90,'Walk':48 if name not in ['GiantBat','Werewolf'] else (24 if name=='GiantBat' else 34),'Attack':60,'Death':72,'Hit':15}
  for clip,frames_count in frames.items():
   if clip in keep:continue
-  action=bpy.data.actions.new(clip);action.use_fake_user=True;rig.animation_data.action=action
+  action=bpy.data.actions.new(clip);action.use_fake_user=True;assign_action(rig,action)
   for f in range(frames_count+1):
    scene.frame_set(f);reset();t=f/frames_count
    def rot(k,degrees,axis=(1,0,0)):rotate_world(rig,aliases.get(k),math.radians(degrees),axis)
@@ -146,10 +167,10 @@ def author_clips(name,rig,aliases,h,base,keep):
     for s,sign in [('L',1),('R',-1)]:rot('UpperArm.'+s,sign*(28*flap-12),(0,1,0));rot('Forearm.'+s,sign*12*sin(t*2*pi+.65),(0,1,0))
    for b in rig.pose.bones:
     b.keyframe_insert('location',frame=f,group=b.name);b.keyframe_insert('rotation_quaternion',frame=f,group=b.name);b.keyframe_insert('scale',frame=f,group=b.name)
-  for fc in action.fcurves:
+  for fc in action_curves(action):
    for k in fc.keyframe_points:k.interpolation='LINEAR'
   keep[clip]=action
- rig.animation_data.action=keep['Idle'];scene.frame_set(0)
+ assign_action(rig,keep['Idle']);scene.frame_set(0)
  return frames
 def existing_aliases(rig,name):
  names=[b.name for b in rig.pose.bones]
@@ -289,16 +310,16 @@ def run(name):
  else:
   aliases=existing_aliases(rig,name)
   # Preserve the artist's rig and sampled action, including its root-axis correction.
-  actions=[a for a in bpy.data.actions if a.frame_range.y>1 and any('pose.bones' in f.data_path for f in a.fcurves)]
+  actions=[a for a in bpy.data.actions if a.frame_range.y>1 and any('pose.bones' in f.data_path for f in action_curves(a))]
   for a in actions:
    low=a.name.lower();label='Idle' if 'idle' in low or 'iddle'in low or name=='SkeletonV3' else 'Walk' if 'walk'in low or 'chasing'in low else 'Attack' if 'attack'in low else None
    if label:a.name=label;a.use_fake_user=True;keep[label]=a
-  assert 'Idle'in keep,(name,[a.name for a in actions]);clear_anim(rig);rig.animation_data.action=keep['Idle'];scene.frame_set(0);bpy.context.view_layer.update()
+  assert 'Idle'in keep,(name,[a.name for a in actions]);clear_anim(rig);assign_action(rig,keep['Idle']);scene.frame_set(0);bpy.context.view_layer.update()
   lo,hi=bounds(meshes,True);h=hi.z-lo.z
   base={b.name:b.matrix_basis.copy() for b in rig.pose.bones}
   # Convert the original 24 fps action time to the project's 30 fps time base.
   for a in keep.values():
-   for fc in a.fcurves:
+   for fc in action_curves(a):
     for k in fc.keyframe_points:k.co.x*=1.25;k.handle_left.x*=1.25;k.handle_right.x*=1.25
   for o in scene.objects:
    if o!=rig and o.animation_data:o.animation_data_clear()
@@ -307,10 +328,10 @@ def run(name):
   for label,original in list(keep.items()):
    samples=[];end=math.ceil(original.frame_range.y)
    for f in range(end+1):
-    rig.animation_data.action=None
+    assign_action(rig,None)
     for b in rig.pose.bones:b.matrix_basis=base[b.name].copy()
-    rig.animation_data.action=original;scene.frame_set(f);bpy.context.view_layer.update();samples.append({b.name:b.matrix_basis.copy() for b in rig.pose.bones})
-   original.name='Source_'+label;action=bpy.data.actions.new(label);rig.animation_data.action=action;action.use_fake_user=True
+    assign_action(rig,original);scene.frame_set(f);bpy.context.view_layer.update();samples.append({b.name:b.matrix_basis.copy() for b in rig.pose.bones})
+   original.name='Source_'+label;action=bpy.data.actions.new(label);assign_action(rig,action);action.use_fake_user=True
    for f,pose in enumerate(samples):
     for b in rig.pose.bones:
      b.rotation_mode='QUATERNION';b.matrix_basis=pose[b.name]
