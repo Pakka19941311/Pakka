@@ -1,0 +1,155 @@
+{
+  "initial_perimeter": {
+    "all_pass": false,
+    "collision_controls": {
+      "existing_tree_still_solid": true,
+      "hollow_floor_accessible": true,
+      "hollow_wall_still_solid": true
+    },
+    "headless": true,
+    "visual_verified": false,
+    "walks": [
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -170.03630065918,
+          448.912994384766
+        ],
+        "reverse": false,
+        "route": "approach_xz",
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -193.897796630859,
+          425.062744140625
+        ],
+        "reverse": true,
+        "route": "approach_xz",
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -193.926422119141,
+          424.974822998047
+        ],
+        "reverse": false,
+        "route": "arena_perimeter_xz",
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": false,
+        "nearby_obstacles": [
+          "D08_tree_004143",
+          "D08_tree_004703"
+        ],
+        "position_server": [
+          -191.974655151367,
+          424.223571777344
+        ],
+        "reverse": true,
+        "route": "arena_perimeter_xz",
+        "stop_drift_m": 0.0
+      }
+    ]
+  },
+  "corrected_perimeter": {
+    "all_pass": true,
+    "collision_controls": {
+      "existing_tree_still_solid": true,
+      "hollow_floor_accessible": true,
+      "hollow_wall_still_solid": true
+    },
+    "headless": true,
+    "visual_verified": false,
+    "walks": [
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -170.03630065918,
+          448.912994384766
+        ],
+        "reverse": false,
+        "route": "approach_xz",
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -193.897796630859,
+          425.062744140625
+        ],
+        "reverse": true,
+        "route": "approach_xz",
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -193.909378051758,
+          425.00146484375
+        ],
+        "reverse": false,
+        "route": "arena_perimeter_xz",
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "nearby_obstacles": [],
+        "position_server": [
+          -194.030670166016,
+          425.084442138672
+        ],
+        "reverse": true,
+        "route": "arena_perimeter_xz",
+        "stop_drift_m": 0.0
+      }
+    ]
+  },
+  "full_scene": {
+    "all_walks_pass": true,
+    "final_art_accepted": false,
+    "forest_removed": 0,
+    "frames": 0,
+    "headless": true,
+    "main_integrated": false,
+    "native_source": "art/world-final/Varendor_Ancient_Tree_D-14.blend",
+    "numerical_only": true,
+    "revision": "D14",
+    "route_id": "arena_perimeter_xz",
+    "tree_colliders": 123,
+    "walks": [
+      {
+        "arrived": true,
+        "first_frame": 0,
+        "last_frame": -1,
+        "last_position_server": [
+          -193.909378051758,
+          425.00146484375
+        ],
+        "reverse": false,
+        "stop_drift_m": 0.0
+      },
+      {
+        "arrived": true,
+        "first_frame": 0,
+        "last_frame": -1,
+        "last_position_server": [
+          -194.030670166016,
+          425.084442138672
+        ],
+        "reverse": true,
+        "stop_drift_m": 0.0
+      }
+    ]
+  },
+  "visual_verified": false
+}

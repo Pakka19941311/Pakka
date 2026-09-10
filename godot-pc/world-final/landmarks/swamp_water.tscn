@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://world-final/nature/assets/swamp_water_D16.glb" id="1"]
+[ext_resource type="Shader" path="res://world-final/materials/swamp_water_D16.gdshader" id="2"]
+
+[sub_resource type="ShaderMaterial" id="WaterMaterial"]
+shader = ExtResource("2")
+
+[node name="SWAMP_WATER" type="Node3D"]
+metadata/stable_id = "SWAMP_WATER"
+metadata/source_revision = "D16"
+metadata/visual_verified = false
+
+[node name="AuthoredWater" parent="." instance=ExtResource("1")]
+
+[node name="SWAMP_WATER_D16" parent="AuthoredWater" index="0"]
+material_override = SubResource("WaterMaterial")
+
+[editable path="AuthoredWater"]

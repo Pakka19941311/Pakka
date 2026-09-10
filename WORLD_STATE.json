@@ -114,7 +114,7 @@
     "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Continue D14 actual Godot approach/hollow/return review and correct defects, then finish remaining D nature/materials before E-H. Owner 2026-09-11 explicitly requested continuous execution of FINAL 1.0; sections 1 and 17 authorize continuation without repeated approval.",
+  "next_task": "Recover accessible D14/D15 graphical evidence, fix observed defects, complete D16 native water source and visual review, then remaining D and E-H. No new permission needed for existing FINAL 1.0 scope.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
@@ -343,7 +343,9 @@
     "numerical_collision_review": "docs/world-final/evidence/D14-tree/collision-review.json",
     "route_source": "godot-pc/world-final/ancient-tree-routes.json",
     "editable_scene": "godot-pc/world-final/landmarks/ancient_tree.tscn",
-    "editable_scene_evidence": "docs/world-final/evidence/D14-tree/editable-scene-review.json"
+    "editable_scene_evidence": "docs/world-final/evidence/D14-tree/editable-scene-review.json",
+    "perimeter_evidence": "docs/world-final/evidence/D14-tree/perimeter-review.json",
+    "graphics_review_status": "Run 34532322276 timed out after 480 seconds. Artifact 10174581839 saved; Release creation denied 403. Connector returned file reference but signed file download returned HTTP 403 / 1010. No images inspected; native graphics acceptance blocked. Follow-up run 34533475898 retains D14/D15/native diagnostics."
   },
   "intermediate_walk": {
     "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
@@ -500,5 +502,23 @@
     "change": "Earlier snow fade on steep faces, cooler exposed stone, less yellow soil; shared terrain/cliff profile. No terrain or placement changes.",
     "import": "Godot 4.6.3 Linux headless editor import passed, exit 0, no script/parse errors. Graphical shader and visual acceptance pending.",
     "native_parity": false
+  },
+  "D16": {
+    "revision": "D16",
+    "status": "candidate_not_integrated",
+    "mesh": "godot-pc/world-final/nature/assets/swamp_water_D16.glb",
+    "sha256": "7fee87f3abee65f91731a1594b35fb399dcf66d1fad49556234d1f469ca519ef",
+    "terrain_sha256": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e",
+    "vertices": 18179,
+    "triangles": 33153,
+    "area_m2": 59862.91261012928,
+    "level_m": 13,
+    "minimum_depth_m": 0.009959958493709564,
+    "maximum_depth_m": 2.1490249633789062,
+    "terrain_changed": false,
+    "collision_added": false,
+    "native_blender_pending": true,
+    "visual_verified": false,
+    "import": "Godot 4.6.3 headless import and isolated saved water scene load passed without errors; no graphical verification."
   }
 }

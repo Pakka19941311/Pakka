@@ -3,7 +3,7 @@ on:
   push:
     branches: [work/character-art-v3]
 permissions:
-  contents: write
+  contents: read
 concurrency:
   group: world-nature-${{ github.ref }}-${{ contains(github.event.head_commit.message, '[world-nature]') && 'review' || github.sha }}
   cancel-in-progress: false
@@ -57,13 +57,11 @@ jobs:
       - name: Preserve real render evidence, including failed attempts
         if: always() && steps.import.outcome == 'success'
         env:
-          GH_TOKEN: ${{ github.token }}
           REVIEW_OUTCOME: ${{ steps.motion.outcome }}
           SURFACE_OUTCOME: ${{ steps.surface.outcome }}
           NATIVE_OUTCOME: ${{ steps.native.outcome }}
         run: |
           python scripts/world_final/package_nature_review.py
-          gh release create "world-nature-${GITHUB_SHA:0:12}" qa-artifacts/world-final/nature-review.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease --latest=false --title "VARENDOR D14 — native review evidence" --notes-file qa-artifacts/world-final/nature-review-notes.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:

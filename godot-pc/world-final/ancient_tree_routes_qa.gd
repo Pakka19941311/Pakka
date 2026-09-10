@@ -15,36 +15,37 @@ func run() -> void:
 	var collision = Collision.new()
 	collision.setup(obstacles)
 	var specification: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://world-final/ancient-tree-routes.json"))
-	var points: Array = specification.approach_xz
 	var results: Array = []
-	for reverse: bool in [false, true]:
-		var route: Array = points.duplicate(true)
-		if reverse:route.reverse()
-		var motor = Motor.new()
-		motor.collision = collision
-		motor.bounds_min = Vector2(-796,-696)
-		motor.bounds_max = Vector2(796,696)
-		motor.reconcile({"time":0,"monsters":[],"heroes":[],"character":{"id":"ancient-tree-route","generation":1,"x":route[0][0],"z":-route[0][1],"yOffset":0,"verticalVelocity":0,"grounded":true,"yaw":0,"stats":{"speed":6.2},"dead":false,"combatState":"idle"}})
-		motor.input_mode = "manual"
-		var passed: bool = true
-		var blocking: Array = []
-		for point: Array in route.slice(1):
-			var target: Vector2 = Vector2(point[0],-point[1])
-			var budget: int = ceili(motor.position_value.distance_to(target)/6.2*60)+150
-			while motor.position_value.distance_to(target) > .16 and budget > 0:
-				motor.input_direction = (target-motor.position_value).normalized()
-				motor.physics_step(1.0/60.0)
-				budget -= 1
-			if budget == 0:
-				passed = false
-				for obstacle: Dictionary in collision.candidates(motor.position_value-Vector2.ONE*3,motor.position_value+Vector2.ONE*3):
-					blocking.append(obstacle.id)
-				break
-		motor.input_direction = Vector2.ZERO
-		motor.physics_step(1.0/60.0)
-		var stopped: Vector2 = motor.position_value
-		for i: int in range(60):motor.physics_step(1.0/60.0)
-		results.append({"reverse":reverse,"arrived":passed,"position_server":[stopped.x,stopped.y],"stop_drift_m":stopped.distance_to(motor.position_value),"nearby_obstacles":blocking})
+	for route_id: String in ["approach_xz", "arena_perimeter_xz"]:
+		var points: Array = specification[route_id]
+		for reverse: bool in [false, true]:
+			var route: Array = points.duplicate(true)
+			if reverse:route.reverse()
+			var motor = Motor.new()
+			motor.collision = collision
+			motor.bounds_min = Vector2(-796,-696)
+			motor.bounds_max = Vector2(796,696)
+			motor.reconcile({"time":0,"monsters":[],"heroes":[],"character":{"id":"ancient-tree-route","generation":1,"x":route[0][0],"z":-route[0][1],"yOffset":0,"verticalVelocity":0,"grounded":true,"yaw":0,"stats":{"speed":6.2},"dead":false,"combatState":"idle"}})
+			motor.input_mode = "manual"
+			var passed: bool = true
+			var blocking: Array = []
+			for point: Array in route.slice(1):
+				var target: Vector2 = Vector2(point[0],-point[1])
+				var budget: int = ceili(motor.position_value.distance_to(target)/6.2*60)+150
+				while motor.position_value.distance_to(target) > .16 and budget > 0:
+					motor.input_direction = (target-motor.position_value).normalized()
+					motor.physics_step(1.0/60.0)
+					budget -= 1
+				if budget == 0:
+					passed = false
+					for obstacle: Dictionary in collision.candidates(motor.position_value-Vector2.ONE*3,motor.position_value+Vector2.ONE*3):
+						blocking.append(obstacle.id)
+					break
+			motor.input_direction = Vector2.ZERO
+			motor.physics_step(1.0/60.0)
+			var stopped: Vector2 = motor.position_value
+			for i: int in range(60):motor.physics_step(1.0/60.0)
+			results.append({"route":route_id,"reverse":reverse,"arrived":passed,"position_server":[stopped.x,stopped.y],"stop_drift_m":stopped.distance_to(motor.position_value),"nearby_obstacles":blocking})
 	var preserved: Dictionary = obstacles.filter(func(o: Dictionary):return o.id == specification.preserved_obstacle)[0]
 	var wall: Dictionary = obstacles.filter(func(o: Dictionary):return o.id == "D14_trunk_wall_0")[0]
 	var collision_controls: Dictionary = {

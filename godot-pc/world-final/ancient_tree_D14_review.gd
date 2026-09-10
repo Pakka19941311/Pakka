@@ -32,7 +32,8 @@ func run_review() -> void:
 		await capture(view.id)
 	if "--tree-static-only" in OS.get_cmdline_user_args():get_tree().call_deferred("quit",0);return
 	nature.set_overview_geometry(false);overview=false;camera.fov=rad_to_deg(.82)
-	var points: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/ancient-tree-routes.json")).approach_xz
+	var route_id: String="arena_perimeter_xz" if "--tree-perimeter-only" in OS.get_cmdline_user_args() else "approach_xz"
+	var points: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/ancient-tree-routes.json"))[route_id]
 	var walks: Array=[]
 	for reverse: bool in [false,true]:
 		var route: Array=points.duplicate()
@@ -40,7 +41,9 @@ func run_review() -> void:
 		reset_actor(Vector2(route[0][0],-route[0][1]));motor.input_mode="manual"
 		var direction: Vector2=Vector2(route[1][0]-route[0][0],-(route[1][1]-route[0][1])).normalized()
 		follow.yaw=-atan2(direction.x,direction.y);follow.reset_follow()
-		status.text="VARENDOR · D14 · "+("выход из полого ствола" if reverse else "подход к полому стволу")+"\nСуществующий герой и камера · 6,2 м/с"
+		var route_title: String=("выход из полого ствола" if reverse else "подход к полому стволу")
+		if route_id=="arena_perimeter_xz":route_title="обход древнего дерева · "+("обратно" if reverse else "вперёд")
+		status.text="VARENDOR · D14 · "+route_title+"\nСуществующий герой и камера · 6,2 м/с"
 		for i: int in range(24):await get_tree().physics_frame
 		var first: int=movie_frame;var arrived: bool=true
 		for point: Array in route.slice(1):
@@ -55,5 +58,6 @@ func run_review() -> void:
 		await capture("hollow-exit-stop" if reverse else "hollow-entry-stop")
 		walks.append({"reverse":reverse,"arrived":arrived,"stop_drift_m":stopped.distance_to(motor.position_value),"last_position_server":[stopped.x,stopped.y],"first_frame":first,"last_frame":movie_frame-1})
 	var report: Dictionary={"revision":"D14","headless":DisplayServer.get_name()=="headless","numerical_only":numerical_only,"native_source":"art/world-final/Varendor_Ancient_Tree_D-14.blend","forest_removed":0,"tree_colliders":extra.size(),"walks":walks,"frames":movie_frame,"all_walks_pass":walks.all(func(w: Dictionary):return w.arrived and w.stop_drift_m<.000001),"final_art_accepted":false,"main_integrated":false}
+	report["route_id"]=route_id
 	var file: FileAccess=FileAccess.open(output_dir.path_join("ancient-tree-review.json"),FileAccess.WRITE);file.store_string(JSON.stringify(report,"  "));file.close()
 	print("ANCIENT_TREE_REVIEW "+JSON.stringify(report));get_tree().call_deferred("quit",0 if report.all_walks_pass else 3)
