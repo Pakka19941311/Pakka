@@ -1,0 +1,16 @@
+{
+  "reconstructed_after_launcher_failure": true,
+  "operation_completed": false,
+  "crash_confirmed": false,
+  "reason": "GDScript diagnostic assigned Nil to PackedColorArray for a mesh without colours; diagnostic stopped progressing. The former launcher failed to record its timeout after taskkill did not finish the process.",
+  "launcher_pid": 6744,
+  "child_pid": 11000,
+  "start_local": "2026-09-10T20:12:40+03:00",
+  "executable": "../tools/Godot_v4.6.3-stable_win64_console.exe",
+  "working_directory": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "scene": "res://world-final/tree_material_diagnostic.tscn",
+  "exit_code": null,
+  "close_method": "Verified path/start time, CloseMainWindow; WaitForExit true and both PIDs absent afterwards.",
+  "fixed": "Handle absent colour arrays. Launcher records launch immediately, gracefully closes only its own windows, preserves a result even if termination remains incomplete.",
+  "retests": "D09-02 through D09-06 exited 0. Deliberate timeout remains a failed operation even when graceful process exit is 0."
+}

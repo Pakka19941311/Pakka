@@ -103,6 +103,11 @@ func set_overview_geometry(enabled: bool) -> void:
 func make_batch(part: Dictionary, placements: Array, center: Vector3) -> MultiMeshInstance3D:
 	var mm: MultiMesh = MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
+	# Explicit white keeps instance tint neutral alongside custom distance data.
+	# In Compatibility the colour slot is multiplied into vertex COLOR even
+	# when only custom data was supplied; the isolated D09 comparison reproduces
+	# dark bark without this initialized colour buffer.
+	mm.use_colors=true
 	mm.use_custom_data=true
 	mm.mesh = part.mesh
 	mm.instance_count = placements.size()
@@ -110,6 +115,7 @@ func make_batch(part: Dictionary, placements: Array, center: Vector3) -> MultiMe
 		var transform: Transform3D = placement_transform(placements[index])*part.transform
 		transform.origin -= center
 		mm.set_instance_transform(index,transform)
+		mm.set_instance_color(index,Color.WHITE)
 		var p: Dictionary=placements[index]
 		mm.set_instance_custom_data(index,Color(p.position[0],p.position[1],p.position[2],p.scale))
 	var node: MultiMeshInstance3D = MultiMeshInstance3D.new()

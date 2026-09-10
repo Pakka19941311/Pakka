@@ -7,7 +7,19 @@ func run_review() -> void:
 	add_child(nature);nature_visual=nature
 	status.text="VARENDOR · D08 · загрузка сохранённых лесных массивов"
 	await nature.build()
+	if "--authored-lod-only" in OS.get_cmdline_user_args():
+		for batch: MultiMeshInstance3D in nature.batches:batch.lod_bias=100000.0
+	if "--pine-palette-D10" in OS.get_cmdline_user_args():
+		for material: ShaderMaterial in nature.focus_materials:
+			var source: Material=material.get_meta("unmodified_source_material")
+			if "pine_tree_01_twig" in source.resource_name:material.set_shader_parameter("base_color",Color(.70,.96,.72))
+	if "--foliage-aa" in OS.get_cmdline_user_args():
+		get_viewport().msaa_3d=Viewport.MSAA_4X
+		var shader: Shader=Shader.new()
+		shader.code=FileAccess.get_file_as_string("res://world-final/nature/tree_focus.gdshader").replace("render_mode cull_disabled;","render_mode cull_disabled,alpha_to_coverage;").replace("ALPHA=a;","ALPHA=a; ALPHA_ANTIALIASING_EDGE=use_alpha?source_alpha_cutoff*0.7:0.0; ALPHA_TEXTURE_COORDINATE=UV*vec2(textureSize(albedo_tex,0));")
+		for material: ShaderMaterial in nature.focus_materials:material.shader=shader
 	var ground: ShaderMaterial=nature.world_ground_material()
+	if "--surface-D10" in OS.get_cmdline_user_args():ground=load("res://world-final/materials/surface_materials.gd").terrain()
 	for node: Node in find_children("*","MeshInstance3D",true,false):
 		if str(node.name).begins_with("cell_"):node.material_override=ground
 	var added: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/collision-D08.json")).obstacles
@@ -20,7 +32,10 @@ func run_review() -> void:
 		{"id":"living-forest-mass","from":Vector3(-450,360,260),"to":Vector3(-510,70,-80)},
 		{"id":"rotten-forest-mass","from":Vector3(-90,325,-190),"to":Vector3(-240,125,-430)},
 		{"id":"snow-treeline","from":Vector3(-610,360,-135),"to":Vector3(-570,220,-405)},
-		{"id":"southern-forest","from":Vector3(0,240,740),"to":Vector3(-160,40,495)}]:
+		{"id":"southern-forest","from":Vector3(0,240,740),"to":Vector3(-160,40,495)},
+		{"id":"volcano-surface","from":Vector3(705,520,-85),"to":Vector3(545,216,-490)},
+		{"id":"lake-shore","from":Vector3(510,130,75),"to":Vector3(355,40,-125)}]:
+		if "--forest-view-only" in OS.get_cmdline_user_args() and view.id!="living-forest-mass":continue
 		camera.position=view.from;camera.look_at(view.to);camera.fov=55
 		status.text="VARENDOR · D08 · лесные массивы\nГеология, атмосфера и игровые переходы ещё в работе"
 		for i: int in range(3):await get_tree().process_frame

@@ -1,0 +1,64 @@
+{
+  "revision": "D10",
+  "mask": "biomes-D10.png",
+  "channels": [
+    "road",
+    "snow",
+    "ash",
+    "wet"
+  ],
+  "mask_dimensions": [
+    801,
+    701
+  ],
+  "world_bounds_xz": [
+    -800,
+    -700,
+    800,
+    700
+  ],
+  "geometry_changed": false,
+  "files": [
+    {
+      "path": "godot-pc/world-final/materials/cliff_diff.jpg",
+      "source": "public/assets/world/coastal_cliff_04/coastal_cliff_04_diff_1k.jpg",
+      "sha256": "c11b74870874f9d764e6eec81387f241cb38e0f0fa5a2c91b4fe6bcbfa397c41",
+      "bytes": 261805
+    },
+    {
+      "path": "godot-pc/world-final/materials/cliff_normal.jpg",
+      "source": "public/assets/world/coastal_cliff_04/coastal_cliff_04_nor_gl_1k.jpg",
+      "sha256": "599b5aea0493d8d5e943d558ff995961533664053030f7d895ee4605099fa4dc",
+      "bytes": 413936
+    },
+    {
+      "path": "godot-pc/world-final/materials/cliff_arm.jpg",
+      "source": "public/assets/world/coastal_cliff_04/coastal_cliff_04_arm_1k.jpg",
+      "sha256": "53c2b5ee836dd12ff06eda30e76f8b8be5102fe5f4594789ffb483a7dcb34709",
+      "bytes": 213613
+    },
+    {
+      "path": "godot-pc/world-final/materials/snow_diff.jpg",
+      "source": "art/world-final/materials/snow_02/snow_02_diff_1k.jpg",
+      "sha256": "523a4e69c90b96d787dd69b897f29a2b3761a017024405c60aa630d1e8e9009a",
+      "bytes": 325497
+    },
+    {
+      "path": "godot-pc/world-final/materials/snow_normal.jpg",
+      "source": "art/world-final/materials/snow_02/snow_02_nor_gl_1k.jpg",
+      "sha256": "9495ec680616b8340e2cbecbd151bff84c690cfad4209e90cc98d2d0ba81f810",
+      "bytes": 1081858
+    },
+    {
+      "path": "godot-pc/world-final/materials/snow_rough.jpg",
+      "source": "art/world-final/materials/snow_02/snow_02_rough_1k.jpg",
+      "sha256": "b6dea8039ac2a5beaed6fd41834fb55540cc76b492edd1d48ba2da2f30f1cb75",
+      "bytes": 146089
+    }
+  ],
+  "source_licenses": [
+    "docs/assets/world-source-manifest.json",
+    "art/world-final/materials/snow_02/source.json"
+  ],
+  "native_material_pending": true
+}

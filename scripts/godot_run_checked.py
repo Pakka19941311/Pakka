@@ -77,6 +77,27 @@ def memory_sampler():
     return sample
 
 
+def close_windows_for_processes(pids):
+    """Gracefully close only windows belonging to this launch's sampled PIDs."""
+    if not hasattr(ctypes, 'WinDLL'):
+        return []
+    user = ctypes.WinDLL('user32', use_last_error=True)
+    callback_type = ctypes.WINFUNCTYPE(w.BOOL, w.HWND, w.LPARAM)
+    user.GetWindowThreadProcessId.argtypes = [w.HWND, ctypes.POINTER(w.DWORD)]
+    user.PostMessageW.argtypes = [w.HWND, w.UINT, w.WPARAM, w.LPARAM]
+    user.EnumWindows.argtypes = [callback_type, w.LPARAM]
+    requested = []
+    @callback_type
+    def visit(hwnd, parameter):
+        pid = w.DWORD()
+        user.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        if pid.value in pids and user.PostMessageW(hwnd, 0x0010, 0, 0):
+            requested.append(pid.value)
+        return True
+    user.EnumWindows(visit, 0)
+    return requested
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--exe', required=True)
@@ -110,17 +131,32 @@ def main():
                                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
         result['launcher_pid'] = process.pid
         result['timed_out'] = False
+        (output / 'launch.json').write_text(json.dumps({k:v for k,v in result.items() if k!='samples'}, indent=2), encoding='utf-8')
         while process.poll() is None:
             reading = sample(process.pid)
             reading['elapsed_s'] = round(time.monotonic() - start, 3)
             result['samples'].append(reading)
             if time.monotonic() - start > args.timeout:
                 # Terminate only this launched process tree, never unrelated Godot sessions.
-                subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True)
                 result['timed_out'] = True
+                selected = {p['pid'] for p in reading.get('processes', [])}
+                result['close_requested_pids'] = close_windows_for_processes(selected)
+                try:
+                    process.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    stopped = subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], capture_output=True)
+                    result['termination_attempt'] = {'exit_code': stopped.returncode,
+                        'stderr': stopped.stderr.decode('utf-8', errors='replace')}
                 break
             time.sleep(0.2)
-        result['exit_code'] = process.wait(timeout=10)
+        try:
+            result['exit_code'] = process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            # Preserve the failed operation and the exact outstanding processes;
+            # never let a launcher exception erase the diagnostic record.
+            result['exit_code'] = None
+            result['termination_incomplete'] = True
+            result['remaining_processes'] = sample(process.pid).get('processes', [])
     result['elapsed_s'] = round(time.monotonic() - start, 3)
     data = '\n'.join((output / name).read_text('utf-8', errors='replace') for name in ('engine.log', 'stderr.log'))
     result['error_lines'] = [line for line in data.splitlines() if 'ERROR:' in line or 'SCRIPT ERROR:' in line]
