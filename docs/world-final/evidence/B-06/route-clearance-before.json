@@ -1,0 +1,249 @@
+{
+  "radius_m": 0.46,
+  "sample_interval_m": 0.25,
+  "source": "qa-artifacts\\world-final\\collision-baseline.json",
+  "all_pass": false,
+  "routes": [
+    {
+      "road": "safe-village-fort",
+      "pass": true,
+      "min_clearance_m": 6.245,
+      "nearest_mesh": "V04_foundation",
+      "blocked": []
+    },
+    {
+      "road": "fort-lake",
+      "pass": false,
+      "min_clearance_m": -4.251,
+      "nearest_mesh": "SH01_foundation",
+      "blocked": [
+        {
+          "mesh": "SH01_walls",
+          "clearance": -3.751,
+          "point": [
+            411.196,
+            60.249
+          ]
+        },
+        {
+          "mesh": "SH01_foundation",
+          "clearance": -4.251,
+          "point": [
+            411.196,
+            60.249
+          ]
+        },
+        {
+          "mesh": "SH01_door",
+          "clearance": 0.055,
+          "point": [
+            409.595,
+            63.93
+          ]
+        }
+      ]
+    },
+    {
+      "road": "west-spine",
+      "pass": false,
+      "min_clearance_m": -1.046,
+      "nearest_mesh": "MINE_PORTAL_left",
+      "blocked": [
+        {
+          "mesh": "MINE_PORTAL_left",
+          "clearance": -1.046,
+          "point": [
+            27.114,
+            -415.147
+          ]
+        }
+      ]
+    },
+    {
+      "road": "living-forest-loop",
+      "pass": true,
+      "min_clearance_m": 178.028,
+      "nearest_mesh": "V07_foundation",
+      "blocked": []
+    },
+    {
+      "road": "rotten-approach",
+      "pass": false,
+      "min_clearance_m": -5.2,
+      "nearest_mesh": "ANCIENT_TREE_trunk",
+      "blocked": [
+        {
+          "mesh": "ANCIENT_TREE_trunk",
+          "clearance": -5.2,
+          "point": [
+            -170.0,
+            -450.0
+          ]
+        }
+      ]
+    },
+    {
+      "road": "snow-ascent",
+      "pass": true,
+      "min_clearance_m": 295.389,
+      "nearest_mesh": "ANCIENT_TREE_trunk",
+      "blocked": []
+    },
+    {
+      "road": "mine-cave-link",
+      "pass": false,
+      "min_clearance_m": -2.427,
+      "nearest_mesh": "CAVE_MOUTH_right",
+      "blocked": [
+        {
+          "mesh": "MINE_PORTAL_right",
+          "clearance": -0.998,
+          "point": [
+            43.002,
+            -419.5
+          ]
+        },
+        {
+          "mesh": "CAVE_MOUTH_right",
+          "clearance": -2.427,
+          "point": [
+            263.387,
+            -290.69
+          ]
+        }
+      ]
+    },
+    {
+      "road": "dry-cave-approach",
+      "pass": false,
+      "min_clearance_m": -6.462,
+      "nearest_mesh": "FORT_gate_tower",
+      "blocked": [
+        {
+          "mesh": "FORT_eastwest-1",
+          "clearance": -2.427,
+          "point": [
+            -183.073,
+            135.442
+          ]
+        },
+        {
+          "mesh": "FORT_south_wing-1",
+          "clearance": -2.484,
+          "point": [
+            -114.687,
+            223.984
+          ]
+        },
+        {
+          "mesh": "FORT_corner",
+          "clearance": -5.972,
+          "point": [
+            -184.986,
+            75.589
+          ]
+        },
+        {
+          "mesh": "FORT_gate_tower",
+          "clearance": -6.462,
+          "point": [
+            -114.381,
+            224.38
+          ]
+        },
+        {
+          "mesh": "CAVE_MOUTH_left",
+          "clearance": -2.396,
+          "point": [
+            226.644,
+            -282.753
+          ]
+        }
+      ]
+    },
+    {
+      "road": "lake-sanctuary",
+      "pass": true,
+      "min_clearance_m": 7.785,
+      "nearest_mesh": "SH03_foundation",
+      "blocked": []
+    },
+    {
+      "road": "volcano-ascent",
+      "pass": true,
+      "min_clearance_m": 89.394,
+      "nearest_mesh": "SH03_foundation",
+      "blocked": []
+    },
+    {
+      "road": "south-ruins",
+      "pass": true,
+      "min_clearance_m": 16.601,
+      "nearest_mesh": "FORT_gate_tower",
+      "blocked": []
+    },
+    {
+      "road": "swamp-path",
+      "pass": true,
+      "min_clearance_m": 11.283,
+      "nearest_mesh": "V08_foundation",
+      "blocked": []
+    },
+    {
+      "road": "necropolis-road",
+      "pass": false,
+      "min_clearance_m": -16.5,
+      "nearest_mesh": "GRAVE_CHURCH_nave_foundation",
+      "blocked": [
+        {
+          "mesh": "GRAVE_CHURCH_nave_walls",
+          "clearance": -16.0,
+          "point": [
+            660.0,
+            280.0
+          ]
+        },
+        {
+          "mesh": "GRAVE_CHURCH_nave_foundation",
+          "clearance": -16.5,
+          "point": [
+            660.0,
+            280.0
+          ]
+        },
+        {
+          "mesh": "GRAVE_CHURCH_transept",
+          "clearance": -7.36,
+          "point": [
+            660.0,
+            280.0
+          ]
+        }
+      ]
+    },
+    {
+      "road": "eastern-grave-approach",
+      "pass": false,
+      "min_clearance_m": -2.043,
+      "nearest_mesh": "SH02_foundation",
+      "blocked": [
+        {
+          "mesh": "SH02_walls",
+          "clearance": -1.543,
+          "point": [
+            437.044,
+            72.066
+          ]
+        },
+        {
+          "mesh": "SH02_foundation",
+          "clearance": -2.043,
+          "point": [
+            437.044,
+            72.066
+          ]
+        }
+      ]
+    }
+  ]
+}

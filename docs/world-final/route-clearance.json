@@ -1,0 +1,113 @@
+{
+  "radius_m": 0.46,
+  "sample_interval_m": 0.25,
+  "source": "godot-pc\\world-final\\geography\\collision.json",
+  "all_pass": true,
+  "routes": [
+    {
+      "road": "safe-village-fort",
+      "pass": true,
+      "min_clearance_m": 6.245,
+      "nearest_mesh": "V04_foundation",
+      "blocked": []
+    },
+    {
+      "road": "fort-lake",
+      "pass": true,
+      "min_clearance_m": 0.599,
+      "nearest_mesh": "BRIDGE_LAKE_parapet",
+      "blocked": []
+    },
+    {
+      "road": "west-spine",
+      "pass": true,
+      "min_clearance_m": 6.84,
+      "nearest_mesh": "MINE_PORTAL_left",
+      "blocked": []
+    },
+    {
+      "road": "living-forest-loop",
+      "pass": true,
+      "min_clearance_m": 178.028,
+      "nearest_mesh": "V07_foundation",
+      "blocked": []
+    },
+    {
+      "road": "rotten-approach",
+      "pass": true,
+      "min_clearance_m": 15.048,
+      "nearest_mesh": "ANCIENT_TREE_trunk",
+      "blocked": []
+    },
+    {
+      "road": "snow-ascent",
+      "pass": true,
+      "min_clearance_m": 295.389,
+      "nearest_mesh": "ANCIENT_TREE_trunk",
+      "blocked": []
+    },
+    {
+      "road": "mine-cave-link",
+      "pass": true,
+      "min_clearance_m": 6.84,
+      "nearest_mesh": "MINE_PORTAL_left",
+      "blocked": []
+    },
+    {
+      "road": "dry-cave-approach",
+      "pass": true,
+      "min_clearance_m": 8.895,
+      "nearest_mesh": "FORT_corner",
+      "blocked": []
+    },
+    {
+      "road": "lake-sanctuary",
+      "pass": true,
+      "min_clearance_m": 7.785,
+      "nearest_mesh": "SH03_foundation",
+      "blocked": []
+    },
+    {
+      "road": "volcano-ascent",
+      "pass": true,
+      "min_clearance_m": 23.695,
+      "nearest_mesh": "SANCTUARY_plinth_east",
+      "blocked": []
+    },
+    {
+      "road": "south-ruins",
+      "pass": true,
+      "min_clearance_m": 16.601,
+      "nearest_mesh": "FORT_gate_tower",
+      "blocked": []
+    },
+    {
+      "road": "swamp-path",
+      "pass": true,
+      "min_clearance_m": 11.283,
+      "nearest_mesh": "V08_foundation",
+      "blocked": []
+    },
+    {
+      "road": "necropolis-road",
+      "pass": true,
+      "min_clearance_m": 1.39,
+      "nearest_mesh": "BRIDGE_GRAVES_parapet",
+      "blocked": []
+    },
+    {
+      "road": "eastern-grave-approach",
+      "pass": true,
+      "min_clearance_m": 6.452,
+      "nearest_mesh": "SH02_foundation",
+      "blocked": []
+    },
+    {
+      "road": "sanctuary-ramp",
+      "pass": true,
+      "min_clearance_m": 8.0,
+      "nearest_mesh": "SANCTUARY_plinth_south_w",
+      "blocked": []
+    }
+  ]
+}

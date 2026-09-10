@@ -6,8 +6,11 @@ const GEO: String = "res://world-final/geography/"
 var layout: Dictionary
 var terrain: Dictionary
 var heights: PackedFloat32Array
+var obstacles: Array
+var support_surfaces: Array
 var motor: VarendorPlayerMovement = VarendorPlayerMovement.new()
 var collision: VarendorCollision = VarendorCollision.new()
+var camera_collision: VarendorCollision = VarendorCollision.new()
 var follow: VarendorCameraController = VarendorCameraController.new()
 var animator: VarendorAnimationController = VarendorAnimationController.new()
 var actor: Node3D
@@ -23,6 +26,8 @@ func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string("res://world-final/world_layout.json"))
 	terrain = JSON.parse_string(FileAccess.get_file_as_string(GEO + "terrain.json"))
 	heights = FileAccess.get_file_as_bytes(GEO + "heightmap.f32").to_float32_array()
+	obstacles = JSON.parse_string(FileAccess.get_file_as_string(GEO + "collision.json")).obstacles
+	support_surfaces = JSON.parse_string(FileAccess.get_file_as_string(GEO + "support-surfaces.json")).surfaces
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--world-B-output="):
 			output_dir = arg.trim_prefix("--world-B-output=")
@@ -52,7 +57,11 @@ func _ready() -> void:
 	camera.current = true
 	add_child(camera)
 	add_child(follow)
-	follow.setup(camera,collision,height_server)
+	# The ramp's full bounding box contains air above its sloped face. Camera
+	# ground clearance already samples its exact support surface; an extra box
+	# would falsely retract the camera into the ramp at its low entrance.
+	camera_collision.setup(obstacles.filter(func(o: Dictionary):return not str(o.source_mesh).contains("_access_ramp")))
+	follow.setup(camera,camera_collision,height_server)
 	var canvas: CanvasLayer = CanvasLayer.new()
 	add_child(canvas)
 	status = Label.new()
@@ -97,9 +106,13 @@ func height_godot(x: float,z: float) -> float:
 	var c: float = heights[index+801]
 	var d: float = heights[index+802]
 	var value: float = a+u*(b-a)+v*(d-b) if u>=v else a+u*(d-c)+v*(c-a)
-	for item: Dictionary in layout.objects:
-		if item.kind == "bridge" and absf(x-item.position[0])<=float(item.size[0])/2 and absf(z-item.position[2])<=float(item.size[2])/2:
-			value = maxf(value,float(item.position[1]))
+	for surface: Dictionary in support_surfaces:
+		var local: Vector2 = Vector2(x-float(surface.x),z-float(surface.z)).rotated(float(surface.angle))
+		if absf(local.x)<=float(surface.halfX) and absf(local.y)<=float(surface.halfZ):
+			var support: float = float(surface.y)
+			if surface.kind == "ramp_z":
+				support = lerpf(float(surface.high),float(surface.y),(local.y+float(surface.halfZ))/(2*float(surface.halfZ)))
+			value = maxf(value,support)
 	return value
 
 func height_server(x: float,z: float) -> float:
@@ -123,7 +136,7 @@ func create_actor() -> void:
 	equipment.apply_equipment({"head":"fallen_helm","chest":"militia_plate","gloves":"wolf_gloves","boots":"grave_boots","belt":"ash_belt","weapon":"wardens_blade"})
 	animator.bind(actor)
 	animator.prefer_run = true
-	collision.setup([])
+	collision.setup(obstacles)
 	motor.collision = collision
 	motor.bounds_min = Vector2(-796,-696)
 	motor.bounds_max = Vector2(796,696)
@@ -187,10 +200,18 @@ func run_review() -> void:
 	await capture("overview-B")
 	var result: Dictionary = {"stage":"B","runtime_scene":"res://world-final/geography_preview.tscn",
 		"headless":DisplayServer.get_name()=="headless","routes":[],"controller":"VarendorPlayerMovement",
-		"architecture_collision_verified":false,"server_integration_verified":false,"full_world_acceptance":false}
+		"architecture_collision_verified":false,"collision_mesh_count":obstacles.size(),"server_integration_verified":false,"full_world_acceptance":false}
 	# Numerical traversal uses the accepted fixed-step motor, normal 6.2m/s,
 	# accelerated wall time. It is not a claim of visually watching every route.
-	for road: Dictionary in layout.roads:
+	var routes: Array = layout.roads + layout.get("review_routes",[])
+	var reverse_routes: Array = []
+	for road: Dictionary in routes:
+		var reversed: Dictionary = road.duplicate(true)
+		reversed.id = str(road.id)+"-return"
+		reversed.points_xyz.reverse()
+		reverse_routes.append(reversed)
+	routes += reverse_routes
+	for road: Dictionary in routes:
 		var points: Array = road.points_xyz
 		reset_actor(Vector2(points[0][0],-points[0][2]))
 		motor.input_mode = "manual"
@@ -218,7 +239,11 @@ func run_review() -> void:
 		result.routes.append({"id":road.id,"arrived":passed,"steps":steps,"stop_drift_m":drift,"max_vertical_support_step_m":worst_step})
 	result["all_routes_arrived"] = result.routes.all(func(r: Dictionary):return r.arrived and r.stop_drift_m<.000001)
 	result["support_steps_pass"] = result.routes.all(func(r: Dictionary):return r.max_vertical_support_step_m<.08)
-	for view: Dictionary in [{"id":"fort-gate","point":Vector2(-100,-245),"yaw":0.0},{"id":"snow-road","point":Vector2(-625,425),"yaw":.8},{"id":"crater-ramp","point":Vector2(463,525),"yaw":-1.2},{"id":"lake-cave","point":Vector2(209,287),"yaw":.0}]:
+	# Negative controls ensure these aren't empty/no-op collision fixtures.
+	result["solid_wall_blocks"] = collision.blocked(Vector2(-183,-150))
+	result["fort_gate_open"] = not collision.blocked(Vector2(-100,-224))
+	result["architecture_collision_verified"] = result.all_routes_arrived and result.solid_wall_blocks and result.fort_gate_open
+	for view: Dictionary in [{"id":"fort-gate","point":Vector2(-100,-245),"yaw":0.0},{"id":"snow-road","point":Vector2(-625,425),"yaw":.8},{"id":"crater-ramp","point":Vector2(463,525),"yaw":-1.2},{"id":"lake-cave","point":Vector2(245,248),"yaw":.0}]:
 		reset_actor(view.point)
 		overview = false
 		camera.fov = rad_to_deg(.82)
@@ -231,4 +256,4 @@ func run_review() -> void:
 	file.store_string(JSON.stringify(result,"  "))
 	file.close()
 	print("WORLD_B_REVIEW "+JSON.stringify(result))
-	get_tree().quit(0 if result.all_routes_arrived and result.support_steps_pass else 3)
+	get_tree().quit(0 if result.architecture_collision_verified and result.support_steps_pass else 3)

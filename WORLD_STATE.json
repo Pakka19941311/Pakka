@@ -5,10 +5,10 @@
   "baseline_commit": "884b26e35508038506fe29477923e08d78744593",
   "checkpoint_ref": "refs/checkpoints/world-final-start-20260910-884b26e",
   "state_commit": "Resolve the commit containing this file; baseline_commit is the preserved pre-world HEAD.",
-  "current_stage": "B",
+  "current_stage": "C",
   "stages": {
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
-    "B": "partial: layout-04 continuous terrain, 143 GLB chunks, Blender masters, bridges, water and landmark massing exist; Godot GPU captures and motor routes passed. Landmark collisions, full route clearance and geological transitions remain to verify before B acceptance.",
+    "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "not started",
     "D": "not started",
     "E": "not started",
@@ -44,12 +44,18 @@
     "art/world-final/payload/",
     "art/world-final/Varendor_Geography_final-1.0-layout-04.blend",
     "docs/world-final/evidence/B-02/",
-    "docs/world-final/GEOGRAPHY_B_RU.md"
+    "docs/world-final/GEOGRAPHY_B_RU.md",
+    "art/world-final/Varendor_Geography_final-1.0-layout-05.blend",
+    "art/world-final/Varendor_Geography_final-1.0-layout-06.blend",
+    "godot-pc/world-final/geography/collision.json",
+    "godot-pc/world-final/geography/support-surfaces.json",
+    "godot-pc/world-final/geography_motion_review.gd",
+    "docs/world-final/evidence/B-06/",
+    "docs/world-final/evidence/B-07/"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Add obstacle footprints matching exported landmark geometry to the B scene; route-test village/fort gates, tree approach, sanctuary and church entrances; correct blocked endpoints and terrain transitions, then capture representative moving gameplay and close B before detailed C architecture/interiors.",
+  "next_task": "C: author and build independent mine and great_cave interiors with floor/walls/ceilings, branches and loops in native Blender; validate both with accepted hero and collision, then detail surface architecture and scale. Do not regenerate/replace B manually authored sources.",
   "not_verified": [
-    "Architecture collision/route clearance in B",
     "Detailed reference quality and vegetation C-D",
     "Mine/cave interiors and maps C-E",
     "Final NPC/server/1000 population integration F-G",
@@ -60,7 +66,7 @@
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "121331d5de6cfc3356abd1c0d2a7d7df224f9a60",
+  "last_saved_commit": "5a5bf7528fdd076e900e60ff04e9bf4bd1d25b51",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -73,7 +79,13 @@
     "bridge_support_steps": "under 0.08m",
     "old_motion_regression_10": true,
     "actual_Godot_frames": "docs/world-final/evidence/B-02",
-    "final_visual_acceptance": false
+    "final_visual_acceptance": false,
+    "measured_obstacles": 192,
+    "motor_routes_with_collision_30": true,
+    "normal_speed_rendered_walks_7": true,
+    "ramp_camera_repeat": true,
+    "payload_clean_restore_153": true,
+    "manual_edit_conflict_preserved": true
   },
   "publication": {
     "content_checkpoint": "121331d5de6cfc3356abd1c0d2a7d7df224f9a60",
@@ -81,6 +93,14 @@
     "native_and_glb_payload_files": 149,
     "payload_parts": 17,
     "main_and_knight_v2_unchanged": true,
-    "note": "A follow-up metadata-only commit preserves exact CRLF bytes for geometry JSON so payload hash checks also pass on clean checkout."
-  }
+    "note": "A follow-up metadata-only commit preserves exact CRLF bytes for geometry JSON so payload hash checks also pass on clean checkout.",
+    "pending": "Current B completion staged for branch publication; resolve commit containing this state."
+  },
+  "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
+  "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
+  "known_nonfatal_log_errors": [
+    "Windows certificate store",
+    "shader cache user directory",
+    "existing user display-settings JSON"
+  ]
 }

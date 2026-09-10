@@ -7,6 +7,8 @@ from pathlib import Path
 import bpy, hashlib, json, math, sys
 import numpy as np
 from mathutils import Vector, Matrix
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from export_landmark_collision import export_collision
 
 ROOT=Path(__file__).resolve().parents[2]
 GEO=ROOT/'godot-pc/world-final/geography'
@@ -36,6 +38,7 @@ stone=material('B_Fieldstone',(.34,.34,.31));roof=material('B_Slate',(.14,.19,.2
 wood=material('B_Old_Timber',(.20,.14,.095));plaster=material('B_Plaster',(.50,.47,.38))
 water=material('B_Water',(.05,.18,.21));water.node_tree.nodes.get('Principled BSDF').inputs['Roughness'].default_value=.23
 dark=material('B_Shadowed_Entrances',(.03,.034,.031))
+support_surfaces=[]
 
 def mesh(name,verts,faces,mat,coll):
     m=bpy.data.meshes.new(name);m.from_pydata(verts,[],faces);m.update()
@@ -116,7 +119,7 @@ for item in layout['objects']:
     name=item['id'];kind=item['kind'];x,y,z=item['position'];sx,sy,sz=item['size']
     if kind in ('peak','arena','crater'):continue # These are shaped in continuous terrain.
     parent=bpy.data.objects.new(name,None);landmark_collection.objects.link(parent)
-    parent['landmark_id']=name;parent['location_id']=item['location_id'];parent['stage']='B massing, C detail pending'
+    parent['landmark_id']=name;parent['location_id']=item['location_id'];parent['stage']='B massing, C detail pending';parent['ground_level']=y
     if kind in ('house','shed','civic_house','ruined_house','crypt'):
         house(name,(x,y,z),(sx,sy,sz),parent)
     elif kind in ('tower','ruined_tower'):
@@ -127,19 +130,21 @@ for item in layout['objects']:
         for sign in [-1,1]:
             block(name+'_eastwest'+str(sign),(x+sign*sx/2,y,z),(5,sy,sz),stone,parent)
             block(name+'_south_wing'+str(sign),(x+sign*(sx/4+5),y,z+sz/2),(sx/2-10,sy,5),stone,parent)
-            for side in [-1,1]:cylinder(name+'_corner',(x+sign*sx/2,y,z+side*sz/2),8,sy+7,stone,parent,16)
+            for side in [-1,1]:cylinder(name+'_corner',(x+sign*sx/2,y,z+side*sz/2),8,item.get('tower_height',sy+7),stone,parent,16)
         block(name+'_north_wall',(x,y,z-sz/2),(sx,sy,5),stone,parent)
-        for sign in [-1,1]:cylinder(name+'_gate_tower',(x+sign*14,y,z+sz/2),7,sy+5,stone,parent,16)
+        for sign in [-1,1]:cylinder(name+'_gate_tower',(x+sign*14,y,z+sz/2),7,item.get('gate_tower_height',sy+5),stone,parent,16)
     elif kind in ('mine_portal','cave_mouth','ruined_gate'):
         block(name+'_left',(x-sx*.44,y,z),(sx*.12,sy,sz),stone,parent)
         block(name+'_right',(x+sx*.44,y,z),(sx*.12,sy,sz),stone,parent)
         block(name+'_lintel',(x,y+sy*.78,z),(sx,sy*.22,sz),wood if kind=='mine_portal' else stone,parent)
     elif kind=='bridge':
         block(name+'_deck',(x,y-.7,z),(sx,.7,sz),stone,parent)
+        support_surfaces.append(dict(id=name+'_deck',kind='plane',x=x,z=z,halfX=sx/2,halfZ=sz/2,y=y,angle=math.radians(item.get('rotation_y_deg',0))))
         for side in [-1,1]:block(name+'_parapet',(x,y,z+side*(sz/2-.3)),(sx,1.15,.55),stone,parent)
         for offset in [-sx*.35,sx*.35]:block(name+'_pier',(x+offset,y-sy,z),(4,sy-.7,sz-1),stone,parent)
     elif kind=='pier':
         block(name+'_deck',(x,y-.35,z),(sz,.35,sx),wood,parent)
+        support_surfaces.append(dict(id=name+'_deck',kind='plane',x=x,z=z,halfX=sz/2,halfZ=sx/2,y=y,angle=math.radians(item.get('rotation_y_deg',0))))
         for offset in [-sz*.4,0,sz*.4]:
             for side in [-1,1]:cylinder(name+'_post',(x+offset,y-5,z+side*sx*.35),.3,5.5,wood,parent,8)
     elif kind=='church':
@@ -148,8 +153,17 @@ for item in layout['objects']:
         block(name+'_transept',(x,y,z),(sx*1.35,sy*.25,sz*.23),stone,parent)
     elif kind=='sanctuary':
         block(name+'_plinth',(x,y,z),(sx,3,sz),stone,parent)
+        support_surfaces.append(dict(id=name+'_plinth',kind='plane',x=x,z=z,halfX=sx/2,halfZ=sz/2,y=y+3,angle=0))
+        # A real worn stone access ramp joins the plinth at exactly 3m.
+        front=z+sz/2;run=14;half=8
+        verts=[xyz(v) for v in [(x-half,y,front+run),(x+half,y,front+run),(x+half,y,front),(x-half,y,front),
+                               (x-half,y+3,front),(x+half,y+3,front)]]
+        ramp=mesh(name+'_access_ramp',verts,[(0,1,5,4),(4,5,2,3),(0,4,3),(1,2,5),(0,3,2,1)],stone,landmark_collection);ramp.parent=parent
+        support_surfaces.append(dict(id=name+'_access_ramp',kind='ramp_z',x=x,z=front+run/2,halfX=half,halfZ=run/2,y=y,high=y+3,angle=0))
         for ix in [-.4,-.2,0,.2,.4]:
-            for iz in [-.4,.4]:cylinder(name+'_column',(x+sx*ix,y+3,z+sz*iz),1.8,sy*.7,stone,parent)
+            for iz in [-.4,.4]:
+                if ix==0 and iz==.4:continue # Axial entrance stays clear.
+                cylinder(name+'_column',(x+sx*ix,y+3,z+sz*iz),1.8,sy*.7,stone,parent)
         block(name+'_entablature',(x,y+sy*.7+3,z),(sx,3,sz),stone,parent)
     elif kind=='ancient_tree':
         cylinder(name+'_trunk',(x,y,z),5.2,sy*.6,wood,parent,14)
@@ -166,6 +180,9 @@ for item in layout['objects']:
     pivot=Vector(xyz((x,y,z)))
     parent.matrix_world=Matrix.Translation(pivot) @ Matrix.Rotation(math.radians(item.get('rotation_y_deg',0)),4,'Z') @ Matrix.Translation(-pivot)
 
+bpy.context.view_layer.update()
+obstacles=export_collision(landmark_collection,GEO/'collision.json')
+(GEO/'support-surfaces.json').write_text(json.dumps({'schema':1,'surfaces':support_surfaces},indent=2)+'\n',encoding='utf-8',newline='\n')
 # Export nonterrain models separately so the runtime can stream cells later.
 bpy.ops.object.select_all(action='DESELECT')
 for o in [*water_collection.objects,*landmark_collection.objects]:o.select_set(True)
@@ -177,6 +194,6 @@ meta['native_source']=source.relative_to(ROOT).as_posix();meta['landmarks']='lan
 report={'blender_version':bpy.app.version_string,'native_source':meta['native_source'],'source_bytes':source.stat().st_size,
         'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'chunks':len(meta['chunks']),
         'landmark_meshes':len(landmark_collection.objects),'terrain_triangles':800*700*2,
-        'stage':'B spatial models only','world_layout_revision':layout['revision']}
+        'stage':'B spatial models only','world_layout_revision':layout['revision'],'collision_meshes':len(obstacles),'support_surfaces':len(support_surfaces)}
 (ROOT/'docs/world-final/blender-geography.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
 print('BLENDER_GEOGRAPHY_OK '+json.dumps(report),flush=True)
