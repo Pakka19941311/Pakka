@@ -2,14 +2,16 @@
 No personal saves, engine caches or third-party data are included.
 """
 from pathlib import Path
-import hashlib,json,zipfile
+import argparse,hashlib,json,zipfile
 
 ROOT=Path(__file__).resolve().parents[2]
 PAYLOAD=ROOT/'art/world-final/payload'
 
-def package():
+def package(label=None):
     geo=ROOT/'godot-pc/world-final/geography'
+    interiors=ROOT/'godot-pc/world-final/interiors'
     files=sorted([*geo.rglob('*.glb'),geo/'heightmap.f32',geo/'terrain-data.npz',geo/'terrain.json',geo/'collision.json',geo/'support-surfaces.json',
+                  *interiors.glob('*.glb'),*interiors.glob('*.f32'),*interiors.glob('*.json'),*interiors.glob('*.tres'),
                   *sorted((ROOT/'art/world-final').glob('*.blend'))])
     manifest_path=ROOT/'art/world-final/payload-manifest.json'
     previous=json.loads(manifest_path.read_text('utf-8')) if manifest_path.exists() else None
@@ -18,7 +20,10 @@ def package():
     files=[p for p in files if hashlib.sha256(p.read_bytes()).hexdigest()!=known.get(p.relative_to(ROOT).as_posix(),{}).get('sha256')]
     if not files:print(json.dumps({'changed_files':0,'layers':len(layers)}));return
     revision=json.loads((ROOT/'godot-pc/world-final/world_layout.json').read_text('utf-8'))['revision']
-    tag='geography-'+revision+'-'+str(len(layers)+1)
+    if label:
+        assert all(c.isalnum() or c in '-_' for c in label), 'Use a plain version label'
+        revision=label
+    tag='world-'+revision+'-'+str(len(layers)+1)
     archive=ROOT/'qa-artifacts/world-final'/(tag+'.zip')
     archive.parent.mkdir(parents=True,exist_ok=True)
     entries=[]
@@ -45,4 +50,6 @@ def package():
     manifest_path.write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps({'changed_files':len(files),'parts_added':len(parts),'archive_bytes':archive.stat().st_size,'layers':len(layers)}),flush=True)
 
-if __name__=='__main__':package()
+if __name__=='__main__':
+    parser=argparse.ArgumentParser();parser.add_argument('--label')
+    package(parser.parse_args().label)

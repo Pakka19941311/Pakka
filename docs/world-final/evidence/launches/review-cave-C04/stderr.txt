@@ -1,0 +1,11 @@
+ERROR: Can't create shader cache folder, no shader caching will happen: user://
+   at: RasterizerGLES3 (drivers/gles3/rasterizer_gles3.cpp:335)
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+WARNING: Source geometry parsing for navigation mesh baking had to parse RenderingServer meshes at runtime.
+		This poses a significant performance issues as visual meshes store geometry data on the GPU and transferring this data back to the CPU blocks the rendering.
+		For runtime (re)baking navigation meshes use and parse collision shapes as source geometry or create geometry data procedurally in scripts.
+   at: add_mesh (scene/resources/3d/navigation_mesh_source_geometry_data_3d.cpp:202)
+   GDScript backtrace (most recent call first):
+       [0] bake_navigation (res://world-final/interior_preview.gd:85)
+       [1] _ready (res://world-final/interior_preview.gd:58)

@@ -1,0 +1,171 @@
+{
+  "all_rooms_connected": true,
+  "all_routes_pass": true,
+  "corridor_cycles": 2,
+  "floor_triangles": 71825.0,
+  "headless": false,
+  "main_game_integrated": false,
+  "maps_final": false,
+  "motor_routes": [
+    {
+      "arrived": true,
+      "id": "mouth",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "mouth-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "entry_neck",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "entry_neck-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "west_neck",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "west_neck-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "east_neck",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "east_neck-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "west_loop",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "west_loop-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "east_loop",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "east_loop-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "deep_neck",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "deep_neck-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "grotto_neck",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "grotto_neck-return",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "deep_bypass",
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "id": "deep_bypass-return",
+      "stop_drift_m": 0.0
+    }
+  ],
+  "nav_paths": [
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 196
+      },
+      "path_points": 9,
+      "reaches_room": true,
+      "room": "entrance_hall"
+    },
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 919
+      },
+      "path_points": 23,
+      "reaches_room": true,
+      "room": "central_hall"
+    },
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 1900
+      },
+      "path_points": 53,
+      "reaches_room": true,
+      "room": "west_gallery"
+    },
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 1938
+      },
+      "path_points": 46,
+      "reaches_room": true,
+      "room": "east_gallery"
+    },
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 2828
+      },
+      "path_points": 78,
+      "reaches_room": true,
+      "room": "cistern"
+    },
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 3639
+      },
+      "path_points": 83,
+      "reaches_room": true,
+      "room": "deep_hall"
+    },
+    {
+      "motor_traversal": {
+        "passed": true,
+        "steps": 3332
+      },
+      "path_points": 103,
+      "reaches_room": true,
+      "room": "old_grotto"
+    }
+  ],
+  "nav_polygons": 836,
+  "obstacles": 4595,
+  "population_capacity_reserved": 110.0,
+  "rooms": 7,
+  "space_id": "great_cave"
+}

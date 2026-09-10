@@ -9,7 +9,7 @@
   "stages": {
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
-    "C": "not started",
+    "C": "partial: independent mine and great_cave native interiors C04, closed walls/ceilings, two loops each, all 18 corridor directions and 7 navigation paths per space traversed; normal-speed graphics passed. Surface architecture remains B blockout and is the next task.",
     "D": "not started",
     "E": "not started",
     "F": "not started",
@@ -51,22 +51,33 @@
     "godot-pc/world-final/geography/support-surfaces.json",
     "godot-pc/world-final/geography_motion_review.gd",
     "docs/world-final/evidence/B-06/",
-    "docs/world-final/evidence/B-07/"
+    "docs/world-final/evidence/B-07/",
+    "art/world-final/Varendor_Interiors_C-04.blend",
+    "godot-pc/world-final/interiors/",
+    "godot-pc/world-final/interior_preview.gd",
+    "godot-pc/world-final/interior_motion_review.gd",
+    "scripts/world_final/build_interiors_blender.py",
+    "scripts/world_final/repair_interior_seams_blender.py",
+    "art/world-final/materials/rock_wall_02/",
+    "docs/world-final/INTERIORS_C_RU.md",
+    "docs/world-final/evidence/C04-mine/",
+    "docs/world-final/evidence/C04-cave/"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "C: author and build independent mine and great_cave interiors with floor/walls/ceilings, branches and loops in native Blender; validate both with accepted hero and collision, then detail surface architecture and scale. Do not regenerate/replace B manually authored sources.",
+  "next_task": "C surface architecture: edit preserved layout-06 native source into a new version; detailed village houses, fortress, shore settlement, shrine, church/necropolis and ruins. Keep all B terrain/road routes and portals fixed; re-export measured collision and validate affected routes with accepted hero. Interior atmosphere/maps/portals/population remain E/F/G.",
   "not_verified": [
-    "Detailed reference quality and vegetation C-D",
-    "Mine/cave interiors and maps C-E",
-    "Final NPC/server/1000 population integration F-G",
-    "Cold/warm performance and final Windows release H"
+    "Final surface architecture and scale C",
+    "Detailed reference quality and dense vegetation D",
+    "Interior final prop dressing, atmosphere and separate maps C-E",
+    "Main-game portals, NPC/server/1000 population F-G",
+    "Cold/warm performance and Windows Release H"
   ],
   "protected": [
     "Existing hero/animation/controller/camera/combat",
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "5a5bf7528fdd076e900e60ff04e9bf4bd1d25b51",
+  "last_saved_commit": "d2062416de8de5e550ca53c71c4a125cca245a4f",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -85,16 +96,21 @@
     "normal_speed_rendered_walks_7": true,
     "ramp_camera_repeat": true,
     "payload_clean_restore_153": true,
-    "manual_edit_conflict_preserved": true
+    "manual_edit_conflict_preserved": true,
+    "interior_closed_wall_edges": 0,
+    "interior_corridor_directions": 36,
+    "interior_navigation_paths": 14,
+    "interior_normal_speed_walks": 2,
+    "interior_navigation_cache_reused": true
   },
   "publication": {
-    "content_checkpoint": "121331d5de6cfc3356abd1c0d2a7d7df224f9a60",
+    "content_checkpoint": "d2062416de8de5e550ca53c71c4a125cca245a4f",
     "binary_blobs_uploaded_and_hash_verified": 27,
     "native_and_glb_payload_files": 149,
     "payload_parts": 17,
     "main_and_knight_v2_unchanged": true,
     "note": "A follow-up metadata-only commit preserves exact CRLF bytes for geometry JSON so payload hash checks also pass on clean checkout.",
-    "pending": "Current B completion staged for branch publication; resolve commit containing this state."
+    "pending": "C04 interiors are the current content checkpoint; resolve commit containing this state for its SHA. Main game still uses prior world."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",

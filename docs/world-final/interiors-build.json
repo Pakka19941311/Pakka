@@ -1,0 +1,59 @@
+{
+  "source": "art/world-final/Varendor_Interiors_C-03.blend",
+  "sha256": "0706cff8657eded17b22e32fac5630482e8deff7ec1f16c3cc767cac5e128a71",
+  "blender": "4.2.3 LTS",
+  "spaces": [
+    {
+      "schema": 1,
+      "space_id": "mine",
+      "native_source": "art/world-final/Varendor_Interiors_C-03.blend",
+      "layout_revision": "C-03",
+      "glb_sha256": "e074be02bc8fd717cc669caff37cd26017d4c840dc07cf925f662cdd2ff9b5db",
+      "bounds": [
+        -125,
+        -295,
+        100,
+        12
+      ],
+      "columns": 225,
+      "rows": 307,
+      "step": 1,
+      "floor": "mine-floor.f32",
+      "floor_sha256": "605e82ad20e93838e53f1857095ed08792ed01fbbe2b4acfa8c2265cae4676b1",
+      "floor_vertices": 17722,
+      "floor_triangles": 31833,
+      "wall_segments": 3623,
+      "wall_endpoints_welded": true,
+      "open_wall_edges": 772,
+      "shell_ceiling": true,
+      "entrance_open": true,
+      "main_game_integrated": false
+    },
+    {
+      "schema": 1,
+      "space_id": "great_cave",
+      "native_source": "art/world-final/Varendor_Interiors_C-03.blend",
+      "layout_revision": "C-03",
+      "glb_sha256": "6a8a9153edf056a553642098c327e431577fbbcea79d7fb176312001d587860e",
+      "bounds": [
+        -145,
+        -380,
+        135,
+        12
+      ],
+      "columns": 280,
+      "rows": 392,
+      "step": 1,
+      "floor": "great_cave-floor.f32",
+      "floor_sha256": "e288585fd2381779915489507138c45f0c03e358a1997be9940247bcdfa50977",
+      "floor_vertices": 38227,
+      "floor_triangles": 71825,
+      "wall_segments": 4667,
+      "wall_endpoints_welded": true,
+      "open_wall_edges": 7006,
+      "shell_ceiling": true,
+      "entrance_open": true,
+      "main_game_integrated": false
+    }
+  ]
+}

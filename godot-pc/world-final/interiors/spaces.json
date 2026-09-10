@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "revision": "C-04",
+  "coordinates": "Local Godot metres; Y up, +Z south. Spaces are independent, never overlaid in the same navigation map.",
+  "status": "Authored interior architecture; population and main-game portals integrate in F-G.",
+  "spaces": [
+    {
+      "id": "mine", "location_id": "L05", "population_capacity": 70,
+      "surface_portal": [35,125,-420], "entry": [0,0,8], "bounds": [-125,-295,100,12],
+      "entrance_half_width": 6, "tunnel_height": 7, "rock_variation": 0.3,
+      "rooms": [
+        {"id":"entry","center":[0,-28],"radii":[15,24],"height":8},
+        {"id":"junction","center":[-10,-82],"radii":[18,16],"height":9},
+        {"id":"west_working","center":[-70,-125],"radii":[25,22],"height":10},
+        {"id":"east_ore","center":[55,-143],"radii":[26,28],"height":12},
+        {"id":"pump_chamber","center":[-22,-195],"radii":[24,22],"height":11},
+        {"id":"deep_working","center":[35,-260],"radii":[30,25],"height":13},
+        {"id":"collapse","center":[-90,-239],"radii":[17,16],"height":8}
+      ],
+      "corridors": [
+        {"id":"entrance","from":"exit","to":"entry","width":12,"points":[[0,10],[0,-28]]},
+        {"id":"main_adit","from":"entry","to":"junction","width":8,"points":[[0,-28],[5,-56],[-10,-82]]},
+        {"id":"west_adit","from":"junction","to":"west_working","width":8,"points":[[-10,-82],[-39,-97],[-70,-125]]},
+        {"id":"east_adit","from":"junction","to":"east_ore","width":9,"points":[[-10,-82],[33,-102],[55,-143]]},
+        {"id":"west_return","from":"west_working","to":"pump_chamber","width":7,"points":[[-70,-125],[-63,-173],[-22,-195]]},
+        {"id":"east_return","from":"east_ore","to":"pump_chamber","width":8,"points":[[55,-143],[44,-185],[-22,-195]]},
+        {"id":"deep_adit","from":"pump_chamber","to":"deep_working","width":8,"points":[[-22,-195],[3,-228],[35,-260]]},
+        {"id":"old_working","from":"west_working","to":"collapse","width":7,"points":[[-70,-125],[-107,-175],[-90,-239]]},
+        {"id":"collapse_bypass","from":"collapse","to":"pump_chamber","width":6,"points":[[-90,-239],[-54,-247],[-22,-195]]}
+      ]
+    },
+    {
+      "id": "great_cave", "location_id": "L07", "population_capacity": 110,
+      "surface_portal": [245,48,-280], "entry": [0,0,8], "bounds": [-145,-380,135,12],
+      "entrance_half_width": 18, "tunnel_height": 14, "rock_variation": 1.1,
+      "rooms": [
+        {"id":"entrance_hall","center":[0,-20],"radii":[26,30],"height":24},
+        {"id":"central_hall","center":[0,-90],"radii":[40,36],"height":32},
+        {"id":"west_gallery","center":[-78,-165],"radii":[38,30],"height":24},
+        {"id":"east_gallery","center":[75,-170],"radii":[40,36],"height":28},
+        {"id":"cistern","center":[-10,-234],"radii":[45,35],"height":31},
+        {"id":"deep_hall","center":[40,-330],"radii":[50,38],"height":34},
+        {"id":"old_grotto","center":[-90,-295],"radii":[30,26],"height":23}
+      ],
+      "corridors": [
+        {"id":"mouth","from":"exit","to":"entrance_hall","width":36,"points":[[0,10],[0,-20]]},
+        {"id":"entry_neck","from":"entrance_hall","to":"central_hall","width":17,"points":[[0,-20],[13,-54],[0,-90]]},
+        {"id":"west_neck","from":"central_hall","to":"west_gallery","width":14,"points":[[0,-90],[-44,-122],[-78,-165]]},
+        {"id":"east_neck","from":"central_hall","to":"east_gallery","width":15,"points":[[0,-90],[53,-117],[75,-170]]},
+        {"id":"west_loop","from":"west_gallery","to":"cistern","width":13,"points":[[-78,-165],[-65,-219],[-10,-234]]},
+        {"id":"east_loop","from":"east_gallery","to":"cistern","width":15,"points":[[75,-170],[59,-228],[-10,-234]]},
+        {"id":"deep_neck","from":"cistern","to":"deep_hall","width":16,"points":[[-10,-234],[18,-280],[40,-330]]},
+        {"id":"grotto_neck","from":"west_gallery","to":"old_grotto","width":12,"points":[[-78,-165],[-120,-235],[-90,-295]]},
+        {"id":"deep_bypass","from":"old_grotto","to":"deep_hall","width":13,"points":[[-90,-295],[-39,-327],[40,-330]]}
+      ]
+    }
+  ]
+}

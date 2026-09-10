@@ -1,0 +1,19 @@
+{
+  "source": "art/world-final/Varendor_Interiors_C-04.blend",
+  "sha256": "f6ded039b32825b52c0367956293228f15a03cf128ca0b9128aa0dfeed6927c7",
+  "repair_only": "Coincident wall vertices within float32 precision; other meshes retained",
+  "spaces": [
+    {
+      "space": "mine",
+      "before_open_edges": 772,
+      "after_open_edges": 0,
+      "tolerance_m": 0.0001
+    },
+    {
+      "space": "great_cave",
+      "before_open_edges": 7006,
+      "after_open_edges": 0,
+      "tolerance_m": 0.0001
+    }
+  ]
+}
