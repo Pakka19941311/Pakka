@@ -1,9 +1,11 @@
 extends "res://world-final/nature_review.gd"
+@export var nature_revision: String="D08"
+@export var geology_material_revision: String=""
 ## Full authored forest distribution in the existing geography scene.
 func run_review() -> void:
 	if DisplayServer.get_name()=="headless":get_tree().quit(4);return
 	DirAccess.make_dir_recursive_absolute(output_dir)
-	var nature: Node3D=NatureLayer.new();nature.authored_revision="D08";nature.distant_trees=true
+	var nature: Node3D=NatureLayer.new();nature.authored_revision=nature_revision;nature.distant_trees=true
 	add_child(nature);nature_visual=nature
 	status.text="VARENDOR · D08 · загрузка сохранённых лесных массивов"
 	await nature.build()
@@ -20,9 +22,10 @@ func run_review() -> void:
 		for material: ShaderMaterial in nature.focus_materials:material.shader=shader
 	var ground: ShaderMaterial=nature.world_ground_material()
 	if "--surface-D10" in OS.get_cmdline_user_args():ground=load("res://world-final/materials/surface_materials.gd").terrain()
+	if not geology_material_revision.is_empty():ground=load("res://world-final/materials/geology_material_D12.gd").terrain(geology_material_revision)
 	for node: Node in find_children("*","MeshInstance3D",true,false):
 		if str(node.name).begins_with("cell_"):node.material_override=ground
-	var added: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/collision-D08.json")).obstacles
+	var added: Array=JSON.parse_string(FileAccess.get_file_as_string("res://world-final/nature/collision-"+nature_revision+".json")).obstacles
 	obstacles.append_array(added);collision.setup(obstacles)
 	camera_collision.setup(obstacles.filter(func(o:Dictionary):return not str(o.source_mesh).contains("_access_ramp")))
 	var report: Dictionary={"revision":"D08","headless":false,"counts":nature.data.counts,"zones":nature.data.zones,"colliders":added.size(),"batch_count":nature.batches.size(),"walks":[],"main_game_integrated":false,"final_art_accepted":false}
@@ -49,6 +52,7 @@ func run_review() -> void:
 	var walks: Array=[{"id":"forest-sample","points":[[-671.5762,-33.5799],[-669.5329,-37.1492],[-648.3,-64.9163]]}]
 	var selected_roads: Array=["snow-ascent","living-forest-loop","rotten-approach","south-ruins"]
 	if "--groundcover-routes" in OS.get_cmdline_user_args():selected_roads.append("volcano-ascent")
+	if "--geology-routes" in OS.get_cmdline_user_args():selected_roads=["snow-ascent","volcano-ascent"]
 	for road: Dictionary in layout.roads:
 		if road.id not in selected_roads:continue
 		var index: int=0

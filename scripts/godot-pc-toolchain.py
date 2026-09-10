@@ -15,6 +15,7 @@ destination.mkdir(parents=True, exist_ok=True)
 paths = {}
 for kind, extension in [('godot', 'zip'), ('export_templates', 'tpz'), ('blender', 'tar.xz')]:
     if '--runtime-only' in sys.argv and kind != 'godot': continue
+    if '--no-blender' in sys.argv and kind == 'blender': continue
     pin = pins[kind]
     # Official GitHub release assets have the same recorded bytes/digests.
     official = {

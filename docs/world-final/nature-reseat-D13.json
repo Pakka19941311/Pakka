@@ -1,0 +1,50 @@
+{
+  "revision": "D13",
+  "terrain_sha256": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e",
+  "retained_forest": 92973,
+  "retained_grass": 362189,
+  "retained_cliffs": 151,
+  "changed_forest_heights": 1629,
+  "changed_grass_heights": 10745,
+  "removed_instances": 0,
+  "xz_and_ids_unchanged": true,
+  "sample_unchanged": true,
+  "max_new_grass_slope": 3.5663935512522182,
+  "grass_orientation_caps": 1842,
+  "native_pending": false,
+  "native_source": "art/world-final/Varendor_Nature_D-13.blend",
+  "native_sha256": "e7a6bfde9e27fed27286269e4edc513d8d6e69a294cf87a1b8f62c148ae1f03f",
+  "changed_cliff_meshes": 120,
+  "forest_native_points": 90413,
+  "retained_native_sample": 2560,
+  "grass_native_points": 362189,
+  "protected_sources_unchanged": true,
+  "native_roundtrip_pending": false,
+  "native_roundtrip_verified": true,
+  "rendered_walks": [
+    {
+      "arrived": true,
+      "first_frame": 0.0,
+      "id": "forest-sample",
+      "last_frame": 55.0,
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "first_frame": 56.0,
+      "id": "snow-ascent",
+      "last_frame": 91.0,
+      "stop_drift_m": 0.0
+    },
+    {
+      "arrived": true,
+      "first_frame": 92.0,
+      "id": "volcano-ascent",
+      "last_frame": 127.0,
+      "stop_drift_m": 0.0
+    }
+  ],
+  "rendered_frames": 128.0,
+  "whole_world_finished": false,
+  "material_native_parity": false
+}

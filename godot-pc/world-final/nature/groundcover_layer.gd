@@ -1,6 +1,9 @@
 extends Node3D
 ## Only saved native points/meshes. No changes to the actor or terrain support.
 const ROOT: String="res://world-final/nature/"
+@export var authored_revision: String="D11"
+@export var geology_material_revision: String=""
+@export var grass_shader: String=ROOT+"grass_mesh.gdshader"
 var data: Dictionary
 var batch_count: int=0
 
@@ -12,7 +15,7 @@ func parts(node: Node, transform: Transform3D=Transform3D.IDENTITY) -> Array:
 	return result
 
 func build() -> void:
-	data=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"groundcover-authored-D11.json"))
+	data=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"groundcover-authored-"+authored_revision+".json"))
 	var prototypes: Dictionary={}
 	for key: String in data.catalog:
 		if data.catalog[key].kind=="cliff":continue
@@ -23,7 +26,7 @@ func build() -> void:
 			for part: Dictionary in meshes:
 				part.mesh=part.mesh.duplicate()
 				for surface: int in range(part.mesh.get_surface_count()):
-					var material: ShaderMaterial=ShaderMaterial.new();material.shader=load(ROOT+"grass_mesh.gdshader")
+					var material: ShaderMaterial=ShaderMaterial.new();material.shader=load(grass_shader)
 					material.set_shader_parameter("lod_index",lod);part.mesh.surface_set_material(surface,material)
 			prototypes[key].append(meshes);node.free()
 	var built: int=0
@@ -48,6 +51,7 @@ func build() -> void:
 		built+=1
 		if built%32==0:await get_tree().process_frame
 	var surface: ShaderMaterial=load("res://world-final/materials/surface_materials.gd").terrain()
+	if not geology_material_revision.is_empty():surface=load("res://world-final/materials/geology_material_D12.gd").terrain(geology_material_revision)
 	for cliff: Dictionary in data.cliff_meshes:
 		var node: Node3D=load(ROOT+cliff.path).instantiate();add_child(node)
 		if node is MeshInstance3D:node.material_override=surface

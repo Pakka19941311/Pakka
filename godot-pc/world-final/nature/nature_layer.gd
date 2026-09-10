@@ -166,7 +166,7 @@ func focus_mesh(source: Mesh,lod_index: int=0) -> Mesh:
 
 func load_far_prototypes() -> void:
 	var descriptor: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"impostors/far-trees-D07.json"))
-	if authored_revision=="D08":
+	if bool(data.get("full_world",false)):
 		var families: Dictionary=JSON.parse_string(FileAccess.get_file_as_string(ROOT+"impostors/far-trees-D09.json"))
 		descriptor.assets.merge(families.assets)
 	for key: String in descriptor.assets:

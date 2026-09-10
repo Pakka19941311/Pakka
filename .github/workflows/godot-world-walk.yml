@@ -1,0 +1,85 @@
+name: Varendor intermediate world walk
+on:
+  push:
+    branches: [work/character-art-v3]
+permissions:
+  contents: write
+concurrency:
+  group: world-walk-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  export:
+    if: ${{ contains(github.event.head_commit.message, '[world-walk]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Restore authored world and accepted knight
+        run: |
+          python scripts/godot-pc-toolchain.py --no-blender
+          npm ci
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          node scripts/materialize-knight-assets.mjs
+          python scripts/world_final/materialize_payload.py
+          python scripts/world_final/prepare_walk_export.py
+      - name: Import and export Windows preview
+        run: |
+          mkdir -p qa-artifacts/walk-build
+          "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee qa-artifacts/walk-build/import.log
+          python -c 'import pathlib; s=pathlib.Path("qa-artifacts/walk-build/import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-16000:]'
+          "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/walk-build/Varendor.exe"
+          "$GODOT" --headless --license > qa-artifacts/walk-build/Godot-LICENSE.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: world-walk-windows-input
+          path: qa-artifacts/walk-build
+          compression-level: 0
+  check-and-publish:
+    needs: export
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: world-walk-windows-input
+          path: qa-artifacts/walk-build
+      - name: Check exact shipped executable
+        run: |
+          python scripts/world_final/check_walk_binary.py qa-artifacts/walk-build/Varendor.exe qa-artifacts/walk-windows
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item qa-artifacts/walk-build/Godot-LICENSE.txt qa-artifacts/walk-windows/Godot-LICENSE.txt
+          python scripts/world_final/package_walk_preview.py qa-artifacts/walk-build/Varendor.exe qa-artifacts/walk-release qa-artifacts/walk-windows
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish ZIP and verify uploaded digest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $walkTag = 'world-walk-' + $env:GITHUB_SHA.Substring(0,12)
+          $walkZip = Get-ChildItem qa-artifacts/walk-release/*.zip
+          $walkHash = (Get-FileHash -LiteralPath $walkZip.FullName -Algorithm SHA256).Hash.ToLower()
+          gh release create $walkTag $walkZip.FullName ($walkZip.FullName + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — промежуточная прогулка по миру' --notes-file qa-artifacts/walk-release/release-notes.md
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $walkRelease = gh api ('repos/' + $env:GITHUB_REPOSITORY + '/releases/tags/' + $walkTag) | ConvertFrom-Json
+          $walkAsset = $walkRelease.assets | Where-Object name -eq $walkZip.Name
+          if ($walkAsset.size -ne $walkZip.Length -or $walkAsset.digest -ne ('sha256:' + $walkHash)) { throw 'Release digest differs' }
+          Invoke-WebRequest -Uri $walkAsset.browser_download_url -OutFile qa-artifacts/walk-release/download-verified.zip
+          if ((Get-FileHash qa-artifacts/walk-release/download-verified.zip -Algorithm SHA256).Hash.ToLower() -ne $walkHash) { throw 'Public download checksum differs' }
+          @{commit=$env:GITHUB_SHA;download=$walkAsset.browser_download_url;release=$walkRelease.html_url;sha256=$walkHash;direct_download_verified=$true} | ConvertTo-Json | Set-Content qa-artifacts/walk-release/publish-result.json
+          ('[Windows ZIP](' + $walkAsset.browser_download_url + ')') | Add-Content $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: world-walk-checks
+          path: |
+            qa-artifacts/walk-windows
+            qa-artifacts/walk-release/publish-result.json

@@ -3,6 +3,7 @@ extends Node3D
 ## animation classes are reused. No combat/economy/save backend is replaced.
 
 const GEO: String = "res://world-final/geography/"
+@export var terrain_root: String = GEO
 var layout: Dictionary
 var terrain: Dictionary
 var heights: PackedFloat32Array
@@ -24,8 +25,8 @@ var elapsed: float = 0
 
 func _ready() -> void:
 	layout = JSON.parse_string(FileAccess.get_file_as_string("res://world-final/world_layout.json"))
-	terrain = JSON.parse_string(FileAccess.get_file_as_string(GEO + "terrain.json"))
-	heights = FileAccess.get_file_as_bytes(GEO + "heightmap.f32").to_float32_array()
+	terrain = JSON.parse_string(FileAccess.get_file_as_string(terrain_root + "terrain.json"))
+	heights = FileAccess.get_file_as_bytes(terrain_root + "heightmap.f32").to_float32_array()
 	obstacles = JSON.parse_string(FileAccess.get_file_as_string(GEO + "collision.json")).obstacles
 	support_surfaces = JSON.parse_string(FileAccess.get_file_as_string(GEO + "support-surfaces.json")).surfaces
 	for arg: String in OS.get_cmdline_user_args():
@@ -73,7 +74,7 @@ func _ready() -> void:
 	set_overview()
 	for cell: Dictionary in terrain.chunks:
 		status.text = "VARENDOR · география B · загрузка %s\nПространственная основа; детализация окружения впереди" % cell.id
-		var path: String = GEO + str(cell.glb)
+		var path: String = terrain_root + str(cell.glb)
 		ResourceLoader.load_threaded_request(path)
 		while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
 			await get_tree().process_frame

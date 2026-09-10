@@ -10,7 +10,7 @@
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
-    "D": "partial: D13 native terrain/forest/grass/cliff edit-export and three rendered walks passed locally. 92973 forest placements, 362189 grass points, 151 cliffs preserved. D14 unique hollow tree source saved and imported, visual/collision review not run. Final nature art and native material parity unfinished.",
+    "D": "partial: D13 terrain and reseated full nature source verified; 92973 forest placements, 362189 grass points and 151 cliffs preserved. Three rendered walks and native forest/grass/cliff edit-export checks pass. Final geology/vegetation quality, native material parity, shore/swamp and unique ancient tree remain unfinished.",
     "E": "not started",
     "F": "not started",
     "G": "not started",
@@ -114,7 +114,7 @@
     "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Obtain usable local disk space first. Fetch this remote checkpoint and reconcile WORLD_STATE with the existing dirty working tree; no reset/checkout. Validate the completed D13 tar.xz and recover its incomplete generated parts without losing the partial evidence; manifest is still D11. Restore-check and publish D13 source/evidence. Then run ancient_tree_D14_review.tscn, inspect real frames, correct root/road/hollow collisions and finish native tree materials. D art remains unfinished; proceed E-H afterward.",
+  "next_task": "FIRST finish GitHub Actions Windows intermediate world-walk Release and give direct ZIP link. THEN resume D14 ancient tree actual Godot approach/hollow/return inspection, refine unfinished nature; continue E-H.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
@@ -123,7 +123,7 @@
     "Streaming, full-world cold/warm performance, editing round-trip and Windows Release H",
     "D09-D10 published at 0308312; native exact shader parity, final AA/performance, full forest canopy coverage and terrain gameplay close views remain incomplete.",
     "D11: native point edits pass; native cliff-edit re-export, coherent rock masses, dark grass and abrupt patch borders, final full-world art/streaming remain. D12 color/normal probes are not promoted.",
-    "D13/D14 source and evidence are local only; packaging interrupted by full C. D14 has no Godot visual/movement evidence yet. Do not claim the final world or release complete."
+    "D13: native terrain/forest/grass/cliff edit tests and three actual rendered walks pass. Snow cover too uniform, mountain faces too smooth, isolated scan edges, abrupt grass tufts/ground palette, exact native shader parity are unfinished. Main still old world."
   ],
   "protected": [
     "Existing hero/animation/controller/camera/combat",
@@ -166,27 +166,28 @@
     "forest_sample_tree_count": 920,
     "forest_sample_motor_walk": true,
     "forest_sample_frames": 161,
-    "forest_sample_stop_drift_m": 0,
+    "forest_sample_stop_drift_m": 0.0,
     "world_forest_placements": 92973,
     "original_sample_placements_unchanged": 2560,
     "world_forest_colliders": 9987,
     "world_forest_normal_walks": 5,
     "world_forest_motion_frames": 199,
-    "world_forest_max_stop_drift_m": 0,
+    "world_forest_max_stop_drift_m": 0.0,
     "payload_clean_restore_314": true,
     "main_after_D08": "headless exit 0; known nonfatal errors retained",
     "forest_after_import_fixes_frames": 152,
     "forest_after_import_fixes_canopy": 0.829587331097905,
-    "forest_after_import_fixes_stop_drift_m": 0,
+    "forest_after_import_fixes_stop_drift_m": 0.0,
     "main_after_D10": "headless exit 0, known certificate/display JSON errors retained",
     "groundcover_native_points": 362189,
     "groundcover_native_edit_roundtrip": true,
     "groundcover_collision_routes": 15,
     "groundcover_normal_walks": 6,
     "groundcover_motion_frames": 228,
-    "groundcover_stop_drift_m": 0,
+    "groundcover_stop_drift_m": 0.0,
     "payload_clean_restore_504": true,
-    "main_after_D11": "headless 900, exit 0; known certificate/display JSON errors retained"
+    "main_after_D11": "headless 900, exit 0; known certificate/display JSON errors retained",
+    "payload_clean_restore_923": true
   },
   "publication": {
     "content_checkpoint": "8403d4a8dc2ca88f56359be7045cf427bd570368",
@@ -194,7 +195,7 @@
     "payload_parts": 192,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D13-D14 local changes NOT published. This commit saves continuation metadata only. The last complete source/evidence checkpoint is 8403d4a."
+    "pending": "D13 sources, preserved D14 candidate and interactive walking preview are queued for GitHub publication and Actions. No final-world acceptance."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -204,7 +205,7 @@
     "existing user display-settings JSON",
     "D04 static/orbit only: one RefCounted with zero references reported at exit; not diagnosed as a Godot crash"
   ],
-  "backup_current_from_workspace": "outputs/world-native-D13",
+  "backup_current_from_workspace": "outputs/world-final-D13-in-progress",
   "blender_D08A_incident": {
     "report": "docs/world-final/diagnostics/BLENDER_D08A_RU.md",
     "original_D03_preserved": true,
@@ -251,18 +252,34 @@
     "native_point_roundtrip_verified": true,
     "rendered_walks": 6,
     "recorded_frames": 228,
-    "stop_drift_m": 0,
+    "stop_drift_m": 0.0,
     "report": "docs/world-final/GROUNDCOVER_D11_RU.md",
     "failed_launches_preserved": true
   },
-  "local_head_at_stop": "8403d4a8dc2ca88f56359be7045cf427bd570368",
+  "D13_in_progress": {
+    "terrain_source": "art/world-final/Varendor_Geology_D-13.blend",
+    "terrain_sha256": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e",
+    "shape_report": "docs/world-final/geology-shape-D13.json",
+    "reseat_report": "docs/world-final/nature-reseat-D13.json",
+    "native_launch": "qa-artifacts/world-final/native-nature-D13",
+    "native_launch_result": "Original 120s launch timed out, exit unknown; source later saved. Separate native reopen/edit-export completed exit 0 in 12.797s.",
+    "main_integrated": false,
+    "combined_visual_verified": "Inspected; final visual quality remains unfinished.",
+    "native_roundtrip_verified": true,
+    "native_source": "art/world-final/Varendor_Nature_D-13.blend",
+    "native_sha256": "e7a6bfde9e27fed27286269e4edc513d8d6e69a294cf87a1b8f62c148ae1f03f",
+    "rendered_walks": 3,
+    "rendered_frames": 128.0,
+    "stop_drift_m": 0,
+    "evidence": "docs/world-final/evidence/D13-geology"
+  },
   "storage_block": {
     "utc": "2026-09-10T18:54:00Z",
     "free_bytes_C": 0,
     "packaging_error": "OSError: [Errno 28] No space left on device",
     "incomplete_archive": "qa-artifacts/world-final/world-geology-D13-9.tar.xz",
     "archive_bytes": 164807584,
-    "archive_validation_pending": true,
+    "archive_validation_pending": false,
     "partial_parts": "art/world-final/payload/world-geology-D13-9.part000 through part029; last may be truncated. Manifest remains D11: 8 layers, 504 files.",
     "blocked_commands": "exec_command and apply_patch cannot start filesystem helper: helper_log_failed, Windows error112 (no disk space).",
     "cleanup": "Removal of restore-check-D11 rejected: approval required, granular.sandbox_approval=false. No deletion performed.",
@@ -275,7 +292,9 @@
       "sha256_matches_published_manifest": true,
       "manifest_sha256": "cdc4786da85e7cff1af3b929be82ca50b8dd59938659b27ad4ff80316e65998a"
     },
-    "local_state_update": "Failed because the filesystem helper cannot write its setup log. This remote WORLD_STATE is the authoritative continuation point."
+    "local_state_update": "Failed because the filesystem helper cannot write its setup log. This remote WORLD_STATE is the authoritative continuation point.",
+    "resolved": "Owner freed C drive; closed archive verified against every source, incomplete parts backed up and recovered; clean restore 923 files passed.",
+    "recovery_backup": "outputs/world-preview-recovery (relative to workspace; outside repository)"
   },
   "D13": {
     "terrain_native": "art/world-final/Varendor_Geology_D-13.blend",
@@ -318,6 +337,76 @@
     "rendered_review": false,
     "collision_review": false,
     "main_integrated": false,
-    "note": "Preview removes only the old ANCIENT_TREE landmark and its colliders; retains D13 nature. Planned approach/hollow/return route is not yet run."
+    "note": "Preview removes only the old ANCIENT_TREE landmark and its colliders; retains D13 nature. Planned approach/hollow/return route is not yet run.",
+    "backup": "outputs/world-preview-recovery; native and GLB verified"
+  },
+  "intermediate_walk": {
+    "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
+    "scene": "godot-pc/world-final/preview_menu.tscn",
+    "release": "pending",
+    "local_graphics_checks": {
+      "surface": {
+        "checks": {
+          "actor": true,
+          "chunks": true,
+          "forest_count": true,
+          "grass_count": true,
+          "height_bytes": true,
+          "movement": true,
+          "pause_resume": true,
+          "space_loaded": true,
+          "stop": true
+        },
+        "distance_m": 12.3287372589111,
+        "full_world_acceptance": false,
+        "headless": false,
+        "ok": true,
+        "personal_saves_opened": false,
+        "space": "surface",
+        "stop_drift_m": 0.0
+      },
+      "mine": {
+        "checks": {
+          "actor": true,
+          "cached_navigation": true,
+          "height_bytes": true,
+          "movement": true,
+          "pause_resume": true,
+          "space_loaded": true,
+          "stop": true
+        },
+        "distance_m": 12.225959777832,
+        "full_world_acceptance": false,
+        "headless": false,
+        "ok": true,
+        "personal_saves_opened": false,
+        "space": "mine",
+        "stop_drift_m": 0.0
+      },
+      "great_cave": {
+        "checks": {
+          "actor": true,
+          "cached_navigation": true,
+          "height_bytes": true,
+          "movement": true,
+          "pause_resume": true,
+          "space_loaded": true,
+          "stop": true
+        },
+        "distance_m": 12.225959777832,
+        "full_world_acceptance": false,
+        "headless": false,
+        "ok": true,
+        "personal_saves_opened": false,
+        "space": "great_cave",
+        "stop_drift_m": 0.0
+      }
+    },
+    "ci_windows_binary_checks": "pending",
+    "limits": [
+      "D13 art unfinished",
+      "No population, combat, NPC, inventory or map in exploration mode",
+      "Existing main game retained with its working systems; scene selection changes only in disposable CI checkout"
+    ]
   }
 }
