@@ -1,5 +1,9 @@
 # VARENDOR — состояние блока монстров и предметов
 
+## 2026-09-10 — Windows-поставка опубликована
+
+Блок книг, предметов, дропа и десяти одобренных моделей выпущен из `af8eb58d3bd9286f36eb60616417a063524f5703`. [Windows ZIP](https://github.com/Pakka19941311/Pakka/releases/download/godot-content-preview-af8eb58d3bd9/Varendor_Godot_PC_af8eb58d3bd9.zip), [Blender-исходники](https://github.com/Pakka19941311/Pakka/releases/download/godot-content-preview-af8eb58d3bd9/Varendor_Monsters_v3.zip), [отчёт и границы проверки](RELEASE_REPORT_RU.md). Прямая загрузка и SHA-256 проверены. Следующий блок — рыцарь; записи ниже сохраняют историю.
+
 ## 2026-09-10 — подготовка игровой поставки
 
 Все 30 книг, экипировка R2, смешанный дроп, опыт ×20 и десять одобренных моделей реализованы. Девять оригиналов Sketchfab сохранены в Git; лесной босс имеет зафиксированный CC0-источник. GitHub Actions собирает реальные Blender-файлы и экспортированные клиенты, проверяет затронутые механики и публикует Windows ZIP с прямой ссылкой. Итог конкретного запуска определяется его Release и `publish-result.json`; эта запись не утверждает успех ещё не завершившегося Actions. Подробности: [IMPLEMENTATION_RU.md](IMPLEMENTATION_RU.md).

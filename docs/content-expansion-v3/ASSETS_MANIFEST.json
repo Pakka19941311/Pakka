@@ -38,7 +38,9 @@
       "work": "Проверить геометрию, риг и набор анимаций после получения архива; подготовить игровые материалы и недостающие движения.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "IceGolem",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "id": "FOREST",
@@ -55,7 +57,9 @@
       "work": "Использовать обновлённый автором вариант с CC0-текстурами; содержимое архива, риг и анимации проверить перед интеграцией.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "SOURCE_DOWNLOADED_AND_CONVERTED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "ForestLord",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "fire_a",
@@ -99,7 +103,9 @@
       "work": "В каталоге 972 тыс. треугольников, анимаций нет. Нужны облегчённая игровая сетка, перенос деталей в текстуры, риг и полный цикл боя.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "FireGolem",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "fire_b",
@@ -148,7 +154,9 @@
       "work": "Около 1 млн треугольников, анимаций нет. Нужна та же подготовка, что G1. Босс потребует отличий в силуэте и движениях; один масштаб не решит задачу.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "RiftWarden",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "boss_marc",
@@ -179,12 +187,14 @@
       ],
       "id": "G3",
       "group": "Големы",
-      "role": "Согласованный альтернативный образ Стража Разлома; дополнительного босса не создаёт",
+      "role": "Призываемый инфернал мага; не создаёт дополнительного босса мира",
       "visual": "Каменно-металлическая конструкция с длинными руками и раскалённым ядром. Альтернатива природному голему, если устраивает мотив древней кузни.",
       "work": "33,3 тыс. треугольников, анимаций нет. Проверить риг после скачивания, подготовить движения, искры и дым. Это отдельное художественное направление.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "HellforgedWarden",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "zombie",
@@ -211,7 +221,9 @@
       "work": "19,5 тыс. треугольников. Автор указывает idle, walk, attack и изменения формы лица/тела. Нужны одежда, предмет в руках, реакции и смерть.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "Zombie",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "skeleton_daniel",
@@ -238,7 +250,9 @@
       "work": "6,8 тыс. треугольников, один клип. Полный боевой набор не подтверждён. Нужны материал старой кости, экипировка и недостающие движения.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "SkeletonV3",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "werewolf_mulberry",
@@ -265,7 +279,9 @@
       "work": "456 тыс. треугольников, анимаций нет. Это скульптура для серьёзной подготовки: игровая сетка, UV, материалы/шерсть, риг и анимации.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "Werewolf",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "bat_pigcraft",
@@ -292,7 +308,9 @@
       "work": "1,92 млн треугольников, анимаций нет. Автор заявляет риг, но архив ещё не проверен. Нужна новая игровая сетка и проверка рига; полёт, атака и смерть создаются/дорабатываются.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "GiantBat",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     },
     {
       "key": "wraith",
@@ -319,7 +337,9 @@
       "work": "2,4 тыс. треугольников, в каталоге два клипа без описанного назначения. Нужны доработка рук/лица, ткань и движения. Страница помечена NoAI: не использовать модель в генераторах изображений/моделей.",
       "status": "APPROVED_FOR_ACQUISITION_AND_ADAPTATION",
       "acquisitionStatus": "DOWNLOADED_AND_HASH_VERIFIED",
-      "integrationStatus": "BLENDER_AND_GODOT_VALIDATION_IN_PROGRESS"
+      "integrationStatus": "INTEGRATED_AND_NATIVE_VALIDATED_TEST_RELEASE",
+      "runtimeModel": "WraithV3",
+      "validationEvidence": "release-evidence/monsters-linux-native-qa.json"
     }
   ],
   "rejected": [
@@ -349,6 +369,10 @@
   "notes": [
     "Прежние отклонённые наборы не становятся разрешёнными после этого согласования.",
     "Манифест фиксирует визуальное согласование, а не наличие проверенного игрового ассета.",
-    "G2 и G3 — согласованные варианты для одного нового босса. Основной выбор исполнителя — G2."
-  ]
+    "G2 и G3 — согласованные варианты для одного нового босса. Основной выбор исполнителя — G2.",
+    "Первичная галерея и перечень работ сохранены как история выбора. Фактическая интеграция десяти моделей подтверждена integrationRelease и release-evidence; это тестовая художественная итерация."
+  ],
+  "integrationRelease": "https://github.com/Pakka19941311/Pakka/releases/tag/godot-content-preview-af8eb58d3bd9",
+  "integrationCommit": "af8eb58d3bd9286f36eb60616417a063524f5703",
+  "editableSourceArchive": "https://github.com/Pakka19941311/Pakka/releases/download/godot-content-preview-af8eb58d3bd9/Varendor_Monsters_v3.zip"
 }

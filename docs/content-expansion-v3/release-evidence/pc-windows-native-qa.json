@@ -1,0 +1,483 @@
+{
+  "ok": true,
+  "source": "af8eb58d3bd9286f36eb60616417a063524f5703",
+  "node": "v24.20.0",
+  "graphical": false,
+  "platform": "win32",
+  "native": {
+    "checks": {
+      "all_effect_icons": true,
+      "all_item_icons": true,
+      "autoattack_started": true,
+      "bag_to_quickbar": true,
+      "book_enemy_selected": true,
+      "buff_20": true,
+      "buff_30": true,
+      "buy_10": true,
+      "buy_20": true,
+      "buy_30": true,
+      "buy_40": true,
+      "class_menu": true,
+      "combat_fixture": true,
+      "connected": true,
+      "cooldown_ready": true,
+      "direct_book": true,
+      "exact_prices": true,
+      "haste_first": true,
+      "integer_cooldown": true,
+      "native_render": false,
+      "no_free_skills": true,
+      "owned_10": true,
+      "owned_20": true,
+      "owned_30": true,
+      "owned_40": true,
+      "ready_for_buff_30": true,
+      "ready_for_direct_book": true
+    },
+    "diagnostic_render_profile": false,
+    "ok": true,
+    "render_scale": 1,
+    "scope": "content-v3"
+  },
+  "events": [
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "bookId": "book_knight_20",
+      "skill": 1,
+      "impactAt": 1789025937049.3333,
+      "endsAt": 1789025937399.3333,
+      "readyAt": 0,
+      "at": 1789025937049.3333,
+      "sequence": 1
+    },
+    {
+      "kind": "buff",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "bookId": "book_knight_20",
+      "effect": "guard",
+      "durationMs": 120000,
+      "at": 1789025937049.3333,
+      "sequence": 2
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "bookId": "book_knight_30",
+      "skill": 2,
+      "impactAt": 1789025937682.6667,
+      "endsAt": 1789025938032.6667,
+      "readyAt": 0,
+      "at": 1789025937682.6667,
+      "sequence": 3
+    },
+    {
+      "kind": "buff",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "bookId": "book_knight_30",
+      "effect": "guard",
+      "durationMs": 120000,
+      "at": 1789025937682.6667,
+      "sequence": 4
+    },
+    {
+      "kind": "buff",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "at": 1789025937716,
+      "sequence": 5
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025938882.6667,
+      "endsAt": 1789025939299.3333,
+      "readyAt": 1789025939370.5034,
+      "actorGeneration": 2,
+      "at": 1789025938466,
+      "sequence": 6
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025938882.6667,
+      "sequence": 7
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99932,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025938882.6667,
+      "sequence": 8
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "bookId": "book_knight_10",
+      "skill": 0,
+      "impactAt": 1789025938982.6667,
+      "endsAt": 1789025939332.6667,
+      "readyAt": 1789025939370.5034,
+      "at": 1789025938982.6667,
+      "sequence": 9
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "effect": "slash",
+      "durationMs": 0,
+      "generation": 1,
+      "at": 1789025938982.6667,
+      "sequence": 10
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 102,
+      "critical": true,
+      "targetHp": 99830,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025938982.6667,
+      "sequence": 11
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025939799.3333,
+      "endsAt": 1789025940216,
+      "readyAt": 1789025940287.1702,
+      "actorGeneration": 2,
+      "at": 1789025939382.6667,
+      "sequence": 12
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025939799.3333,
+      "sequence": 13
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99762,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025939799.3333,
+      "sequence": 14
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025940716,
+      "endsAt": 1789025941132.6667,
+      "readyAt": 1789025941203.8367,
+      "actorGeneration": 2,
+      "at": 1789025940299.3333,
+      "sequence": 15
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025940716,
+      "sequence": 16
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99694,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025940716,
+      "sequence": 17
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025941632.6667,
+      "endsAt": 1789025942049.3333,
+      "readyAt": 1789025942120.5034,
+      "actorGeneration": 2,
+      "at": 1789025941216,
+      "sequence": 18
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025941632.6667,
+      "sequence": 19
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99626,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025941632.6667,
+      "sequence": 20
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025942549.3333,
+      "endsAt": 1789025942966,
+      "readyAt": 1789025943037.1702,
+      "actorGeneration": 2,
+      "at": 1789025942132.6667,
+      "sequence": 21
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025942549.3333,
+      "sequence": 22
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99558,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025942549.3333,
+      "sequence": 23
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025943466,
+      "endsAt": 1789025943882.6667,
+      "readyAt": 1789025943953.8367,
+      "actorGeneration": 2,
+      "at": 1789025943049.3333,
+      "sequence": 24
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025943466,
+      "sequence": 25
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99490,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025943466,
+      "sequence": 26
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025944382.6667,
+      "endsAt": 1789025944799.3333,
+      "readyAt": 1789025944870.5034,
+      "actorGeneration": 2,
+      "at": 1789025943966,
+      "sequence": 27
+    },
+    {
+      "kind": "release",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "actorGeneration": 2,
+      "effect": "slash",
+      "durationMs": 0,
+      "origin": {
+        "x": -78.31924073231946,
+        "z": 3.5685370783581996,
+        "y": -0.09619317977569386
+      },
+      "destination": {
+        "x": -80.36699580096472,
+        "z": 2.6854178080902256,
+        "y": -0.05239263658941895
+      },
+      "at": 1789025944382.6667,
+      "sequence": 28
+    },
+    {
+      "kind": "hit",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "amount": 68,
+      "critical": false,
+      "targetHp": 99422,
+      "targetMaxHp": 85,
+      "targetGeneration": 1,
+      "generation": 1,
+      "at": 1789025944382.6667,
+      "sequence": 29
+    },
+    {
+      "kind": "attack",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "target": "greyfang-meadow:0",
+      "skill": null,
+      "generation": 1,
+      "impactAt": 1789025945299.3333,
+      "endsAt": 1789025945716,
+      "readyAt": 1789025945787.1702,
+      "actorGeneration": 2,
+      "at": 1789025944882.6667,
+      "sequence": 30
+    },
+    {
+      "kind": "cancel",
+      "actor": "fca878bc-a8d0-4cb6-a0c2-4d201fb2d3a6",
+      "at": 1789025945032.6667,
+      "sequence": 31
+    }
+  ],
+  "localSandboxCertificateWarning": false
+}

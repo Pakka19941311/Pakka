@@ -11,3 +11,5 @@
 Локальные каталоги `sources`, `editable`, `runtime` — воспроизводимые продукты сборки. GitHub Actions прикладывает фактические Blender-файлы, текстуры, оригинальные GLB и игровые экспорты к Release архивом `Varendor_Monsters_v3.zip`. Механики и балансовые значения описаны в `docs/content-expansion-v3/IMPLEMENTATION_RU.md`.
 
 Игровые версии подготовлены. Проверка `godot-monster-qa.mjs` воспроизводит четыре основных действия всех десяти моделей через контроллер Godot и проверяет высоту стоп наземных моделей. Текущий выпуск подтверждается успешным Actions и опубликованным Release, а не наличием экспорта. Локально применяется Blender 4.2.3, в Actions — зафиксированный Blender 4.5.9.
+
+Опубликованный тест: [Release](https://github.com/Pakka19941311/Pakka/releases/tag/godot-content-preview-af8eb58d3bd9), [десять Blender-исходников и текстуры](https://github.com/Pakka19941311/Pakka/releases/download/godot-content-preview-af8eb58d3bd9/Varendor_Monsters_v3.zip). Commit: `af8eb58d3bd9286f36eb60616417a063524f5703`. Итоговые проверки — `docs/content-expansion-v3/release-evidence/`.
