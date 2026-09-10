@@ -1,0 +1,148 @@
+name: Godot content V3 Windows preview
+
+on:
+  push:
+    branches: [work/character-art-v3]
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: godot-content-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-build:
+    if: ${{ contains(github.event.head_commit.message, '[content-preview]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned native toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb libgl1-mesa-dri libxi6 libxrender1 libxxf86vm1 libxfixes3 libxkbcommon0
+          python scripts/godot-pc-toolchain.py
+          python -m pip install py7zr==1.1.3
+          npm ci
+          npx tsc --noEmit
+          node --experimental-strip-types --test tests/content-v3.test.mjs
+      - name: Restore unchanged world cache
+        id: world_cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            godot-pc/generated/world.glb
+            godot-pc/generated/blender-build.json
+            godot-pc/generated/wildlife/
+            world-source/Varendor_PC_World.blend
+          key: territory-blender-4.5.9-${{ hashFiles('scripts/godot-pc-world.py', 'scripts/territory_art.py', 'src/world/territory-layout.ts', 'src/world/territory.ts', 'public/assets/world/world-topology.json') }}
+      - name: Restore the current knight checkpoint and build approved monsters
+        run: |
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          node scripts/materialize-knight-assets.mjs --include-source
+          python scripts/restore-knight-build-inputs.py --blender "$BLENDER"
+          python scripts/restore-character-v3-checkpoint.py
+          python scripts/materialize-monsters-v3.py --blender "$BLENDER"
+          python scripts/materialize-forest-monster.py --blender "$BLENDER"
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          python scripts/package-monster-art.py qa-artifacts/pc-build
+      - name: Import actual native assets
+        run: |
+          mkdir -p qa-artifacts/pc-build qa-artifacts/pc-linux
+          "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee qa-artifacts/pc-linux/import.log
+          python -c 'import pathlib; s=pathlib.Path("qa-artifacts/pc-linux/import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-16000:]'
+      - name: Export current Linux and Windows clients
+        run: |
+          "$GODOT" --headless --path godot-pc --export-release 'Linux QA' "$PWD/qa-artifacts/pc-build/Varendor.x86_64"
+          "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/pc-build/Varendor.exe"
+          cp godot-pc/generated/blender-build.json qa-artifacts/pc-build/
+      - name: Exercise books and every approved animated monster in native graphics
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          LP_NUM_THREADS: '4'
+        run: |
+          xvfb-run -a -s '-screen 0 1600x900x24' node --experimental-strip-types scripts/godot-content-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/pc-linux --graphical
+          xvfb-run -a -s '-screen 0 1280x900x24' node scripts/godot-monster-qa.mjs qa-artifacts/pc-build/Varendor.x86_64 qa-artifacts/monsters-linux --graphical
+      - uses: actions/upload-artifact@v4
+        with:
+          name: content-v3-windows-input
+          path: |
+            qa-artifacts/pc-build/Varendor.exe
+            qa-artifacts/pc-build/blender-build.json
+            qa-artifacts/pc-build/p1-samples/
+            qa-artifacts/pc-build/Varendor_Monsters_v3.zip
+            qa-artifacts/pc-build/monster-art.json
+            qa-artifacts/pc-linux/
+            qa-artifacts/monsters-linux/
+          compression-level: 0
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: content-v3-native-evidence
+          path: |
+            qa-artifacts/pc-linux/
+            qa-artifacts/monsters-linux/
+          retention-days: 30
+  windows-package:
+    needs: native-build
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          name: content-v3-windows-input
+          path: qa-artifacts
+      - name: Package the Windows executable and portable server
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Directory -Force godot-pc/generated | Out-Null
+          Copy-Item qa-artifacts/pc-build/blender-build.json godot-pc/generated/blender-build.json
+          node scripts/package-godot-pc.mjs qa-artifacts/pc-build/Varendor.exe qa-artifacts/release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/publish-content-preview.mjs qa-artifacts --stage
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test the shipped Windows executable and portable Node
+        run: |
+          $contentPackage = Join-Path $PWD ('qa-artifacts/release/Varendor_Godot_PC_' + $env:GITHUB_SHA.Substring(0,12))
+          & (Join-Path $contentPackage 'runtime/node.exe') --experimental-strip-types scripts/godot-content-qa.mjs (Join-Path $contentPackage 'Varendor.exe') qa-artifacts/pc-windows ("--package=" + $contentPackage)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $contentPackage 'runtime/node.exe') scripts/godot-monster-qa.mjs (Join-Path $contentPackage 'Varendor.exe') qa-artifacts/monsters-windows
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Publish the tested ZIP and verify its public direct download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/publish-content-preview.mjs qa-artifacts
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: content-v3-windows-evidence
+          path: |
+            qa-artifacts/pc-windows/
+            qa-artifacts/monsters-windows/
+            qa-artifacts/release/publish-result.json
+            qa-artifacts/release/*.sha256
+          retention-days: 30

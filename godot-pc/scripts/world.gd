@@ -355,6 +355,7 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 		templates[model] = load(path)
 	var visual: Node3D = (templates[model] as PackedScene).instantiate()
 	root.add_child(visual)
+	var monster_profiles: Dictionary = monster_asset_profiles()
 	var bounds: AABB = AABB()
 	var first: bool = true
 	for node: Node in visual.find_children("*", "MeshInstance3D", true, false):
@@ -367,6 +368,12 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 		# replacement cannot resize the hero or move their gameplay root.
 		visual.scale = Vector3.ONE * (size / KNIGHT_SOURCE_HEIGHT)
 		visual.position.y = 0.0
+	elif monster_profiles.has(model):
+		var profile: Dictionary = monster_profiles[model]
+		var factor: float = size / float(profile.sourceHeight)
+		visual.scale = Vector3.ONE * factor
+		visual.position.y = -float(profile.sourceFloor) * factor
+		bounds = AABB(Vector3.ZERO,Vector3(float(profile.sourceWidth),float(profile.sourceHeight),float(profile.sourceDepth)))
 	elif bounds.size.y > .001:
 		var scale_factor: float = size / bounds.size.y
 		visual.scale = Vector3.ONE * scale_factor
@@ -421,6 +428,9 @@ func make_actor(id: String, model: String, size: float, title: String, color: Co
 	actors[id] = root
 	return root
 
+static func monster_asset_profiles() -> Dictionary:
+	return JSON.parse_string(FileAccess.get_file_as_string("res://generated/monster-profiles.json"))
+
 func apply_snapshot(snapshot: Dictionary) -> void:
 	current_snapshot = snapshot
 	book_ground.apply(snapshot)
@@ -451,6 +461,9 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		initialize_pose(actor, point(person.x, person.z, person.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
 		actor.set_meta("motion", person.duplicate(true))
+		var vanishing: bool = float(person.get("buffs",{}).get("vanish",0)) > float(snapshot.get("time",0))
+		for mesh: MeshInstance3D in (actor.get_meta("visual") as Node3D).find_children("*","MeshInstance3D",true,false):
+			mesh.transparency = .68 if vanishing else 0.0
 		if bool(person.get("dead", false)):
 			begin_death(actor)
 		elif actor.get_meta("dead", false):
@@ -467,7 +480,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		keep[id] = true
 		var def: Dictionary = data.monsters[monster.id]
 		var actor: Node3D = make_actor(id, str(def.get("visualModel",def.model)), float(def.get("visualHeight",2.05 * float(def.get("scale", 1)))), def.name + " · %d" % int(def.level), Color("e0a6a0"))
-		if str(monster.id) == "night_zombie" and not actor.has_meta("undead_tint"):
+		if str(monster.id) == "night_zombie" and str(def.get("visualModel","")) != "Zombie" and not actor.has_meta("undead_tint"):
 			for mesh: MeshInstance3D in actor.find_children("*","MeshInstance3D",true,false):
 				if mesh.mesh == null: continue
 				for surface: int in range(mesh.mesh.get_surface_count()):
@@ -493,7 +506,9 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 	for summon: Dictionary in snapshot.get("summons", []):
 		var id: String = str(summon.uid)
 		keep[id] = true
-		var actor: Node3D = make_actor(id, "Skeleton", 1.9, "Призванный скелет", Color("86b3c2"))
+		var kind: String = str(summon.get("bookKind","skeleton"))
+		var model: String = "FireGolem" if kind == "fire_golem" else "HellforgedWarden" if kind == "infernal" else "SkeletonV3"
+		var actor: Node3D = make_actor(id, model, 2.8 if kind == "infernal" else 2.7 if kind == "fire_golem" else 1.9, "Инфернал" if kind == "infernal" else "Призванный голем" if kind == "fire_golem" else "Призванный скелет", Color("86b3c2"))
 		initialize_pose(actor, point(summon.x, summon.z, summon.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(summon.get("yaw", 0)) + PI)
 		actor.set_meta("motion", summon.duplicate(true))

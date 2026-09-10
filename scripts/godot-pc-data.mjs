@@ -23,6 +23,8 @@ const restoredTopology=restoreWorldTopology(topology);
 const itemStats=Object.fromEntries(Object.entries(ITEMS).map(([id,def])=>[id,Array.from({length:16},(_,plus)=>itemStatBreakdown(def,plus))]));
 const itemLayout=JSON.parse(readFileSync('art/item-icons-v3/layout.json','utf8'));
 const itemIcons=Object.fromEntries(itemLayout.sheets.flatMap(sheet=>sheet.items.map(item=>[item.id,{file:sheet.file,column:item.column,row:item.row}])));
+const monsterLock=JSON.parse(readFileSync('art/monsters-v3/source-lock.json','utf8'));
+const monsterProfiles=Object.fromEntries(monsterLock.models.filter(m=>existsSync(`art/monsters-v3/runtime/${m.name}.json`)).map(m=>[m.name,JSON.parse(readFileSync(`art/monsters-v3/runtime/${m.name}.json`,'utf8'))]));
 writeFileSync(resolve(output,'game.json'),JSON.stringify({contentVersion:CONTENT_VERSION,mapVersion:mapVersion(restoredTopology.collision,restoredTopology.terrain),classes:CLASSES,books:SKILL_BOOKS,bookTestDefaults:BOOK_TEST_DEFAULTS,items:ITEMS,itemIcons,monsters:MONSTERS,equipSlots:EQUIP_SLOTS,slotNames:SLOT_NAMES,locations:LOCATIONS,quickDefaults:quickDefaults(),quickKeys:QUICK_KEYS,itemStats,scrolls:SCROLLS,chances:ENHANCEMENT_PERCENT,xpNeeded:Array.from({length:MAX_LEVEL+1},(_,i)=>xpNeeded(Math.max(1,i)))}));
 writeFileSync(resolve(output,'terrain.json'),JSON.stringify({width:terrain.width,depth:terrain.depth,columns:terrain.columns,rows:terrain.rows,heights:Array.from(terrain.heights),roads:terrain.roads,platforms:topology.platforms,colliders:topology.colliders}));
 writeFileSync(resolve(output,'territory.json'),JSON.stringify(authored.territory));
@@ -48,3 +50,5 @@ cpSync(resolve(root, "public/assets/audio/ambient/forest.mp3"), resolve(output, 
 
 // Approved visual replacement preserves the old server animation cadence.
 if(existsSync('art/monsters-v3/forest/ForestLord.glb'))cpSync('art/monsters-v3/forest/ForestLord.glb',resolve(output,'actors/ForestLord.glb'));
+for(const model of monsterLock.models)if(existsSync(`art/monsters-v3/runtime/${model.name}.glb`))cpSync(`art/monsters-v3/runtime/${model.name}.glb`,resolve(output,'actors',model.name+'.glb'));
+writeFileSync(resolve(output,'monster-profiles.json'),JSON.stringify(monsterProfiles));

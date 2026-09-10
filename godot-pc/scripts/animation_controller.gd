@@ -17,6 +17,14 @@ const GAITS: Dictionary = {
 	"Monk": {"height": 2.05, "walk": 1.065, "run": 3.279},
 	"Fox": {"height": 1.25, "walk": 1.489192, "run": 1.670283},
 	"Skeleton": {"height": 1.9, "walk": 3.228, "run": 3.228},
+	# Authored stance travels 40% of body height in 60% of each 1.6s cycle.
+	"IceGolem": {"height":3.1,"walk":1.292,"run":1.292},
+	"FireGolem": {"height":3.1,"walk":1.292,"run":1.292},
+	"RiftWarden": {"height":5.1,"walk":2.125,"run":2.125},
+	"HellforgedWarden": {"height":2.8,"walk":1.167,"run":1.167},
+	"Werewolf": {"height":3.2,"walk":2.259,"run":2.259},
+	"SkeletonV3": {"height":1.92,"walk":.8,"run":.8},
+	"GiantBat": {"height":1.6,"walk":3.0,"run":3.0},
 }
 
 var actor: Node3D

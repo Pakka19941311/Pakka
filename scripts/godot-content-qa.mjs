@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {mkdirSync,mkdtempSync,existsSync,readFileSync,writeFileSync,appendFileSync,rmSync} from 'node:fs';
 import {resolve,join,sep} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {spawn} from 'node:child_process';
+import {spawn,execFileSync} from 'node:child_process';
 import {stageNativeServer} from './package-godot-pc.mjs';
 import {SERVICES} from '../src/world/territory.ts';
 const [binaryArg,outputArg,...args]=process.argv.slice(2);
@@ -49,7 +49,7 @@ try{
 }catch(error){failure=error;console.error(error.stack??error);}
 finally{
  clearInterval(watcher);clearTimeout(timer);if(child&&child.exitCode===null){child.kill();await new Promise(done=>child.once('close',done));}if(bridge)await bridge.close();
- writeFileSync(join(output,'content-integration.json'),JSON.stringify({ok:!failure,graphical,platform:process.platform,native,events,localSandboxCertificateWarning:log.includes('Failed to read the root certificate store.'),...(failure?{error:String(failure)}:{})},null,2));
+ writeFileSync(join(output,'content-integration.json'),JSON.stringify({ok:!failure,source:process.env.GITHUB_SHA??execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),node:process.version,graphical,platform:process.platform,native,events,localSandboxCertificateWarning:log.includes('Failed to read the root certificate store.'),...(failure?{error:String(failure)}:{})},null,2));
  // Verified dedicated child of the caller's QA output, never a user save path.
  assert.ok(resolve(temporary).startsWith(output+sep)&&temporary.includes('.content-qa-'));
  try{rmSync(temporary,{recursive:true,force:true});}catch(error){writeFileSync(join(output,'cleanup-note.json'),JSON.stringify({temporary,cleanupError:error.code,notForPublication:true}));}
