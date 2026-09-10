@@ -130,7 +130,7 @@
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "8403d4a8dc2ca88f56359be7045cf427bd570368",
+  "last_saved_commit": "7da1252645205ae051c4cad4f36722ec21c7dd8c",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -190,12 +190,12 @@
     "payload_clean_restore_923": true
   },
   "publication": {
-    "content_checkpoint": "8403d4a8dc2ca88f56359be7045cf427bd570368",
-    "native_and_glb_payload_files": 504,
-    "payload_parts": 192,
+    "content_checkpoint": "7da1252645205ae051c4cad4f36722ec21c7dd8c",
+    "native_and_glb_payload_files": 927,
+    "payload_parts": 246,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D13 sources, preserved D14 candidate and interactive walking preview are queued for GitHub publication and Actions. No final-world acceptance."
+    "pending": "D13, preserved D14 candidate, interactive walking preview and curated evidence are published. Actions run 34523422720 is exporting the intermediate Windows preview from 8ef78c79e36bc58de2a9f436216c4d40fba9f8db; Windows binary checks and Release remain pending. No final-world acceptance."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -343,6 +343,8 @@
   "intermediate_walk": {
     "scope": "User explicitly requested a playable intermediate FIRST, before more art. Surface/mine/cave menu in existing project; no server or save I/O.",
     "scene": "godot-pc/world-final/preview_menu.tscn",
+    "ci_commit": "8ef78c79e36bc58de2a9f436216c4d40fba9f8db",
+    "workflow_run": "https://github.com/Pakka19941311/Pakka/actions/runs/34523422720",
     "release": "pending",
     "local_graphics_checks": {
       "surface": {

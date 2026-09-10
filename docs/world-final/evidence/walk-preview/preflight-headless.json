@@ -1,0 +1,62 @@
+{
+  "kind": "local headless preview QA preflight; exported binary validation remains separate",
+  "engine": "Godot 4.6.3 stable",
+  "spaces": {
+    "surface": {
+      "checks": {
+        "actor": true,
+        "chunks": true,
+        "forest_count": true,
+        "grass_count": true,
+        "height_bytes": true,
+        "movement": true,
+        "pause_resume": true,
+        "space_loaded": true,
+        "stop": true
+      },
+      "distance_m": 10.262186050415,
+      "full_world_acceptance": false,
+      "headless": true,
+      "ok": true,
+      "personal_saves_opened": false,
+      "space": "surface",
+      "stop_drift_m": 0.0
+    },
+    "mine": {
+      "checks": {
+        "actor": true,
+        "cached_navigation": true,
+        "height_bytes": true,
+        "movement": true,
+        "pause_resume": true,
+        "space_loaded": true,
+        "stop": true
+      },
+      "distance_m": 12.1226253509521,
+      "full_world_acceptance": false,
+      "headless": true,
+      "ok": true,
+      "personal_saves_opened": false,
+      "space": "mine",
+      "stop_drift_m": 0.0
+    },
+    "great_cave": {
+      "checks": {
+        "actor": true,
+        "cached_navigation": true,
+        "height_bytes": true,
+        "movement": true,
+        "pause_resume": true,
+        "space_loaded": true,
+        "stop": true
+      },
+      "distance_m": 10.2626276016235,
+      "full_world_acceptance": false,
+      "headless": true,
+      "ok": true,
+      "personal_saves_opened": false,
+      "space": "great_cave",
+      "stop_drift_m": 0.0
+    }
+  }
+}
