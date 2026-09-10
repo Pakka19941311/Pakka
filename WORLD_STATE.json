@@ -10,7 +10,7 @@
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
-    "D": "partial: D08 full forest preserved; D10 materials published; D11 adds 362189 saved grass points and 151 fitted cliff meshes. Corrected native D11D reopened and point-edit round-trip verified. 15 new-collision routes and six rendered walks passed, zero stop drift. Grass palette/borders, coherent mountain silhouettes, shore/swamp/ancient tree and final art remain unfinished.",
+    "D": "partial: D13 native terrain/forest/grass/cliff edit-export and three rendered walks passed locally. 92973 forest placements, 362189 grass points, 151 cliffs preserved. D14 unique hollow tree source saved and imported, visual/collision review not run. Final nature art and native material parity unfinished.",
     "E": "not started",
     "F": "not started",
     "G": "not started",
@@ -114,7 +114,7 @@
     "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Publish the staged D11 source/evidence checkpoint, then refine D12 art: coherent ridge/scarp silhouettes (current isolated rocks are not accepted), grass shading and irregular wetland/forest transitions, shore and ancient tree. Keep all saved forest density. Then E atmosphere/maps, F main/NPC/portals/saves, G exact 1000 population, H performance and Actions Release.",
+  "next_task": "Obtain usable local disk space first. Fetch this remote checkpoint and reconcile WORLD_STATE with the existing dirty working tree; no reset/checkout. Validate the completed D13 tar.xz and recover its incomplete generated parts without losing the partial evidence; manifest is still D11. Restore-check and publish D13 source/evidence. Then run ancient_tree_D14_review.tscn, inspect real frames, correct root/road/hollow collisions and finish native tree materials. D art remains unfinished; proceed E-H afterward.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
@@ -122,14 +122,15 @@
     "Main-game portals, NPC/save migration and 1000-population server F-G",
     "Streaming, full-world cold/warm performance, editing round-trip and Windows Release H",
     "D09-D10 published at 0308312; native exact shader parity, final AA/performance, full forest canopy coverage and terrain gameplay close views remain incomplete.",
-    "D11: native point edits pass; native cliff-edit re-export, coherent rock masses, dark grass and abrupt patch borders, final full-world art/streaming remain. D12 color/normal probes are not promoted."
+    "D11: native point edits pass; native cliff-edit re-export, coherent rock masses, dark grass and abrupt patch borders, final full-world art/streaming remain. D12 color/normal probes are not promoted.",
+    "D13/D14 source and evidence are local only; packaging interrupted by full C. D14 has no Godot visual/movement evidence yet. Do not claim the final world or release complete."
   ],
   "protected": [
     "Existing hero/animation/controller/camera/combat",
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "0308312b66d2f8ffd131896716b98b9d05fc7793",
+  "last_saved_commit": "8403d4a8dc2ca88f56359be7045cf427bd570368",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -165,35 +166,35 @@
     "forest_sample_tree_count": 920,
     "forest_sample_motor_walk": true,
     "forest_sample_frames": 161,
-    "forest_sample_stop_drift_m": 0.0,
+    "forest_sample_stop_drift_m": 0,
     "world_forest_placements": 92973,
     "original_sample_placements_unchanged": 2560,
     "world_forest_colliders": 9987,
     "world_forest_normal_walks": 5,
     "world_forest_motion_frames": 199,
-    "world_forest_max_stop_drift_m": 0.0,
+    "world_forest_max_stop_drift_m": 0,
     "payload_clean_restore_314": true,
     "main_after_D08": "headless exit 0; known nonfatal errors retained",
     "forest_after_import_fixes_frames": 152,
     "forest_after_import_fixes_canopy": 0.829587331097905,
-    "forest_after_import_fixes_stop_drift_m": 0.0,
+    "forest_after_import_fixes_stop_drift_m": 0,
     "main_after_D10": "headless exit 0, known certificate/display JSON errors retained",
     "groundcover_native_points": 362189,
     "groundcover_native_edit_roundtrip": true,
     "groundcover_collision_routes": 15,
     "groundcover_normal_walks": 6,
     "groundcover_motion_frames": 228,
-    "groundcover_stop_drift_m": 0.0,
+    "groundcover_stop_drift_m": 0,
     "payload_clean_restore_504": true,
     "main_after_D11": "headless 900, exit 0; known certificate/display JSON errors retained"
   },
   "publication": {
-    "content_checkpoint": "0308312b66d2f8ffd131896716b98b9d05fc7793",
+    "content_checkpoint": "8403d4a8dc2ca88f56359be7045cf427bd570368",
     "native_and_glb_payload_files": 504,
     "payload_parts": 192,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "D11 content pending publication; last published checkpoint is 0308312."
+    "pending": "D13-D14 local changes NOT published. This commit saves continuation metadata only. The last complete source/evidence checkpoint is 8403d4a."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -203,7 +204,7 @@
     "existing user display-settings JSON",
     "D04 static/orbit only: one RefCounted with zero references reported at exit; not diagnosed as a Godot crash"
   ],
-  "backup_current_from_workspace": "outputs/world-final-D11",
+  "backup_current_from_workspace": "outputs/world-native-D13",
   "blender_D08A_incident": {
     "report": "docs/world-final/diagnostics/BLENDER_D08A_RU.md",
     "original_D03_preserved": true,
@@ -250,8 +251,73 @@
     "native_point_roundtrip_verified": true,
     "rendered_walks": 6,
     "recorded_frames": 228,
-    "stop_drift_m": 0.0,
+    "stop_drift_m": 0,
     "report": "docs/world-final/GROUNDCOVER_D11_RU.md",
     "failed_launches_preserved": true
+  },
+  "local_head_at_stop": "8403d4a8dc2ca88f56359be7045cf427bd570368",
+  "storage_block": {
+    "utc": "2026-09-10T18:54:00Z",
+    "free_bytes_C": 0,
+    "packaging_error": "OSError: [Errno 28] No space left on device",
+    "incomplete_archive": "qa-artifacts/world-final/world-geology-D13-9.tar.xz",
+    "archive_bytes": 164807584,
+    "archive_validation_pending": true,
+    "partial_parts": "art/world-final/payload/world-geology-D13-9.part000 through part029; last may be truncated. Manifest remains D11: 8 layers, 504 files.",
+    "blocked_commands": "exec_command and apply_patch cannot start filesystem helper: helper_log_failed, Windows error112 (no disk space).",
+    "cleanup": "Removal of restore-check-D11 rejected: approval required, granular.sandbox_approval=false. No deletion performed.",
+    "alternate_storage": "D has ~512130134016 free bytes. request_permissions granted target paths, but New-Item was denied by Windows at D:/Varendor_Codex_Work and D:/база проекта/Varendor_Codex_Work. Neither move ran.",
+    "compression": "compact marked restore-check-D11 directories for NTFS compression; file compression did not reclaim space. No source bytes removed.",
+    "verified_temporary_copy": {
+      "path": "qa-artifacts/world-final/restore-check-D11",
+      "files": 504,
+      "bytes": 1143062778,
+      "sha256_matches_published_manifest": true,
+      "manifest_sha256": "cdc4786da85e7cff1af3b929be82ca50b8dd59938659b27ad4ff80316e65998a"
+    },
+    "local_state_update": "Failed because the filesystem helper cannot write its setup log. This remote WORLD_STATE is the authoritative continuation point."
+  },
+  "D13": {
+    "terrain_native": "art/world-final/Varendor_Geology_D-13.blend",
+    "height_sha256": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e",
+    "native_source": "art/world-final/Varendor_Nature_D-13.blend",
+    "native_sha256": "e7a6bfde9e27fed27286269e4edc513d8d6e69a294cf87a1b8f62c148ae1f03f",
+    "native_bytes": 117139382,
+    "native_report": "docs/world-final/native-roundtrip-D13.json",
+    "report": "docs/world-final/GEOLOGY_D13_RU.md",
+    "evidence": "docs/world-final/evidence/D13-geology",
+    "backup_in_progress": "outputs/world-final-D13-in-progress (relative to Codex workspace, 758 files,185757716 bytes)",
+    "backup_native": "outputs/world-native-D13 (relative to Codex workspace, SHA verified)",
+    "source_launch": "native-nature-D13 timed out120s, exitunknown; retained as failure. Process later saved file and ended.",
+    "native_reopen": "exit0 in12.797s; forest,grass,terrain and in-memory edit-export of cliff passed; original source unchanged.",
+    "rendered_walks": 3,
+    "rendered_frames": 128,
+    "stop_drift_m": 0,
+    "graphical_run": "reseated-walks-D13 exit0 in51.828s; forest sample, snow ascent, volcano ascent",
+    "main_smoke": "main-after-D13 headless900 exit0 in11.969s; known certificate/display JSON errors retained",
+    "material_limitations": "Godot D12/D13 material candidate not yet copied exactly into Blender native materials. Snow too uniform; smooth rock faces, isolated cliff edges, dark/rigid grass and yellow ground remain.",
+    "main_integrated": false
+  },
+  "D14": {
+    "native_source": "art/world-final/Varendor_Ancient_Tree_D-14.blend",
+    "native_sha256": "deb2cdcd33adf7437beda09f28fc4acda8c6922b35aa4fb951ef1c6d90e3b676",
+    "glb": "godot-pc/world-final/nature/assets/ancient_tree_D14.glb",
+    "glb_sha256": "5e603cc896caca5fd1dd4e2b93fa044ae1c847ae59cbe270d1c3d038d5ef1502",
+    "source_script": "scripts/world_final/author_ancient_tree_D14_blender.py",
+    "review_scene": "godot-pc/world-final/ancient_tree_D14_review.tscn",
+    "report": "docs/world-final/ancient-tree-D14.json",
+    "anchor_xyz": [
+      -170,
+      122,
+      -450
+    ],
+    "editable_meshes": 54,
+    "triangles": 27444,
+    "native_launch": "native-ancient-tree-D14 exit0 in2.078s",
+    "import": "import-ancient-D14 exit0 in10.297s",
+    "rendered_review": false,
+    "collision_review": false,
+    "main_integrated": false,
+    "note": "Preview removes only the old ANCIENT_TREE landmark and its colliders; retains D13 nature. Planned approach/hollow/return route is not yet run."
   }
 }
