@@ -7,6 +7,9 @@ const GRAVITY: float = 22.0
 const JUMP_SPEED: float = 8.2
 const PHYSICS_STEP: float = 1.0 / 60.0
 var collision: VarendorCollision
+# Map limits are geography data. Defaults preserve the accepted 320x280 world.
+var bounds_min: Vector2 = Vector2(-156, -136)
+var bounds_max: Vector2 = Vector2(156, 136)
 var position_value: Vector2 = Vector2.ZERO
 var previous_position: Vector2 = Vector2.ZERO
 var velocity: Vector2 = Vector2.ZERO
@@ -355,7 +358,7 @@ func physics_step(dt: float) -> void:
 		var spacing: float = radius+float(body.get("bodyRadius",.46))
 		if absf(center.x-position_value.x) > spacing+absf(displacement.x) or absf(center.y-position_value.y) > spacing+absf(displacement.y): continue
 		displacement = VarendorActorSpacing.slide(position_value,displacement,center,spacing)
-	var next: Vector2 = collision.resolve(position_value,displacement).clamp(Vector2(-156,-136),Vector2(156,136))
+	var next: Vector2 = collision.resolve(position_value,displacement).clamp(bounds_min,bounds_max)
 	position_value = next
 	actual_velocity = (position_value - previous_position) / dt
 	if not actual_velocity.is_zero_approx():

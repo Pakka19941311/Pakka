@@ -89,6 +89,8 @@ jobs:
       - name: Import actual native assets
         run: |
           mkdir -p qa-artifacts/pc-build qa-artifacts/pc-linux
+          # Restore authored FINAL sources/GLBs exactly; never regenerate the layout.
+          python scripts/world_final/materialize_payload.py
           "$GODOT" --headless --path godot-pc --editor --import 2>&1 | tee qa-artifacts/pc-linux/import.log
           python -c 'import pathlib; s=pathlib.Path("qa-artifacts/pc-linux/import.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-16000:]'
           for test in hotfix_motion_qa stop_anchor_qa player_stop_qa; do

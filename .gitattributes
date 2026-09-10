@@ -3,3 +3,6 @@ art/character-v3/payload/*.part* text eol=lf -diff
 # Preserve supplied package hashes and raw incident evidence byte-for-byte.
 docs/world-final/spec/** -text whitespace=-blank-at-eol
 docs/world-final/diagnostics/godot-20260910/* -text whitespace=-blank-at-eol
+art/world-final/payload/*.part* -text -diff
+godot-pc/world-final/geography/terrain.json -text whitespace=cr-at-eol
+godot-pc/world-final/world_layout.json -text whitespace=cr-at-eol

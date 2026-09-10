@@ -8,7 +8,7 @@
   "current_stage": "B",
   "stages": {
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
-    "B": "not yet built: layout contains authored road elevations, water boundaries and 46 landmark placements; no new playable terrain yet",
+    "B": "partial: layout-04 continuous terrain, 143 GLB chunks, Blender masters, bridges, water and landmark massing exist; Godot GPU captures and motor routes passed. Landmark collisions, full route clearance and geological transitions remain to verify before B acceptance.",
     "C": "not started",
     "D": "not started",
     "E": "not started",
@@ -21,7 +21,10 @@
     "original_check": "failed, exit 1; never counted as successful",
     "minimal_correction": "scripts/godot_run_checked.py preflights an existing writable absolute log file",
     "retest": "same Godot 4.6.3, current project headless startup 60 and 900 frames exited 0 without crash",
-    "remaining_log_errors": ["Windows root certificate store read", "Existing user display-settings JSON parsing"],
+    "remaining_log_errors": [
+      "Windows root certificate store read",
+      "Existing user display-settings JSON parsing"
+    ],
     "visual_check": false,
     "backup_from_workspace": "outputs/godot-crash-20260910T121037Z"
   },
@@ -29,15 +32,47 @@
     "godot-pc/world-final/world_layout.json",
     "docs/world-final/REFERENCE_ANNOTATED.svg",
     "docs/world-final/LAYOUT_PLAN.svg",
-    "docs/world-final/LANDMARK_REGISTRY.csv"
+    "docs/world-final/LANDMARK_REGISTRY.csv",
+    "scripts/world_final/build_geography.py",
+    "scripts/world_final/build_geography_blender.py",
+    "art/world-final/Varendor_Geography_final-1.0-layout-03.blend",
+    "godot-pc/world-final/geography_preview.gd",
+    "godot-pc/world-final/geography_preview.tscn",
+    "godot-pc/world-final/geography/",
+    "docs/world-final/evidence/B-01/",
+    "art/world-final/payload-manifest.json",
+    "art/world-final/payload/",
+    "art/world-final/Varendor_Geography_final-1.0-layout-04.blend",
+    "docs/world-final/evidence/B-02/",
+    "docs/world-final/GEOGRAPHY_B_RU.md"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Build continuous 1600x1400 m terrain in 128 m chunks with 2 m support grid from the authored layout; correct route grades and bridge decks; export editable Blender source and GLB, then validate the existing movement controller on the main links in Godot.",
+  "next_task": "Add obstacle footprints matching exported landmark geometry to the B scene; route-test village/fort gates, tree approach, sanctuary and church entrances; correct blocked endpoints and terrain transitions, then capture representative moving gameplay and close B before detailed C architecture/interiors.",
   "not_verified": [
-    "New terrain geometry, collisions and route traversal",
-    "Godot overview/gameplay frames matching final reference",
-    "Final population distribution and separate interior runtime layers",
-    "New world performance and final Windows release"
+    "Architecture collision/route clearance in B",
+    "Detailed reference quality and vegetation C-D",
+    "Mine/cave interiors and maps C-E",
+    "Final NPC/server/1000 population integration F-G",
+    "Cold/warm performance and final Windows release H"
   ],
-  "protected": ["Existing hero/animation/controller/camera/combat", "NPC and inventory/equipment/enchant/storage/save data", "main and work/knight-integration-v2 branches"]
+  "protected": [
+    "Existing hero/animation/controller/camera/combat",
+    "NPC and inventory/equipment/enchant/storage/save data",
+    "main and work/knight-integration-v2 branches"
+  ],
+  "last_saved_commit": "4dcf07348cff169881ab3beaf16494d57769ff37",
+  "changed_shared_code": {
+    "path": "godot-pc/scripts/player_movement.gd",
+    "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
+  },
+  "passed_checks": {
+    "package_hashes": true,
+    "road_grades_14": true,
+    "motor_route_arrival_14": true,
+    "planar_stop_drift_14": "0m in numerical scenarios",
+    "bridge_support_steps": "under 0.08m",
+    "old_motion_regression_10": true,
+    "actual_Godot_frames": "docs/world-final/evidence/B-02",
+    "final_visual_acceptance": false
+  }
 }
