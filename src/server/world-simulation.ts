@@ -287,7 +287,7 @@ export class WorldSimulation {
     }
     if(command.type==='storage'){
       if(!nearService(p,'storage'))throw Error('storage-unavailable');
-      transferStorage(p,command,item=>!('slot' in itemDef(item))&&!SKILL_BOOKS[item.id],()=>this.identifier(),STORAGE_CAPACITY);
+      transferStorage(p,command,item=>{const definition=itemDef(item);return Boolean(definition)&&!definition.slot&&!SKILL_BOOKS[item.id];},()=>this.identifier(),STORAGE_CAPACITY);
       return;
     }
     if (command.type==='equip' || command.type==='unequip' || command.type==='reorder') {

@@ -63,3 +63,8 @@ test('storage remains proximity gated and whole equipment can be reordered and r
  assert.equal(f.send(command('deposit',sword,{index:3})).ok,true);assert.equal(f.send(command('reorder',sword,{index:499})).ok,true);
  assert.equal(f.send(command('withdraw',sword,{index:0})).ok,true);assert.deepEqual(f.p.inventory,[sword]);
 });
+test('legacy unknown items remain withdrawable and are never merged speculatively',t=>{
+ const f=fixture(t),old=f.item('legacy_unknown_item',2);f.p.storage=[old];f.p.inventory=[f.item(old.id,3)];
+ assert.equal(f.send(command('withdraw',old)).ok,true);assert.equal(f.p.inventory.length,2);
+ assert.equal(f.p.inventory[1].uid,old.uid);assert.equal(f.p.inventory[1].count,2);assert.equal(f.p.storage[0],null);
+});
