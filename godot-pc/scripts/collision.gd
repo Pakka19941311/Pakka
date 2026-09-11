@@ -6,9 +6,11 @@ extends RefCounted
 const RADIUS: float = .46
 var cells: Dictionary = {}
 var walkability: Callable
+var camera_ignored_ids: Dictionary = {}
 
 func setup(obstacles: Array) -> void:
 	cells.clear()
+	camera_ignored_ids.clear()
 	for obstacle: Dictionary in obstacles:
 		var ext: Vector2 = Vector2.ONE * float(obstacle.get("radius", 0))
 		if obstacle.kind == "box":
@@ -107,7 +109,7 @@ func nearest_free(point: Vector2) -> Vector2:
 	return point
 
 # Finite camera/picking sweep with real height bounds. Inputs use Godot xyz.
-func ray_distance(origin: Vector3, end: Vector3, radius: float = 0.0) -> float:
+func ray_distance(origin: Vector3, end: Vector3, radius: float = 0.0, for_camera: bool = false) -> float:
 	var start: Vector3 = Vector3(origin.x, origin.y, -origin.z)
 	var finish: Vector3 = Vector3(end.x, end.y, -end.z)
 	var direction: Vector3 = finish - start
@@ -115,6 +117,9 @@ func ray_distance(origin: Vector3, end: Vector3, radius: float = 0.0) -> float:
 	var a: Vector2 = Vector2(start.x, start.z)
 	var b: Vector2 = Vector2(finish.x, finish.z)
 	for obstacle: Dictionary in candidates(a.min(b) - Vector2.ONE * radius, a.max(b) + Vector2.ONE * radius):
+		# Cutaway architecture affects only framing; movement, targeting and
+		# authoritative line-of-sight keep using the complete physical walls.
+		if for_camera and camera_ignored_ids.has(str(obstacle.get("id",""))): continue
 		var center: Vector2 = Vector2(obstacle.x, obstacle.z)
 		var angle: float = float(obstacle.get("rotation", 0))
 		var local: Vector2 = (a - center).rotated(angle)

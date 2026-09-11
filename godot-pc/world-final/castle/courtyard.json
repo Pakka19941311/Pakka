@@ -1,5 +1,5 @@
 {
-  "schema": 1,
+  "schema": 2,
   "id": "greenfall-courtyard",
   "coordinates": "server x,z; +z north",
   "center": [
@@ -8,24 +8,6 @@
   ],
   "active_radius": 210,
   "props": [
-    {
-      "id": "Elsa_provisions",
-      "x": -114,
-      "z": -187,
-      "zone": "market"
-    },
-    {
-      "id": "Caravan_exchange",
-      "x": -121,
-      "z": -199,
-      "zone": "market"
-    },
-    {
-      "id": "Mira_herbs",
-      "x": -129,
-      "z": -177,
-      "zone": "market"
-    },
     {
       "id": "Bran_forge",
       "x": -139,
@@ -67,24 +49,6 @@
       "x": -154,
       "z": -170,
       "zone": "stable"
-    },
-    {
-      "id": "Herb_bed_A",
-      "x": -168,
-      "z": -190,
-      "zone": "garden"
-    },
-    {
-      "id": "Herb_bed_B",
-      "x": -168,
-      "z": -197,
-      "zone": "garden"
-    },
-    {
-      "id": "Training_sand",
-      "x": -46,
-      "z": -147,
-      "zone": "training"
     },
     {
       "id": "Training_target_0",
@@ -147,307 +111,241 @@
       "zone": "supply"
     },
     {
-      "id": "Well_paving",
-      "x": -114,
-      "z": -151,
-      "zone": "rest"
+      "id": "Paved_bailey",
+      "x": -100,
+      "z": -150,
+      "zone": "paving"
     },
     {
-      "id": "Market_paving",
-      "x": -116,
-      "z": -186,
-      "zone": "market"
+      "id": "Citadel_west_hall",
+      "x": -136,
+      "z": -108,
+      "zone": "citadel"
+    },
+    {
+      "id": "Citadel_east_hall",
+      "x": -66,
+      "z": -105,
+      "zone": "citadel"
+    },
+    {
+      "id": "Citadel_donjon",
+      "x": -101,
+      "z": -101,
+      "zone": "citadel"
+    },
+    {
+      "id": "Donjon_gate",
+      "x": -101,
+      "z": -119.7,
+      "zone": "citadel"
+    },
+    {
+      "id": "Donjon_turret_-1",
+      "x": -118,
+      "z": -118,
+      "zone": "citadel"
+    },
+    {
+      "id": "Donjon_turret_1",
+      "x": -84,
+      "z": -118,
+      "zone": "citadel"
+    },
+    {
+      "id": "Donjon_machicolations",
+      "x": -101,
+      "z": -120.25,
+      "zone": "citadel"
+    },
+    {
+      "id": "Curtain_tower_roof_0",
+      "x": -183,
+      "z": -76,
+      "zone": "tower_roofs"
+    },
+    {
+      "id": "Curtain_tower_roof_1",
+      "x": -17,
+      "z": -76,
+      "zone": "tower_roofs"
+    },
+    {
+      "id": "Curtain_tower_roof_2",
+      "x": -183,
+      "z": -224,
+      "zone": "tower_roofs"
+    },
+    {
+      "id": "Curtain_tower_roof_3",
+      "x": -17,
+      "z": -224,
+      "zone": "tower_roofs"
+    },
+    {
+      "id": "Curtain_tower_roof_4",
+      "x": -114,
+      "z": -224,
+      "zone": "tower_roofs"
+    },
+    {
+      "id": "Curtain_tower_roof_5",
+      "x": -86,
+      "z": -224,
+      "zone": "tower_roofs"
+    },
+    {
+      "id": "Gate_heraldry",
+      "x": -100,
+      "z": -221.0,
+      "zone": "gate_facade"
+    },
+    {
+      "id": "West_garrison_gallery",
+      "x": -173,
+      "z": -122,
+      "zone": "gallery"
+    },
+    {
+      "id": "Eastern_arsenal",
+      "x": -61,
+      "z": -175,
+      "zone": "arsenal"
+    },
+    {
+      "id": "Arsenal_loading_porch",
+      "x": -70,
+      "z": -185.3,
+      "zone": "arsenal"
+    },
+    {
+      "id": "West_stable",
+      "x": -165,
+      "z": -155,
+      "zone": "stable_building"
+    },
+    {
+      "id": "Elsa_provisions",
+      "x": -114,
+      "z": -187,
+      "zone": "service_arcades"
+    },
+    {
+      "id": "Mira_herbs",
+      "x": -129,
+      "z": -177,
+      "zone": "service_arcades"
+    },
+    {
+      "id": "Caravan_exchange",
+      "x": -121,
+      "z": -199,
+      "zone": "service_arcades"
+    },
+    {
+      "id": "Training_court",
+      "x": -45,
+      "z": -147,
+      "zone": "training"
+    },
+    {
+      "id": "Armoury_shelter",
+      "x": -29,
+      "z": -144,
+      "zone": "training_shelter"
+    },
+    {
+      "id": "Kitchen_herbs_0",
+      "x": -162,
+      "z": -135,
+      "zone": "garden"
+    },
+    {
+      "id": "Kitchen_herbs_1",
+      "x": -162,
+      "z": -140,
+      "zone": "garden"
+    },
+    {
+      "id": "Tavern_floor",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_floor"
+    },
+    {
+      "id": "Tavern_wall_west",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_wall_west"
+    },
+    {
+      "id": "Tavern_wall_north",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_wall_north"
+    },
+    {
+      "id": "Tavern_wall_south",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_wall_south"
+    },
+    {
+      "id": "Tavern_wall_east",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_wall_east"
+    },
+    {
+      "id": "Tavern_roof",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_roof"
+    },
+    {
+      "id": "Tavern_entry_porch",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_entry_porch"
+    },
+    {
+      "id": "Tavern_sign",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_sign"
+    },
+    {
+      "id": "Tavern_bar",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_furniture"
+    },
+    {
+      "id": "Tavern_hearth",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_furniture"
+    },
+    {
+      "id": "Tavern_chimney",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_roof"
+    },
+    {
+      "id": "Tavern_book_alcove",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_furniture"
+    },
+    {
+      "id": "Tavern_lamps",
+      "x": -155,
+      "z": -199,
+      "zone": "tavern_lamps"
     }
   ],
   "obstacles": [
-    {
-      "id": "courtyard:Elsa_provisions:0",
-      "kind": "box",
-      "x": -116.3,
-      "z": -188.6,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Elsa_provisions:1",
-      "kind": "box",
-      "x": -116.3,
-      "z": -185.4,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Elsa_provisions:2",
-      "kind": "box",
-      "x": -111.7,
-      "z": -188.6,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Elsa_provisions:3",
-      "kind": "box",
-      "x": -111.7,
-      "z": -185.4,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Elsa_provisions:4",
-      "kind": "box",
-      "x": -114.0,
-      "z": -187.0,
-      "halfX": 2.3,
-      "halfZ": 1.6,
-      "rotation": 0,
-      "bottom": 72.8,
-      "top": 73.57,
-      "blocksMovement": false
-    },
-    {
-      "id": "courtyard:Elsa_provisions:5",
-      "kind": "box",
-      "x": -114.0,
-      "z": -187.3,
-      "halfX": 2.0,
-      "halfZ": 0.575,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 71.06,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Elsa_provisions:6",
-      "kind": "box",
-      "x": -116.85,
-      "z": -186.9,
-      "halfX": 0.44,
-      "halfZ": 0.44,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.96,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Elsa_provisions:7",
-      "kind": "box",
-      "x": -111.15,
-      "z": -186.75,
-      "halfX": 0.45,
-      "halfZ": 0.415,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.8,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:8",
-      "kind": "box",
-      "x": -123.3,
-      "z": -200.6,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:9",
-      "kind": "box",
-      "x": -123.3,
-      "z": -197.4,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:10",
-      "kind": "box",
-      "x": -118.7,
-      "z": -200.6,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:11",
-      "kind": "box",
-      "x": -118.7,
-      "z": -197.4,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:12",
-      "kind": "box",
-      "x": -121.0,
-      "z": -199.0,
-      "halfX": 2.3,
-      "halfZ": 1.6,
-      "rotation": 0,
-      "bottom": 72.8,
-      "top": 73.57,
-      "blocksMovement": false
-    },
-    {
-      "id": "courtyard:Caravan_exchange:13",
-      "kind": "box",
-      "x": -121.0,
-      "z": -199.3,
-      "halfX": 2.0,
-      "halfZ": 0.575,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 71.06,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:14",
-      "kind": "box",
-      "x": -123.85,
-      "z": -198.9,
-      "halfX": 0.44,
-      "halfZ": 0.44,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.96,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Caravan_exchange:15",
-      "kind": "box",
-      "x": -118.15,
-      "z": -198.75,
-      "halfX": 0.45,
-      "halfZ": 0.415,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.8,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:16",
-      "kind": "box",
-      "x": -131.3,
-      "z": -178.6,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:17",
-      "kind": "box",
-      "x": -131.3,
-      "z": -175.4,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:18",
-      "kind": "box",
-      "x": -126.7,
-      "z": -178.6,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:19",
-      "kind": "box",
-      "x": -126.7,
-      "z": -175.4,
-      "halfX": 0.075,
-      "halfZ": 0.075,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 73.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:20",
-      "kind": "box",
-      "x": -129.0,
-      "z": -177.0,
-      "halfX": 2.3,
-      "halfZ": 1.6,
-      "rotation": 0,
-      "bottom": 72.8,
-      "top": 73.57,
-      "blocksMovement": false
-    },
-    {
-      "id": "courtyard:Mira_herbs:21",
-      "kind": "box",
-      "x": -129.0,
-      "z": -177.3,
-      "halfX": 2.0,
-      "halfZ": 0.575,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 71.06,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:22",
-      "kind": "box",
-      "x": -131.85,
-      "z": -176.9,
-      "halfX": 0.44,
-      "halfZ": 0.44,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.96,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Mira_herbs:23",
-      "kind": "box",
-      "x": -126.15,
-      "z": -176.75,
-      "halfX": 0.45,
-      "halfZ": 0.415,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.8,
-      "blocksMovement": true
-    },
     {
       "id": "courtyard:Bran_forge:24",
       "kind": "box",
@@ -761,30 +659,6 @@
       "blocksMovement": true
     },
     {
-      "id": "courtyard:Herb_bed_A:50",
-      "kind": "box",
-      "x": -168.0,
-      "z": -190.0,
-      "halfX": 2.25,
-      "halfZ": 1.35,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.4,
-      "blocksMovement": true
-    },
-    {
-      "id": "courtyard:Herb_bed_B:51",
-      "kind": "box",
-      "x": -168.0,
-      "z": -197.0,
-      "halfX": 2.25,
-      "halfZ": 1.35,
-      "rotation": 0,
-      "bottom": 70,
-      "top": 70.4,
-      "blocksMovement": true
-    },
-    {
       "id": "courtyard:Training_target_0:52",
       "kind": "box",
       "x": -41.0,
@@ -959,6 +833,1350 @@
       "z": -177.0,
       "halfX": 1.0,
       "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_west_hall:41",
+      "kind": "box",
+      "x": -136.0,
+      "z": -108.0,
+      "halfX": 17.5,
+      "halfZ": 14.5,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 83.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_west_hall:42",
+      "kind": "box",
+      "x": -153.0,
+      "z": -122.85,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 80.72,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_west_hall:43",
+      "kind": "box",
+      "x": -119.0,
+      "z": -122.85,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 80.72,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_east_hall:44",
+      "kind": "box",
+      "x": -66.0,
+      "z": -105.0,
+      "halfX": 17.5,
+      "halfZ": 12.5,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 82.0,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_east_hall:45",
+      "kind": "box",
+      "x": -83.0,
+      "z": -117.85,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 79.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_east_hall:46",
+      "kind": "box",
+      "x": -49.0,
+      "z": -117.85,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 79.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_donjon:47",
+      "kind": "box",
+      "x": -101.0,
+      "z": -101.0,
+      "halfX": 15.5,
+      "halfZ": 18.5,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 97.0,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_donjon:48",
+      "kind": "box",
+      "x": -116.0,
+      "z": -119.85,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 91.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Citadel_donjon:49",
+      "kind": "box",
+      "x": -86.0,
+      "z": -119.85,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 91.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Donjon_gate:50",
+      "kind": "box",
+      "x": -104.1,
+      "z": -119.8,
+      "halfX": 0.4,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Donjon_gate:51",
+      "kind": "box",
+      "x": -97.9,
+      "z": -119.8,
+      "halfX": 0.4,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Donjon_turret_-1:52",
+      "kind": "box",
+      "x": -118.0,
+      "z": -118.0,
+      "halfX": 3.5,
+      "halfZ": 3.5,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 100,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Donjon_turret_1:53",
+      "kind": "box",
+      "x": -84.0,
+      "z": -118.0,
+      "halfX": 3.5,
+      "halfZ": 3.5,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 100,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:54",
+      "kind": "box",
+      "x": -175.7,
+      "z": -135.0,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:55",
+      "kind": "box",
+      "x": -170.3,
+      "z": -135.0,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:56",
+      "kind": "box",
+      "x": -175.7,
+      "z": -128.5,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:57",
+      "kind": "box",
+      "x": -170.3,
+      "z": -128.5,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:58",
+      "kind": "box",
+      "x": -175.7,
+      "z": -122.0,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:59",
+      "kind": "box",
+      "x": -170.3,
+      "z": -122.0,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:60",
+      "kind": "box",
+      "x": -175.7,
+      "z": -115.5,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:61",
+      "kind": "box",
+      "x": -170.3,
+      "z": -115.5,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:62",
+      "kind": "box",
+      "x": -175.7,
+      "z": -109.0,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_garrison_gallery:63",
+      "kind": "box",
+      "x": -170.3,
+      "z": -109.0,
+      "halfX": 0.325,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Eastern_arsenal:64",
+      "kind": "box",
+      "x": -61.0,
+      "z": -175.0,
+      "halfX": 11.0,
+      "halfZ": 9.0,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 77.5,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Eastern_arsenal:65",
+      "kind": "box",
+      "x": -71.5,
+      "z": -184.35,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 76.0,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Eastern_arsenal:66",
+      "kind": "box",
+      "x": -50.5,
+      "z": -184.35,
+      "halfX": 0.625,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 76.0,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:67",
+      "kind": "box",
+      "x": -172.5,
+      "z": -155.0,
+      "halfX": 0.4,
+      "halfZ": 11.0,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 76,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:68",
+      "kind": "box",
+      "x": -165.0,
+      "z": -166.0,
+      "halfX": 7.9,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 76,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:69",
+      "kind": "box",
+      "x": -165.0,
+      "z": -144.0,
+      "halfX": 7.9,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 76,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:70",
+      "kind": "box",
+      "x": -157.6,
+      "z": -163.0,
+      "halfX": 0.21,
+      "halfZ": 0.21,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:71",
+      "kind": "box",
+      "x": -157.6,
+      "z": -157.0,
+      "halfX": 0.21,
+      "halfZ": 0.21,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:72",
+      "kind": "box",
+      "x": -157.6,
+      "z": -151.0,
+      "halfX": 0.21,
+      "halfZ": 0.21,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:73",
+      "kind": "box",
+      "x": -157.6,
+      "z": -146.0,
+      "halfX": 0.21,
+      "halfZ": 0.21,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:74",
+      "kind": "box",
+      "x": -168.0,
+      "z": -162.0,
+      "halfX": 4.5,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:75",
+      "kind": "box",
+      "x": -170.0,
+      "z": -160.0,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:76",
+      "kind": "box",
+      "x": -168.0,
+      "z": -156.0,
+      "halfX": 4.5,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:77",
+      "kind": "box",
+      "x": -170.0,
+      "z": -154.0,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:78",
+      "kind": "box",
+      "x": -168.0,
+      "z": -150.0,
+      "halfX": 4.5,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:West_stable:79",
+      "kind": "box",
+      "x": -170.0,
+      "z": -148.0,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:80",
+      "kind": "box",
+      "x": -116.35,
+      "z": -185.7,
+      "halfX": 0.225,
+      "halfZ": 0.225,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:81",
+      "kind": "box",
+      "x": -111.65,
+      "z": -185.7,
+      "halfX": 0.225,
+      "halfZ": 0.225,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:82",
+      "kind": "box",
+      "x": -116.35,
+      "z": -188.3,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:83",
+      "kind": "box",
+      "x": -111.65,
+      "z": -188.3,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:84",
+      "kind": "box",
+      "x": -114.0,
+      "z": -187.3,
+      "halfX": 2.0,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:85",
+      "kind": "box",
+      "x": -131.35,
+      "z": -175.7,
+      "halfX": 0.225,
+      "halfZ": 0.225,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:86",
+      "kind": "box",
+      "x": -126.65,
+      "z": -175.7,
+      "halfX": 0.225,
+      "halfZ": 0.225,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:87",
+      "kind": "box",
+      "x": -131.35,
+      "z": -178.3,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:88",
+      "kind": "box",
+      "x": -126.65,
+      "z": -178.3,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:89",
+      "kind": "box",
+      "x": -129.0,
+      "z": -177.3,
+      "halfX": 2.0,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:90",
+      "kind": "box",
+      "x": -123.35,
+      "z": -197.7,
+      "halfX": 0.225,
+      "halfZ": 0.225,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:91",
+      "kind": "box",
+      "x": -118.65,
+      "z": -197.7,
+      "halfX": 0.225,
+      "halfZ": 0.225,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:92",
+      "kind": "box",
+      "x": -123.35,
+      "z": -200.3,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:93",
+      "kind": "box",
+      "x": -118.65,
+      "z": -200.3,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:94",
+      "kind": "box",
+      "x": -121.0,
+      "z": -199.3,
+      "halfX": 2.0,
+      "halfZ": 0.55,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_court:95",
+      "kind": "box",
+      "x": -30.7,
+      "z": -159.0,
+      "halfX": 0.1,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.15,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_court:96",
+      "kind": "box",
+      "x": -30.7,
+      "z": -152.0,
+      "halfX": 0.1,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.15,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_court:97",
+      "kind": "box",
+      "x": -30.7,
+      "z": -144.0,
+      "halfX": 0.1,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.15,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_court:98",
+      "kind": "box",
+      "x": -30.7,
+      "z": -136.0,
+      "halfX": 0.1,
+      "halfZ": 0.1,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.15,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Armoury_shelter:99",
+      "kind": "box",
+      "x": -29.0,
+      "z": -150.0,
+      "halfX": 0.2,
+      "halfZ": 0.2,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Armoury_shelter:100",
+      "kind": "box",
+      "x": -29.0,
+      "z": -138.0,
+      "halfX": 0.2,
+      "halfZ": 0.2,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_0:101",
+      "kind": "box",
+      "x": -164.1,
+      "z": -135.0,
+      "halfX": 0.075,
+      "halfZ": 1.25,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_0:102",
+      "kind": "box",
+      "x": -159.9,
+      "z": -135.0,
+      "halfX": 0.075,
+      "halfZ": 1.25,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_0:103",
+      "kind": "box",
+      "x": -162.0,
+      "z": -136.2,
+      "halfX": 2.15,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_0:104",
+      "kind": "box",
+      "x": -162.0,
+      "z": -133.8,
+      "halfX": 2.15,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_0:105",
+      "kind": "box",
+      "x": -162.0,
+      "z": -135.0,
+      "halfX": 2.15,
+      "halfZ": 1.25,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.65,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_1:106",
+      "kind": "box",
+      "x": -164.1,
+      "z": -140.0,
+      "halfX": 0.075,
+      "halfZ": 1.25,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_1:107",
+      "kind": "box",
+      "x": -159.9,
+      "z": -140.0,
+      "halfX": 0.075,
+      "halfZ": 1.25,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_1:108",
+      "kind": "box",
+      "x": -162.0,
+      "z": -141.2,
+      "halfX": 2.15,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_1:109",
+      "kind": "box",
+      "x": -162.0,
+      "z": -138.8,
+      "halfX": 2.15,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.3,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Kitchen_herbs_1:110",
+      "kind": "box",
+      "x": -162.0,
+      "z": -140.0,
+      "halfX": 2.15,
+      "halfZ": 1.25,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.65,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_west:111",
+      "kind": "box",
+      "x": -167.5,
+      "z": -199.0,
+      "halfX": 0.425,
+      "halfZ": 14.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.5,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_west:112",
+      "kind": "box",
+      "x": -167.5,
+      "z": -199.0,
+      "halfX": 0.425,
+      "halfZ": 14.4,
+      "rotation": 0,
+      "bottom": 74.5,
+      "top": 78.1,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_wall_north:113",
+      "kind": "box",
+      "x": -155.0,
+      "z": -185.0,
+      "halfX": 12.9,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.5,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_north:114",
+      "kind": "box",
+      "x": -155.0,
+      "z": -185.0,
+      "halfX": 12.9,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 74.5,
+      "top": 78.1,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_wall_south:115",
+      "kind": "box",
+      "x": -155.0,
+      "z": -213.0,
+      "halfX": 12.9,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.5,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_south:116",
+      "kind": "box",
+      "x": -155.0,
+      "z": -213.0,
+      "halfX": 12.9,
+      "halfZ": 0.425,
+      "rotation": 0,
+      "bottom": 74.5,
+      "top": 78.1,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:117",
+      "kind": "box",
+      "x": -142.5,
+      "z": -206.95,
+      "halfX": 0.425,
+      "halfZ": 6.15,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.5,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:118",
+      "kind": "box",
+      "x": -142.5,
+      "z": -206.95,
+      "halfX": 0.425,
+      "halfZ": 6.15,
+      "rotation": 0,
+      "bottom": 74.5,
+      "top": 78.1,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:119",
+      "kind": "box",
+      "x": -142.5,
+      "z": -191.05,
+      "halfX": 0.425,
+      "halfZ": 6.15,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.5,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:120",
+      "kind": "box",
+      "x": -142.5,
+      "z": -191.05,
+      "halfX": 0.425,
+      "halfZ": 6.15,
+      "rotation": 0,
+      "bottom": 74.5,
+      "top": 78.1,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:121",
+      "kind": "box",
+      "x": -142.5,
+      "z": -199.0,
+      "halfX": 0.525,
+      "halfZ": 1.8,
+      "rotation": 0,
+      "bottom": 73.9,
+      "top": 78.1,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:122",
+      "kind": "box",
+      "x": -142.5,
+      "z": -200.95,
+      "halfX": 0.575,
+      "halfZ": 0.175,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.9,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_wall_east:123",
+      "kind": "box",
+      "x": -142.5,
+      "z": -197.05,
+      "halfX": 0.575,
+      "halfZ": 0.175,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.9,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_entry_porch:124",
+      "kind": "box",
+      "x": -139.6,
+      "z": -201.8,
+      "halfX": 0.19,
+      "halfZ": 0.19,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_entry_porch:125",
+      "kind": "box",
+      "x": -139.6,
+      "z": -196.2,
+      "halfX": 0.19,
+      "halfZ": 0.19,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:126",
+      "kind": "box",
+      "x": -158.0,
+      "z": -191.7,
+      "halfX": 7.5,
+      "halfZ": 0.675,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.18,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:127",
+      "kind": "box",
+      "x": -165.0,
+      "z": -187.5,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:128",
+      "kind": "box",
+      "x": -162.0,
+      "z": -187.5,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:129",
+      "kind": "box",
+      "x": -159.0,
+      "z": -187.5,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:130",
+      "kind": "box",
+      "x": -156.0,
+      "z": -187.5,
+      "halfX": 0.45,
+      "halfZ": 0.45,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:131",
+      "kind": "box",
+      "x": -162.0,
+      "z": -205.0,
+      "halfX": 1.8,
+      "halfZ": 0.825,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:132",
+      "kind": "box",
+      "x": -164.05,
+      "z": -205.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:133",
+      "kind": "box",
+      "x": -159.95,
+      "z": -205.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:134",
+      "kind": "box",
+      "x": -153.0,
+      "z": -206.0,
+      "halfX": 1.8,
+      "halfZ": 0.825,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:135",
+      "kind": "box",
+      "x": -155.05,
+      "z": -206.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:136",
+      "kind": "box",
+      "x": -150.95,
+      "z": -206.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:137",
+      "kind": "box",
+      "x": -161.0,
+      "z": -198.0,
+      "halfX": 1.8,
+      "halfZ": 0.825,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:138",
+      "kind": "box",
+      "x": -163.05,
+      "z": -198.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:139",
+      "kind": "box",
+      "x": -158.95,
+      "z": -198.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:140",
+      "kind": "box",
+      "x": -160.0,
+      "z": -209.0,
+      "halfX": 1.8,
+      "halfZ": 0.825,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:141",
+      "kind": "box",
+      "x": -162.05,
+      "z": -209.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:142",
+      "kind": "box",
+      "x": -157.95,
+      "z": -209.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:143",
+      "kind": "box",
+      "x": -149.0,
+      "z": -202.0,
+      "halfX": 1.8,
+      "halfZ": 0.825,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:144",
+      "kind": "box",
+      "x": -151.05,
+      "z": -202.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_bar:145",
+      "kind": "box",
+      "x": -146.95,
+      "z": -202.0,
+      "halfX": 0.3,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.59,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_hearth:146",
+      "kind": "box",
+      "x": -166.3,
+      "z": -203.8,
+      "halfX": 0.825,
+      "halfZ": 0.36,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_hearth:147",
+      "kind": "box",
+      "x": -166.3,
+      "z": -200.2,
+      "halfX": 0.825,
+      "halfZ": 0.36,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_hearth:148",
+      "kind": "box",
+      "x": -166.3,
+      "z": -202.0,
+      "halfX": 1.025,
+      "halfZ": 2.25,
+      "rotation": 0,
+      "bottom": 73.2,
+      "top": 73.75,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_hearth:149",
+      "kind": "box",
+      "x": -166.1,
+      "z": -202.0,
+      "halfX": 1.1,
+      "halfZ": 2.0,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_chimney:150",
+      "kind": "box",
+      "x": -166.3,
+      "z": -202.0,
+      "halfX": 1.0,
+      "halfZ": 1.9,
+      "rotation": 0,
+      "bottom": 73.6,
+      "top": 86.6,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Tavern_book_alcove:151",
+      "kind": "box",
+      "x": -146.35,
+      "z": -187.35,
+      "halfX": 2.95,
+      "halfZ": 0.75,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Tavern_book_alcove:152",
+      "kind": "box",
+      "x": -146.4,
+      "z": -191.4,
+      "halfX": 2.45,
+      "halfZ": 0.625,
       "rotation": 0,
       "bottom": 70,
       "top": 71.06,
@@ -1431,30 +2649,30 @@
     {
       "name": "Носильщик Бек",
       "model": "Monk",
-      "x": -71,
-      "z": -187,
+      "x": -77,
+      "z": -186,
       "route": [
         {
-          "x": -71,
-          "z": -187,
+          "x": -77,
+          "z": -186,
           "activity": "collect",
           "duration": 7,
           "interval": 5,
           "look": {
-            "x": -68,
-            "z": -187
+            "x": -73,
+            "z": -186
           },
           "clip": "pickup"
         },
         {
-          "x": -73,
-          "z": -181,
+          "x": -78,
+          "z": -175,
           "activity": "walk",
           "duration": 3,
           "interval": 5
         },
         {
-          "x": -72,
+          "x": -79,
           "z": -162,
           "activity": "walk",
           "duration": 3,
@@ -1555,31 +2773,31 @@
     {
       "name": "Садовница Лина",
       "model": "Monk",
-      "x": -165,
-      "z": -190,
+      "x": -158,
+      "z": -140,
       "route": [
         {
-          "x": -165,
-          "z": -190,
+          "x": -158,
+          "z": -140,
           "activity": "garden",
           "duration": 12,
           "interval": 6,
           "look": {
-            "x": -168,
-            "z": -190
+            "x": -162,
+            "z": -140
           },
           "clip": "pickup"
         },
         {
-          "x": -163,
-          "z": -184,
+          "x": -150,
+          "z": -141,
           "activity": "walk",
           "duration": 3,
           "interval": 5
         },
         {
-          "x": -141,
-          "z": -178,
+          "x": -142,
+          "z": -171,
           "activity": "walk",
           "duration": 3,
           "interval": 5
@@ -1597,15 +2815,15 @@
           "clip": "pickup"
         },
         {
-          "x": -142,
-          "z": -177,
+          "x": -143,
+          "z": -171,
           "activity": "walk",
           "duration": 3,
           "interval": 5
         },
         {
-          "x": -164,
-          "z": -184,
+          "x": -150,
+          "z": -140,
           "activity": "walk",
           "duration": 3,
           "interval": 5
@@ -1671,6 +2889,226 @@
       "start_index": 0,
       "phase": 0,
       "civilian": true
+    },
+    {
+      "name": "Трактирщик Бруно",
+      "model": "Monk",
+      "x": -160,
+      "z": -190.3,
+      "route": [
+        {
+          "x": -160,
+          "z": -190.3,
+          "activity": "tend_bar",
+          "duration": 12,
+          "interval": 5,
+          "look": {
+            "x": -160,
+            "z": -192
+          }
+        },
+        {
+          "x": -155,
+          "z": -190.3,
+          "activity": "tend_bar",
+          "duration": 10,
+          "interval": 5,
+          "look": {
+            "x": -155,
+            "z": -193
+          }
+        }
+      ],
+      "role": "barkeep",
+      "seed": 116,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Рудокоп Густав",
+      "model": "Monk",
+      "x": -163,
+      "z": -206.5,
+      "route": [
+        {
+          "x": -163,
+          "z": -206.5,
+          "activity": "drink",
+          "duration": 120,
+          "interval": 5,
+          "look": {
+            "x": -160,
+            "z": -205
+          }
+        }
+      ],
+      "role": "drinker",
+      "seed": 117,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Стражник в отставке",
+      "model": "Warrior",
+      "x": -153,
+      "z": -207.7,
+      "route": [
+        {
+          "x": -153,
+          "z": -207.7,
+          "activity": "sit_drink",
+          "duration": 120,
+          "interval": 5,
+          "look": {
+            "x": -153,
+            "z": -206
+          }
+        }
+      ],
+      "role": "drinker",
+      "seed": 118,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 2,
+      "civilian": true
+    },
+    {
+      "name": "Усталый путник",
+      "model": "Rogue",
+      "x": -163,
+      "z": -199.7,
+      "route": [
+        {
+          "x": -163,
+          "z": -199.7,
+          "activity": "doze",
+          "duration": 120,
+          "interval": 5,
+          "look": {
+            "x": -161,
+            "z": -198
+          }
+        }
+      ],
+      "role": "sleeper",
+      "seed": 119,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Весельчак Лутц",
+      "model": "Monk",
+      "x": -154,
+      "z": -202,
+      "route": [
+        {
+          "x": -154,
+          "z": -202,
+          "activity": "drink",
+          "duration": 12,
+          "interval": 5,
+          "look": {
+            "x": -156,
+            "z": -203
+          }
+        },
+        {
+          "x": -152,
+          "z": -201,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -150,
+          "z": -195.5,
+          "activity": "drink",
+          "duration": 10,
+          "interval": 5,
+          "look": {
+            "x": -153,
+            "z": -192
+          }
+        },
+        {
+          "x": -154,
+          "z": -201,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "drinker",
+      "seed": 120,
+      "speed": 0.75,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Подавальщица Хельга",
+      "model": "Ranger",
+      "x": -148,
+      "z": -196,
+      "route": [
+        {
+          "x": -148,
+          "z": -196,
+          "activity": "serve",
+          "duration": 8,
+          "interval": 5,
+          "look": {
+            "x": -149,
+            "z": -192
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -144,
+          "z": -204,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -157,
+          "z": -208,
+          "activity": "serve",
+          "duration": 8,
+          "interval": 5,
+          "look": {
+            "x": -161,
+            "z": -205
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -151,
+          "z": -210,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -147,
+          "z": -206,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "server",
+      "seed": 121,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
     }
   ],
   "residentLooks": {},
@@ -1678,12 +3116,12 @@
     {
       "species": "crow",
       "x": -54,
-      "z": -185
+      "z": -194
     },
     {
       "species": "crow",
       "x": -56,
-      "z": -194
+      "z": -202
     },
     {
       "species": "crow",
@@ -1692,13 +3130,13 @@
     },
     {
       "species": "hare",
-      "x": -172,
-      "z": -191
+      "x": -158,
+      "z": -134
     },
     {
       "species": "hare",
-      "x": -164,
-      "z": -202
+      "x": -169,
+      "z": -139
     }
   ],
   "signs": [
@@ -1707,21 +3145,104 @@
       "x": -100,
       "z": -224,
       "height": 8.5,
-      "range": 75
+      "range": 65
     },
     {
-      "text": "Рынок снабжения",
-      "x": -121,
-      "z": -199,
-      "height": 3.95,
-      "range": 28
+      "text": "ЧЁРНЫЙ\nВОРОН",
+      "x": -140.07,
+      "z": -203.6,
+      "height": 3.8,
+      "range": 22,
+      "physical": true,
+      "yaw": 1.5707963267948966
+    }
+  ],
+  "tavern": {
+    "name": "Чёрный ворон",
+    "bounds": [
+      -167.0,
+      -212.5,
+      -142.8,
+      -185.5
+    ],
+    "door": {
+      "x": -142.5,
+      "z": -199
+    },
+    "entry": {
+      "x": -139,
+      "z": -199
+    },
+    "inside": {
+      "x": -147,
+      "z": -199
+    },
+    "bookService": {
+      "id": "npc:books",
+      "name": "Книготорговец Северин",
+      "model": "Wizard",
+      "x": -146.4,
+      "z": -189.9,
+      "role": "Книги умений",
+      "yaw": 3.141592653589793
+    },
+    "lights": [
+      {
+        "x": -160,
+        "z": -197,
+        "height": 4.7,
+        "range": 9
+      },
+      {
+        "x": -151,
+        "z": -205,
+        "height": 4.7,
+        "range": 9
+      },
+      {
+        "x": -148,
+        "z": -190,
+        "height": 4.3,
+        "range": 9
+      },
+      {
+        "x": -165,
+        "z": -202,
+        "height": 2.2,
+        "range": 9
+      },
+      {
+        "x": -141.5,
+        "z": -201.8,
+        "height": 3.1,
+        "range": 4
+      }
+    ],
+    "replacesLandmarks": [
+      "F_KEEP",
+      "F_HALL",
+      "F_STABLE",
+      "F_STORE"
+    ]
+  },
+  "supportSurfaces": [
+    {
+      "kind": "plate",
+      "x": -100,
+      "z": 150,
+      "halfX": 77.5,
+      "halfZ": 68.5,
+      "angle": 0,
+      "y": 70.14
     },
     {
-      "text": "Учебный двор",
-      "x": -48,
-      "z": -164,
-      "height": 2.6,
-      "range": 32
+      "kind": "plate",
+      "x": -155,
+      "z": 199,
+      "halfX": 12.2,
+      "halfZ": 13.5,
+      "angle": 0,
+      "y": 70.2275
     }
   ]
 }

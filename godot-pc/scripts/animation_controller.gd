@@ -269,6 +269,9 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 		return
 	# Local chores use existing authored clips; they cannot schedule damage,
 	# acquire a combat target, or alter a network actor's combat animation.
+	if motion.get("kind","") == "ambient" and motion.get("state","") == "activity" and motion.get("activity","") in ["drink","sit_drink","doze","tend_bar"]:
+		preload("res://world-final/castle/tavern_pose.gd").sample(self,motion,presentation_time_ms,dt)
+		return
 	if motion.get("kind","") == "ambient" and motion.get("action","") == "gesture":
 		var clip: String = find_clip([str(motion.get("activityClip","pickup"))])
 		if not clip.is_empty():

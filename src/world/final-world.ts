@@ -98,6 +98,8 @@ export class FinalWorld {
     this.root=root;
     const json=(p:string)=>JSON.parse(readFileSync(resolve(root,p),'utf8'));
     this.layout=json('world_layout.json');
+    const courtyard=json('castle/courtyard.json');
+    const replaced=new Set(courtyard.tavern?.replacesLandmarks??[]);
     const digest=createHash('sha256');
     digest.update('surface-slope-50-degrees-v2');
     const interiors=json('interiors/spaces.json').spaces;
@@ -105,9 +107,9 @@ export class FinalWorld {
     for(const id of ['surface','mine','great_cave'] as SpaceId[]){
       const meta=json(id==='surface'?'geology-D13/terrain.json':`interiors/${id}.json`);
       const bytes=readFileSync(resolve(root,id==='surface'?'geology-D13/heightmap.f32':`interiors/${meta.floor}`));digest.update(bytes);
-      const supports=id==='surface'?json('geography/support-surfaces.json').surfaces:[];
+      const supports=id==='surface'?[...json('geography/support-surfaces.json').surfaces,...(courtyard.supportSurfaces??[])]:[];
       const terrain=new FinalTerrain(meta,bytes,supports),collision=new FinalCollision();
-      const obstacles:Obstacle[]=id==='surface'?['geography/collision.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','castle/courtyard.json'].flatMap(p=>json(p).obstacles):meta.obstacles;
+      const obstacles:Obstacle[]=id==='surface'?['geography/collision.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','castle/courtyard.json'].flatMap(p=>json(p).obstacles).filter(o=>!replaced.has(o.landmark)):meta.obstacles;
       digest.update(JSON.stringify({obstacles,supports}));
       for(const o of obstacles){
         if(o.kind==='circle')collision.addCircle(o.x,o.z,o.radius,o.bottom,o.top);
@@ -127,6 +129,11 @@ export class FinalWorld {
       const p=this.spaces.surface.collision.findNearestFree({x:raw[0],z:-raw[1]},.8);
       if(this.spaces.surface.collision.isBlocked(p,.8))throw Error('final-service-blocked:'+id);
       this.services[id]={...npc,...p,spaceId:'surface'};
+    }
+    if(courtyard.tavern?.bookService){
+      const {id,...bookSeller}=courtyard.tavern.bookService;
+      if(this.spaces.surface.collision.isBlocked(bookSeller,.8))throw Error('tavern-bookseller-blocked');
+      this.services[id]={...bookSeller,spaceId:'surface'};
     }
     this.slots=loadPopulation?json('gameplay/spawn-manifest.json').slots:[];
     if(loadPopulation&&(this.slots.length!==1000||new Set(this.slots.map(s=>s.uid)).size!==1000))throw Error('final-population-capacity');

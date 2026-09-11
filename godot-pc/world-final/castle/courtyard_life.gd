@@ -6,6 +6,7 @@ var speech_clock: float = 6.0
 var speech_index: int = 0
 var speech_count: int = 0
 var definition: Dictionary
+var tavern: RefCounted
 const LINES: Dictionary = {
 	"merchant":["Полотно проверяй по краю. Всё целое.","Три тюка — и доставим к складу."],
 	"buyer":["Муку оставьте. Заберу после кузницы.","Сойдёмся на этой цене."],
@@ -17,11 +18,18 @@ const LINES: Dictionary = {
 	"scribe":["Две бочки, три мешка. Записал."],
 	"gardener":["Свежие травы — для Миры."],
 	"gate":["Проход свободен. Оружие держите в ножнах."],
-	"walker":["У колодца сегодня спокойно."]}
+	"walker":["У колодца сегодня спокойно."],
+	"barkeep":["Книги у Северина. Эль — у меня.","Хельга, ещё хлеба к дальнему столу!"],
+	"drinker":["Я эту байку… сам видел!", "За Гринфолл! И за следующую кружку…"],
+	"sleeper":["Я не сплю… я слушаю."],
+	"server":["Горячее несу! Дайте пройти.","Сначала расчёт за прошлую кружку."]}
 
 func setup(value: VarendorWorld, data: Dictionary) -> void:
 	world = value
 	definition = data
+	if data.has("tavern"):
+		tavern = preload("res://world-final/castle/tavern_life.gd").new()
+		tavern.setup(world,data.tavern,world.final_environment.castle_mesh,self)
 	wildlife = VarendorTerritoryLife.new()
 	wildlife.name = "CourtyardWildlife"
 	add_child(wildlife)
@@ -35,6 +43,11 @@ func setup(value: VarendorWorld, data: Dictionary) -> void:
 		sign.modulate = Color("d4c6a0")
 		sign.outline_size = 5
 		sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		if sign_data.get("physical",false):
+			sign.billboard = BaseMaterial3D.BILLBOARD_DISABLED
+			sign.rotation.y = sign_data.yaw
+			sign.pixel_size = .003
+			sign.font_size = 36
 		sign.visibility_range_end = float(sign_data.range)
 		add_child(sign)
 	# One small, shadow-free forge light; no particle emitters or new shadow maps.

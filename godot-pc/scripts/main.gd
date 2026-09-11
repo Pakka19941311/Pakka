@@ -160,6 +160,9 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
+		if "--qa-scope=castle-preview" in OS.get_cmdline_user_args():
+			await preload("res://world-final/castle/tavern_acceptance.gd").run(self)
+			return
 		if "--qa-scope=castle" in OS.get_cmdline_user_args():
 			await preload("res://world-final/castle/courtyard_acceptance.gd").run(self)
 			return
@@ -775,7 +778,10 @@ func interact() -> void:
 	npc_interaction.begin(world.target_id)
 
 func open_npc_service(id: String) -> void:
-	if id == "npc:asterhold:shop": book_ui.shop_classes(); return
+	if id in ["npc:asterhold:shop","npc:books"]:
+		book_ui.merchant_name = str(VarendorNpcInteraction.SERVICES[id].name)
+		book_ui.shop_classes()
+		return
 	if id == "npc:asterhold:elder": book_ui.quest_menu(); return
 	var service: Dictionary = VarendorNpcInteraction.SERVICES.get(id,{})
 	var kind: String = id.get_slice(":",id.get_slice_count(":")-1)

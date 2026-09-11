@@ -2,6 +2,7 @@ class_name VarendorBookUI
 extends RefCounted
 
 var app: Node
+var merchant_name: String = "Торговец Эдрик"
 var targeting_book: String = ""
 var last_book_press: int = 0
 var effect_signature: String = ""
@@ -103,7 +104,7 @@ func catalogue(shop: bool = false, class_id: String = "") -> void:
 	if class_id.is_empty(): class_id = str(app.net.hero.get("classId","knight"))
 	var body: VBoxContainer = app.dialog(("Книготорговец · " if shop else "Мои книги · ")+str(app.data.classes[class_id].name),Vector2i(610,490))
 	app.active_dialog.set_meta("nonmodal",not shop)
-	body.add_child(app.label("10–40: покупка в Астерхолде. 50–60: задания Ардена.\nПеретащите купленную книгу из сумки на панель.",12))
+	body.add_child(app.label("Книги умений для выбранного класса.\nПеретащите купленную книгу из сумки на панель.",12))
 	for level: int in [10,20,30,40,50,60]:
 		var id: String = "book_%s_%d" % [class_id,level]
 		var b: Dictionary = app.data.books[id]
@@ -111,14 +112,14 @@ func catalogue(shop: bool = false, class_id: String = "") -> void:
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id if owns(id) else ""; cell.artwork = icon(id); cell.usable = owns(id) or shop; cell.tooltip_text = tooltip(id); row.add_child(cell)
 		var text: Label = app.label("%d+  %s\n%s" % [level,b.name,b.description],12); text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; text.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(text)
 		if shop and int(b.price)>0:
-			var buy: Button = app.button("%d серебра" % int(b.price),func(): await app.net.command({"type":"buy","itemId":id}); catalogue(true,class_id))
+			var buy: Button = app.button("%d золота" % int(b.price),func(): await app.net.command({"type":"buy","itemId":id}); catalogue(true,class_id))
 			buy.disabled = owns(id) or class_id != str(app.net.hero.classId); row.add_child(buy)
 		elif not owns(id): row.add_child(app.label("Задание" if level>=50 else "Не куплена",11))
 	if shop: body.add_child(app.button("Все классы",shop_classes))
 
 func shop_classes() -> void:
-	var body: VBoxContainer = app.dialog("Эдрик · Книги умений",Vector2i(410,350))
-	body.add_child(app.button("Продать добычу",func(): app.polish.shop("books","Торговец Эдрик",1)))
+	var body: VBoxContainer = app.dialog(merchant_name+" · Книги умений",Vector2i(410,350))
+	if merchant_name == "Торговец Эдрик": body.add_child(app.button("Продать добычу",func(): app.polish.shop("books",merchant_name,1)))
 	body.add_child(app.label("Выберите класс",16))
 	for id: String in ["knight","ranger","mage","necro","assassin"]:
 		body.add_child(app.button(str(app.data.classes[id].name),func(): catalogue(true,id)))

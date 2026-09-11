@@ -42,6 +42,7 @@ func setup(value: VarendorWorld) -> void:
 
 func _process(delta: float) -> void:
 	if world == null or world.world_environment == null: return
+	world.world_environment.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	if world.final_environment != null and world.final_environment.active_space != "surface":
 		rain.emitting = false
 		world.sun_light.visible = false
@@ -77,6 +78,15 @@ func _process(delta: float) -> void:
 	world.world_environment.fog_light_color = Color("192b48").lerp(Color("a1c2d9"),daylight)
 	world.world_environment.fog_density = .003 if raining else .0007
 	world.world_environment.fog_sky_affect = .1
+	var in_tavern: bool = world.final_environment != null and world.final_environment.courtyard != null and world.final_environment.courtyard.tavern != null and world.final_environment.courtyard.tavern.inside
+	if in_tavern:
+		# The tavern's camera cutaway does not turn the indoor space into daylight.
+		# Local lanterns and the hearth remain visible even with shadows disabled.
+		world.sun_light.light_energy *= .12
+		world.world_environment.ambient_light_color = Color("b7a083")
+		world.world_environment.ambient_light_energy = .45
+		world.world_environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
+		world.world_environment.fog_enabled = false
 	rain.position = world.hero_position+Vector3(0,14,0)
-	rain.emitting = raining
+	rain.emitting = raining and not in_tavern
 	last_weather = str(env.get("weather","sun"))

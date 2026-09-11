@@ -213,7 +213,7 @@ func _obstruction_distance(hero_position: Vector3, floor_y: float, wanted_camera
 	# avoid a different zoom response when running next to walls and hills.
 	var origin: Vector3 = Vector3(hero_position.x, floor_y + 1.25, hero_position.z)
 	var length_value: float = origin.distance_to(wanted_camera)
-	var allowed: float = length_value if _collision == null else _collision.ray_distance(origin, wanted_camera, CAMERA_RADIUS)
+	var allowed: float = length_value if _collision == null else _collision.ray_distance(origin, wanted_camera, CAMERA_RADIUS, true)
 	var sample_distance: float = .5
 	while sample_distance <= allowed:
 		var location: Vector3 = origin.lerp(wanted_camera, sample_distance / maxf(.001, length_value))

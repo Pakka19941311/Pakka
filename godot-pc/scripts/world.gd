@@ -703,6 +703,8 @@ func _process(delta: float) -> void:
 		actor.visible = not controller.corpse_complete and (id == hero_id or distance_sq < 85.0*85.0)
 		update_corpse_fade(actor,controller,actor_clock)
 		(actor.get_meta("label") as Label3D).hide()
+	if final_environment != null and final_environment.courtyard != null and final_environment.courtyard.tavern != null:
+		final_environment.courtyard.tavern.before_camera()
 	camera_controller.update_pose(delta,hero_position,jump_offset)
 	update_nameplates()
 	target_ring.visible = actors.has(target_id) and actors[target_id].visible and actors[target_id].get_meta("pickable", false)
@@ -785,6 +787,10 @@ func update_nameplates() -> void:
 		var title: Label = actor.get_meta("screen_label")
 		title.hide()
 		if id.begins_with("ambient:") and actor.position.distance_to(hero_position)>12: continue
+		if id == "npc:books" or (id.begins_with("ambient:") and int(id.get_slice(":",1)) >= 116):
+			var eye: Vector3 = hero_position+Vector3.UP*1.5
+			var head: Vector3 = actor.position+Vector3.UP*1.5
+			if collision.ray_distance(eye,head) < eye.distance_to(head)-.1: continue
 		if not show_names or not actor.visible or actor.get_meta("dead", false) or actor.position.distance_to(hero_position) > 26 or used.size() >= 10:
 			continue
 		var point_value: Vector3 = actor.position + Vector3(0, (actor.get_meta("pick_size") as Vector3).y + .3, 0)

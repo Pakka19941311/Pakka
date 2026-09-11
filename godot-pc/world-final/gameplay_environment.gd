@@ -15,6 +15,7 @@ var nature: Node3D
 var roots: Dictionary = {}
 var loaded_data: Dictionary = {}
 var courtyard: Node3D
+var castle_mesh: Node3D
 
 func setup(value: VarendorWorld) -> bool:
 	world = value
@@ -45,7 +46,11 @@ func activate_space(id: String) -> bool:
 		var meta: Dictionary = read_json("geology-D13/terrain.json" if id == "surface" else "interiors/"+id+".json")
 		var raw: PackedFloat32Array = FileAccess.get_file_as_bytes(ROOT+("geology-D13/heightmap.f32" if id == "surface" else "interiors/"+str(meta.floor))).to_float32_array()
 		var support: Array = read_json("geography/support-surfaces.json").surfaces if id == "surface" else []
+		if id == "surface": support.append_array(read_json("castle/courtyard.json").get("supportSurfaces",[]))
 		var obstacles: Array = read_json("geography/collision.json").obstacles if id == "surface" else meta.obstacles
+		if id == "surface":
+			var replaced: Array = read_json("castle/courtyard.json").get("tavern",{}).get("replacesLandmarks",[])
+			obstacles = obstacles.filter(func(o: Dictionary): return not o.get("landmark","") in replaced)
 		loaded_data[id] = {"terrain":meta,"heights":raw,"supports":support,"obstacles":obstacles}
 		if id == "surface":
 			var ground: ShaderMaterial = load(ROOT+"materials/geology_material_D12.gd").terrain("D13")
@@ -64,11 +69,15 @@ func activate_space(id: String) -> bool:
 			if landmarks == null:
 				push_error("Missing final architecture")
 				return false
+			for old_id: String in read_json("castle/courtyard.json").get("tavern",{}).get("replacesLandmarks",[]):
+				var old_building: Node3D = landmarks.find_child(old_id,true,false)
+				if old_building != null: old_building.hide()
 			world.loading_progress.emit("Обустройство двора Гринфолла…")
 			var courtyard_mesh: Node3D = await load_scene("castle/courtyard.glb",root)
 			if courtyard_mesh == null: return false
+			castle_mesh = courtyard_mesh
 			for mesh: MeshInstance3D in courtyard_mesh.find_children("*","MeshInstance3D",true,false):
-				mesh.visibility_range_end = 165
+				mesh.visibility_range_end = 430 if "citadel" in str(mesh.name) or "tower_roofs" in str(mesh.name) else 210
 				mesh.visibility_range_end_margin = 12
 			obstacles.append_array(read_json("castle/courtyard.json").obstacles)
 			world.loading_progress.emit("Загрузка леса и растительности…")

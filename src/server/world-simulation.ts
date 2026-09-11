@@ -368,11 +368,14 @@ export class WorldSimulation {
     }
     if (command.type==='buy'&&SKILL_BOOKS[command.itemId]) {
       const book=SKILL_BOOKS[command.itemId];
-      if(distance(p,SERVICES['npc:asterhold:shop'])>3.2||!book.price)throw Error('shop-unavailable');
+      const services=this.finalWorld?.services??SERVICES;
+      const booksellers=['npc:asterhold:shop','npc:books'].map(id=>services[id as keyof typeof services]).filter(Boolean);
+      if(!booksellers.some(s=>sameSpace(p,s)&&distance(p,s)<=3.2&&this.lineOfSight(p,s))||!book.price)throw Error('shop-unavailable');
       if(book.classId!==p.classId)throw Error('class-restricted');
       if([...p.inventory,...p.lootBuffer,...(p.storage??[]).filter(Boolean)].some(i=>i?.id===book.id))throw Error('book-already-owned');
       if(p.gold<book.price)throw Error('insufficient-gold');
-      p.gold-=book.price;this.addItem(p,book.id);return;
+      if(addOrStackItem(p.inventory,this.item(book.id),false)==='full')throw Error('bag-full');
+      p.gold-=book.price;return;
     }
     if (command.type==='buy') {
       const cost: Record<string,number>={potion:55,potion_large:110,ether:70,teleport:130,haste:100};

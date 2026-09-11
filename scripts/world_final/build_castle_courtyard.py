@@ -5,7 +5,7 @@ Coordinates in the authored placement calls are server x,z (north is +z).
 The same measured props produce the native mesh and server/client obstacles.
 """
 from pathlib import Path
-import bpy, json, math, random, shutil
+import bpy, bmesh, json, math, random, shutil, sys, struct
 from mathutils import Vector
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -35,6 +35,12 @@ def material(name, color, texture=None, metallic=0):
                 if socket!='Base Color': im.colorspace_settings.name='Non-Color'
                 tex=m.node_tree.nodes.new('ShaderNodeTexImage'); tex.image=im
                 m.node_tree.links.new(tex.outputs['Color'],bs.inputs[socket])
+        normal_path=ROOT/'godot-pc/generated'/f'world_{texture}_normal.jpg'
+        if normal_path.exists():
+            im=bpy.data.images.load(str(normal_path),check_existing=True);im.pack();im.colorspace_settings.name='Non-Color'
+            tex=m.node_tree.nodes.new('ShaderNodeTexImage');tex.image=im
+            normal=m.node_tree.nodes.new('ShaderNodeNormalMap');normal.inputs['Strength'].default_value=.7
+            m.node_tree.links.new(tex.outputs['Color'],normal.inputs['Color']);m.node_tree.links.new(normal.outputs['Normal'],bs.inputs['Normal'])
     materials[name]=m; return m
 
 material('weathered_oak',(.24,.15,.08),'medieval_wood')
@@ -69,21 +75,30 @@ def finish(obj,mat):
     return obj
 
 def box(name,p,s,mat='weathered_oak',bevel=.025):
-    bpy.ops.mesh.primitive_cube_add(size=1,location=p); o=bpy.context.object; o.name=name; o.dimensions=s
-    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+    # Direct mesh construction avoids a full scene dependency update for each
+    # board/stone; the previous operator loop grew quadratic with a furnished inn.
+    data=bpy.data.meshes.new(name)
+    data.from_pydata([(a*s[0]/2,b*s[1]/2,c*s[2]/2) for a,b,c in [(-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)]],[],[(0,3,2,1),(4,5,6,7),(0,1,5,4),(1,2,6,5),(2,3,7,6),(3,0,4,7)])
     if bevel:
-        mod=o.modifiers.new('worn_edges','BEVEL'); mod.width=bevel; mod.segments=1
-        bpy.context.view_layer.objects.active=o; bpy.ops.object.modifier_apply(modifier=mod.name)
+        bm=bmesh.new();bm.from_mesh(data)
+        bmesh.ops.bevel(bm,geom=list(bm.edges),offset=min(bevel,min(s)*.35),segments=1,affect='EDGES')
+        bm.to_mesh(data);bm.free()
+    data.update();o=bpy.data.objects.new(name,data);bpy.context.collection.objects.link(o);o.location=p
     return finish(o,mat)
 
 def cylinder(name,p,r,h,mat='weathered_oak',r2=None,n=12):
-    bpy.ops.mesh.primitive_cone_add(vertices=n,radius1=r,radius2=r if r2 is None else r2,depth=h,location=p)
-    o=bpy.context.object; o.name=name; return finish(o,mat)
+    upper=r if r2 is None else r2
+    v=[(rr*math.cos(i*math.tau/n),rr*math.sin(i*math.tau/n),yy) for rr,yy in [(r,-h/2),(upper,h/2)] for i in range(n)]
+    f=[tuple(reversed(range(n))),tuple(range(n,n*2))]+[(i,(i+1)%n,(i+1)%n+n,i+n) for i in range(n)]
+    data=bpy.data.meshes.new(name);data.from_pydata(v,[],f);data.update()
+    o=bpy.data.objects.new(name,data);bpy.context.collection.objects.link(o);o.location=p
+    return finish(o,mat)
 
 def sphere(name,p,s,mat):
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=10,ring_count=6,radius=1,location=p)
-    o=bpy.context.object; o.name=name; o.scale=s
-    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+    v=[(s[0]*math.sin(j*math.pi/6)*math.cos(i*math.tau/10),s[1]*math.sin(j*math.pi/6)*math.sin(i*math.tau/10),s[2]*math.cos(j*math.pi/6)) for j in range(7) for i in range(10)]
+    f=[(j*10+i,j*10+(i+1)%10,(j+1)*10+(i+1)%10,(j+1)*10+i) for j in range(6) for i in range(10)]
+    data=bpy.data.meshes.new(name);data.from_pydata(v,[],f);data.update()
+    o=bpy.data.objects.new(name,data);bpy.context.collection.objects.link(o);o.location=p
     for f in o.data.polygons:f.use_smooth=True
     return finish(o,mat)
 
@@ -311,13 +326,29 @@ resident('Горожанин Освин','Rogue',[waypoint(-118,-154,'rest',(-11
 
 wildlife=[{'species':'crow','x':-54,'z':-185},{'species':'crow','x':-56,'z':-194},
  {'species':'crow','x':-116,'z':-155},{'species':'hare','x':-172,'z':-191},{'species':'hare','x':-164,'z':-202}]
-data={'schema':1,'id':'greenfall-courtyard','coordinates':'server x,z; +z north','center':[-100,-150],
- 'active_radius':210,'props':props,'obstacles':obstacles,'residents':residents,'residentLooks':{},'wildlife':wildlife,'signs':anchors}
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from castle_architecture import rebuild
+print('Building castle revision 02',flush=True)
+rebuild(globals())
+print('Authored castle and walk-in tavern geometry',flush=True)
+for name,factor in material_factors.items():
+    material_value=materials[name]; tree=material_value.node_tree
+    socket=tree.nodes.get('Principled BSDF').inputs['Base Color']
+    if socket.is_linked:
+        source=socket.links[0].from_socket
+        tint=tree.nodes.new('ShaderNodeMixRGB'); tint.blend_type='MULTIPLY'; tint.inputs[0].default_value=1
+        tint.inputs[2].default_value=factor
+        tree.links.new(source,tint.inputs[1]);tree.links.new(tint.outputs[0],socket)
+
+data={'schema':2,'id':'greenfall-courtyard','coordinates':'server x,z; +z north','center':[-100,-150],
+ 'active_radius':210,'props':props,'obstacles':obstacles,'residents':residents,'residentLooks':{},'wildlife':wildlife,'signs':anchors,'tavern':tavern,
+ 'supportSurfaces':[{'kind':'plate','x':-100,'z':150,'halfX':77.5,'halfZ':68.5,'angle':0,'y':70.14},
+                    {'kind':'plate','x':-155,'z':199,'halfX':12.2,'halfZ':13.5,'angle':0,'y':70.2275}]}
 (OUT/'courtyard.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 # Keep the native authoring file with named pieces. Runtime joins each zone by
 # material: a few dozen draw calls instead of hundreds of decorative pieces.
-native=ROOT/'art/world-final/Greenfall_Courtyard_01.blend'; native.parent.mkdir(parents=True,exist_ok=True)
+native=ROOT/'art/world-final/Greenfall_Castle_Tavern_02.blend'; native.parent.mkdir(parents=True,exist_ok=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(native))
 objects=[o for o in bpy.context.scene.objects if o.type=='MESH']
 groups={}
@@ -330,4 +361,11 @@ for (zone,mat),items in groups.items():
     if len(items)>1:bpy.ops.object.join()
     o=bpy.context.object; o.name='Courtyard_'+zone+'_'+mat
 bpy.ops.export_scene.gltf(filepath=str(OUT/'courtyard.glb'),export_format='GLB',export_yup=True,export_apply=True,export_animations=False,export_extras=True)
+# Preserve the numeric tint in the runtime PBR factors as well as in Blender.
+runtime=OUT/'courtyard.glb'; raw=runtime.read_bytes(); length=struct.unpack_from('<I',raw,12)[0]
+document=json.loads(raw[20:20+length]); tail=raw[20+length:]
+for value in document.get('materials',[]):
+    if value['name'] in material_factors:value.setdefault('pbrMetallicRoughness',{})['baseColorFactor']=material_factors[value['name']]
+packed=json.dumps(document,separators=(',',':'),ensure_ascii=False).encode();packed+=b' '*((-len(packed))%4)
+runtime.write_bytes(struct.pack('<4sII',b'glTF',2,20+len(packed)+len(tail))+struct.pack('<I4s',len(packed),b'JSON')+packed+tail)
 print('CASTLE_COURTYARD '+json.dumps({'props':len(props),'residents':len(residents),'animals':len(wildlife),'runtime_draw_groups':len(groups),'obstacles':len(obstacles)}))

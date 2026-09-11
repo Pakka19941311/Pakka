@@ -23,7 +23,7 @@ function walk(from,to,r=.46){
 }
 
 test('castle gate, main avenue and all six established services remain accessible',()=>{
-  walk(gate,{x:-100,z:-95});
+  walk(gate,{x:-100,z:-128});
   const expected={shop:[-111,-190],elder:[-100,-180],smith:[-135,-188],teleport:[-86,-191],alchemist:[-125,-180],storage:[-75,-189]};
   for(const [id,[x,z]] of Object.entries(expected)){
     const p=world.services['npc:'+id];assert.deepEqual([p.x,p.z],[x,z],'service anchor was moved');
@@ -32,7 +32,7 @@ test('castle gate, main avenue and all six established services remain accessibl
 });
 
 test('every authored resident route is reachable without correcting its spawn',()=>{
-  assert.equal(new Set(data.residents.map(r=>r.seed)).size,15);
+  assert.equal(new Set(data.residents.map(r=>r.seed)).size,21);
   for(const resident of data.residents){
     assert.equal(collision.isBlocked(resident,.42),false,resident.name);
     for(let i=0;i<resident.route.length;i++)walk(resident.route[i],resident.route[(i+1)%resident.route.length],.42);
@@ -40,13 +40,13 @@ test('every authored resident route is reachable without correcting its spawn',(
 });
 
 test('rest, training, garden and supply areas connect to the gate',()=>{
-  for(const p of [{x:-49,z:-146},{x:-118,z:-154},{x:-165,z:-190},{x:-71,z:-187},{x:-154,z:-168.8}])walk(gate,p);
+  for(const p of [{x:-49,z:-146},{x:-118,z:-154},{x:-158,z:-140},{x:-77,z:-186},{x:-154,z:-168.8}])walk(gate,p);
   for(const animal of data.wildlife)assert.equal(collision.isBlocked(animal,.46),false,animal.species+' embedded in a prop');
 });
 
 test('courtyard props are local, solid, and canopy clearance stays open',()=>{
   for(const o of data.obstacles){
-    assert.ok(o.x>=-175&&o.x<=-30&&o.z>=-218&&o.z<=-127,'decoration escaped castle');
+    assert.ok(o.x>=-190&&o.x<=-10&&o.z>=-230&&o.z<=-72,'decoration escaped castle');
     if(o.blocksMovement)assert.equal(collision.isBlocked({x:o.x,z:o.z},.05),true);
   }
   assert.equal(collision.isBlocked({x:-121,z:-197.7},.42),false,'merchant can stand under canopy');

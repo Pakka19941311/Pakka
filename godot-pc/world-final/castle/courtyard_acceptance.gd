@@ -42,7 +42,7 @@ static func run(app: Node) -> void:
 	app.get_viewport().scaling_3d_scale = 1.0
 	app.get_viewport().msaa_3d = Viewport.MSAA_2X
 	var ambient: VarendorAmbientResidents = app.world.ambient_residents
-	checks.fifteen_unique_residents = ambient.residents.size()==15 and app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==15
+	checks.twenty_one_unique_residents = ambient.residents.size()==21 and app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==21
 	checks.five_secondary_animals = app.world.final_environment.courtyard.wildlife.creatures.size()==5
 	checks.spawns_free = ambient.residents.all(func(r): return not app.world.collision.blocked(r.position,.42))
 	checks.ambient_not_combat_targets = ambient.residents.all(func(r): return not app.world.actors[r.id].get_meta("pickable",true))
@@ -106,8 +106,8 @@ static func run(app: Node) -> void:
 	checks.distant_simulation_paused = is_equal_approx(ambient.clock_ms,inside_clock)
 	await Mouse.fixture(app,"castle-return")
 	await Keys.wait_ms(app.get_tree(),400)
-	checks.return_without_duplicates = app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==15 and ambient.clock_ms>clock_before
-	checks.residents_grounded = ids.all(func(id): return absf(app.world.actors[id].position.y-70)<.05)
+	checks.return_without_duplicates = app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==21 and ambient.clock_ms>clock_before
+	checks.residents_grounded = ids.all(func(id): return absf(app.world.actors[id].position.y-app.world.height_at(app.world.actors[id].position.x,-app.world.actors[id].position.z))<.05)
 	checks.gate_walk_out = await go(app,Vector2(-100,-238))
 	var ok: bool = checks.values().all(func(v): return v==true)
 	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"travelMetres":travelled,"maxSpeedRatio":max_speed,"adapter":RenderingServer.get_video_adapter_name()})
