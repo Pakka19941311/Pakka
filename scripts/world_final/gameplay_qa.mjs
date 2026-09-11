@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {mkdirSync,readFileSync,writeFileSync,existsSync} from 'node:fs';
-import {resolve,join} from 'node:path';
+import {resolve,join,dirname} from 'node:path';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {startWorldServer} from '../../server/http-server.mjs';
@@ -51,7 +51,8 @@ try{
   result.generation=p.generation;writeFileSync(join(output,'fixture-ready.json'),JSON.stringify(result));
  },75);
  const python=process.env.PYTHON??(process.platform==='win32'?'python':'python3');
- const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),'--project','godot-pc','--output',join(output,'native'),'--timeout','240','--',...options.filter(x=>!x.startsWith('--package=')),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,'gameplay.json')}`,'--qa-scope=final'];
+ const launchMode=packageOption?['--packaged','--cwd',dirname(resolve(binary))]:['--project','godot-pc'];
+ const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),...launchMode,'--output',join(output,'native'),'--timeout','240','--',...options.filter(x=>!x.startsWith('--package=')),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,'gameplay.json')}`,'--qa-scope=final'];
  child=spawn(python,args,{stdio:'inherit',windowsHide:true});
  const [code]=await once(child,'exit');assert.equal(code,0,'Checked native launch failed');
  const log=readFileSync(join(output,'native/engine.log'),'utf8');

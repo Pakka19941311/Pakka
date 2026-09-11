@@ -112,15 +112,18 @@ def close_windows_for_processes(pids):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--exe', required=True)
-    parser.add_argument('--project', required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--project', help='Source project directory for the editor/development binary')
+    mode.add_argument('--packaged', action='store_true', help='Run an exported executable using its embedded PCK, without --path')
     parser.add_argument('--output', required=True, help='New evidence directory; refuses to overwrite a run')
     parser.add_argument('--cwd', default='.')
     parser.add_argument('--timeout', type=float, default=90)
     parser.add_argument('godot_args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
-    exe, project, cwd, output = (Path(v).resolve() for v in (args.exe, args.project, args.cwd, args.output))
+    exe, cwd, output = (Path(v).resolve() for v in (args.exe, args.cwd, args.output))
+    project = Path(args.project).resolve() if args.project else None
     if not exe.is_file(): parser.error('Godot executable is missing')
-    if not (project / 'project.godot').is_file(): parser.error('project.godot is missing')
+    if project is not None and not (project / 'project.godot').is_file(): parser.error('project.godot is missing')
     godot_args = args.godot_args[1:] if args.godot_args[:1] == ['--'] else args.godot_args
     if any(v in godot_args for v in ('--log-file', '--path')):
         parser.error('The checked launcher owns --path and --log-file')
@@ -129,7 +132,8 @@ def main():
     with log.open('xb') as f:
         f.write(b'')
         f.flush()
-    command = [exe.as_posix(), '--path', project.as_posix(), '--log-file', log.as_posix(), '--verbose', *godot_args]
+    project_args = ['--path', project.as_posix()] if project is not None else []
+    command = [exe.as_posix(), *project_args, '--log-file', log.as_posix(), '--verbose', *godot_args]
     result = {'command': command, 'windows_command_line': subprocess.list2cmdline(command),
               'cwd': str(cwd), 'utc_start': datetime.datetime.now(datetime.timezone.utc).isoformat(),
               'environment_overrides': {}, 'project_settings_changed': False,
