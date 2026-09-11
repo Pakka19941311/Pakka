@@ -20,21 +20,49 @@ static func run(app: Node) -> void:
 	var checks: Dictionary = {}
 	checks.connected = await Wait.until(app,func(): return app.net.connected and app.world.actors.has(app.world.hero_id),45000)
 	app.login.hide(); app.close_dialog(); app.inventory_panel.hide(); app.player_input.focus_changed(true)
-	app.world.weather.qa_override = {"hour":11.0,"daylight":1.0,"night":false,"fullMoon":false,"weather":"sun","clouds":.18}
+	app.world.weather.qa_override = {"hour":14.5,"daylight":1.0,"night":false,"fullMoon":false,"weather":"sun","clouds":.18}
 	app.get_viewport().scaling_3d_scale = 1.0; app.get_viewport().msaa_3d = Viewport.MSAA_2X
 	# Art review at the existing shadow option; no saved preferences are changed.
 	app.world.sun_light.shadow_enabled = true
 	var court: Node3D = app.world.final_environment.courtyard
-	checks.residents_unique = app.world.ambient_residents.residents.size()==21 and app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==21
+	checks.residents_unique = app.world.ambient_residents.residents.size()==39 and app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==39
 	checks.residents_grounded_free = app.world.ambient_residents.residents.all(func(r): return not app.world.collision.blocked(r.position,.42))
+	if "--block=street-signs" in OS.get_cmdline_user_args():
+		await Mouse.fixture(app,"castle-fair")
+		await art(app,"tavern-street",Vector3(-140.5,76,179),Vector3(-140.5,76,134))
+		await art(app,"apothecary-front",Vector3(-121,77,175),Vector3(-130,75,166))
+		await art(app,"guild-front",Vector3(-90,77,154),Vector3(-80,76,140))
+		await art(app,"market-street",Vector3(-106,79,219),Vector3(-127,75,191))
+		var signs_ok: bool = checks.values().all(func(v): return v==true)
+		app.net.save_private_json(app.qa_path,{"ok":signs_ok,"checks":checks,"review_only":true,"game_exported":false,"art_only":true})
+		app.get_tree().quit(0 if signs_ok else 2)
+		return
 	await Mouse.fixture(app,"castle-overview")
 	await art(app,"castle-overview",Vector3(-203,167,271),Vector3(-100,78,148))
 	await Mouse.fixture(app,"castle-citadel")
 	await art(app,"castle-citadel",Vector3(-94,87,182),Vector3(-105,87,111))
+	await Mouse.fixture(app,"castle-fair")
+	await art(app,"market-street",Vector3(-106,79,219),Vector3(-127,75,191))
+	await art(app,"tavern-street",Vector3(-140.5,76,179),Vector3(-140.5,76,134))
+	await Mouse.fixture(app,"castle-alehouse")
+	await art(app,"podkova-beer-garden",Vector3(-79,78,186),Vector3(-58,75,205))
+	await Mouse.fixture(app,"castle-fair")
+	await Court.shot(app,"market-gameplay",-.35)
+	app.world.weather.qa_override = {"hour":19.8,"daylight":.18,"night":true,"fullMoon":false,"weather":"sun","clouds":.18}
+	await Keys.wait_ms(app.get_tree(),2200)
+	checks.street_lanterns_work = court.street_lights.size()==10 and court.street_lights.all(func(l): return l.visible and not l.shadow_enabled)
+	await art(app,"market-evening",Vector3(-106,79,219),Vector3(-127,75,191))
+	app.world.weather.qa_override = {"hour":14.5,"daylight":1.0,"night":false,"fullMoon":false,"weather":"sun","clouds":.18}
+	await Keys.wait_ms(app.get_tree(),2200)
 	await Mouse.fixture(app,"castle-training")
 	await Court.shot(app,"castle-training",-1.1)
 	await Mouse.fixture(app,"castle-tavern")
 	await art(app,"tavern-exterior",Vector3(-116,90,217),Vector3(-154,77,198))
+	if "--block=art-only" in OS.get_cmdline_user_args():
+		var art_ok: bool = checks.values().all(func(v): return v==true)
+		app.net.save_private_json(app.qa_path,{"ok":art_ok,"checks":checks,"review_only":true,"game_exported":false,"art_only":true})
+		app.get_tree().quit(0 if art_ok else 2)
+		return
 	checks.door_walk_in = await Court.go(app,Vector2(-147,-199))
 	await Keys.wait_ms(app.get_tree(),900)
 	checks.inside_cutaway = court.tavern.inside and not court.tavern.parts.roof.is_empty() and court.tavern.parts.roof.all(func(p): return p.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY)
@@ -68,8 +96,13 @@ static func run(app: Node) -> void:
 	checks.outdoor_weather_restored = app.world.weather.rain.emitting and app.world.world_environment.reflected_light_source == Environment.REFLECTION_SOURCE_BG
 	app.world.weather.qa_override.weather = "sun"
 	checks.door_reenter = await Court.go(app,Vector2(-147,-199))
-	checks.no_resident_duplicates = app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==21
+	checks.no_resident_duplicates = app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==39
 	checks.back_to_main_court = await Court.go(app,Vector2(-100,-201))
+	checks.quarter_walkable = true
+	checks.crowd_stays_on_free_ground = true
+	for point: Dictionary in court.definition.quarter.routeReview:
+		checks.quarter_walkable = await Court.go(app,Vector2(point.x,point.z),25000) and checks.quarter_walkable
+		checks.crowd_stays_on_free_ground = app.world.ambient_residents.residents.all(func(r): return not app.world.collision.blocked(r.position,.40)) and checks.crowd_stays_on_free_ground
 	var ok: bool = checks.values().all(func(v): return v==true)
 	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"review_only":true,"game_exported":false,"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)

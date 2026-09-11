@@ -32,7 +32,7 @@ test('castle gate, main avenue and all six established services remain accessibl
 });
 
 test('every authored resident route is reachable without correcting its spawn',()=>{
-  assert.equal(new Set(data.residents.map(r=>r.seed)).size,21);
+  assert.equal(new Set(data.residents.map(r=>r.seed)).size,39);
   for(const resident of data.residents){
     assert.equal(collision.isBlocked(resident,.42),false,resident.name);
     for(let i=0;i<resident.route.length;i++)walk(resident.route[i],resident.route[(i+1)%resident.route.length],.42);

@@ -7,6 +7,7 @@ var speech_index: int = 0
 var speech_count: int = 0
 var definition: Dictionary
 var tavern: RefCounted
+var street_lights: Array[OmniLight3D] = []
 const LINES: Dictionary = {
 	"merchant":["Полотно проверяй по краю. Всё целое.","Три тюка — и доставим к складу."],
 	"buyer":["Муку оставьте. Заберу после кузницы.","Сойдёмся на этой цене."],
@@ -46,8 +47,8 @@ func setup(value: VarendorWorld, data: Dictionary) -> void:
 		if sign_data.get("physical",false):
 			sign.billboard = BaseMaterial3D.BILLBOARD_DISABLED
 			sign.rotation.y = sign_data.yaw
-			sign.pixel_size = .003
-			sign.font_size = 36
+			sign.pixel_size = float(sign_data.get("pixel_size",.006))
+			sign.font_size = int(sign_data.get("font_size",36))
 		sign.visibility_range_end = float(sign_data.range)
 		add_child(sign)
 	# One small, shadow-free forge light; no particle emitters or new shadow maps.
@@ -62,8 +63,22 @@ func setup(value: VarendorWorld, data: Dictionary) -> void:
 	forge.distance_fade_begin = 24
 	forge.distance_fade_length = 8
 	add_child(forge)
+	for data_light: Dictionary in data.get("quarter",{}).get("lights",[]):
+		var lantern: OmniLight3D = OmniLight3D.new()
+		lantern.position = world.point(data_light.x,data_light.z,data_light.height)
+		lantern.light_color = Color("ffbc73")
+		lantern.light_energy = .65
+		lantern.omni_range = data_light.range
+		lantern.shadow_enabled = false
+		lantern.distance_fade_enabled = true
+		lantern.distance_fade_begin = 23
+		lantern.distance_fade_length = 8
+		add_child(lantern)
+		street_lights.append(lantern)
 
 func _process(delta: float) -> void:
+	for lantern: OmniLight3D in street_lights:
+		lantern.visible = world != null and world.weather != null and world.weather.daylight < .55
 	if world == null or world.current_snapshot.is_empty() or not world.ambient_active(): return
 	speech_clock -= delta
 	if speech_clock > 0: return

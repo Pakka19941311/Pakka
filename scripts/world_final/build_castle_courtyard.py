@@ -328,8 +328,10 @@ wildlife=[{'species':'crow','x':-54,'z':-185},{'species':'crow','x':-56,'z':-194
  {'species':'crow','x':-116,'z':-155},{'species':'hare','x':-172,'z':-191},{'species':'hare','x':-164,'z':-202}]
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from castle_architecture import rebuild
-print('Building castle revision 02',flush=True)
+print('Building castle quarter revision 03',flush=True)
 rebuild(globals())
+from castle_quarter import build as build_quarter
+build_quarter(globals())
 print('Authored castle and walk-in tavern geometry',flush=True)
 for name,factor in material_factors.items():
     material_value=materials[name]; tree=material_value.node_tree
@@ -341,25 +343,41 @@ for name,factor in material_factors.items():
         tree.links.new(source,tint.inputs[1]);tree.links.new(tint.outputs[0],socket)
 
 data={'schema':2,'id':'greenfall-courtyard','coordinates':'server x,z; +z north','center':[-100,-150],
- 'active_radius':210,'props':props,'obstacles':obstacles,'residents':residents,'residentLooks':{},'wildlife':wildlife,'signs':anchors,'tavern':tavern,
+ 'active_radius':210,'props':props,'obstacles':obstacles,'residents':residents,'residentLooks':{},'wildlife':wildlife,'signs':anchors,'tavern':tavern,'quarter':quarter,
  'supportSurfaces':[{'kind':'plate','x':-100,'z':150,'halfX':77.5,'halfZ':68.5,'angle':0,'y':70.14},
                     {'kind':'plate','x':-155,'z':199,'halfX':12.2,'halfZ':13.5,'angle':0,'y':70.2275}]}
 (OUT/'courtyard.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
-# Keep the native authoring file with named pieces. Runtime joins each zone by
-# material: a few dozen draw calls instead of hundreds of decorative pieces.
-native=ROOT/'art/world-final/Greenfall_Castle_Tavern_02.blend'; native.parent.mkdir(parents=True,exist_ok=True)
+# Keep editable pieces in Blender; batch runtime meshes by district/material.
+native=ROOT/'art/world-final/Greenfall_Castle_Quarter_03.blend'; native.parent.mkdir(parents=True,exist_ok=True)
+print('Saving editable quarter',flush=True)
 bpy.ops.wm.save_as_mainfile(filepath=str(native))
+print('Batching runtime meshes',flush=True)
 objects=[o for o in bpy.context.scene.objects if o.type=='MESH']
 groups={}
 for o in objects:groups.setdefault((o.parent['zone'],o.data.materials[0].name),[]).append(o)
+bpy.context.view_layer.update()
 for (zone,mat),items in groups.items():
-    bpy.ops.object.select_all(action='DESELECT')
-    for o in items:o.select_set(True)
-    bpy.context.view_layer.objects.active=items[0]
-    bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
-    if len(items)>1:bpy.ops.object.join()
-    o=bpy.context.object; o.name='Courtyard_'+zone+'_'+mat
+    origin=items[0].parent.matrix_world.translation.copy()
+    vertices=[]; faces=[]; uv_values=[]; smooth=[]
+    for item in items:
+        matrix=item.matrix_world.copy();offset=len(vertices)
+        vertices.extend(tuple(matrix@v.co-origin) for v in item.data.vertices)
+        uv=item.data.uv_layers.active
+        for poly in item.data.polygons:
+            faces.append(tuple(offset+i for i in poly.vertices));smooth.append(poly.use_smooth)
+            uv_values.extend(tuple(uv.data[i].uv) for i in poly.loop_indices)
+    name='Courtyard_'+zone+'_'+mat
+    data=bpy.data.meshes.new(name);data.from_pydata(vertices,[],faces);data.update()
+    uv=data.uv_layers.new(name='UVMap')
+    for i,value in enumerate(uv_values):uv.data[i].uv=value
+    for poly,value in zip(data.polygons,smooth):poly.use_smooth=value
+    o=bpy.data.objects.new(name,data);bpy.context.collection.objects.link(o)
+    o.location=origin;o.data.materials.append(materials[mat])
+for o in objects:bpy.data.objects.remove(o,do_unlink=True)
+for o in list(bpy.context.scene.objects):
+    if o.type=='EMPTY':bpy.data.objects.remove(o,do_unlink=True)
+print('Exporting batched quarter',flush=True)
 bpy.ops.export_scene.gltf(filepath=str(OUT/'courtyard.glb'),export_format='GLB',export_yup=True,export_apply=True,export_animations=False,export_extras=True)
 # Preserve the numeric tint in the runtime PBR factors as well as in Blender.
 runtime=OUT/'courtyard.glb'; raw=runtime.read_bytes(); length=struct.unpack_from('<I',raw,12)[0]

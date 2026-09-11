@@ -27,7 +27,7 @@ try{
   const request=JSON.parse(readFileSync(file,'utf8'));if(request.stage===handled)return;handled=request.stage;
   const hero=world.state.characters[p.id],boss=world.state.monsters.find(m=>m.id==='cave_boss');
   if(castle&&request.stage.startsWith('castle-')){
-   const positions={entry:[-100,-238],market:[-118,-205],training:[-52,-149],well:[-116,-161],supply:[-68,-192],return:[-100,-190],overview:[-100,-150],interior:[0,-4],tavern:[-137,-199],citadel:[-100,-147]};
+   const positions={entry:[-100,-238],market:[-118,-205],training:[-52,-149],well:[-116,-161],supply:[-68,-192],return:[-100,-190],overview:[-100,-150],interior:[0,-4],tavern:[-137,-199],citadel:[-100,-147],fair:[-113,-204],alehouse:[-74,-194]};
    const key=request.stage.slice(7),point=positions[key];assert.ok(point,'unknown courtyard QA point');
    world.relocate(hero,{x:point[0],z:point[1],spaceId:key==='interior'?'great_cave':'surface'});
   }
