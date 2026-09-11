@@ -234,15 +234,19 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 	var sale: VBoxContainer = VBoxContainer.new(); sale.name = "Продать"; sale.add_theme_constant_override("separation",8); tabs.add_child(sale)
 	tabs.current_tab = selected_tab
 	if kind == "books": purchase.add_child(app.button("Книги умений · выбрать класс",app.book_ui.shop_classes))
-	for id: String in ([] if kind == "books" else ["haste"] if kind == "alchemist" else ["potion","ether","teleport"]):
+	for id: String in ([] if kind == "books" else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]):
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); purchase.add_child(row)
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id; cell.custom_minimum_size = CELL
 		cell.artwork = app.book_ui.item_icon({"id":id}); row.add_child(cell)
-		var price: int = int({"haste":100,"potion":55,"ether":70,"teleport":130}[id])
+		var price: int = int({"haste":100,"potion":55,"potion_large":110,"ether":70,"teleport":130}[id])
 		var column: VBoxContainer = VBoxContainer.new(); column.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(column)
 		column.add_child(app.label(str(app.data.items[id].name),13))
 		var desc: Label = app.label(str(app.data.items[id].desc),11); desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(desc)
-		var buy: Button = app.button("%d ◈" % price,func(): app.net.command({"type":"buy","itemId":id})); buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
+		var buy: Button = app.button("%d ◈" % price,func():
+			if app.net.command_busy: return
+			await app.net.command({"type":"buy","itemId":id})
+			if is_instance_valid(body): shop(kind,title,0))
+		buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
 	sale.add_child(app.wrapped_label("Выберите предмет и количество. Ниже указана цена продажи одной единицы.",12))
 	var count: int = 0
 	for item: Dictionary in app.net.hero.inventory:

@@ -11,7 +11,11 @@ static func run(app: Node) -> void:
 	var checks: Dictionary = {}
 	checks.connected = await Wait.until(app,func(): return app.net.connected and app.world.actors.has(app.world.hero_id),45000)
 	app.login.hide(); app.close_dialog(); app.inventory_panel.hide(); app.player_input.focus_changed(true)
-	await sale(app,checks)
+	var block: String = "all"
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--block="): block = arg.trim_prefix("--block=")
+	if block in ["all","sale"]: await sale(app,checks)
+	if block in ["all","potions"]: await potions(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)
 	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)
@@ -48,3 +52,21 @@ static func sale(app: Node, checks: Dictionary) -> void:
 	checks.sale_all = await Wait.until(app,func(): return not app.net.hero.inventory.any(func(i): return i.uid == item.uid),5000)
 	checks.sale_full_gold = int(app.net.hero.gold) == before_gold+150
 	app.close_dialog()
+
+static func potions(app: Node, checks: Dictionary) -> void:
+	for id: String in ["potion_large","haste"]:
+		app.open_npc_service("npc:shop"); await Keys.wait_ms(app.get_tree(),200)
+		var buttons: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(b): return b.get_meta("npc_action","") == "buy:"+id)
+		checks["elza_offers_"+id] = buttons.size() == 1
+		if buttons.is_empty(): continue
+		var scroll: ScrollContainer = app.active_dialog.find_child("DialogScroll",true,false); scroll.ensure_control_visible(buttons[0])
+		await Keys.wait_ms(app.get_tree(),120); Mouse.mouse(app,buttons[0].get_global_rect().get_center())
+		checks["elza_buys_"+id] = await Wait.until(app,func(): return app.net.hero.inventory.any(func(i): return i.id == id),4000)
+	app.close_dialog()
+	checks.healing_descriptions = "37 HP" in str(app.data.items.potion.desc) and "70 HP" in str(app.data.items.potion_large.desc)
+	var before: float = float(app.net.hero.hp)
+	app.activate("potion_large")
+	checks.large_quick_use = await Wait.until(app,func(): return not app.net.hero.inventory.any(func(i): return i.id == "potion_large"),4000) and float(app.net.hero.hp) > before
+	app.activate("haste")
+	checks.haste_quick_use = await Wait.until(app,func(): return float(app.net.hero.get("buffs",{}).get("haste",0)) > float(app.net.last_time),4000)
+	app.open_npc_service("npc:shop"); await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"elza-potions"); app.close_dialog()

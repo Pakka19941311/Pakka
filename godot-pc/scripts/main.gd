@@ -421,7 +421,7 @@ func refresh_quick() -> void:
 		slot.remaining = 0
 		slot.quantity = 0
 		slot.usable = not net.hero.get("dead", false)
-		if action in ["potion", "ether", "teleport", "haste"] and not hero.is_empty():
+		if action in ["potion", "potion_large", "ether", "teleport", "haste"] and not hero.is_empty():
 			for item: Dictionary in hero.inventory:
 				if item.id == action:
 					slot.quantity += int(item.count)
@@ -472,7 +472,7 @@ func load_preferences(id: String) -> void:
 				continue
 			var action: String = str(values[index].get("action", ""))
 			var key: String = str(values[index].get("key", ""))
-			if action.begins_with("item:") or data.books.has(action) or action in ["", "attack", "potion", "ether", "teleport", "haste"]:
+			if action.begins_with("item:") or data.books.has(action) or action in ["", "attack", "potion", "potion_large", "ether", "teleport", "haste"]:
 				quick[index].action = action
 			quick[index].key = key if key in data.quickKeys and key not in used else ""
 			if not quick[index].key.is_empty():
@@ -527,7 +527,7 @@ func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer
 
 func assign_dialog(index: int) -> void:
 	var box: VBoxContainer = dialog("Назначение ячейки " + str(index + 1))
-	var actions: Array = ["", "attack", "potion", "ether", "teleport", "haste"]
+	var actions: Array = ["", "attack", "potion", "potion_large", "ether", "teleport", "haste"]
 	for id: String in data.books:
 		if book_ui.owns(id): actions.append(id)
 	var action_select: OptionButton = OptionButton.new()
@@ -815,7 +815,7 @@ func activate(action: String) -> void:
 				selected_item = {"kind":"bag","item":item.duplicate()}; use_selected(); return
 		notice("Предмет недоступен в сумке")
 		return
-	if action in ["potion", "ether", "teleport", "haste"]:
+	if action in ["potion", "potion_large", "ether", "teleport", "haste"]:
 		for item: Dictionary in net.hero.inventory:
 			if item.id == action:
 				net.command({"type":"use","item":item.duplicate()})
@@ -941,6 +941,7 @@ func toggle_inventory() -> void:
 		tooltip_panel = null
 
 func notice(message: String) -> void:
+	if message == "health-full": message = "Здоровье уже полностью восстановлено"
 	if not qa_path.is_empty():
 		print("VARENDOR_QA_NOTICE " + message)
 	var translations: Dictionary = {"invalid-storage-quantity":"Укажите целое количество от 1 до размера стопки", "book-required":"Умения применяются через книги", "book-level":"Недостаточный уровень для книги", "book-not-owned":"Книга должна находиться в сумке", "book-already-owned":"Эта книга уже куплена", "invalid-target":"Выберите живого противника", "invalid-ally":"Выберите союзника", "out-of-range":"Цель слишком далеко или закрыта препятствием", "safe-zone":"В городе нельзя применять боевые умения", "resource":"Недостаточно ресурса", "cannot-cast":"Дождитесь приземления", "cast-busy":"Дождитесь завершения применения", "cannot-sell-book":"Книга умения не продаётся обратно", "storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}

@@ -343,7 +343,8 @@ export class WorldSimulation {
     if (command.type==='use') {
       const item=p.inventory.find(i=>i.uid===command.item.uid);
       if (!item || item.id!==command.item.id || item.plus!==command.item.plus || item.count!==command.item.count) throw Error('stale-item');
-      if (item.id==='potion' && p.hp<p.maxHp) p.hp=Math.min(p.maxHp,p.hp+Math.round(p.maxHp*.45));
+      const healing=(itemDef(item) as {heal?:number}).heal;
+      if (healing) {if(p.hp>=p.maxHp)throw Error('health-full');p.hp=Math.min(p.maxHp,p.hp+healing);}
       else if(item.id==='ether' && p.mp<p.maxMp) p.mp=Math.min(p.maxMp,p.mp+Math.round(p.maxMp*.45));
       else if(item.id==='haste'){p.buffs.haste=this.state.time+HASTE_DURATION_MS;this.recalculate(p);this.event('buff',p.id);}
       else if(item.id==='teleport') this.relocate(p,this.startPoint());
@@ -369,10 +370,13 @@ export class WorldSimulation {
       p.gold-=book.price;this.addItem(p,book.id);return;
     }
     if (command.type==='buy') {
-      const cost: Record<string,number>={potion:55,ether:70,teleport:130,haste:100};
-      if (!Object.hasOwn(cost,command.itemId) || !this.nearService(p,command.itemId==='haste'?'alchemist':'shop')) throw Error('shop-unavailable');
+      const cost: Record<string,number>={potion:55,potion_large:110,ether:70,teleport:130,haste:100};
+      const atShop=this.nearService(p,'shop'),atAlchemist=command.itemId==='haste'&&this.nearService(p,'alchemist');
+      if (!Object.hasOwn(cost,command.itemId) || !(atShop||atAlchemist)) throw Error('shop-unavailable');
       if (p.gold<cost[command.itemId]) throw Error('insufficient-gold');
-      p.gold-=cost[command.itemId];this.addItem(p,command.itemId);return;
+      const item=this.item(command.itemId);
+      if(addOrStackItem(p.inventory,item,!('slot' in itemDef(item)))==='full')throw Error('bag-full');
+      p.gold-=cost[command.itemId];return;
     }
     if (command.type==='teleport') {
       const point=(this.finalWorld?.teleports??teleportPoints)[command.destination];
