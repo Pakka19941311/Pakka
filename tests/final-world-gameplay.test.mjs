@@ -12,6 +12,29 @@ import {sameSpace} from '../src/world/world-space.ts';
 import {pathSegmentIsClear} from '../src/world/navigation.ts';
 
 const geography=new FinalWorld();
+test('forest road-to-slime route crosses the formerly forbidden hillside in both directions while trunks remain solid',()=>{
+ const route=JSON.parse(readFileSync('scripts/world_final/forest-route.json','utf8'));
+ const space=geography.spaces.surface,c=space.collision,t=space.terrain;
+ let position={...route.start},length=0;
+ const points=[...route.points,...route.points.slice(0,-1).reverse(),route.start];
+ for(const goal of points){
+  let budget=2000;
+  while(Math.hypot(position.x-goal.x,position.z-goal.z)>.025&&budget-->0){
+   const dx=goal.x-position.x,dz=goal.z-position.z,d=Math.hypot(dx,dz),step=Math.min(.12,d);
+   const next=c.resolve(position,{x:dx/d*step,z:dz/d*step},.46);
+   assert.ok(Math.hypot(next.x-position.x,next.z-position.z)>.01,'No invisible hillside barrier');
+   length+=step;position=next;
+  }
+  assert.ok(budget>0);
+ }
+ assert.ok(length>80);assert.ok(Math.hypot(position.x-route.start.x,position.z-route.start.z)<.03);
+ const p=route.steepPoint;
+ const gradient=Math.hypot(t.supportAt(p.x+.5,p.z)-t.supportAt(p.x-.5,p.z),t.supportAt(p.x,p.z+.5)-t.supportAt(p.x,p.z-.5));
+ assert.ok(gradient>Math.tan(20*Math.PI/180)+.015);assert.ok(geography.walkable(space,p,.46));
+ const trees=JSON.parse(readFileSync('godot-pc/world-final/nature/collision-D13.json','utf8')).obstacles;
+ const tree=trees.find(o=>o.kind==='circle'&&Math.hypot(o.x-p.x,o.z-p.z)<15);
+ assert.ok(tree);assert.equal(c.isBlocked(tree,.46),true,'Tree trunks must still block movement');
+});
 class MemoryStore {
  saved=null;receipts=new Map();
  load(){return this.saved?structuredClone(this.saved):null;}

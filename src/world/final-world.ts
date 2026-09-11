@@ -98,6 +98,7 @@ export class FinalWorld {
     const json=(p:string)=>JSON.parse(readFileSync(resolve(root,p),'utf8'));
     this.layout=json('world_layout.json');
     const digest=createHash('sha256');
+    digest.update('surface-slope-50-degrees-v2');
     const interiors=json('interiors/spaces.json').spaces;
     this.spaces={} as Record<SpaceId,FinalSpace>;
     for(const id of ['surface','mine','great_cave'] as SpaceId[]){
@@ -159,6 +160,9 @@ export class FinalWorld {
       }
     }
     const step=.5,dx=(t.supportAt(p.x+step,p.z)-t.supportAt(p.x-step,p.z))/(2*step),dz=(t.supportAt(p.x,p.z+step)-t.supportAt(p.x,p.z-step))/(2*step);
-    return Number.isFinite(y)&&Math.hypot(dx,dz)<=Math.tan(20*Math.PI/180)+.015;
+    // Ordinary forest hills are traversable in both directions. Authored
+    // trunks, rocks, walls and water still own their physical exclusions.
+    const maximumSlope = space.id === 'surface' ? 50 : 20;
+    return Number.isFinite(y)&&Math.hypot(dx,dz)<=Math.tan(maximumSlope*Math.PI/180)+.015;
   }
 }

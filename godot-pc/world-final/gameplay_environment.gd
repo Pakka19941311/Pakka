@@ -181,7 +181,10 @@ func walkable(p: Vector2,radius: float = .46) -> bool:
 	var step: float = .5
 	var dx: float = (height_at(p.x+step,p.y)-height_at(p.x-step,p.y))/(2*step)
 	var dz: float = (height_at(p.x,p.y+step)-height_at(p.x,p.y-step))/(2*step)
-	return is_finite(y) and Vector2(dx,dz).length()<=tan(deg_to_rad(20))+.015
+	# Match FinalWorld: hills permit uphill AND downhill travel; the authored
+	# tree/wall/rock collision and water rules above remain authoritative.
+	var maximum_slope: float = 50.0 if active_space == "surface" else 20.0
+	return is_finite(y) and Vector2(dx,dz).length()<=tan(deg_to_rad(maximum_slope))+.015
 
 func location_name(p: Vector2) -> String:
 	if active_space == "mine": return "Шахта"

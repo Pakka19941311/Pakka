@@ -116,7 +116,7 @@ func make_draggable(handle: Control, node: Control, key: String) -> void:
 func floating(title: String, dimensions: Vector2) -> PanelContainer:
 	var panel: PanelContainer = PanelContainer.new()
 	panel.name = title
-	panel.add_theme_stylebox_override("panel",VarendorReferenceHud.frame(Color("182024f5"),Color("8c7353"),10,3))
+	panel.add_theme_stylebox_override("panel",preload("res://scripts/titan_theme.gd").plate(14))
 	app.ui.add_child(panel)
 	panel.size = dimensions.min(app.ui.size-Vector2(24,24))
 	panel.position = (app.ui.size-panel.size)*.5
@@ -128,13 +128,15 @@ func shell(panel: PanelContainer, title: String, close: Callable, drag_key: Stri
 	panel.add_child(body)
 	var header: HBoxContainer = HBoxContainer.new()
 	body.add_child(header)
-	var caption: Label = app.label(title,16,Color("ddc89d"))
+	var caption: Label = app.label(title,18,Color("ddc89d"))
+	preload("res://scripts/titan_theme.gd").heading(caption)
 	caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(caption)
 	make_draggable(caption,panel,drag_key)
 	var exit_button: Button = app.button("×",close)
 	exit_button.custom_minimum_size = Vector2(30,26)
 	header.add_child(exit_button)
+	body.add_child(HSeparator.new())
 	return body
 
 func toggle_map() -> void:
@@ -222,10 +224,18 @@ func refresh_storage() -> void:
 		storage_slots[index].update_item(item)
 	storage_count.text = "%d / 500 ячеек · общий склад двух городов" % items.filter(func(i): return i is Dictionary).size()
 
-func shop(kind: String, title: String) -> void:
+func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 	var body: VBoxContainer = app.dialog(title,Vector2i(480,350))
-	for id: String in (["haste"] if kind == "alchemist" else ["potion","ether","teleport"]):
-		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); body.add_child(row)
+	body.add_child(app.label("Ваше золото: %d ◈" % int(app.net.hero.gold),13))
+	var tabs: TabContainer = TabContainer.new()
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(tabs)
+	var purchase: VBoxContainer = VBoxContainer.new(); purchase.name = "Купить"; purchase.add_theme_constant_override("separation",10); tabs.add_child(purchase)
+	var sale: VBoxContainer = VBoxContainer.new(); sale.name = "Продать"; sale.add_theme_constant_override("separation",8); tabs.add_child(sale)
+	tabs.current_tab = selected_tab
+	if kind == "books": purchase.add_child(app.button("Книги умений · выбрать класс",app.book_ui.shop_classes))
+	for id: String in ([] if kind == "books" else ["haste"] if kind == "alchemist" else ["potion","ether","teleport"]):
+		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); purchase.add_child(row)
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id; cell.custom_minimum_size = CELL
 		cell.artwork = app.book_ui.item_icon({"id":id}); row.add_child(cell)
 		var price: int = int({"haste":100,"potion":55,"ether":70,"teleport":130}[id])
@@ -233,6 +243,20 @@ func shop(kind: String, title: String) -> void:
 		column.add_child(app.label(str(app.data.items[id].name),13))
 		var desc: Label = app.label(str(app.data.items[id].desc),11); desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(desc)
 		var buy: Button = app.button("%d ◈" % price,func(): app.net.command({"type":"buy","itemId":id})); buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
+	sale.add_child(app.wrapped_label("Выберите добычу из сумки. Цена указана за всю стопку; продажа требует подтверждения.",12))
+	var count: int = 0
+	for item: Dictionary in app.net.hero.inventory:
+		if app.data.books.has(str(item.id)): continue
+		count += 1
+		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",10); sale.add_child(row)
+		var icon: TextureRect = TextureRect.new(); icon.texture = app.book_ui.item_icon(item); icon.custom_minimum_size = Vector2(36,36); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; row.add_child(icon)
+		var name_label: Label = app.wrapped_label(app.item_name(item)+" ×"+str(item.count),12); name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(name_label)
+		var price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))*int(item.count)
+		var sell: Button = app.button("%d ◈" % price,func():
+			app.selected_item = {"kind":"bag","item":item.duplicate(true)}
+			app.sell_selected(func(): shop(kind,title,1)))
+		sell.set_meta("npc_action","sell:"+str(item.uid)); sell.tooltip_text = "Продать "+app.item_name(item); row.add_child(sell)
+	if count == 0: sale.add_child(app.label("В сумке нет предметов для продажи.",12))
 
 func open_skills() -> void:
 	app.book_ui.catalogue()
@@ -261,7 +285,7 @@ func configure_chat() -> void:
 	chat_box = app.reference_hud.log_panel
 	for child: Node in chat_box.get_children(): chat_box.remove_child(child); child.queue_free()
 	chat_box.size = Vector2(330,215)
-	var head: Label = app.reference_hud.text(chat_box,"Чат",Vector2(8,2),Vector2(210,22),12)
+	var head: Label = app.reference_hud.text(chat_box,"Чат",Vector2(17,4),Vector2(200,20),12)
 	make_draggable(head,chat_box,"chat")
 	chat_lock = app.reference_hud.small_button(chat_box,"Фикс.",Vector2(270,2),Vector2(51,21),func():
 		var state: Dictionary = layout_data.get("chat",{}); state.locked = not bool(state.get("locked",false)); layout_data.chat = state; save_layout())

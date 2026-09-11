@@ -6,7 +6,7 @@ extends RefCounted
 const GEAR_LAYOUT: Array = [["ear1","Серьга I"],["head","Голова"],["ear2","Серьга II"],["neck","Ожерелье"],["chest","Нагрудник"],["offhand","Щит / фокус"],["weapon","Оружие"],["belt","Пояс"],["gloves","Перчатки"],["ring1","Кольцо I"],["boots","Обувь"],["ring2","Кольцо II"]]
 const STAT_LAYOUT: Array = [["level","Уровень"],["xp","Опыт"],["hp","HP"],["mp","MP"],["str","Сила"],["dex","Ловкость"],["int","Интеллект"],["def","Общая защита"],["mdef","Магическая защита"]]
 const ITEM_STAT_LABELS: Dictionary = {"atkMin":"Мин. физ. атака","atkMax":"Макс. физ. атака","matk":"Магическая атака","def":"Физическая защита","mdef":"Магическая защита","hp":"Макс. HP","mp":"Макс. MP","crit":"Критический шанс","accuracy":"Точность","evasion":"Уклонение","speed":"Скорость передвижения"}
-const WINDOW_SIZE: Vector2 = Vector2(332,502)
+const WINDOW_SIZE: Vector2 = Vector2(332,516)
 const DOCK_WIDTH: float = 756.0
 var app: Node
 var dock: Control
@@ -73,15 +73,16 @@ func small_button(parent: Control, value: String, position: Vector2, dimensions:
 	result.text = value
 	result.focus_mode = Control.FOCUS_NONE
 	result.add_theme_font_size_override("font_size",font_size)
-	result.add_theme_stylebox_override("normal",frame(Color("2c3138"),Color("6a5a44"),0,1))
-	result.add_theme_stylebox_override("hover",frame(Color("44545a"),Color("c9b78b"),0,1))
-	result.add_theme_stylebox_override("pressed",frame(Color("67563c"),Color("d5bd88"),0,1))
+	result.add_theme_stylebox_override("normal",preload("res://scripts/titan_theme.gd").button("normal",0))
+	result.add_theme_stylebox_override("hover",preload("res://scripts/titan_theme.gd").button("hover",0))
+	result.add_theme_stylebox_override("pressed",preload("res://scripts/titan_theme.gd").button("pressed",0))
 	result.pressed.connect(callback)
 	rect(result,parent,position,dimensions)
 	return result
 
 func panel(parent: Control, position: Vector2, dimensions: Vector2, background: Color = Color("20242af0"), border: Color = Color("8c7353")) -> Panel:
 	var result: Panel = Panel.new()
+	# Compact inset panels leave room for their labels; ornate plates frame windows.
 	result.add_theme_stylebox_override("panel",frame(background,border))
 	rect(result,parent,position,dimensions)
 	return result
@@ -108,6 +109,7 @@ func setup(owner_ui: Node) -> void:
 	theme.set_color("font_color","Button",Color("eae4d8"))
 	theme.set_font_size("font_size","TooltipLabel",11)
 	theme.set_stylebox("panel","TooltipPanel",frame(Color("162028fc"),Color("948363"),10,2))
+	preload("res://scripts/titan_theme.gd").install(theme)
 	app.ui.theme = theme
 	dock = control(app.ui,Vector2.ZERO,Vector2(DOCK_WIDTH,dock_height))
 	dock.name = "ReferenceBottomDock"
@@ -127,12 +129,12 @@ func setup(owner_ui: Node) -> void:
 	xp_label = bar_label(app.xp,9)
 	# PanelContainer stays as a compatibility handle; all child geometry is explicit.
 	app.quick_panel_node = PanelContainer.new()
-	app.quick_panel_node.add_theme_stylebox_override("panel",frame(Color("20242af0"),Color("8c7353")))
+	app.quick_panel_node.add_theme_stylebox_override("panel",preload("res://scripts/titan_theme.gd").plate(0))
 	rect(app.quick_panel_node,dock,Vector2(268,0),Vector2(382,119))
 	var quick_content: Control = Control.new()
 	quick_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	app.quick_panel_node.add_child(quick_content)
-	text(quick_content,"Быстрые действия",Vector2(6,1),Vector2(166,22),10,Color("bbb5a8"))
+	text(quick_content,"Быстрые действия",Vector2(17,12),Vector2(166,14),10,Color("bbb5a8"))
 	row_toggle = small_button(quick_content,"4 ряда",Vector2(218,3),Vector2(62,18),func():
 		app.full_quick = not app.full_quick
 		app.refresh_quick()
@@ -264,12 +266,13 @@ func bar_label(parent: ProgressBar, font_size: int) -> Label:
 func build_inventory() -> void:
 	app.inventory_panel = app.place_panel(Control.PRESET_TOP_LEFT,Vector2(app.ui.size.x-350,58),WINDOW_SIZE)
 	app.inventory_panel.name = "ReferenceCharacterWindow"
-	app.inventory_panel.add_theme_stylebox_override("panel",frame(Color("182024"),Color("817256"),0,3))
+	app.inventory_panel.add_theme_stylebox_override("panel",preload("res://scripts/titan_theme.gd").plate(0))
 	var content: Control = Control.new()
 	content.mouse_filter = Control.MOUSE_FILTER_PASS
 	app.inventory_panel.add_child(content)
-	var header: Panel = panel(content,Vector2.ZERO,Vector2(330,32),Color("29343a"),Color("65727766"))
-	app.inventory_title = text(header,"Персонаж",Vector2(12,0),Vector2(235,32),16,Color("e4dece"))
+	var header: Control = control(content,Vector2.ZERO,Vector2(330,36))
+	app.inventory_title = text(header,"Персонаж",Vector2(20,6),Vector2(225,26),16,Color("e4dece"))
+	preload("res://scripts/titan_theme.gd").heading(app.inventory_title)
 	app.inventory_title.mouse_filter = Control.MOUSE_FILTER_STOP
 	app.inventory_title.gui_input.connect(func(event: InputEvent):
 		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
@@ -279,8 +282,8 @@ func build_inventory() -> void:
 		elif event is InputEventMouseMotion and app.inventory_drag:
 			app.inventory_panel.position = app.get_viewport().get_mouse_position()-app.inventory_drag_offset
 			clamp_inventory())
-	text(header,"Tab",Vector2(263,5),Vector2(31,22),10,Color("a8b0b0"))
-	var close: Button = small_button(header,"×",Vector2(301,4),Vector2(24,24),app.toggle_inventory,22)
+	text(header,"Tab",Vector2(251,9),Vector2(31,22),10,Color("a8b0b0"))
+	var close: Button = small_button(header,"×",Vector2(288,8),Vector2(24,24),app.toggle_inventory,22)
 	close.name = "CloseInventory"
 	inventory_name = text(content,"",Vector2(11,32),Vector2(163,30),13,Color("e8dfca"))
 	inventory_name.clip_text = true

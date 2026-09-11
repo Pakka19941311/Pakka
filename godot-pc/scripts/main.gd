@@ -190,17 +190,8 @@ func run_territory_qa() -> void:
 func run_stop_npc_qa() -> void:
 	await preload("res://scripts/stop_npc_acceptance.gd").run(self)
 
-func panel_style(background: Color = Color("191e20"), border: Color = Color("776544")) -> StyleBoxFlat:
-	var box: StyleBoxFlat = StyleBoxFlat.new()
-	box.bg_color = background
-	box.border_color = border
-	box.set_border_width_all(1)
-	box.set_corner_radius_all(4)
-	box.content_margin_left = 12
-	box.content_margin_right = 12
-	box.content_margin_top = 9
-	box.content_margin_bottom = 9
-	return box
+func panel_style(_background: Color = Color("191e20"), _border: Color = Color("776544")) -> StyleBox:
+	return preload("res://scripts/titan_theme.gd").plate(12)
 
 func label(text_value: String, size: int = 16, color: Color = Color("d8d5c8")) -> Label:
 	var node: Label = Label.new()
@@ -627,17 +618,26 @@ func wrapped_label(message: String, font_size: int = 15) -> Label:
 func setting_toggle(parent: Control, title: String, key: String, fallback: bool) -> void:
 	var check: CheckButton = CheckButton.new()
 	check.text = title
+	check.custom_minimum_size.y = 38
 	check.button_pressed = bool(game_settings.get(key, fallback))
 	parent.add_child(check)
 	check.toggled.connect(func(value: bool): game_settings[key] = value; apply_settings(); save_preferences())
 
 func setting_choice(parent: Control, title: String, key: String, choices: Array, fallback: int) -> void:
-	parent.add_child(label(title))
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation",12)
+	row.custom_minimum_size.y = 38
+	parent.add_child(row)
+	var caption: Label = wrapped_label(title,14)
+	caption.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(caption)
 	var choice: OptionButton = OptionButton.new()
+	choice.custom_minimum_size.x = 190
+	choice.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	for value: String in choices:
 		choice.add_item(value)
 	choice.selected = clampi(int(game_settings.get(key, fallback)), 0, choices.size() - 1)
-	parent.add_child(choice)
+	row.add_child(choice)
 	choice.item_selected.connect(func(value: int):
 		var previous: Dictionary = {"display":game_settings.get("display", 1),"resolution":game_settings.get("resolution", 1)}
 		game_settings[key] = value
@@ -877,7 +877,7 @@ func use_selected() -> void:
 	else:
 		net.command({"type":"use","item":item.duplicate()})
 
-func sell_selected() -> void:
+func sell_selected(return_to: Callable = Callable()) -> void:
 	var item: Dictionary = selected_item.get("item", {})
 	if item.is_empty() or selected_item.get("kind") != "bag":
 		notice("Выберите предмет в сумке")
@@ -885,8 +885,10 @@ func sell_selected() -> void:
 	var box: VBoxContainer = dialog("Продать предмет?", Vector2i(500, 180))
 	box.add_child(label(item_name(item) + " ×" + str(int(item.count))))
 	box.add_child(button("Продать", func():
-		net.command({"type":"sell","item":item.duplicate()})
-		close_dialog()))
+		await net.command({"type":"sell","item":item.duplicate()})
+		if net.hero.inventory.any(func(value): return value.uid == item.uid): return
+		close_dialog()
+		if return_to.is_valid(): return_to.call()))
 
 func transfer_storage(item: Dictionary, direction: String, index: int = -1) -> void:
 	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(item): return

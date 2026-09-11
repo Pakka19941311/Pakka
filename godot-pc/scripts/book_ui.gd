@@ -116,6 +116,7 @@ func catalogue(shop: bool = false, class_id: String = "") -> void:
 
 func shop_classes() -> void:
 	var body: VBoxContainer = app.dialog("Эдрик · Книги умений",Vector2i(410,350))
+	body.add_child(app.button("Продать добычу",func(): app.polish.shop("books","Торговец Эдрик",1)))
 	body.add_child(app.label("Выберите класс",16))
 	for id: String in ["knight","ranger","mage","necro","assassin"]:
 		body.add_child(app.button(str(app.data.classes[id].name),func(): catalogue(true,id)))

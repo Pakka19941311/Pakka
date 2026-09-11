@@ -70,6 +70,7 @@ static func run(app: Node) -> void:
 	print("MAP_MOUSE_QA before=",ui_position," after=",Vector2(app.net.hero.x,app.net.hero.z)," rect=",app.polish.atlas.get_global_rect())
 	app.polish.toggle_map()
 	await Wait.capture(app,"final-town")
+	await forest_walk(app,checks)
 	var combat: Dictionary = await fixture(app,"combat")
 	checks.fixture_combat = not combat.is_empty()
 	if checks.fixture_combat:
@@ -79,6 +80,7 @@ static func run(app: Node) -> void:
 		await Wait.capture(app,"final-combat")
 		checks.real_autoattack_loot = await Wait.until(app,func(): return int(app.net.hero.kills)>int(combat.kills),30000)
 		checks.real_knight_rig = app.world.actors[app.world.hero_id].get_meta("animation_controller").knight_rig != null
+	await merchant_and_theme(app,checks)
 	for id: String in ["mine","great_cave"]:
 		var f: Dictionary = await fixture(app,"portal-"+id)
 		checks[id+"_fixture"] = not f.is_empty()
@@ -111,3 +113,84 @@ static func run(app: Node) -> void:
 	print("FINAL_GAMEPLAY_QA "+JSON.stringify(checks))
 	app.world.stop_audio(); await app.net.request("/api/disconnect",{}); app.net.end_session()
 	app.get_tree().quit(0 if ok else 2)
+
+static func forest_walk(app: Node, checks: Dictionary) -> void:
+	var route: Dictionary = await fixture(app,"forest")
+	checks.forest_road_start = not route.is_empty()
+	if route.is_empty(): return
+	var generation: int = int(app.net.hero.generation)
+	var start: Vector2 = Vector2(route.start.x,route.start.z)
+	var initial_height: float = app.world.final_environment.height_at(start.x,start.y)
+	var reached: bool = true
+	await Wait.capture(app,"forest-road-start")
+	for point: Dictionary in route.points:
+		app.net.intent({"type":"destination","x":point.x,"z":point.z})
+		if not await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(Vector2(point.x,point.z))<.55,15000): reached = false; break
+	checks.forest_reached_slime_on_foot = reached and app.world.actors.has(str(route.target))
+	var finish: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
+	checks.forest_elevation_crossed = absf(app.world.final_environment.height_at(finish.x,finish.y)-initial_height)>5.0
+	await Wait.capture(app,"forest-slime-arrival")
+	# Walk back over the same hill using real keyboard input. Orienting the
+	# camera chooses the W heading; the normal input/prediction/server motor runs.
+	var back: Array = route.points.duplicate(true); back.pop_back(); back.reverse(); back.append(route.start)
+	var returned: bool = true
+	for point: Dictionary in back:
+		var goal: Vector2 = Vector2(point.x,point.z)
+		var deadline: int = Time.get_ticks_msec()+15000
+		while Vector2(app.net.hero.x,app.net.hero.z).distance_to(goal)>.65 and Time.get_ticks_msec()<deadline:
+			var direction: Vector2 = goal-Vector2(app.net.hero.x,app.net.hero.z)
+			app.world.camera_controller.yaw = direction.angle()-PI*.5
+			app.world.camera_controller.smoothed_yaw = app.world.camera_controller.yaw
+			Keys.keyboard(app,KEY_W,true)
+			await Keys.wait_ms(app.get_tree(),70)
+		Keys.keyboard(app,KEY_W,false)
+		await Keys.wait_ms(app.get_tree(),180)
+		if Vector2(app.net.hero.x,app.net.hero.z).distance_to(goal)>1: returned = false; break
+	checks.forest_uphill_downhill_keyboard = returned and Vector2(app.net.hero.x,app.net.hero.z).distance_to(start)<1
+	checks.forest_no_teleport_during_walk = int(app.net.hero.generation) == generation
+	app.world.camera_controller.yaw = 0; app.world.camera_controller.smoothed_yaw = 0
+	await Wait.capture(app,"forest-road-return")
+	print("FOREST_WALK_QA ",JSON.stringify({"start":route.start,"end":{"x":app.net.hero.x,"z":app.net.hero.z},"one_way_metres":route.length,"previously_blocked_samples":route.previouslyBlockedSamples,"max_slope":route.maxSlope,"checks":checks}))
+
+static func merchant_and_theme(app: Node, checks: Dictionary) -> void:
+	var merchant: Dictionary = await fixture(app,"merchant")
+	checks.merchant_fixture = merchant.has("item")
+	if not checks.merchant_fixture: return
+	var item: Dictionary = merchant.item
+	var before_gold: int = int(app.net.hero.gold)
+	var price: int = int(floorf(float(app.data.items[item.id].value)*.48))*int(item.count)
+	app.open_npc_service(str(merchant.merchant))
+	await Keys.wait_ms(app.get_tree(),250); await Wait.capture(app,"titan-merchant-buy")
+	var tabs: TabContainer = app.active_dialog.find_children("*","TabContainer",true,false)[0]
+	tabs.current_tab = 1
+	await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-merchant-sell")
+	var buttons: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(b): return b.get_meta("npc_action","") == "sell:"+str(item.uid))
+	checks.merchant_sell_button = buttons.size() == 1
+	if not buttons.is_empty():
+		var sell: Button = buttons[0]
+		var scroll: ScrollContainer = app.active_dialog.find_child("DialogScroll",true,false)
+		scroll.ensure_control_visible(sell)
+		await Keys.wait_ms(app.get_tree(),200)
+		mouse(app,sell.get_global_rect().get_center())
+		await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-sale-confirm")
+		var confirms: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(b): return b.text == "Продать")
+		checks.merchant_confirmation = confirms.size() == 1
+		if not confirms.is_empty(): mouse(app,confirms[0].get_global_rect().get_center())
+		checks.merchant_loot_sold = await Wait.until(app,func(): return not app.net.hero.inventory.any(func(i): return i.uid == item.uid),5000)
+		checks.merchant_exact_gold = int(app.net.hero.gold) == before_gold+price
+		await fixture(app,"verify-sale")
+		app.close_dialog()
+		var profile: Dictionary = app.net.bootstrap.profiles[0].duplicate()
+		await app.net.request("/api/disconnect",{}); app.net.end_session()
+		await app.net.connect_profile(profile)
+		checks.merchant_sale_survives_reconnect = await Wait.until(app,func(): return app.net.connected and int(app.net.hero.get("gold",-1)) == before_gold+price and not app.net.hero.inventory.any(func(i): return i.uid == item.uid),8000)
+		app.login.hide(); app.close_dialog()
+	app.controls_dialog(); await Keys.wait_ms(app.get_tree(),200)
+	var settings: TabContainer = app.active_dialog.find_children("*","TabContainer",true,false)[0]
+	for index: int in range(4):
+		settings.current_tab = index; await Keys.wait_ms(app.get_tree(),140); await Wait.capture(app,"titan-settings-"+str(index))
+	app.close_dialog(); app.inventory_panel.show(); app.refresh_inventory(); await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-inventory"); app.inventory_panel.hide()
+	app.book_ui.shop_classes(); await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-books"); app.close_dialog()
+	app.open_npc_service("npc:elder"); await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-dialogue"); app.close_dialog()
+	app.open_npc_service("npc:teleport"); await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-teleport"); app.close_dialog()
+	checks.titan_theme_installed = app.ui.theme.get_stylebox("normal","Button") is StyleBoxTexture

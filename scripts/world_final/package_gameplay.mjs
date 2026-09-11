@@ -24,8 +24,9 @@ const python=process.env.PYTHON??(process.platform==='win32'?'python':'python3')
 execFileSync(python,['-c',"import pathlib,sys,zipfile\np=pathlib.Path(sys.argv[3]);p.mkdir()\nwith zipfile.ZipFile(sys.argv[1]) as z:\n for n in ('node.exe','LICENSE'): (p/n).write_bytes(z.read(sys.argv[2]+'/'+n))",archive,`node-v${config.version}-${config.platform}`,join(destination,'runtime')]);
 writeFileSync(join(destination,'BUILD_COMMIT.txt'),commit+'\n');
 const notes=`VARENDOR — игровой тест нового мира\n\nПолностью распакуйте ZIP и запустите RUN_VARENDOR.bat. Node установлен внутри пакета.\n\nПоверхность D13, шахта и большая пещера; 1000 постоянных существ (997 обычных + 3 босса), 15 видов. Обычный герой, серверный бой, добыча, предметы, NPC и сохранения.\n\nWASD — движение; мышь — камера; щелчок по врагу — автоатака; F у входа — войти или выйти; M — карта. Службы доступны в поселениях.\n\nПрежнее сохранение при первом переносе сохраняет уровень, XP и предметы; герой перемещается в безопасную точку нового мира. Пусковая программа создаёт проверенную копию найденной прежней базы. Не закрывайте её окно во время игры.\n\nЭто промежуточная игровая проверка. Материалы природы, архитектурные детали, свет и художественные карты ещё дорабатываются. Карты пока построены из геометрии. Ночные виды входят в фиксированные 1000 мест; старые дополнительные случайные ночные спавны отключены для этого профиля.\n`;
-writeFileSync(join(destination,'README_RU.txt'),notes);
-writeFileSync(join(output,'release-notes.md'),notes+'\nСборка: '+commit+'\n');
+const updateNotes='Обновление: лесные склоны на поверхности проходимы вверх и вниз до 50°; настоящие стволы, камни, стены и вода сохраняют ограничения. У торговцев появилась вкладка «Продать» для добычи из сумки; у Эдрика — кнопка «Продать добычу». Окна оформлены в стиле «Руны титанов» по предоставленным макетам.\n\n';
+writeFileSync(join(destination,'README_RU.txt'),updateNotes+notes);
+writeFileSync(join(output,'release-notes.md'),updateNotes+notes+'\nСборка: '+commit+'\n');
 writePackageManifest(destination,{kind:'world-final-gameplay-test',buildCommit:commit,permanentPopulation:1000,node:config,serverFiles:dependencies});
 writeFileSync(join(output,'package-result.json'),JSON.stringify({name,destination,commit},null,2));
 console.log(JSON.stringify({name,destination,commit}));
