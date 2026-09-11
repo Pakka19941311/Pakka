@@ -62,6 +62,9 @@ func text_at(p: Vector2,value: String,font_size: int,color: Color = INK) -> void
 	draw_string(ThemeDB.fallback_font,p,value,HORIZONTAL_ALIGNMENT_LEFT,-1,font_size,color)
 
 func _draw() -> void:
+	if world != null and world.final_environment != null:
+		preload("res://world-final/gameplay_map.gd").draw_map(self)
+		return
 	layout_projection()
 	draw_rect(Rect2(Vector2.ZERO,size),Color("161f1c"))
 	if world == null or world.territory.is_empty(): return

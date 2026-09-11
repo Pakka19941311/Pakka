@@ -1,0 +1,31 @@
+import {cpSync,mkdirSync,readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {resolve,join,dirname} from 'node:path';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+import {stageNativeServer} from '../package-godot-pc.mjs';
+import {writePackageManifest} from '../package-world-windows.mjs';
+const [binary,outputArg,license,nodeArchive]=process.argv.slice(2),root=process.cwd(),output=resolve(outputArg);
+const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+const name='Varendor_World_Gameplay_'+commit.slice(0,12),destination=join(output,name);
+if(existsSync(destination))throw Error('Package destination already exists');
+mkdirSync(destination,{recursive:true});
+const dependencies=stageNativeServer(root,destination,{finalWorld:true});
+cpSync(binary,join(destination,'Varendor.exe'));
+cpSync('packaging/windows/RUN_VARENDOR_PC.bat',join(destination,'RUN_VARENDOR.bat'));
+mkdirSync(join(destination,'licenses'),{recursive:true});
+cpSync(license,join(destination,'licenses/Godot.txt'));
+for(const [from,to] of [['public/assets/licenses','assets'],['public/assets/models/monsters-glb/licenses','monsters']])cpSync(from,join(destination,'licenses',to),{recursive:true});
+for(const from of ['art/knight-v2/LICENSES.md','art/forgotten-knight/LICENSES.md','docs/assets/world-source-manifest.json','art/world-final/nature-source/pine-wood/source.json','art/world-final/materials/snow_02/source.json','art/world-final/materials/rock_wall_02/source.json']){const to=join(destination,'licenses',from);mkdirSync(dirname(to),{recursive:true});cpSync(from,to);}
+const config=JSON.parse(readFileSync('packaging/windows/node-runtime.json','utf8'));
+let bytes;if(nodeArchive)bytes=readFileSync(nodeArchive);else{const r=await fetch(config.url,{signal:AbortSignal.timeout(180000)});if(!r.ok)throw Error('Node download '+r.status);bytes=Buffer.from(await r.arrayBuffer());}
+if(createHash('sha256').update(bytes).digest('hex')!==config.sha256)throw Error('Node runtime checksum differs');
+const archive=join(output,'node-runtime.zip');writeFileSync(archive,bytes);
+const python=process.env.PYTHON??(process.platform==='win32'?'python':'python3');
+execFileSync(python,['-c',"import pathlib,sys,zipfile\np=pathlib.Path(sys.argv[3]);p.mkdir()\nwith zipfile.ZipFile(sys.argv[1]) as z:\n for n in ('node.exe','LICENSE'): (p/n).write_bytes(z.read(sys.argv[2]+'/'+n))",archive,`node-v${config.version}-${config.platform}`,join(destination,'runtime')]);
+writeFileSync(join(destination,'BUILD_COMMIT.txt'),commit+'\n');
+const notes=`VARENDOR — игровой тест нового мира\n\nПолностью распакуйте ZIP и запустите RUN_VARENDOR.bat. Node установлен внутри пакета.\n\nПоверхность D13, шахта и большая пещера; 1000 постоянных существ (997 обычных + 3 босса), 15 видов. Обычный герой, серверный бой, добыча, предметы, NPC и сохранения.\n\nWASD — движение; мышь — камера; щелчок по врагу — автоатака; F у входа — войти или выйти; M — карта. Службы доступны в поселениях.\n\nПрежнее сохранение при первом переносе сохраняет уровень, XP и предметы; герой перемещается в безопасную точку нового мира. Пусковая программа создаёт проверенную копию найденной прежней базы. Не закрывайте её окно во время игры.\n\nЭто промежуточная игровая проверка. Материалы природы, архитектурные детали, свет и художественные карты ещё дорабатываются. Карты пока построены из геометрии. Ночные виды входят в фиксированные 1000 мест; старые дополнительные случайные ночные спавны отключены для этого профиля.\n`;
+writeFileSync(join(destination,'README_RU.txt'),notes);
+writeFileSync(join(output,'release-notes.md'),notes+'\nСборка: '+commit+'\n');
+writePackageManifest(destination,{kind:'world-final-gameplay-test',buildCommit:commit,permanentPopulation:1000,node:config,serverFiles:dependencies});
+writeFileSync(join(output,'package-result.json'),JSON.stringify({name,destination,commit},null,2));
+console.log(JSON.stringify({name,destination,commit}));

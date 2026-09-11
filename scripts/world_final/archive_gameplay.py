@@ -1,0 +1,16 @@
+"""Archive only the portable application after exact-binary acceptance."""
+from pathlib import Path
+import hashlib,json,sys,zipfile
+meta=Path(sys.argv[1]);data=json.loads(meta.read_text('utf-8'))
+report=json.loads(Path(sys.argv[2]).read_text('utf-8'))
+assert report['ok'] is True,'Native gameplay checks failed'
+stage=Path(data['destination']);archive=meta.parent/(data['name']+'.zip')
+# The detailed local QA save, bootstrap tokens and raw logs are not deliverables.
+with zipfile.ZipFile(archive,'x',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
+    for p in sorted(stage.rglob('*')):
+        if p.is_file():z.write(p,Path(data['name'])/p.relative_to(stage))
+sha=hashlib.file_digest(archive.open('rb'),'sha256').hexdigest()
+archive.with_suffix('.zip.sha256').write_text(sha+'  '+archive.name+'\n')
+with (meta.parent/'release-notes.md').open('a',encoding='utf-8') as f:
+    f.write('\nПоставляемый EXE и переносимый сервер прошли Actions на Windows без графического окна: 1000 постоянных мест, WASD/остановка, автоатака/добыча, переходы и уровень. Локальная графическая проверка выполнена в Godot 4.6.3 на NVIDIA RTX 3070 Laptop. Это не итоговая художественная приёмка мира.\n')
+print(json.dumps({'zip':str(archive),'sha256':sha,'bytes':archive.stat().st_size}))

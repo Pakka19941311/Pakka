@@ -1,0 +1,190 @@
+extends Node3D
+## Geography adapter for the existing multiplayer client. No preview actor,
+## camera, offline inventory or independent combat simulation is created here.
+const ROOT: String = "res://world-final/"
+var world: VarendorWorld
+var layout: Dictionary
+var spaces: Dictionary = {}
+var active_space: String = ""
+var terrain: Dictionary
+var heights: PackedFloat32Array
+var supports: Array = []
+var definition: Dictionary = {}
+var bounds: Array = []
+var nature: Node3D
+var roots: Dictionary = {}
+var loaded_data: Dictionary = {}
+
+func setup(value: VarendorWorld) -> void:
+	world = value
+	layout = read_json("world_layout.json")
+	for item: Dictionary in read_json("interiors/spaces.json").spaces: spaces[item.id] = item
+	await activate_space("surface")
+
+func read_json(path: String) -> Dictionary:
+	return JSON.parse_string(FileAccess.get_file_as_string(ROOT+path))
+
+func load_scene(path: String, parent: Node3D) -> Node3D:
+	if ResourceLoader.load_threaded_request(ROOT+path) != OK: return null
+	while ResourceLoader.load_threaded_get_status(ROOT+path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		await get_tree().process_frame
+	if ResourceLoader.load_threaded_get_status(ROOT+path) != ResourceLoader.THREAD_LOAD_LOADED: return null
+	var packed: PackedScene = ResourceLoader.load_threaded_get(ROOT+path)
+	var node: Node3D = packed.instantiate()
+	parent.add_child(node)
+	return node
+
+func activate_space(id: String) -> void:
+	for root: Node3D in roots.values(): root.hide()
+	if not roots.has(id):
+		var root: Node3D = Node3D.new()
+		root.name = "World_"+id
+		add_child(root)
+		roots[id] = root
+		var meta: Dictionary = read_json("geology-D13/terrain.json" if id == "surface" else "interiors/"+id+".json")
+		var raw: PackedFloat32Array = FileAccess.get_file_as_bytes(ROOT+("geology-D13/heightmap.f32" if id == "surface" else "interiors/"+str(meta.floor))).to_float32_array()
+		var support: Array = read_json("geography/support-surfaces.json").surfaces if id == "surface" else []
+		var obstacles: Array = read_json("geography/collision.json").obstacles if id == "surface" else meta.obstacles
+		loaded_data[id] = {"terrain":meta,"heights":raw,"supports":support,"obstacles":obstacles}
+		if id == "surface":
+			var ground: ShaderMaterial = load(ROOT+"materials/geology_material_D12.gd").terrain("D13")
+			for cell: Dictionary in meta.chunks:
+				var cell_node: Node3D = await load_scene("geology-D13/"+str(cell.glb),root)
+				assert(cell_node != null,"Missing final terrain cell")
+				for mesh: MeshInstance3D in cell_node.find_children("*","MeshInstance3D",true,false): mesh.material_override = ground
+				await get_tree().process_frame
+			var landmarks: Node3D = await load_scene("geography/landmarks.glb",root)
+			assert(landmarks != null,"Missing final architecture")
+			nature = load(ROOT+"nature/nature_layer.gd").new()
+			nature.authored_revision = "D13"
+			nature.distant_trees = true
+			root.add_child(nature)
+			await nature.build()
+			for material: ShaderMaterial in nature.focus_materials:
+				var source: Material = material.get_meta("unmodified_source_material")
+				if "pine_tree_01_twig" in source.resource_name: material.set_shader_parameter("base_color",Color(.70,.96,.72))
+			var groundcover: Node3D = load(ROOT+"nature/groundcover_layer.gd").new()
+			groundcover.authored_revision = "D13"
+			groundcover.geology_material_revision = "D13"
+			groundcover.grass_shader = ROOT+"nature/grass_lit_D13.gdshader"
+			root.add_child(groundcover)
+			await groundcover.build()
+			for path: String in ["nature/collision-D13.json","nature/groundcover-collision-D13.json"]: obstacles.append_array(read_json(path).obstacles)
+		else:
+			var interior: Node3D = await load_scene("interiors/"+id+".glb",root)
+			assert(interior != null,"Missing final interior")
+			# Use the saved interior navigation; runtime does not rebake it.
+			var nav: NavigationRegion3D = NavigationRegion3D.new()
+			nav.navigation_mesh = load(ROOT+"interiors/"+id+"-nav.tres")
+			# Server navigation owns decisions. Do not merge these local coordinates
+			# with another space's Godot navigation map.
+			nav.enabled = false
+			root.add_child(nav)
+			for room: Dictionary in spaces[id].rooms:
+				var lamp: OmniLight3D = OmniLight3D.new()
+				lamp.position = Vector3(room.center[0],5,room.center[1])
+				lamp.omni_range = maxf(room.radii[0],room.radii[1])*1.5
+				lamp.light_energy = 2
+				lamp.light_color = Color("ffbb78") if id == "mine" else Color("99b5c4")
+				root.add_child(lamp)
+	active_space = id
+	var saved: Dictionary = loaded_data[id]
+	terrain = saved.terrain
+	heights = saved.heights
+	supports = saved.supports
+	definition = spaces.get(id,{})
+	bounds = [-796,-696,796,696] if id == "surface" else [terrain.bounds[0]+1,-terrain.bounds[3]+1,terrain.bounds[2]-1,-terrain.bounds[1]-1]
+	world.collision.setup(saved.obstacles)
+	world.collision.walkability = walkable
+	world.player_motion.bounds_min = Vector2(bounds[0],bounds[1])
+	world.player_motion.bounds_max = Vector2(bounds[2],bounds[3])
+	roots[id].show()
+	for service_id: String in VarendorNpcInteraction.SERVICES:
+		if world.actors.has(service_id): world.actors[service_id].visible = id == "surface"
+	print("FINAL_WORLD_SPACE_READY "+id)
+
+func height_at(x: float,z: float,with_support: bool = true) -> float:
+	var b: Array = terrain.get("bounds",[-800,-700,800,700])
+	var c: int = int(terrain.columns)
+	var r: int = int(terrain.rows)
+	var step: float = float(terrain.step)
+	var gx: float = clampf((x-float(b[0]))/step,0,c)
+	var gz: float = clampf((-z-float(b[1]))/step,0,r)
+	var col: int = mini(c-1,floori(gx))
+	var row: int = mini(r-1,floori(gz))
+	var u: float = gx-col
+	var v: float = gz-row
+	var i: int = row*(c+1)+col
+	var a: float = heights[i]
+	var bb: float = heights[i+1]
+	var cc: float = heights[i+c+1]
+	var d: float = heights[i+c+2]
+	var y: float = a+u*(bb-a)+v*(d-bb) if u>=v else a+u*(d-cc)+v*(cc-a)
+	if with_support:
+		for s: Dictionary in supports:
+			var local: Vector2 = Vector2(x-float(s.x),-z-float(s.z)).rotated(float(s.angle))
+			if absf(local.x)<=float(s.halfX) and absf(local.y)<=float(s.halfZ):
+				y = maxf(y,lerpf(float(s.high),float(s.y),(local.y+float(s.halfZ))/(2*float(s.halfZ))) if s.kind == "ramp_z" else float(s.y))
+	return y
+
+func polygon_has(x: float,z: float,polygon: Array) -> bool:
+	var inside: bool = false
+	var j: int = polygon.size()-1
+	for i: int in range(polygon.size()):
+		var a: Array = polygon[i]
+		var b: Array = polygon[j]
+		if (a[1]>z)!=(b[1]>z) and x<(b[0]-a[0])*(z-a[1])/(b[1]-a[1])+a[0]: inside = not inside
+		j = i
+	return inside
+
+func gap(x: float,z: float,a: Array,b: Array) -> float:
+	var aa: Vector2 = Vector2(a[0],a[1])
+	var delta: Vector2 = Vector2(b[0],b[1])-aa
+	return Vector2(x,z).distance_to(aa+delta*clampf((Vector2(x,z)-aa).dot(delta)/maxf(.000001,delta.length_squared()),0,1))
+
+func interior_fits(x: float,z: float) -> bool:
+	for room: Dictionary in definition.rooms:
+		if pow((x-room.center[0])/room.radii[0],2)+pow((z-room.center[1])/room.radii[1],2)<.98: return true
+	for corridor: Dictionary in definition.corridors:
+		for i: int in range(1,corridor.points.size()):
+			if gap(x,z,corridor.points[i],corridor.points[i-1])<float(corridor.width)/2-.25: return true
+	return false
+
+func walkable(p: Vector2,radius: float = .46) -> bool:
+	if p.x-radius<bounds[0] or p.y-radius<bounds[1] or p.x+radius>bounds[2] or p.y+radius>bounds[3]: return false
+	var x: float = p.x
+	var z: float = -p.y
+	var y: float = height_at(p.x,p.y)
+	if active_space != "surface":
+		for offset: Vector2 in [Vector2.ZERO,Vector2(radius,0),Vector2(-radius,0),Vector2(0,radius),Vector2(0,-radius)]:
+			if not interior_fits(x+offset.x,z+offset.y): return false
+	else:
+		var water: Dictionary = layout.water
+		if polygon_has(x,z,water.lake.polygon) and y<water.lake.level+.12: return false
+		if polygon_has(x,z,water.swamp.polygon) and y<water.swamp.level-.25: return false
+		for i: int in range(1,water.river.centerline_xyz.size()):
+			var a: Array = water.river.centerline_xyz[i-1]
+			var b: Array = water.river.centerline_xyz[i]
+			if gap(x,z,[a[0],a[2]],[b[0],b[2]])<water.river.width/2+radius and y<maxf(a[1],b[1])+1: return false
+	var step: float = .5
+	var dx: float = (height_at(p.x+step,p.y)-height_at(p.x-step,p.y))/(2*step)
+	var dz: float = (height_at(p.x,p.y+step)-height_at(p.x,p.y-step))/(2*step)
+	return is_finite(y) and Vector2(dx,dz).length()<=tan(deg_to_rad(20))+.015
+
+func location_name(p: Vector2) -> String:
+	if active_space == "mine": return "Шахта"
+	if active_space == "great_cave": return "Большая пещера"
+	for location: Dictionary in layout.locations:
+		if polygon_has(p.x,-p.y,location.outline_xz): return location.name_ru
+	return "Варендор"
+
+func portal_near(p: Vector2) -> String:
+	for id: String in spaces:
+		var raw: Array = spaces[id].surface_portal if active_space == "surface" else spaces[id].entry
+		if active_space != "surface" and active_space != id: continue
+		if p.distance_to(Vector2(raw[0],-raw[2]))<=7: return id
+	return ""
+
+func _process(_dt: float) -> void:
+	if active_space == "surface" and nature != null and world.camera != null:
+		nature.update_focus(world.hero_position,world.camera.global_position,false)

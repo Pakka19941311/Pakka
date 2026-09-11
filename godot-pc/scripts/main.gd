@@ -137,6 +137,9 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
+		if "--qa-scope=final" in OS.get_cmdline_user_args():
+			await preload("res://world-final/gameplay_acceptance.gd").run(self)
+			return
 		if "--qa-scope=sliding" in OS.get_cmdline_user_args():
 			call_deferred("run_sliding_qa")
 			return
@@ -706,6 +709,11 @@ func picked(id: String) -> void:
 		net.intent({"type":"attack","entityId":id,"skill":null})
 
 func interact() -> void:
+	if world.final_environment != null and not net.hero.is_empty():
+		var portal_id: String = world.final_environment.portal_near(Vector2(net.hero.x,net.hero.z))
+		if not portal_id.is_empty():
+			net.command({"type":"portal","destination":portal_id})
+			return
 	npc_interaction.begin(world.target_id)
 
 func open_npc_service(id: String) -> void:
@@ -722,7 +730,7 @@ func open_npc_service(id: String) -> void:
 	id = "npc:"+kind
 	if id == "npc:elder":
 		var box: VBoxContainer = dialog(str(service.get("name","Старейшина")),Vector2i(480,240))
-		var progress: Array[String] = ["За стенами снова слышен вой. Восемь тварей — и я поверю, что ты способен пережить эту ночь.","Очищай дорогу за стенами города. Побеждено тварей: %d / 8." % mini(int(net.hero.kills),8),"Теперь отыщи Кровавого Оборотня в Чёрном лесу.","Спустись к шахте и победи Хозяина Гнилого Леса.","Ты прошёл этот путь. Продолжай охоту и укрепляй своё снаряжение."]
+		var progress: Array[String] = ["За стенами снова слышен вой. Восемь тварей — и я поверю, что ты способен пережить эту ночь.","Очищай дорогу за стенами города. Побеждено тварей: %d / 8." % mini(int(net.hero.kills),8),("Теперь отыщи Кровавого Оборотня в снежных горах." if world.final_environment != null else "Теперь отыщи Кровавого Оборотня в Чёрном лесу."),("Победи Хозяина Гнилого Леса у древнего дерева в гнилой чаще." if world.final_environment != null else "Спустись к шахте и победи Хозяина Гнилого Леса."),"Ты прошёл этот путь. Продолжай охоту и укрепляй своё снаряжение."]
 		var quest_text: Label = label(progress[clampi(int(net.hero.quest),0,4)])
 		quest_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		box.add_child(quest_text)
@@ -943,6 +951,7 @@ func _process(delta: float) -> void:
 		qa_last_frame_usec = now_usec
 
 func _physics_process(delta: float) -> void:
+	if world != null and world.space_loading: return
 	if world != null and net != null:
 		# A fresh WASD edge commits after catch-up. Do not let an NPC window
 		# open first and steal that input; its intent will cancel the approach.
@@ -983,9 +992,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		if text_focused():
 			return
-		# F is also an assignable quickbar key. A selected service NPC owns
-		# interaction here; without an NPC the user's quickbar binding wins.
-		if event.is_action_pressed("interact") and VarendorNpcInteraction.SERVICES.has(world.target_id):
+		# Services and nearby world entrances own F before an assignable slot.
+		var portal_nearby: bool = world.final_environment != null and not world.space_loading and not world.final_environment.portal_near(Vector2(world.hero_position.x,-world.hero_position.z)).is_empty()
+		if event.is_action_pressed("interact") and (VarendorNpcInteraction.SERVICES.has(world.target_id) or portal_nearby):
 			interact()
 			return
 		var key: String = ""

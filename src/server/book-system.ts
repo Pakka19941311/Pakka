@@ -1,3 +1,4 @@
+import {spatialDistance,sameSpace} from '../world/world-space.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
 import {classAttackRange,classCombatProfile} from '../core/game-rules.ts';
 import type {WorldCharacter as Hero,WorldMonster as Mob,WorldSummon,Position,WorldEvent} from '../network/world-protocol.ts';
@@ -11,8 +12,9 @@ type Host={
   damage(m:Mob,n:number,p:Hero,critical:boolean):void;recalculate(p:Hero):void;
   event(kind:WorldEvent['kind'],actor:string,target?:string,extra?:Partial<WorldEvent>):void;
   provoke(m:Mob,p:Hero):void;release(m:Mob):void;cancel(id:string):void;
+  summonPoint?(p:Position):Position;
 };
-const dist=(a:Position,b:Position)=>Math.hypot(a.x-b.x,a.z-b.z);
+const dist=spatialDistance;
 export class BookSystem {
   private host:Host;
   constructor(host:Host){this.host=host;}
@@ -96,7 +98,7 @@ export class BookSystem {
       if(level===60){this.hit(p,target!,this.physical(p)*1.1,'slash');this.dot(target!,p,'fire',5+this.host.random()*4+p.stats.matk*.1,7);}
     }else if(c==='ranger'){
       if(level===20)buff({dex:10});if(level===30)buff({slow:40},target!);if(level===40)buff({attackSpeed:25});if(level===50)buff({range:20});
-      if(level===60){const point={x:p.x+Math.sin(p.yaw)*1.8,z:p.z+Math.cos(p.yaw)*1.8};this.host.traps().push({id:this.host.uid(),owner:p.id,generation:p.generation,point,expiresAt:this.host.now()+30000,damage:this.directDamage(p,this.physical(p)*3),hit:[]});}
+      if(level===60){const point={spaceId:p.spaceId,x:p.x+Math.sin(p.yaw)*1.8,z:p.z+Math.cos(p.yaw)*1.8};this.host.traps().push({id:this.host.uid(),owner:p.id,generation:p.generation,point,expiresAt:this.host.now()+30000,damage:this.directDamage(p,this.physical(p)*3),hit:[]});}
     }else if(c==='mage'){
       if(level===20)buff({speed:10,attackSpeed:10});
       if(level===30){for(const h of this.host.heroes().filter(h=>!h.dead&&h.activeUntil>this.host.now()&&(h.id===ally.id||dist(h,p)<=4)&&this.host.visible(p,h)))buff({def:10,mdef:13,evasion:3},h);}
@@ -117,12 +119,13 @@ export class BookSystem {
   }
   private near(point:Position,radius:number):Mob[]{return this.host.monsters().filter(m=>m.alive&&dist(m,point)<=radius).sort((a,b)=>dist(a,point)-dist(b,point));}
   private area(p:Hero,id:string,point:Position,radius:number,damage:number,remaining:number,interval:number,limit:number,fx:string):void{
-    this.host.areas().push({id,owner:p.id,generation:p.generation,point:{x:point.x,z:point.z},radius,damage:this.directDamage(p,damage),remaining,nextAt:this.host.now()+interval,interval,limit,fx});
+    this.host.areas().push({id,owner:p.id,generation:p.generation,point:{x:point.x,z:point.z,spaceId:p.spaceId},radius,damage:this.directDamage(p,damage),remaining,nextAt:this.host.now()+interval,interval,limit,fx});
   }
   private summon(p:Hero,id:string,kind:string,duration:number):void{
     // One summon of each kind per owner, including refresh after reconnect.
     for(const s of this.host.summons())if(s.owner===p.id&&s.bookKind===kind)s.expiresAt=this.host.now();
-    const uid=this.host.uid();this.host.summons().push({uid,owner:p.id,bookKind:kind,ownerGeneration:p.generation,x:p.x+1,z:p.z,yOffset:0,grounded:true,yaw:p.yaw,action:'idle',actionStartedAt:this.host.now(),actionEndsAt:0,expiresAt:this.host.now()+duration*1000,attackReadyAt:this.host.now()+500});
+    const point=this.host.summonPoint?.(p)??{spaceId:p.spaceId,x:p.x+1,z:p.z};
+    const uid=this.host.uid();this.host.summons().push({uid,owner:p.id,bookKind:kind,ownerGeneration:p.generation,...point,yOffset:0,grounded:true,yaw:p.yaw,action:'idle',actionStartedAt:this.host.now(),actionEndsAt:0,expiresAt:this.host.now()+duration*1000,attackReadyAt:this.host.now()+500});
     this.effect(p,id,p.id,duration,{});this.host.event('summon',p.id,uid,{bookId:id,durationMs:duration*1000});
   }
   tick():void{
@@ -133,7 +136,7 @@ export class BookSystem {
       if('classId' in actor)continue;
       for(const d of actor.bookDots??[]){
         const p=this.host.heroes().find(p=>p.id===d.owner);
-        if(actor.alive&&p&&!p.dead&&p.activeUntil>now&&d.nextAt<=now+1e-6&&d.nextAt<=d.expiresAt+1e-6){
+        if(actor.alive&&p&&sameSpace(actor,p)&&!p.dead&&p.activeUntil>now&&d.nextAt<=now+1e-6&&d.nextAt<=d.expiresAt+1e-6){
           if(!d.range||dist(p,actor)<=d.range){
             const raw=d.damage+(d.carry??0);const amount=d.nextAt+1000>d.expiresAt+1e-6?Math.round(raw):Math.floor(raw+1e-8);d.carry=raw-amount;
             // An applied burn/poison continues behind cover. Only retaliation has a range condition.
@@ -156,12 +159,12 @@ export class BookSystem {
   summonTick(s:WorldSummon,dt:number,walk:(s:WorldSummon,goal:Position,step:number)=>void):boolean{
     if(!s.bookKind)return false;
     const p=this.host.heroes().find(p=>p.id===s.owner&&!p.dead&&p.generation===s.ownerGeneration&&p.activeUntil>this.host.now());
-    if(!p){s.expiresAt=this.host.now();return true;}
+    if(!p||!sameSpace(s,p)){s.expiresAt=this.host.now();return true;}
     const target=this.near(p,14).find(m=>this.host.visible(p,m));
     if(!target||this.host.safe(p)){if(dist(s,p)>2)walk(s,p,6*dt);else s.action='idle';return true;}
     const range=s.bookKind==='skeleton'?2:3;
     if(dist(s,target)>range){walk(s,target,6*dt);return true;}
-    if(s.attackReadyAt>this.host.now())return true;
+    if(s.attackReadyAt>this.host.now()||!this.host.visible(s,target))return true;
     s.yaw=Math.atan2(target.x-s.x,target.z-s.z);s.attackReadyAt=this.host.now()+1000;s.action='attack';s.actionStartedAt=this.host.now();s.actionEndsAt=this.host.now()+650;
     this.host.event('attack',s.uid,target.uid,{endsAt:s.actionEndsAt,impactAt:this.host.now()});
     for(const m of (s.bookKind==='skeleton'?[target]:this.near(s,3))){

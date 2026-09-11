@@ -5,6 +5,7 @@ extends RefCounted
 # src/world/collision-world.ts; decorative overhead arches do not stop walking.
 const RADIUS: float = .46
 var cells: Dictionary = {}
+var walkability: Callable
 
 func setup(obstacles: Array) -> void:
 	cells.clear()
@@ -31,6 +32,7 @@ func candidates(low: Vector2, high: Vector2) -> Array:
 	return result
 
 func blocked(point: Vector2, radius: float = RADIUS) -> bool:
+	if walkability.is_valid() and not walkability.call(point,radius): return true
 	for obstacle: Dictionary in candidates(point - Vector2.ONE * radius, point + Vector2.ONE * radius):
 		if not obstacle.get("blocksMovement", true):
 			continue
@@ -78,11 +80,14 @@ func depenetrate(start: Vector2, radius: float = RADIUS) -> Vector2:
 	return point
 
 func resolve(start: Vector2, displacement: Vector2) -> Vector2:
-	var point: Vector2 = depenetrate(start) if blocked(start) else start
+	var point: Vector2 = depenetrate(start) if blocked(start) and not walkability.is_valid() else start
 	var steps: int = maxi(1, ceili(displacement.length() / (RADIUS * .5)))
 	for index: int in range(steps):
 		var candidate: Vector2 = point + displacement / steps
-		if not blocked(candidate):
+		if walkability.is_valid() and not walkability.call(candidate,RADIUS):
+			for axis: Vector2 in [Vector2(displacement.x/steps,0),Vector2(0,displacement.y/steps)]:
+				if not blocked(point+axis): point += axis
+		elif not blocked(candidate):
 			point = candidate
 		else:
 			var slide: Vector2 = depenetrate(candidate)

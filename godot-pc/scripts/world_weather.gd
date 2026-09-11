@@ -42,6 +42,18 @@ func setup(value: VarendorWorld) -> void:
 
 func _process(delta: float) -> void:
 	if world == null or world.world_environment == null: return
+	if world.final_environment != null and world.final_environment.active_space != "surface":
+		rain.emitting = false
+		world.sun_light.visible = false
+		world.world_environment.background_mode = Environment.BG_COLOR
+		world.world_environment.background_color = Color("101419")
+		world.world_environment.ambient_light_color = Color("8695a1")
+		world.world_environment.ambient_light_energy = .3
+		world.world_environment.fog_enabled = false
+		return
+	world.sun_light.visible = true
+	world.world_environment.background_mode = Environment.BG_SKY
+	world.world_environment.fog_enabled = true
 	var env: Dictionary = qa_override if not qa_override.is_empty() else world.current_snapshot.get("environment",{})
 	if env.is_empty(): env = {"hour":9.0,"daylight":1.0,"night":false,"fullMoon":false,"weather":"sun","clouds":.18}
 	current = env

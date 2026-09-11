@@ -9,6 +9,7 @@ import { startWorldServer } from './server/http-server.mjs';
 import { restoreWorldTopology } from './src/world/world-topology.ts';
 import { backupWorld } from './scripts/p0-backup-world.mjs';
 import { teleportProgressRecovery } from './src/core/teleport-progress-repair.ts';
+import { FinalWorld } from './src/world/final-world.ts';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const readJson = path => JSON.parse(readFileSync(path, 'utf8'));
@@ -87,8 +88,9 @@ export async function startNativeBridge({ data, legacy, backups, port = 0 }) {
         profiles.push({ id: hero.id, name: hero.name, classId: hero.classId, level: hero.level, token });
       }
     } finally { store.close(); }
-    const { collision, terrain } = restoreWorldTopology(readJson(join(root, 'public/assets/world/world-topology.json')));
-    service = startWorldServer({ database, collision, terrain, port, host: '127.0.0.1', beta: true });
+    const finalWorld=existsSync(join(root,'world-final/gameplay/spawn-manifest.json'))?new FinalWorld(join(root,'world-final')):undefined;
+    const { collision, terrain } = finalWorld?finalWorld.spaces.surface:restoreWorldTopology(readJson(join(root, 'public/assets/world/world-topology.json')));
+    service = startWorldServer({ database, collision, terrain, finalWorld, port, host: '127.0.0.1', beta: true });
     await once(service.server, 'listening');
     const url = `http://127.0.0.1:${service.server.address().port}`;
     const bootstrapPath = join(data, 'bootstrap.json');

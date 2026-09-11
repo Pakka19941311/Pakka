@@ -12,8 +12,8 @@
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
     "D": "partial: D13 terrain and reseated full nature source verified; 92973 forest placements, 362189 grass points and 151 cliffs preserved. Three rendered walks and native forest/grass/cliff edit-export checks pass. Final geology/vegetation quality, native material parity, shore/swamp and unique ancient tree remain unfinished.",
     "E": "not started",
-    "F": "not started; owner promoted required gameplay/server integration ahead of further D-E decoration on 2026-09-11",
-    "G": "not started; next priority is approved 997 regular plus 3 bosses with real existing AI/combat and runtime tests",
+    "F": "in progress: existing main client, three spaces, services, save migration and portable server connected. Graphical Godot HTTP/SSE movement, stop, combat and portal round trips pass. Windows gameplay Actions/Release pending; final F/H acceptance not claimed.",
+    "G": "in progress: 1000 authored stable slots, 997 regular plus 3 bosses, all 15 species and exact quotas. 24 focused tests pass including temporary summons, restart, AI and loot. Native gameplay smoke passes; full encounter and route review remains.",
     "H": "not started"
   },
   "crash_investigation": {
@@ -527,5 +527,11 @@
     "do_not_repeat": "The unchanged D13 walking ZIP is already published.",
     "preserved_remote_checkpoint": "8fbadf55698628fb75718ba4d61bc1ac777f1b79",
     "D14_D15_D16": "All source candidates and numerical checks preserved. No graphical acceptance inferred; unfinished art is deferred, not discarded."
+  },
+  "gameplay_integration": {
+    "report": "docs/world-final/GAMEPLAY_FG_RU.md",
+    "revision": "world-final-gameplay-1",
+    "workflow": ".github/workflows/world-gameplay.yml",
+    "release_status": "pending"
   }
 }

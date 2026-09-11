@@ -1,3 +1,4 @@
+import {FinalWorld} from '../src/world/final-world.ts';
 import { createServer } from 'node:http';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
@@ -8,11 +9,11 @@ import { createWorldStream } from './world-stream.mjs';
 import { WorldSimulation } from '../src/server/world-simulation.ts';
 import { restoreWorldTopology } from '../src/world/world-topology.ts';
 
-export function startWorldServer({database, collision, terrain, port=4173, host='127.0.0.1', beta=false, xpRate=Number(process.env.VARENDOR_XP_RATE??20), allowLocalImport=false, staticRoot, now=Date.now}) {
+export function startWorldServer({database, collision, terrain, finalWorld, port=4173, host='127.0.0.1', beta=false, xpRate=Number(process.env.VARENDOR_XP_RATE??20), allowLocalImport=false, staticRoot, now=Date.now}) {
   const loopback=address=>['127.0.0.1','::1','::ffff:127.0.0.1'].includes(address);
   if(allowLocalImport&&(!beta||!loopback(host)))throw Error('Local import requires a private loopback beta server');
   const store=new WorldStore(database);
-  const world=new WorldSimulation({store,collision,terrain,now:now(),identifier:randomUUID,beta,xpRate});
+  const world=new WorldSimulation({store,collision,terrain,finalWorld,now:now(),identifier:randomUUID,beta,xpRate});
   const streams=new Map();let broadcastAt=0;
   let fatal=null;
   const clock=setInterval(()=>{
@@ -120,10 +121,11 @@ export function startWorldServer({database, collision, terrain, port=4173, host=
 }
 
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
+  const finalWorld=process.env.VARENDOR_WORLD==='final'?new FinalWorld(process.env.VARENDOR_FINAL_ROOT):undefined;
   const manifest=process.env.VARENDOR_COLLISIONS??'public/assets/world/world-topology.json';
-  if(!existsSync(manifest))throw Error('The reviewed world topology is missing. Generate it during the offline world build before starting the server.');
-  const {collision,terrain}=restoreWorldTopology(JSON.parse(readFileSync(manifest,'utf8')));
-  const running=startWorldServer({database:process.env.VARENDOR_DATABASE??'server-data/world.sqlite',collision,terrain,
+  if(!finalWorld&&!existsSync(manifest))throw Error('The reviewed world topology is missing. Generate it during the offline world build before starting the server.');
+  const {collision,terrain}=finalWorld?.spaces.surface??restoreWorldTopology(JSON.parse(readFileSync(manifest,'utf8')));
+  const running=startWorldServer({database:process.env.VARENDOR_DATABASE??'server-data/world.sqlite',collision,terrain,finalWorld,
     port:Number(process.env.PORT??4173),host:'127.0.0.1',beta:process.env.VARENDOR_BETA==='1',
     allowLocalImport:process.env.VARENDOR_ALLOW_LOCAL_IMPORT==='1',staticRoot:'dist'});
   running.server.on('listening',()=>console.log(`Varendor world listening on http://127.0.0.1:${running.server.address().port}`));

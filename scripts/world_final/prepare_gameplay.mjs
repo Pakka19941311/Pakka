@@ -1,0 +1,14 @@
+import {readFileSync,writeFileSync,readdirSync} from 'node:fs';
+import {FinalWorld} from '../../src/world/final-world.ts';
+import {CONTENT_VERSION} from '../../src/server/content-manifest.ts';
+const world=new FinalWorld();
+const path='godot-pc/generated/game.json',game=JSON.parse(readFileSync(path,'utf8'));
+game.contentVersion=CONTENT_VERSION;game.mapVersion=world.mapVersion;game.worldRevision=world.revision;
+game.locations=world.layout.locations.map(l=>({name:l.name_ru,spaceId:l.space_id,kind:l.safe?'safe':'danger'}));
+writeFileSync(path,JSON.stringify(game));
+writeFileSync('godot-pc/world-final/gameplay/services.json',JSON.stringify(world.services,null,2)+'\n');
+const raw=[];
+for(const folder of ['world-final','generated','data','tests'])for(const file of readdirSync('godot-pc/'+folder,{recursive:true}))if(/\.(json|f32)$/.test(file))raw.push(folder+'/'+file.replaceAll('\\','/'));
+const presets='godot-pc/export_presets.cfg';
+writeFileSync(presets,readFileSync(presets,'utf8').replace(/include_filter="[^"]*"/g,'include_filter="'+raw.sort().join(',')+'"'));
+console.log(JSON.stringify({revision:world.revision,mapVersion:world.mapVersion,permanent:world.slots.length}));

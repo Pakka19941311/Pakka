@@ -11,6 +11,9 @@ signal moved_to(point: Vector2)
 
 var book_ui: VarendorBookUI
 var book_ground: VarendorBookGroundEffects = VarendorBookGroundEffects.new()
+var final_environment: Node3D
+var space_loading: bool = false
+var pending_space_snapshot: Dictionary = {}
 var data: Dictionary
 var terrain: Dictionary
 var territory: Dictionary
@@ -81,6 +84,27 @@ func _init() -> void:
 	targeting.setup(self)
 
 func receive_snapshot(snapshot: Dictionary) -> void:
+	if final_environment != null:
+		pending_space_snapshot = snapshot
+		if space_loading: return
+		if str(snapshot.character.get("spaceId","surface")) != final_environment.active_space:
+			space_loading = true
+			while str(pending_space_snapshot.character.get("spaceId","surface")) != final_environment.active_space:
+				await final_environment.activate_space(str(pending_space_snapshot.character.get("spaceId","surface")))
+			snapshot = pending_space_snapshot
+			for id: String in actors.keys():
+				if not id.begins_with("npc:"):
+					actors[id].queue_free()
+					actors.erase(id)
+			timeline = SnapshotTimeline.new()
+			for effect: Dictionary in effects:
+				if is_instance_valid(effect.get("node")): effect.node.queue_free()
+			effects.clear()
+			for floater: Dictionary in floaters:
+				if is_instance_valid(floater.get("node")): floater.node.queue_free()
+			floaters.clear()
+			player_motion.identity = ""
+			space_loading = false
 	# Validate chronology/lifecycle before ANY consumer mutates live state.
 	# A delayed HTTP reply must not rewind prediction after a new SSE generation.
 	if not timeline.ingest(snapshot): return
@@ -131,6 +155,7 @@ func reject_intent(value: Dictionary, input_sequence: int, error: String) -> voi
 	player_motion.intent_pending = false
 
 func _physics_process(delta: float) -> void:
+	if space_loading: return
 	player_motion.physics_step(delta)
 	if not current_snapshot.is_empty(): ambient_residents.physics_step(delta)
 
@@ -157,60 +182,66 @@ func setup(game: Dictionary) -> bool:
 	ambient_player.volume_linear = .275
 	add_child(ambient_player)
 	ambient_player.play()
-	terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
-	territory = JSON.parse_string(FileAccess.get_file_as_string("res://generated/territory.json"))
-	VarendorNpcInteraction.SERVICES = territory.services
-	collision.setup(terrain.colliders)
-	if ResourceLoader.load_threaded_request("res://generated/world.glb") != OK:
-		return false
-	while ResourceLoader.load_threaded_get_status("res://generated/world.glb") == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-		await get_tree().process_frame
-	var scene: PackedScene = ResourceLoader.load_threaded_get("res://generated/world.glb")
-	if scene == null:
-		return false
-	var environment_world: Node3D = scene.instantiate()
-	add_child(environment_world)
-	for mesh: Node in environment_world.find_children("*", "GeometryInstance3D", true, false):
-		if "fern" in str(mesh.name).to_lower() or "shrub" in str(mesh.name).to_lower() or "grass" in str(mesh.name).to_lower():
-			decorations.append(mesh)
-	var wind_materials: Dictionary = {}
-	var graded_materials: Dictionary = {}
-	for instance: Node in environment_world.find_children("*", "MeshInstance3D", true, false):
-		var geometry: MeshInstance3D = instance
-		for surface: int in geometry.mesh.get_surface_count():
-			var source: Material = geometry.get_active_material(surface)
-			if not source is StandardMaterial3D: continue
-			var key: int = source.get_instance_id()
-			if not graded_materials.has(key):
-				graded_materials[key] = true
-				var material_name: String = str(source.resource_name).to_lower().replace(" ","_")
-				var tint: Color = Color.WHITE
-				if "castle_stone" in material_name or "limewashed_fieldstone" in material_name: tint = Color("b5c1c4")
-				elif "medieval_wood" in material_name: tint = Color("94724f")
-				elif "slate_roof" in material_name: tint = Color("637683")
-				elif "paved_roads" in material_name: tint = Color("b4b8ad")
-				if tint != Color.WHITE:
-					source.albedo_color = tint
-					territory_material_audit.graded.append(str(source.resource_name))
-			if not str(source.resource_name).begins_with("Territory_Wind_"): continue
-			territory_material_audit.wind_surfaces += 1
-			if not wind_materials.has(key):
-				var wind: ShaderMaterial = ShaderMaterial.new()
-				wind.shader = preload("res://scripts/territory_wind.gdshader")
-				wind.set_shader_parameter("base_color",source.albedo_color)
-				wind.set_shader_parameter("textured",source.albedo_texture != null)
-				if source.albedo_texture != null: wind.set_shader_parameter("albedo_map",source.albedo_texture)
-				wind.set_shader_parameter("cutout","Foliage" in source.resource_name or source.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED)
-				wind.set_shader_parameter("strength",.11 if "Grass" in source.resource_name else .16 if "Banner" in source.resource_name else .12)
-				wind_materials[key] = wind
-			geometry.set_surface_override_material(surface,wind_materials[key])
-	# Blender exports photometric intensities (5087/9001 cd). Compatibility uses
-	# relative energy here; copying those values clips the whole settlement white.
-	for node: Node in environment_world.find_children("*", "OmniLight3D", true, false):
-		var fire_light: OmniLight3D = node
-		fire_light.light_energy = 1.0
-		fire_light.omni_range = 5.0
-		fire_light.omni_attenuation = 1.6
+	if data.get("worldRevision","") == "world-final-gameplay-1":
+		final_environment = load("res://world-final/gameplay_environment.gd").new()
+		add_child(final_environment)
+		VarendorNpcInteraction.SERVICES = JSON.parse_string(FileAccess.get_file_as_string("res://world-final/gameplay/services.json"))
+		await final_environment.setup(self)
+	else:
+		terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
+		territory = JSON.parse_string(FileAccess.get_file_as_string("res://generated/territory.json"))
+		VarendorNpcInteraction.SERVICES = territory.services
+		collision.setup(terrain.colliders)
+		if ResourceLoader.load_threaded_request("res://generated/world.glb") != OK:
+			return false
+		while ResourceLoader.load_threaded_get_status("res://generated/world.glb") == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			await get_tree().process_frame
+		var scene: PackedScene = ResourceLoader.load_threaded_get("res://generated/world.glb")
+		if scene == null:
+			return false
+		var environment_world: Node3D = scene.instantiate()
+		add_child(environment_world)
+		for mesh: Node in environment_world.find_children("*", "GeometryInstance3D", true, false):
+			if "fern" in str(mesh.name).to_lower() or "shrub" in str(mesh.name).to_lower() or "grass" in str(mesh.name).to_lower():
+				decorations.append(mesh)
+		var wind_materials: Dictionary = {}
+		var graded_materials: Dictionary = {}
+		for instance: Node in environment_world.find_children("*", "MeshInstance3D", true, false):
+			var geometry: MeshInstance3D = instance
+			for surface: int in geometry.mesh.get_surface_count():
+				var source: Material = geometry.get_active_material(surface)
+				if not source is StandardMaterial3D: continue
+				var key: int = source.get_instance_id()
+				if not graded_materials.has(key):
+					graded_materials[key] = true
+					var material_name: String = str(source.resource_name).to_lower().replace(" ","_")
+					var tint: Color = Color.WHITE
+					if "castle_stone" in material_name or "limewashed_fieldstone" in material_name: tint = Color("b5c1c4")
+					elif "medieval_wood" in material_name: tint = Color("94724f")
+					elif "slate_roof" in material_name: tint = Color("637683")
+					elif "paved_roads" in material_name: tint = Color("b4b8ad")
+					if tint != Color.WHITE:
+						source.albedo_color = tint
+						territory_material_audit.graded.append(str(source.resource_name))
+				if not str(source.resource_name).begins_with("Territory_Wind_"): continue
+				territory_material_audit.wind_surfaces += 1
+				if not wind_materials.has(key):
+					var wind: ShaderMaterial = ShaderMaterial.new()
+					wind.shader = preload("res://scripts/territory_wind.gdshader")
+					wind.set_shader_parameter("base_color",source.albedo_color)
+					wind.set_shader_parameter("textured",source.albedo_texture != null)
+					if source.albedo_texture != null: wind.set_shader_parameter("albedo_map",source.albedo_texture)
+					wind.set_shader_parameter("cutout","Foliage" in source.resource_name or source.transparency != BaseMaterial3D.TRANSPARENCY_DISABLED)
+					wind.set_shader_parameter("strength",.11 if "Grass" in source.resource_name else .16 if "Banner" in source.resource_name else .12)
+					wind_materials[key] = wind
+				geometry.set_surface_override_material(surface,wind_materials[key])
+		# Blender exports photometric intensities (5087/9001 cd). Compatibility uses
+		# relative energy here; copying those values clips the whole settlement white.
+		for node: Node in environment_world.find_children("*", "OmniLight3D", true, false):
+			var fire_light: OmniLight3D = node
+			fire_light.light_energy = 1.0
+			fire_light.omni_range = 5.0
+			fire_light.omni_attenuation = 1.6
 	var environment: WorldEnvironment = WorldEnvironment.new()
 	var env: Environment = Environment.new()
 	env.background_mode = Environment.BG_SKY
@@ -245,7 +276,7 @@ func setup(game: Dictionary) -> bool:
 	camera = Camera3D.new()
 	camera.fov = rad_to_deg(.82)
 	camera.near = .15
-	camera.far = 520
+	camera.far = 5000 if final_environment != null else 520
 	add_child(camera)
 	camera.current = true
 	add_child(camera_controller)
@@ -286,19 +317,21 @@ func setup(game: Dictionary) -> bool:
 		await get_tree().process_frame
 	# Local residents have their own 60Hz motion owner; service NPCs above keep
 	# their static positions. Install each first pose before it can be rendered.
-	ambient_residents.setup(collision,territory)
-	for resident: Dictionary in ambient_residents.sample():
-		var actor: Node3D = make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
-		initialize_pose(actor,point(resident.x,resident.z))
-		actor.rotation.y = -float(resident.yaw) + PI
-		actor.set_meta("motion",resident)
-		actor.set_meta("pickable",false)
-	territory_life = VarendorTerritoryLife.new()
-	add_child(territory_life)
-	territory_life.setup(self)
+	if final_environment == null:
+		ambient_residents.setup(collision,territory)
+		for resident: Dictionary in ambient_residents.sample():
+			var actor: Node3D = make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
+			initialize_pose(actor,point(resident.x,resident.z))
+			actor.rotation.y = -float(resident.yaw) + PI
+			actor.set_meta("motion",resident)
+			actor.set_meta("pickable",false)
+		territory_life = VarendorTerritoryLife.new()
+		add_child(territory_life)
+		territory_life.setup(self)
 	return true
 
 func location_name(p: Vector2) -> String:
+	if final_environment != null: return final_environment.location_name(p)
 	if territory.is_empty(): return "Варендор"
 	for settlement: Dictionary in [territory.fort,territory.capital]:
 		if absf(p.x-settlement.x)<settlement.width/2 and absf(p.y-settlement.z)<settlement.depth/2:
@@ -322,6 +355,7 @@ func location_name(p: Vector2) -> String:
 	return result
 
 func height_at(x: float, z: float) -> float:
+	if final_environment != null: return final_environment.height_at(x,z)
 	var cols: int = int(terrain.columns)
 	var rows: int = int(terrain.rows)
 	var gx: float = clampf((x + terrain.width / 2.0) * cols / terrain.width, 0, cols - .000001)
@@ -579,7 +613,7 @@ func record_intent(value: Dictionary, input_sequence: int) -> void:
 	player_motion.sent(value,input_sequence)
 
 func _process(delta: float) -> void:
-	if camera == null: return
+	if camera == null or space_loading: return
 	book_ground.update_preview()
 	var before_clock: float = timeline.clock_ms
 	var frame: Dictionary = timeline.advance(delta)

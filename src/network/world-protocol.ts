@@ -1,3 +1,4 @@
+import type {SpaceId} from '../world/world-space.ts';
 import type {BookEffect,BookDot} from '../server/book-system.ts';
 import type { InventoryItem, ItemReference } from '../core/inventory-commands.ts';
 import type { MonsterAiState } from '../world/monster-ai.ts';
@@ -6,7 +7,7 @@ import type { EquipmentCombatStats } from '../core/equipment-stats.ts';
 
 export const WORLD_PROTOCOL = 1;
 export const DISCONNECT_GRACE_MS = 30_000;
-export type Position = { x: number; z: number };
+export type Position = { x: number; z: number; spaceId?:SpaceId };
 export type WorldMotion = { yOffset:number; grounded:boolean; yaw:number; action:'idle'|'walk'|'jump'|'attack'|'death'; actionStartedAt:number; actionEndsAt:number; velocityX?:number; velocityZ?:number; verticalVelocity?:number; locomotionState?:LocomotionState; combatState?:'idle'|'approach'|'face'|'windup'|'recovery'|'dead'; hitAt?:number; hitUntil?:number; bodyRadius?:number; attackRange?:number };
 export type WorldCharacter = Position & WorldMotion & {
   id: string; name: string; classId: string; level: number; xp: number; gold: number;
@@ -26,10 +27,12 @@ export type WorldMonster = Position & WorldMotion & {
   uid: string; id: string; home: Position; regionId?: string; patrolIndex: number; patrolStep?:number;
   hp: number; alive: boolean; respawnAt: number; attackReadyAt: number; generation: number;
   phase: number; status: { slow: number; stun: number; dot: number; nextDot: number; dotOwner?: string };
+  temporaryOwner?:string;ownerGeneration?:number;temporaryUntil?:number;
   nightIndex?:number; pairId?:string; provokedBy?:string; owner?: string; aiState?: MonsterAiState; targetId?:string|null; deathAt?:number; corpseUntil?:number;
 };
 export type WorldSummon = Position & WorldMotion & { bookKind?:string;ownerGeneration?:number;uid: string; owner: string; expiresAt: number; attackReadyAt: number };
 export type WorldEvent = {
+  spaceId?:SpaceId;
   sequence: number; at: number; kind: 'attack' | 'release' | 'cancel' | 'hit' | 'miss' | 'death' | 'respawn' | 'loot' | 'buff' | 'summon';
   bookId?:string; actor: string; target?: string; skill?: number | null; amount?: number; critical?: boolean; generation?: number; impactAt?:number; endsAt?:number; readyAt?:number; effect?:string; durationMs?:number; reason?:string;
   position?:Position & {yOffset:number;yaw:number};
@@ -37,6 +40,7 @@ export type WorldEvent = {
   gold?: number; xp?: number; items?: string[];
 };
 export type WorldSnapshot = {
+  spaceId?:SpaceId;worldRevision?:string;populationCapacity?:number;
   groundEffects?:Array<{id:string;kind:'trap'|'area'|'slam';owner:string;point:Position;radius:number;expiresAt:number;effect:string}>;
   environment?: import("../world/world-cycle.ts").WorldCycleSnapshot; chat?: WorldChatMessage[];
   contentVersion?: string; mapVersion?: string;
@@ -56,6 +60,7 @@ export type WorldCommand =
   | { type: 'sell'; item: ItemReference }
   | { type: 'buy'; itemId: string }
   | { type: 'teleport'; destination: string }
+  | { type: 'portal'; destination:'mine'|'great_cave' }
   | { type: 'respawn' }
   | { type: 'quest' }
   | { type: 'collect' }

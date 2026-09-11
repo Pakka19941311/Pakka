@@ -1,0 +1,2414 @@
+{
+  "schema": 1,
+  "catalog": "src/data/game-data.ts:MONSTERS",
+  "bossesIncludedIn15": true,
+  "rows": [
+    {
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "spaceId": "surface",
+      "counts": {
+        "wolf": 100,
+        "spider": 40,
+        "exile": 20
+      }
+    },
+    {
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "spaceId": "surface",
+      "counts": {
+        "undead": 35,
+        "wraith": 30,
+        "night_zombie": 12,
+        "night_skeleton": 12,
+        "big": 1
+      }
+    },
+    {
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "spaceId": "surface",
+      "counts": {
+        "ice_golem": 69,
+        "wolf": 10,
+        "mini": 1
+      }
+    },
+    {
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "spaceId": "surface",
+      "counts": {
+        "miner": 24,
+        "bat": 6
+      }
+    },
+    {
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "spaceId": "mine",
+      "counts": {
+        "miner": 45,
+        "bat": 15,
+        "spider": 10
+      }
+    },
+    {
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "spaceId": "surface",
+      "counts": {
+        "spider": 30,
+        "bat": 15,
+        "wolf": 15
+      }
+    },
+    {
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "spaceId": "great_cave",
+      "counts": {
+        "bat": 60,
+        "spider": 25,
+        "undead": 25
+      }
+    },
+    {
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "spaceId": "surface",
+      "counts": {
+        "cultist": 40,
+        "undead": 20
+      }
+    },
+    {
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "spaceId": "surface",
+      "counts": {
+        "fire_golem": 75,
+        "cultist": 14,
+        "rift_boss": 1
+      }
+    },
+    {
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "spaceId": "surface",
+      "counts": {
+        "exile": 45,
+        "cultist": 25
+      }
+    },
+    {
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "spaceId": "surface",
+      "counts": {
+        "wraith": 60,
+        "spider": 30
+      }
+    },
+    {
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "spaceId": "surface",
+      "counts": {
+        "undead": 40,
+        "night_zombie": 25,
+        "night_skeleton": 25
+      }
+    }
+  ],
+  "species": [
+    {
+      "id": "fire_golem",
+      "name": "Огненный голем",
+      "model": "FireGolem",
+      "boss": false,
+      "count": 75
+    },
+    {
+      "id": "ice_golem",
+      "name": "Ледяной голем",
+      "model": "IceGolem",
+      "boss": false,
+      "count": 69
+    },
+    {
+      "id": "rift_boss",
+      "name": "Страж раскалённого разлома",
+      "model": "RiftWarden",
+      "boss": true,
+      "count": 1
+    },
+    {
+      "id": "night_zombie",
+      "name": "Ночной зомби",
+      "model": "Zombie",
+      "boss": false,
+      "count": 37
+    },
+    {
+      "id": "night_skeleton",
+      "name": "Лунный скелет",
+      "model": "SkeletonV3",
+      "boss": false,
+      "count": 37
+    },
+    {
+      "id": "wolf",
+      "name": "Пепельный гончий",
+      "model": "Fox",
+      "boss": false,
+      "count": 125
+    },
+    {
+      "id": "exile",
+      "name": "Проклятый изгнанник",
+      "model": "Rogue",
+      "boss": false,
+      "count": 65
+    },
+    {
+      "id": "spider",
+      "name": "Теневой слизень",
+      "model": "Slime",
+      "boss": false,
+      "count": 135
+    },
+    {
+      "id": "undead",
+      "name": "Безымянный мертвец",
+      "model": "SkeletonV3",
+      "boss": false,
+      "count": 120
+    },
+    {
+      "id": "bat",
+      "name": "Пещерный кровопийца",
+      "model": "GiantBat",
+      "boss": false,
+      "count": 96
+    },
+    {
+      "id": "cultist",
+      "name": "Сектант Пепла",
+      "model": "Wizard",
+      "boss": false,
+      "count": 79
+    },
+    {
+      "id": "miner",
+      "name": "Одержимый рудокоп",
+      "model": "Zombie",
+      "boss": false,
+      "count": 69
+    },
+    {
+      "id": "wraith",
+      "name": "Болотный призрак",
+      "model": "WraithV3",
+      "boss": false,
+      "count": 90
+    },
+    {
+      "id": "mini",
+      "name": "Кровавый Оборотень",
+      "model": "Werewolf",
+      "boss": true,
+      "count": 1
+    },
+    {
+      "id": "big",
+      "name": "Хозяин Гнилого Леса",
+      "model": "ForestLord",
+      "boss": true,
+      "count": 1
+    }
+  ],
+  "groups": [
+    {
+      "x": -595.376,
+      "z": -210.933,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g000",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -394.981,
+      "z": -10.622,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g001",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -315.549,
+      "z": -120.977,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g002",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -626.412,
+      "z": -131.8,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g003",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -676.115,
+      "z": -155.953,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g004",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -430.166,
+      "z": 170.45,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g005",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -715.445,
+      "z": -59.074,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g006",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -746.75,
+      "z": 205.575,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g007",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -571.209,
+      "z": -176.913,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g008",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 4
+    },
+    {
+      "x": -786.281,
+      "z": 210.496,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g009",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -650.763,
+      "z": -110.329,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g010",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -380.63,
+      "z": -66.267,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g011",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -624.921,
+      "z": 179.646,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g012",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -416.118,
+      "z": 28.473,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g013",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -345.652,
+      "z": 114.444,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g014",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -636.124,
+      "z": -59.662,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g015",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -410.114,
+      "z": -185.894,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g016",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -739.582,
+      "z": 80.251,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g017",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 4
+    },
+    {
+      "x": -779.158,
+      "z": 113.812,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g018",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -320.189,
+      "z": 93.89,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g019",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -709.081,
+      "z": 103.845,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g020",
+      "speciesId": "wolf",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 2
+    },
+    {
+      "x": -711.589,
+      "z": -160.138,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g021",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -310.136,
+      "z": 50.072,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g022",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -550.374,
+      "z": -139.992,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g023",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -326.957,
+      "z": -10.548,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g024",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -371.094,
+      "z": 74.829,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g025",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -390.042,
+      "z": 130.721,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g026",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -690.656,
+      "z": -99.686,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g027",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -579.731,
+      "z": -139.971,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g028",
+      "speciesId": "spider",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -751.524,
+      "z": -20.611,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g029",
+      "speciesId": "exile",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -371.79,
+      "z": 45.621,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g030",
+      "speciesId": "exile",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 4
+    },
+    {
+      "x": -341.705,
+      "z": 153.57,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g031",
+      "speciesId": "exile",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 4
+    },
+    {
+      "x": -706.623,
+      "z": 65.816,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g032",
+      "speciesId": "exile",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 5
+    },
+    {
+      "x": -540.313,
+      "z": -180.107,
+      "spaceId": "surface",
+      "groupId": "wf:living_forest:g033",
+      "speciesId": "exile",
+      "locationId": "L03",
+      "subzoneId": "living_forest",
+      "count": 2
+    },
+    {
+      "x": -169.383,
+      "z": 428.031,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g000",
+      "speciesId": "big",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 1
+    },
+    {
+      "x": -245.711,
+      "z": 400.897,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g001",
+      "speciesId": "undead",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 9
+    },
+    {
+      "x": -165.674,
+      "z": 333.472,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g002",
+      "speciesId": "undead",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 9
+    },
+    {
+      "x": -271.487,
+      "z": 314.916,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g003",
+      "speciesId": "undead",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 9
+    },
+    {
+      "x": -214.721,
+      "z": 335.678,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g004",
+      "speciesId": "undead",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 8
+    },
+    {
+      "x": -214.53,
+      "z": 414.28,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g005",
+      "speciesId": "wraith",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 8
+    },
+    {
+      "x": -194.54,
+      "z": 463.658,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g006",
+      "speciesId": "wraith",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 8
+    },
+    {
+      "x": -110.844,
+      "z": 343.189,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g007",
+      "speciesId": "wraith",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 7
+    },
+    {
+      "x": -309.117,
+      "z": 284.736,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g008",
+      "speciesId": "wraith",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 7
+    },
+    {
+      "x": -149.145,
+      "z": 464.483,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g009",
+      "speciesId": "night_zombie",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 6
+    },
+    {
+      "x": -244.803,
+      "z": 369.338,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g010",
+      "speciesId": "night_zombie",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 6
+    },
+    {
+      "x": -240.796,
+      "z": 324.438,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g011",
+      "speciesId": "night_skeleton",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 6
+    },
+    {
+      "x": -136.386,
+      "z": 420.736,
+      "spaceId": "surface",
+      "groupId": "wf:rotten_forest:g012",
+      "speciesId": "night_skeleton",
+      "locationId": "L03",
+      "subzoneId": "rotten_forest",
+      "count": 6
+    },
+    {
+      "x": -559.076,
+      "z": 529.573,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g000",
+      "speciesId": "mini",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 1
+    },
+    {
+      "x": -501.059,
+      "z": 365.552,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g001",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 4
+    },
+    {
+      "x": -584.928,
+      "z": 443.946,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g002",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -521.925,
+      "z": 530.735,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g003",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 4
+    },
+    {
+      "x": -601.442,
+      "z": 335.836,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g004",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 4
+    },
+    {
+      "x": -466.745,
+      "z": 488.064,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g005",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -559.803,
+      "z": 339.779,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g006",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -516.799,
+      "z": 575.651,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g007",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -586.029,
+      "z": 269.623,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g008",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -650.555,
+      "z": 320.462,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g009",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -615.564,
+      "z": 413.438,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g010",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 4
+    },
+    {
+      "x": -575.775,
+      "z": 390.469,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g011",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -554.811,
+      "z": 583.923,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g012",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -541.383,
+      "z": 460.351,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g013",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -500.656,
+      "z": 478.505,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g014",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -529.8,
+      "z": 355.377,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g015",
+      "speciesId": "ice_golem",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 3
+    },
+    {
+      "x": -625.386,
+      "z": 308.053,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g016",
+      "speciesId": "wolf",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 5
+    },
+    {
+      "x": -495.976,
+      "z": 509.675,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g017",
+      "speciesId": "wolf",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 4
+    },
+    {
+      "x": -535.141,
+      "z": 385.962,
+      "spaceId": "surface",
+      "groupId": "wf:snow:g018",
+      "speciesId": "wolf",
+      "locationId": "L04",
+      "subzoneId": "snow",
+      "count": 1
+    },
+    {
+      "x": -56.012,
+      "z": 360.217,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g000",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 5
+    },
+    {
+      "x": 75.139,
+      "z": 394.69,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g001",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 5
+    },
+    {
+      "x": 10.63,
+      "z": 415.089,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g002",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 5
+    },
+    {
+      "x": -16.575,
+      "z": 380.126,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g003",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 5
+    },
+    {
+      "x": 39.885,
+      "z": 425.502,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g004",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 4
+    },
+    {
+      "x": 39.704,
+      "z": 394.957,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g005",
+      "speciesId": "bat",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 5
+    },
+    {
+      "x": 128.626,
+      "z": 395.229,
+      "spaceId": "surface",
+      "groupId": "wf:mine_exterior:g006",
+      "speciesId": "bat",
+      "locationId": "L05",
+      "subzoneId": "mine_exterior",
+      "count": 1
+    },
+    {
+      "x": 41.492,
+      "z": 269.554,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g000",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": 1.273,
+      "z": 85.42,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g001",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -62.375,
+      "z": 129.834,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g002",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -28.193,
+      "z": 89.181,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g003",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": 55.069,
+      "z": 250.972,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g004",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -34.109,
+      "z": 199.167,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g005",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": 52.941,
+      "z": 135.663,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g006",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 4
+    },
+    {
+      "x": -99.326,
+      "z": 230.701,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g007",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -12.787,
+      "z": 213.226,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g008",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -2.17,
+      "z": 64.395,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g009",
+      "speciesId": "miner",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 1
+    },
+    {
+      "x": 32.609,
+      "z": 150.247,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g010",
+      "speciesId": "bat",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": 67.456,
+      "z": 155.299,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g011",
+      "speciesId": "bat",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": 35.865,
+      "z": 245.599,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g012",
+      "speciesId": "bat",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -72.916,
+      "z": 105.269,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g013",
+      "speciesId": "spider",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 5
+    },
+    {
+      "x": -48.093,
+      "z": 104.752,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g014",
+      "speciesId": "spider",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 4
+    },
+    {
+      "x": 12.267,
+      "z": 235.024,
+      "spaceId": "mine",
+      "groupId": "wf:mine_interior:g015",
+      "speciesId": "spider",
+      "locationId": "L05",
+      "subzoneId": "mine_interior",
+      "count": 1
+    },
+    {
+      "x": 298.61,
+      "z": -144.011,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g000",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 105.735,
+      "z": 274.779,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g001",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 4
+    },
+    {
+      "x": -76.641,
+      "z": 188.959,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g002",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 249.014,
+      "z": -139.124,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g003",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 253.086,
+      "z": 244.838,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g004",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 4
+    },
+    {
+      "x": 360.132,
+      "z": -134.955,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g005",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 23.526,
+      "z": 238.851,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g006",
+      "speciesId": "spider",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 2
+    },
+    {
+      "x": 139.207,
+      "z": 278.912,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g007",
+      "speciesId": "bat",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 190.917,
+      "z": 259.693,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g008",
+      "speciesId": "bat",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 64.502,
+      "z": 248.374,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g009",
+      "speciesId": "bat",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": -29.633,
+      "z": 205.047,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g010",
+      "speciesId": "wolf",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 225.323,
+      "z": 245.688,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g011",
+      "speciesId": "wolf",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": -99.18,
+      "z": 168.038,
+      "spaceId": "surface",
+      "groupId": "wf:shores:g012",
+      "speciesId": "wolf",
+      "locationId": "L06",
+      "subzoneId": "shores",
+      "count": 5
+    },
+    {
+      "x": 15.939,
+      "z": 54.939,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g000",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": 35.571,
+      "z": 364.666,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g001",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -72.484,
+      "z": 200.941,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g002",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": -18.578,
+      "z": 85.258,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g003",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -48.028,
+      "z": 173.246,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g004",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": 67.348,
+      "z": 343.744,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g005",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": 40.95,
+      "z": 178.349,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g006",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": 0.79,
+      "z": 83.598,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g007",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -94.366,
+      "z": 309.936,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g008",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": -13.622,
+      "z": 39.856,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g009",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -117.445,
+      "z": 243.857,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g010",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -102.783,
+      "z": 158.596,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g011",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -4.989,
+      "z": 264.939,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g012",
+      "speciesId": "bat",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": 70.384,
+      "z": 175.764,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g013",
+      "speciesId": "spider",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": 30.418,
+      "z": 225.154,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g014",
+      "speciesId": "spider",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -47.574,
+      "z": 228.154,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g015",
+      "speciesId": "spider",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": 6.451,
+      "z": 240.884,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g016",
+      "speciesId": "spider",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -62.783,
+      "z": 158.47,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g017",
+      "speciesId": "spider",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": -104.895,
+      "z": 293.177,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g018",
+      "speciesId": "spider",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 2
+    },
+    {
+      "x": 47.213,
+      "z": 158.685,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g019",
+      "speciesId": "undead",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -43.848,
+      "z": 128.122,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g020",
+      "speciesId": "undead",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -83.613,
+      "z": 159.017,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g021",
+      "speciesId": "undead",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -92.242,
+      "z": 275.208,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g022",
+      "speciesId": "undead",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 5
+    },
+    {
+      "x": -109.969,
+      "z": 219.416,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g023",
+      "speciesId": "undead",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 4
+    },
+    {
+      "x": -34.815,
+      "z": 248.733,
+      "spaceId": "great_cave",
+      "groupId": "wf:cave_depths:g024",
+      "speciesId": "undead",
+      "locationId": "L07",
+      "subzoneId": "cave_depths",
+      "count": 1
+    },
+    {
+      "x": 625.129,
+      "z": 123.724,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g000",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 634.467,
+      "z": 9.282,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g001",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 663.061,
+      "z": 104.943,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g002",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 4
+    },
+    {
+      "x": 653.132,
+      "z": 139.22,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g003",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 574.963,
+      "z": 65.952,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g004",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 4
+    },
+    {
+      "x": 660.073,
+      "z": 190.92,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g005",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 533.626,
+      "z": -16.236,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g006",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 633.116,
+      "z": 59.975,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g007",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 4
+    },
+    {
+      "x": 695.592,
+      "z": 105.017,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g008",
+      "speciesId": "cultist",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 3
+    },
+    {
+      "x": 658.915,
+      "z": 25.872,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g009",
+      "speciesId": "undead",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 695.82,
+      "z": 69.566,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g010",
+      "speciesId": "undead",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 600.813,
+      "z": 105.33,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g011",
+      "speciesId": "undead",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 5
+    },
+    {
+      "x": 590.366,
+      "z": 8.66,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g012",
+      "speciesId": "undead",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 4
+    },
+    {
+      "x": 694.896,
+      "z": 39.641,
+      "spaceId": "surface",
+      "groupId": "wf:sanctuary:g013",
+      "speciesId": "undead",
+      "locationId": "L08",
+      "subzoneId": "sanctuary",
+      "count": 1
+    },
+    {
+      "x": 545.798,
+      "z": 489.907,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g000",
+      "speciesId": "rift_boss",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 1
+    },
+    {
+      "x": 440.071,
+      "z": 518.885,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g001",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 309.482,
+      "z": 318.804,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g002",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 668.687,
+      "z": 300.939,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g003",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 513.497,
+      "z": 530.676,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g004",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 725.397,
+      "z": 413.136,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g005",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 583.237,
+      "z": 209.753,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g006",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 453.108,
+      "z": 585.247,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g007",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 575.018,
+      "z": 518.015,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g008",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 565.193,
+      "z": 630.281,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g009",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 514.611,
+      "z": 424.878,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g010",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 700.41,
+      "z": 143.867,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g011",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 563.596,
+      "z": 420.72,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g012",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 428.259,
+      "z": 483.328,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g013",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 675.174,
+      "z": 530.124,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g014",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 590.099,
+      "z": 273.218,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g015",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 545.84,
+      "z": 369.573,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g016",
+      "speciesId": "fire_golem",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 485.936,
+      "z": 240.582,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g017",
+      "speciesId": "cultist",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 5
+    },
+    {
+      "x": 655.801,
+      "z": 505.327,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g018",
+      "speciesId": "cultist",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 609.074,
+      "z": 303.58,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g019",
+      "speciesId": "cultist",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 4
+    },
+    {
+      "x": 544.935,
+      "z": 443.644,
+      "spaceId": "surface",
+      "groupId": "wf:volcano:g020",
+      "speciesId": "cultist",
+      "locationId": "L09",
+      "subzoneId": "volcano",
+      "count": 1
+    },
+    {
+      "x": 29.75,
+      "z": -441.635,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g000",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -80.12,
+      "z": -400.987,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g001",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -129.321,
+      "z": -451.407,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g002",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -164.039,
+      "z": -529.313,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g003",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -170.727,
+      "z": -411.391,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g004",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": 153.118,
+      "z": -310.734,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g005",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -0.92,
+      "z": -505.934,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g006",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -84.61,
+      "z": -496.425,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g007",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -125.755,
+      "z": -534.927,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g008",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 4
+    },
+    {
+      "x": 210.592,
+      "z": -401.046,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g009",
+      "speciesId": "exile",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 1
+    },
+    {
+      "x": -144.947,
+      "z": -495.563,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g010",
+      "speciesId": "cultist",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": 80.295,
+      "z": -301.226,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g011",
+      "speciesId": "cultist",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 4
+    },
+    {
+      "x": -136.607,
+      "z": -375.15,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g012",
+      "speciesId": "cultist",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": 174.794,
+      "z": -416.697,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g013",
+      "speciesId": "cultist",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": -11.456,
+      "z": -465.285,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g014",
+      "speciesId": "cultist",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 5
+    },
+    {
+      "x": 45.108,
+      "z": -335.476,
+      "spaceId": "surface",
+      "groupId": "wf:ruins:g015",
+      "speciesId": "cultist",
+      "locationId": "L10",
+      "subzoneId": "ruins",
+      "count": 1
+    },
+    {
+      "x": -739.353,
+      "z": -529.68,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g000",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -571.211,
+      "z": -601.197,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g001",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -699.536,
+      "z": -386.061,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g002",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -686.654,
+      "z": -661.071,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g003",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -684.371,
+      "z": -444.371,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g004",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 4
+    },
+    {
+      "x": -636.127,
+      "z": -351.827,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g005",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -769.254,
+      "z": -271.897,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g006",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -646.535,
+      "z": -649.292,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g007",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -621.196,
+      "z": -580.942,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g008",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -414.683,
+      "z": -496.315,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g009",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -765.449,
+      "z": -671.215,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g010",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -750.43,
+      "z": -304.802,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g011",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -545.357,
+      "z": -686.527,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g012",
+      "speciesId": "wraith",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 1
+    },
+    {
+      "x": -574.127,
+      "z": -516.014,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g013",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 4
+    },
+    {
+      "x": -585.473,
+      "z": -540.221,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g014",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -786.563,
+      "z": -414.692,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g015",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 5
+    },
+    {
+      "x": -406.508,
+      "z": -574.112,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g016",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 4
+    },
+    {
+      "x": -375.526,
+      "z": -461.033,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g017",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 4
+    },
+    {
+      "x": -639.797,
+      "z": -466.234,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g018",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 4
+    },
+    {
+      "x": -734.939,
+      "z": -586.893,
+      "spaceId": "surface",
+      "groupId": "wf:swamp:g019",
+      "speciesId": "spider",
+      "locationId": "L11",
+      "subzoneId": "swamp",
+      "count": 4
+    },
+    {
+      "x": 694.717,
+      "z": -256.427,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g000",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 558.691,
+      "z": -616.095,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g001",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 4
+    },
+    {
+      "x": 375.616,
+      "z": -556.419,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g002",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 548.282,
+      "z": -239.68,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g003",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 505.157,
+      "z": -669.944,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g004",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 598.851,
+      "z": -249.323,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g005",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 615.981,
+      "z": -310.495,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g006",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 603.913,
+      "z": -201.833,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g007",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 4
+    },
+    {
+      "x": 705.107,
+      "z": -216.723,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g008",
+      "speciesId": "undead",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 2
+    },
+    {
+      "x": 725.057,
+      "z": -289.582,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g009",
+      "speciesId": "night_zombie",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 760.192,
+      "z": -540.991,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g010",
+      "speciesId": "night_zombie",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 339.575,
+      "z": -486.092,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g011",
+      "speciesId": "night_zombie",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 640.995,
+      "z": -466.29,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g012",
+      "speciesId": "night_zombie",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 760.005,
+      "z": -686.772,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g013",
+      "speciesId": "night_zombie",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 459.52,
+      "z": -419.271,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g014",
+      "speciesId": "night_skeleton",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 493.424,
+      "z": -389.454,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g015",
+      "speciesId": "night_skeleton",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 4
+    },
+    {
+      "x": 789.399,
+      "z": -354.814,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g016",
+      "speciesId": "night_skeleton",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 664.331,
+      "z": -234.977,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g017",
+      "speciesId": "night_skeleton",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 715.909,
+      "z": -406.282,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g018",
+      "speciesId": "night_skeleton",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 5
+    },
+    {
+      "x": 729.926,
+      "z": -656.798,
+      "spaceId": "surface",
+      "groupId": "wf:necropolis:g019",
+      "speciesId": "night_skeleton",
+      "locationId": "L12",
+      "subzoneId": "necropolis",
+      "count": 1
+    }
+  ]
+}
