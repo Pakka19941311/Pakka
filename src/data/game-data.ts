@@ -1,3 +1,4 @@
+import {CAVE_BOSS_DEFINITION} from './cave-boss.ts';
 import { BOOK_ITEMS } from './skill-books.ts';
 // Centralized gameplay manifest. Presentation code must not invent balance values.
 export const CLASSES = {
@@ -91,6 +92,7 @@ export const ITEMS = {
 export const MONSTERS = {
   fire_golem:{visualModel:'FireGolem',visualHeight:3.1,name:'Огненный голем',model:'FireGolem',level:20,hp:650,atk:60,xp:750,gold:[45,75],tint:0xff6c28,scale:1.45,drops:[]},
   ice_golem:{visualModel:'IceGolem',visualHeight:3.1,name:'Ледяной голем',model:'IceGolem',level:22,hp:750,atk:66,xp:950,gold:[55,90],tint:0x86d6ee,scale:1.5,drops:[]},
+  cave_boss:CAVE_BOSS_DEFINITION,
   rift_boss:{visualModel:'RiftWarden',visualHeight:5.1,name:'Страж раскалённого разлома',model:'RiftWarden',level:25,hp:9000,atk:90,xp:9000,gold:[1400,2000],tint:0xff963e,scale:2.3,boss:'big',drops:[]},
   night_zombie:{visualModel:'Zombie',visualHeight:1.92,name:'Ночной зомби',model:'Monk',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0x70885b,scale:.8,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['ember_ring',.01],['fang_necklace',.01]]},
   night_skeleton:{visualModel:'SkeletonV3',visualHeight:1.92,name:'Лунный скелет',model:'Skeleton',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0xc3d1bd,scale:.78,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['ember_ring',.01],['fang_necklace',.01]]},

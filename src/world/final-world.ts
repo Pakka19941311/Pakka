@@ -1,3 +1,4 @@
+import {CAVE_BOSS_SLOT} from '../data/cave-boss.ts';
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
 import {createHash} from 'node:crypto';
@@ -128,8 +129,9 @@ export class FinalWorld {
       this.services[id]={...npc,...p,spaceId:'surface'};
     }
     this.slots=loadPopulation?json('gameplay/spawn-manifest.json').slots:[];
+    if(loadPopulation&&(this.slots.length!==1000||new Set(this.slots.map(s=>s.uid)).size!==1000))throw Error('final-population-capacity');
+    if(loadPopulation)this.slots.push(structuredClone(CAVE_BOSS_SLOT));
     this.slotById=new Map(this.slots.map(s=>[s.uid,s]));
-    if(loadPopulation&&(this.slots.length!==1000||this.slotById.size!==1000))throw Error('final-population-capacity');
     digest.update(JSON.stringify({layout:this.layout,slots:this.slots,services:this.services}));
     this.mapVersion=this.revision+'-'+digest.digest('hex');
   }

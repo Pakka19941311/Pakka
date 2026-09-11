@@ -18,6 +18,7 @@ static func run(app: Node) -> void:
 	if block in ["all","potions"]: await potions(app,checks)
 	if block in ["all","drag"]: await drag(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
+	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)
 	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)
@@ -162,3 +163,56 @@ static func autorun(app: Node, checks: Dictionary) -> void:
 	var field: LineEdit = LineEdit.new(); app.active_dialog.add_child(field); field.grab_focus()
 	key(app,KEY_R); checks.autorun_typing_ignored = not app.player_input.autorun
 	app.close_dialog(); app.player_input.stop_autorun(); app.net.intent({"type":"cancel"})
+
+static func cave(app: Node, checks: Dictionary) -> void:
+	const BOSS: String = "wf:great_cave:cave_boss:000"
+	app.close_dialog(); app.inventory_panel.hide()
+	await Mouse.fixture(app,"cave-entrance")
+	checks.cave_visible_entrance = app.world.final_environment.roots.surface.has_node("PortalMarkers/great_cave/PortalLabel")
+	await Wait.capture(app,"cave-entrance")
+	key(app,KEY_R); await Keys.wait_ms(app.get_tree(),100); key(app,KEY_F)
+	checks.cave_enter = await Wait.until(app,func(): return app.net.hero.get("spaceId","") == "great_cave" and not app.world.space_loading,20000)
+	await Keys.wait_ms(app.get_tree(),400)
+	var entry: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
+	await Keys.wait_ms(app.get_tree(),300)
+	checks.cave_transition_stops_run = not app.player_input.autorun and entry.distance_to(Vector2(app.net.hero.x,app.net.hero.z))<.04
+	key(app,KEY_F); await Keys.wait_ms(app.get_tree(),200)
+	checks.cave_no_immediate_bounce = app.net.hero.spaceId == "great_cave"
+	checks.cave_safe_floor = not app.world.collision.blocked(entry) and app.world.hero_position.y>app.world.height_at(entry.x,entry.y)-.2
+	checks.cave_has_monsters_and_one_boss = app.world.current_snapshot.monsters.filter(func(m): return m.uid==BOSS).size()==1 and app.world.current_snapshot.monsters.any(func(m): return m.uid!=BOSS and m.alive)
+	await Wait.capture(app,"cave-inside")
+	app.net.intent({"type":"destination","x":20,"z":86})
+	checks.cave_walk_to_hall = await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(Vector2(20,86))<.7,45000)
+	var actor: Node3D = app.world.actors.get(BOSS)
+	checks.cave_boss_rendered = is_instance_valid(actor) and actor.visible
+	if not is_instance_valid(actor): return
+	var gold: int = int(app.net.hero.gold)
+	var position: Vector2 = app.world.camera.unproject_position(actor.position+Vector3.UP*2.5)
+	Mouse.mouse(app,position)
+	checks.cave_boss_targetable = await Wait.until(app,func(): return app.world.target_id == BOSS,1500)
+	app.activate("attack")
+	checks.cave_boss_takes_damage = await Wait.until(app,func(): return app.world.current_snapshot.monsters.any(func(m): return m.uid==BOSS and m.hp<14400),20000)
+	checks.cave_boss_aoe = await Wait.until(app,func(): return app.world.current_snapshot.get("groundEffects",[]).any(func(e): return e.owner==BOSS and e.kind=="slam"),8000)
+	await Wait.capture(app,"cave-boss-fight")
+	await Mouse.fixture(app,"cave-finish")
+	app.activate("attack")
+	checks.cave_boss_death_loot = await Wait.until(app,func(): return int(app.net.hero.gold)==gold+100000 and app.world.current_snapshot.monsters.any(func(m): return m.uid==BOSS and not m.alive),15000)
+	await Wait.capture(app,"cave-boss-loot")
+	app.net.intent({"type":"destination","x":0,"z":-6})
+	checks.cave_walk_to_exit = await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(Vector2(0,-6))<.7,45000)
+	app.world.camera_controller.yaw = PI
+	app.world.camera_controller.smoothed_yaw = PI
+	await Keys.wait_ms(app.get_tree(),300)
+	await Wait.capture(app,"cave-exit")
+	Mouse.mouse(app,app.world.camera.unproject_position(app.world.point(0,-8,1.3)))
+	checks.cave_click_exit = await Wait.until(app,func(): return app.net.hero.spaceId=="surface" and not app.world.space_loading,15000)
+	if not checks.cave_click_exit: return
+	await Keys.wait_ms(app.get_tree(),250)
+	checks.cave_exit_facing_safe = absf(absf(float(app.net.hero.yaw))-PI)<.05 and not app.world.collision.blocked(Vector2(app.net.hero.x,app.net.hero.z))
+	app.net.intent({"type":"destination","x":245,"z":278})
+	await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(Vector2(245,278))<.5,5000)
+	key(app,KEY_F)
+	checks.cave_reentry = await Wait.until(app,func(): return app.net.hero.spaceId=="great_cave" and not app.world.space_loading,15000)
+	await Keys.wait_ms(app.get_tree(),500)
+	var bosses: Array = app.world.current_snapshot.monsters.filter(func(m): return m.uid==BOSS)
+	checks.cave_no_duplicate_or_instant_respawn = bosses.size()==1 and not bosses[0].alive and int(app.net.hero.gold)==gold+100000

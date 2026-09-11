@@ -766,6 +766,7 @@ func interact() -> void:
 	if world.final_environment != null and not net.hero.is_empty():
 		var portal_id: String = world.final_environment.portal_near(Vector2(net.hero.x,net.hero.z))
 		if not portal_id.is_empty():
+			player_input.stop_autorun()
 			net.command({"type":"portal","destination":portal_id})
 			return
 	npc_interaction.begin(world.target_id)
@@ -1084,6 +1085,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		refresh_inventory()
 		get_viewport().set_input_as_handled()
 		return
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT and world.final_environment != null and not world.space_loading:
+		var portal: String = world.final_environment.portal_clicked(event.position)
+		if not portal.is_empty():
+			player_input.stop_autorun(); net.command({"type":"portal","destination":portal})
+			get_viewport().set_input_as_handled(); return
 	if player_input.mouse(event):
 		get_viewport().set_input_as_handled()
 		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]: save_preferences()

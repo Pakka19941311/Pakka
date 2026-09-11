@@ -1,3 +1,4 @@
+import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss.ts';
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
@@ -122,6 +123,10 @@ export class WorldSimulation {
     const loaded=this.store.load();
     this.state = loaded ?? {schema:1,mapVersion:this.mapContentVersion,territoryVersion:TERRITORY_VERSION,time:options.now,revision:0,sequence:0,characters:{},monsters:[],summons:[],pending:[]};
     if (this.state.schema !== 1) throw Error('unsupported-world-schema');
+    // The cave timer advances only while the game process runs. Other existing
+    // clocks retain their own lifecycle; a restart preserves this remaining delay.
+    if(loaded)for(const m of this.state.monsters)if(m.uid===CAVE_BOSS_UID&&!m.alive)
+      m.respawnAt+=Math.max(0,options.now-this.state.time);
     if(this.finalWorld)this.migrateFinalWorld();
     else if(loaded)migrateTerritory(this.state,this.collision,this.mapContentVersion);
     this.state.projectiles??=[];
@@ -142,7 +147,7 @@ export class WorldSimulation {
     }
     // Process restarts cancel unfinished windups; already released projectiles
     // remain server-owned and retain their generation checks.
-    this.state.pending=this.state.pending.filter(a=>a.monster);
+    this.state.pending=this.state.pending.filter(a=>a.monster&&a.actor!==CAVE_BOSS_UID);
     this.advance(options.now);
     this.store.save(this.state);
   }
@@ -391,8 +396,10 @@ export class WorldSimulation {
       const surface={x:def.surface_portal[0],z:-def.surface_portal[2],spaceId:'surface' as const};
       const entry={x:def.entry[0],z:-def.entry[2],spaceId:space.id};
       const from=spaceOf(p)==='surface'?surface:entry;
-      if(!sameSpace(p,from)||distance(p,from)>7||!p.grounded)throw Error('portal-out-of-range');
-      this.relocate(p,spaceOf(p)==='surface'?{...entry,z:entry.z+4}:{...surface,z:surface.z-8});return;
+      if(!sameSpace(p,from)||distance(p,from)>3.2||!p.grounded||!this.lineOfSight(p,from))throw Error('portal-out-of-range');
+      const entering=spaceOf(p)==='surface';
+      this.relocate(p,entering?{...entry,z:entry.z+4}:{...surface,z:surface.z-8});
+      p.yaw=entering?0:Math.PI;return;
     }
     if (command.type==='collect') {
       const retained: InventoryItem[]=[];
@@ -437,7 +444,7 @@ export class WorldSimulation {
       ...(this.state.bookAreas??[]).filter(a=>a.remaining>0).map(a=>({id:a.owner+':'+a.id,kind:'area' as const,owner:a.owner,point:a.point,radius:a.radius,expiresAt:a.nextAt+(a.remaining-1)*a.interval,effect:a.fx})),
       ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'}))
     ];
-    return structuredClone({groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?1000:undefined,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
+    return structuredClone({groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
       monsters:this.state.monsters.filter(m=>sameSpace(m,character)&&(!this.finalWorld||distance(m,character)<135)).map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons.filter(m=>sameSpace(m,character)),events:this.events.filter(e=>e.sequence>afterEvent&&(!this.finalWorld||e.spaceId===spaceOf(character)))});
   }
@@ -579,7 +586,7 @@ export class WorldSimulation {
       this.event('release',s.uid,m.uid,{effect:'slash',durationMs:0,generation:m.generation});this.damage(m,a.damage!,p,false);return;}
     if(a.monster){
       const m=this.state.monsters.find(m=>m.uid===a.actor&&m.alive)!;const p=this.state.characters[a.target];
-      if(a.slam){for(const victim of Object.values(this.state.characters).filter(v=>!v.dead&&v.activeUntil>this.state.time&&!this.safe(v)&&distance(v,a.slam!)<=4&&this.lineOfSight(m,v)))this.monsterHit(m,victim,1.4);return;}
+      if(a.slam){for(const victim of Object.values(this.state.characters).filter(v=>sameSpace(m,v)&&!v.dead&&v.activeUntil>this.state.time&&!this.safe(v)&&distance(v,a.slam!)<=4&&this.lineOfSight(m,v)))this.monsterHit(m,victim,1.4);return;}
       if(distance(m,p)>=this.monsterRange(m)+.25||!this.lineOfSight(m,p)||!facingTarget(m.yaw,m,p))return;
       m.combatState='recovery';
       this.monsterHit(m,p);return;
@@ -675,7 +682,7 @@ export class WorldSimulation {
       atPatrolPoint:!point||distance(m,point)<.55,aggroRadius:region?.aggroRadius??(boss?11:9),
       leashRadius,attackRange:this.monsterRange(m)});
     m.targetId=decision.targetId;m.combatState='idle';
-    if(decision.changed&&decision.intent==='return'&&['fire_golem','ice_golem','rift_boss'].includes(m.id)){
+    if(decision.changed&&decision.intent==='return'&&['fire_golem','ice_golem','rift_boss',CAVE_BOSS_ID].includes(m.id)){
       this.cancelAttack(m.uid);m.hp=def.hp;m.phase=1;m.owner=undefined;m.bookDots=[];m.bookEffects=[];m.nextSlamAt=undefined;
     }
     if(m.pairId&&m.targetId&&target&&['chase','attack'].includes(decision.intent)){
@@ -703,14 +710,15 @@ export class WorldSimulation {
         // extra facing wait before the animation. Contact still checks facing.
         m.combatState='face';this.action(m,'idle');m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),9,dt);
         if(m.attackReadyAt<=this.state.time){
-          m.attackReadyAt=this.state.time+(m.id==='fire_golem'?2500:m.id==='ice_golem'?2800:m.id==='rift_boss'?2400:(boss?1450:2050)/rage)/(1-this.books.value(m,'attackSlow')/100);
-          const slam=m.id==='rift_boss'&&(m.nextSlamAt??0)<=this.state.time;
+          m.attackReadyAt=this.state.time+(m.id==='fire_golem'?2500:m.id==='ice_golem'?2800:[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?2400:(boss?1450:2050)/rage)/(1-this.books.value(m,'attackSlow')/100);
+          const slam=m.id===CAVE_BOSS_ID||m.id==='rift_boss'&&(m.nextSlamAt??0)<=this.state.time;
+          const slamPoint=m.id===CAVE_BOSS_ID?{x:target.x,z:target.z,spaceId:m.spaceId}:{x:m.x,z:m.z,spaceId:m.spaceId};
           if(slam)m.nextSlamAt=this.state.time+9000;
-          const custom=m.id==='fire_golem'?{duration:1500,windup:900}:m.id==='ice_golem'?{duration:1700,windup:1100}:m.id==='rift_boss'?{duration:slam?1900:1600,windup:slam?1400:1000}:null;
+          const custom=m.id==='fire_golem'?{duration:1500,windup:900}:m.id==='ice_golem'?{duration:1700,windup:1100}:[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?{duration:slam?1900:1600,windup:slam?1400:1000}:null;
           const rawTiming=custom??attackTimings(def.model),timing={duration:rawTiming.duration/(custom?1:rage),windup:rawTiming.windup/(custom?1:rage)},endsAt=this.tickDeadline(timing.duration),impactAt=this.tickDeadline(timing.windup);
-          this.state.pending.push({actor:m.uid,target:target.id,generation:target.generation,actorGeneration:m.generation,hitAt:impactAt,endsAt,skill:null,monster:true,...(slam?{slam:{x:m.x,z:m.z,spaceId:m.spaceId}}:{})});
+          this.state.pending.push({actor:m.uid,target:target.id,generation:target.generation,actorGeneration:m.generation,hitAt:impactAt,endsAt,skill:null,monster:true,...(slam?{slam:slamPoint}:{})});
           this.action(m,'attack',endsAt);m.combatState='windup';m.hitAt=impactAt;
-          this.event('attack',m.uid,target.id,{impactAt,endsAt,generation:target.generation,actorGeneration:m.generation,...(slam?{effect:'slam',origin:{x:m.x,z:m.z,y:this.terrainFor(m).supportAt(m.x,m.z)},durationMs:1400}:{})});
+          this.event('attack',m.uid,target.id,{impactAt,endsAt,generation:target.generation,actorGeneration:m.generation,...(slam?{effect:'slam',origin:{...slamPoint,y:this.terrainFor(m).supportAt(slamPoint.x,slamPoint.z)},durationMs:1400}:{})});
         }
       }
     }else if(decision.intent==='return'){
@@ -770,7 +778,7 @@ export class WorldSimulation {
       m.deathAt=this.state.time;m.corpseUntil=this.state.time+REFERENCE_DEATH_MS+REFERENCE_CORPSE_MS;
       // Browser MonsterLifecycle starts its existing respawn delay after corpse
       // display, rather than consuming that delay while the body is visible.
-      m.respawnAt=m.corpseUntil+(m.id==='rift_boss'?3600:m.id.includes('golem')?45+this.random()*15:'boss' in def?bossRespawnSeconds(def.boss as 'mini'|'big',this.random):28+this.random()*20)*1000;
+      m.respawnAt=m.id===CAVE_BOSS_ID?this.state.time+CAVE_BOSS_RESPAWN_MS:m.corpseUntil+(m.id==='rift_boss'?3600:m.id.includes('golem')?45+this.random()*15:'boss' in def?bossRespawnSeconds(def.boss as 'mini'|'big',this.random):28+this.random()*20)*1000;
       m.targetId=null;m.velocityX=0;m.velocityZ=0;m.combatState='dead';this.brains.get(m.uid)?.forceLifecycle('dead');this.paths.delete(m.uid);
       this.cancelAttack(m.uid);this.action(m,'death');this.event('death',m.uid,undefined,{generation:m.generation,endsAt:m.corpseUntil,position:{x:m.x,z:m.z,yOffset:m.yOffset,yaw:m.yaw}});
       for(const player of Object.values(this.state.characters))if(player.target===m.uid)this.cancelControl(player);
@@ -789,7 +797,7 @@ export class WorldSimulation {
     }
   }
   private spawnMonster(id:string,point:Position,uid:string,regionId?:string,index=0):void {
-    const def=MONSTERS[id as MonsterId];const home={...this.collisionFor(point).findNearestFree(point,id==='rift_boss'?1.5:id.includes('golem')?1:id==='big'?1.2:id==='mini'?.9:.42),...(this.finalWorld?{spaceId:spaceOf(point)}:{})};
+    const def=MONSTERS[id as MonsterId];const home={...this.collisionFor(point).findNearestFree(point,[CAVE_BOSS_ID,'rift_boss'].includes(id)?1.5:id.includes('golem')?1:id==='big'?1.2:id==='mini'?.9:.42),...(this.finalWorld?{spaceId:spaceOf(point)}:{})};
     if(this.finalWorld&&this.collisionFor(point).isBlocked(home,.46)){
       if(this.finalWorld.slotById.has(uid))throw Error('final-spawn-blocked:'+uid);
       return; // A temporary summon cannot materialize inside a wall or cliff.
@@ -933,9 +941,9 @@ export class WorldSimulation {
     const length=Math.hypot(start.x-end.x,start.y-end.y,start.z-end.z);
     for(let d=.4;d<length;d+=.4){const t=d/length;const x=start.x+(end.x-start.x)*t,z=start.z+(end.z-start.z)*t,y=start.y+(end.y-start.y)*t;if(y<terrain.heightAt(x,z)+.06)return false;}return true;
   }
-  private monsterRadius(m:WorldMonster):number{return m.id==='rift_boss'?1.5:m.id.includes('golem')?1:m.id==='big'?1.2:m.id==='mini'?.9:.42;}
-  private bodyRadius(actor:Position):number {const m=('uid' in actor&&'id' in actor&&Object.hasOwn(MONSTERS,String(actor.id)))?actor as WorldMonster:undefined;return m?m.id==='rift_boss'?1.65:m.id.includes('golem')?1.05:m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
-  private monsterRange(m:WorldMonster):number{return Math.max(1.65,this.bodyRadius(m)+.64);}
+  private monsterRadius(m:WorldMonster):number{return [CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.5:m.id.includes('golem')?1:m.id==='big'?1.2:m.id==='mini'?.9:.42;}
+  private bodyRadius(actor:Position):number {const m=('uid' in actor&&'id' in actor&&Object.hasOwn(MONSTERS,String(actor.id)))?actor as WorldMonster:undefined;return m?[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.65:m.id.includes('golem')?1.05:m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
+  private monsterRange(m:WorldMonster):number{if(m.id===CAVE_BOSS_ID)return classAttackRange('ranger');return Math.max(1.65,this.bodyRadius(m)+.64);}
   private relocate(p:WorldCharacter,point:Position):void {
     const free=this.collisionFor(point).findNearestFree(point,.46);
     if(this.collisionFor(point).isBlocked(free,.46))throw Error('no-free-arrival');

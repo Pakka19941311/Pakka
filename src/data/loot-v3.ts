@@ -1,3 +1,4 @@
+import {SKILL_BOOKS} from './skill-books.ts';
 // One equipment pool roll, separate resources and scrolls. XP rate never enters loot.
 export type LootStack={id:string;count:number};
 const pools:Record<string,string[]>={
@@ -23,6 +24,13 @@ export function rollLootV3(id:string,random:()=>number):LootStack[]{
  const add=(id:string,count=1)=>{const old=loot.find(i=>i.id===id);if(old)old.count+=count;else loot.push({id,count});};
  const roll=(id:string,chance:number,count=1)=>{if(random()<chance)add(id,count);};
  const pick=(pool:string[],count:number)=>{const remaining=[...pool];for(let i=0;i<count&&remaining.length;i++)add(remaining.splice(Math.min(remaining.length-1,Math.floor(random()*remaining.length)),1)[0]);};
+ if(id==='cave_boss'){
+   for(let i=0;i<3;i++)add(random()<.5?'weapon_scroll':'armor_scroll');
+   for(let i=0;i<3;i++)add(random()<.5?'weapon_scroll_improved':'armor_scroll_improved');
+   pick(WARDEN_EQUIPMENT.slice(0,5),1);
+   if(random()<.2)pick(Object.values(SKILL_BOOKS).filter(b=>b.level>=60).map(b=>b.id),1);
+   return loot;
+ }
  const golem=id==='fire_golem'||id==='ice_golem',boss=['mini','big','rift_boss'].includes(id);
  if(id==='rift_boss'){pick(WARDEN_EQUIPMENT.slice(0,5),1);pick(WARDEN_EQUIPMENT.slice(5),1);pick(GOLEM_EQUIPMENT,1);add('ancient_shard',2+Math.floor(random()*3));add('fire_core',3+Math.floor(random()*3));add('ice_core',3+Math.floor(random()*3));roll('haste',.5);}
  else if(id==='big'){pick(pools.big,2+(random()<.3?1:0));add('boss_seal');add('black_bone',4+Math.floor(random()*3));add('iron',2);}

@@ -47,8 +47,8 @@ func _process(delta: float) -> void:
 		world.sun_light.visible = false
 		world.world_environment.background_mode = Environment.BG_COLOR
 		world.world_environment.background_color = Color("101419")
-		world.world_environment.ambient_light_color = Color("8695a1")
-		world.world_environment.ambient_light_energy = .3
+		world.world_environment.ambient_light_color = Color("bdc9dc") if world.final_environment.active_space == "great_cave" else Color("8695a1")
+		world.world_environment.ambient_light_energy = .7 if world.final_environment.active_space == "great_cave" else .3
 		world.world_environment.fog_enabled = false
 		return
 	world.sun_light.visible = true

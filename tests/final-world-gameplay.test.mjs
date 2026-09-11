@@ -4,6 +4,7 @@ import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {resolve,join,sep} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {stageNativeServer} from '../scripts/package-godot-pc.mjs';
+import {CAVE_BOSS_UID} from '../src/data/cave-boss.ts';
 import {FinalWorld} from '../src/world/final-world.ts';
 import {WorldSimulation} from '../src/server/world-simulation.ts';
 import {CollisionWorld} from '../src/world/collision-world.ts';
@@ -55,16 +56,16 @@ function step(w,ms){const end=w.state.time+ms;while(w.state.time+17<end){for(con
 
 test('final runtime has the approved 1000 stable slots, all 15 species, exact location/subzone/space totals',()=>{
  const w=create(),spec=JSON.parse(readFileSync('docs/world-final/spec/WORLD_REQUIREMENTS.json','utf8'));
- assert.equal(w.state.monsters.length,1000);assert.equal(new Set(w.state.monsters.map(m=>m.uid)).size,1000);
- assert.equal(new Set(w.state.monsters.map(m=>m.id)).size,15);
- assert.equal(w.state.monsters.filter(m=>'boss' in MONSTERS[m.id]).length,3);
+ assert.equal(w.state.monsters.length,1001);assert.equal(new Set(w.state.monsters.map(m=>m.uid)).size,1001);
+ assert.equal(new Set(w.state.monsters.filter(m=>m.uid!==CAVE_BOSS_UID).map(m=>m.id)).size,15);
+ assert.equal(w.state.monsters.filter(m=>'boss' in MONSTERS[m.id]).length,4);
  for(const location of spec.locations){
-  const slots=geography.slots.filter(s=>s.locationId===location.id);
+  const slots=geography.slots.filter(s=>s.locationId===location.id&&s.uid!==CAVE_BOSS_UID);
   assert.equal(slots.filter(s=>!s.boss).length,location.regular,location.id);
   assert.equal(slots.filter(s=>s.boss).length,location.bosses,location.id);
   for(const sub of location.subzones??[])assert.equal(slots.filter(s=>s.subzoneId===sub.id).length,sub.regular+sub.bosses,sub.id);
  }
- for(const space of spec.spaces)assert.equal(w.state.monsters.filter(m=>m.spaceId===space.id).length,space.total);
+ for(const space of spec.spaces)assert.equal(w.state.monsters.filter(m=>m.spaceId===space.id&&m.uid!==CAVE_BOSS_UID).length,space.total);
  for(const slot of geography.slots){
   const c=geography.space(slot).collision,m=w.state.monsters.find(m=>m.uid===slot.uid),radius=w.bodyRadius(m);
   assert.equal(m.home.x,slot.x,slot.uid);assert.equal(m.home.z,slot.z,slot.uid);
@@ -85,7 +86,7 @@ test('portable server contains complete final geography and restores the same 10
   const world=bridge.service.world,p=world.createCharacter('Переносимый мир','knight');
   assert.equal(world.finalWorld.mapVersion,geography.mapVersion);
   assert.equal(world.snapshot(p.id).worldRevision,geography.revision);
-  assert.equal(world.state.monsters.length,1000);
+  assert.equal(world.state.monsters.length,geography.slots.length);
   const ids=world.state.monsters.map(m=>m.uid);world.checkpoint();await bridge.close();bridge=null;
   bridge=await startNativeBridge(options);
   assert.deepEqual(bridge.service.world.state.monsters.map(m=>m.uid),ids);
@@ -99,11 +100,11 @@ test('boss phase summons are explicitly temporary, never respawn or displace the
  const temporary=w.state.monsters.filter(m=>m.temporaryOwner===boss.uid);
  assert.ok(temporary.length>0);
  for(const m of temporary){assert.equal(m.ownerGeneration,boss.generation);assert.ok(m.temporaryUntil>w.state.time);assert.equal(geography.space(m).collision.isBlocked(m,.46),false);}
- assert.equal(w.state.monsters.filter(m=>!m.temporaryOwner).length,1000);
+ assert.equal(w.state.monsters.filter(m=>!m.temporaryOwner).length,geography.slots.length);
  w.damage(boss,boss.hp+1,p,false);step(w,100);
  assert.equal(w.state.monsters.some(m=>m.temporaryOwner===boss.uid),false);
  w.advance(w.state.time+121000);
- assert.equal(w.state.monsters.filter(m=>!m.temporaryOwner).length,1000);
+ assert.equal(w.state.monsters.filter(m=>!m.temporaryOwner).length,geography.slots.length);
  assert.equal(w.state.monsters.some(m=>temporary.some(t=>t.uid===m.uid)),false);
 });
 
@@ -120,12 +121,13 @@ test('legacy hero migrates once; gear, item UIDs, storage, level and progression
   stand(w,hero,{x:def.surface_portal[0],z:-def.surface_portal[2],spaceId:'surface'});
   let r=w.command(hero.id,`enter-${id}`,{type:'portal',destination:id});assert.equal(r.ok,true,r.reason);assert.equal(hero.spaceId,id);assert.equal(hero.level,27);
   w.checkpoint();w=create(store,w.state.time);hero=w.state.characters[hero.id];assert.equal(hero.spaceId,id);assert.equal(hero.level,27);
+  stand(w,hero,{x:def.entry[0],z:-def.entry[2]+1,spaceId:id});
   r=w.command(hero.id,`exit-${id}`,{type:'portal',destination:id});assert.equal(r.ok,true,r.reason);assert.equal(hero.spaceId,'surface');assert.equal(hero.level,27);
  }
  const npc=geography.services['npc:teleport'];stand(w,hero,npc);
  const r=w.command(hero.id,'teleport-keep-level',{type:'teleport',destination:'Астерхолд'});assert.equal(r.ok,true,r.reason);assert.equal(hero.level,27);
  assert.deepEqual(hero.storage,before.storage);assert.deepEqual(hero.inventory,before.inventory);
- assert.equal(w.state.monsters.filter(m=>!m.temporaryOwner).length,1000);
+ assert.equal(w.state.monsters.filter(m=>!m.temporaryOwner).length,geography.slots.length);
 });
 
 test('identical local coordinates in separate spaces never aggro, block or damage each other; streaming retains identity and HP',()=>{
@@ -139,7 +141,7 @@ test('identical local coordinates in separate spaces never aggro, block or damag
  assert.ok(w.snapshot(p.id).monsters.some(n=>n.uid===m.uid&&n.hp===hp));
  stand(w,p,{...geography.start});w.snapshot(p.id);stand(w,p,{...m,x:m.x+12});
  assert.equal(w.snapshot(p.id).monsters.find(n=>n.uid===m.uid).hp,hp);assert.equal(m.generation,generation);
- assert.equal(w.state.monsters.length,1000);
+ assert.equal(w.state.monsters.length,geography.slots.length);
 });
 
 test('new map bounds permit live motion beyond old edges and stop on the first neutral step',()=>{
@@ -169,5 +171,5 @@ test('existing authoritative AI and autoattack kill a real final-world monster; 
  w.checkpoint();w=create(store,w.state.time);p=w.state.characters[p.id];m=w.state.monsters.find(n=>n.uid===m.uid);
  assert.equal(m.alive,false);assert.equal(m.respawnAt,deadline);assert.equal(p.kills,kills);assert.equal(p.xp,xp);
  p.activeUntil=0;w.advance(deadline+50);assert.equal(m.alive,true);assert.equal(m.generation,gen+1);assert.equal(m.hp,MONSTERS[m.id].hp);
- assert.equal(w.state.monsters.filter(n=>!n.temporaryOwner).length,1000);
+ assert.equal(w.state.monsters.filter(n=>!n.temporaryOwner).length,geography.slots.length);
 });

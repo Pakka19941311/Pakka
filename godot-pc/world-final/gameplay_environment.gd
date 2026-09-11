@@ -110,6 +110,7 @@ func activate_space(id: String) -> bool:
 	world.player_motion.bounds_min = Vector2(bounds[0],bounds[1])
 	world.player_motion.bounds_max = Vector2(bounds[2],bounds[3])
 	roots[id].show()
+	build_portal_markers(id)
 	for service_id: String in VarendorNpcInteraction.SERVICES:
 		if world.actors.has(service_id): world.actors[service_id].visible = id == "surface"
 	print("FINAL_WORLD_SPACE_READY "+id)
@@ -197,9 +198,46 @@ func portal_near(p: Vector2) -> String:
 	for id: String in spaces:
 		var raw: Array = spaces[id].surface_portal if active_space == "surface" else spaces[id].entry
 		if active_space != "surface" and active_space != id: continue
-		if p.distance_to(Vector2(raw[0],-raw[2]))<=7: return id
+		var point: Vector2 = Vector2(raw[0],-raw[2])
+		if p.distance_to(point)>3.2: continue
+		var start: Vector3 = world.point(p.x,p.y,1.2)
+		var end: Vector3 = world.point(point.x,point.y,1.2)
+		if world.collision.ray_distance(start,end)>=start.distance_to(end)-.05: return id
 	return ""
 
 func _process(_dt: float) -> void:
 	if active_space == "surface" and nature != null and world.camera != null:
 		nature.update_focus(world.hero_position,world.camera.global_position,false)
+
+func build_portal_markers(id: String) -> void:
+	var root: Node3D = roots[id]
+	if root.has_node("PortalMarkers"): return
+	var group: Node3D = Node3D.new(); group.name = "PortalMarkers"; root.add_child(group)
+	for portal_id: String in spaces:
+		if id != "surface" and id != portal_id: continue
+		var raw: Array = spaces[portal_id].surface_portal if id == "surface" else spaces[portal_id].entry
+		var anchor: Node3D = Node3D.new(); anchor.name = portal_id; group.add_child(anchor)
+		anchor.position = Vector3(raw[0],height_at(raw[0],-raw[2])+.08,raw[2])
+		var glow: StandardMaterial3D = StandardMaterial3D.new()
+		glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED; glow.albedo_color = Color("68d4eb")
+		var ring: MeshInstance3D = MeshInstance3D.new(); var torus: TorusMesh = TorusMesh.new()
+		torus.inner_radius = 1.15; torus.outer_radius = 1.3; torus.rings = 24; torus.ring_segments = 8
+		ring.mesh = torus; ring.material_override = glow; ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		anchor.add_child(ring)
+		var caption: Label3D = Label3D.new()
+		caption.name = "PortalLabel"
+		caption.text = ("Большая пещера" if portal_id == "great_cave" else "Шахта") if id == "surface" else "Выход из пещеры"
+		caption.text += "\nF / ЛКМ — "+("войти" if id == "surface" else "выйти")
+		caption.position.y = 2.7; caption.font_size = 38; caption.outline_size = 8; caption.pixel_size = .008
+		caption.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		caption.modulate = Color("b7f3ff"); caption.visibility_range_end = 55
+		anchor.add_child(caption)
+
+func portal_clicked(screen: Vector2) -> String:
+	var id: String = portal_near(Vector2(world.hero_position.x,-world.hero_position.z))
+	if id.is_empty(): return ""
+	var raw: Array = spaces[id].surface_portal if active_space == "surface" else spaces[id].entry
+	for height: float in [.15,1.3,2.7]:
+		var point: Vector3 = world.point(raw[0],-raw[2],height)
+		if not world.camera.is_position_behind(point) and world.camera.unproject_position(point).distance_to(screen)<48: return id
+	return ""
