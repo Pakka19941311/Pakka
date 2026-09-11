@@ -577,7 +577,7 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 	var item_slot: String = str(definition.get("slot",""))
 	var selected_slot: String = comparison_slot(item_slot)
 	var category: String = "Кольцо" if item_slot == "ring" else str(app.data.slotNames.get(item_slot,item_slot)) if not item_slot.is_empty() else "Расходник" if definition.get("type") == "consumable" else "Свиток улучшения" if definition.get("type") == "enhance" else "Материал"
-	var result: Dictionary = {"title":app.item_name(item),"subtitle":category+(" · надето" if kind == "equipment" else "")+(" · %d шт." % int(item.count) if int(item.count)>1 else ""),"description":str(definition.get("desc",""))+("\nИсточник: "+str(definition.origin) if definition.has("origin") else ""),"rows":item_rows(item),"restrictions":[],"actions":[],"comparisons":[]}
+	var result: Dictionary = {"title":app.item_name(item),"subtitle":category+(" · надето" if kind == "equipment" else "")+(" · %d шт." % int(item.count) if int(item.count)>1 else ""),"description":str(definition.get("desc","")),"rows":item_rows(item),"restrictions":[],"actions":[],"comparisons":[]}
 	if definition.get("type") == "book":
 		result.subtitle = "Книга умения · ур. %d" % int(definition.requiredLevel)
 		result.description = app.book_ui.tooltip(item.id)

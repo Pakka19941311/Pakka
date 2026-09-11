@@ -3398,7 +3398,7 @@ function inventoryTooltip(ref: InventoryItemRef): InventoryTooltip | null {
   const category = definition.slot ? (definition.slot === 'ring' ? 'Кольцо' : SLOT_NAMES_MAP[definition.slot] ?? definition.slot)
     : definition.type === 'consumable' ? 'Расходник' : definition.type === 'enhance' ? 'Свиток улучшения' : 'Материал';
   return {title: `${definition.name}${item.plus ? ` +${item.plus}` : ''}`, subtitle: `${category}${ref.location === 'equipment' ? ' · надето' : ''}${item.count > 1 ? ` · ${item.count} шт.` : ''}`,
-    description: [definition.desc, definition.origin ? `Источник: ${definition.origin}` : ''].filter(Boolean).join('\n'), rows,
+    description: definition.desc || '', rows,
     restrictions: enhancementSelection && definition.slot ? [`${ITEMS_MAP[enhancementSelection.scroll.id].name}: ${item.plus>=15?"предел +15":`+${item.plus} → +${item.plus+1}`}`, `Шанс: ${(scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)*100).toLocaleString('ru-RU',{maximumFractionDigits:2})}%`, scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)===1?'Безопасно.':scrollChance(enhancementSelection.scroll.id,definition.slot,item.plus)>0?'При неудаче предмет уничтожается.':'Этот предмет нельзя усилить выбранным свитком.'] : definition.slot ? ['Без требования уровня.'] : [],
     actions: player.dead ? ['После возрождения действия снова будут доступны.']
       : enhancementSelection && definition.slot ? [scrollChance(enhancementSelection.scroll.id, definition.slot, item.plus) > 0 ? 'Один клик — одна попытка заточки.' : 'Выберите подходящий предмет или отмените заточку.', 'Esc / ПКМ — отменить без расхода свитка.']

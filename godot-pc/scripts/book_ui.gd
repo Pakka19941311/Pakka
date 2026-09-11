@@ -131,6 +131,11 @@ func quest_menu() -> void:
 		var btn: Button = app.button({"":"Принять задание","active":"Задание выполняется","ready":"Получить книгу","claimed":"Книга получена"}.get(state,""),func(): await app.net.command({"type":"bookQuest","level":level}); quest_menu())
 		btn.disabled = state in ["active","claimed"] or int(app.net.hero.level)<level; body.add_child(btn)
 
+static func buff_time(milliseconds: float) -> String:
+	var seconds: int = ceili(milliseconds / 1000.0)
+	if seconds <= 0: return ""
+	return "%d:%02d" % [seconds / 60, seconds % 60] if seconds > 60 else "%d с" % seconds
+
 func refresh_effects(hero: Dictionary, row: HBoxContainer) -> void:
 	var now: float = float(app.world.current_snapshot.get("time",app.net.last_time))
 	var effects: Array = []
@@ -140,6 +145,8 @@ func refresh_effects(hero: Dictionary, row: HBoxContainer) -> void:
 	# The first applied effect is nearest the map; haste always occupies that place.
 	effects.reverse()
 	if float(hero.get("buffs",{}).get("haste",0))>now: effects.append({"id":"haste","expiresAt":hero.buffs.haste})
+	for legacy: String in ["guard","vanish"]:
+		if float(hero.get("buffs",{}).get(legacy,0))>now: effects.append({"id":legacy,"expiresAt":hero.buffs[legacy]})
 	var ids: Array = effects.map(func(e: Dictionary): return str(e.id))
 	var signature: String = ",".join(ids)
 	if signature != effect_signature:
@@ -147,13 +154,18 @@ func refresh_effects(hero: Dictionary, row: HBoxContainer) -> void:
 		for child: Node in row.get_children(): row.remove_child(child); child.queue_free()
 		for effect: Dictionary in effects:
 			var cell: Control = Control.new(); cell.custom_minimum_size = Vector2(38,49); row.add_child(cell)
-			var image: TextureRect = TextureRect.new(); image.texture = icon(effect.id,true); image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; image.size = Vector2(36,36); cell.add_child(image)
+			var image: TextureRect = TextureRect.new(); image.texture = icon({"guard":"book_knight_20","vanish":"book_assassin_20"}.get(str(effect.id),str(effect.id)),true); image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; image.size = Vector2(36,36); cell.add_child(image)
 			cell.tooltip_text = "Стремительность · бег +50%, атака +15%" if effect.id == "haste" else tooltip(effect.id)
 			image.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			var timer: Label = app.label("",10); timer.position = Vector2(0,35); timer.size = Vector2(36,14); timer.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER; timer.mouse_filter = Control.MOUSE_FILTER_IGNORE; cell.add_child(timer)
 			effect_cells[effect.id] = timer
 	for effect: Dictionary in effects:
-		if effect_cells.has(effect.id): effect_cells[effect.id].text = str(ceili((float(effect.expiresAt)-now)/1000))
+		if effect_cells.has(effect.id):
+			var remaining: String = buff_time(float(effect.expiresAt)-now)
+			effect_cells[effect.id].text = remaining
+			var caption: String = {"haste":"Стремительность · бег +50%, атака +15%","guard":"Защита","vanish":"Невидимость"}.get(str(effect.id),"")
+			if caption.is_empty(): caption = tooltip(effect.id)
+			effect_cells[effect.id].get_parent().tooltip_text = caption+"\nОсталось: "+remaining
 
 func position_loot() -> void:
 	if not is_instance_valid(loot_panel): return
