@@ -15,11 +15,11 @@ var nature: Node3D
 var roots: Dictionary = {}
 var loaded_data: Dictionary = {}
 
-func setup(value: VarendorWorld) -> void:
+func setup(value: VarendorWorld) -> bool:
 	world = value
 	layout = read_json("world_layout.json")
 	for item: Dictionary in read_json("interiors/spaces.json").spaces: spaces[item.id] = item
-	await activate_space("surface")
+	return await activate_space("surface")
 
 func read_json(path: String) -> Dictionary:
 	return JSON.parse_string(FileAccess.get_file_as_string(ROOT+path))
@@ -34,7 +34,7 @@ func load_scene(path: String, parent: Node3D) -> Node3D:
 	parent.add_child(node)
 	return node
 
-func activate_space(id: String) -> void:
+func activate_space(id: String) -> bool:
 	for root: Node3D in roots.values(): root.hide()
 	if not roots.has(id):
 		var root: Node3D = Node3D.new()
@@ -48,13 +48,22 @@ func activate_space(id: String) -> void:
 		loaded_data[id] = {"terrain":meta,"heights":raw,"supports":support,"obstacles":obstacles}
 		if id == "surface":
 			var ground: ShaderMaterial = load(ROOT+"materials/geology_material_D12.gd").terrain("D13")
+			var loaded_cells: int = 0
 			for cell: Dictionary in meta.chunks:
 				var cell_node: Node3D = await load_scene("geology-D13/"+str(cell.glb),root)
-				assert(cell_node != null,"Missing final terrain cell")
+				if cell_node == null:
+					push_error("Missing final terrain cell: "+str(cell.glb))
+					return false
 				for mesh: MeshInstance3D in cell_node.find_children("*","MeshInstance3D",true,false): mesh.material_override = ground
+				loaded_cells += 1
+				world.loading_progress.emit("Ландшафт: %d / %d" % [loaded_cells,meta.chunks.size()])
 				await get_tree().process_frame
+			world.loading_progress.emit("Загрузка городов и построек…")
 			var landmarks: Node3D = await load_scene("geography/landmarks.glb",root)
-			assert(landmarks != null,"Missing final architecture")
+			if landmarks == null:
+				push_error("Missing final architecture")
+				return false
+			world.loading_progress.emit("Загрузка леса и растительности…")
 			nature = load(ROOT+"nature/nature_layer.gd").new()
 			nature.authored_revision = "D13"
 			nature.distant_trees = true
@@ -72,7 +81,9 @@ func activate_space(id: String) -> void:
 			for path: String in ["nature/collision-D13.json","nature/groundcover-collision-D13.json"]: obstacles.append_array(read_json(path).obstacles)
 		else:
 			var interior: Node3D = await load_scene("interiors/"+id+".glb",root)
-			assert(interior != null,"Missing final interior")
+			if interior == null:
+				push_error("Missing final interior: "+id)
+				return false
 			# Use the saved interior navigation; runtime does not rebake it.
 			var nav: NavigationRegion3D = NavigationRegion3D.new()
 			nav.navigation_mesh = load(ROOT+"interiors/"+id+"-nav.tres")
@@ -102,6 +113,7 @@ func activate_space(id: String) -> void:
 	for service_id: String in VarendorNpcInteraction.SERVICES:
 		if world.actors.has(service_id): world.actors[service_id].visible = id == "surface"
 	print("FINAL_WORLD_SPACE_READY "+id)
+	return true
 
 func height_at(x: float,z: float,with_support: bool = true) -> float:
 	var b: Array = terrain.get("bounds",[-800,-700,800,700])

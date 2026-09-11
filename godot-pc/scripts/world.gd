@@ -8,6 +8,8 @@ const KNIGHT_SOURCE_HEIGHT: float = 1.84
 
 signal picked(entity_id: String)
 signal moved_to(point: Vector2)
+signal loading_progress(message: String)
+signal loading_failed(message: String)
 
 var book_ui: VarendorBookUI
 var book_ground: VarendorBookGroundEffects = VarendorBookGroundEffects.new()
@@ -90,7 +92,9 @@ func receive_snapshot(snapshot: Dictionary) -> void:
 		if str(snapshot.character.get("spaceId","surface")) != final_environment.active_space:
 			space_loading = true
 			while str(pending_space_snapshot.character.get("spaceId","surface")) != final_environment.active_space:
-				await final_environment.activate_space(str(pending_space_snapshot.character.get("spaceId","surface")))
+				if not await final_environment.activate_space(str(pending_space_snapshot.character.get("spaceId","surface"))):
+					loading_failed.emit("Не удалось загрузить локацию. Перезапустите игру из полностью распакованного пакета.")
+					return
 			snapshot = pending_space_snapshot
 			for id: String in actors.keys():
 				if not id.begins_with("npc:"):
@@ -161,6 +165,7 @@ func _physics_process(delta: float) -> void:
 
 
 func setup(game: Dictionary) -> bool:
+	loading_progress.emit("Подготовка звука…")
 	data = game
 	var canvas: CanvasLayer = CanvasLayer.new()
 	canvas.layer = 0
@@ -186,7 +191,7 @@ func setup(game: Dictionary) -> bool:
 		final_environment = load("res://world-final/gameplay_environment.gd").new()
 		add_child(final_environment)
 		VarendorNpcInteraction.SERVICES = JSON.parse_string(FileAccess.get_file_as_string("res://world-final/gameplay/services.json"))
-		await final_environment.setup(self)
+		if not await final_environment.setup(self): return false
 	else:
 		terrain = JSON.parse_string(FileAccess.get_file_as_string("res://generated/terrain.json"))
 		territory = JSON.parse_string(FileAccess.get_file_as_string("res://generated/territory.json"))
@@ -242,6 +247,7 @@ func setup(game: Dictionary) -> bool:
 			fire_light.light_energy = 1.0
 			fire_light.omni_range = 5.0
 			fire_light.omni_attenuation = 1.6
+	loading_progress.emit("Подготовка города и персонажей…")
 	var environment: WorldEnvironment = WorldEnvironment.new()
 	var env: Environment = Environment.new()
 	env.background_mode = Environment.BG_SKY

@@ -38,6 +38,7 @@ func reconcile(snapshot: Dictionary) -> void:
 	current = {"id":selected_id,"generation":next_generation,"name":world.data.monsters[entity.id].name,"hp":entity.hp,"alive":true,"distance":Vector2(hero.x-entity.x,hero.z-entity.z).length(),"attackRange":hero.get("attackRange",2.6),"combatState":hero.get("combatState","idle"),"entity":entity}
 
 func pick(screen: Vector2) -> String:
+	if not is_instance_valid(world.camera) or world.space_loading: return ""
 	var origin: Vector3 = world.camera.project_ray_origin(screen)
 	var direction: Vector3 = world.camera.project_ray_normal(screen)
 	var closest: float = INF
@@ -58,6 +59,7 @@ func pick(screen: Vector2) -> String:
 	return selected
 
 func ground(screen: Vector2) -> Variant:
+	if not is_instance_valid(world.camera) or world.space_loading: return null
 	var origin: Vector3 = world.camera.project_ray_origin(screen)
 	var direction: Vector3 = world.camera.project_ray_normal(screen)
 	var previous: Vector3 = origin
@@ -70,7 +72,7 @@ func ground(screen: Vector2) -> Variant:
 				else: previous = middle
 			# A ground ray hitting a wall first is not a request to walk through it.
 			if world.collision.ray_distance(origin,point) < origin.distance_to(point)-.1: return null
-			var goal: Vector2 = world.collision.nearest_free(Vector2(point.x,-point.z).clamp(Vector2(-155,-135),Vector2(155,135)))
+			var goal: Vector2 = world.collision.nearest_free(Vector2(point.x,-point.z).clamp(world.player_motion.bounds_min,world.player_motion.bounds_max))
 			return null if world.collision.blocked(goal) else goal
 		previous = point
 	return null

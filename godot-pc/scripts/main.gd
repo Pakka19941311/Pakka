@@ -73,6 +73,9 @@ var quick_panel_node: PanelContainer
 var reference_hud: VarendorReferenceHud = VarendorReferenceHud.new()
 var book_ui: VarendorBookUI = VarendorBookUI.new()
 var polish: VarendorInterfacePolish = VarendorInterfacePolish.new()
+var startup_complete: bool = false
+var loading_layer: CanvasLayer
+var loading_status: Label
 
 func _ready() -> void:
 	if "--qa-scope=monsters" in OS.get_cmdline_user_args():
@@ -102,12 +105,24 @@ func _ready() -> void:
 	world.snapshot_presented.connect(present_snapshot)
 	build_ui()
 	polish.setup(self)
+	ui.hide()
+	build_loading_screen()
+	world.loading_progress.connect(func(message: String):
+		if is_instance_valid(loading_status): loading_status.text = message)
+	world.loading_failed.connect(func(message: String):
+		startup_complete = false
+		ui.hide()
+		if not is_instance_valid(loading_layer): build_loading_screen()
+		loading_status.text = message)
 	world.event_presented.connect(reference_hud.combat_event)
 	login.hide()
+	for arg: String in OS.get_cmdline_user_args():
+		if arg.begins_with("--qa-startup="):
+			preload("res://world-final/startup_acceptance.gd").run(self,arg.trim_prefix("--qa-startup="))
 	notice("Загрузка мира…")
 	await get_tree().process_frame
 	if not await world.setup(data):
-		notice("Не удалось загрузить мир. Полностью распакуйте свежий пакет игры.")
+		loading_status.text = "Не удалось загрузить мир. Полностью распакуйте свежий пакет игры."
 		return
 	world.picked.connect(picked)
 	npc_interaction.setup(world,net)
@@ -122,6 +137,9 @@ func _ready() -> void:
 		selected_item = {}
 		refresh_inventory())
 	world.moved_to.connect(func(point: Vector2): net.intent({"type":"destination","x":point.x,"z":point.y}))
+	startup_complete = true
+	loading_layer.queue_free()
+	ui.show()
 	login.show()
 	for option: String in OS.get_cmdline_user_args():
 		if option.begins_with("--frame-pacing-dir="):
@@ -217,6 +235,32 @@ func place_panel(anchor: int, position: Vector2, size: Vector2) -> PanelContaine
 
 func build_ui() -> void:
 	reference_hud.setup(self)
+
+func build_loading_screen() -> void:
+	loading_layer = CanvasLayer.new()
+	loading_layer.layer = 100
+	add_child(loading_layer)
+	var background: ColorRect = ColorRect.new()
+	background.color = Color("18242c")
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	background.mouse_filter = Control.MOUSE_FILTER_STOP
+	loading_layer.add_child(background)
+	var center: CenterContainer = CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	background.add_child(center)
+	var box: VBoxContainer = VBoxContainer.new()
+	box.add_theme_constant_override("separation",20)
+	center.add_child(box)
+	var title: Label = label("ВАРЕНДОР",36,Color("e6c78a"))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(title)
+	loading_status = label("Загрузка мира…",20)
+	loading_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(loading_status)
+	var hint: Label = label("Подготавливаем ландшафт, город и персонажей.",16)
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	box.add_child(hint)
+	box.add_child(button("Закрыть игру",quit_game))
 
 func build_login() -> void:
 	login = place_panel(Control.PRESET_CENTER, Vector2(-240, -220), Vector2(480, 410))
@@ -911,7 +955,7 @@ func text_focused() -> bool:
 	return get_viewport().gui_get_focus_owner() is LineEdit or (is_instance_valid(active_dialog) and not active_dialog.get_meta("nonmodal",false)) or (login != null and login.visible)
 
 func _process(delta: float) -> void:
-	if world == null or net == null:
+	if not startup_complete or world == null or net == null:
 		return
 	# The frame's catch-up physics belongs to the previously held input.
 	# Commit freshly sampled keys AFTER those ticks and BEFORE world rendering:
@@ -951,6 +995,7 @@ func _process(delta: float) -> void:
 		qa_last_frame_usec = now_usec
 
 func _physics_process(delta: float) -> void:
+	if not startup_complete: return
 	if world != null and world.space_loading: return
 	if world != null and net != null:
 		# A fresh WASD edge commits after catch-up. Do not let an NPC window
@@ -960,6 +1005,7 @@ func _physics_process(delta: float) -> void:
 		status.text = "Соединение потеряно · переподключение…"
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not startup_complete: return
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_ESCAPE: player_input.autorun = false
 		if event.physical_keycode == KEY_F3:
@@ -1035,6 +1081,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP,MOUSE_BUTTON_WHEEL_DOWN]: save_preferences()
 
 func _input(event: InputEvent) -> void:
+	if not startup_complete: return
 	if player_input != null and player_input.release_buttons(event):
 		get_viewport().set_input_as_handled()
 		return

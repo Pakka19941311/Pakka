@@ -150,6 +150,12 @@ jobs:
           PYTHON: python
         run: |
           $gamePackage = (Get-Content qa-artifacts/gameplay-release/package-result.json | ConvertFrom-Json).destination
+          # Exercise the release input path while no Camera3D exists yet.
+          # This happens before login, so it needs no personal save/server.
+          python scripts/godot_run_checked.py --exe (Join-Path $gamePackage 'Varendor.exe') --packaged --cwd $gamePackage --output qa-artifacts/gameplay-startup --timeout 240 -- --headless --audio-driver Dummy -- ("--qa-startup=" + (Join-Path $PWD 'qa-artifacts/gameplay-startup/startup.json'))
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $startupResult = Get-Content qa-artifacts/gameplay-startup/startup.json | ConvertFrom-Json
+          if (-not $startupResult.ok) { throw 'Startup input verification failed' }
           & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/gameplay_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --headless ("--package=" + $gamePackage)
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Publish verified gameplay ZIP
@@ -176,6 +182,7 @@ jobs:
         with:
           name: world-gameplay-checks
           path: |
+            qa-artifacts/gameplay-startup
             qa-artifacts/gameplay-windows/gameplay.json
             qa-artifacts/gameplay-windows/native/result.json
             qa-artifacts/gameplay-windows/native/engine.log

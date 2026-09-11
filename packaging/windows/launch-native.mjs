@@ -125,13 +125,20 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     console.log('Исходная база не изменяется. Не закрывайте это окно во время игры.');
     const args = process.argv.slice(2);
     const executable = process.env.VARENDOR_GODOT_BINARY || join(root, 'Varendor.exe');
-    const child = spawn(executable, [...(args.includes('--headless') ? ['--headless'] : []), '--', `--bootstrap=${bridge.bootstrapPath}`, ...args.filter(value => value !== '--headless')], { cwd: root, stdio: 'inherit' });
+    const logs = join(data, 'logs');
+    mkdirSync(logs, { recursive: true });
+    const engineLog = join(logs, `game-${Date.now()}-${process.pid}.log`);
+    // Preflight a writable, unique log before Godot initializes its logger.
+    writeFileSync(engineLog, '', { flag: 'wx' });
+    console.log('Журнал игры:', engineLog);
+    const child = spawn(executable, ['--log-file', engineLog, ...(args.includes('--headless') ? ['--headless'] : []), '--', `--bootstrap=${bridge.bootstrapPath}`, ...args.filter(value => value !== '--headless')], { cwd: root, stdio: 'inherit' });
     child.once('error', error => { console.error('Не удалось запустить игру:', error.message); });
     const stop = async () => { if (!child.killed) child.kill(); await bridge.close(); };
     process.once('SIGINT', stop);
     process.once('SIGTERM', stop);
     const [code] = await once(child, 'exit');
     await bridge.close();
+    if (code !== 0) console.error('Игра завершилась с ошибкой. Журнал:', engineLog);
     process.exitCode = code ?? 1;
   } catch (error) {
     console.error('Запуск остановлен:', error.message);

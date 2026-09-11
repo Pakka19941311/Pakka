@@ -53,6 +53,7 @@ func poll(delta: float, enabled: bool) -> void:
 		network.intent({"type":"direction","x":direction.x,"z":direction.y})
 
 func mouse(event: InputEvent) -> bool:
+	if not is_instance_valid(world.camera) or world.space_loading or not network.connected: return false
 	if not focused or event is not InputEventMouseButton or not event.pressed: return false
 	if event.button_index == MOUSE_BUTTON_RIGHT:
 		right_down = true

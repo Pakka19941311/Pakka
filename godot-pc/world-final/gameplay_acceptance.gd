@@ -3,6 +3,28 @@ extends RefCounted
 const Wait = preload("res://scripts/content_acceptance.gd")
 const Keys = preload("res://scripts/knight_integration_qa.gd")
 
+static func mouse(app: Node, screen: Vector2, button: int = MOUSE_BUTTON_LEFT) -> void:
+	for pressed: bool in [true,false]:
+		var event: InputEventMouseButton = InputEventMouseButton.new()
+		event.position = screen
+		event.button_index = button
+		event.pressed = pressed
+		# Projection and GUI rectangles use viewport-local coordinates. Keep
+		# the full input/GUI/unhandled pipeline, without desktop DPI conversion.
+		app.get_viewport().push_input(event,true)
+
+static func click_near_hero(app: Node) -> Vector2:
+	var position: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
+	for offset: Vector2 in [Vector2(2,0),Vector2(-2,0),Vector2(0,2),Vector2(0,-2)]:
+		var target: Vector2 = position+offset
+		if app.world.collision.blocked(target): continue
+		var screen: Vector2 = app.world.camera.unproject_position(app.world.point(target.x,target.y))
+		var picked = app.world.targeting.ground(screen)
+		if picked == null or picked.distance_to(target) > .25 or not app.world.targeting.pick(screen).is_empty(): continue
+		mouse(app,screen)
+		return target
+	return Vector2.INF
+
 static func fixture(app: Node, stage: String) -> Dictionary:
 	app.net.save_private_json(app.qa_path.get_base_dir().path_join("fixture-request.json"),{"stage":stage})
 	var file: String = app.qa_path.get_base_dir().path_join("fixture-ready.json")
@@ -33,6 +55,20 @@ static func run(app: Node) -> void:
 	checks.wasd_moves = a.distance_to(b) > 1
 	await Keys.wait_ms(app.get_tree(),500)
 	checks.stop = b.distance_to(Vector2(app.net.hero.x,app.net.hero.z)) < .015
+	# This town is outside the legacy +/-135m limits; a real click must stay
+	# near its projected destination instead of being clamped to the old map.
+	var mouse_goal: Vector2 = click_near_hero(app)
+	checks.mouse_ground_moves_in_new_world = mouse_goal.is_finite() and await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(mouse_goal)<.4,5000)
+	print("MOUSE_QA goal=",mouse_goal," actual=",Vector2(app.net.hero.x,app.net.hero.z)," viewport=",app.get_viewport().get_visible_rect()," focused=",app.player_input.focused)
+	await Keys.wait_ms(app.get_tree(),300)
+	app.polish.toggle_map()
+	await Keys.wait_ms(app.get_tree(),200)
+	var ui_position: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
+	mouse(app,app.polish.atlas.get_global_rect().get_center())
+	await Keys.wait_ms(app.get_tree(),350)
+	checks.map_consumes_mouse = Vector2(app.net.hero.x,app.net.hero.z).distance_to(ui_position)<.05
+	print("MAP_MOUSE_QA before=",ui_position," after=",Vector2(app.net.hero.x,app.net.hero.z)," rect=",app.polish.atlas.get_global_rect())
+	app.polish.toggle_map()
 	await Wait.capture(app,"final-town")
 	var combat: Dictionary = await fixture(app,"combat")
 	checks.fixture_combat = not combat.is_empty()
