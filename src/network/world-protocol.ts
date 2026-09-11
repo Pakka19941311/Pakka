@@ -57,7 +57,7 @@ export type WorldCommand =
   | { type: 'reorder'; item: ItemReference; index: number }
   | { type: 'enhance'; item: ItemReference; scroll: ItemReference }
   | { type: 'use'; item: ItemReference }
-  | { type: 'sell'; item: ItemReference }
+  | { type: 'sell'; item: ItemReference; quantity?:number }
   | { type: 'buy'; itemId: string }
   | { type: 'teleport'; destination: string }
   | { type: 'portal'; destination:'mine'|'great_cave' }

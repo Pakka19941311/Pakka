@@ -355,7 +355,10 @@ export class WorldSimulation {
       const item=p.inventory.find(i=>i.uid===command.item.uid);
       if(!item||item.id!==command.item.id||item.plus!==command.item.plus||item.count!==command.item.count)throw Error('stale-item');
       if(SKILL_BOOKS[item.id])throw Error('cannot-sell-book');
-      p.gold+=Math.floor(ITEMS[item.id as ItemId].value*.48)*item.count;p.inventory=p.inventory.filter(i=>i.uid!==item.uid);return;
+      const quantity=command.quantity??item.count;
+      if(!Number.isSafeInteger(quantity)||quantity<1||quantity>item.count)throw Error('invalid-quantity');
+      p.gold+=Math.floor(ITEMS[item.id as ItemId].value*.48)*quantity;
+      item.count-=quantity;if(item.count===0)p.inventory=p.inventory.filter(i=>i.uid!==item.uid);return;
     }
     if (command.type==='buy'&&SKILL_BOOKS[command.itemId]) {
       const book=SKILL_BOOKS[command.itemId];

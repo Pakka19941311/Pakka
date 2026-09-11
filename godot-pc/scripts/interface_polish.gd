@@ -243,15 +243,15 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 		column.add_child(app.label(str(app.data.items[id].name),13))
 		var desc: Label = app.label(str(app.data.items[id].desc),11); desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(desc)
 		var buy: Button = app.button("%d ◈" % price,func(): app.net.command({"type":"buy","itemId":id})); buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
-	sale.add_child(app.wrapped_label("Выберите добычу из сумки. Цена указана за всю стопку; продажа требует подтверждения.",12))
+	sale.add_child(app.wrapped_label("Выберите предмет и количество. Ниже указана цена продажи одной единицы.",12))
 	var count: int = 0
 	for item: Dictionary in app.net.hero.inventory:
 		if app.data.books.has(str(item.id)): continue
 		count += 1
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",10); sale.add_child(row)
 		var icon: TextureRect = TextureRect.new(); icon.texture = app.book_ui.item_icon(item); icon.custom_minimum_size = Vector2(36,36); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; row.add_child(icon)
-		var name_label: Label = app.wrapped_label(app.item_name(item)+" ×"+str(item.count),12); name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(name_label)
-		var price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))*int(item.count)
+		var name_label: Label = app.wrapped_label(app.item_name(item)+" ×"+str(int(item.count)),12); name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(name_label)
+		var price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))
 		var sell: Button = app.button("%d ◈" % price,func():
 			app.selected_item = {"kind":"bag","item":item.duplicate(true)}
 			app.sell_selected(func(): shop(kind,title,1)))

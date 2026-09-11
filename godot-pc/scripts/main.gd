@@ -155,6 +155,9 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
+		if "--qa-scope=stage" in OS.get_cmdline_user_args():
+			await preload("res://scripts/stage_acceptance.gd").run(self)
+			return
 		if "--qa-scope=final" in OS.get_cmdline_user_args():
 			await preload("res://world-final/gameplay_acceptance.gd").run(self)
 			return
@@ -882,13 +885,7 @@ func sell_selected(return_to: Callable = Callable()) -> void:
 	if item.is_empty() or selected_item.get("kind") != "bag":
 		notice("Выберите предмет в сумке")
 		return
-	var box: VBoxContainer = dialog("Продать предмет?", Vector2i(500, 180))
-	box.add_child(label(item_name(item) + " ×" + str(int(item.count))))
-	box.add_child(button("Продать", func():
-		await net.command({"type":"sell","item":item.duplicate()})
-		if net.hero.inventory.any(func(value): return value.uid == item.uid): return
-		close_dialog()
-		if return_to.is_valid(): return_to.call()))
+	preload("res://scripts/sale_dialog.gd").open(self,item.duplicate(true),return_to)
 
 func transfer_storage(item: Dictionary, direction: String, index: int = -1) -> void:
 	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(item): return
