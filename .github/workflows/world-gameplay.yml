@@ -89,7 +89,7 @@ jobs:
         run: |
           python scripts/world_final/materialize_payload.py
           node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs
-          node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs tests/stage-cave.test.mjs tests/stage-potions.test.mjs
+          node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs tests/stage-cave.test.mjs tests/stage-potions.test.mjs tests/castle-courtyard.test.mjs tests/ambient-npc.test.mjs
       - name: Import and export the gameplay client
         timeout-minutes: 25
         run: |
@@ -159,17 +159,19 @@ jobs:
           if (-not $startupResult.ok) { throw 'Startup input verification failed' }
           & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --headless ("--package=" + $gamePackage)
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/castle-windows --castle --headless ("--package=" + $gamePackage)
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Publish verified gameplay ZIP
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $gameResult = Get-Content qa-artifacts/gameplay-release/package-result.json | ConvertFrom-Json
-          python scripts/world_final/archive_gameplay.py qa-artifacts/gameplay-release/package-result.json qa-artifacts/gameplay-windows/stage.json
+          python scripts/world_final/archive_gameplay.py qa-artifacts/gameplay-release/package-result.json qa-artifacts/gameplay-windows/stage.json qa-artifacts/castle-windows/castle.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $gameZip = Join-Path $PWD ('qa-artifacts/gameplay-release/' + $gameResult.name + '.zip')
           $gameHash = (Get-FileHash -LiteralPath $gameZip -Algorithm SHA256).Hash.ToLower()
           $gameTag = 'world-gameplay-' + $env:GITHUB_SHA.Substring(0,12)
-          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — пещера 40, торговля и автобег R' --notes-file qa-artifacts/gameplay-release/release-notes.md
+          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — живой двор замка Гринфолл' --notes-file qa-artifacts/gameplay-release/release-notes.md
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $gameRelease = gh api ('repos/' + $env:GITHUB_REPOSITORY + '/releases/tags/' + $gameTag) | ConvertFrom-Json
           $gameAsset = $gameRelease.assets | Where-Object name -eq ($gameResult.name + '.zip')
@@ -187,4 +189,7 @@ jobs:
             qa-artifacts/gameplay-windows/stage.json
             qa-artifacts/gameplay-windows/native/result.json
             qa-artifacts/gameplay-windows/native/engine.log
+            qa-artifacts/castle-windows/castle.json
+            qa-artifacts/castle-windows/native/result.json
+            qa-artifacts/castle-windows/native/engine.log
             qa-artifacts/gameplay-release/publish-result.json

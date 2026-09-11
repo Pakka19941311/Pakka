@@ -160,6 +160,9 @@ func _ready() -> void:
 			await net.connect_profile(net.bootstrap.profiles[0])
 		else:
 			await net.create_character("PC Test", "knight")
+		if "--qa-scope=castle" in OS.get_cmdline_user_args():
+			await preload("res://world-final/castle/courtyard_acceptance.gd").run(self)
+			return
 		if "--qa-scope=stage" in OS.get_cmdline_user_args():
 			await preload("res://scripts/stage_acceptance.gd").run(self)
 			return

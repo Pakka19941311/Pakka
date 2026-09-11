@@ -14,6 +14,7 @@ var bounds: Array = []
 var nature: Node3D
 var roots: Dictionary = {}
 var loaded_data: Dictionary = {}
+var courtyard: Node3D
 
 func setup(value: VarendorWorld) -> bool:
 	world = value
@@ -63,6 +64,13 @@ func activate_space(id: String) -> bool:
 			if landmarks == null:
 				push_error("Missing final architecture")
 				return false
+			world.loading_progress.emit("Обустройство двора Гринфолла…")
+			var courtyard_mesh: Node3D = await load_scene("castle/courtyard.glb",root)
+			if courtyard_mesh == null: return false
+			for mesh: MeshInstance3D in courtyard_mesh.find_children("*","MeshInstance3D",true,false):
+				mesh.visibility_range_end = 165
+				mesh.visibility_range_end_margin = 12
+			obstacles.append_array(read_json("castle/courtyard.json").obstacles)
 			world.loading_progress.emit("Загрузка леса и растительности…")
 			nature = load(ROOT+"nature/nature_layer.gd").new()
 			nature.authored_revision = "D13"
@@ -115,6 +123,12 @@ func activate_space(id: String) -> bool:
 		if world.actors.has(service_id): world.actors[service_id].visible = id == "surface"
 	print("FINAL_WORLD_SPACE_READY "+id)
 	return true
+
+func setup_courtyard_life() -> void:
+	if courtyard != null: return
+	courtyard = load("res://world-final/castle/courtyard_life.gd").new()
+	roots.surface.add_child(courtyard)
+	courtyard.setup(world,read_json("castle/courtyard.json"))
 
 func height_at(x: float,z: float,with_support: bool = true) -> float:
 	var b: Array = terrain.get("bounds",[-800,-700,800,700])

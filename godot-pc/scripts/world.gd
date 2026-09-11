@@ -97,7 +97,7 @@ func receive_snapshot(snapshot: Dictionary) -> void:
 					return
 			snapshot = pending_space_snapshot
 			for id: String in actors.keys():
-				if not id.begins_with("npc:"):
+				if not id.begins_with("npc:") and not id.begins_with("ambient:"):
 					actors[id].queue_free()
 					actors.erase(id)
 			timeline = SnapshotTimeline.new()
@@ -161,7 +161,12 @@ func reject_intent(value: Dictionary, input_sequence: int, error: String) -> voi
 func _physics_process(delta: float) -> void:
 	if space_loading: return
 	player_motion.physics_step(delta)
-	if not current_snapshot.is_empty(): ambient_residents.physics_step(delta)
+	if not current_snapshot.is_empty() and ambient_active():
+		ambient_residents.visitor_positions = [player_motion.position_value]
+		ambient_residents.physics_step(delta)
+
+func ambient_active() -> bool:
+	return final_environment == null or (final_environment.active_space == "surface" and player_motion.position_value.distance_to(Vector2(-100,-150)) < 210)
 
 
 func setup(game: Dictionary) -> bool:
@@ -323,14 +328,22 @@ func setup(game: Dictionary) -> bool:
 		await get_tree().process_frame
 	# Local residents have their own 60Hz motion owner; service NPCs above keep
 	# their static positions. Install each first pose before it can be rendered.
-	if final_environment == null:
-		ambient_residents.setup(collision,territory)
-		for resident: Dictionary in ambient_residents.sample():
-			var actor: Node3D = make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
-			initialize_pose(actor,point(resident.x,resident.z))
-			actor.rotation.y = -float(resident.yaw) + PI
-			actor.set_meta("motion",resident)
-			actor.set_meta("pickable",false)
+	var resident_data: Dictionary = territory
+	if final_environment != null:
+		resident_data = final_environment.read_json("castle/courtyard.json")
+		resident_data["services"] = VarendorNpcInteraction.SERVICES
+	ambient_residents.setup(collision,resident_data)
+	for resident: Dictionary in ambient_residents.sample():
+		var actor: Node3D = make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
+		initialize_pose(actor,point(resident.x,resident.z))
+		actor.rotation.y = -float(resident.yaw) + PI
+		actor.set_meta("motion",resident)
+		actor.set_meta("pickable",false)
+		if resident.get("civilian",false):
+			for piece: Node in (actor.get_meta("visual") as Node3D).find_children("*","MeshInstance3D",true,false):
+				if "sword" in str(piece.name).to_lower() or "bow" in str(piece.name).to_lower() or "dagger" in str(piece.name).to_lower(): piece.hide()
+	if final_environment != null: final_environment.setup_courtyard_life()
+	else:
 		territory_life = VarendorTerritoryLife.new()
 		add_child(territory_life)
 		territory_life.setup(self)
@@ -635,6 +648,9 @@ func _process(delta: float) -> void:
 	hero_position = point(local_pose.x,local_pose.z,local_pose.yOffset)
 	for id: String in actors:
 		var actor: Node3D = actors[id]
+		if id.begins_with("ambient:") and not ambient_active():
+			actor.hide()
+			continue
 		var before: Vector3 = actor.position
 		var motion: Dictionary = actor.get_meta("motion", {}).duplicate()
 		if id == hero_id:
@@ -768,6 +784,7 @@ func update_nameplates() -> void:
 		var actor: Node3D = actors[id]
 		var title: Label = actor.get_meta("screen_label")
 		title.hide()
+		if id.begins_with("ambient:") and actor.position.distance_to(hero_position)>12: continue
 		if not show_names or not actor.visible or actor.get_meta("dead", false) or actor.position.distance_to(hero_position) > 26 or used.size() >= 10:
 			continue
 		var point_value: Vector3 = actor.position + Vector3(0, (actor.get_meta("pick_size") as Vector3).y + .3, 0)

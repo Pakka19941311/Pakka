@@ -7,7 +7,8 @@ import {pathToFileURL} from 'node:url';
 import {startWorldServer} from '../../server/http-server.mjs';
 import {FinalWorld} from '../../src/world/final-world.ts';
 const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
-mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,'stage.json')),'Use fresh QA output');
+const castle=options.includes('--castle'),reportName=castle?'castle.json':'stage.json';
+mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
 const geography=new FinalWorld();let bridge,fixtureTimer;
 if(packageArg){const {startNativeBridge}=await import(pathToFileURL(join(resolve(packageArg.slice(10)),'launch-native.mjs')));bridge=await startNativeBridge({data:join(output,'save'),backups:join(output,'backups')});}
 const service=bridge?.service??startWorldServer({database:join(output,'world.sqlite'),finalWorld:geography,collision:geography.spaces.surface.collision,terrain:geography.spaces.surface.terrain,port:0,beta:true});
@@ -24,7 +25,12 @@ try{
   const file=join(output,'fixture-request.json');if(!existsSync(file))return;
   const request=JSON.parse(readFileSync(file,'utf8'));if(request.stage===handled)return;handled=request.stage;
   const hero=world.state.characters[p.id],boss=world.state.monsters.find(m=>m.id==='cave_boss');
-  if(request.stage==='cave-entrance'){world.relocate(hero,{x:245,z:278,spaceId:'surface'});hero.hp=hero.maxHp;}
+  if(castle&&request.stage.startsWith('castle-')){
+   const positions={entry:[-100,-238],market:[-118,-205],training:[-52,-149],well:[-116,-161],supply:[-68,-192],return:[-100,-190],overview:[-100,-150],interior:[0,-4]};
+   const key=request.stage.slice(7),point=positions[key];assert.ok(point,'unknown courtyard QA point');
+   world.relocate(hero,{x:point[0],z:point[1],spaceId:key==='interior'?'great_cave':'surface'});
+  }
+  else if(request.stage==='cave-entrance'){world.relocate(hero,{x:245,z:278,spaceId:'surface'});hero.hp=hero.maxHp;}
   else if(request.stage==='cave-finish'){
    // Keep the native regression short after observing real damage/animation.
    // The production definition remains 14400 HP; loot/respawn use normal death.
@@ -35,9 +41,9 @@ try{
  },100);
  const bootstrap=join(output,'bootstrap.json');writeFileSync(bootstrap,JSON.stringify({server_url,profiles:[{id:p.id,token:session.token,name:p.name,classId:p.classId,level:p.level}]}));
  const mode=packageArg?['--packaged','--cwd',dirname(resolve(binary))]:['--project','godot-pc'];
- const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),...mode,'--output',join(output,'native'),'--timeout','360','--',...options.filter(x=>x==='--headless'),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,'stage.json')}`,'--qa-scope=stage',...options.filter(x=>x.startsWith('--block='))];
+ const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),...mode,'--output',join(output,'native'),'--timeout','360','--',...options.filter(x=>x==='--headless'),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,reportName)}`,`--qa-scope=${castle?'castle':'stage'}`,...options.filter(x=>x.startsWith('--block='))];
  const process=spawn(globalThis.process.env.PYTHON??'python',args,{stdio:'inherit',windowsHide:true});const [code]=await once(process,'exit');assert.equal(code,0);
- const report=JSON.parse(readFileSync(join(output,'stage.json'),'utf8'));assert.equal(report.ok,true,JSON.stringify(report.checks));
+ const report=JSON.parse(readFileSync(join(output,reportName),'utf8'));assert.equal(report.ok,true,JSON.stringify(report.checks));
  assert.ok(!/SCRIPT ERROR:|Parse Error:/.test(readFileSync(join(output,'native/engine.log'),'utf8')));
  console.log(JSON.stringify({checks:report.checks,ok:true}));
 }finally{clearInterval(fixtureTimer);if(bridge)await bridge.close();else await service.close();}

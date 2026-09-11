@@ -24,6 +24,9 @@ func verify_directory(path: String) -> void:
 
 func verify() -> void:
 	verify_scene("res://world-final/geography/landmarks.glb")
+	verify_scene("res://world-final/castle/courtyard.glb")
+	verify_scene("res://world-final/castle/wildlife/crow.glb")
+	verify_scene("res://world-final/castle/wildlife/hare.glb")
 	verify_scene("res://world-final/interiors/mine.glb")
 	verify_scene("res://world-final/interiors/great_cave.glb")
 	verify_directory("res://world-final/geology-D13")

@@ -1,0 +1,1727 @@
+{
+  "schema": 1,
+  "id": "greenfall-courtyard",
+  "coordinates": "server x,z; +z north",
+  "center": [
+    -100,
+    -150
+  ],
+  "active_radius": 210,
+  "props": [
+    {
+      "id": "Elsa_provisions",
+      "x": -114,
+      "z": -187,
+      "zone": "market"
+    },
+    {
+      "id": "Caravan_exchange",
+      "x": -121,
+      "z": -199,
+      "zone": "market"
+    },
+    {
+      "id": "Mira_herbs",
+      "x": -129,
+      "z": -177,
+      "zone": "market"
+    },
+    {
+      "id": "Bran_forge",
+      "x": -139,
+      "z": -187,
+      "zone": "workshop"
+    },
+    {
+      "id": "Courtyard_well",
+      "x": -114,
+      "z": -151,
+      "zone": "rest"
+    },
+    {
+      "id": "Well_bench",
+      "x": -120,
+      "z": -156,
+      "zone": "rest"
+    },
+    {
+      "id": "Rest_bench",
+      "x": -108,
+      "z": -145,
+      "zone": "rest"
+    },
+    {
+      "id": "Barracks_bench",
+      "x": -123,
+      "z": -132,
+      "zone": "rest"
+    },
+    {
+      "id": "Store_delivery",
+      "x": -58,
+      "z": -189,
+      "zone": "supply"
+    },
+    {
+      "id": "Stable_supplies",
+      "x": -154,
+      "z": -170,
+      "zone": "stable"
+    },
+    {
+      "id": "Herb_bed_A",
+      "x": -168,
+      "z": -190,
+      "zone": "garden"
+    },
+    {
+      "id": "Herb_bed_B",
+      "x": -168,
+      "z": -197,
+      "zone": "garden"
+    },
+    {
+      "id": "Training_sand",
+      "x": -46,
+      "z": -147,
+      "zone": "training"
+    },
+    {
+      "id": "Training_target_0",
+      "x": -41,
+      "z": -138,
+      "zone": "training"
+    },
+    {
+      "id": "Training_target_1",
+      "x": -41,
+      "z": -151,
+      "zone": "training"
+    },
+    {
+      "id": "Training_target_2",
+      "x": -37,
+      "z": -159,
+      "zone": "training"
+    },
+    {
+      "id": "Training_weapon_rack",
+      "x": -35,
+      "z": -144,
+      "zone": "training"
+    },
+    {
+      "id": "Gate_west_standard",
+      "x": -108,
+      "z": -214,
+      "zone": "guard"
+    },
+    {
+      "id": "Gate_east_standard",
+      "x": -92,
+      "z": -214,
+      "zone": "guard"
+    },
+    {
+      "id": "Hall_standard",
+      "x": -88,
+      "z": -132,
+      "zone": "guard"
+    },
+    {
+      "id": "Notice_board",
+      "x": -94,
+      "z": -204,
+      "zone": "guard"
+    },
+    {
+      "id": "Store_ledger",
+      "x": -78,
+      "z": -185,
+      "zone": "supply"
+    },
+    {
+      "id": "Roen_dispatches",
+      "x": -102,
+      "z": -177,
+      "zone": "supply"
+    },
+    {
+      "id": "Well_paving",
+      "x": -114,
+      "z": -151,
+      "zone": "rest"
+    },
+    {
+      "id": "Market_paving",
+      "x": -116,
+      "z": -186,
+      "zone": "market"
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "courtyard:Elsa_provisions:0",
+      "kind": "box",
+      "x": -116.3,
+      "z": -188.6,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:1",
+      "kind": "box",
+      "x": -116.3,
+      "z": -185.4,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:2",
+      "kind": "box",
+      "x": -111.7,
+      "z": -188.6,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:3",
+      "kind": "box",
+      "x": -111.7,
+      "z": -185.4,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:4",
+      "kind": "box",
+      "x": -114.0,
+      "z": -187.0,
+      "halfX": 2.3,
+      "halfZ": 1.6,
+      "rotation": 0,
+      "bottom": 72.8,
+      "top": 73.57,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Elsa_provisions:5",
+      "kind": "box",
+      "x": -114.0,
+      "z": -187.3,
+      "halfX": 2.0,
+      "halfZ": 0.575,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:6",
+      "kind": "box",
+      "x": -116.85,
+      "z": -186.9,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Elsa_provisions:7",
+      "kind": "box",
+      "x": -111.15,
+      "z": -186.75,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:8",
+      "kind": "box",
+      "x": -123.3,
+      "z": -200.6,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:9",
+      "kind": "box",
+      "x": -123.3,
+      "z": -197.4,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:10",
+      "kind": "box",
+      "x": -118.7,
+      "z": -200.6,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:11",
+      "kind": "box",
+      "x": -118.7,
+      "z": -197.4,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:12",
+      "kind": "box",
+      "x": -121.0,
+      "z": -199.0,
+      "halfX": 2.3,
+      "halfZ": 1.6,
+      "rotation": 0,
+      "bottom": 72.8,
+      "top": 73.57,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Caravan_exchange:13",
+      "kind": "box",
+      "x": -121.0,
+      "z": -199.3,
+      "halfX": 2.0,
+      "halfZ": 0.575,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:14",
+      "kind": "box",
+      "x": -123.85,
+      "z": -198.9,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Caravan_exchange:15",
+      "kind": "box",
+      "x": -118.15,
+      "z": -198.75,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:16",
+      "kind": "box",
+      "x": -131.3,
+      "z": -178.6,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:17",
+      "kind": "box",
+      "x": -131.3,
+      "z": -175.4,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:18",
+      "kind": "box",
+      "x": -126.7,
+      "z": -178.6,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:19",
+      "kind": "box",
+      "x": -126.7,
+      "z": -175.4,
+      "halfX": 0.075,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 73.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:20",
+      "kind": "box",
+      "x": -129.0,
+      "z": -177.0,
+      "halfX": 2.3,
+      "halfZ": 1.6,
+      "rotation": 0,
+      "bottom": 72.8,
+      "top": 73.57,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Mira_herbs:21",
+      "kind": "box",
+      "x": -129.0,
+      "z": -177.3,
+      "halfX": 2.0,
+      "halfZ": 0.575,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:22",
+      "kind": "box",
+      "x": -131.85,
+      "z": -176.9,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Mira_herbs:23",
+      "kind": "box",
+      "x": -126.15,
+      "z": -176.75,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Bran_forge:24",
+      "kind": "box",
+      "x": -139.0,
+      "z": -187.0,
+      "halfX": 1.25,
+      "halfZ": 0.9,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.18,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Bran_forge:25",
+      "kind": "box",
+      "x": -139.85,
+      "z": -186.45,
+      "halfX": 0.325,
+      "halfZ": 0.3,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.1,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Bran_forge:26",
+      "kind": "box",
+      "x": -136.8,
+      "z": -189.0,
+      "halfX": 0.75,
+      "halfZ": 0.43,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.31,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Bran_forge:27",
+      "kind": "box",
+      "x": -139.1,
+      "z": -190.0,
+      "halfX": 1.1,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Bran_forge:28",
+      "kind": "box",
+      "x": -141.3,
+      "z": -188.5,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Courtyard_well:29",
+      "kind": "box",
+      "x": -114.0,
+      "z": -151.0,
+      "halfX": 1.29,
+      "halfZ": 1.29,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.92,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Courtyard_well:30",
+      "kind": "box",
+      "x": -115.35,
+      "z": -151.0,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.95,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Courtyard_well:31",
+      "kind": "box",
+      "x": -112.65,
+      "z": -151.0,
+      "halfX": 0.11,
+      "halfZ": 0.11,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.95,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Courtyard_well:32",
+      "kind": "box",
+      "x": -113.45,
+      "z": -152.6,
+      "halfX": 0.29,
+      "halfZ": 0.29,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.43,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Courtyard_well:33",
+      "kind": "box",
+      "x": -114.0,
+      "z": -151.0,
+      "halfX": 1.9,
+      "halfZ": 1.3,
+      "rotation": 0,
+      "bottom": 72.96,
+      "top": 73.55,
+      "blocksMovement": false
+    },
+    {
+      "id": "courtyard:Well_bench:34",
+      "kind": "box",
+      "x": -120.0,
+      "z": -156.0,
+      "halfX": 1.4,
+      "halfZ": 0.33,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.27,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Rest_bench:35",
+      "kind": "box",
+      "x": -108.0,
+      "z": -145.0,
+      "halfX": 1.4,
+      "halfZ": 0.33,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.27,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Barracks_bench:36",
+      "kind": "box",
+      "x": -123.0,
+      "z": -132.0,
+      "halfX": 1.4,
+      "halfZ": 0.33,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.27,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:37",
+      "kind": "box",
+      "x": -60.8,
+      "z": -189.0,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:38",
+      "kind": "box",
+      "x": -60.8,
+      "z": -189.0,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:39",
+      "kind": "box",
+      "x": -60.8,
+      "z": -188.0,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:40",
+      "kind": "box",
+      "x": -55.7,
+      "z": -187.4,
+      "halfX": 0.45,
+      "halfZ": 0.415,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:41",
+      "kind": "box",
+      "x": -56.1,
+      "z": -190.2,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:42",
+      "kind": "box",
+      "x": -55.2,
+      "z": -190.3,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:43",
+      "kind": "box",
+      "x": -58.0,
+      "z": -189.0,
+      "halfX": 0.87,
+      "halfZ": 1.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.55,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_delivery:44",
+      "kind": "box",
+      "x": -58.0,
+      "z": -191.2,
+      "halfX": 0.575,
+      "halfZ": 0.775,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.97,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Stable_supplies:45",
+      "kind": "box",
+      "x": -154.0,
+      "z": -170.0,
+      "halfX": 1.7,
+      "halfZ": 0.5,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Stable_supplies:46",
+      "kind": "box",
+      "x": -157.0,
+      "z": -170.0,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Stable_supplies:47",
+      "kind": "box",
+      "x": -157.0,
+      "z": -168.9,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Stable_supplies:48",
+      "kind": "box",
+      "x": -151.2,
+      "z": -169.8,
+      "halfX": 0.44,
+      "halfZ": 0.44,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.96,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Stable_supplies:49",
+      "kind": "box",
+      "x": -154.0,
+      "z": -167.0,
+      "halfX": 1.5,
+      "halfZ": 0.575,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.85,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Herb_bed_A:50",
+      "kind": "box",
+      "x": -168.0,
+      "z": -190.0,
+      "halfX": 2.25,
+      "halfZ": 1.35,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Herb_bed_B:51",
+      "kind": "box",
+      "x": -168.0,
+      "z": -197.0,
+      "halfX": 2.25,
+      "halfZ": 1.35,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_target_0:52",
+      "kind": "box",
+      "x": -41.0,
+      "z": -138.0,
+      "halfX": 0.33,
+      "halfZ": 0.925,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.29,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_target_1:53",
+      "kind": "box",
+      "x": -41.0,
+      "z": -151.0,
+      "halfX": 0.33,
+      "halfZ": 0.925,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.29,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_target_2:54",
+      "kind": "box",
+      "x": -37.0,
+      "z": -159.0,
+      "halfX": 0.33,
+      "halfZ": 0.925,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.29,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Training_weapon_rack:55",
+      "kind": "box",
+      "x": -35.0,
+      "z": -144.0,
+      "halfX": 0.325,
+      "halfZ": 1.275,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.8,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Gate_west_standard:56",
+      "kind": "box",
+      "x": -108.0,
+      "z": -214.0,
+      "halfX": 0.34,
+      "halfZ": 0.34,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.26,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Gate_west_standard:57",
+      "kind": "box",
+      "x": -108.0,
+      "z": -214.0,
+      "halfX": 0.06,
+      "halfZ": 0.06,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Gate_east_standard:58",
+      "kind": "box",
+      "x": -92.0,
+      "z": -214.0,
+      "halfX": 0.34,
+      "halfZ": 0.34,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.26,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Gate_east_standard:59",
+      "kind": "box",
+      "x": -92.0,
+      "z": -214.0,
+      "halfX": 0.06,
+      "halfZ": 0.06,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 75.4,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Hall_standard:60",
+      "kind": "box",
+      "x": -88.0,
+      "z": -132.0,
+      "halfX": 0.34,
+      "halfZ": 0.34,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 70.26,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Hall_standard:61",
+      "kind": "box",
+      "x": -88.0,
+      "z": -132.0,
+      "halfX": 0.06,
+      "halfZ": 0.06,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 74.6,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Notice_board:62",
+      "kind": "box",
+      "x": -95.0,
+      "z": -204.0,
+      "halfX": 0.07,
+      "halfZ": 0.07,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Notice_board:63",
+      "kind": "box",
+      "x": -93.0,
+      "z": -204.0,
+      "halfX": 0.07,
+      "halfZ": 0.07,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.2,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Notice_board:64",
+      "kind": "box",
+      "x": -94.0,
+      "z": -204.0,
+      "halfX": 1.225,
+      "halfZ": 0.075,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 72.33,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Store_ledger:65",
+      "kind": "box",
+      "x": -78.0,
+      "z": -185.0,
+      "halfX": 1.0,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    },
+    {
+      "id": "courtyard:Roen_dispatches:66",
+      "kind": "box",
+      "x": -102.0,
+      "z": -177.0,
+      "halfX": 1.0,
+      "halfZ": 0.4,
+      "rotation": 0,
+      "bottom": 70,
+      "top": 71.06,
+      "blocksMovement": true
+    }
+  ],
+  "residents": [
+    {
+      "name": "Дозорный Хальд",
+      "model": "Warrior",
+      "x": -106,
+      "z": -211,
+      "route": [
+        {
+          "x": -106,
+          "z": -211,
+          "activity": "guard",
+          "duration": 18,
+          "interval": 5,
+          "look": {
+            "x": -100,
+            "z": -233
+          }
+        },
+        {
+          "x": -110,
+          "z": -208,
+          "activity": "guard",
+          "duration": 7,
+          "interval": 5,
+          "look": {
+            "x": -100,
+            "z": -210
+          }
+        }
+      ],
+      "role": "gate",
+      "seed": 101,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": false
+    },
+    {
+      "name": "Дозорная Веста",
+      "model": "Ranger",
+      "x": -94,
+      "z": -210,
+      "route": [
+        {
+          "x": -94,
+          "z": -210,
+          "activity": "guard",
+          "duration": 15,
+          "interval": 5,
+          "look": {
+            "x": -100,
+            "z": -234
+          }
+        },
+        {
+          "x": -89,
+          "z": -208,
+          "activity": "guard",
+          "duration": 8,
+          "interval": 5,
+          "look": {
+            "x": -95,
+            "z": -201
+          }
+        }
+      ],
+      "role": "gate",
+      "seed": 102,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": false
+    },
+    {
+      "name": "Патрульный Ольгер",
+      "model": "Warrior",
+      "x": -105,
+      "z": -204,
+      "route": [
+        {
+          "x": -105,
+          "z": -204,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -106,
+          "z": -165,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -104,
+          "z": -135,
+          "activity": "guard",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -98,
+            "z": -135
+          }
+        },
+        {
+          "x": -95,
+          "z": -135,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -94,
+          "z": -169,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -94,
+          "z": -201,
+          "activity": "guard",
+          "duration": 4,
+          "interval": 5,
+          "look": {
+            "x": -100,
+            "z": -213
+          }
+        }
+      ],
+      "role": "patrol",
+      "seed": 103,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": false
+    },
+    {
+      "name": "Купец Вальтер",
+      "model": "Monk",
+      "x": -121,
+      "z": -197.7,
+      "route": [
+        {
+          "x": -121,
+          "z": -197.7,
+          "activity": "trade",
+          "duration": 35,
+          "interval": 8,
+          "look": {
+            "x": -121,
+            "z": -201
+          },
+          "clip": "pickup"
+        }
+      ],
+      "role": "merchant",
+      "seed": 104,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Караванщица Нелла",
+      "model": "Rogue",
+      "x": -121,
+      "z": -201,
+      "route": [
+        {
+          "x": -121,
+          "z": -201,
+          "activity": "trade",
+          "duration": 27,
+          "interval": 9,
+          "look": {
+            "x": -121,
+            "z": -197.7
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -127,
+          "z": -204,
+          "activity": "inspect",
+          "duration": 5,
+          "interval": 5,
+          "look": {
+            "x": -125,
+            "z": -201
+          }
+        },
+        {
+          "x": -123,
+          "z": -203,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "buyer",
+      "seed": 105,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 4,
+      "civilian": true
+    },
+    {
+      "name": "Снабженец Ден",
+      "model": "Monk",
+      "x": -117,
+      "z": -190,
+      "route": [
+        {
+          "x": -117,
+          "z": -190,
+          "activity": "inspect",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -114,
+            "z": -187
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -118,
+          "z": -182,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -123,
+          "z": -179,
+          "activity": "trade",
+          "duration": 8,
+          "interval": 5,
+          "look": {
+            "x": -129,
+            "z": -177
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -119,
+          "z": -194,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -118,
+          "z": -201,
+          "activity": "talk",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -121,
+            "z": -201
+          }
+        }
+      ],
+      "role": "buyer",
+      "seed": 106,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Сержант Гаррен",
+      "model": "Warrior",
+      "x": -49,
+      "z": -146,
+      "route": [
+        {
+          "x": -49,
+          "z": -146,
+          "activity": "instruct",
+          "duration": 12,
+          "interval": 5,
+          "look": {
+            "x": -43,
+            "z": -145
+          },
+          "clip": "punch"
+        },
+        {
+          "x": -48,
+          "z": -153,
+          "activity": "instruct",
+          "duration": 10,
+          "interval": 6,
+          "look": {
+            "x": -43,
+            "z": -151
+          },
+          "clip": "punch"
+        }
+      ],
+      "role": "instructor",
+      "seed": 107,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": false
+    },
+    {
+      "name": "Новобранец Ильмар",
+      "model": "Warrior",
+      "x": -43,
+      "z": -138,
+      "route": [
+        {
+          "x": -43,
+          "z": -138,
+          "activity": "train",
+          "duration": 17,
+          "interval": 3.5,
+          "look": {
+            "x": -41,
+            "z": -138
+          },
+          "clip": "sword_attack"
+        },
+        {
+          "x": -47,
+          "z": -135,
+          "activity": "rest",
+          "duration": 7,
+          "interval": 5,
+          "look": {
+            "x": -43,
+            "z": -138
+          }
+        }
+      ],
+      "role": "trainee",
+      "seed": 108,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": false
+    },
+    {
+      "name": "Новобранец Рик",
+      "model": "Warrior",
+      "x": -43,
+      "z": -151,
+      "route": [
+        {
+          "x": -43,
+          "z": -151,
+          "activity": "train",
+          "duration": 19,
+          "interval": 4,
+          "look": {
+            "x": -41,
+            "z": -151
+          },
+          "clip": "sword_attack2"
+        },
+        {
+          "x": -47,
+          "z": -154,
+          "activity": "rest",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -43,
+            "z": -151
+          }
+        }
+      ],
+      "role": "trainee",
+      "seed": 109,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 1.5,
+      "civilian": false
+    },
+    {
+      "name": "Стрелок Тая",
+      "model": "Ranger",
+      "x": -50,
+      "z": -159,
+      "route": [
+        {
+          "x": -50,
+          "z": -159,
+          "activity": "train",
+          "duration": 20,
+          "interval": 5,
+          "look": {
+            "x": -37,
+            "z": -159
+          },
+          "clip": "bow_shoot"
+        },
+        {
+          "x": -53,
+          "z": -162,
+          "activity": "rest",
+          "duration": 7,
+          "interval": 5,
+          "look": {
+            "x": -37,
+            "z": -159
+          }
+        }
+      ],
+      "role": "archer",
+      "seed": 110,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 2.5,
+      "civilian": false
+    },
+    {
+      "name": "Подмастерье Йорен",
+      "model": "Monk",
+      "x": -154,
+      "z": -168.8,
+      "route": [
+        {
+          "x": -154,
+          "z": -168.8,
+          "activity": "work",
+          "duration": 14,
+          "interval": 6,
+          "look": {
+            "x": -154,
+            "z": -170
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -157,
+          "z": -172,
+          "activity": "inspect",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -154,
+            "z": -170
+          }
+        },
+        {
+          "x": -150,
+          "z": -172,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "worker",
+      "seed": 111,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Носильщик Бек",
+      "model": "Monk",
+      "x": -71,
+      "z": -187,
+      "route": [
+        {
+          "x": -71,
+          "z": -187,
+          "activity": "collect",
+          "duration": 7,
+          "interval": 5,
+          "look": {
+            "x": -68,
+            "z": -187
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -73,
+          "z": -181,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -72,
+          "z": -162,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -98,
+          "z": -162,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -139,
+          "z": -168,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -150,
+          "z": -173,
+          "activity": "deliver",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -154,
+            "z": -170
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -138,
+          "z": -175,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -99,
+          "z": -172,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -78,
+          "z": -177,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "porter",
+      "seed": 112,
+      "speed": 1.2,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Писарь Эмиль",
+      "model": "Rogue",
+      "x": -78,
+      "z": -183.5,
+      "route": [
+        {
+          "x": -78,
+          "z": -183.5,
+          "activity": "ledger",
+          "duration": 16,
+          "interval": 9,
+          "look": {
+            "x": -78,
+            "z": -185
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -82,
+          "z": -181,
+          "activity": "talk",
+          "duration": 5,
+          "interval": 5,
+          "look": {
+            "x": -75,
+            "z": -189
+          }
+        }
+      ],
+      "role": "scribe",
+      "seed": 113,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Садовница Лина",
+      "model": "Monk",
+      "x": -165,
+      "z": -190,
+      "route": [
+        {
+          "x": -165,
+          "z": -190,
+          "activity": "garden",
+          "duration": 12,
+          "interval": 6,
+          "look": {
+            "x": -168,
+            "z": -190
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -163,
+          "z": -184,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -141,
+          "z": -178,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -134,
+          "z": -180,
+          "activity": "trade",
+          "duration": 6,
+          "interval": 5,
+          "look": {
+            "x": -129,
+            "z": -177
+          },
+          "clip": "pickup"
+        },
+        {
+          "x": -142,
+          "z": -177,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        },
+        {
+          "x": -164,
+          "z": -184,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "gardener",
+      "seed": 114,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    },
+    {
+      "name": "Горожанин Освин",
+      "model": "Rogue",
+      "x": -118,
+      "z": -154,
+      "route": [
+        {
+          "x": -118,
+          "z": -154,
+          "activity": "rest",
+          "duration": 10,
+          "interval": 5,
+          "look": {
+            "x": -114,
+            "z": -151
+          }
+        },
+        {
+          "x": -109,
+          "z": -149,
+          "activity": "talk",
+          "duration": 8,
+          "interval": 5,
+          "look": {
+            "x": -114,
+            "z": -151
+          }
+        },
+        {
+          "x": -108,
+          "z": -134,
+          "activity": "inspect",
+          "duration": 7,
+          "interval": 5,
+          "look": {
+            "x": -123,
+            "z": -132
+          }
+        },
+        {
+          "x": -115,
+          "z": -140,
+          "activity": "walk",
+          "duration": 3,
+          "interval": 5
+        }
+      ],
+      "role": "walker",
+      "seed": 115,
+      "speed": 1.1,
+      "start_index": 0,
+      "phase": 0,
+      "civilian": true
+    }
+  ],
+  "residentLooks": {},
+  "wildlife": [
+    {
+      "species": "crow",
+      "x": -54,
+      "z": -185
+    },
+    {
+      "species": "crow",
+      "x": -56,
+      "z": -194
+    },
+    {
+      "species": "crow",
+      "x": -116,
+      "z": -155
+    },
+    {
+      "species": "hare",
+      "x": -172,
+      "z": -191
+    },
+    {
+      "species": "hare",
+      "x": -164,
+      "z": -202
+    }
+  ],
+  "signs": [
+    {
+      "text": "ГРИНФОЛЛ",
+      "x": -100,
+      "z": -224,
+      "height": 8.5,
+      "range": 75
+    },
+    {
+      "text": "Рынок снабжения",
+      "x": -121,
+      "z": -199,
+      "height": 3.95,
+      "range": 28
+    },
+    {
+      "text": "Учебный двор",
+      "x": -48,
+      "z": -164,
+      "height": 2.6,
+      "range": 32
+    }
+  ]
+}

@@ -17,7 +17,7 @@ export function stageNativeServer(root, destination, {finalWorld=false}={}) {
   // The gameplay profile ships the authoritative collision/height data beside
   // the server; render-only GLBs stay inside the exported Godot package.
   if (finalWorld) {
-    for (const file of ['world_layout.json','geology-D13/terrain.json','geology-D13/heightmap.f32','geography/collision.json','geography/support-surfaces.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','interiors/spaces.json','interiors/mine.json','interiors/great_cave.json','gameplay/spawn-manifest.json']) copy('godot-pc/world-final/'+file,'world-final/'+file);
+    for (const file of ['world_layout.json','geology-D13/terrain.json','geology-D13/heightmap.f32','geography/collision.json','geography/support-surfaces.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','castle/courtyard.json','interiors/spaces.json','interiors/mine.json','interiors/great_cave.json','gameplay/spawn-manifest.json']) copy('godot-pc/world-final/'+file,'world-final/'+file);
     for (const id of ['mine','great_cave']) {
       const meta=JSON.parse(readFileSync(resolve(root,`godot-pc/world-final/interiors/${id}.json`),'utf8'));
       copy('godot-pc/world-final/interiors/'+meta.floor,'world-final/interiors/'+meta.floor);

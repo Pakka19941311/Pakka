@@ -5,16 +5,20 @@ var world: VarendorWorld
 var creatures: Array[Dictionary] = []
 var clock: float = 0
 
-func setup(value: VarendorWorld) -> void:
+func setup(value: VarendorWorld, authored: Array = []) -> void:
 	world = value
 	var definitions: Array = [
 		["crow",Vector2(15,-15)],["crow",Vector2(-24,-18)],["crow",Vector2(34,-12)],
 		["crow",Vector2(-78,58)],["crow",Vector2(63,-5)],
 		["hare",Vector2(-66,-21)],["hare",Vector2(-73,8)],["hare",Vector2(80,33)],
 		["hare",Vector2(39,-58)],["hare",Vector2(-110,27)]]
+	if not authored.is_empty():
+		definitions.clear()
+		for entry: Dictionary in authored: definitions.append([str(entry.species),Vector2(entry.x,entry.z)])
 	for index: int in definitions.size():
 		var definition: Array = definitions[index]
-		var packed: PackedScene = load("res://generated/wildlife/"+str(definition[0])+".glb")
+		var asset_root: String = "res://world-final/castle/wildlife/" if world.final_environment != null else "res://generated/wildlife/"
+		var packed: PackedScene = load(asset_root+str(definition[0])+".glb")
 		var actor: Node3D = packed.instantiate()
 		add_child(actor)
 		var position_value: Vector2 = world.collision.nearest_free(definition[1])
@@ -24,6 +28,7 @@ func setup(value: VarendorWorld) -> void:
 
 func _process(delta: float) -> void:
 	if world == null or world.current_snapshot.is_empty(): return
+	if world.final_environment != null and (world.final_environment.active_space != "surface" or not world.ambient_active()): return
 	clock += delta
 	var hero: Vector2 = world.player_motion.position_value
 	for creature: Dictionary in creatures:
@@ -41,7 +46,7 @@ func _process(delta: float) -> void:
 			var offset: Vector2 = (creature.goal as Vector2)-p
 			var speed: float = (4.2 if crow else 3.7) if creature.state == "flee" else .45
 			var movement: Vector2 = offset.normalized()*minf(speed*delta,offset.length())
-			if crow and creature.state == "flee" and float(creature.height)>7.5: p += movement
+			if crow and creature.state == "flee" and float(creature.height)>7.5 and world.final_environment == null: p += movement
 			else: p = world.collision.resolve(p,movement)
 			creature.yaw = lerp_angle(float(creature.yaw),atan2(movement.x,movement.y),minf(1,delta*9))
 			if offset.length() < .3 or creature.timer <= 0:

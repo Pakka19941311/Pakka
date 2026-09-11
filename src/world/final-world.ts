@@ -107,7 +107,7 @@ export class FinalWorld {
       const bytes=readFileSync(resolve(root,id==='surface'?'geology-D13/heightmap.f32':`interiors/${meta.floor}`));digest.update(bytes);
       const supports=id==='surface'?json('geography/support-surfaces.json').surfaces:[];
       const terrain=new FinalTerrain(meta,bytes,supports),collision=new FinalCollision();
-      const obstacles:Obstacle[]=id==='surface'?['geography/collision.json','nature/collision-D13.json','nature/groundcover-collision-D13.json'].flatMap(p=>json(p).obstacles):meta.obstacles;
+      const obstacles:Obstacle[]=id==='surface'?['geography/collision.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','castle/courtyard.json'].flatMap(p=>json(p).obstacles):meta.obstacles;
       digest.update(JSON.stringify({obstacles,supports}));
       for(const o of obstacles){
         if(o.kind==='circle')collision.addCircle(o.x,o.z,o.radius,o.bottom,o.top);

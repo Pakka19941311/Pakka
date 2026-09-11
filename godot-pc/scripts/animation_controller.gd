@@ -267,6 +267,17 @@ func update(motion: Dictionary, rendered_velocity: Vector3, presentation_time_ms
 	if death_at >= 0:
 		sample_death(presentation_time_ms, dt)
 		return
+	# Local chores use existing authored clips; they cannot schedule damage,
+	# acquire a combat target, or alter a network actor's combat animation.
+	if motion.get("kind","") == "ambient" and motion.get("action","") == "gesture":
+		var clip: String = find_clip([str(motion.get("activityClip","pickup"))])
+		if not clip.is_empty():
+			set_state("gesture",presentation_time_ms)
+			visual.transform = base_visual
+			var span: float = maxf(1,float(motion.actionEndsAt)-float(motion.actionStartedAt))
+			sample(clip,clampf((presentation_time_ms-float(motion.actionStartedAt))/span,0,1),false,dt)
+			actor.set_meta("animation_state","gesture")
+			return
 	if model == "ForgottenKnight":
 		knight_auto_active = bool(motion.get("autoAttack", actor.get_meta("knight_autoattack_active", false)))
 	var snapshot_start: float = float(motion.get("actionStartedAt", -1))
@@ -494,4 +505,3 @@ func sample(clip: String, phase: float, looping: bool, dt: float) -> void:
 	player.seek(clampf(phase, 0, .999999) * clip_length(clip), true)
 	if model == "ForgottenKnight":
 		stabilize_knight_root()
-
