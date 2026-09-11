@@ -622,7 +622,12 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 			result.comparisons.append({"title":str(app.data.slotNames.get(slot,slot))+": "+(app.item_name(equipped) if not equipped.is_empty() else "пусто"),"selected":slot==selected_slot,"equipped_rows":item_rows(equipped),"rows":rows})
 	return result
 
+func hide_tooltip() -> void:
+	if is_instance_valid(app.tooltip_panel): app.tooltip_panel.queue_free()
+	app.tooltip_panel = null
+
 func show_tooltip(item: Dictionary, anchor: Control) -> void:
+	if app.get_viewport().gui_is_dragging(): return
 	if is_instance_valid(app.tooltip_panel):
 		app.tooltip_panel.queue_free()
 		app.tooltip_panel = null

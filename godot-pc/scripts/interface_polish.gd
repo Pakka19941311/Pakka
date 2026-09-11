@@ -247,13 +247,16 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 			await app.net.command({"type":"buy","itemId":id})
 			if is_instance_valid(body): shop(kind,title,0))
 		buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
+	var drop_area = preload("res://scripts/sale_drop.gd").new()
+	drop_area.app = app; drop_area.reopen = func(): shop(kind,title,1)
+	sale.add_child(drop_area)
 	sale.add_child(app.wrapped_label("Выберите предмет и количество. Ниже указана цена продажи одной единицы.",12))
 	var count: int = 0
 	for item: Dictionary in app.net.hero.inventory:
 		if app.data.books.has(str(item.id)): continue
 		count += 1
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",10); sale.add_child(row)
-		var icon: TextureRect = TextureRect.new(); icon.texture = app.book_ui.item_icon(item); icon.custom_minimum_size = Vector2(36,36); icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED; row.add_child(icon)
+		var icon: VarendorItemSlot = VarendorItemSlot.new(); icon.owner_ui = app; icon.payload = {"kind":"bag","item":item.duplicate(true)}; row.add_child(icon); icon.update_item(item)
 		var name_label: Label = app.wrapped_label(app.item_name(item)+" ×"+str(int(item.count)),12); name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(name_label)
 		var price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))
 		var sell: Button = app.button("%d ◈" % price,func():
@@ -280,9 +283,7 @@ func drop_quick(data: Dictionary, destination: int) -> void:
 	if data.get("kind") == "quick" and int(data.get("index",-1)) >= 0 and int(data.index) != destination: app.quick[int(data.index)].action = old
 	app.refresh_quick(); app.save_preferences()
 
-func finish_quick_drag(index: int, successful: bool) -> void:
-	if index >= 0 and not successful and not drag_cancelled and not app.quick_panel_node.get_global_rect().has_point(app.ui.get_global_mouse_position()):
-		app.quick[index].action = ""; app.refresh_quick(); app.save_preferences()
+func finish_quick_drag(_index: int, _successful: bool) -> void:
 	dragging_quick = false; drag_cancelled = false
 
 func configure_chat() -> void:

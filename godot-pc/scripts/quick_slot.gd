@@ -23,17 +23,8 @@ func _get_drag_data(_position: Vector2):
 	if owner_ui == null: return null
 	var action: String = str(owner_ui.quick[slot_index].action) if slot_index >= 0 else custom_action
 	if action.is_empty(): return null
-	var preview: Control = Control.new()
-	var icon_view: TextureRect = TextureRect.new()
-	icon_view.texture = artwork
-	icon_view.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	icon_view.size = VarendorInterfacePolish.ICON
-	icon_view.position = -VarendorInterfacePolish.ICON*.5
-	preview.add_child(icon_view)
-	if artwork == null:
-		var glyph: Label = Label.new()
-		glyph.text = symbol; glyph.position = Vector2(-12,-14)
-		glyph.add_theme_font_size_override("font_size",22); preview.add_child(glyph)
+	owner_ui.reference_hud.hide_tooltip()
+	var preview: Control = preload("res://scripts/drag_preview.gd").make(self,artwork,quantity,symbol)
 	set_drag_preview(preview)
 	owns_drag = true
 	owner_ui.polish.dragging_quick = true
@@ -47,11 +38,15 @@ func _drop_data(_position: Vector2, data) -> void:
 	owner_ui.polish.drop_quick(data,slot_index)
 
 func _notification(what: int) -> void:
+	if what in [NOTIFICATION_DRAG_BEGIN,NOTIFICATION_DRAG_END]: queue_redraw()
 	if what == NOTIFICATION_DRAG_END and owns_drag:
 		owns_drag = false
 		owner_ui.polish.finish_quick_drag(slot_index,is_drag_successful())
 
 func _draw() -> void:
+	if get_viewport().gui_is_dragging() and _can_drop_data(Vector2.ZERO,get_viewport().gui_get_drag_data()):
+		draw_rect(Rect2(Vector2.ONE,size-Vector2.ONE*2),Color("b5ce8e"),false,2)
+
 	var icon_font: Font = get_theme_default_font()
 	if artwork != null:
 		draw_texture_rect(artwork,Rect2((size-VarendorInterfacePolish.ICON)*.5,VarendorInterfacePolish.ICON),false,Color.WHITE if usable or remaining > 0 else Color("77746c"))

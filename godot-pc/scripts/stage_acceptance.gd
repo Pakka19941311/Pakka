@@ -16,6 +16,7 @@ static func run(app: Node) -> void:
 		if arg.begins_with("--block="): block = arg.trim_prefix("--block=")
 	if block in ["all","sale"]: await sale(app,checks)
 	if block in ["all","potions"]: await potions(app,checks)
+	if block in ["all","drag"]: await drag(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)
 	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)
@@ -70,3 +71,53 @@ static func potions(app: Node, checks: Dictionary) -> void:
 	app.activate("haste")
 	checks.haste_quick_use = await Wait.until(app,func(): return float(app.net.hero.get("buffs",{}).get("haste",0)) > float(app.net.last_time),4000)
 	app.open_npc_service("npc:shop"); await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"elza-potions"); app.close_dialog()
+
+
+static func drag_begin(app: Node, source: Control) -> void:
+	var point: Vector2 = source.get_global_rect().get_center()
+	var down: InputEventMouseButton = InputEventMouseButton.new()
+	down.position = point; down.button_index = MOUSE_BUTTON_LEFT; down.pressed = true
+	app.get_viewport().push_input(down,true)
+	var motion: InputEventMouseMotion = InputEventMouseMotion.new()
+	motion.position = point+Vector2(25,0); motion.relative = Vector2(25,0); motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+	app.get_viewport().push_input(motion,true)
+	await Keys.wait_ms(app.get_tree(),150)
+
+static func drag_end(app: Node, point: Vector2) -> void:
+	var motion: InputEventMouseMotion = InputEventMouseMotion.new()
+	motion.position = point; motion.button_mask = MOUSE_BUTTON_MASK_LEFT
+	app.get_viewport().push_input(motion,true)
+	var up: InputEventMouseButton = InputEventMouseButton.new()
+	up.position = point; up.button_index = MOUSE_BUTTON_LEFT; up.pressed = false
+	app.get_viewport().push_input(up,true)
+	await Keys.wait_ms(app.get_tree(),150)
+
+static func drag(app: Node, checks: Dictionary) -> void:
+	var inventory: String = JSON.stringify(app.net.hero.inventory)
+	checks.drag_size_and_cancel = true
+	for ui_scale: float in [1.0,1.5]:
+		app.get_window().content_scale_factor = ui_scale
+		app.polish.shop("shop","Торговка Эльза",1)
+		await Keys.wait_ms(app.get_tree(),300)
+		var slots: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(n): return n is VarendorItemSlot)
+		if slots.is_empty(): checks.drag_size_and_cancel = false; continue
+		await drag_begin(app,slots[0])
+		var preview: Control = app.get_tree().root.find_child("ItemDragPreview",true,false)
+		checks.drag_size_and_cancel = checks.drag_size_and_cancel and is_instance_valid(preview) and preview.dimensions.is_equal_approx(VarendorInterfacePolish.ICON) and preview.get_combined_minimum_size() == Vector2.ZERO
+		checks.drag_tooltip_hidden = not is_instance_valid(app.tooltip_panel)
+		await Wait.capture(app,"drag-scale-"+str(ui_scale))
+		await drag_end(app,Vector2(15,15))
+		checks.drag_size_and_cancel = checks.drag_size_and_cancel and JSON.stringify(app.net.hero.inventory) == inventory
+	app.get_window().content_scale_factor = 1.0
+	app.polish.shop("shop","Торговка Эльза",1); await Keys.wait_ms(app.get_tree(),200)
+	var slot: Control = app.active_dialog.find_children("*","Button",true,false).filter(func(n): return n is VarendorItemSlot)[0]
+	var drop: Control = app.active_dialog.find_child("SaleDrop",true,false)
+	var point: Vector2 = drop.get_global_rect().get_center()
+	await drag_begin(app,slot); await drag_end(app,point)
+	checks.drag_sale_opens_quantity = is_instance_valid(app.active_dialog.find_child("SaleQuantity",true,false))
+	checks.drag_sale_no_automatic_sale = JSON.stringify(app.net.hero.inventory) == inventory
+	app.close_dialog()
+	var previous: String = app.quick[2].action
+	app.quick[2].action = "potion"; app.polish.finish_quick_drag(2,false)
+	checks.quick_cancel_keeps_reference = app.quick[2].action == "potion"
+	app.quick[2].action = previous; app.refresh_quick()

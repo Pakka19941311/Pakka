@@ -31,6 +31,7 @@ func update_item(item: Dictionary) -> void:
 	queue_redraw()
 
 func _draw() -> void:
+
 	var bounds: Rect2 = Rect2(Vector2.ONE,size-Vector2.ONE*2)
 	var item: Dictionary = payload.get("item",{})
 	var selected: bool = not item.is_empty() and str(owner_ui.selected_item.get("item",{}).get("uid","")) == str(item.uid)
@@ -60,17 +61,15 @@ func _draw() -> void:
 			draw_line(Vector2(x,size.y-4),Vector2(mini(x+3,int(size.x)-4),size.y-4),Color("c5b688aa"))
 	if owner_ui.can_enhance(item): draw_rect(bounds.grow(-1),Color("d5b66c"),false,2)
 
+	if get_viewport().gui_is_dragging() and _can_drop_data(Vector2.ZERO,get_viewport().gui_get_drag_data()):
+		draw_rect(Rect2(Vector2.ONE,size-Vector2.ONE*2),Color("b5ce8e"),false,2)
+
 func _get_drag_data(_position: Vector2):
 	if owner_ui.net.hero.get("dead",true) or owner_ui.net.command_busy or not owner_ui.selected_scroll.is_empty(): return null
 	if pressed_payload.is_empty() or pressed_payload.get("item",{}).is_empty() or not owner_ui.reference_hud.has_item_version(pressed_payload.item): return null
 	dragging = true
-	var preview: Control = Control.new()
-	var image: TextureRect = TextureRect.new()
-	image.texture = texture
-	image.size = VarendorInterfacePolish.ICON
-	image.position = -VarendorInterfacePolish.ICON*.5
-	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	preview.add_child(image)
+	owner_ui.reference_hud.hide_tooltip()
+	var preview: Control = preload("res://scripts/drag_preview.gd").make(self,texture,int(pressed_payload.item.get("count",1)))
 	set_drag_preview(preview)
 	return pressed_payload.duplicate(true)
 
@@ -106,3 +105,7 @@ func _gui_input(event: InputEvent) -> void:
 			if pressed_payload.get("item",{}).is_empty() or owner_ui.reference_hud.has_item_version(pressed_payload.item):
 				owner_ui.item_clicked(pressed_payload,double_pressed)
 			else: owner_ui.notice("stale-item")
+
+func _notification(what: int) -> void:
+	if what in [NOTIFICATION_DRAG_BEGIN,NOTIFICATION_DRAG_END]: queue_redraw()
+	if what == NOTIFICATION_DRAG_END: dragging = false

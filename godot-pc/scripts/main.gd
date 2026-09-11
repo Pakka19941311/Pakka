@@ -1315,6 +1315,7 @@ func system_menu() -> void:
 	box.add_child(button("Выйти из игры", quit_game))
 
 func show_item_tip(item: Dictionary, anchor: Control) -> void:
+	if get_viewport().gui_is_dragging(): return
 	reference_hud.show_tooltip(item,anchor)
 
 func fit_reference_tooltip(anchor: Control) -> void:
