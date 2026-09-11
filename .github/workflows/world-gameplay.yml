@@ -90,14 +90,29 @@ jobs:
           python scripts/world_final/materialize_payload.py
           node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs
           node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs
+      - uses: actions/cache/restore@v4
+        with:
+          path: godot-pc/.godot/imported
+          key: gameplay-godot-4.6.3-${{ github.sha }}
+          restore-keys: gameplay-godot-4.6.3-
       - name: Import and export the gameplay client
-        timeout-minutes: 15
+        timeout-minutes: 25
         run: |
           mkdir -p qa-artifacts/gameplay-build
-          python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-import --timeout 300 -- --headless --editor --import
+          set +e
+          python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-import --timeout 900 -- --headless --editor --import
+          import_status=$?
+          set -e
+          tail -n 80 qa-artifacts/gameplay-import/engine.log
+          if [ "$import_status" -ne 0 ]; then exit "$import_status"; fi
           python -c 'import pathlib; s=pathlib.Path("qa-artifacts/gameplay-import/engine.log").read_text(); assert "SCRIPT ERROR:" not in s and "Parse Error:" not in s,s[-8000:]'
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/gameplay-build/Varendor.exe"
           "$GODOT" --headless --path godot-pc --script "$PWD/scripts/world_final/write_godot_license.gd" -- --license-output="$PWD/qa-artifacts/gameplay-build/Godot-LICENSE.txt"
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: godot-pc/.godot/imported
+          key: gameplay-godot-4.6.3-${{ github.sha }}
       - uses: actions/upload-artifact@v4
         with:
           name: world-gameplay-windows-input
