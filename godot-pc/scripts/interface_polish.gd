@@ -184,6 +184,7 @@ func update_clock() -> void:
 	atlas_clock.text = "Мир %02d:%02d · %s%s · до %s %s     Сервер %02d:%02d UTC" % [floori(hour),floori(fmod(hour,1)*60),"Ночь" if env.night else "День"," · Полнолуние" if env.fullMoon else "","рассвета" if env.night else "ночи",VarendorReferenceHud.timer_text(float(env.phaseRemainingMs)/1000),real.hour,real.minute]
 
 func open_storage() -> void:
+	app.player_input.stop_autorun()
 	if is_instance_valid(storage_panel): storage_panel.queue_free()
 	storage_slots.clear()
 	storage_signature = ""

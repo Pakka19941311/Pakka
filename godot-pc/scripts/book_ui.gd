@@ -71,6 +71,7 @@ func activate(id: String) -> void:
 	cast(id)
 
 func cast(id: String, target: String = "", point: Variant = null) -> void:
+	if app.data.books[id].get("mode","") in ["enemy","area"]: app.player_input.stop_autorun()
 	var command: Dictionary = {"type":"castBook","bookId":id}
 	if not target.is_empty(): command.targetId = target
 	if point is Vector2: command.point = {"x":point.x,"z":point.y}

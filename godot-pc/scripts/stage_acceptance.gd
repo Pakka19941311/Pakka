@@ -17,6 +17,7 @@ static func run(app: Node) -> void:
 	if block in ["all","sale"]: await sale(app,checks)
 	if block in ["all","potions"]: await potions(app,checks)
 	if block in ["all","drag"]: await drag(app,checks)
+	if block in ["all","autorun"]: await autorun(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)
 	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)
@@ -121,3 +122,43 @@ static func drag(app: Node, checks: Dictionary) -> void:
 	app.quick[2].action = "potion"; app.polish.finish_quick_drag(2,false)
 	checks.quick_cancel_keeps_reference = app.quick[2].action == "potion"
 	app.quick[2].action = previous; app.refresh_quick()
+
+static func key(app: Node, code: Key, echo: bool = false) -> void:
+	var event: InputEventKey = InputEventKey.new()
+	event.physical_keycode = code; event.keycode = KEY_UNKNOWN if code == KEY_R else code
+	event.pressed = true; event.echo = echo
+	app.get_viewport().push_input(event,true)
+	event = event.duplicate(); event.pressed = false; event.echo = false
+	app.get_viewport().push_input(event,true)
+
+static func autorun(app: Node, checks: Dictionary) -> void:
+	app.close_dialog(); app.inventory_panel.hide(); app.player_input.stop_autorun()
+	var origin: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
+	var heading: Vector2 = Vector2(sin(float(app.net.hero.yaw)),cos(float(app.net.hero.yaw)))
+	key(app,KEY_R); await Keys.wait_ms(app.get_tree(),400)
+	var delta: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)-origin
+	checks.autorun_physical_r_heading = app.player_input.autorun and delta.dot(heading)>.3 and app.autorun_indicator.visible
+	key(app,KEY_R,true); checks.autorun_no_repeat = app.player_input.autorun
+	key(app,KEY_SPACE); await Keys.wait_ms(app.get_tree(),100)
+	checks.autorun_jump = app.player_input.autorun and not bool(app.net.hero.grounded)
+	key(app,KEY_TAB); await Keys.wait_ms(app.get_tree(),80)
+	checks.autorun_inventory = app.player_input.autorun and app.inventory_panel.visible
+	key(app,KEY_TAB); await Keys.wait_ms(app.get_tree(),1100)
+	checks.autorun_lands = app.player_input.autorun and bool(app.net.hero.grounded)
+	key(app,KEY_R); await Keys.wait_ms(app.get_tree(),200)
+	origin = Vector2(app.net.hero.x,app.net.hero.z); await Keys.wait_ms(app.get_tree(),300)
+	checks.autorun_stops_without_slide = not app.player_input.autorun and origin.distance_to(Vector2(app.net.hero.x,app.net.hero.z))<.03
+	key(app,KEY_R); key(app,KEY_W); await Keys.wait_ms(app.get_tree(),100)
+	checks.autorun_manual_priority = not app.player_input.autorun
+	key(app,KEY_R)
+	app.net.intent({"type":"destination","x":app.net.hero.x+1,"z":app.net.hero.z})
+	checks.autorun_new_destination = not app.player_input.autorun
+	key(app,KEY_R)
+	app.net.intent({"type":"attack","entityId":"missing-test-target","skill":null})
+	checks.autorun_new_attack = not app.player_input.autorun
+	key(app,KEY_R); key(app,KEY_ESCAPE); checks.autorun_escape = not app.player_input.autorun
+	app.close_dialog(); key(app,KEY_R); app.open_npc_service("npc:shop")
+	checks.autorun_trade = not app.player_input.autorun
+	var field: LineEdit = LineEdit.new(); app.active_dialog.add_child(field); field.grab_focus()
+	key(app,KEY_R); checks.autorun_typing_ignored = not app.player_input.autorun
+	app.close_dialog(); app.player_input.stop_autorun(); app.net.intent({"type":"cancel"})

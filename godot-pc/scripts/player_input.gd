@@ -12,6 +12,9 @@ var focused: bool = true
 var pressed_keys: Dictionary = {}
 var movement_started: bool = false
 var autorun: bool = false
+var autorun_heading: Vector2 = Vector2.ZERO
+var steering_yaw: float = 0.0
+var character_generation: String = ""
 var left_down: bool = false
 var right_down: bool = false
 var chord_active: bool = false
@@ -23,12 +26,37 @@ const MOVE_ACTIONS: Array[StringName] = ["move_left", "move_right", "move_back",
 func setup(value: VarendorWorld, connection: VarendorNetwork) -> void:
 	world = value
 	network = connection
+	network.intent_reserved.connect(func(value: Dictionary, _sequence: int):
+		if str(value.get("type","")) in ["destination","attack"]: stop_autorun(false))
+
+func stop_autorun(send_stop: bool = true) -> void:
+	if not autorun: return
+	autorun = false
+	last_direction = Vector2.ZERO; last_axes = Vector2.ZERO
+	movement_started = false; elapsed = 0.0
+	if send_stop:
+		stop_manual_prediction()
+		network.intent({"type":"direction","x":0,"z":0})
+
+func toggle_autorun() -> void:
+	if autorun: stop_autorun(); return
+	network.intent({"type":"cancel"})
+	pressed_keys.clear(); movement_started = false
+	var heading: float = float(network.hero.get("yaw",0))
+	autorun_heading = Vector2(sin(heading),cos(heading))
+	steering_yaw = world.camera_controller.yaw
+	autorun = true
 
 func poll(delta: float, enabled: bool) -> void:
+	var identity: String = str(network.hero.get("id",""))+":"+str(network.hero.get("generation",0))
+	if character_generation != identity:
+		stop_autorun()
+		pressed_keys.clear()
+		character_generation = identity
 	# Neutralizing local input cannot depend on an HTTP connection: intent()
 	# deliberately ignores disconnected traffic before emitting prediction.
 	if not enabled or not focused or not network.connected:
-		autorun = false
+		stop_autorun()
 		stop_manual_prediction()
 		pressed_keys.clear()
 		movement_started = false
@@ -36,6 +64,11 @@ func poll(delta: float, enabled: bool) -> void:
 	var axes_changed: bool = axes != last_axes
 	last_axes = axes
 	var direction: Vector2 = world.camera_controller.movement_direction(axes)
+	if autorun:
+		if world.camera_controller.captured and not is_equal_approx(steering_yaw,world.camera_controller.yaw):
+			steering_yaw = world.camera_controller.yaw
+			autorun_heading = Vector2(0,1).rotated(steering_yaw)
+		direction = autorun_heading
 	# Preserve a down/up edge delivered during one slow frame: it must cancel
 	# click-to-move/attack even when no direction remains held at the next tick.
 	if movement_started and direction.is_zero_approx():
@@ -64,7 +97,7 @@ func mouse(event: InputEvent) -> bool:
 		return world.camera_controller.begin_capture(event.position)
 	if event.button_index == MOUSE_BUTTON_LEFT:
 		left_down = true
-		autorun = false
+		stop_autorun()
 		if right_down:
 			begin_chord(right_origin)
 			return true
@@ -80,6 +113,7 @@ func mouse(event: InputEvent) -> bool:
 	return false
 
 func begin_chord(point: Vector2) -> void:
+	stop_autorun()
 	chord_active = true
 	chord_target = world.targeting.pick(point)
 	if chord_target.is_empty() and world.actors.has(world.target_id): chord_target = world.target_id
@@ -108,6 +142,9 @@ func handle_keyboard(event: InputEvent, enabled: bool) -> void:
 		pressed_keys.erase(code)
 		return
 	if not enabled or not focused or not network.connected: return
+	if code == KEY_R:
+		if not event.echo: toggle_autorun()
+		return
 	# Like the reference pressed-code set: focus restoration/typing cannot
 	# revive a held key via OS key-repeat; release then press is required.
 	if event.echo and not pressed_keys.has(code): return
@@ -115,7 +152,7 @@ func handle_keyboard(event: InputEvent, enabled: bool) -> void:
 	for action: StringName in MOVE_ACTIONS:
 		if event.is_action_pressed(action, true): actions.append(action)
 	if actions.is_empty(): return
-	autorun = false
+	stop_autorun(false)
 	if not pressed_keys.has(code): movement_started = true
 	pressed_keys[code] = actions
 

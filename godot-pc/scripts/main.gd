@@ -21,6 +21,7 @@ var target_panel: PanelContainer
 var target_hp: ProgressBar
 var target_state: Label
 var diagnostics: Label
+var autorun_indicator: Label
 var tooltip_panel: PanelContainer
 var tooltip_timer: float = 0
 var tooltip_anchor: Control
@@ -91,6 +92,7 @@ func _ready() -> void:
 	get_viewport().gui_embed_subwindows = true
 	configure_input()
 	data = JSON.parse_string(FileAccess.get_file_as_string("res://generated/game.json"))
+	data.quickKeys = data.quickKeys.filter(func(k): return not str(k).ends_with("KeyR"))
 	quick = data.quickDefaults.duplicate(true)
 	net = VarendorNetwork.new()
 	add_child(net)
@@ -137,6 +139,9 @@ func _ready() -> void:
 		selected_item = {}
 		refresh_inventory())
 	world.moved_to.connect(func(point: Vector2): net.intent({"type":"destination","x":point.x,"z":point.y}))
+	autorun_indicator = label("Автобег [R]",13)
+	autorun_indicator.name = "AutorunIndicator"; autorun_indicator.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ui.add_child(autorun_indicator); autorun_indicator.hide()
 	startup_complete = true
 	loading_layer.queue_free()
 	ui.show()
@@ -510,6 +515,7 @@ func save_preferences() -> void:
 		notice("Не удалось сохранить назначения клавиш")
 
 func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer:
+	player_input.stop_autorun()
 	world.camera_controller.release_for_modal()
 	if is_instance_valid(active_dialog): close_dialog()
 	active_dialog = polish.floating(title,Vector2(size)+Vector2(0,40))
@@ -545,7 +551,7 @@ func assign_dialog(index: int) -> void:
 	box.add_child(button("Сохранить", func():
 		var key: String = data.quickKeys[key_select.selected]
 		for entry: Dictionary in quick:
-			if not key.is_empty() and entry.key == key:
+			if not key.is_empty() and entry.key == key and key != "KeyR":
 				entry.key = ""
 		quick[index] = {"action":actions[action_select.selected],"key":key}
 		save_preferences()
@@ -579,7 +585,7 @@ func controls_dialog() -> void:
 				setting_choice(page, "Декоративная растительность", "vegetation", ["24 м", "45 м", "80 м"], 2)
 				setting_choice(page, "Разрешение 3D", "render_scale", ["50%", "75%", "100%"], 2)
 			"Управление":
-				page.add_child(wrapped_label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. K — автобег, N — навыки.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
+				page.add_child(wrapped_label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. R — автобег (фиксированная клавиша), N — навыки.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
 				setting_toggle(page, "Инвертировать камеру по вертикали", "invert_y", false)
 				page.add_child(label("Чувствительность мыши"))
 				var slider: HSlider = HSlider.new()
@@ -693,6 +699,7 @@ func configure_input() -> void:
 		InputMap.action_erase_events(action)
 		var event: InputEventKey = InputEventKey.new()
 		event.physical_keycode = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
+		if event.physical_keycode == KEY_R: event.physical_keycode = DEFAULT_BINDINGS[action]
 		InputMap.action_add_event(action, event)
 		if action in ["move_forward","move_back","move_left","move_right"] and event.physical_keycode == DEFAULT_BINDINGS[action]:
 			var arrow: InputEventKey = InputEventKey.new()
@@ -701,8 +708,8 @@ func configure_input() -> void:
 
 func assign_movement_binding(event: InputEventKey) -> void:
 	var key: int = event.physical_keycode
-	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_K, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
-		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, K / M, Enter и 1–8 заняты интерфейсом."
+	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_R, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
+		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, R / M, Enter и 1–8 заняты интерфейсом."
 		return
 	var bindings: Dictionary = game_settings.get("bindings", {}).duplicate()
 	for action: String in DEFAULT_BINDINGS:
@@ -952,7 +959,7 @@ func notice(message: String) -> void:
 		print(message)
 
 func text_focused() -> bool:
-	return get_viewport().gui_get_focus_owner() is LineEdit or (is_instance_valid(active_dialog) and not active_dialog.get_meta("nonmodal",false)) or (login != null and login.visible)
+	return get_viewport().gui_get_focus_owner() is LineEdit or get_viewport().gui_get_focus_owner() is TextEdit or (is_instance_valid(active_dialog) and not active_dialog.get_meta("nonmodal",false)) or (login != null and login.visible)
 
 func _process(delta: float) -> void:
 	if not startup_complete or world == null or net == null:
@@ -963,7 +970,9 @@ func _process(delta: float) -> void:
 	# movement while the server has already simulated it, causing a later slide.
 	# Only input sampling moves here; the motor still integrates fixed 60 Hz ticks.
 	polish.process(delta)
-	player_input.poll(delta,not text_focused() and net.connected and not net.hero.is_empty() and not net.hero.dead)
+	player_input.poll(delta,not text_focused() and not world.space_loading and net.connected and not net.hero.is_empty() and not net.hero.dead)
+	autorun_indicator.visible = player_input.autorun
+	autorun_indicator.position = Vector2(quick_panel_node.position.x,quick_panel_node.position.y-23)
 	if not display_before.is_empty():
 		display_remaining -= delta
 		if is_instance_valid(display_countdown):
@@ -1007,7 +1016,7 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not startup_complete: return
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.physical_keycode == KEY_ESCAPE: player_input.autorun = false
+		if event.physical_keycode == KEY_ESCAPE: player_input.stop_autorun()
 		if event.physical_keycode == KEY_F3:
 			var recorder: Node = get_node_or_null("FramePacingRecorder")
 			if recorder != null: recorder.start_recording()
@@ -1046,19 +1055,18 @@ func _unhandled_input(event: InputEvent) -> void:
 		var key: String = ""
 		if event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_8:
 			key = "Digit" + str(event.physical_keycode - KEY_0)
-		elif event.physical_keycode in [KEY_Q, KEY_E, KEY_R, KEY_F, KEY_T, KEY_G]:
+		elif event.physical_keycode in [KEY_Q, KEY_E, KEY_F, KEY_T, KEY_G]:
 			key = "Key" + OS.get_keycode_string(event.physical_keycode)
 		if event.shift_pressed:
 			key = "Shift+" + key
 		if not event.ctrl_pressed and not event.alt_pressed and not event.meta_pressed and not key.is_empty():
 			for entry: Dictionary in quick:
-				if entry.key == key:
+				if entry.key == key and key != "KeyR":
 					activate(entry.action)
 					return
 		match event.physical_keycode:
 			KEY_I, KEY_C, KEY_TAB: toggle_inventory()
 			KEY_N: reference_hud.skills_dialog()
-			KEY_K: player_input.autorun = not player_input.autorun
 			KEY_M: reference_hud.map_dialog()
 			KEY_ENTER: reference_hud.chat.grab_focus()
 		if event.is_action_pressed("jump"):
@@ -1086,6 +1094,7 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_ESCAPE: player_input.stop_autorun()
 		if polish.dragging_quick and event.physical_keycode == KEY_ESCAPE: polish.drag_cancelled = true
 		if is_instance_valid(polish.atlas) and event.physical_keycode in [KEY_M,KEY_ESCAPE]:
 			polish.toggle_map(); get_viewport().set_input_as_handled(); return
@@ -1097,7 +1106,9 @@ func _input(event: InputEvent) -> void:
 			if event.physical_keycode in [KEY_ESCAPE,KEY_TAB]:
 				close_dialog(); get_viewport().set_input_as_handled(); return
 	if world != null and net != null:
-		player_input.handle_keyboard(event, not text_focused() and net.connected and not bool(net.hero.get("dead", true)))
+		player_input.handle_keyboard(event, not text_focused() and not world.space_loading and net.connected and not bool(net.hero.get("dead", true)))
+		if event is InputEventKey and event.physical_keycode == KEY_R and not text_focused():
+			get_viewport().set_input_as_handled()
 	if world != null and world.camera_controller.handle_captured_input(event): get_viewport().set_input_as_handled()
 
 func release_orbit(restore: bool = true) -> void:
