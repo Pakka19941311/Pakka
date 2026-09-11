@@ -47,7 +47,7 @@ static func run(app: Node) -> void:
 	checks.connected = await Wait.until(app,func(): return app.net.connected and app.world.actors.has(app.world.hero_id),45000)
 	app.login.hide(); app.close_dialog(); app.inventory_panel.hide()
 	app.player_input.focus_changed(true)
-	checks.final_world = app.world.final_environment != null and app.world.current_snapshot.get("populationCapacity",0) == 1000
+	checks.final_world = app.world.final_environment != null and app.world.current_snapshot.get("populationCapacity",0) == 1001
 	var a: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
 	Keys.keyboard(app,KEY_W,true); await Keys.wait_ms(app.get_tree(),900)
 	Keys.keyboard(app,KEY_W,false); await Keys.wait_ms(app.get_tree(),300)
@@ -101,6 +101,7 @@ static func run(app: Node) -> void:
 		await Wait.capture(app,"final-"+id)
 		app.polish.toggle_map(); await Keys.wait_ms(app.get_tree(),200)
 		await Wait.capture(app,"final-map-"+id); app.polish.toggle_map()
+		entry_position.y -= 2
 		app.net.intent({"type":"destination","x":entry_position.x,"z":entry_position.y})
 		checks[id+"_walk_back"] = await Wait.until(app,func(): return entry_position.distance_to(Vector2(app.net.hero.x,app.net.hero.z))<.6,6000)
 		Keys.keyboard(app,KEY_F,true,true); Keys.keyboard(app,KEY_F,false)
@@ -173,7 +174,9 @@ static func merchant_and_theme(app: Node, checks: Dictionary) -> void:
 		await Keys.wait_ms(app.get_tree(),200)
 		mouse(app,sell.get_global_rect().get_center())
 		await Keys.wait_ms(app.get_tree(),200); await Wait.capture(app,"titan-sale-confirm")
-		var confirms: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(b): return b.text == "Продать")
+		var all: Button = app.active_dialog.find_child("SaleAll",true,false)
+		if is_instance_valid(all): mouse(app,all.get_global_rect().get_center())
+		var confirms: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(b): return b.name == "SaleConfirm")
 		checks.merchant_confirmation = confirms.size() == 1
 		if not confirms.is_empty(): mouse(app,confirms[0].get_global_rect().get_center())
 		checks.merchant_loot_sold = await Wait.until(app,func(): return not app.net.hero.inventory.any(func(i): return i.uid == item.uid),5000)

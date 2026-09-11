@@ -89,7 +89,7 @@ jobs:
         run: |
           python scripts/world_final/materialize_payload.py
           node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs
-          node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs
+          node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs tests/stage-cave.test.mjs tests/stage-potions.test.mjs
       - name: Import and export the gameplay client
         timeout-minutes: 25
         run: |
@@ -106,6 +106,7 @@ jobs:
           # Always import this clean checkout and verify the real dependencies.
           python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-dependencies --timeout 180 -- --headless --script "$PWD/scripts/world_final/verify_gameplay_import.gd"
           tail -n 12 qa-artifacts/gameplay-dependencies/engine.log
+          "$GODOT" --headless --path godot-pc --script res://scripts/stage_format_qa.gd
           "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/gameplay-build/Varendor.exe"
           "$GODOT" --headless --path godot-pc --script "$PWD/scripts/world_final/write_godot_license.gd" -- --license-output="$PWD/qa-artifacts/gameplay-build/Godot-LICENSE.txt"
       - uses: actions/upload-artifact@v4
@@ -156,19 +157,19 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $startupResult = Get-Content qa-artifacts/gameplay-startup/startup.json | ConvertFrom-Json
           if (-not $startupResult.ok) { throw 'Startup input verification failed' }
-          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/gameplay_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --headless ("--package=" + $gamePackage)
+          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --headless ("--package=" + $gamePackage)
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Publish verified gameplay ZIP
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $gameResult = Get-Content qa-artifacts/gameplay-release/package-result.json | ConvertFrom-Json
-          python scripts/world_final/archive_gameplay.py qa-artifacts/gameplay-release/package-result.json qa-artifacts/gameplay-windows/gameplay.json
+          python scripts/world_final/archive_gameplay.py qa-artifacts/gameplay-release/package-result.json qa-artifacts/gameplay-windows/stage.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $gameZip = Join-Path $PWD ('qa-artifacts/gameplay-release/' + $gameResult.name + '.zip')
           $gameHash = (Get-FileHash -LiteralPath $gameZip -Algorithm SHA256).Hash.ToLower()
           $gameTag = 'world-gameplay-' + $env:GITHUB_SHA.Substring(0,12)
-          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — игровой тест нового мира' --notes-file qa-artifacts/gameplay-release/release-notes.md
+          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — пещера 40, торговля и автобег R' --notes-file qa-artifacts/gameplay-release/release-notes.md
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $gameRelease = gh api ('repos/' + $env:GITHUB_REPOSITORY + '/releases/tags/' + $gameTag) | ConvertFrom-Json
           $gameAsset = $gameRelease.assets | Where-Object name -eq ($gameResult.name + '.zip')
@@ -183,7 +184,7 @@ jobs:
           name: world-gameplay-checks
           path: |
             qa-artifacts/gameplay-startup
-            qa-artifacts/gameplay-windows/gameplay.json
+            qa-artifacts/gameplay-windows/stage.json
             qa-artifacts/gameplay-windows/native/result.json
             qa-artifacts/gameplay-windows/native/engine.log
             qa-artifacts/gameplay-release/publish-result.json

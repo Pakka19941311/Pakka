@@ -54,7 +54,7 @@ function stand(w,p,point){
 }
 function step(w,ms){const end=w.state.time+ms;while(w.state.time+17<end){for(const p of Object.values(w.state.characters))w.heartbeat(p.id);w.advance(Math.min(end,w.state.time+50));}w.advance(end);}
 
-test('final runtime has the approved 1000 stable slots, all 15 species, exact location/subzone/space totals',()=>{
+test('final runtime preserves the approved base population and adds one cave boss',()=>{
  const w=create(),spec=JSON.parse(readFileSync('docs/world-final/spec/WORLD_REQUIREMENTS.json','utf8'));
  assert.equal(w.state.monsters.length,1001);assert.equal(new Set(w.state.monsters.map(m=>m.uid)).size,1001);
  assert.equal(new Set(w.state.monsters.filter(m=>m.uid!==CAVE_BOSS_UID).map(m=>m.id)).size,15);
@@ -75,7 +75,7 @@ test('final runtime has the approved 1000 stable slots, all 15 species, exact lo
  }
 });
 
-test('portable server contains complete final geography and restores the same 1000 identities',async()=>{
+test('portable server contains complete final geography and restores the same permanent identities',async()=>{
  const parent=resolve('..'),temp=mkdtempSync(join(parent,'.final-world-bridge-')),stage=join(temp,'application');
  let bridge;
  try{
@@ -93,7 +93,7 @@ test('portable server contains complete final geography and restores the same 10
  }finally{if(bridge)await bridge.close();assert.ok(resolve(temp).startsWith(parent+sep));rmSync(temp,{recursive:true,force:true});}
 });
 
-test('boss phase summons are explicitly temporary, never respawn or displace the 1000 permanent slots',()=>{
+test('boss phase summons are explicitly temporary, never respawn or displace the permanent slots',()=>{
  const w=create(),p=w.createCharacter('Призыв босса','knight'),boss=w.state.monsters.find(m=>m.id==='big');
  stand(w,p,{...boss,x:boss.x+5});
  w.damage(boss,Math.ceil(MONSTERS.big.hp*.4),p,false);

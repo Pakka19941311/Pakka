@@ -12,5 +12,5 @@ with zipfile.ZipFile(archive,'x',zipfile.ZIP_DEFLATED,compresslevel=6) as z:
 sha=hashlib.file_digest(archive.open('rb'),'sha256').hexdigest()
 archive.with_suffix('.zip.sha256').write_text(sha+'  '+archive.name+'\n')
 with (meta.parent/'release-notes.md').open('a',encoding='utf-8') as f:
-    f.write('\nПоставляемый EXE и переносимый сервер прошли Actions на Windows без графического окна: 1000 постоянных мест, WASD/остановка, автоатака/добыча, переходы и уровень. Локальная графическая проверка выполнена в Godot 4.6.3 на NVIDIA RTX 3070 Laptop. Это не итоговая художественная приёмка мира.\n')
+    f.write('\nПоставляемый EXE и переносимый сервер прошли целевые проверки этапа в Actions на Windows без графического окна. Сценарии: продажа количества, перенос, зелья, автобег R, вход/бой/добыча/выход/повторный вход. Графический тест боя использует уменьшение остатка HP только в изолированной тестовой базе после первого настоящего попадания; это проверка функций, не окончательная оценка сложности босса.\n')
 print(json.dumps({'zip':str(archive),'sha256':sha,'bytes':archive.stat().st_size}))
