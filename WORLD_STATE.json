@@ -5,15 +5,15 @@
   "baseline_commit": "884b26e35508038506fe29477923e08d78744593",
   "checkpoint_ref": "refs/checkpoints/world-final-start-20260910-884b26e",
   "state_commit": "Resolve the commit containing this file; baseline_commit is the preserved pre-world HEAD.",
-  "current_stage": "D",
+  "current_stage": "F-G",
   "stages": {
     "A": "complete: preserved baseline, full package read and hash-checked, reference inspected and annotated, authored layout",
     "B": "complete as spatial geography: layout-06, 192 measured obstacle entries, 30 motor routes including returns, 7 normal-speed rendered walks; ramp camera defect corrected and rechecked. Final geology/material detail belongs to C-D; main game migration remains F.",
     "C": "complete as architecture geometry pass: surface C09 plus independent interiors C04, real pier, 334 graves, keep/settlements/ruins/shrine/church, measured collision. 40 surface routes and four normal-speed walks passed; closed-face normals fixed visually in C09. Final material wear, organic geology and atmosphere remain D-E; final visual acceptance is not claimed.",
     "D": "partial: D13 terrain and reseated full nature source verified; 92973 forest placements, 362189 grass points and 151 cliffs preserved. Three rendered walks and native forest/grass/cliff edit-export checks pass. Final geology/vegetation quality, native material parity, shore/swamp and unique ancient tree remain unfinished.",
     "E": "not started",
-    "F": "not started",
-    "G": "not started",
+    "F": "not started; owner promoted required gameplay/server integration ahead of further D-E decoration on 2026-09-11",
+    "G": "not started; next priority is approved 997 regular plus 3 bosses with real existing AI/combat and runtime tests",
     "H": "not started"
   },
   "crash_investigation": {
@@ -114,7 +114,7 @@
     "scripts/world_final/export_groundcover_points_blender.py"
   ],
   "authoring_rule": "Edit world_layout.json directly. initialize_layout.py refuses to overwrite it. Preserve manually authored objects.",
-  "next_task": "Recover accessible D14/D15 graphical evidence, fix observed defects, complete D16 native water source and visual review, then remaining D and E-H. No new permission needed for existing FINAL 1.0 scope.",
+  "next_task": "Read docs/handoff/CODEX_WORLD_GAMEPLAY_CONTINUE_RU.md. Per owner 2026-09-11, integrate existing server combat and exact approved 1000 population into the new world before more forests/mountains/caves decoration. Verify real AI, combat, collision, lifecycle and movement; then a gameplay Windows Actions/Release build and resume architecture/nature. Do not rebuild unchanged walking preview.",
   "not_verified": [
     "D07 local tree focus and distant views corrected and static/normal-walk checked. LOD transitions and full-world forest need motion acceptance. D04 static/orbit launch has a RefCounted shutdown leak warning; no crash.",
     "Final reference-quality art, dense forest and organic geology D",
@@ -130,7 +130,7 @@
     "NPC and inventory/equipment/enchant/storage/save data",
     "main and work/knight-integration-v2 branches"
   ],
-  "last_saved_commit": "7da1252645205ae051c4cad4f36722ec21c7dd8c",
+  "last_saved_commit": "8fbadf55698628fb75718ba4d61bc1ac777f1b79",
   "changed_shared_code": {
     "path": "godot-pc/scripts/player_movement.gd",
     "change": "Extract hardcoded map bounds into parameters; accepted old defaults preserved. No speed, animation, reconciliation, acceleration, or stopping change."
@@ -195,7 +195,7 @@
     "payload_parts": 246,
     "main_and_knight_v2_unchanged": true,
     "note": "Git payload preserves actual native masters and derived assets, not just generator code. Unknown/manual changes are protected by restore checks.",
-    "pending": "Intermediate Windows walkthrough published and verified at world-walk-687f980175f4. Owner visual test and unfinished D14/D-E-H work remain; no final-world acceptance."
+    "pending": "Intermediate walk is published and verified. Further work is gameplay/population integration per the new handoff; final-world acceptance remains pending."
   },
   "checkpoint_resume": "refs/checkpoints/world-final-resume-20260910T141317Z-5a5bf75",
   "backup_resume_from_workspace": "outputs/world-final-resume-20260910T141317Z-5a5bf75",
@@ -520,5 +520,12 @@
     "native_blender_pending": true,
     "visual_verified": false,
     "import": "Godot 4.6.3 headless import and isolated saved water scene load passed without errors; no graphical verification."
+  },
+  "continuation_handoff": "docs/handoff/CODEX_WORLD_GAMEPLAY_CONTINUE_RU.md",
+  "owner_priority_20260911": {
+    "order": "Existing server/gameplay integration F and exact approved population G, targeted runtime combat check and Windows gameplay Release, then unfinished architecture/nature D-E and remaining F-H.",
+    "do_not_repeat": "The unchanged D13 walking ZIP is already published.",
+    "preserved_remote_checkpoint": "8fbadf55698628fb75718ba4d61bc1ac777f1b79",
+    "D14_D15_D16": "All source candidates and numerical checks preserved. No graphical acceptance inferred; unfinished art is deferred, not discarded."
   }
 }
