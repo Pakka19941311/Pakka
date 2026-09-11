@@ -6193,6 +6193,30 @@
           "sha256": "5e603cc896caca5fd1dd4e2b93fa044ae1c847ae59cbe270d1c3d038d5ef1502"
         }
       ]
+    },
+    {
+      "revision": "D16-native-verified",
+      "format": "zip",
+      "archive_sha256": "309a24745d8e04214fbb543a2333732d1349207b6c1776a0aa9fb39b53734ec9",
+      "parts": [
+        {
+          "path": "art/world-final/payload/world-D16-native-verified-11.part000",
+          "bytes": 1026966,
+          "sha256": "309a24745d8e04214fbb543a2333732d1349207b6c1776a0aa9fb39b53734ec9"
+        }
+      ],
+      "files": [
+        {
+          "path": "art/world-final/Varendor_Wetlands_D-16.blend",
+          "bytes": 790458,
+          "sha256": "9fb3c4d79e96444318af35b4ea468748b06f861d9704c97027f8017c89f57af7"
+        },
+        {
+          "path": "godot-pc/world-final/nature/assets/swamp_water_D16.glb",
+          "bytes": 1126080,
+          "sha256": "7fee87f3abee65f91731a1594b35fb399dcf66d1fad49556234d1f469ca519ef"
+        }
+      ]
     }
   ],
   "files": [
@@ -6340,6 +6364,11 @@
       "path": "art/world-final/Varendor_Surface_D-10.blend",
       "bytes": 88548323,
       "sha256": "f679ee77535609c05df92e3b182f3063d2dc12ee23671e80b6855a9a60318b0f"
+    },
+    {
+      "path": "art/world-final/Varendor_Wetlands_D-16.blend",
+      "bytes": 790458,
+      "sha256": "9fb3c4d79e96444318af35b4ea468748b06f861d9704c97027f8017c89f57af7"
     },
     {
       "path": "art/world-final/nature-source/pine-D02/pine_0_restored.glb",
@@ -10710,6 +10739,11 @@
       "path": "godot-pc/world-final/nature/assets/stump_0_D08_lod1.glb",
       "bytes": 3020508,
       "sha256": "51be308a94966b43231338afa5b1db08f16c1319ddc67599a535ad9c96c7ca29"
+    },
+    {
+      "path": "godot-pc/world-final/nature/assets/swamp_water_D16.glb",
+      "bytes": 1126080,
+      "sha256": "7fee87f3abee65f91731a1594b35fb399dcf66d1fad49556234d1f469ca519ef"
     },
     {
       "path": "godot-pc/world-final/nature/authored-D01.json",
