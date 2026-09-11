@@ -10,11 +10,16 @@ permissions:
 
 concurrency:
   group: world-gameplay-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
+  preview-hold:
+    runs-on: ubuntu-24.04
+    steps:
+      - run: echo 'Game exports are paused while the castle design is being revised and reviewed.'
   native-build:
-    if: ${{ contains(github.event.head_commit.message, '[world-gameplay]') }}
+    # User requested visual previews only; re-enable after design approval.
+    if: ${{ false && contains(github.event.head_commit.message, '[world-gameplay]') }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     defaults:
