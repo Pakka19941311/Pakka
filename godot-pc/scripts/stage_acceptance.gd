@@ -22,6 +22,7 @@ static func run(app: Node) -> void:
 	if block == "starter": await preload("res://scripts/starter_quests_acceptance.gd").run(app,checks)
 	if block == "p2" or block.begins_with("p2:"): await preload("res://scripts/p2_population_acceptance.gd").run(app,checks)
 	if block == "p2-city": await preload("res://scripts/p2_city_acceptance.gd").run(app,checks)
+	if block == "p2-cloak": await preload("res://scripts/p2_cloak_acceptance.gd").run(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)

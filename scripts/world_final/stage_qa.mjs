@@ -41,7 +41,11 @@ try{
    const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');
    world.relocate(hero,{...geography.services[id],x:geography.services[id].x+2});
   }
-  else if(request.stage==='p2-city'){
+  else if(request.stage==='p2-city'||request.stage==='p2-cloak'){
+   if(request.stage==='p2-cloak'){
+    hero.level=60;
+    for(const id of ['cloak_defense','cloak_captain','cloak_sky'])hero.inventory.push(world.item(id));
+   }
    for(const id of ['starter_weapon_knight','starter_chest_knight','starter_head','starter_gloves','starter_boots','starter_belt'])hero.equipment[STARTER_ITEMS[id].slot]=world.item(id);
    world.recalculate(hero);hero.hp=hero.maxHp;
    assert.equal(geography.populationMode,'starter-v3');world.relocate(hero,{x:-90,z:-203,spaceId:'surface'});

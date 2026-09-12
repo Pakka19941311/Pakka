@@ -3,6 +3,7 @@ extends Node3D
 
 # Art selection stays client-only: server class model still owns attack timings.
 const P2_ADAPTER = preload("res://world-expansion-v3/actors/profile_adapter.gd")
+const CLOAK_VISUAL = preload("res://scripts/cloak_visual.gd")
 const KNIGHT_MODEL: String = "ForgottenKnight"
 const KNIGHT_ASSET: String = "res://assets/knight/Knight_Modular.glb"
 const KNIGHT_SOURCE_HEIGHT: float = 1.84
@@ -531,6 +532,10 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			if person.has("autoAttack"):
 				actor.set_meta("knight_autoattack_active", bool(person.autoAttack))
 				actor.set_meta("knight_autoattack_target", str(person.get("target", "")) if person.get("target") != null else "")
+		if not actor.has_meta("cloak_visual"):
+			var cloak: RefCounted = CLOAK_VISUAL.new()
+			cloak.bind(actor)
+		actor.get_meta("cloak_visual").apply_equipment(person.get("equipment",{}))
 		initialize_pose(actor, point(person.x, person.z, person.get("yOffset", 0)))
 		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
 		actor.set_meta("motion", person.duplicate(true))
@@ -718,6 +723,8 @@ func _process(delta: float) -> void:
 		var interval: float = 0.0 if id == hero_id or id == target_id or distance_sq < 24.0*24.0 else .1 if distance_sq < 50.0*50.0 else .5
 		if pose_delta >= interval:
 			controller.update(motion,rendered_velocity,actor_clock,pose_delta)
+			if actor.has_meta("cloak_visual"):
+				actor.get_meta("cloak_visual").tick(actor_clock,motion,rendered_velocity)
 			pose_delta = 0.0
 		actor.set_meta("pose_delta",pose_delta)
 		actor.visible = not controller.corpse_complete and (id == hero_id or distance_sq < 85.0*85.0)
