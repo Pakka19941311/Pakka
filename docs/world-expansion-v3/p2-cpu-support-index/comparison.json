@@ -1,0 +1,1293 @@
+{
+  "schema": 1,
+  "baseline": "../p2-ambient-baseline/profile.json",
+  "current": "profile.json",
+  "method": "Single before/after run; inclusive CPU spans cannot be summed. Support index changed, inactive line/counter implementation also present. Not a packaged performance or full movement acceptance.",
+  "same_settings": true,
+  "same_map": true,
+  "same_destination": true,
+  "same_population_capacity": true,
+  "phases": [
+    {
+      "phase": "idle_8s",
+      "baseline": {
+        "wall_duration_ms": 8002.664,
+        "metrics": {
+          "actors": {
+            "count": 57,
+            "max": 179.0,
+            "mean": 179.0,
+            "median": 179.0,
+            "p95": 179.0,
+            "total": 10203.0
+          },
+          "draw_calls_previous": {
+            "count": 57,
+            "max": 2922.0,
+            "mean": 2920.33333333333,
+            "median": 2920.0,
+            "p95": 2922.0,
+            "total": 166459.0
+          },
+          "engine_physics_ms_previous": {
+            "count": 57,
+            "max": 66.537,
+            "mean": 12.1108245614035,
+            "median": 4.393,
+            "p95": 66.537,
+            "total": 690.317
+          },
+          "engine_process_ms_previous": {
+            "count": 57,
+            "max": 246.869,
+            "mean": 141.594578947368,
+            "median": 135.253,
+            "p95": 154.585,
+            "total": 8070.891
+          },
+          "snapshot_monsters": {
+            "count": 57,
+            "max": 146.0,
+            "mean": 145.789473684211,
+            "median": 146.0,
+            "p95": 146.0,
+            "total": 8310.0
+          },
+          "wall_interval_ms": {
+            "count": 56,
+            "max": 330.784,
+            "mean": 140.203392857143,
+            "median": 134.682,
+            "p95": 223.614,
+            "total": 7851.39
+          }
+        },
+        "counts": {
+          "actor_iterations": 10203,
+          "rig_far": 1638,
+          "rig_hidden": 1008,
+          "rig_middle": 2067,
+          "rig_near": 1311,
+          "sse_packets": 162,
+          "stream_bytes": 22101431
+        }
+      },
+      "current": {
+        "wall_duration_ms": 8030.76,
+        "metrics": {
+          "actors": {
+            "count": 90,
+            "max": 179.0,
+            "mean": 179.0,
+            "median": 179.0,
+            "p95": 179.0,
+            "total": 16110.0
+          },
+          "draw_calls_previous": {
+            "count": 90,
+            "max": 2922.0,
+            "mean": 2920.37777777778,
+            "median": 2920.0,
+            "p95": 2922.0,
+            "total": 262834.0
+          },
+          "engine_physics_ms_previous": {
+            "count": 90,
+            "max": 24.337,
+            "mean": 5.85316666666666,
+            "median": 2.574,
+            "p95": 24.337,
+            "total": 526.785
+          },
+          "engine_process_ms_previous": {
+            "count": 90,
+            "max": 167.465,
+            "mean": 113.6638,
+            "median": 106.707,
+            "p95": 167.465,
+            "total": 10229.742
+          },
+          "snapshot_monsters": {
+            "count": 90,
+            "max": 146.0,
+            "mean": 145.744444444444,
+            "median": 146.0,
+            "p95": 146.0,
+            "total": 13117.0
+          },
+          "wall_interval_ms": {
+            "count": 89,
+            "max": 182.832,
+            "mean": 89.0394943820225,
+            "median": 88.963,
+            "p95": 118.45,
+            "total": 7924.515
+          }
+        },
+        "counts": {
+          "actor_iterations": 16110,
+          "rig_far": 1755,
+          "rig_hidden": 1080,
+          "rig_middle": 2067,
+          "rig_near": 2070,
+          "sse_packets": 165,
+          "stream_bytes": 22508514
+        }
+      },
+      "timings": {
+        "ambient.physics": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 479,
+              "max": 66.037,
+              "mean": 1.98640709812109,
+              "median": 1.661,
+              "p95": 3.75,
+              "total": 951.489000000001
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 79.573,
+              "mean": 16.4049827586207,
+              "median": 12.187,
+              "p95": 44.24,
+              "total": 951.489
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 483,
+              "max": 23.703,
+              "mean": 0.939219461697723,
+              "median": 0.838,
+              "p95": 1.56,
+              "total": 453.643
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 28.134,
+              "mean": 4.98508791208791,
+              "median": 4.325,
+              "p95": 10.292,
+              "total": 453.643
+            }
+          },
+          "current_over_baseline_call_mean": 0.4728232508764771,
+          "current_over_baseline_total": 0.4767716705080137
+        },
+        "ambient.find_path": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 10,
+              "max": 64.066,
+              "mean": 8.7509,
+              "median": 2.672,
+              "p95": 6.817,
+              "total": 87.509
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 64.066,
+              "mean": 1.50877586206897,
+              "median": 0.0,
+              "p95": 3.642,
+              "total": 87.509
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 10,
+              "max": 22.335,
+              "mean": 3.083,
+              "median": 0.786,
+              "p95": 2.673,
+              "total": 30.83
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 22.335,
+              "mean": 0.338791208791209,
+              "median": 0.0,
+              "p95": 0.921,
+              "total": 30.83
+            }
+          },
+          "current_over_baseline_call_mean": 0.3523066198905256,
+          "current_over_baseline_total": 0.35230661989052553
+        },
+        "rig.ground_fit": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 4161,
+              "max": 1.532,
+              "mean": 0.302471040615236,
+              "median": 0.278,
+              "p95": 0.512,
+              "total": 1258.582
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 55.605,
+              "mean": 21.6996896551724,
+              "median": 18.075,
+              "p95": 38.023,
+              "total": 1258.582
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 4947,
+              "max": 0.324,
+              "mean": 0.0535312310491207,
+              "median": 0.049,
+              "p95": 0.085,
+              "total": 264.819
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 8.996,
+              "mean": 2.9100989010989,
+              "median": 3.005,
+              "p95": 5.978,
+              "total": 264.819
+            }
+          },
+          "current_over_baseline_call_mean": 0.17697969015558127,
+          "current_over_baseline_total": 0.2104106049506508
+        },
+        "rig.controller": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 4988,
+              "max": 0.294,
+              "mean": 0.0439484763432241,
+              "median": 0.038,
+              "p95": 0.084,
+              "total": 219.215000000002
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 11.149,
+              "mean": 3.77956896551724,
+              "median": 2.723,
+              "p95": 7.565,
+              "total": 219.215
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 5862,
+              "max": 0.355,
+              "mean": 0.0416079836233373,
+              "median": 0.036,
+              "p95": 0.078,
+              "total": 243.906000000003
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 9.968,
+              "mean": 2.68028571428571,
+              "median": 2.205,
+              "p95": 5.592,
+              "total": 243.906
+            }
+          },
+          "current_over_baseline_call_mean": 0.9467446220067273,
+          "current_over_baseline_total": 1.1126337157585056
+        },
+        "world.actor_loop": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 57,
+              "max": 86.334,
+              "mean": 37.679947368421,
+              "median": 32.929,
+              "p95": 57.479,
+              "total": 2147.757
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 86.334,
+              "mean": 37.0302931034483,
+              "median": 32.929,
+              "p95": 57.479,
+              "total": 2147.757
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 90,
+              "max": 31.061,
+              "mean": 13.5259777777778,
+              "median": 12.451,
+              "p95": 19.53,
+              "total": 1217.338
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 31.061,
+              "mean": 13.3773406593407,
+              "median": 12.31,
+              "p95": 19.53,
+              "total": 1217.338
+            }
+          },
+          "current_over_baseline_call_mean": 0.3589701876577917,
+          "current_over_baseline_total": 0.5667950331438798
+        },
+        "world.process": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 57,
+              "max": 117.049,
+              "mean": 57.0273684210526,
+              "median": 53.568,
+              "p95": 83.916,
+              "total": 3250.56
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 117.049,
+              "mean": 56.0441379310345,
+              "median": 53.568,
+              "p95": 83.916,
+              "total": 3250.56
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 90,
+              "max": 58.13,
+              "mean": 31.2786666666667,
+              "median": 31.546,
+              "p95": 43.927,
+              "total": 2815.08
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 58.13,
+              "mean": 30.9349450549451,
+              "median": 31.43,
+              "p95": 43.927,
+              "total": 2815.08
+            }
+          },
+          "current_over_baseline_call_mean": 0.5484851840913575,
+          "current_over_baseline_total": 0.866029238038984
+        },
+        "network.consume_stream": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 57,
+              "max": 70.058,
+              "mean": 25.6094035087719,
+              "median": 23.304,
+              "p95": 44.862,
+              "total": 1459.736
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 70.058,
+              "mean": 25.1678620689655,
+              "median": 23.304,
+              "p95": 44.862,
+              "total": 1459.736
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 90,
+              "max": 52.586,
+              "mean": 16.3828,
+              "median": 15.932,
+              "p95": 32.334,
+              "total": 1474.452
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 52.586,
+              "mean": 16.2027692307692,
+              "median": 15.873,
+              "p95": 32.334,
+              "total": 1474.452
+            }
+          },
+          "current_over_baseline_call_mean": 0.6397181408145042,
+          "current_over_baseline_total": 1.0100812749702686
+        },
+        "timeline.advance": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 57,
+              "max": 13.859,
+              "mean": 6.68336842105263,
+              "median": 7.184,
+              "p95": 12.51,
+              "total": 380.952
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 13.859,
+              "mean": 6.56813793103448,
+              "median": 7.184,
+              "p95": 12.51,
+              "total": 380.952
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 90,
+              "max": 12.835,
+              "mean": 6.8325,
+              "median": 7.06,
+              "p95": 11.752,
+              "total": 614.925
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 12.835,
+              "mean": 6.75741758241758,
+              "median": 7.005,
+              "p95": 11.752,
+              "total": 614.925
+            }
+          },
+          "current_over_baseline_call_mean": 1.022313834813835,
+          "current_over_baseline_total": 1.614179739179739
+        },
+        "timeline.ingest": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 57,
+              "max": 4.205,
+              "mean": 2.09501754385965,
+              "median": 1.978,
+              "p95": 2.981,
+              "total": 119.416
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 4.205,
+              "mean": 2.05889655172414,
+              "median": 1.978,
+              "p95": 2.981,
+              "total": 119.416
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 90,
+              "max": 3.5,
+              "mean": 1.96694444444444,
+              "median": 1.878,
+              "p95": 2.549,
+              "total": 177.025
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 3.5,
+              "mean": 1.94532967032967,
+              "median": 1.872,
+              "p95": 2.549,
+              "total": 177.025
+            }
+          },
+          "current_over_baseline_call_mean": 0.9388677675799979,
+          "current_over_baseline_total": 1.4824227909157903
+        },
+        "world.apply_snapshot": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 45,
+              "max": 21.602,
+              "mean": 10.7142222222222,
+              "median": 10.27,
+              "p95": 11.738,
+              "total": 482.14
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 21.602,
+              "mean": 8.31275862068965,
+              "median": 10.131,
+              "p95": 11.738,
+              "total": 482.14
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 74,
+              "max": 14.576,
+              "mean": 8.93451351351352,
+              "median": 8.639,
+              "p95": 11.007,
+              "total": 661.154
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 14.576,
+              "mean": 7.26542857142857,
+              "median": 8.431,
+              "p95": 10.883,
+              "total": 661.154
+            }
+          },
+          "current_over_baseline_call_mean": 0.8338928695153053,
+          "current_over_baseline_total": 1.3712904965362758
+        },
+        "main.present_snapshot": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 45,
+              "max": 2.495,
+              "mean": 1.39348888888889,
+              "median": 1.288,
+              "p95": 1.824,
+              "total": 62.707
+            },
+            "per_frame_ms": {
+              "count": 58,
+              "max": 2.495,
+              "mean": 1.08115517241379,
+              "median": 1.245,
+              "p95": 1.824,
+              "total": 62.707
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 74,
+              "max": 2.364,
+              "mean": 1.45537837837838,
+              "median": 1.412,
+              "p95": 2.19,
+              "total": 107.698
+            },
+            "per_frame_ms": {
+              "count": 91,
+              "max": 2.364,
+              "mean": 1.18349450549451,
+              "median": 1.344,
+              "p95": 2.138,
+              "total": 107.698
+            }
+          },
+          "current_over_baseline_call_mean": 1.0444133354653713,
+          "current_over_baseline_total": 1.7174797072097212
+        }
+      }
+    },
+    {
+      "phase": "destination_10s",
+      "baseline": {
+        "wall_duration_ms": 10080.945,
+        "metrics": {
+          "actors": {
+            "count": 36,
+            "max": 205.0,
+            "mean": 195.444444444444,
+            "median": 202.0,
+            "p95": 205.0,
+            "total": 7036.0
+          },
+          "draw_calls_previous": {
+            "count": 36,
+            "max": 3001.0,
+            "mean": 2937.19444444444,
+            "median": 2932.0,
+            "p95": 2996.0,
+            "total": 105739.0
+          },
+          "engine_physics_ms_previous": {
+            "count": 36,
+            "max": 258.997,
+            "mean": 43.4023333333333,
+            "median": 9.862,
+            "p95": 258.997,
+            "total": 1562.484
+          },
+          "engine_process_ms_previous": {
+            "count": 36,
+            "max": 583.152,
+            "mean": 260.507861111111,
+            "median": 209.581,
+            "p95": 583.152,
+            "total": 9378.283
+          },
+          "snapshot_monsters": {
+            "count": 36,
+            "max": 156.0,
+            "mean": 153.611111111111,
+            "median": 155.0,
+            "p95": 156.0,
+            "total": 5530.0
+          },
+          "wall_interval_ms": {
+            "count": 35,
+            "max": 730.438,
+            "mean": 281.714142857143,
+            "median": 260.306,
+            "p95": 521.84,
+            "total": 9859.995
+          }
+        },
+        "counts": {
+          "actor_iterations": 7036,
+          "rig_far": 1632,
+          "rig_hidden": 1064,
+          "rig_middle": 1953,
+          "rig_near": 1123,
+          "sse_packets": 162,
+          "stream_bytes": 23280242
+        }
+      },
+      "current": {
+        "wall_duration_ms": 10057.305,
+        "metrics": {
+          "actors": {
+            "count": 72,
+            "max": 205.0,
+            "mean": 196.222222222222,
+            "median": 204.0,
+            "p95": 205.0,
+            "total": 14128.0
+          },
+          "draw_calls_previous": {
+            "count": 72,
+            "max": 3004.0,
+            "mean": 2939.31944444444,
+            "median": 2932.0,
+            "p95": 2990.0,
+            "total": 211631.0
+          },
+          "engine_physics_ms_previous": {
+            "count": 72,
+            "max": 108.104,
+            "mean": 18.1901666666667,
+            "median": 4.147,
+            "p95": 108.104,
+            "total": 1309.692
+          },
+          "engine_process_ms_previous": {
+            "count": 72,
+            "max": 548.15,
+            "mean": 202.968347222222,
+            "median": 136.77,
+            "p95": 548.15,
+            "total": 14613.721
+          },
+          "snapshot_monsters": {
+            "count": 72,
+            "max": 156.0,
+            "mean": 153.75,
+            "median": 155.0,
+            "p95": 156.0,
+            "total": 11070.0
+          },
+          "wall_interval_ms": {
+            "count": 71,
+            "max": 648.514,
+            "mean": 140.014028169014,
+            "median": 127.105,
+            "p95": 221.092,
+            "total": 9940.996
+          }
+        },
+        "counts": {
+          "actor_iterations": 14128,
+          "rig_far": 1946,
+          "rig_hidden": 1288,
+          "rig_middle": 3648,
+          "rig_near": 2242,
+          "sse_packets": 192,
+          "stream_bytes": 27631115
+        }
+      },
+      "timings": {
+        "ambient.physics": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 594,
+              "max": 258.133,
+              "mean": 4.96217171717172,
+              "median": 4.114,
+              "p95": 6.492,
+              "total": 2947.53
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 338.514,
+              "mean": 79.662972972973,
+              "median": 66.681,
+              "p95": 152.557,
+              "total": 2947.53
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 598,
+              "max": 107.751,
+              "mean": 2.28439130434783,
+              "median": 1.893,
+              "p95": 3.146,
+              "total": 1366.066
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 125.567,
+              "mean": 18.7132328767123,
+              "median": 14.896,
+              "p95": 36.273,
+              "total": 1366.066
+            }
+          },
+          "current_over_baseline_call_mean": 0.4603611955714141,
+          "current_over_baseline_total": 0.46346127096246686
+        },
+        "ambient.find_path": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 22,
+              "max": 253.24,
+              "mean": 19.4326363636364,
+              "median": 2.241,
+              "p95": 34.74,
+              "total": 427.518
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 253.24,
+              "mean": 11.5545405405405,
+              "median": 0.0,
+              "p95": 36.224,
+              "total": 427.518
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 22,
+              "max": 105.488,
+              "mean": 8.25609090909091,
+              "median": 0.75,
+              "p95": 13.574,
+              "total": 181.634
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 105.488,
+              "mean": 2.48813698630137,
+              "median": 0.0,
+              "p95": 1.669,
+              "total": 181.634
+            }
+          },
+          "current_over_baseline_call_mean": 0.42485696508684934,
+          "current_over_baseline_total": 0.4248569650868501
+        },
+        "rig.ground_fit": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 3856,
+              "max": 1.942,
+              "mean": 0.302210062240662,
+              "median": 0.279,
+              "p95": 0.498,
+              "total": 1165.32199999999
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 52.269,
+              "mean": 31.4951891891892,
+              "median": 31.473,
+              "p95": 49.66,
+              "total": 1165.322
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 6777,
+              "max": 0.23,
+              "mean": 0.0557193448428519,
+              "median": 0.051,
+              "p95": 0.093,
+              "total": 377.610000000007
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 10.699,
+              "mean": 5.1727397260274,
+              "median": 4.99,
+              "p95": 8.242,
+              "total": 377.61
+            }
+          },
+          "current_over_baseline_call_mean": 0.1843728975459472,
+          "current_over_baseline_total": 0.3240391926008521
+        },
+        "rig.controller": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 4680,
+              "max": 0.326,
+              "mean": 0.0473519230769234,
+              "median": 0.039,
+              "p95": 0.096,
+              "total": 221.607000000002
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 10.675,
+              "mean": 5.98937837837838,
+              "median": 5.511,
+              "p95": 9.772,
+              "total": 221.607
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 7802,
+              "max": 0.407,
+              "mean": 0.0431790566521407,
+              "median": 0.036,
+              "p95": 0.079,
+              "total": 336.883000000002
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 8.847,
+              "mean": 4.61483561643835,
+              "median": 4.557,
+              "p95": 6.994,
+              "total": 336.883
+            }
+          },
+          "current_over_baseline_call_mean": 0.9118754603059339,
+          "current_over_baseline_total": 1.5201821242108733
+        },
+        "world.actor_loop": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 36,
+              "max": 84.594,
+              "mean": 52.6371666666667,
+              "median": 52.131,
+              "p95": 74.737,
+              "total": 1894.938
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 84.594,
+              "mean": 51.2145405405405,
+              "median": 50.996,
+              "p95": 74.737,
+              "total": 1894.938
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 72,
+              "max": 35.186,
+              "mean": 19.5247361111111,
+              "median": 19.42,
+              "p95": 26.447,
+              "total": 1405.781
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 35.186,
+              "mean": 19.2572739726027,
+              "median": 19.303,
+              "p95": 26.447,
+              "total": 1405.781
+            }
+          },
+          "current_over_baseline_call_mean": 0.3709306056451447,
+          "current_over_baseline_total": 0.7418612112902901
+        },
+        "world.process": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 36,
+              "max": 162.8,
+              "mean": 84.1315277777778,
+              "median": 78.61,
+              "p95": 117.914,
+              "total": 3028.735
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 162.8,
+              "mean": 81.8577027027027,
+              "median": 78.128,
+              "p95": 117.914,
+              "total": 3028.735
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 72,
+              "max": 139.292,
+              "mean": 42.8215277777778,
+              "median": 43.245,
+              "p95": 61.666,
+              "total": 3083.15
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 139.292,
+              "mean": 42.2349315068493,
+              "median": 43.18,
+              "p95": 61.666,
+              "total": 3083.15
+            }
+          },
+          "current_over_baseline_call_mean": 0.5089831233171606,
+          "current_over_baseline_total": 1.017966246634321
+        },
+        "network.consume_stream": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 36,
+              "max": 50.009,
+              "mean": 39.7026944444444,
+              "median": 39.993,
+              "p95": 47.17,
+              "total": 1429.297
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 50.009,
+              "mean": 38.6296486486486,
+              "median": 39.933,
+              "p95": 47.17,
+              "total": 1429.297
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 72,
+              "max": 58.486,
+              "mean": 24.7901944444444,
+              "median": 24.714,
+              "p95": 40.388,
+              "total": 1784.894
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 58.486,
+              "mean": 24.450602739726,
+              "median": 24.443,
+              "p95": 40.388,
+              "total": 1784.894
+            }
+          },
+          "current_over_baseline_call_mean": 0.6243957693887271,
+          "current_over_baseline_total": 1.2487915387774549
+        },
+        "timeline.advance": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 36,
+              "max": 13.747,
+              "mean": 7.62908333333334,
+              "median": 7.663,
+              "p95": 13.018,
+              "total": 274.647
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 13.747,
+              "mean": 7.42289189189189,
+              "median": 7.595,
+              "p95": 13.018,
+              "total": 274.647
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 72,
+              "max": 14.551,
+              "mean": 7.12254166666667,
+              "median": 7.393,
+              "p95": 12.821,
+              "total": 512.823
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 14.551,
+              "mean": 7.02497260273973,
+              "median": 7.358,
+              "p95": 12.821,
+              "total": 512.823
+            }
+          },
+          "current_over_baseline_call_mean": 0.9336038624124782,
+          "current_over_baseline_total": 1.867207724824957
+        },
+        "timeline.ingest": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 36,
+              "max": 3.084,
+              "mean": 2.08216666666667,
+              "median": 2.007,
+              "p95": 2.529,
+              "total": 74.958
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 3.084,
+              "mean": 2.02589189189189,
+              "median": 1.989,
+              "p95": 2.529,
+              "total": 74.958
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 72,
+              "max": 4.316,
+              "mean": 2.15877777777778,
+              "median": 2.084,
+              "p95": 2.8,
+              "total": 155.432
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 4.316,
+              "mean": 2.12920547945206,
+              "median": 2.082,
+              "p95": 2.8,
+              "total": 155.432
+            }
+          },
+          "current_over_baseline_call_mean": 1.0367939379385784,
+          "current_over_baseline_total": 2.0735878758771578
+        },
+        "world.apply_snapshot": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 31,
+              "max": 113.909,
+              "mean": 22.3753870967742,
+              "median": 16.917,
+              "p95": 48.113,
+              "total": 693.637
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 113.909,
+              "mean": 18.7469459459459,
+              "median": 12.317,
+              "p95": 48.113,
+              "total": 693.637
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 60,
+              "max": 105.217,
+              "mean": 14.9249333333333,
+              "median": 10.129,
+              "p95": 29.704,
+              "total": 895.496
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 105.217,
+              "mean": 12.2670684931507,
+              "median": 9.75,
+              "p95": 26.157,
+              "total": 895.496
+            }
+          },
+          "current_over_baseline_call_mean": 0.6670245868275945,
+          "current_over_baseline_total": 1.2910153293437345
+        },
+        "main.present_snapshot": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 31,
+              "max": 3.307,
+              "mean": 1.52612903225806,
+              "median": 1.463,
+              "p95": 1.953,
+              "total": 47.31
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 3.307,
+              "mean": 1.27864864864865,
+              "median": 1.44,
+              "p95": 1.953,
+              "total": 47.31
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 60,
+              "max": 2.509,
+              "mean": 1.46838333333333,
+              "median": 1.41,
+              "p95": 2.074,
+              "total": 88.103
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 2.509,
+              "mean": 1.2068904109589,
+              "median": 1.374,
+              "p95": 1.728,
+              "total": 88.103
+            }
+          },
+          "current_over_baseline_call_mean": 0.9621619812583675,
+          "current_over_baseline_total": 1.8622489959839355
+        },
+        "actor.create": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 26,
+              "max": 5.617,
+              "mean": 4.57926923076923,
+              "median": 4.584,
+              "p95": 5.265,
+              "total": 119.061
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 23.086,
+              "mean": 3.21786486486486,
+              "median": 0.0,
+              "p95": 9.78,
+              "total": 119.061
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 26,
+              "max": 6.095,
+              "mean": 4.54926923076923,
+              "median": 4.499,
+              "p95": 5.435,
+              "total": 118.281
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 12.948,
+              "mean": 1.62028767123288,
+              "median": 0.0,
+              "p95": 8.559,
+              "total": 118.281
+            }
+          },
+          "current_over_baseline_call_mean": 0.9934487363620329,
+          "current_over_baseline_total": 0.9934487363620329
+        },
+        "actor.animation_bind": {
+          "baseline": {
+            "per_call_ms": {
+              "count": 52,
+              "max": 10.49,
+              "mean": 3.80753846153846,
+              "median": 3.691,
+              "p95": 4.337,
+              "total": 197.992
+            },
+            "per_frame_ms": {
+              "count": 37,
+              "max": 38.76,
+              "mean": 5.35113513513514,
+              "median": 0.0,
+              "p95": 15.798,
+              "total": 197.992
+            }
+          },
+          "current": {
+            "per_call_ms": {
+              "count": 52,
+              "max": 5.387,
+              "mean": 3.64725,
+              "median": 3.468,
+              "p95": 4.715,
+              "total": 189.657
+            },
+            "per_frame_ms": {
+              "count": 73,
+              "max": 22.918,
+              "mean": 2.59804109589041,
+              "median": 0.0,
+              "p95": 14.131,
+              "total": 189.657
+            }
+          },
+          "current_over_baseline_call_mean": 0.9579023394884646,
+          "current_over_baseline_total": 0.9579023394884643
+        }
+      }
+    }
+  ],
+  "navigation": {
+    "baseline_count": 51,
+    "current_count": 51,
+    "current_success": 51,
+    "all_event_geometry_equal_in_order": true
+  },
+  "largest_destination_wall_frame": {
+    "actors": 179,
+    "calls": {
+      "ambient.find_path": 1,
+      "ambient.physics": 30,
+      "main.present_snapshot": 1,
+      "main.process": 1,
+      "network.consume_stream": 1,
+      "player.physics": 30,
+      "player.reconcile": 1,
+      "rig.controller": 177,
+      "rig.ground_fit": 121,
+      "rig.total": 179,
+      "timeline.advance": 1,
+      "timeline.ingest": 1,
+      "world.actor_loop": 1,
+      "world.apply_snapshot": 1,
+      "world.camera": 1,
+      "world.nameplates": 1,
+      "world.physics": 30,
+      "world.process": 1
+    },
+    "draw_calls_previous": 2924.0,
+    "engine_physics_ms_previous": 2.373,
+    "engine_process_ms_previous": 93.313,
+    "frame": 982,
+    "hero": [
+      -281.755950927734,
+      52.0524864196777,
+      205.008041381836
+    ],
+    "latest_ms": 1789231522774.33,
+    "snapshot_monsters": 147,
+    "timeline_ms": 1789231522774.33,
+    "timings_ms": {
+      "ambient.find_path": 0.588,
+      "ambient.physics": 47.498,
+      "main.present_snapshot": 1.284,
+      "main.process": 0.073,
+      "network.consume_stream": 43.749,
+      "player.physics": 5.984,
+      "player.reconcile": 1.433,
+      "rig.controller": 8.847,
+      "rig.ground_fit": 6.194,
+      "rig.total": 16.03,
+      "timeline.advance": 10.869,
+      "timeline.ingest": 1.871,
+      "world.actor_loop": 24.2,
+      "world.apply_snapshot": 8.482,
+      "world.camera": 0.102,
+      "world.nameplates": 1.769,
+      "world.physics": 53.762,
+      "world.process": 48.23
+    },
+    "wall_interval_ms": 648.514,
+    "wall_ms": 54476.619
+  }
+}

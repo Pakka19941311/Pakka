@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "status": "failed_before_fixture",
+  "performance_evidence": false,
+  "utc_start": "2026-09-12T16:40:46.229641+00:00",
+  "elapsed_s": 88.453,
+  "exit_code": 4294967295,
+  "wrapper_crash_detected": true,
+  "manual_termination": {
+    "pid": 4464,
+    "method": "Stop-Process after verifying the exact executable path",
+    "reason": "Main script could not compile; repeated Nil physics errors",
+    "assessment": "0xFFFFFFFF follows explicit manual termination; not evidence of an access violation"
+  },
+  "root_compile_error": {
+    "type": "VarendorLineEffects",
+    "locations": [
+      "res://scripts/book_ground_effects.gd:7",
+      "res://scripts/book_ground_effects.gd:9"
+    ]
+  },
+  "unique_errors": {
+    "ERROR: Can't create shader cache folder, no shader caching will happen: user://": 2,
+    "ERROR: Failed to read the root certificate store.": 2,
+    "SCRIPT ERROR: Parse Error: Could not find type \"VarendorLineEffects\" in the current scope.": 4,
+    "SCRIPT ERROR: Compile Error: Failed to compile depended scripts.": 4,
+    "ERROR: Failed to load script \"res://scripts/main.gd\" with error \"Compilation failed\".": 2,
+    "SCRIPT ERROR: Invalid call. Nonexistent function 'new' in base 'GDScript'.": 2,
+    "SCRIPT ERROR: Invalid assignment of property or key 'world' with value of type 'Node3D (VarendorWorld)' on a base object of type 'Nil'.": 2,
+    "SCRIPT ERROR: Invalid call. Nonexistent function 'physics_step' in base 'Nil'.": 9166,
+    "SCRIPT ERROR: Invalid call. Nonexistent function 'setup' in base 'Nil'.": 2
+  },
+  "source_log": "work/qa/p2-cpu-profile-03-support-index/native/engine.log",
+  "log_sha256": "c923cf9fb7b03f7f178d2807395c01b400aa34d1f783202a173eef7bc6b5d9db",
+  "source_result": "work/qa/p2-cpu-profile-03-support-index/native/result.json"
+}
