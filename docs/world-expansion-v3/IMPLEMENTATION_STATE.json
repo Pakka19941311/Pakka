@@ -5,11 +5,11 @@
   "accepted": "2026-09-12: user accepted the complete v3 specification and instructed implementation",
   "branch": "work/character-art-v3",
   "baseline": "f79d8a81fa824f01fa1d35678ab7391cd17ea208",
-  "current": "Live cloaks committed7e19305, sixlegMOB05 committed6b60234, isolated NPC motion09ccecf; live NPC integration, nature source and actual +3 economy underway; full accepted master remains active",
+  "current": "Protected Godot startup189b102 remains verified; live NPC03b6981, early upkeepca0e61e and native pursuitda7e7bd committed. Nature7648404 is connected but actual material/continuity review remains open. Full accepted master remains active.",
   "stages": {
     "P0": "in_progress: accepted specification preserved; live sources, migrations and asset intake",
     "P1": "candidate_data: 48 species / 2416 reachable points / 30 routes; terrain and visual composition not yet rebuilt",
-    "P2": "in_progress: first150 natural encounters/1151 actualslots,5starter quests and nativecombat; one livehouse and actualmovement, actorart/cityNPC/nature/economy still require completion",
+    "P2": "in_progress: 150 new/1151 actual slots, five quests, real native battle/pursuit, one house, two live NPC and cloak integration; local economy corrected. Nature is connected with art defects still being corrected. P2 is not ready for mass art replication.",
     "P3": "in_progress: classes,cap90,city sales,rings/J and three wearable cloaks implemented;162 allclass rig checks and20 live knight equip checks passed; broader item scope remains",
     "P4": "pending",
     "P5": "pending",
@@ -29,9 +29,9 @@
     "old_world_contract": "historical only; v3 supersedes old quotas and stages"
   },
   "personal_save_backup": "not_claimed: only isolated SQLite fixtures touched; real user saves unopened and unchanged",
-  "release": "no new candidate yet",
-  "next_action": "Finish live guard/resident observations and long P2 monster pursuit, integrate reviewed forest/shore candidate, finish5x10 +3 actual hunt/restocking; P2 visual/economy gate precedes massworldart. Remaining43species/12newminis/fullmap/P4-P9 and exact testedWindowsZIP are not complete.",
-  "last_updated_utc": "2026-09-12T15:03:38.197657+00:00",
+  "release": "No new ZIP/export/release in this continuation; user authorization to publish work/character-art-v3 persists.",
+  "next_action": "Complete actual forest/shore high-profile material review and continuity check; finish approved typed book damage block and separate enemy ranged response. Review P2 mixed legacy/new population before presenting complete suburb. Full48species/2416slots/12newminis/map/castles and exact tested Windows ZIP remain unfinished.",
+  "last_updated_utc": "2026-09-12T16:05:02.380327+00:00",
   "completed_blocks": [
     {
       "commit": "bcde7b6",
@@ -177,23 +177,73 @@
       "commit": "7e19305",
       "block": "Three cloaks connected to live character equipment and pose",
       "checks": "20native livechecks70.704s;3screenshotsreviewed;equip/replace/remove UID andoldchestcape preserved"
+    },
+    {
+      "commit": "03b6981",
+      "block": "Two existing city residents animated on their unchanged live routes",
+      "checks": "23 native90.219s plus8 factory checks; three PNG reviewed"
+    },
+    {
+      "commit": "9c5d783",
+      "block": "Editable isolated forest and shore source with spatial runtime chunks",
+      "checks": "167 source collision,291 GLB/export,9 isolated native checks; art defects recorded"
+    },
+    {
+      "commit": "aee1a60",
+      "block": "Five actual +3 ten-kill hunt and restock measurements",
+      "checks": "50 fullworld battles/10 checks; knight2 upkeep49.11% discovered, not accepted balance"
+    },
+    {
+      "commit": "e487c66",
+      "block": "Isolated early upkeep candidate comparison",
+      "checks": "7 tests; three continuous candidate loops; production unchanged at this checkpoint"
+    },
+    {
+      "commit": "ca0e61e",
+      "block": "P2 weak MOB01/03 level1-2 repeat-attack pause, preserving damage/loot",
+      "checks": "18 tests and tsc; full1151 knight route33HP/55gold/28.80%/TTK11.05s;10level1 fights"
+    },
+    {
+      "commit": "48572cb",
+      "block": "Five separate inactive model candidates MOB06-10 with editable/source credits",
+      "checks": "5 byte-identical reproductions;14clips434Blender phases; art/animation blockers remain; no activation"
+    },
+    {
+      "commit": "d33534e",
+      "block": "Correct unverified Lynx identity in source audit",
+      "checks": "Fortnite identity risk recorded; no false animal claim or asset download"
+    },
+    {
+      "commit": "7648404",
+      "block": "P2-only nature collision/client rendering integration and actual-route fixtures",
+      "checks": "13 Node checks plus tsc; native01 movement/camera/settings passed but continuity probe and art still open"
+    },
+    {
+      "commit": "42d9800",
+      "block": "Reproduce safe legacy golem/rift farming and specify typed book damage",
+      "checks": "Two ordinary-intent server battles;5checks; gates work, DEF bypass and missing ranged response remain"
+    },
+    {
+      "commit": "da7e7bd",
+      "block": "Network gait clock, terrain support and lifecycle/resync correction",
+      "checks": "87 final native checks181.359s and51 isolated checks; all-vertex gap measured; no access violation, scripts or leaks"
     }
   ],
   "in_progress_checks": {
     "rings_and_cloaks": "backendac4b31b;3Dmodels5classfit ae696c4; livehook and20native equip checks7e19305 passed",
-    "assets": "boar andsixlegRoachacceptedP2;09ccecf guard/resident isolated12native checks; liveNPC observations and nature candidate integration pending",
-    "combat": "67actualnativechecksMOB01/03/04/05 passed inclrealclick/fullHPdeath/loot/stop; sustained+3fiveclasses follows. Highlevelbooks/golems/bossresponse open",
+    "assets": "P2 boar/sixlegroach/cloaks and two NPC motion integrated. Cohort06-10 inactive source candidates only, missing rigged animal lynx and incomplete combat animations. Full48 artwork not complete.",
+    "combat": "87 native four-species pursuit/roach battle plus51 clock/ground/lifecycle checks passed. Full1151 knight upkeep corrected28.80%. Typed book damage approved for implementation; legacy safe ranged farming remains open until real counterattacks/defenses.",
     "starter": "fivequests/UIcommitted; actualroutes preserved,60continuousfights andQUEST102 return/claim recorded",
     "backup": "pendingrewardUIDs and changedmapVersion covered;11targetedchecks passed; personalsavesunopened",
     "late_quests": "d83739b committed34+1server/23nativechecks; laterpopulationgates remainintentional",
-    "population": "1151 actualslots,150naturalP2groups; full2416 remainsstageddata; noadditionalglobalactivation",
-    "city": "66bed9d onehouse/stairs/underpass/camera passed22nativechecks; sourceblend andgenerator saved; closedhouseinteriornotclaimed",
-    "nature": "revised forest/shore candidate visually improved and167 sourcechecks; root requests isolatedrender layer/export, D13 heights unchanged; notyetconnected"
+    "population": "1151 actual includes legacy1001 plusnew150; full2416 remains staged. Final starter population presentation still needs review for visual crowding/legacy overlap; no mass activation claimed.",
+    "city": "One house/stairs/underpass/camera22 native checks; two existing NPC live routes23 andfactory8 passed. Whole castle/city architecture remains unfinished.",
+    "nature": "7648404 P2 local source/collision/render adapter connected. First actual native01 functional path/camera/settings passed, observer continuity needs time-normalized trace; foliage too pale/ground too dark, high-profile material review underway. candidateOnly=true."
   },
   "latest_user_correction": {
     "issue": "Godot access violation read0x58 during direct service check-only",
     "fix_commit": "189b102",
-    "verified": "same script via checked launcher,exit0,clean log",
+    "verified": "Same script via checked launcher exit0; later check-only stage see p2-stage-parse-nature-01 exit0 with empty error_lines; final root native pursuit06 exit0 after181.359s, no native exception. Shader cache/root cert environment warnings persist in graphical runs.",
     "policy": "all subsequent engine calls via godot_run_checked.py; no direct starts"
   }
 }
