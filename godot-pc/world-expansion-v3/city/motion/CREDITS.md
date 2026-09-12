@@ -1,0 +1,10 @@
+# City NPC motion derivatives
+
+The original five CC0 city sample assets remain unchanged. These **separate** motion derivatives add equipment with a different license.
+
+- Bodies, 53-bone `game_engine` rigs, eyes, hair and eyebrows: **MakeHuman Community / MPFB**, CC0. Clothing: **Rehman Polanski** (viking tunic, trousers and boots), **Donitz** (robe), CC0. Sources and full CC0 text: [original city attribution](../CREDITS.md), [MPFB](https://github.com/makehumancommunity/mpfb2), [suits02](https://static.makehumancommunity.org/assets/assetpacks/suits02.html).
+- Guard open helmet and sword: **The Forgotten Knight — Igor Oskolskiy (dark_igorek), CC BY 4.0**. [Original model](https://sketchfab.com/3d-models/the-forgotten-knight-d14eb14d83bd4e7ba7cbe443d76a10fd), [license](https://creativecommons.org/licenses/by/4.0/). Existing approved donor: `godot-pc/assets/knight/Knight_Modular.glb`; original receipts and attribution in `art/forgotten-knight/LICENSES.md` and `source_provenance.json`. Preserve this attribution when redistributing the guard. No endorsement by the source artist is implied.
+- New changes: fitted plain open helmet with decorative horns and crest removed, reduced and belt-mounted sword, new fitted leather scabbard and two straps, relaxed hand and arm pose. Resident robe hem raised to ankle length and lower garment weights blended; boot geometry concealed inside the robe removed. Visible feet remain. Source material maps and UVs retained.
+- All five clips (`idle`, `walk`, `talk`, `turn_left`, `turn_right`) are authored in the Varendor Blender script using anatomical joint positions and two-bone IK. They are **not** copies of Quaternius UAL clips. No third-party addon code is packaged in either GLB. No AI-generated geometry or image edits are used.
+
+Reproduction and measured runtime checks: `docs/world-expansion-v3/P2_NPC_MOTION.md` and `scripts/assets/city/run_npc_motion.py`. The derivative guard is not wholly CC0: its helmet and sword retain CC BY 4.0 obligations.
