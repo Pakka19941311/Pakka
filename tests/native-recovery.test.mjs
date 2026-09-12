@@ -8,6 +8,8 @@ import { WorldSimulation } from '../src/server/world-simulation.ts';
 import { CollisionWorld } from '../src/world/collision-world.ts';
 import { restoreWorldTopology } from '../src/world/world-topology.ts';
 import { CLASSES, MONSTERS } from '../src/data/game-data.ts';
+import { SKILL_BOOKS } from '../src/data/skill-books.ts';
+import { SERVICES } from '../src/world/territory.ts';
 
 function fixture(t, classId='knight', monsterId='wolf', actualMap=false) {
   const dir=mkdtempSync(join(tmpdir(),'varendor-recovery-'));
@@ -40,25 +42,44 @@ for(const classId of Object.keys(CLASSES))for(const monsterId of ['wolf','mini']
   });
 }
 
-for(const classId of Object.keys(CLASSES))for(let index=0;index<4;index++) {
-  test(`${classId} skill ${index}: authoritative cost, cooldown and visible event`,t=>{
-    const {world,p,m,advance,observedEvents}=fixture(t,classId,'mini');
-    const skill=CLASSES[classId].skills[index];
-    const self=Boolean(skill.buff||skill.summon);
-    world.input(p.id,1,{type:'attack',entityId:self?'@self':m.uid,skill:index});advance(6000);
-    assert.ok(p.cooldowns[index]>1000, 'server accepted the skill');
-    assert.ok(observedEvents.some(e=>e.actor===p.id&&(self?['buff','summon'].includes(e.kind):e.kind==='release'&&e.skill===index)));
+for(const classId of Object.keys(CLASSES)) {
+  test(`${classId}: legacy numeric skills cannot bypass owned books`,t=>{
+    const {world,p,m}=fixture(t,classId,'mini');
+    const before=JSON.stringify([p.mp,p.cooldowns,m.hp,world.state.pending]);
+    for(let index=0;index<4;index++)assert.throws(()=>world.input(p.id,index+1,{type:'attack',entityId:m.uid,skill:index}),/book-required/);
+    assert.equal(JSON.stringify([p.mp,p.cooldowns,m.hp,world.state.pending]),before);
+    assert.equal(world.events.filter(e=>e.actor===p.id&&['attack','release'].includes(e.kind)).length,0);
+  });
+}
+
+for(const book of Object.values(SKILL_BOOKS)) {
+  test(`${book.id}: owned book pays once, starts cooldown and produces its authoritative effect`,t=>{
+    const {world,p,m}=fixture(t,book.classId,'mini');
+    p.level=60;world.recalculate(p);p.mp=p.maxMp;p.z=m.z-1.5;
+    p.inventory.push(world.item(book.id));
+    const mp=p.mp,now=world.state.time;
+    const command={type:'castBook',bookId:book.id,targetId:book.mode==='ally'?p.id:m.uid,point:{x:m.x,z:m.z}};
+    const result=world.command(p.id,'book-owned-once',command);
+    assert.equal(result.ok,true,result.reason);
+    assert.equal(p.mp,mp-book.cost);assert.equal(p.bookCooldowns[book.id],now+book.cd*1000);
+    assert.ok(world.events.some(e=>e.actor===p.id&&e.kind==='attack'&&e.bookId===book.id));
+    if(book.mode==='area')assert.ok(world.state.bookAreas.some(a=>a.id===book.id&&a.owner===p.id));
+    else if(book.mode==='trap')assert.ok(world.state.bookTraps.some(a=>a.owner===p.id));
+    else assert.ok(world.events.some(e=>e.actor===p.id&&['release','buff','summon'].includes(e.kind)));
+    const after=JSON.stringify([p,world.state.summons,world.state.bookAreas,world.state.bookTraps,world.events]);
+    assert.deepEqual(world.command(p.id,'book-owned-once',command),result);
+    assert.equal(JSON.stringify([p,world.state.summons,world.state.bookAreas,world.state.bookTraps,world.events]),after);
   });
 }
 
 test('Asterhold arrival is free on the shipped map and cancels all previous motion',t=>{
   const {world,p,advance,collision}=fixture(t,'knight','wolf',true);
-  Object.assign(p,{x:-7,z:-20});world.input(p.id,1,{type:'direction',x:1,z:0});
+  Object.assign(p,SERVICES['npc:teleport']);world.input(p.id,1,{type:'direction',x:1,z:0});
   const generation=p.generation;
   const receipt=world.command(p.id,'arrival-regression',{type:'teleport',destination:'Астерхолд'});
   assert.equal(receipt.ok,true);assert.equal(p.generation,generation+1);
   assert.equal(collision.isBlocked(p,.46),false);
-  assert.ok(Math.hypot(p.x+108,p.z+90)<1);
+  assert.ok(Math.hypot(p.x+98,p.z+84)<1);
   const arrival={x:p.x,z:p.z};advance(1000);
   assert.deepEqual({x:p.x,z:p.z},arrival);assert.equal(p.destination,null);assert.equal(p.target,null);
   assert.equal(p.yOffset,0);assert.equal(p.grounded,true);

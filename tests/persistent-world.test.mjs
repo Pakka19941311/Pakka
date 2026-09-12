@@ -32,15 +32,21 @@ test('one scroll mutation and the identical receipt survive retry and restart',t
 });
 
 test('failed durable write rolls back the equipment and scroll together',t=>{
-  const f=setup(t);const p=f.world.createCharacter('Рыцарь','knight');
+  const f=setup(t);const p=f.world.createCharacter('Маг','mage');
+  assert.ok(p.equipment.weapon&&p.inventory.some(i=>i.id==='weapon_scroll'));
   const before=structuredClone(p);const commit=f.store.commit;
-  f.store.commit=()=>{throw Error('disk-full');};
+  f.store.commit=(state,_id,_commandId,_command,receipt)=>{
+    assert.equal(receipt.ok,true,'exercise failed persistence after a valid mutation, not an invalid-item receipt');
+    assert.equal(state.characters[p.id].equipment.weapon.plus,1);
+    assert.equal(state.characters[p.id].inventory.find(i=>i.id==='weapon_scroll').count,99);
+    throw Error('disk-full');
+  };
   assert.throws(()=>f.world.command(p.id,'enhance-operation-2',{type:'enhance',item:p.equipment.weapon,scroll:p.inventory.find(i=>i.id==='weapon_scroll')}),/disk-full/);
   assert.deepEqual(f.world.state.characters[p.id],before);f.store.commit=commit;
 });
 
 test('a failed risky enhancement destroys the item, never restores it on stale retry',t=>{
-  const f=setup(t);const p=f.world.createCharacter('Рыцарь','knight');p.equipment.weapon.plus=4;
+  const f=setup(t);const p=f.world.createCharacter('Маг','mage');p.equipment.weapon.plus=4;
   const command={type:'enhance',item:structuredClone(p.equipment.weapon),scroll:structuredClone(p.inventory.find(i=>i.id==='weapon_scroll'))};
   const result=f.world.command(p.id,'enhance-operation-3',command);
   assert.equal(result.outcome.success,false);assert.equal(f.world.state.characters[p.id].equipment.weapon,undefined);
@@ -59,7 +65,7 @@ test('boss deadline is absolute and expires after restart with zero players',t=>
 
 test('movement is server-normalized, collides and stale inputs cannot restart it',t=>{
   const collision=new CollisionWorld();collision.addBox(-5,-11,.3,5,0,0,8);
-  const f=setup(t,{collision});const w=f.world;const p=w.createCharacter('Игрок','ranger');w.heartbeat(p.id);
+  const f=setup(t,{collision});const w=f.world;const p=w.createCharacter('Игрок','ranger');Object.assign(p,{x:-7,z:-11});w.heartbeat(p.id);
   w.input(p.id,1,{type:'direction',x:100000,z:0});w.advance(1400);
   assert.ok(p.x < -5.7);assert.ok(p.x > -7);
   w.input(p.id,2,{type:'cancel'});const stopped=p.x;

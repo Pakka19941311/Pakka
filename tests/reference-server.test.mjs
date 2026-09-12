@@ -128,7 +128,7 @@ test('reference corpse deadline keeps death guards and emits exactly one reward'
   input({type:'attack',entityId:monster.uid,skill:null});
   for(let tick=1;monster.alive&&tick<120;tick++)world.advance(1000+tick*1000/60);
   assert.equal(monster.alive,false);assert.equal(monster.combatState,'dead');assert.equal(player.target,null);
-  close(monster.corpseUntil-monster.deathAt,1070,'browser .42 death + .65 corpse');
+  close(monster.corpseUntil-monster.deathAt,3000,'owner override: .42 death + 2.58 corpse');
   const at={x:monster.x,z:monster.z};world.advance(monster.deathAt+650);
   assert.equal(world.snapshot(player.id).monsters[0].aiState,'corpse');assert.deepEqual({x:monster.x,z:monster.z},at);
   world.advance(monster.corpseUntil+1000/60);assert.equal(world.snapshot(player.id).monsters[0].aiState,'despawn');
