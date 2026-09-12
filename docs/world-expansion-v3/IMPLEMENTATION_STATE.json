@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "specification": "spec/ACCEPTED_MASTER_TZ_RU.md",
+  "specification_sha256": "34c34e0cdb837d67dc96c7b2ce2c7ea8efebfd9dd23f4933bac8bf96733de9c8",
+  "accepted": "2026-09-12: user accepted the complete v3 specification and instructed implementation",
+  "branch": "work/character-art-v3",
+  "baseline": "f79d8a81fa824f01fa1d35678ab7391cd17ea208",
+  "current": "P0/P1 and dependencies for P2",
+  "stages": {
+    "P0": "in_progress: accepted specification preserved; live sources, migrations and asset intake",
+    "P1": "in_progress: canonical population data and spatial hunting plan",
+    "P2": "pending: playable, visually finished Greenfall outskirts sample",
+    "P3": "in_progress_dependencies: real primary equipment stats and city-only selling",
+    "P4": "pending", "P5": "pending", "P6": "pending", "P7": "pending", "P8": "pending", "P9": "pending"
+  },
+  "constraints": {
+    "max_level": 90,
+    "ordinary_species": 48,
+    "ordinary_spawn_slots": 2400,
+    "new_minibosses": 12,
+    "existing_large_bosses": 4,
+    "total_spawn_slots": 2416,
+    "equipment": "left earring and right cloak; rings upgrade only through crafting",
+    "old_world_contract": "historical only; v3 supersedes old quotas and stages"
+  },
+  "personal_save_backup": "not_claimed: no user save has been opened or migrated; implementation uses isolated fixtures",
+  "release": "no new candidate yet",
+  "next_action": "Implement and verify independent source blocks, then integrate the P2 playable sample; maintain accepted visual checkpoints."
+}
