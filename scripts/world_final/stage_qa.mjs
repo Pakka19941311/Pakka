@@ -11,6 +11,8 @@ import {ITEMS} from '../../src/data/game-data.ts';
 import {recordStarterQuestEvent} from '../../src/core/starter-quests-v3.ts';
 import {STARTER_ITEMS} from '../../src/data/starter-progression-v3.ts';
 import {p2Encounter} from '../../src/data/p2-encounters.ts';
+import {prepareNativePursuitFixture} from '../world_expansion_v3/p2-native-pursuit-fixture.mjs';
+import {prepareNativeNatureFixture} from '../world_expansion_v3/p2-native-nature-fixture.mjs';
 const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
 const castlePreview=options.includes('--castle-preview'),castle=options.includes('--castle')||castlePreview,reportName=castle?'castle.json':'stage.json';
 mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
@@ -59,6 +61,10 @@ try{
    for(const id of ['starter_weapon_knight','starter_chest_knight','starter_head','starter_gloves','starter_boots','starter_belt'])hero.equipment[STARTER_ITEMS[id].slot]=world.item(id);
    world.recalculate(hero);hero.hp=hero.maxHp;
    assert.equal(geography.populationMode,'starter-v3');world.relocate(hero,{x:-90,z:-203,spaceId:'surface'});
+  }
+  else if(request.stage.startsWith('p2-nature-')) extra=prepareNativeNatureFixture(world,geography,hero,request.stage);
+  else if(request.stage.startsWith('p2-pursuit-MOB-')){
+   extra=prepareNativePursuitFixture(world,geography,hero,request.stage.slice('p2-pursuit-'.length));
   }
   else if(request.stage.startsWith('p2-combat-MOB-')){
    assert.equal(geography.populationMode,'starter-v3');

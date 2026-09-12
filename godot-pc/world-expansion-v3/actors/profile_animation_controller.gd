@@ -5,6 +5,25 @@ extends "res://scripts/animation_controller.gd"
 # cancellation, death and manual AnimationPlayer sampling. No damage is emitted.
 var profile: Dictionary = {}
 
+func align_to_ground(height_at: Callable) -> void:
+	# Only the visible animal tilts. The authoritative root, picking and route
+	# stay untouched. The base controller resets this transform before each pose.
+	var bounds: Array = profile.get("pick_size",[1.0,1.0,1.0])
+	var radius: float = maxf(.2,minf(.65,maxf(float(bounds[0]),float(bounds[2]))*.4))
+	var origin: Vector3 = actor.global_position
+	var center: float = height_at.call(origin.x,origin.z)
+	var dx: float = (float(height_at.call(origin.x+radius,origin.z))-float(height_at.call(origin.x-radius,origin.z)))/(2.0*radius)
+	var dz: float = (float(height_at.call(origin.x,origin.z+radius))-float(height_at.call(origin.x,origin.z-radius)))/(2.0*radius)
+	var normal := Vector3(-dx,1.0,-dz).normalized()
+	var local_normal: Vector3 = (actor.global_basis.inverse()*normal).normalized()
+	var support: float = 0.0
+	for x: float in [-radius,0.0,radius]:
+		for z: float in [-radius,0.0,radius]:
+			var residual: float = float(height_at.call(origin.x+x,origin.z+z))-center-dx*x-dz*z
+			support = maxf(support,residual)
+	visual.transform = Transform3D(Basis(Quaternion(Vector3.UP,local_normal)),Vector3(0,support,0))*visual.transform
+	actor.set_meta("p2_ground_fit",{"normal":normal,"support":support,"radius":radius})
+
 func contact_fraction() -> float:
 	return float(profile.get("attack_contact", .42))
 

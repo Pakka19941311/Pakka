@@ -120,6 +120,7 @@ func receive_snapshot(snapshot: Dictionary) -> void:
 		# Recovery is one explicit authoritative correction after a real outage.
 		# Do not fly through seconds of old motion or replay expired projectiles.
 		player_motion.identity = ""
+		reset_remote_pose_baselines()
 		for effect: Dictionary in effects:
 			if is_instance_valid(effect.get("node")): effect.node.queue_free()
 		effects.clear()
@@ -541,7 +542,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			var cloak: RefCounted = CLOAK_VISUAL.new()
 			cloak.bind(actor)
 		actor.get_meta("cloak_visual").apply_equipment(person.get("equipment",{}))
-		initialize_pose(actor, point(person.x, person.z, person.get("yOffset", 0)))
+		initialize_pose(actor, point(person.x, person.z, person.get("yOffset", 0)),int(person.get("generation",0)))
 		actor.set_meta("yaw", -float(person.get("yaw", 0)) + PI)
 		actor.set_meta("motion", person.duplicate(true))
 		var vanishing: bool = float(person.get("buffs",{}).get("vanish",0)) > float(snapshot.get("time",0))
@@ -551,6 +552,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			begin_death(actor)
 		elif actor.get_meta("dead", false):
 			actor.set_meta("dead", false)
+			actor.set_meta("pose_dirty",true)
 			(actor.get_meta("animation_controller") as VarendorAnimationController).reset_alive()
 			(actor.get_meta("visual") as Node3D).transform = actor.get_meta("base_visual")
 			actor.set_meta("action", "")
@@ -581,7 +583,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 						owned.albedo_color = Color("7c966b")
 						mesh.set_surface_override_material(surface,owned)
 			actor.set_meta("undead_tint",true)
-		initialize_pose(actor, point(monster.x, monster.z, monster.get("yOffset", 0)))
+		initialize_pose(actor, point(monster.x, monster.z, monster.get("yOffset", 0)),int(monster.get("generation",0)))
 		actor.set_meta("pickable", bool(monster.alive))
 		actor.set_meta("yaw", -float(monster.get("yaw", 0)) + PI)
 		actor.set_meta("motion", monster.duplicate(true))
@@ -589,6 +591,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			begin_death(actor)
 		elif actor.get_meta("dead", false):
 			actor.set_meta("dead", false)
+			actor.set_meta("pose_dirty",true)
 			(actor.get_meta("animation_controller") as VarendorAnimationController).reset_alive()
 			(actor.get_meta("visual") as Node3D).transform = actor.get_meta("base_visual")
 			actor.set_meta("action", "")
@@ -600,7 +603,7 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 		var kind: String = str(summon.get("bookKind","skeleton"))
 		var model: String = "FireGolem" if kind == "fire_golem" else "HellforgedWarden" if kind == "infernal" else "SkeletonV3"
 		var actor: Node3D = make_actor(id, model, 2.8 if kind == "infernal" else 2.7 if kind == "fire_golem" else 1.9, "Инфернал" if kind == "infernal" else "Призванный голем" if kind == "fire_golem" else "Призванный скелет", Color("86b3c2"))
-		initialize_pose(actor, point(summon.x, summon.z, summon.get("yOffset", 0)))
+		initialize_pose(actor, point(summon.x, summon.z, summon.get("yOffset", 0)),int(summon.get("generation",0)))
 		actor.set_meta("yaw", -float(summon.get("yaw", 0)) + PI)
 		actor.set_meta("motion", summon.duplicate(true))
 
@@ -619,6 +622,7 @@ func present_event(event: Dictionary) -> void:
 		if event.has("actorGeneration") and int(actor.get_meta("motion", {}).get("generation",event.actorGeneration)) != int(event.actorGeneration): return
 		if event.kind in ["attack","release","death","cancel","buff"]:
 			(actor.get_meta("animation_controller") as VarendorAnimationController).on_event(event,float(current_snapshot.get("time",0)))
+			actor.set_meta("pose_dirty",true)
 	event_presented.emit(event)
 	if event.kind == "death" and target_id == str(event.actor): targeting.clear()
 	if event.kind == "attack" and actors.has(str(event.actor)):
@@ -650,13 +654,27 @@ func present_event(event: Dictionary) -> void:
 func blocked(position: Vector3) -> bool:
 	return collision.blocked(Vector2(position.x, -position.z))
 
-func initialize_pose(actor: Node3D, destination: Vector3) -> void:
+func reset_remote_pose_baselines() -> void:
+	for id: String in actors:
+		if id == hero_id or id.begins_with("ambient:") or id.begins_with("npc:"): continue
+		var actor: Node3D = actors[id]
+		actor.set_meta("initialized",false)
+		actor.set_meta("pose_delta",0.0)
+		actor.set_meta("pose_dirty",true)
+		if actor.has_meta("pose_motion"): actor.remove_meta("pose_motion")
+
+func initialize_pose(actor: Node3D, destination: Vector3, pose_generation: int = -1) -> void:
 	actor.set_meta("previous", actor.position)
 	actor.set_meta("destination", destination)
-	if not actor.get_meta("initialized"):
+	var discontinuity: bool = pose_generation >= 0 and pose_generation != int(actor.get_meta("pose_generation",pose_generation))
+	if pose_generation >= 0: actor.set_meta("pose_generation",pose_generation)
+	if not actor.get_meta("initialized") or discontinuity:
 		actor.position = destination
 		actor.set_meta("previous", destination)
 		actor.set_meta("initialized", true)
+		actor.set_meta("pose_delta",0.0)
+		actor.set_meta("pose_dirty",true)
+		if actor.has_meta("pose_motion"): actor.remove_meta("pose_motion")
 
 func record_intent(value: Dictionary, input_sequence: int) -> void:
 	player_motion.sent(value,input_sequence)
@@ -711,7 +729,12 @@ func _process(delta: float) -> void:
 			if not pose.is_empty():
 				actor.position = point(pose.x,pose.z,pose.get("yOffset",0))
 				actor.rotation.y = -float(pose.get("yaw",0)) + PI
-		var rendered_velocity: Vector3 = (actor.position-before)/maxf(.0001,delta)
+		var remote_clock: bool = id != hero_id and not ambient_poses.has(id)
+		var motion_dt: float = presentation_dt if remote_clock else delta
+		var rendered_velocity: Vector3 = (actor.position-before)/maxf(.0001,motion_dt) if motion_dt > .000001 else Vector3.ZERO
+		if remote_clock:
+			if not actor.has_meta("pose_motion"): actor.set_meta("pose_motion",preload("res://scripts/pose_motion.gd").new())
+			actor.get_meta("pose_motion").push(actor.position-before,motion_dt)
 		if actor.has_meta("p2_npc_role"):
 			actor.set_meta("p2_npc_travel",float(actor.get_meta("p2_npc_travel",0.0))+Vector2(actor.position.x-before.x,actor.position.z-before.z).length())
 		if id == hero_id:
@@ -728,7 +751,8 @@ func _process(delta: float) -> void:
 		var distance_sq: float = actor.position.distance_squared_to(hero_position)
 		var pose_delta: float = float(actor.get_meta("pose_delta", 0.0)) + (delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
 		var interval: float = 0.0 if id == hero_id or id == target_id or distance_sq < 24.0*24.0 else .1 if distance_sq < 50.0*50.0 else .5
-		if pose_delta >= interval:
+		if bool(actor.get_meta("pose_dirty",false)) or (pose_delta >= interval and (not remote_clock or pose_delta > .000001)):
+			if remote_clock: rendered_velocity = actor.get_meta("pose_motion").consume()
 			if actor.has_meta("p2_npc_role"):
 				var travelled: float = float(actor.get_meta("p2_npc_travel",0.0))
 				var npc_state: String = "walk" if travelled>.001 else "talk" if motion.get("state","")=="activity" and motion.get("activity","")=="talk" else "idle"
@@ -736,9 +760,12 @@ func _process(delta: float) -> void:
 				actor.set_meta("p2_npc_travel",0.0)
 			else:
 				controller.update(motion,rendered_velocity,actor_clock,pose_delta)
+				if controller is VarendorP2AnimationController:
+					controller.align_to_ground(func(x: float,z: float) -> float: return point(x,-z).y)
 			if actor.has_meta("cloak_visual"):
 				actor.get_meta("cloak_visual").tick(actor_clock,motion,rendered_velocity)
 			pose_delta = 0.0
+			actor.set_meta("pose_dirty",false)
 		actor.set_meta("pose_delta",pose_delta)
 		actor.visible = not controller.corpse_complete and (id == hero_id or distance_sq < 85.0*85.0)
 		update_corpse_fade(actor,controller,actor_clock)
@@ -815,6 +842,7 @@ func stop_audio() -> void:
 func begin_death(actor: Node3D) -> void:
 	if actor.get_meta("dead",false): return
 	actor.set_meta("dead",true)
+	actor.set_meta("pose_dirty",true)
 	actor.set_meta("pickable",false)
 	var motion: Dictionary = actor.get_meta("motion",{})
 	(actor.get_meta("animation_controller") as VarendorAnimationController).begin_death(float(motion.get("deathAt",current_snapshot.get("time",0))),float(motion.get("corpseUntil",float(current_snapshot.get("time",0))+3000)))

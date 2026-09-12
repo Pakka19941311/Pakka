@@ -10,6 +10,10 @@ static func run(app: Node) -> void:
 	app.qa_interaction = true
 	var checks: Dictionary = {}
 	checks.connected = await Wait.until(app,func(): return app.net.connected and app.world.actors.has(app.world.hero_id),45000)
+	if not checks.connected:
+		app.net.save_private_json(app.qa_path,{"ok":false,"checks":checks,"reason":"Client did not join the matching test world"})
+		app.get_tree().quit(2)
+		return
 	app.login.hide(); app.close_dialog(); app.inventory_panel.hide(); app.player_input.focus_changed(true)
 	var block: String = "all"
 	for arg: String in OS.get_cmdline_user_args():
@@ -24,6 +28,8 @@ static func run(app: Node) -> void:
 	if block == "p2-city": await preload("res://scripts/p2_city_acceptance.gd").run(app,checks)
 	if block == "p2-cloak": await preload("res://scripts/p2_cloak_acceptance.gd").run(app,checks)
 	if block == "p2-npc": await preload("res://scripts/p2_npc_acceptance.gd").run(app,checks)
+	if block == "p2-nature": await preload("res://scripts/p2_nature_acceptance.gd").run(app,checks)
+	if block == "p2-pursuit" or block.begins_with("p2-pursuit:"): await preload("res://scripts/p2_pursuit_acceptance.gd").run(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)

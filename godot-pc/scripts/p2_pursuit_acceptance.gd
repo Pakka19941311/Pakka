@@ -10,7 +10,7 @@ static func planar(value: Dictionary) -> Vector2:
 	return Vector2(float(value.get("x",0)),float(value.get("z",0)))
 
 static func monster(app: Node, uid: String) -> Dictionary:
-	for value: Dictionary in app.world.current_snapshot.get("monsters",[]):
+	for value: Dictionary in app.world.timeline.latest.get("monsters",[]):
 		if str(value.uid) == uid: return value
 	return {}
 
@@ -33,7 +33,7 @@ static func observed_floor(app: Node, actor: Node3D, surfaces: Array) -> Diction
 	var lowest: float = INF
 	var highest: float = -INF
 	var pose: Array = []
-	var low_points: Array[Vector3] = []
+	var min_gap: float = INF
 	for surface: Dictionary in surfaces:
 		var skeleton: Skeleton3D = surface.skeleton
 		var transforms: Array[Transform3D] = []
@@ -51,11 +51,8 @@ static func observed_floor(app: Node, actor: Node3D, surfaces: Array) -> Diction
 				var cursor: int = vertex*influences+influence
 				point += (transforms[joints[cursor]] * vertices[vertex]) * weights[cursor]
 			lowest = minf(lowest,point.y); highest = maxf(highest,point.y)
-			# The support test uses actual deformed low vertices, not static AABB.
-			if point.y <= lowest+.04: low_points.append(point)
-	var min_gap: float = INF
-	for point: Vector3 in low_points:
-		if point.y <= lowest+.04:
+			# Uphill feet can be above the lowest world-Y foot. Inspect every
+			# deformed vertex against its own local terrain, not just that foot.
 			min_gap = minf(min_gap,point.y-app.world.point(point.x,-point.z).y)
 	return {"skin_min_gap":min_gap,"skin_height":highest-lowest,"pose":str(pose).sha256_text(),
 		"root_gap":actor.global_position.y-app.world.point(actor.global_position.x,-actor.global_position.z).y}
@@ -75,7 +72,7 @@ static func click_target(app: Node, actor: Node3D, uid: String, auto: bool = fal
 static func row(app: Node, actor: Node3D, uid: String, stage: String, surfaces: Array) -> Dictionary:
 	var motion: Dictionary = monster(app,uid)
 	var controller: VarendorP2AnimationController = actor.get_meta("animation_controller")
-	var value: Dictionary = {"at":float(app.world.current_snapshot.time),"stage":stage,"server":motion.duplicate(true),
+	var value: Dictionary = {"at":float(app.world.timeline.latest.time),"presentation_at":app.world.timeline.clock_ms,"stage":stage,"server":motion.duplicate(true),
 		"hero":[app.net.hero.x,app.net.hero.z],"rendered":[actor.global_position.x,actor.global_position.y,actor.global_position.z],
 		"controller_state":controller.state,"clip":controller.current_clip,"gait_phase":controller.gait_phase,
 		"rate":controller.playback_rate,"gait":actor.get_meta("p2_gait_contract",{}).duplicate(true),
@@ -188,7 +185,7 @@ static func pursuit(app: Node, mob_id: String, checks: Dictionary) -> void:
 		await app.get_tree().create_timer(.15).timeout
 		var m: Dictionary = monster(app,uid)
 		if m.is_empty() or not bool(m.alive): break
-		var at: float = float(app.world.current_snapshot.time)
+		var at: float = float(app.world.timeline.latest.time)
 		if at <= last_sample_time: continue
 		last_sample_time = at
 		var current: Vector2 = planar(m)
@@ -196,9 +193,11 @@ static func pursuit(app: Node, mob_id: String, checks: Dictionary) -> void:
 		previous = current
 		if stage == "orbit" and Time.get_ticks_msec()-last_command > 250:
 			var angle: float = (current-center).angle() if current.distance_to(center) > .8 else float(fixture.angle)
-			var lead: float = angle+.82
+			var lead: float = angle+1.15
 			var goal: Vector2 = center+Vector2(cos(lead),sin(lead))*float(fixture.radius)
-			if distance >= float(fixture.minimumContinuousMetres)+1.0:
+			# Wait for one unbroken segment, not cumulative movement interrupted
+			# by the initial provocation attack. The acceptance threshold stays 12m.
+			if float(evaluate(trace,fixture,app.world.hero_id).continuous_metres) >= float(fixture.minimumContinuousMetres)+1.0:
 				var hero_angle: float = (planar(app.net.hero)-center).angle()
 				for route: Dictionary in fixture.escapeRoutes:
 					if absf(angle_difference(hero_angle,float(route.angle))) < .22:
@@ -216,7 +215,7 @@ static func pursuit(app: Node, mob_id: String, checks: Dictionary) -> void:
 			stage = "return"
 			await Wait.capture(app,"pursuit-"+mob_id+"-return")
 		if saw_return and current.distance_to(home) <= .7 and m.get("targetId") == null and m.get("provokedBy") == null: break
-	app.net.intent({"type":"cancel"})
+	await app.net.intent({"type":"cancel"})
 	var result: Dictionary = evaluate(trace,fixture,app.world.hero_id)
 	for key: String in result.checks: checks[prefix+key] = result.checks[key]
 	checks[prefix+"hero_survived"] = not bool(app.net.hero.get("dead",false))

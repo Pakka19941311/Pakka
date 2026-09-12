@@ -34,7 +34,8 @@ static func fixture(app: Node, stage: String) -> Dictionary:
 		return value != null and value.get("stage","") == stage,10000)
 	if not ready: return {}
 	var result: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(file))
-	await Wait.until(app,func(): return not app.world.space_loading and int(app.net.hero.generation) >= int(result.generation),15000)
+	var relocated: bool = await Wait.until(app,func(): return not app.world.space_loading and int(app.net.hero.get("generation",-1)) >= int(result.get("generation",0)),15000)
+	if not relocated: return {}
 	await Keys.wait_ms(app.get_tree(),500)
 	return result
 
