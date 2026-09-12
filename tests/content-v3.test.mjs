@@ -82,7 +82,7 @@ test('loot excludes books, mixes equipment, and guarantees boss weapon/armor/ord
 function giveCast(f,id,extra={}){f.p.inventory.push(f.item(id));const result=f.command({type:'castBook',bookId:id,targetId:f.m.uid,...extra});assert.equal(result.ok,true,`${id}: ${result.reason}`);}
 test('ranger dexterity changes physical damage, accuracy, crit, evasion and cadence together',()=>{
  const f=setup('ranger'),before={...f.p.stats},cadence=classCombatProfile('ranger',60,before).attackInterval;
- giveCast(f,'book_ranger_20');assert.equal(f.p.stats.dex,before.dex+10);assert.equal(f.p.stats.atkMin,before.atkMin+23);assert.equal(f.p.stats.accuracy,before.accuracy+18);assert.ok(Math.abs(f.p.stats.crit-before.crit-1.7)<1e-8);assert.equal(f.p.stats.evasion,before.evasion+4.5);assert.ok(classCombatProfile('ranger',60,f.p.stats).attackInterval<cadence);
+ giveCast(f,'book_ranger_20');assert.equal(f.p.stats.dex,before.dex+10);assert.equal(f.p.stats.atkMin,before.atkMin+3);assert.equal(f.p.stats.physicalAccuracy,before.physicalAccuracy+3);assert.equal(f.p.stats.magicAccuracy,before.magicAccuracy);assert.equal(f.p.stats.accuracy,before.accuracy+3);assert.ok(Math.abs(f.p.stats.crit-before.crit-1.7)<1e-8);assert.equal(f.p.stats.evasion,before.evasion+4.5);assert.ok(classCombatProfile('ranger',60,f.p.stats).attackInterval<cadence);
 });
 test('knight run/attack and defense buffs expire; taunt releases only unstruck enemies',()=>{
  const f=setup(),before={...f.p.stats};giveCast(f,'book_knight_20');assert.equal(f.p.stats.speed,before.speed*1.1);assert.equal(f.w.books.attackSpeed(f.p),1.08);

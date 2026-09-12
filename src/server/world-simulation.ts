@@ -13,7 +13,7 @@ import { equipInventoryItem, unequipInventoryItem, reorderInventoryItem } from '
 import {transferStorage} from '../core/storage-transfers.ts';
 import type { InventoryItem } from '../core/inventory-commands.ts';
 import { addOrStackItem, applyExperience } from '../core/gameplay-session.ts';
-import { bossRespawnSeconds, classAttackRange, classCombatProfile, monsterMovementSpeed } from '../core/game-rules.ts';
+import { bossRespawnSeconds, classAttackRange, classCombatProfile, monsterMovementSpeed, attackDamageType, accuracyForDamage, manaRegenerationPerSecond } from '../core/game-rules.ts';
 import { resolveAttackAccuracy } from '../core/attack-accuracy.ts';
 import { CollisionWorld } from '../world/collision-world.ts';
 import { SPAWN_REGIONS, spawnPointInRegion, patrolRouteInRegion } from '../world/spawn-regions.ts';
@@ -460,7 +460,7 @@ export class WorldSimulation {
     for(const p of Object.values(this.state.characters)){
       if(p.activeUntil<=this.state.time||p.dead){this.cancelAttack(p.id);p.velocityX=0;p.velocityZ=0;continue;}
       p.combatState='idle';
-      p.mp=Math.min(p.maxMp,p.mp+p.maxMp*.022*dt);
+      p.mp=Math.min(p.maxMp,p.mp+manaRegenerationPerSecond(p.classId,p.maxMp,p.stats)*dt);
       if(this.state.time-p.lastInputAt>500)p.direction={x:0,z:0};
       let active=this.state.pending.find(a=>a.actor===p.id);
       if(active&&!this.validAttack(active)){this.cancelAttack(p.id);active=undefined;}
@@ -565,11 +565,12 @@ export class WorldSimulation {
     const cls=CLASSES[p.classId as ClassId];const profile=classCombatProfile(p.classId,p.level,p.stats);
     p.attackReadyAt=Math.max(p.attackReadyAt,this.state.time+profile.attackInterval*1000/(((p.buffs.haste??0)>this.state.time?1.15:1)*this.books.attackSpeed(p)));
     const timing=attackTimings(cls.model,(p.attackReadyAt-this.state.time)/1000*.92);
-    const base=p.classId==='mage'||p.classId==='necro'?p.stats.matk:p.stats.atkMin+this.random()*(p.stats.atkMax-p.stats.atkMin);
+    const damageType=attackDamageType(p.classId,Boolean(skill));
+    const base=damageType==='magic'?p.stats.matk:p.stats.atkMin+this.random()*(p.stats.atkMax-p.stats.atkMin);
     const critical=this.random()<p.stats.crit/100;
     const damage=base*(skill?.mul??1)*(critical?profile.critMultiplier:1);
     const attack:PendingAttack={actor:p.id,target:target.uid,generation:target.generation,actorGeneration:p.generation,
-      hitAt:skill?this.state.time:this.tickDeadline(timing.windup),endsAt:this.tickDeadline(skill?180:timing.duration),skill:p.skill,monster:false,damage,critical,accuracy:p.stats.accuracy,resourcePaid:Boolean(skill)};
+      hitAt:skill?this.state.time:this.tickDeadline(timing.windup),endsAt:this.tickDeadline(skill?180:timing.duration),skill:p.skill,monster:false,damage,critical,accuracy:accuracyForDamage(p.stats,damageType),resourcePaid:Boolean(skill)};
     this.state.pending.push(attack);this.motor(p).stopPlanar();this.action(p,'attack',attack.endsAt);p.combatState='windup';p.hitAt=attack.hitAt;
     this.event('attack',p.id,target.uid,{skill:p.skill,generation:target.generation,impactAt:attack.hitAt,endsAt:attack.endsAt,readyAt:p.attackReadyAt,actorGeneration:p.generation});p.skill=null;p.singleAttack=false;
     // Ready skills release on this input boundary. A second skill received
@@ -635,7 +636,8 @@ export class WorldSimulation {
     const skill=a.skill===null?undefined:CLASSES[p.classId as ClassId].skills[a.skill] as Skill;
     const hit=(m:WorldMonster,amount:number,critical=false)=>{
       if(!resolveAttackAccuracy(a.accuracy,this.random()).hit){this.event('miss',p.id,m.uid,{skill:a.skill,generation:m.generation});return false;}
-      this.damage(m,this.books.normalDamage(p,amount)+this.books.value(m,['mage','necro'].includes(p.classId)?'mdefDown':'defDown')*.2,p,critical);if(!['mage','necro'].includes(p.classId))this.books.physicalHit(p,m);return true;
+      const magical=attackDamageType(p.classId,Boolean(skill))==='magic';
+      this.damage(m,this.books.normalDamage(p,amount)+this.books.value(m,magical?'mdefDown':'defDown')*.2,p,critical);if(!magical)this.books.physicalHit(p,m);return true;
     };
     let primary=false;
     if(skill?.chain){
@@ -966,7 +968,13 @@ export class WorldSimulation {
     if(stopPlanar)this.motor(p).stopPlanar();
     p.combatState=p.dead?'dead':'idle';
   }
-  private recalculate(p:WorldCharacter):void {Object.assign(p,calculateEquipmentStats(p.classId,CLASSES[p.classId as ClassId].stats,p.level,p.equipment,itemDef));this.books.modifyStats(p);if((p.buffs.haste??0)>this.state.time)p.stats.speed*=1.5;p.hp=Math.min(p.hp,p.maxHp);p.mp=Math.min(p.mp,p.maxMp);}
+  private recalculate(p:WorldCharacter):void {
+    Object.assign(p,calculateEquipmentStats(p.classId,CLASSES[p.classId as ClassId].stats,p.level,p.equipment,itemDef));
+    this.books.modifyStats(p);
+    if((p.buffs.haste??0)>this.state.time){p.stats.speed*=1.5;p.stats.attackInterval!/=1.15;}
+    p.stats.manaRegen=manaRegenerationPerSecond(p.classId,p.maxMp,p.stats);
+    p.hp=Math.min(p.hp,p.maxHp);p.mp=Math.min(p.mp,p.maxMp);
+  }
   private migrateEquipment(p:WorldCharacter):void {
     for(const [slot,item] of Object.entries(p.equipment)){if(!item)continue;const def=itemDef(item);if(def.classes&&!def.classes.includes(p.classId)){delete p.equipment[slot];if(p.inventory.length<42)p.inventory.push(item);else p.lootBuffer.push(item);}}
   }

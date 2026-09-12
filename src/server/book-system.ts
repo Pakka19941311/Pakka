@@ -1,6 +1,8 @@
 import {spatialDistance,sameSpace} from '../world/world-space.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
-import {classAttackRange,classCombatProfile} from '../core/game-rules.ts';
+import {classAttackRange,classCombatProfile,accuracyForDamage,attackDamageType} from '../core/game-rules.ts';
+import type {AttackDamageType} from '../core/game-rules.ts';
+import {resolveAttackAccuracy} from '../core/attack-accuracy.ts';
 import type {WorldCharacter as Hero,WorldMonster as Mob,WorldSummon,Position,WorldEvent} from '../network/world-protocol.ts';
 export type BookEffect={id:string;owner:string;appliedAt:number;expiresAt:number;values:Record<string,number>};
 export type BookDot={id:string;owner:string;expiresAt:number;nextAt:number;damage:number;range?:number;carry?:number};
@@ -28,7 +30,11 @@ export class BookSystem {
     const after=classCombatProfile(p.classId,p.level,p.stats);
     p.stats.atkMin+=Math.round(after.physicalScaling)-Math.round(before.physicalScaling);
     p.stats.atkMax+=Math.round(after.physicalScaling)-Math.round(before.physicalScaling);
-    p.stats.accuracy+=Math.round(after.accuracy)-Math.round(before.accuracy);
+    p.stats.matk+=after.magicScaling-before.magicScaling;
+    p.stats.physicalAccuracy=accuracyForDamage(p.stats,'physical')+after.physicalAccuracy-before.physicalAccuracy;
+    p.stats.magicAccuracy=accuracyForDamage(p.stats,'magic')+after.magicAccuracy-before.magicAccuracy;
+    p.stats.accuracy=accuracyForDamage(p.stats,attackDamageType(p.classId));
+    p.stats.attackInterval=after.attackInterval/this.attackSpeed(p);
     p.stats.crit+=after.critChance-before.critChance;
     p.stats.evasion+=this.value(p,'dex')*.45;
     p.stats.evasion*=1+this.value(p,'evasionPercent')/100;
@@ -60,13 +66,20 @@ export class BookSystem {
   }
   physicalHit(p:Hero,m:Mob):void{if(this.value(p,'poison')&&m.alive)this.dot(m,p,'poison',this.host.hp(m)*.035/5,5);}
   attacked(p:Hero,m:Mob):void{if(this.value(p,'retaliation')&&dist(p,m)<=3)this.dot(m,p,'lightning',75,10,3);}
-  hit(p:Hero,m:Mob,amount:number,fx:string,critical=false,fixed=false,opener=false):void{
-    if(!m.alive||this.host.safe(p)||!this.host.visible(p,m))return;
-    const magical=['fire','bone','lightning','curse'].includes(fx);
+  private contact(p:Hero,m:Mob,type:AttackDamageType):boolean{
+    if(!m.alive||!sameSpace(p,m)||this.host.safe(p)||!this.host.visible(p,m))return false;
+    if(resolveAttackAccuracy(accuracyForDamage(p.stats,type),this.host.random()).hit)return true;
+    this.host.event('miss',p.id,m.uid,{generation:m.generation});return false;
+  }
+  hit(p:Hero,m:Mob,amount:number,fx:string,critical=false,fixed=false,opener=false):boolean{
+    if(!m.alive||!sameSpace(p,m)||this.host.safe(p)||!this.host.visible(p,m))return false;
+    const magical=['fire','ice','bone','lightning','curse','drain'].includes(fx);
     const debuff=fixed?0:this.value(m,magical?'mdefDown':'defDown')*.2;
     this.host.event('release',p.id,m.uid,{effect:fx,durationMs:0,generation:m.generation});
+    if(!this.contact(p,m,magical?'magic':'physical'))return false;
     this.host.damage(m,Math.max(1,Math.round((fixed?amount:opener?this.normalDamage(p,amount):this.directDamage(p,amount))+debuff)),p,critical);
     if(!magical&&!fixed)this.physicalHit(p,m);
+    return true;
   }
   owns(p:Hero,id:string):boolean{return p.inventory.some(i=>i.id===id&&i.count>0);}
   cast(p:Hero,id:string,targetId?:string,point?:Position):void{
@@ -95,9 +108,9 @@ export class BookSystem {
       if(level===30)buff({def:5});
       if(level===40){buff({});for(const m of this.near(p,7)){this.effect(m,id,p.id,15,{taunt:1});this.host.provoke(m,p);}}
       if(level===50){const base=p.maxHp/(1+this.value(p,'hp')/100);buff({hp:45});p.hp=Math.min(p.maxHp,p.hp+Math.round(base*.45));}
-      if(level===60){this.hit(p,target!,this.physical(p)*1.1,'slash');this.dot(target!,p,'fire',5+this.host.random()*4+p.stats.matk*.1,7);}
+      if(level===60&&this.hit(p,target!,this.physical(p)*1.1,'slash'))this.dot(target!,p,'fire',5+this.host.random()*4+p.stats.matk*.1,7);
     }else if(c==='ranger'){
-      if(level===20)buff({dex:10});if(level===30)buff({slow:40},target!);if(level===40)buff({attackSpeed:25});if(level===50)buff({range:20});
+      if(level===20)buff({dex:10});if(level===30&&this.contact(p,target!,'physical'))buff({slow:40},target!);if(level===40)buff({attackSpeed:25});if(level===50)buff({range:20});
       if(level===60){const point={spaceId:p.spaceId,x:p.x+Math.sin(p.yaw)*1.8,z:p.z+Math.cos(p.yaw)*1.8};this.host.traps().push({id:this.host.uid(),owner:p.id,generation:p.generation,point,expiresAt:this.host.now()+30000,damage:this.directDamage(p,this.physical(p)*3),hit:[]});}
     }else if(c==='mage'){
       if(level===20)buff({speed:10,attackSpeed:10});
@@ -107,10 +120,10 @@ export class BookSystem {
       if(level===60)this.summon(p,id,'infernal',15);
     }else if(c==='necro'){
       if(level===20)this.summon(p,id,'skeleton',7);
-      if(level===30)for(const m of this.near(target!,3).filter(m=>dist(p,m)<=this.range(p)))buff({defDown:10,mdefDown:10,attackSlow:7},m);
+      if(level===30)for(const m of this.near(target!,3).filter(m=>dist(p,m)<=this.range(p)))if(this.contact(p,m,'magic'))buff({defDown:10,mdefDown:10,attackSlow:7},m);
       if(level===40)this.summon(p,id,'fire_golem',115);
       if(level===50)this.area(p,id,center,4,p.stats.matk*1.2,3,700,4,b.fx);
-      if(level===60){buff({sleep:1},target!);this.host.cancel(target!.uid);}
+      if(level===60&&this.contact(p,target!,'magic')){buff({sleep:1},target!);this.host.cancel(target!.uid);}
     }else if(c==='assassin'){
       if(level===20)buff({evasionPercent:50});if(level===30)buff({poison:1});
       if(level===40){buff({invisible:1});for(const m of this.host.monsters().filter(m=>m.targetId===p.id))this.host.release(m);}

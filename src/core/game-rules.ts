@@ -7,7 +7,7 @@ export type BaseStats = {
   spi: number;
 };
 
-export const MAX_LEVEL = 100;
+export const MAX_LEVEL = 90;
 export const INVENTORY_CAPACITY = 42;
 export const SAFE_ENHANCEMENT_MAX = 3;
 export const MINI_BOSS_RESPAWN_SECONDS = { min: 30 * 60, max: 50 * 60 } as const;
@@ -23,12 +23,13 @@ const ARMOR_ENHANCEMENT_BONUS = [
   0, 0.03, 0.06, 0.09, 0.13, 0.17, 0.22, 0.27, 0.33, 0.39, 0.46, 0.54, 0.63, 0.73, 0.84, 0.96,
 ] as const;
 
-const GROWTH: Record<string, BaseStats> = {
-  knight: { str: 0.22, dex: 0.07, int: 0.02, vit: 0.24, spi: 0.05 },
-  mage: { str: 0.04, dex: 0.08, int: 0.28, vit: 0.08, spi: 0.24 },
-  assassin: { str: 0.17, dex: 0.26, int: 0.03, vit: 0.12, spi: 0.07 },
-  ranger: { str: 0.12, dex: 0.24, int: 0.05, vit: 0.11, spi: 0.1 },
-  necro: { str: 0.05, dex: 0.08, int: 0.25, vit: 0.11, spi: 0.23 },
+const GROWTH: Record<string, {str:number;dex:number;int:number;vit:number;spi:number}> = {
+  // STR/DEX/INT are level intervals (zero means no growth); VIT/SPI keep their per-level rates.
+  knight: { str: 3, dex: 5, int: 5, vit: 0.24, spi: 0.05 },
+  mage: { str: 3, dex: 5, int: 3, vit: 0.08, spi: 0.24 },
+  assassin: { str: 3, dex: 3, int: 0, vit: 0.12, spi: 0.07 },
+  ranger: { str: 4, dex: 3, int: 4, vit: 0.11, spi: 0.1 },
+  necro: { str: 4, dex: 3, int: 4, vit: 0.11, spi: 0.23 },
 };
 
 export function statsAtLevel(classId: string, base: BaseStats, level: number): BaseStats {
@@ -36,9 +37,9 @@ export function statsAtLevel(classId: string, base: BaseStats, level: number): B
   const growth = GROWTH[classId] ?? GROWTH.knight;
   const gained = clamped - 1;
   return {
-    str: round2(base.str + growth.str * gained),
-    dex: round2(base.dex + growth.dex * gained),
-    int: round2(base.int + growth.int * gained),
+    str: base.str + Math.floor(clamped / growth.str),
+    dex: base.dex + Math.floor(clamped / growth.dex),
+    int: base.int + (growth.int ? Math.floor(clamped / growth.int) : 0),
     vit: round2(base.vit + growth.vit * gained),
     spi: round2(base.spi + growth.spi * gained),
   };
@@ -52,7 +53,7 @@ export function baseVitals(classId: string, level: number, stats: BaseStats): { 
   const gained = Math.max(0, level - 1);
   if (classId === 'knight') {
     return {
-      hp: Math.round(250 + 35 * gained + 28 * stats.vit),
+      hp: Math.round(250 + 35 * gained + 28 * stats.vit + 10 * stats.str),
       mp: Math.round(60 + 5 * gained + 9 * stats.spi),
     };
   }
@@ -84,13 +85,28 @@ export type ClassCombatProfile = {
   physicalScaling: number;
   magicScaling: number;
   accuracy: number;
+  physicalAccuracy: number;
+  magicAccuracy: number;
   critChance: number;
   critMultiplier: number;
   movementSpeed: number;
   attackInterval: number;
 };
 
-export function classCombatProfile(classId: string, level: number, stats: BaseStats): ClassCombatProfile {
+export type AttackDamageType = 'physical' | 'magic';
+/** Existing ordinary/skill actions keep their controls; necromancer's ordinary shot is physical. */
+export function attackDamageType(classId:string,skill=false):AttackDamageType {
+  return classId==='mage'||classId==='necro'&&skill?'magic':'physical';
+}
+/** Old snapshots are accepted until the authoritative equipment recalculation fills both ratings. */
+export function accuracyForDamage(stats:{accuracy:number;physicalAccuracy?:number;magicAccuracy?:number},type:AttackDamageType):number {
+  return (type==='magic'?stats.magicAccuracy:stats.physicalAccuracy)??stats.accuracy;
+}
+export function manaRegenerationPerSecond(classId:string,maxMp:number,stats:Pick<BaseStats,'int'>):number {
+  return maxMp*.022+(['mage','necro'].includes(classId)?stats.int*.1:0);
+}
+
+export function classCombatProfile(classId: string, _level: number, stats: BaseStats): ClassCombatProfile {
   type StoredProfile = Pick<ClassCombatProfile, 'critMultiplier' | 'movementSpeed'> & {
     critBase: number;
     critDex: number;
@@ -102,34 +118,22 @@ export function classCombatProfile(classId: string, level: number, stats: BaseSt
     knight: { critMultiplier: 1.5, movementSpeed: 95, critBase: 5, critDex: 0.1, critCap: 50, baseInterval: 1.15, speedCap: 0.3 },
     mage: { critMultiplier: 1.5, movementSpeed: 100, critBase: 4, critDex: 0.07, critCap: 50, baseInterval: 1.5, speedCap: 0.22 },
     assassin: { critMultiplier: 1.65, movementSpeed: 112, critBase: 10, critDex: 0.2, critCap: 60, baseInterval: 0.8, speedCap: 0.42 },
-    ranger: { critMultiplier: 1.55, movementSpeed: 108, critBase: 8, critDex: 0.17, critCap: 55, baseInterval: 1.02, speedCap: 0.35 },
+    ranger: { critMultiplier: 1.55, movementSpeed: 108, critBase: 8, critDex: 0.17, critCap: 55, baseInterval: 1.02, speedCap: 0.1 },
     necro: { critMultiplier: 1.5, movementSpeed: 98, critBase: 4, critDex: 0.08, critCap: 50, baseInterval: 1.45, speedCap: 0.24 },
   };
   const profile = profiles[classId] ?? profiles.knight;
-  const physicalScaling = classId === 'knight'
-    ? stats.str * 2.6 + stats.dex * 0.25
-    : classId === 'assassin'
-      ? stats.str * 1.5 + stats.dex * 1.35
-      : classId === 'ranger'
-        ? stats.dex * 2.3 + stats.str * 0.4
-        : stats.str * 1.2;
-  const magicScaling = classId === 'mage'
-    ? stats.int * 2.8 + stats.spi * 0.5
-    : classId === 'necro'
-      ? stats.int * 2.5 + stats.spi * 0.8
-      : stats.int * 1.1;
-  const accuracy = classId === 'knight'
-    ? 70 + stats.dex * 1.3 + level * 0.15
-    : classId === 'assassin'
-      ? 75 + stats.dex * 1.7 + level * 0.15
-      : classId === 'ranger'
-        ? 78 + stats.dex * 1.8 + level * 0.15
-        : 78 + stats.int * 1.45 + level * 0.15;
+  const physicalScaling=Math.floor((['ranger','necro'].includes(classId)?stats.dex:stats.str)/3);
+  const magicScaling=Math.floor(stats.int/3);
+  const baseAccuracy=classId==='knight'?70:classId==='assassin'?75:78;
+  const physicalAccuracy=baseAccuracy+physicalScaling,magicAccuracy=baseAccuracy+magicScaling;
+  const accuracy=attackDamageType(classId)==='magic'?magicAccuracy:physicalAccuracy;
   const speedMultiplier = 1 + Math.min(profile.speedCap, (stats.dex / (stats.dex + 180)) * 0.45);
   return {
     physicalScaling,
     magicScaling,
     accuracy,
+    physicalAccuracy,
+    magicAccuracy,
     critChance: Math.min(profile.critCap, profile.critBase + stats.dex * profile.critDex),
     critMultiplier: profile.critMultiplier,
     movementSpeed: 6.2 * (profile.movementSpeed / 100),

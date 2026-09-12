@@ -4,8 +4,8 @@ extends RefCounted
 # Native presentation port of src/hud.css + src/ui/character-inventory.ts at
 # 1e94a0d1. This owns layout, formatting and views; authority remains in net.
 const GEAR_LAYOUT: Array = [["ear1","Серьга I"],["head","Голова"],["ear2","Серьга II"],["neck","Ожерелье"],["chest","Нагрудник"],["offhand","Щит / фокус"],["weapon","Оружие"],["belt","Пояс"],["gloves","Перчатки"],["ring1","Кольцо I"],["boots","Обувь"],["ring2","Кольцо II"]]
-const STAT_LAYOUT: Array = [["level","Уровень"],["xp","Опыт"],["hp","HP"],["mp","MP"],["str","Сила"],["dex","Ловкость"],["int","Интеллект"],["def","Общая защита"],["mdef","Магическая защита"]]
-const ITEM_STAT_LABELS: Dictionary = {"atkMin":"Мин. физ. атака","atkMax":"Макс. физ. атака","matk":"Магическая атака","def":"Физическая защита","mdef":"Магическая защита","hp":"Макс. HP","mp":"Макс. MP","crit":"Критический шанс","accuracy":"Точность","evasion":"Уклонение","speed":"Скорость передвижения"}
+const STAT_LAYOUT: Array = [["level","Уровень"],["xp","Опыт"],["hp","HP"],["mp","MP"],["str","Сила"],["dex","Ловкость"],["int","Интеллект"],["physicalAttack","Физическая атака"],["matk","Магическая атака"],["physicalAccuracy","Точность физ. атак"],["magicAccuracy","Точность магии"],["def","Общая защита"],["mdef","Магическая защита"],["evasion","Уклонение"],["attackRate","Атак в секунду"],["manaRegen","MP в секунду"]]
+const ITEM_STAT_LABELS: Dictionary = {"str":"Сила","dex":"Ловкость","int":"Интеллект","vit":"Выносливость","spi":"Дух","atkMin":"Мин. физ. атака","atkMax":"Макс. физ. атака","matk":"Магическая атака","def":"Физическая защита","mdef":"Магическая защита","hp":"Макс. HP","mp":"Макс. MP","crit":"Критический шанс","accuracy":"Точность","evasion":"Уклонение","speed":"Скорость передвижения"}
 const WINDOW_SIZE: Vector2 = Vector2(332,516)
 const DOCK_WIDTH: float = 756.0
 var app: Node
@@ -432,6 +432,10 @@ func refresh(hero: Dictionary) -> void:
 		elif key == "xp": value = "%d / %d" % [int(hero.xp),xp_needed]
 		elif key == "hp": value = "%d / %d" % [ceili(float(hero.hp)),int(hero.maxHp)]
 		elif key == "mp": value = "%d / %d" % [ceili(float(hero.mp)),int(hero.maxMp)]
+		elif key == "physicalAttack": value = "%d–%d" % [int(hero.stats.atkMin),int(hero.stats.atkMax)]
+		elif key == "attackRate": value = "%.2f" % (1.0/maxf(.01,float(hero.stats.get("attackInterval",1))))
+		elif key == "manaRegen": value = "%.2f" % float(hero.stats.get("manaRegen",0))
+		elif key == "evasion": value = stat_number(hero.stats.get(key,0))
 		app.stat_values[key].text = value
 	var quests: Array = [["Голос границы","Поговорите со старостой Гринфолла."],["Кровь на дороге","Победите тварей рубежа: %d / 8" % mini(int(hero.get("kills",0)),8)],["Вой стаи","Отыщите Кровавого Оборотня в Чёрном лесу."],["Печать владыки","Спуститесь к шахте и победите Хозяина Гнилого Леса."],["Первый след","Вертикальный срез пройден. Продолжайте охоту и заточку."]]
 	var quest: Array = quests[clampi(int(hero.get("quest",0)),0,4)]

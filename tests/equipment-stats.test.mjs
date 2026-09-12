@@ -38,11 +38,13 @@ test('initial Knight uses whole actual attack, defense and accuracy while base i
     weapon: instance('weapon', 'wardens_blade'), chest: instance('chest', 'militia_plate'),
   };
   const result = calculateEquipmentStats('knight', CLASSES.knight.stats, 1, equipment, item => ITEMS[item.id]);
-  assert.equal(result.stats.atkMin, 45);
-  assert.equal(result.stats.atkMax, 51);
+  assert.equal(result.stats.atkMin, 16);
+  assert.equal(result.stats.atkMax, 22);
   assert.equal(result.stats.def, 32);
-  assert.equal(result.stats.accuracy, 79);
-  assert.equal(result.maxHp, 687);
+  assert.equal(result.stats.accuracy, 75);
+  assert.equal(result.stats.physicalAccuracy, 75);
+  assert.equal(result.stats.magicAccuracy, 71);
+  assert.equal(result.maxHp, 807);
   assert.equal(result.maxMp, 96);
   close(result.stats.speed, 5.89);
   assert.equal(result.stats.str, 12);

@@ -16,10 +16,10 @@ import {
 } from '../src/core/game-rules.ts';
 import { CLASSES } from '../src/data/game-data.ts';
 
-test('locked Knight level-one values remain 642 HP, 96 MP and 150 XP', () => {
+test('Knight level-one STR adds 120 HP while MP and first XP threshold stay unchanged', () => {
   const stats = statsAtLevel('knight', CLASSES.knight.stats, 1);
   assert.deepEqual(stats, { str: 12, dex: 6, int: 2, vit: 14, spi: 4 });
-  assert.deepEqual(baseVitals('knight', 1, stats), { hp: 642, mp: 96 });
+  assert.deepEqual(baseVitals('knight', 1, stats), { hp: 762, mp: 96 });
   assert.equal(xpNeeded(1), 150);
 });
 
@@ -63,9 +63,9 @@ test('all five classes retain four active skills', () => {
   for (const classDef of Object.values(CLASSES)) assert.equal(classDef.skills.length, 4);
 });
 
-test('all class base attributes and vitals match Master GDD v4', () => {
+test('base attributes retain their values and vitals include the approved Knight STR dependency', () => {
   const expected = {
-    knight: [{ str: 12, dex: 6, int: 2, vit: 14, spi: 4 }, { hp: 642, mp: 96 }],
+    knight: [{ str: 12, dex: 6, int: 2, vit: 14, spi: 4 }, { hp: 762, mp: 96 }],
     mage: [{ str: 3, dex: 7, int: 15, vit: 6, spi: 13 }, { hp: 270, mp: 454 }],
     assassin: [{ str: 9, dex: 15, int: 3, vit: 8, spi: 6 }, { hp: 370, mp: 180 }],
     ranger: [{ str: 7, dex: 14, int: 5, vit: 8, spi: 8 }, { hp: 380, mp: 218 }],
@@ -91,7 +91,8 @@ test('Ranger and Mage have distinct sustained ranged combat profiles', () => {
   const ranger = classCombatProfile('ranger', 1, CLASSES.ranger.stats);
   const mage = classCombatProfile('mage', 1, CLASSES.mage.stats);
   assert.ok(ranger.attackInterval < mage.attackInterval);
-  assert.ok(ranger.accuracy > mage.accuracy);
+  assert.equal(ranger.physicalAccuracy,82);
+  assert.equal(mage.magicAccuracy,83);
   assert.ok(classAttackRange('ranger') > classAttackRange('mage'));
   assert.ok(classAttackRange('mage') > classAttackRange('knight'));
 });

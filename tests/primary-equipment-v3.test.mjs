@@ -15,8 +15,9 @@ test('primary gear is applied before derived combat stats and removed without re
     assert.equal(equipped.stats.str,empty.stats.str+1);
     assert.equal(equipped.stats.dex,empty.stats.dex+1);
     assert.equal(equipped.stats.int,empty.stats.int+1);
-    assert.ok(equipped.stats.atkMin>empty.stats.atkMin);
-    assert.ok(equipped.stats.matk>empty.stats.matk);
+    const attribute=['ranger','necro'].includes(classId)?'dex':'str';
+    assert.equal(equipped.stats.atkMin-empty.stats.atkMin,Math.floor(equipped.stats[attribute]/3)-Math.floor(empty.stats[attribute]/3));
+    assert.equal(equipped.stats.matk-empty.stats.matk,Math.floor(equipped.stats.int/3)-Math.floor(empty.stats.int/3));
     assert.ok(equipped.stats.evasion>empty.stats.evasion);
     delete gear.cloak;
     assert.deepEqual(profile(classId,gear),empty);
@@ -27,8 +28,9 @@ test('two same-family rings add independent primary and direct contributions onc
   const both=profile('knight',{ring1:item('a','strength'),ring2:item('b','strength')});
   assert.equal(one.stats.str-base.stats.str,4);
   assert.equal(both.stats.str-base.stats.str,8);
-  assert.equal(both.maxHp-base.maxHp,60);
-  assert.equal(both.stats.accuracy-base.stats.accuracy,2);
+  assert.equal(both.maxHp-base.maxHp,140);
+  assert.equal(both.stats.accuracy-base.stats.accuracy,5);
+  assert.equal(both.stats.magicAccuracy-base.stats.magicAccuracy,2);
   assert.notEqual(both.stats.atkMin,one.stats.atkMin);
 });
 test('cloak enhancement raises defense but never multiplies primary attributes',()=>{

@@ -1,10 +1,14 @@
-import { baseVitals, classCombatProfile, statsAtLevel } from './game-rules.ts';
+import { baseVitals, classCombatProfile, statsAtLevel, attackDamageType, manaRegenerationPerSecond } from './game-rules.ts';
 import type { BaseStats } from './game-rules.ts';
 import { integerItemStats, itemSpeedToWorldUnits } from './item-progression.ts';
 import type { ItemStatDefinition, ItemStatContribution } from './item-progression.ts';
 export type { ItemStatDefinition, ItemStatContribution } from './item-progression.ts';
 
-export type EquipmentCombatStats = BaseStats & Omit<ItemStatContribution, 'hp' | 'mp'>;
+export type EquipmentCombatStats = BaseStats & Omit<ItemStatContribution, 'hp' | 'mp'> & {
+  physicalAccuracy?:number;magicAccuracy?:number;
+  /** MP per second; interval is seconds per ordinary attack. Optional only for old snapshots. */
+  manaRegen?:number;attackInterval?:number;
+};
 export type EquipmentStats = { stats: EquipmentCombatStats; maxHp: number; maxMp: number };
 
 /** Exact integer contribution used by the item tooltip and combat. Speed is in percent. */
@@ -52,23 +56,30 @@ export function calculateEquipmentStats<T extends { plus: number; legacyRingBonu
     mdef: Math.round(stats.spi * 1.15 + level * 0.65),
     crit: profile.critChance,
     accuracy: Math.round(profile.accuracy),
+    physicalAccuracy: profile.physicalAccuracy,
+    magicAccuracy: profile.magicAccuracy,
+    attackInterval: profile.attackInterval,
     evasion: stats.dex * 0.45,
     speed: profile.movementSpeed,
   };
   let gearHp = 0;
   let gearMp = 0;
   for (const contribution of contributions) {
-    for (const key of ['atkMin', 'atkMax', 'matk', 'def', 'mdef', 'crit', 'accuracy', 'evasion'] as const) {
+    for (const key of ['atkMin', 'atkMax', 'matk', 'def', 'mdef', 'crit', 'evasion'] as const) {
       computed[key] += contribution[key];
     }
+    computed.physicalAccuracy! += contribution.accuracy;
+    computed.magicAccuracy! += contribution.accuracy;
     computed.speed += itemSpeedToWorldUnits(contribution.speed);
     gearHp += contribution.hp;
     gearMp += contribution.mp;
   }
+  computed.accuracy=(attackDamageType(classId)==='magic'?computed.magicAccuracy:computed.physicalAccuracy)!;
   if(classId==='assassin'){
     const penalty=Object.values(equipment).filter(item=>item&&definitionFor(item).assassinForeign).length*2;
     for(const key of ['def','mdef','evasion'] as const)computed[key]=Math.max(0,computed[key]-penalty);
   }
   const vitals = baseVitals(classId, level, stats);
+  computed.manaRegen=manaRegenerationPerSecond(classId,vitals.mp+gearMp,stats);
   return { stats: computed, maxHp: vitals.hp + gearHp, maxMp: vitals.mp + gearMp };
 }
