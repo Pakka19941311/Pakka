@@ -510,6 +510,7 @@ func load_preferences(id: String) -> void:
 	world.camera_distance = clampf(float(preferences.get("camera_distance",10.5)) if reference_camera else 10.5,5.5,18)
 	preferences["camera_reference"] = "1e94a0d1"
 	game_settings = preferences.get("settings", {}).duplicate(true)
+	preload("res://scripts/graphics_profile.gd").migrate(game_settings)
 	for key: String in ["display","resolution","ui_scale"]: game_settings[key] = polish.startup_display.get(key,1)
 	configure_input()
 	full_quick = bool(preferences.get("full_quick", false))
@@ -654,6 +655,7 @@ func setting_toggle(parent: Control, title: String, key: String, fallback: bool)
 	check.text = title
 	check.custom_minimum_size.y = 38
 	check.button_pressed = bool(game_settings.get(key, fallback))
+	check.set_meta("setting_key",key)
 	parent.add_child(check)
 	check.toggled.connect(func(value: bool): game_settings[key] = value; apply_settings(); save_preferences())
 
@@ -671,6 +673,7 @@ func setting_choice(parent: Control, title: String, key: String, choices: Array,
 	for value: String in choices:
 		choice.add_item(value)
 	choice.selected = clampi(int(game_settings.get(key, fallback)), 0, choices.size() - 1)
+	choice.set_meta("setting_key",key)
 	row.add_child(choice)
 	choice.item_selected.connect(func(value: int):
 		var previous: Dictionary = {"display":game_settings.get("display", 1),"resolution":game_settings.get("resolution", 1)}
@@ -679,8 +682,8 @@ func setting_choice(parent: Control, title: String, key: String, choices: Array,
 			confirm_display(previous)
 			return
 		if key == "quality":
-			game_settings["msaa"] = [0, 1, 2][value]
-			game_settings["shadows"] = value > 0
+			preload("res://scripts/graphics_profile.gd").apply(game_settings,value)
+			preload("res://scripts/graphics_profile.gd").sync_controls(parent,game_settings)
 		apply_settings()
 		save_preferences())
 
