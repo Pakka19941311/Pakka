@@ -1,0 +1,160 @@
+{
+  "schema": 1,
+  "status": "candidate-native-ui-pass-live-dodge-fail",
+  "codeHashes": {
+    "godot-pc/scripts/line_effects.gd": "83715a1d24f53a3c23ed5f2b63e9a5ff249cfe6306ce4b918f71a2353c2a47fe",
+    "godot-pc/scripts/book_ground_effects.gd": "1c13767fee10c51204e9074dc27875a4aea8f629965be0dda74062a8ff6e601f",
+    "godot-pc/scripts/line_effects_acceptance.gd": "6a08796ef1f33b5da0ce2126fb5b6766219dedce421f9f948130e9175ed78acd",
+    "godot-pc/scripts/p2_line_acceptance.gd": "2a7e26778264aab6e71d160992330bf1d9d35d3a0610c96bef83292c575384f3",
+    "godot-pc/scripts/world.gd": "0b2da04d847e0b79080c536026367ffab07a317cbfeb5ebcbe06e09f16c1b41d",
+    "godot-pc/scripts/stage_acceptance.gd": "f9df8d04d237f864ae4d130a1e5d9751dd574fab51196e2736a8bcdc158b3374",
+    "scripts/world_final/stage_qa.mjs": "d4baf8cf56fde00ebc10ee95b4ff0029e42836cd3b28997ca5985c36449ddac3",
+    "scripts/world_expansion_v3/p2-native-line-fixture.mjs": "a0a14c568d0982118d1c07b4a028e5b3e46645cd5a984718a4fa329df2727504",
+    "scripts/world_expansion_v3/p2-native-line-fixture.test.mjs": "19d0c4a675204b52a4b93b17c9903e89f313a61bdc02fe57d1b152e5bbaa68c9"
+  },
+  "files": [
+    {
+      "source": "work/qa/p2-line-live-01/stage.json",
+      "path": "live-01-checks.json",
+      "bytes": 1463,
+      "sha256": "1c64ab6ce8daba4605fe90f29f5cfb2e0d1c29b0a3db5194da37110f25d976a1"
+    },
+    {
+      "source": "work/qa/p2-line-live-01/p2-line-live.json",
+      "path": "live-01-trace.json",
+      "bytes": 4084,
+      "sha256": "a857877bfddb37443cfc5aee57a126c8e5225acf54401f3cb3fda27843190267"
+    },
+    {
+      "source": "work/qa/p2-line-live-01/native/result.json",
+      "path": "live-01-receipt.json",
+      "bytes": 346524,
+      "sha256": "2d54b2a37e493660ee60e174eb6b1bf686ff28fe3ddac53bef5fc86a7235bb1d"
+    },
+    {
+      "source": "work/qa/p2-line-live-02/stage.json",
+      "path": "live-02-checks.json",
+      "bytes": 1464,
+      "sha256": "3f9b5948b70bc0c1fcdfac9395c5eea943a8e983cc47d62b15c1060dd1ade7a2"
+    },
+    {
+      "source": "work/qa/p2-line-live-02/p2-line-live.json",
+      "path": "live-02-trace.json",
+      "bytes": 4560,
+      "sha256": "0a0504969acc01073a673970652dea53e2c84212cf04e312f80f074559402d31"
+    },
+    {
+      "source": "work/qa/p2-line-live-02/native/result.json",
+      "path": "live-02-receipt.json",
+      "bytes": 351233,
+      "sha256": "1ef89b89b569b37e2b1aa21ac206c34c42c6f4e713185f3f05981473093fa71c"
+    },
+    {
+      "source": "work/qa/p2-line-live-03/stage.json",
+      "path": "live-03-checks.json",
+      "bytes": 1546,
+      "sha256": "aaf22731750d3fc4a97486f04761bb815bfb611d9ae731939c8fa49db9be884e"
+    },
+    {
+      "source": "work/qa/p2-line-live-03/p2-line-live.json",
+      "path": "live-03-trace.json",
+      "bytes": 8110,
+      "sha256": "7812ba61919ca1b4ee64522ca49460f6a37808257ff6d4e423d43aab3a29abbb"
+    },
+    {
+      "source": "work/qa/p2-line-live-03/native/result.json",
+      "path": "live-03-receipt.json",
+      "bytes": 380483,
+      "sha256": "b79edded523bf255f8b7eb678a8881a2b9dd0f892fd0a6b7eeb32074c031a013"
+    },
+    {
+      "source": "work/qa/p2-line-isolated-01/result.json",
+      "path": "isolated-01-receipt.json",
+      "bytes": 6568,
+      "sha256": "cfe7d3dacdf508d3e4dda7007cd6418d75c4b466a77b91a8ebe6840e4e1b02bc"
+    },
+    {
+      "source": "work/qa/p2-line-isolated-02/result.json",
+      "path": "isolated-02-receipt.json",
+      "bytes": 4073,
+      "sha256": "c7c8c0f25ddab78de3e13aa17161b9843acb551507c70b511dc514bdb94395a5"
+    },
+    {
+      "source": "work/qa/p2-line-isolated-03/result.json",
+      "path": "isolated-03-receipt.json",
+      "bytes": 4075,
+      "sha256": "c2b31f278daa076ca19bc5b2ab8c02323a6f12b384e0b68cf51d3009f1ec3504"
+    },
+    {
+      "source": "work/qa/p2-line-live-01/p2-line-fire-windup.png",
+      "path": "live-01-p2-line-fire-windup.png",
+      "bytes": 1792973,
+      "sha256": "8d70b035f181bbdd01aa813f74f5e8e64dc821a4cb39b856c738a077ae450243"
+    },
+    {
+      "source": "work/qa/p2-line-live-01/p2-line-ice-dodge-windup.png",
+      "path": "live-01-p2-line-ice-dodge-windup.png",
+      "bytes": 2646083,
+      "sha256": "95b477b93713dd467d333fd47ff4967458fbd06d31ca49a3d96fc1a0e7ac4b23"
+    },
+    {
+      "source": "work/qa/p2-line-live-02/p2-line-fire-windup.png",
+      "path": "live-02-p2-line-fire-windup.png",
+      "bytes": 1146404,
+      "sha256": "a21837124e0db8b4ea26763baf9bfa7d379ed687ba2b2213c9332d1dc9b2e601"
+    },
+    {
+      "source": "work/qa/p2-line-live-02/p2-line-ice-dodge-windup.png",
+      "path": "live-02-p2-line-ice-dodge-windup.png",
+      "bytes": 2052693,
+      "sha256": "286065a95963a4ed78fca26068ba6c8047543afc2f1d0cd48e164d786ca68f6b"
+    },
+    {
+      "source": "work/qa/p2-line-live-03/p2-line-ice-dodge-warm.png",
+      "path": "live-03-p2-line-ice-dodge-warm.png",
+      "bytes": 2802749,
+      "sha256": "1b946af10766a6c55d6c48c477426fb7e742980301bb827700be93221fb6e836"
+    },
+    {
+      "source": "work/qa/p2-line-live-03/p2-line-ice-dodge-after.png",
+      "path": "live-03-p2-line-ice-dodge-after.png",
+      "bytes": 1956689,
+      "sha256": "2cd11623bf22c1e8ebf6876431a432dd15b88660fb6d2cff6cf439ca2c56a8ea"
+    }
+  ],
+  "runs": [
+    {
+      "id": "live-01",
+      "passed": 27,
+      "total": 32,
+      "failed": [
+        "p2_line_fire_directed_pulse_presented",
+        "p2_line_fire_release_endpoint_exact",
+        "p2_line_ice_dodge_directed_pulse_presented",
+        "p2_line_ice_dodge_release_endpoint_exact",
+        "p2_line_ice_dodge_sidestep_avoids_real_damage"
+      ]
+    },
+    {
+      "id": "live-02",
+      "passed": 26,
+      "total": 32,
+      "failed": [
+        "p2_line_fire_directed_pulse_presented",
+        "p2_line_fire_release_endpoint_exact",
+        "p2_line_ice_dodge_directed_pulse_presented",
+        "p2_line_ice_dodge_release_endpoint_exact",
+        "p2_line_ice_dodge_server_windup_1200ms",
+        "p2_line_ice_dodge_sidestep_avoids_real_damage"
+      ]
+    },
+    {
+      "id": "live-03",
+      "passed": 33,
+      "total": 34,
+      "failed": [
+        "p2_line_ice_dodge_sidestep_avoids_real_damage"
+      ]
+    }
+  ]
+}

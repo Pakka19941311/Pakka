@@ -936,6 +936,7 @@ func show_aura(position_value: Vector3, color: Color) -> void:
 	effects.append({"node":node,"left":.6,"duration":.6})
 
 func show_release(event: Dictionary) -> void:
+	if book_ground.show_release(event): return
 	if not actors.has(str(event.actor)) or not actors.has(str(event.get("target", ""))):
 		return
 	var source: Node3D = actors[str(event.actor)]

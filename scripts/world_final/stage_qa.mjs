@@ -13,6 +13,7 @@ import {STARTER_ITEMS} from '../../src/data/starter-progression-v3.ts';
 import {p2Encounter} from '../../src/data/p2-encounters.ts';
 import {prepareNativePursuitFixture} from '../world_expansion_v3/p2-native-pursuit-fixture.mjs';
 import {prepareNativeNatureFixture} from '../world_expansion_v3/p2-native-nature-fixture.mjs';
+import {prepareNativeLineFixture} from '../world_expansion_v3/p2-native-line-fixture.mjs';
 const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
 const castlePreview=options.includes('--castle-preview'),castle=options.includes('--castle')||castlePreview,reportName=castle?'castle.json':'stage.json';
 mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
@@ -22,7 +23,7 @@ const service=bridge?.service??startWorldServer({database:join(output,'world.sql
 try{
  if(!service.server.listening)await once(service.server,'listening');
  const server_url=`http://127.0.0.1:${service.server.address().port}`;
- const result=await fetch(server_url+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Проверка этапа',classId:'knight'})});assert.equal(result.status,201);
+ const result=await fetch(server_url+'/api/session',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Проверка этапа',classId:options.includes('--block=p2-line')?'ranger':'knight'})});assert.equal(result.status,201);
  const session=await result.json(),world=service.world,p=world.state.characters[session.snapshot.character.id];
  p.level=40;world.recalculate(p);p.gold=200000;p.hp=p.maxHp-150;
  p.inventory.find(i=>i.id==='potion').count=10;
@@ -63,6 +64,7 @@ try{
    assert.equal(geography.populationMode,'starter-v3');world.relocate(hero,{x:-90,z:-203,spaceId:'surface'});
   }
   else if(request.stage.startsWith('p2-nature-')) extra=prepareNativeNatureFixture(world,geography,hero,request.stage);
+  else if(request.stage.startsWith('p2-line-')) extra=prepareNativeLineFixture(world,geography,hero,request.stage);
   else if(request.stage.startsWith('p2-pursuit-MOB-')){
    extra=prepareNativePursuitFixture(world,geography,hero,request.stage.slice('p2-pursuit-'.length));
   }

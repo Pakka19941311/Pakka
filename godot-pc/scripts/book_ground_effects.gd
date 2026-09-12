@@ -4,6 +4,20 @@ extends RefCounted
 var world: Node3D
 var nodes: Dictionary = {}
 var preview: MeshInstance3D
+const LineEffects = preload("res://scripts/line_effects.gd")
+var lines: Node3D
+
+func line_layer() -> Node3D:
+	if not is_instance_valid(lines):
+		lines=LineEffects.new()
+		world.add_child(lines);lines.setup(world)
+	return lines
+
+func show_release(event: Dictionary) -> bool:
+	# Called before the legacy projectile path, so aimed-line is rendered once
+	# and does not need a living target node or a homing endpoint.
+	if event.get("attackKind","")!="aimed-line":return false
+	return line_layer().show_release(event)
 
 func ring(center: Vector2, radius: float, color: Color) -> MeshInstance3D:
 	# Follow the real terrain so the indicated radius matches the server on slopes.
@@ -30,8 +44,10 @@ func ring(center: Vector2, radius: float, color: Color) -> MeshInstance3D:
 	return node
 
 func apply(snapshot: Dictionary) -> void:
+	line_layer().apply(snapshot)
 	var keep: Dictionary = {}
 	for zone: Dictionary in snapshot.get("groundEffects",[]):
+		if zone.get("kind","")=="line":continue
 		if float(zone.expiresAt) <= float(snapshot.time): continue
 		var id: String = str(zone.id)
 		keep[id] = true
