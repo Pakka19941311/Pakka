@@ -1,0 +1,1507 @@
+{
+  "scope": "candidate only; source server collision, no runtime mutation",
+  "slots": 1151,
+  "checks": [
+    {
+      "name": "population count unchanged",
+      "pass": true,
+      "evidence": {
+        "initial": 1151,
+        "current": 1151
+      }
+    },
+    {
+      "name": "unchanged godot-pc/world-final/geology-D13/heightmap.f32",
+      "pass": true,
+      "evidence": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e"
+    },
+    {
+      "name": "unchanged godot-pc/world-final/nature/authored-D13.json",
+      "pass": true,
+      "evidence": "41e52595b38212710d3f1c348aae784b33f132cba96ba5e6cef68a51ff815303"
+    },
+    {
+      "name": "unchanged godot-pc/world-final/nature/groundcover-authored-D13.json",
+      "pass": true,
+      "evidence": "38f179b3703a3f02e102c9ce71a6d4ab145ad21245d219ad743d55392c7cf6f3"
+    },
+    {
+      "name": "unchanged godot-pc/world-final/nature/collision-D13.json",
+      "pass": true,
+      "evidence": "ad72e21091bdf9fc8c105abcbf96dd18ad886bc808bf9a64862adacdca978223"
+    },
+    {
+      "name": "unchanged godot-pc/world-final/nature/groundcover-collision-D13.json",
+      "pass": true,
+      "evidence": "589005c28283d467314cca5bd188e05b9c7723e98d7688b08338dd1b73d8d5fd"
+    },
+    {
+      "name": "unchanged godot-pc/world-final/world_layout.json",
+      "pass": true,
+      "evidence": "470dec5939ee21155532c5b99ad2f6762f9ce23235004cb50c9baefa8daaa19c"
+    },
+    {
+      "name": "unchanged src/data/p2-starter-population-v3.ts",
+      "pass": true,
+      "evidence": "7b46823055b2a7a673f74c82018071c37a8c8bb762207eb2401c76cec858d4a3"
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:000",
+      "pass": true,
+      "evidence": {
+        "x": -250.366,
+        "z": -200.323,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:001",
+      "pass": true,
+      "evidence": {
+        "x": -247.351,
+        "z": -202.993,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:002",
+      "pass": true,
+      "evidence": {
+        "x": -244.961,
+        "z": -198.993,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:003",
+      "pass": true,
+      "evidence": {
+        "x": -247.74,
+        "z": -196.308,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:004",
+      "pass": true,
+      "evidence": {
+        "x": -250.998,
+        "z": -187.399,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:005",
+      "pass": true,
+      "evidence": {
+        "x": -253.553,
+        "z": -191.934,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:006",
+      "pass": true,
+      "evidence": {
+        "x": -247.838,
+        "z": -192.346,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:007",
+      "pass": true,
+      "evidence": {
+        "x": -243.784,
+        "z": -205.495,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:008",
+      "pass": true,
+      "evidence": {
+        "x": -248.516,
+        "z": -207.002,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:009",
+      "pass": true,
+      "evidence": {
+        "x": -244.476,
+        "z": -210.767,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:010",
+      "pass": true,
+      "evidence": {
+        "x": -240.978,
+        "z": -188.533,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:011",
+      "pass": true,
+      "evidence": {
+        "x": -244.283,
+        "z": -184.513,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:012",
+      "pass": true,
+      "evidence": {
+        "x": -247.384,
+        "z": -188.359,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:013",
+      "pass": true,
+      "evidence": {
+        "x": -244.604,
+        "z": -190.793,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:014",
+      "pass": true,
+      "evidence": {
+        "x": -238.826,
+        "z": -192.523,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:015",
+      "pass": true,
+      "evidence": {
+        "x": -242.538,
+        "z": -194.568,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:016",
+      "pass": true,
+      "evidence": {
+        "x": -240.82,
+        "z": -198.827,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:017",
+      "pass": true,
+      "evidence": {
+        "x": -237.061,
+        "z": -196.533,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:018",
+      "pass": true,
+      "evidence": {
+        "x": -257.206,
+        "z": -195.706,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:019",
+      "pass": true,
+      "evidence": {
+        "x": -259.476,
+        "z": -199.233,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:020",
+      "pass": true,
+      "evidence": {
+        "x": -255.414,
+        "z": -200.941,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:021",
+      "pass": true,
+      "evidence": {
+        "x": -253.751,
+        "z": -196.944,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:022",
+      "pass": true,
+      "evidence": {
+        "x": -251.165,
+        "z": -183.331,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:023",
+      "pass": true,
+      "evidence": {
+        "x": -247.502,
+        "z": -181.213,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:024",
+      "pass": true,
+      "evidence": {
+        "x": -250.05,
+        "z": -177.852,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:025",
+      "pass": true,
+      "evidence": {
+        "x": -254.015,
+        "z": -180.061,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:026",
+      "pass": true,
+      "evidence": {
+        "x": -254.667,
+        "z": -206.105,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:027",
+      "pass": true,
+      "evidence": {
+        "x": -258.427,
+        "z": -207.862,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:028",
+      "pass": true,
+      "evidence": {
+        "x": -256.029,
+        "z": -212.347,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:029",
+      "pass": true,
+      "evidence": {
+        "x": -252.587,
+        "z": -210.172,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:030",
+      "pass": true,
+      "evidence": {
+        "x": -236.396,
+        "z": -201.657,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:031",
+      "pass": true,
+      "evidence": {
+        "x": -238.985,
+        "z": -203.148,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:032",
+      "pass": true,
+      "evidence": {
+        "x": -238.987,
+        "z": -206.73,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:033",
+      "pass": true,
+      "evidence": {
+        "x": -235.195,
+        "z": -207.862,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-01:034",
+      "pass": true,
+      "evidence": {
+        "x": -233.9,
+        "z": -204.315,
+        "radius": 0.4
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:000",
+      "pass": true,
+      "evidence": {
+        "x": -264.425,
+        "z": -208.463,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:001",
+      "pass": true,
+      "evidence": {
+        "x": -268.149,
+        "z": -209.738,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:002",
+      "pass": true,
+      "evidence": {
+        "x": -265.445,
+        "z": -212.322,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:003",
+      "pass": true,
+      "evidence": {
+        "x": -276.312,
+        "z": -211.059,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:004",
+      "pass": true,
+      "evidence": {
+        "x": -275.053,
+        "z": -214.574,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:005",
+      "pass": true,
+      "evidence": {
+        "x": -272.802,
+        "z": -212.008,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:006",
+      "pass": true,
+      "evidence": {
+        "x": -271.684,
+        "z": -207.26,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:007",
+      "pass": true,
+      "evidence": {
+        "x": -271.425,
+        "z": -203.973,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:008",
+      "pass": true,
+      "evidence": {
+        "x": -263.469,
+        "z": -203.418,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:009",
+      "pass": true,
+      "evidence": {
+        "x": -265.974,
+        "z": -201.302,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:010",
+      "pass": true,
+      "evidence": {
+        "x": -267.079,
+        "z": -205.019,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:011",
+      "pass": true,
+      "evidence": {
+        "x": -273.712,
+        "z": -196.799,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:012",
+      "pass": true,
+      "evidence": {
+        "x": -272.826,
+        "z": -200.571,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:013",
+      "pass": true,
+      "evidence": {
+        "x": -270.223,
+        "z": -197.701,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:014",
+      "pass": true,
+      "evidence": {
+        "x": -279.42,
+        "z": -204.344,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:015",
+      "pass": true,
+      "evidence": {
+        "x": -282.307,
+        "z": -207.065,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:016",
+      "pass": true,
+      "evidence": {
+        "x": -278.742,
+        "z": -208.101,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:017",
+      "pass": true,
+      "evidence": {
+        "x": -267.435,
+        "z": -192.355,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:018",
+      "pass": true,
+      "evidence": {
+        "x": -266.132,
+        "z": -195.676,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:019",
+      "pass": true,
+      "evidence": {
+        "x": -263.731,
+        "z": -192.929,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:020",
+      "pass": true,
+      "evidence": {
+        "x": -281.262,
+        "z": -198.13,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:021",
+      "pass": true,
+      "evidence": {
+        "x": -277.358,
+        "z": -198.569,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:022",
+      "pass": true,
+      "evidence": {
+        "x": -279.442,
+        "z": -195.255,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:023",
+      "pass": true,
+      "evidence": {
+        "x": -251.627,
+        "z": -217.281,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-A:MOB-03:024",
+      "pass": true,
+      "evidence": {
+        "x": -249.019,
+        "z": -215.262,
+        "radius": 0.22
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:000",
+      "pass": true,
+      "evidence": {
+        "x": -276.976,
+        "z": -169.107,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:001",
+      "pass": true,
+      "evidence": {
+        "x": -280.013,
+        "z": -167.817,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:002",
+      "pass": true,
+      "evidence": {
+        "x": -261.611,
+        "z": -143.813,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:003",
+      "pass": true,
+      "evidence": {
+        "x": -261.021,
+        "z": -147.05,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:004",
+      "pass": true,
+      "evidence": {
+        "x": -265.436,
+        "z": -146.942,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:005",
+      "pass": true,
+      "evidence": {
+        "x": -265.379,
+        "z": -143.652,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:006",
+      "pass": true,
+      "evidence": {
+        "x": -263.111,
+        "z": -138.095,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:007",
+      "pass": true,
+      "evidence": {
+        "x": -260.034,
+        "z": -136.905,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:008",
+      "pass": true,
+      "evidence": {
+        "x": -256.189,
+        "z": -149.964,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:009",
+      "pass": true,
+      "evidence": {
+        "x": -256.248,
+        "z": -146.669,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:010",
+      "pass": true,
+      "evidence": {
+        "x": -254.754,
+        "z": -142.992,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:011",
+      "pass": true,
+      "evidence": {
+        "x": -256.207,
+        "z": -140.036,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:012",
+      "pass": true,
+      "evidence": {
+        "x": -269.731,
+        "z": -135.782,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:013",
+      "pass": true,
+      "evidence": {
+        "x": -266.465,
+        "z": -135.997,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:014",
+      "pass": true,
+      "evidence": {
+        "x": -271.679,
+        "z": -141.358,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:015",
+      "pass": true,
+      "evidence": {
+        "x": -268.903,
+        "z": -143.128,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:016",
+      "pass": true,
+      "evidence": {
+        "x": -252.41,
+        "z": -146.874,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:017",
+      "pass": true,
+      "evidence": {
+        "x": -252.449,
+        "z": -150.17,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:018",
+      "pass": true,
+      "evidence": {
+        "x": -257.928,
+        "z": -134.084,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:019",
+      "pass": true,
+      "evidence": {
+        "x": -259.488,
+        "z": -131.202,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:020",
+      "pass": true,
+      "evidence": {
+        "x": -273.026,
+        "z": -146.997,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:021",
+      "pass": true,
+      "evidence": {
+        "x": -272.242,
+        "z": -150.202,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:022",
+      "pass": true,
+      "evidence": {
+        "x": -264.139,
+        "z": -130.487,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:023",
+      "pass": true,
+      "evidence": {
+        "x": -266.764,
+        "z": -132.487,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:024",
+      "pass": true,
+      "evidence": {
+        "x": -254.204,
+        "z": -133.014,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:025",
+      "pass": true,
+      "evidence": {
+        "x": -254.927,
+        "z": -136.232,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:026",
+      "pass": true,
+      "evidence": {
+        "x": -248.503,
+        "z": -138.665,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:027",
+      "pass": true,
+      "evidence": {
+        "x": -250.925,
+        "z": -140.904,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:028",
+      "pass": true,
+      "evidence": {
+        "x": -275.974,
+        "z": -143.717,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:029",
+      "pass": true,
+      "evidence": {
+        "x": -276.224,
+        "z": -140.428,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:030",
+      "pass": true,
+      "evidence": {
+        "x": -257.824,
+        "z": -127.704,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:031",
+      "pass": true,
+      "evidence": {
+        "x": -261.093,
+        "z": -127.262,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:032",
+      "pass": true,
+      "evidence": {
+        "x": -269.92,
+        "z": -126.241,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:033",
+      "pass": true,
+      "evidence": {
+        "x": -269.473,
+        "z": -129.484,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:034",
+      "pass": true,
+      "evidence": {
+        "x": -275.572,
+        "z": -135.259,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:035",
+      "pass": true,
+      "evidence": {
+        "x": -273.025,
+        "z": -133.166,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:036",
+      "pass": true,
+      "evidence": {
+        "x": -246.564,
+        "z": -145.78,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:037",
+      "pass": true,
+      "evidence": {
+        "x": -248.073,
+        "z": -148.713,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:038",
+      "pass": true,
+      "evidence": {
+        "x": -249.994,
+        "z": -129.81,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:039",
+      "pass": true,
+      "evidence": {
+        "x": -253.249,
+        "z": -129.3,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:040",
+      "pass": true,
+      "evidence": {
+        "x": -265.254,
+        "z": -124.2,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:041",
+      "pass": true,
+      "evidence": {
+        "x": -266.35,
+        "z": -127.313,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:042",
+      "pass": true,
+      "evidence": {
+        "x": -255.616,
+        "z": -121.601,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:043",
+      "pass": true,
+      "evidence": {
+        "x": -259.058,
+        "z": -117.922,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-B:MOB-04:044",
+      "pass": true,
+      "evidence": {
+        "x": -260.85,
+        "z": -122.949,
+        "radius": 0.48
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:000",
+      "pass": true,
+      "evidence": {
+        "x": -240.359,
+        "z": -108.346,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:001",
+      "pass": true,
+      "evidence": {
+        "x": -243.459,
+        "z": -108.325,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:002",
+      "pass": true,
+      "evidence": {
+        "x": -229.809,
+        "z": -91.822,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:003",
+      "pass": true,
+      "evidence": {
+        "x": -228.775,
+        "z": -88.899,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:004",
+      "pass": true,
+      "evidence": {
+        "x": -258.385,
+        "z": -96.372,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:005",
+      "pass": true,
+      "evidence": {
+        "x": -258.88,
+        "z": -93.312,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:006",
+      "pass": true,
+      "evidence": {
+        "x": -231.881,
+        "z": -125.868,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:007",
+      "pass": true,
+      "evidence": {
+        "x": -233.502,
+        "z": -128.511,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:008",
+      "pass": true,
+      "evidence": {
+        "x": -262.253,
+        "z": -116.24,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:009",
+      "pass": true,
+      "evidence": {
+        "x": -263.132,
+        "z": -119.213,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:010",
+      "pass": true,
+      "evidence": {
+        "x": -242.502,
+        "z": -146.489,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:011",
+      "pass": true,
+      "evidence": {
+        "x": -244.587,
+        "z": -148.783,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:012",
+      "pass": true,
+      "evidence": {
+        "x": -268.133,
+        "z": -140.147,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:013",
+      "pass": true,
+      "evidence": {
+        "x": -265.045,
+        "z": -140.423,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:014",
+      "pass": true,
+      "evidence": {
+        "x": -281.958,
+        "z": -115.971,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:015",
+      "pass": true,
+      "evidence": {
+        "x": -284.991,
+        "z": -116.611,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:016",
+      "pass": true,
+      "evidence": {
+        "x": -246.504,
+        "z": -74.491,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:017",
+      "pass": true,
+      "evidence": {
+        "x": -249.267,
+        "z": -73.084,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:018",
+      "pass": true,
+      "evidence": {
+        "x": -228.001,
+        "z": -68.014,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:019",
+      "pass": true,
+      "evidence": {
+        "x": -225.055,
+        "z": -68.98,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:020",
+      "pass": true,
+      "evidence": {
+        "x": -241.386,
+        "z": -169.399,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:021",
+      "pass": true,
+      "evidence": {
+        "x": -244.408,
+        "z": -168.707,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:022",
+      "pass": true,
+      "evidence": {
+        "x": -269.196,
+        "z": -77.21,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:023",
+      "pass": true,
+      "evidence": {
+        "x": -268.693,
+        "z": -74.151,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-02:024",
+      "pass": true,
+      "evidence": {
+        "x": -277.732,
+        "z": -95.745,
+        "radius": 0.46
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:000",
+      "pass": true,
+      "evidence": {
+        "x": -237.959,
+        "z": -80.758,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:001",
+      "pass": true,
+      "evidence": {
+        "x": -241.129,
+        "z": -85.952,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:002",
+      "pass": true,
+      "evidence": {
+        "x": -235.354,
+        "z": -86.121,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:003",
+      "pass": true,
+      "evidence": {
+        "x": -238.329,
+        "z": -88.182,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:004",
+      "pass": true,
+      "evidence": {
+        "x": -242.31,
+        "z": -91.81,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:005",
+      "pass": true,
+      "evidence": {
+        "x": -237.901,
+        "z": -94.438,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:006",
+      "pass": true,
+      "evidence": {
+        "x": -240.861,
+        "z": -76.04,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:007",
+      "pass": true,
+      "evidence": {
+        "x": -245.651,
+        "z": -78.062,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:008",
+      "pass": true,
+      "evidence": {
+        "x": -242.173,
+        "z": -82.225,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:009",
+      "pass": true,
+      "evidence": {
+        "x": -232.101,
+        "z": -76.444,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:010",
+      "pass": true,
+      "evidence": {
+        "x": -237.351,
+        "z": -77.245,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:011",
+      "pass": true,
+      "evidence": {
+        "x": -233.821,
+        "z": -81.272,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:012",
+      "pass": true,
+      "evidence": {
+        "x": -249.499,
+        "z": -86.814,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:013",
+      "pass": true,
+      "evidence": {
+        "x": -250.94,
+        "z": -90.763,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:014",
+      "pass": true,
+      "evidence": {
+        "x": -247.124,
+        "z": -93.17,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:015",
+      "pass": true,
+      "evidence": {
+        "x": -245.038,
+        "z": -88.995,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:016",
+      "pass": true,
+      "evidence": {
+        "x": -240.297,
+        "z": -72.446,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:017",
+      "pass": true,
+      "evidence": {
+        "x": -239.163,
+        "z": -67.384,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:018",
+      "pass": true,
+      "evidence": {
+        "x": -243.493,
+        "z": -67.322,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "slot wv3:L02-C:MOB-05:019",
+      "pass": true,
+      "evidence": {
+        "x": -244.421,
+        "z": -71.913,
+        "radius": 0.3
+      }
+    },
+    {
+      "name": "preserved route QUEST-101+103",
+      "pass": true,
+      "evidence": {
+        "segments": 262,
+        "baselineBlocked": 0,
+        "newBlocked": 0,
+        "affected": []
+      }
+    },
+    {
+      "name": "preserved route QUEST-104",
+      "pass": true,
+      "evidence": {
+        "segments": 178,
+        "baselineBlocked": 0,
+        "newBlocked": 0,
+        "affected": []
+      }
+    },
+    {
+      "name": "preserved route QUEST-105",
+      "pass": true,
+      "evidence": {
+        "segments": 219,
+        "baselineBlocked": 0,
+        "newBlocked": 0,
+        "affected": []
+      }
+    },
+    {
+      "name": "trunk-to-trunk passage",
+      "pass": true,
+      "evidence": [
+        {
+          "a": "P2N_tree_001",
+          "b": "P2N_tree_023",
+          "gap": 3.7407160213031583
+        },
+        {
+          "a": "P2N_tree_008",
+          "b": "P2N_tree_018",
+          "gap": 4.635027158979758
+        },
+        {
+          "a": "P2N_tree_000",
+          "b": "P2N_tree_022",
+          "gap": 4.635368835067655
+        },
+        {
+          "a": "P2N_tree_007",
+          "b": "P2N_tree_018",
+          "gap": 4.6390536991807725
+        },
+        {
+          "a": "P2N_tree_004",
+          "b": "P2N_tree_006",
+          "gap": 5.515192051723569
+        }
+      ]
+    },
+    {
+      "name": "central combat clearing",
+      "pass": true,
+      "evidence": {
+        "x": -263,
+        "z": -204
+      }
+    },
+    {
+      "name": "continuous 5m central passage",
+      "pass": true,
+      "evidence": [
+        {
+          "x": -263,
+          "z": -228
+        },
+        {
+          "x": -263,
+          "z": -180
+        }
+      ]
+    },
+    {
+      "name": "hero camera site forest-gameplay",
+      "pass": true,
+      "evidence": {
+        "x": -284,
+        "z": -208
+      }
+    },
+    {
+      "name": "hero camera site forest-roots",
+      "pass": true,
+      "evidence": {
+        "x": -291,
+        "z": -219
+      }
+    },
+    {
+      "name": "hero camera site shore-gameplay",
+      "pass": true,
+      "evidence": {
+        "x": -40,
+        "z": 72
+      }
+    }
+  ],
+  "failed": 0
+}

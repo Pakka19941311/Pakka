@@ -1,0 +1,52 @@
+{
+	"checks": 9,
+	"failed": 0,
+	"results": [
+		{
+			"evidence": 35,
+			"name": "all chunks instantiated",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "no physical scene objects",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "no hero rigs",
+			"pass": true
+		},
+		{
+			"evidence": 18,
+			"name": "small decorations contain only grass chunks",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "local old grass suppressed",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "outside old grass unchanged",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "build idempotent",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "baseline grass restored by reference",
+			"pass": true
+		},
+		{
+			"evidence": null,
+			"name": "ground overlay has separate material",
+			"pass": true
+		}
+	],
+	"scope": "isolated source adapter; not packaged/full-world/performance acceptance"
+}
