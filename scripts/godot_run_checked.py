@@ -118,6 +118,7 @@ def main():
     parser.add_argument('--output', required=True, help='New evidence directory; refuses to overwrite a run')
     parser.add_argument('--cwd', default='.')
     parser.add_argument('--timeout', type=float, default=90)
+    parser.add_argument('--check-script', help='Check one res:// GDScript using the protected headless launch')
     parser.add_argument('godot_args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
     exe, cwd, output = (Path(v).resolve() for v in (args.exe, args.cwd, args.output))
@@ -125,6 +126,15 @@ def main():
     if not exe.is_file(): parser.error('Godot executable is missing')
     if project is not None and not (project / 'project.godot').is_file(): parser.error('project.godot is missing')
     godot_args = args.godot_args[1:] if args.godot_args[:1] == ['--'] else args.godot_args
+    if args.check_script:
+        if project is None or not args.check_script.startswith('res://'):
+            parser.error('--check-script requires --project and a res:// script')
+        script = (project / args.check_script[6:]).resolve()
+        if not script.is_relative_to(project) or not script.is_file() or script.suffix != '.gd':
+            parser.error('--check-script must name an existing .gd inside the project')
+        if godot_args:
+            parser.error('--check-script supplies its own engine arguments')
+        godot_args = ['--headless', '--check-only', '--script', args.check_script]
     if any(v in godot_args for v in ('--log-file', '--path')):
         parser.error('The checked launcher owns --path and --log-file')
     output.mkdir(parents=True, exist_ok=False)
@@ -186,7 +196,11 @@ def main():
     data = '\n'.join((output / name).read_text('utf-8', errors='replace') for name in ('engine.log', 'stderr.log'))
     result['error_lines'] = [line for line in data.splitlines() if 'ERROR:' in line or 'SCRIPT ERROR:' in line]
     result['clean_error_log'] = not result['error_lines']
-    result['crash_detected'] = 'CrashHandlerException' in data or 'Program crashed' in data
+    code = result['exit_code']
+    # Some native startup failures end before Godot can write its own handler
+    # text. Preserve that failure instead of reporting crash_detected=false.
+    result['native_exception_code'] = f'0x{code & 0xffffffff:08X}' if os.name == 'nt' and code is not None and (code & 0xffffffff) >= 0xC0000000 else None
+    result['crash_detected'] = 'CrashHandlerException' in data or 'Program crashed' in data or result['native_exception_code'] is not None or (os.name != 'nt' and code is not None and code < 0)
     result['operation_completed'] = result['exit_code'] == 0 and not result['timed_out'] and not result['crash_detected']
     result['peak_process_working_set_bytes'] = max((p.get('peak_working_set', 0) for s in result['samples'] for p in s['processes']), default=0)
     result['peak_process_private_bytes'] = max((p.get('private_bytes', 0) for s in result['samples'] for p in s['processes']), default=0)
