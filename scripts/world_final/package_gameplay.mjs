@@ -4,18 +4,26 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {stageNativeServer} from '../package-godot-pc.mjs';
 import {writePackageManifest} from '../package-world-windows.mjs';
+import {stageArtPacks} from '../stage-art-packs.mjs';
 const [binary,outputArg,license,nodeArchive]=process.argv.slice(2),root=process.cwd(),output=resolve(outputArg);
 const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const name='Varendor_World_Gameplay_'+commit.slice(0,12),destination=join(output,name);
 if(existsSync(destination))throw Error('Package destination already exists');
 mkdirSync(destination,{recursive:true});
-const dependencies=stageNativeServer(root,destination,{finalWorld:true});
+const populationMode=process.argv.includes('--starter-v3')?'starter-v3':'legacy';
+const generatedGame=JSON.parse(readFileSync('godot-pc/generated/game.json','utf8'));
+if((generatedGame.populationMode??'legacy')!==populationMode)throw Error('Client and packaged population mode differ');
+const dependencies=stageNativeServer(root,destination,{finalWorld:true,populationMode});
 cpSync(binary,join(destination,'Varendor.exe'));
 cpSync('packaging/windows/RUN_VARENDOR_PC.bat',join(destination,'RUN_VARENDOR.bat'));
 mkdirSync(join(destination,'licenses'),{recursive:true});
 cpSync(license,join(destination,'licenses/Godot.txt'));
 for(const [from,to] of [['public/assets/licenses','assets'],['public/assets/models/monsters-glb/licenses','monsters']])cpSync(from,join(destination,'licenses',to),{recursive:true});
-for(const from of ['art/knight-v2/LICENSES.md','art/forgotten-knight/LICENSES.md','docs/assets/world-source-manifest.json','art/world-final/nature-source/pine-wood/source.json','art/world-final/materials/snow_02/source.json','art/world-final/materials/rock_wall_02/source.json']){const to=join(destination,'licenses',from);mkdirSync(dirname(to),{recursive:true});cpSync(from,to);}
+for(const from of ['art/knight-v2/LICENSES.md','art/forgotten-knight/LICENSES.md','docs/assets/world-source-manifest.json','art/world-final/nature-source/pine-wood/source.json','art/world-final/materials/snow_02/source.json','art/world-final/materials/rock_wall_02/source.json','godot-pc/world-expansion-v3/actors/CREDITS.md']){const to=join(destination,'licenses',from);mkdirSync(dirname(to),{recursive:true});cpSync(from,to);}
+const artPacks=populationMode==='starter-v3'?stageArtPacks(root,destination,JSON.parse(readFileSync('docs/world-expansion-v3/P2_STANDALONE_ART_PACKS.json','utf8'))):undefined;
+if(populationMode==='starter-v3')for(const file of ['CREDITS.md','licenses/CC0-1.0.txt']){
+ const target=join(destination,'licenses/city',file);mkdirSync(dirname(target),{recursive:true});cpSync('godot-pc/world-expansion-v3/city/'+file,target);
+}
 const config=JSON.parse(readFileSync('packaging/windows/node-runtime.json','utf8'));
 let bytes;if(nodeArchive)bytes=readFileSync(nodeArchive);else{const r=await fetch(config.url,{signal:AbortSignal.timeout(180000)});if(!r.ok)throw Error('Node download '+r.status);bytes=Buffer.from(await r.arrayBuffer());}
 if(createHash('sha256').update(bytes).digest('hex')!==config.sha256)throw Error('Node runtime checksum differs');
@@ -50,8 +58,9 @@ const updateNotes=`VARENDOR — замковый квартал Гринфолл
 Бытовой обмен на ярмарке — сцены между жителями. Новые прилавки не добавляют отдельные магазины для игрока. Большинство новых домов оформлены снаружи; доступный интерьер на этом этапе — «Чёрный ворон». Использованы существующие модели жителей и животных.
 
 `;
-writeFileSync(join(destination,'README_RU.txt'),updateNotes+notes);
-writeFileSync(join(output,'release-notes.md'),updateNotes+notes+'\nСборка: '+commit+'\n');
-writePackageManifest(destination,{kind:'world-final-gameplay-test',buildCommit:commit,permanentPopulation:1001,node:config,serverFiles:dependencies});
+const releaseNotes=populationMode==='starter-v3'?readFileSync('packaging/windows/README_P2_RU.txt','utf8'):updateNotes+notes;
+writeFileSync(join(destination,'README_RU.txt'),releaseNotes);
+writeFileSync(join(output,'release-notes.md'),releaseNotes+'\nСборка: '+commit+'\n');
+writePackageManifest(destination,{kind:'world-final-gameplay-test',buildCommit:commit,permanentPopulation:generatedGame.populationCapacity??1001,populationMode,artPacks,node:config,serverFiles:dependencies});
 writeFileSync(join(output,'package-result.json'),JSON.stringify({name,destination,commit},null,2));
 console.log(JSON.stringify({name,destination,commit}));
