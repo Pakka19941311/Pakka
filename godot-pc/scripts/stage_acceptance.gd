@@ -18,6 +18,9 @@ static func run(app: Node) -> void:
 	var block: String = "all"
 	for arg: String in OS.get_cmdline_user_args():
 		if arg.begins_with("--block="): block = arg.trim_prefix("--block=")
+	if block == "stability":
+		await preload("res://scripts/native_stability_acceptance.gd").run(app)
+		return
 	if block in ["all","sale"]: await sale(app,checks)
 	if block in ["all","potions"]: await potions(app,checks)
 	if block in ["all","drag","ui-v3"]: await drag(app,checks)
