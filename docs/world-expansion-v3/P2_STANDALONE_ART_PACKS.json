@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "purpose": "Release builder copies every file from each pack to destination_directory outside the PCK; verify hashes before packaging. Do not encrypt or add restrictive terms to these art files.",
+  "packs": [
+    {
+      "id": "roach",
+      "mob_id": "MOB-05",
+      "destination_directory": "art/roach-cc-by-sa-3.0",
+      "license": "CC-BY-SA-3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+      "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+      "authors": [
+        "Atmostatic",
+        "Danimal"
+      ],
+      "changes_notice": "CREDITS.md",
+      "files": [
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/roach/V3RoachCandidate.glb",
+          "destination": "V3RoachCandidate.glb",
+          "bytes": 4328048,
+          "sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
+          "kind": "adapted_art"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/roach/V3RoachCandidate_Roach.png",
+          "destination": "V3RoachCandidate_Roach.png",
+          "bytes": 1757157,
+          "sha256": "9d3f8bdb9aef0e3d3e4f823cf757a4107f72bcd8e2e9af05d1c2083618841712",
+          "kind": "adapted_art"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/roach/V3RoachCandidate_RoachNormal.png",
+          "destination": "V3RoachCandidate_RoachNormal.png",
+          "bytes": 1898368,
+          "sha256": "f2bfb35b835ea821b3496b741effb21ed89d3e0a2eee0568e15ea1f46055d379",
+          "kind": "adapted_art"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/roach/CREDITS.md",
+          "destination": "CREDITS.md",
+          "bytes": 2096,
+          "sha256": "e73d9b5a3048a394e41164f04c824d9304eefbd5ce16282959a110b3e580a084",
+          "kind": "license_or_credit"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/roach/CC-BY-SA-3.0-legalcode.html",
+          "destination": "CC-BY-SA-3.0-legalcode.html",
+          "bytes": 54307,
+          "sha256": "7e09ceffbcaa8dab3e66625f6264a7274912be272fc80e9cd94a29f94090b00c",
+          "kind": "license_or_credit"
+        }
+      ],
+      "separate_accessible_files_required": true,
+      "files_in_pck_do_not_replace_this_copy": true,
+      "independent_game_code_relicensed": false
+    }
+  ],
+  "note": "Adapted Roach artwork has share-alike terms. This manifest does not extend those terms to independent GDScript/TypeScript or the game as a whole."
+}

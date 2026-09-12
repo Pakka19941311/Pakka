@@ -31,6 +31,10 @@ func sample_gait(speed: float, dt: float) -> void:
 	var maximum: float = float(profile.get("maximum_gait_rate", 1.65))
 	playback_rate = minf(requested, maximum)
 	actor.set_meta("p2_gait_contract_violation", requested > maximum + .001)
+	var diagnostic: Dictionary = {"kind":"gait","mob_id":profile.get("mob_id",""),"clip":gait_clip,"rendered_speed":speed,"source_stride_speed":native_speed,"requested_rate":requested,"maximum_rate":maximum,"applied_rate":playback_rate,"maximum_supported_speed":native_speed*maximum}
+	actor.set_meta("p2_gait_contract",diagnostic)
+	if requested > maximum + .001:
+		actor.set_meta("p2_last_gait_violation",diagnostic.duplicate(true))
 	# Stopping is immediate; phase is driven by drawn movement. If the incoming
 	# speed exceeds this asset's stride capacity, flag it instead of frantic legs.
 	gait_phase = fposmod(gait_phase + playback_rate * dt / clip_length(gait_clip), 1.0)
@@ -47,6 +51,10 @@ func sample_attack(now: float, dt: float) -> void:
 	var maximum: float = float(profile.get("maximum_attack_rate", 1.5))
 	var clipped: bool = maxf(before_rate, after_rate) > maximum + .001
 	actor.set_meta("p2_attack_contract_violation", clipped)
+	var diagnostic: Dictionary = {"kind":"attack","mob_id":profile.get("mob_id",""),"clip":clip,"source_length":length,"contact_fraction":contact,"windup_seconds":windup,"recovery_seconds":recovery,"windup_rate":before_rate,"recovery_rate":after_rate,"maximum_rate":maximum,"started_at":attack_started_at,"impact_at":attack_impact_at,"ends_at":attack_ends_at}
+	actor.set_meta("p2_attack_contract",diagnostic)
+	if clipped:
+		actor.set_meta("p2_last_attack_violation",diagnostic.duplicate(true))
 	# Even an incompatible incoming clock cannot create damage or accelerate
 	# beyond the cap. Trim presentation endpoints while retaining exact contact.
 	var first_phase: float = maxf(0.0, contact - windup * maximum / length)

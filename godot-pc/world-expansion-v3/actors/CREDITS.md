@@ -35,3 +35,7 @@ Changes: applied source Mirror modifier; converted original diffuse material; re
 
 ## Additional P2 changes to Wolf, Rat and Shell Bug
 Wolf attack is now the documented frame 18–43 window from source ATK2 at the imported 24 fps, not the long ATK1 of the earlier intake preview. This retains the source bite poses without speeding the entire 2.667-second attack up threefold. All five P2 actors have 60 Hz baked upward floor corrections and per-clip millimetre clearance guards where needed. Bone display helper geometry was excluded from normalization. Existing source authors and licenses above remain applicable. These are visual candidates, not endorsed or final production art.
+
+## Canonical MOB-05 — Roach (2026-09-12)
+
+The previous Shell Bug is retained as a rejected art prototype. Canonical MOB-05 now uses `alternatives/roach/V3RoachCandidate.glb`, original model by Atmostatic, rig/animation/textures by Danimal. Source: https://opengameart.org/content/roach-game-ready-and-animated. License: CC BY-SA 3.0. Full attribution, exact changes and full legal text are in [alternatives/roach/CREDITS.md](alternatives/roach/CREDITS.md). Releases include the adapted GLB and texture art, credits and license as separate accessible files outside the PCK according to `docs/world-expansion-v3/P2_STANDALONE_ART_PACKS.json`. This artwork requirement does not relicense independent game code.

@@ -1,0 +1,2979 @@
+{
+  "id": "MOB-05-roach",
+  "status": "temporary_P2_development_basis",
+  "source_receipt": {
+    "url": "https://opengameart.org/sites/default/files/Roach.zip",
+    "final_url": "https://opengameart.org/sites/default/files/Roach.zip",
+    "http_status": 200,
+    "bytes": 5065421,
+    "sha256": "038d01360b353a4d4ebaf1e67293f8554e67ebdb06f34627cbc9538489487594",
+    "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-roach\\Roach.zip",
+    "content_type": "application/zip"
+  },
+  "archive_members": [
+    {
+      "path": "Roach.blend",
+      "bytes": 8352632,
+      "compressed_bytes": 5065265
+    }
+  ],
+  "author": "Danimal; original model Atmostatic",
+  "license": "CC-BY-SA-3.0",
+  "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+  "artifact": {
+    "path": "godot-pc/world-expansion-v3/actors/alternatives/roach/V3RoachCandidate.glb",
+    "sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
+    "bytes": 4328048
+  },
+  "adaptation": {
+    "mob_id": "MOB-05",
+    "model": "V3RoachCandidate",
+    "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka\\godot-pc\\world-expansion-v3\\actors\\alternatives\\roach\\V3RoachCandidate.glb",
+    "sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
+    "bytes": 4328048,
+    "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-roach\\prepared.glb",
+    "source_sha256": "a678735b07a04488e9cd01f3b2daecd570811e9b3196cf317dc7f5850b62a937",
+    "author": "Danimal; original model Atmostatic",
+    "license": "CC-BY-SA-3.0",
+    "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+    "target_height": 0.45,
+    "source_normalization_factor": 1.042418347950461,
+    "axis": "GLB +Y up / -Z forward; native adapter rotates visual PI to match actor yaw=-serverYaw+PI",
+    "idle_bounds_blender": {
+      "min": [
+        -0.23175080120563507,
+        -0.400026798248291,
+        -5.960464477539063e-08
+      ],
+      "max": [
+        0.23175062239170074,
+        0.236362487077713,
+        0.44999998807907104
+      ]
+    },
+    "clips": [
+      {
+        "clip": "idle",
+        "source_action": "ArmatureAction.002_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          100.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          10.0,
+          50.0
+        ],
+        "duration_factor": 0.6,
+        "kind": "source_nla_cycle_window",
+        "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee."
+      },
+      {
+        "clip": "run",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          10.0,
+          50.0
+        ],
+        "duration_factor": 0.35,
+        "kind": "source_nla_cycle_window",
+        "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee."
+      },
+      {
+        "clip": "attack",
+        "source_action": "ArmatureAction.001_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          29.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "ArmatureAction.009_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          44.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "hit",
+        "kind": "authored_local_rig_action",
+        "description": "local spine/head recoil",
+        "frames": [
+          0,
+          8
+        ],
+        "fps": 24
+      }
+    ],
+    "texture_sizes": [
+      {
+        "name": "Roach",
+        "original": [
+          1024,
+          1024
+        ],
+        "exported": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "RoachNormal.png",
+        "original": [
+          1024,
+          1024
+        ],
+        "exported": [
+          1024,
+          1024
+        ]
+      }
+    ],
+    "ground_corrections": [
+      {
+        "clip": "idle",
+        "max_upward_source_units": 0.00029474496841430664,
+        "frames_checked": 251
+      },
+      {
+        "clip": "walk",
+        "max_upward_source_units": 0.0021893084049224854,
+        "frames_checked": 61
+      },
+      {
+        "clip": "run",
+        "max_upward_source_units": 0.0021889209747314453,
+        "frames_checked": 36
+      },
+      {
+        "clip": "attack",
+        "max_upward_source_units": 0.0017164051532745361,
+        "frames_checked": 74
+      },
+      {
+        "clip": "death",
+        "max_upward_source_units": 0.07372605800628662,
+        "frames_checked": 111
+      },
+      {
+        "clip": "hit",
+        "max_upward_source_units": 0.0,
+        "frames_checked": 21
+      }
+    ],
+    "dense_floor_samples": [
+      {
+        "clip": "idle",
+        "phase": 0.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.016666666666666666,
+        "floor": 5.364418029785156e-07,
+        "height": 0.4471185803413391,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.03333333333333333,
+        "floor": 1.9073486328125e-06,
+        "height": 0.4394257068634033,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.05,
+        "floor": -5.0961971282958984e-06,
+        "height": 0.4284011125564575,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.06666666666666667,
+        "floor": 1.043081283569336e-06,
+        "height": 0.4173855483531952,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.08333333333333333,
+        "floor": 1.7881393432617188e-07,
+        "height": 0.40971148014068604,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.1,
+        "floor": 0.0,
+        "height": 0.4068380296230316,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.11666666666666667,
+        "floor": -2.1457672119140625e-06,
+        "height": 0.4053952693939209,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.13333333333333333,
+        "floor": -1.4662742614746094e-05,
+        "height": 0.4015577435493469,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.15,
+        "floor": 6.73532485961914e-05,
+        "height": 0.39899301528930664,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.16666666666666666,
+        "floor": -9.387731552124023e-06,
+        "height": 0.40283262729644775,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.18333333333333332,
+        "floor": -1.0132789611816406e-06,
+        "height": 0.40996652841567993,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.2,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.21666666666666667,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.23333333333333334,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.25,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.26666666666666666,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.2833333333333333,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.3,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.31666666666666665,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.3333333333333333,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.35,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.36666666666666664,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.38333333333333336,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.4,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.4166666666666667,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.43333333333333335,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.45,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.4666666666666667,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.48333333333333334,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5166666666666667,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5333333333333333,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.55,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4132552742958069,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4129713773727417,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5833333333333334,
+        "floor": -3.8743019104003906e-07,
+        "height": 0.41082674264907837,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.40640753507614136,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6166666666666667,
+        "floor": -2.2351741790771484e-06,
+        "height": 0.40238362550735474,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6333333333333333,
+        "floor": -5.8710575103759766e-06,
+        "height": 0.3999650776386261,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.65,
+        "floor": 2.8073787689208984e-05,
+        "height": 0.39819541573524475,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6666666666666666,
+        "floor": -5.662441253662109e-06,
+        "height": 0.4015527367591858,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6833333333333333,
+        "floor": -1.6689300537109375e-06,
+        "height": 0.4042607247829437,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.4060775637626648,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7166666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4067752957344055,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7333333333333333,
+        "floor": 1.1920928955078125e-07,
+        "height": 0.4078858196735382,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.75,
+        "floor": -8.046627044677734e-07,
+        "height": 0.41144347190856934,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7666666666666667,
+        "floor": 1.1920928955078125e-07,
+        "height": 0.4161718189716339,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7833333333333333,
+        "floor": 9.715557098388672e-06,
+        "height": 0.41982048749923706,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8,
+        "floor": 2.6345252990722656e-05,
+        "height": 0.42255300283432007,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8166666666666667,
+        "floor": 4.3898820877075195e-05,
+        "height": 0.42497050762176514,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8333333333333334,
+        "floor": 5.1975250244140625e-05,
+        "height": 0.4275270998477936,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.85,
+        "floor": 4.711747169494629e-05,
+        "height": 0.4304608106613159,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8666666666666667,
+        "floor": 4.07099723815918e-05,
+        "height": 0.4338676929473877,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8833333333333333,
+        "floor": 3.260374069213867e-05,
+        "height": 0.4374326169490814,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9,
+        "floor": 2.4080276489257812e-05,
+        "height": 0.44074928760528564,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9166666666666666,
+        "floor": 1.77919864654541e-05,
+        "height": 0.44341155886650085,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9333333333333333,
+        "floor": 1.195073127746582e-05,
+        "height": 0.44562625885009766,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.95,
+        "floor": 6.5267086029052734e-06,
+        "height": 0.44757723808288574,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9666666666666667,
+        "floor": 2.8312206268310547e-06,
+        "height": 0.44898104667663574,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9833333333333333,
+        "floor": 5.960464477539062e-07,
+        "height": 0.44976192712783813,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 1.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.0,
+        "floor": 0.0,
+        "height": 0.44521594047546387,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.016666666666666666,
+        "floor": 0.0,
+        "height": 0.4446568787097931,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.03333333333333333,
+        "floor": 0.0,
+        "height": 0.4440188407897949,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.05,
+        "floor": 0.0,
+        "height": 0.4432820677757263,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.06666666666666667,
+        "floor": 0.0,
+        "height": 0.4425261318683624,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.08333333333333333,
+        "floor": 0.0,
+        "height": 0.44169870018959045,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.1,
+        "floor": 0.0,
+        "height": 0.44081151485443115,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.11666666666666667,
+        "floor": 8.940696716308594e-08,
+        "height": 0.4399833679199219,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.13333333333333333,
+        "floor": 0.0,
+        "height": 0.43915116786956787,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.15,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.438341349363327,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.16666666666666666,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.43767866492271423,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.18333333333333332,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.43707984685897827,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.2,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.4365602433681488,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.21666666666666667,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.43622124195098877,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.23333333333333334,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.43596500158309937,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.25,
+        "floor": 0.0,
+        "height": 0.4357961118221283,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.26666666666666666,
+        "floor": 0.0,
+        "height": 0.43605679273605347,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.2833333333333333,
+        "floor": 0.0,
+        "height": 0.43650898337364197,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.3,
+        "floor": 0.0,
+        "height": 0.43709880113601685,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.31666666666666665,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4378014802932739,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.3333333333333333,
+        "floor": 0.00010317564010620117,
+        "height": 0.43700137734413147,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.35,
+        "floor": 8.255243301391602e-06,
+        "height": 0.4383182227611542,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.36666666666666664,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4400738477706909,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.38333333333333336,
+        "floor": 0.0,
+        "height": 0.4418594241142273,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.4,
+        "floor": 0.0,
+        "height": 0.44362032413482666,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.4166666666666667,
+        "floor": 0.0,
+        "height": 0.4455011785030365,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.43333333333333335,
+        "floor": 0.0,
+        "height": 0.44722193479537964,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.45,
+        "floor": 0.0,
+        "height": 0.44879525899887085,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.4666666666666667,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4499812722206116,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.48333333333333334,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.45088285207748413,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5,
+        "floor": 0.0,
+        "height": 0.45154041051864624,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5166666666666667,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.4532988667488098,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5333333333333333,
+        "floor": 0.0,
+        "height": 0.4546920359134674,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.55,
+        "floor": 0.0,
+        "height": 0.4556516706943512,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5666666666666667,
+        "floor": 0.0,
+        "height": 0.45677393674850464,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5833333333333334,
+        "floor": 0.0,
+        "height": 0.45778828859329224,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6,
+        "floor": 0.0,
+        "height": 0.4586588740348816,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6166666666666667,
+        "floor": 0.0,
+        "height": 0.4596344828605652,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6333333333333333,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4604109525680542,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.65,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.4610409736633301,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6666666666666666,
+        "floor": 0.0,
+        "height": 0.46163544058799744,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6833333333333333,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.46204590797424316,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7,
+        "floor": 0.0,
+        "height": 0.4623520076274872,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7166666666666667,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.4625195860862732,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7333333333333333,
+        "floor": 0.0,
+        "height": 0.4625784754753113,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.75,
+        "floor": 0.0,
+        "height": 0.4625622630119324,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7666666666666667,
+        "floor": 0.0,
+        "height": 0.46236610412597656,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7833333333333333,
+        "floor": 0.0,
+        "height": 0.46191805601119995,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8,
+        "floor": 0.0,
+        "height": 0.46109357476234436,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8166666666666667,
+        "floor": 0.0,
+        "height": 0.45987820625305176,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8333333333333334,
+        "floor": 0.0,
+        "height": 0.45839953422546387,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.85,
+        "floor": 0.0,
+        "height": 0.4563586711883545,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8666666666666667,
+        "floor": 0.0,
+        "height": 0.45415443181991577,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8833333333333333,
+        "floor": 2.9802322387695312e-08,
+        "height": 0.45266595482826233,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9,
+        "floor": -5.960464477539063e-08,
+        "height": 0.45049771666526794,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9166666666666666,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.4495660364627838,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9333333333333333,
+        "floor": 0.0,
+        "height": 0.4480926990509033,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.95,
+        "floor": 0.0,
+        "height": 0.4466416835784912,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9666666666666667,
+        "floor": 0.0,
+        "height": 0.4460693597793579,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9833333333333333,
+        "floor": 0.0,
+        "height": 0.4454828202724457,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 1.0,
+        "floor": 0.0,
+        "height": 0.44521594047546387,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.0,
+        "floor": 0.0,
+        "height": 0.44521594047546387,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.016666666666666666,
+        "floor": -1.7523765563964844e-05,
+        "height": 0.4446393549442291,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.03333333333333333,
+        "floor": -1.3142824172973633e-05,
+        "height": 0.44400569796562195,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.05,
+        "floor": 3.1322240829467773e-05,
+        "height": 0.4433133900165558,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.06666666666666667,
+        "floor": -2.86102294921875e-06,
+        "height": 0.4425232708454132,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.08333333333333333,
+        "floor": 3.0100345611572266e-06,
+        "height": 0.4417017102241516,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.1,
+        "floor": 3.248453140258789e-05,
+        "height": 0.44084399938583374,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.11666666666666667,
+        "floor": 1.3113021850585938e-06,
+        "height": 0.43998461961746216,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.13333333333333333,
+        "floor": 2.175569534301758e-06,
+        "height": 0.43915340304374695,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.15,
+        "floor": 1.2814998626708984e-05,
+        "height": 0.43835413455963135,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.16666666666666666,
+        "floor": -3.0100345611572266e-06,
+        "height": 0.4376756250858307,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.18333333333333332,
+        "floor": -2.115964889526367e-06,
+        "height": 0.43707776069641113,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.2,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.4365602433681488,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.21666666666666667,
+        "floor": -2.0265579223632812e-06,
+        "height": 0.4362192749977112,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.23333333333333334,
+        "floor": -3.2782554626464844e-07,
+        "height": 0.4359646737575531,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.25,
+        "floor": -6.556510925292969e-07,
+        "height": 0.43579545617103577,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.26666666666666666,
+        "floor": 4.023313522338867e-06,
+        "height": 0.4360608160495758,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.2833333333333333,
+        "floor": -6.556510925292969e-07,
+        "height": 0.4365083575248718,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.3,
+        "floor": -9.930133819580078e-05,
+        "height": 0.43699949979782104,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.31666666666666665,
+        "floor": -0.00011473894119262695,
+        "height": 0.4376867413520813,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.3333333333333333,
+        "floor": 0.0007722079753875732,
+        "height": 0.43767037987709045,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.35,
+        "floor": 6.330013275146484e-05,
+        "height": 0.43837323784828186,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.36666666666666664,
+        "floor": -1.7374753952026367e-05,
+        "height": 0.44005656242370605,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.38333333333333336,
+        "floor": -5.143880844116211e-05,
+        "height": 0.44180792570114136,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.4,
+        "floor": 0.0,
+        "height": 0.44362032413482666,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.4166666666666667,
+        "floor": -5.605816841125488e-05,
+        "height": 0.44544512033462524,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.43333333333333335,
+        "floor": -5.194544792175293e-05,
+        "height": 0.4471700191497803,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.45,
+        "floor": -4.5180320739746094e-05,
+        "height": 0.4487500786781311,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.4666666666666667,
+        "floor": -4.094839096069336e-05,
+        "height": 0.4499402642250061,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.48333333333333334,
+        "floor": -9.179115295410156e-06,
+        "height": 0.45087361335754395,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5,
+        "floor": 0.0005330443382263184,
+        "height": 0.45207345485687256,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5166666666666667,
+        "floor": -5.602836608886719e-05,
+        "height": 0.45324280858039856,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5333333333333333,
+        "floor": -0.00015920400619506836,
+        "height": 0.45453280210494995,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.55,
+        "floor": 6.371736526489258e-05,
+        "height": 0.4557153880596161,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5666666666666667,
+        "floor": -3.960728645324707e-05,
+        "height": 0.45673438906669617,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5833333333333334,
+        "floor": -7.668137550354004e-05,
+        "height": 0.4577115774154663,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6,
+        "floor": 0.0,
+        "height": 0.4586588740348816,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6166666666666667,
+        "floor": -7.855892181396484e-05,
+        "height": 0.4595559537410736,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6333333333333333,
+        "floor": -3.8504600524902344e-05,
+        "height": 0.4603723883628845,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.65,
+        "floor": 4.890561103820801e-05,
+        "height": 0.4610899090766907,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6666666666666666,
+        "floor": -1.4066696166992188e-05,
+        "height": 0.46162134408950806,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6833333333333333,
+        "floor": 3.6954879760742188e-06,
+        "height": 0.46204960346221924,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7,
+        "floor": 2.09808349609375e-05,
+        "height": 0.46237295866012573,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7166666666666667,
+        "floor": -6.556510925292969e-07,
+        "height": 0.4625188708305359,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7333333333333333,
+        "floor": 1.7285346984863281e-06,
+        "height": 0.46258020401000977,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.75,
+        "floor": -4.589557647705078e-06,
+        "height": 0.46255767345428467,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7666666666666667,
+        "floor": -3.337860107421875e-06,
+        "height": 0.46236276626586914,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7833333333333333,
+        "floor": -4.902482032775879e-05,
+        "height": 0.4618690609931946,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8,
+        "floor": 0.0,
+        "height": 0.46109357476234436,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8166666666666667,
+        "floor": -6.112456321716309e-05,
+        "height": 0.4598170816898346,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8333333333333334,
+        "floor": -0.0002084672451019287,
+        "height": 0.45819106698036194,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.85,
+        "floor": -0.00035944581031799316,
+        "height": 0.4559992551803589,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8666666666666667,
+        "floor": -1.0699033737182617e-05,
+        "height": 0.4541437029838562,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8833333333333333,
+        "floor": 4.70280647277832e-05,
+        "height": 0.4527129530906677,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9,
+        "floor": 0.0005750358104705811,
+        "height": 0.4510728120803833,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9166666666666666,
+        "floor": 2.0325183868408203e-05,
+        "height": 0.449586421251297,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9333333333333333,
+        "floor": 4.106760025024414e-05,
+        "height": 0.44813382625579834,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.95,
+        "floor": 0.00021144747734069824,
+        "height": 0.4468531310558319,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9666666666666667,
+        "floor": -3.5136938095092773e-05,
+        "height": 0.4460342526435852,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9833333333333333,
+        "floor": 7.867813110351562e-06,
+        "height": 0.44549068808555603,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 1.0,
+        "floor": 0.0,
+        "height": 0.44521594047546387,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.016666666666666666,
+        "floor": -1.4901161193847656e-07,
+        "height": 0.4498421549797058,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.03333333333333333,
+        "floor": 5.7220458984375e-06,
+        "height": 0.44968825578689575,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.05,
+        "floor": -1.5795230865478516e-06,
+        "height": 0.44922900199890137,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.06666666666666667,
+        "floor": -7.748603820800781e-07,
+        "height": 0.4487420916557312,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.08333333333333333,
+        "floor": -1.519918441772461e-06,
+        "height": 0.44800788164138794,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.1,
+        "floor": 1.570582389831543e-05,
+        "height": 0.44721245765686035,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.11666666666666667,
+        "floor": -8.672475814819336e-06,
+        "height": 0.44619685411453247,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.13333333333333333,
+        "floor": -6.735324859619141e-06,
+        "height": 0.4450919032096863,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.15,
+        "floor": -2.3245811462402344e-06,
+        "height": 0.44388771057128906,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.16666666666666666,
+        "floor": 1.4781951904296875e-05,
+        "height": 0.44257014989852905,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.18333333333333332,
+        "floor": -1.385807991027832e-05,
+        "height": 0.44198745489120483,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.2,
+        "floor": -1.3828277587890625e-05,
+        "height": 0.44314321875572205,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.21666666666666667,
+        "floor": -8.344650268554688e-06,
+        "height": 0.44440728425979614,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.23333333333333334,
+        "floor": 2.3543834686279297e-06,
+        "height": 0.4456560015678406,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.25,
+        "floor": -8.58306884765625e-06,
+        "height": 0.44689661264419556,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.26666666666666666,
+        "floor": -1.1026859283447266e-05,
+        "height": 0.4481176435947418,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.2833333333333333,
+        "floor": -7.152557373046875e-06,
+        "height": 0.45044827461242676,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.3,
+        "floor": -2.9206275939941406e-06,
+        "height": 0.45448780059814453,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.31666666666666665,
+        "floor": -2.0265579223632812e-06,
+        "height": 0.47614583373069763,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.3333333333333333,
+        "floor": -4.26173210144043e-06,
+        "height": 0.4957013726234436,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.35,
+        "floor": -2.5331974029541016e-06,
+        "height": 0.5125539302825928,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.36666666666666664,
+        "floor": -1.7285346984863281e-06,
+        "height": 0.5270547270774841,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.38333333333333336,
+        "floor": 2.384185791015625e-07,
+        "height": 0.5406246185302734,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.4,
+        "floor": -5.364418029785156e-07,
+        "height": 0.5504786968231201,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.4166666666666667,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.5580279231071472,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.43333333333333335,
+        "floor": -8.940696716308594e-08,
+        "height": 0.5613172054290771,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.45,
+        "floor": 1.0132789611816406e-06,
+        "height": 0.5581408739089966,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.4666666666666667,
+        "floor": -1.7881393432617188e-07,
+        "height": 0.5380104780197144,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.48333333333333334,
+        "floor": -5.781650543212891e-06,
+        "height": 0.513523519039154,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5,
+        "floor": -7.271766662597656e-06,
+        "height": 0.4789225459098816,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5166666666666667,
+        "floor": 2.7686357498168945e-05,
+        "height": 0.45780301094055176,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5333333333333333,
+        "floor": -4.947185516357422e-06,
+        "height": 0.4524151682853699,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.55,
+        "floor": -1.7523765563964844e-05,
+        "height": 0.4479452669620514,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5666666666666667,
+        "floor": -3.266334533691406e-05,
+        "height": 0.4457336664199829,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5833333333333334,
+        "floor": 0.000125885009765625,
+        "height": 0.44339078664779663,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6,
+        "floor": -2.828240394592285e-05,
+        "height": 0.44228434562683105,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6166666666666667,
+        "floor": -2.592802047729492e-06,
+        "height": 0.4450812339782715,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6333333333333333,
+        "floor": -2.759695053100586e-05,
+        "height": 0.4481602609157562,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.65,
+        "floor": 0.00010576844215393066,
+        "height": 0.45098668336868286,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6666666666666666,
+        "floor": -2.1278858184814453e-05,
+        "height": 0.45329567790031433,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6833333333333333,
+        "floor": -9.715557098388672e-06,
+        "height": 0.45547807216644287,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7,
+        "floor": -3.2782554626464844e-06,
+        "height": 0.45700499415397644,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7166666666666667,
+        "floor": 0.0002657175064086914,
+        "height": 0.4586406946182251,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7333333333333333,
+        "floor": 6.258487701416016e-07,
+        "height": 0.4597483277320862,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.75,
+        "floor": 6.556510925292969e-07,
+        "height": 0.4601503014564514,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7666666666666667,
+        "floor": -1.4007091522216797e-06,
+        "height": 0.4600434899330139,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7833333333333333,
+        "floor": 4.100799560546875e-05,
+        "height": 0.4597347378730774,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8,
+        "floor": -5.748867988586426e-05,
+        "height": 0.45928406715393066,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8166666666666667,
+        "floor": -5.7637691497802734e-05,
+        "height": 0.4583424925804138,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8333333333333334,
+        "floor": -6.911158561706543e-05,
+        "height": 0.45777732133865356,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.85,
+        "floor": 4.3511390686035156e-05,
+        "height": 0.4564861059188843,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8666666666666667,
+        "floor": -0.00011876225471496582,
+        "height": 0.45540645718574524,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8833333333333333,
+        "floor": 3.167986869812012e-05,
+        "height": 0.45426368713378906,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9,
+        "floor": -2.110004425048828e-05,
+        "height": 0.4532085955142975,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9166666666666666,
+        "floor": -7.599592208862305e-06,
+        "height": 0.45226168632507324,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9333333333333333,
+        "floor": -5.155801773071289e-06,
+        "height": 0.45142862200737,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.95,
+        "floor": -1.0102987289428711e-05,
+        "height": 0.4508042335510254,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9666666666666667,
+        "floor": -1.2814998626708984e-06,
+        "height": 0.4503370225429535,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9833333333333333,
+        "floor": -8.940696716308594e-07,
+        "height": 0.450128972530365,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 1.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.016666666666666666,
+        "floor": -1.1920928955078125e-07,
+        "height": 0.4497165381908417,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.03333333333333333,
+        "floor": -8.940696716308594e-08,
+        "height": 0.44907087087631226,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.05,
+        "floor": -2.384185791015625e-07,
+        "height": 0.44806623458862305,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.06666666666666667,
+        "floor": 1.5497207641601562e-06,
+        "height": 0.44665879011154175,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.08333333333333333,
+        "floor": -3.2782554626464844e-07,
+        "height": 0.4447941184043884,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.1,
+        "floor": 0.0,
+        "height": 0.44266626238822937,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.11666666666666667,
+        "floor": 1.4603137969970703e-06,
+        "height": 0.44030651450157166,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.13333333333333333,
+        "floor": -1.0728836059570312e-06,
+        "height": 0.4377361536026001,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.15,
+        "floor": -1.519918441772461e-06,
+        "height": 0.43511611223220825,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.16666666666666666,
+        "floor": -1.6093254089355469e-06,
+        "height": 0.4325363039970398,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.18333333333333332,
+        "floor": -1.043081283569336e-06,
+        "height": 0.43004682660102844,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.2,
+        "floor": 0.0,
+        "height": 0.4278474450111389,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.21666666666666667,
+        "floor": -9.5367431640625e-07,
+        "height": 0.42597007751464844,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.23333333333333334,
+        "floor": -1.5795230865478516e-06,
+        "height": 0.4244052767753601,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.25,
+        "floor": 7.3015689849853516e-06,
+        "height": 0.4231887459754944,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.26666666666666666,
+        "floor": -1.430511474609375e-06,
+        "height": 0.422560453414917,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.2833333333333333,
+        "floor": -7.152557373046875e-07,
+        "height": 0.4223080575466156,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.3,
+        "floor": 0.0,
+        "height": 0.42239582538604736,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.31666666666666665,
+        "floor": -6.854534149169922e-07,
+        "height": 0.42282772064208984,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.3333333333333333,
+        "floor": -1.1622905731201172e-06,
+        "height": 0.4236050248146057,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.35,
+        "floor": -1.341104507446289e-06,
+        "height": 0.4246109127998352,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.36666666666666664,
+        "floor": -1.1324882507324219e-06,
+        "height": 0.42584002017974854,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.38333333333333336,
+        "floor": 1.7285346984863281e-06,
+        "height": 0.42735555768013,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.4,
+        "floor": 0.0,
+        "height": 0.4291188716888428,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.4166666666666667,
+        "floor": -8.046627044677734e-07,
+        "height": 0.43103694915771484,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.43333333333333335,
+        "floor": 2.8908252716064453e-06,
+        "height": 0.43358564376831055,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.45,
+        "floor": -1.2218952178955078e-06,
+        "height": 0.4363439679145813,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.4666666666666667,
+        "floor": -9.5367431640625e-07,
+        "height": 0.4391074776649475,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.48333333333333334,
+        "floor": -4.470348358154297e-07,
+        "height": 0.44182127714157104,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5,
+        "floor": 0.0,
+        "height": 0.44445133209228516,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5166666666666667,
+        "floor": -3.8743019104003906e-07,
+        "height": 0.4468400478363037,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5333333333333333,
+        "floor": -5.066394805908203e-07,
+        "height": 0.44900578260421753,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.55,
+        "floor": -3.5762786865234375e-07,
+        "height": 0.4509316682815552,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5666666666666667,
+        "floor": 2.682209014892578e-07,
+        "height": 0.4525578022003174,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5833333333333334,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4537704586982727,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6,
+        "floor": -5.960464477539063e-08,
+        "height": 0.45468389987945557,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6166666666666667,
+        "floor": -8.940696716308594e-08,
+        "height": 0.45529770851135254,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6333333333333333,
+        "floor": 0.0,
+        "height": 0.455528199672699,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.65,
+        "floor": -2.682209014892578e-07,
+        "height": 0.45263662934303284,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6666666666666666,
+        "floor": -1.7285346984863281e-06,
+        "height": 0.4458003640174866,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6833333333333333,
+        "floor": -1.9669532775878906e-06,
+        "height": 0.43443819880485535,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7,
+        "floor": -5.960464477539063e-08,
+        "height": 0.41701972484588623,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7166666666666667,
+        "floor": 3.904104232788086e-06,
+        "height": 0.3956984579563141,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7333333333333333,
+        "floor": -4.172325134277344e-07,
+        "height": 0.3718681335449219,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.75,
+        "floor": 0.0006598532199859619,
+        "height": 0.3502664268016815,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7666666666666667,
+        "floor": -1.481175422668457e-05,
+        "height": 0.3414210081100464,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7833333333333333,
+        "floor": -7.510185241699219e-06,
+        "height": 0.3329431116580963,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8,
+        "floor": 0.0,
+        "height": 0.32443854212760925,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8166666666666667,
+        "floor": -4.649162292480469e-06,
+        "height": 0.3165318965911865,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8333333333333334,
+        "floor": 0.0004305541515350342,
+        "height": 0.31186288595199585,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.85,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.3115052580833435,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8666666666666667,
+        "floor": -2.9802322387695312e-08,
+        "height": 0.31153541803359985,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8833333333333333,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9166666666666666,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9333333333333333,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.95,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9666666666666667,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9833333333333333,
+        "floor": 0.0,
+        "height": 0.31153538823127747,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 1.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.3115353286266327,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.016666666666666666,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4497056305408478,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.03333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44940686225891113,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.05,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4491037130355835,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.06666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44879627227783203,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.08333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44848448038101196,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.1,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44816839694976807,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.11666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44784802198410034,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.13333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4475482106208801,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.15,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44726988673210144,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.16666666666666666,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44698846340179443,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.18333333333333332,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4467039704322815,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.2,
+        "floor": -5.960464477539063e-08,
+        "height": 0.446416437625885,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.21666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.446125864982605,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.23333333333333334,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4458322525024414,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.25,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4455356299877167,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.26666666666666666,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4453357458114624,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.2833333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4451345205307007,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.3,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44493192434310913,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.31666666666666665,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4447280168533325,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.3333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4445227384567261,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.35,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4443161189556122,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.36666666666666664,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44410818815231323,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.38333333333333336,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44396695494651794,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.4,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44389328360557556,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.4166666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44381949305534363,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.43333333333333335,
+        "floor": -5.960464477539063e-08,
+        "height": 0.443745493888855,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.45,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44367140531539917,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.4666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44359707832336426,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.48333333333333334,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4435226023197174,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4434479773044586,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5166666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4435226023197174,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44359707832336426,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.55,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44367140531539917,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.443745493888855,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5833333333333334,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44381949305534363,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44389328360557556,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6166666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44396695494651794,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44410818815231323,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.65,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4443161189556122,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6666666666666666,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4445227384567261,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6833333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44472798705101013,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44493192434310913,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7166666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4451345205307007,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4453357458114624,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.75,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4455356299877167,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4458322525024414,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7833333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.446125864982605,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8,
+        "floor": -5.960464477539063e-08,
+        "height": 0.446416437625885,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8166666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4467039704322815,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8333333333333334,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44698846340179443,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.85,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44726988673210144,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4475482106208801,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8833333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44784802198410034,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44816839694976807,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9166666666666666,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44848448038101196,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9333333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44879627227783203,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.95,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4491037130355835,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9666666666666667,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44940686225891113,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9833333333333333,
+        "floor": -5.960464477539063e-08,
+        "height": 0.4497056305408478,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 1.0,
+        "floor": -5.960464477539063e-08,
+        "height": 0.44999998807907104,
+        "finite": true
+      }
+    ],
+    "gait_measurements": {
+      "walk": {
+        "measured_stance_speed_mps": 0.5778764560818672,
+        "stance_segments": 126,
+        "method": "median backward displacement of selected low-quarter support bone heads; visual calibration still required"
+      },
+      "run": {
+        "measured_stance_speed_mps": 0.9906468859740666,
+        "stance_segments": 126,
+        "method": "median backward displacement of selected low-quarter support bone heads; visual calibration still required"
+      }
+    },
+    "clip_lengths_seconds": {
+      "idle": 4.166666666666667,
+      "walk": 1.0,
+      "run": 0.5833333333333334,
+      "attack": 1.2166666666666666,
+      "death": 1.8333333333333333,
+      "hit": 0.3333333333333333
+    },
+    "status": "P2 visual candidate; no gameplay art acceptance",
+    "residual_clearance_guards_meters": {}
+  },
+  "profile": {
+    "mob_id": "MOB-05",
+    "model": "V3RoachCandidate",
+    "title": "Панцирное существо · Roach",
+    "asset_path": "res://world-expansion-v3/actors/alternatives/roach/V3RoachCandidate.glb",
+    "height": 0.45,
+    "native_bounds": {
+      "name": "V3RoachCandidate",
+      "targetHeight": 0.45,
+      "sourceHeight": 0.45,
+      "sourceFloor": 0.0,
+      "sourceWidth": 0.4635014235973358,
+      "sourceDepth": 0.636389285326004
+    },
+    "pick_size": [
+      0.75,
+      0.45,
+      0.75
+    ],
+    "body_radius_proposed": 0.3,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.2475,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.42,
+    "qa_attack_duration_ms": 1400,
+    "qa_server_contact_fraction": 0.5,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 0.605793,
+      "run": 1.038502
+    },
+    "gait_provenance": {
+      "walk": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints.",
+      "run": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints."
+    },
+    "status": "temporary_P2_development_basis; final_art_gates_open",
+    "clip_provenance": [
+      {
+        "clip": "idle",
+        "source_action": "ArmatureAction.002_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          100.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          10.0,
+          50.0
+        ],
+        "duration_factor": 0.6,
+        "kind": "source_nla_cycle_window",
+        "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee."
+      },
+      {
+        "clip": "run",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          10.0,
+          50.0
+        ],
+        "duration_factor": 0.35,
+        "kind": "source_nla_cycle_window",
+        "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee."
+      },
+      {
+        "clip": "attack",
+        "source_action": "ArmatureAction.001_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          29.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "ArmatureAction.009_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          44.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "hit",
+        "kind": "authored_local_rig_action",
+        "description": "local spine/head recoil",
+        "frames": [
+          0,
+          8
+        ],
+        "fps": 24
+      }
+    ],
+    "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+    "license": "CC-BY-SA-3.0",
+    "author": "Danimal; original model Atmostatic",
+    "sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
+    "ground_min_dense": -0.00035944581031799316,
+    "floor_clearance_guards": {},
+    "proposed_p2_movement_speed": 1.6,
+    "maximum_supported_speed": 1.7135283,
+    "visual_acceptance_note": "Accepted by project integration review as the MOB-05 basis at1.6m/s; this is not final art or acceptance of all live gameplay.",
+    "open_art_gates": {
+      "six_animated_supporting_legs": "OPEN: source currently has4legs; add rigged moving middle pair or replace basis after boar work. Source54bones alone does not meet six-leg requirement.",
+      "mandibles_organic_chitin": "OPEN: verify visible mandibles and organic chitin after geometry adaptation; source jaw/texture existence does not equal final art acceptance.",
+      "live_pursuit": "OPEN: native centered velocity sampling is not live server pursuit on terrain."
+    }
+  },
+  "visual_limitations_ru": [
+    "Четыре лапы, хвост и шипы: фэнтезийное панцирное существо, а не натуральный шестилапый жук.",
+    "Исходные лапы имеют неодинаковые локальные скорости опоры. Медианная оценка не доказывает полного отсутствия скольжения.",
+    "Прежние3.4м/с не поддерживаются. Для P2 согласовано предложение1.6м/с; сервер изменяет интегратор.",
+    "Основа MOB-05 принята; окончательное качество и живой сетевой pursuit ещё требуют проверки интегратором."
+  ],
+  "separate_art_release_required": true,
+  "game_code_relicensed": false,
+  "native_qa": {
+    "path": "docs/world-expansion-v3/roach-p2-evidence/teardown-check/ROACH_NATIVE_QA.json",
+    "sha256": "4bf5bf74f3faee63df52a54cc470baf1e92b6127831fcb39a9685d60c2978109",
+    "checks": 35,
+    "native_render": true,
+    "gameplay_server_connected": false,
+    "root_translation_tested": false,
+    "movement_scope": "controller receives1.6m/s velocity; actor stays centered for close inspection",
+    "gait_contract": {
+      "applied_rate": 1.54068073421318,
+      "clip": "run",
+      "kind": "gait",
+      "maximum_rate": 1.65,
+      "maximum_supported_speed": 1.7135283,
+      "mob_id": "MOB-05",
+      "rendered_speed": 1.60000002384186,
+      "requested_rate": 1.54068073421318,
+      "source_stride_speed": 1.038502
+    },
+    "warnings": [
+      "user shader cache unavailable",
+      "root certificate store unavailable"
+    ],
+    "clean_exit_log": false,
+    "crash_detected": false,
+    "clean_teardown": true,
+    "teardown_fix": "The isolated QA now parents world.camera_controller; build_world normally does this in the live world. No log suppression.",
+    "checked_wrapper_result": "docs/world-expansion-v3/roach-p2-evidence/teardown-check/result.json",
+    "qa_script_sha256": "4a16d208cb3c179bc9a747b573e5e2c3247ecbfae7620a139d6f14f6feb820a2",
+    "new_screenshots_generated": false,
+    "prior_failure_evidence": "docs/world-expansion-v3/roach-p2-evidence/checked-native-01-result.json",
+    "canonical_profile_check": {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/canonical-profile-check/ROACH_NATIVE_QA.json",
+      "sha256": "764cecf98f32033b80d4d9b1e48382522f78e756f627cd9f663e5f0cae3084c4",
+      "qa_script_sha256": "a71f0a0d95fbefdf25571cd8181dc4fc570a5065e319545ddef52ba88b1fb189",
+      "checks": 35,
+      "clean_teardown": true,
+      "no_root_cache_hook_dependency": true,
+      "new_captures": false
+    }
+  },
+  "captures": [
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_attack.png",
+      "sha256": "2ca69c12428ea0cf9af42ef0d1dfebecefd45beb4a8c1abe39833d1903212c4f"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_death.png",
+      "sha256": "743145944ebf06394711bafa283f93d422b5f8e61d8017cacecc38df2ed6612a"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_idle.png",
+      "sha256": "d1c55eaf3babd91998cfdcbf1c64708d72b6b55ba81440eecf63746a48bda086"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_run_0.png",
+      "sha256": "4a419ced8048a60a2a2d40bdf3cc42d2b3342f9b61bf67fbdc4bc42e23e4472f"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_run_12.png",
+      "sha256": "ea3a4fb164ff2f33b67c0f7fadf601bf1ed92794b1c58b4da9646ad41357e9db"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_run_18.png",
+      "sha256": "3739f7db84bd0f2c5d9d0039d642efe350af0e35ef2386e30aae89b0d79aa9e1"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_run_24.png",
+      "sha256": "b5f2b7bd40c4bcaf032d4110afa0dca5de82dd570e286f55b028722b710fec1a"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_run_30.png",
+      "sha256": "b74339599240d9e49aaaa4ed1de2e7138a389c1e5840b2ad7c6b97ac203d2057"
+    },
+    {
+      "path": "docs/world-expansion-v3/roach-p2-evidence/MOB-05_run_6.png",
+      "sha256": "46d03551153873a964ef9017c821b8c796f8995dfaaf26a14c53b16c4be459ae"
+    }
+  ],
+  "previous_canonical_profile": {
+    "model": "V3StarterBeetle",
+    "sha256": "bd7e6ab4051aaf7fa215f8133c12f912e1a1b1ab4e679bc5ca47c5b0093d478d",
+    "status": "art_rejected_functional_prototype"
+  },
+  "open_art_gates": {
+    "six_animated_supporting_legs": "OPEN: source currently has4legs; add rigged moving middle pair or replace basis after boar work. Source54bones alone does not meet six-leg requirement.",
+    "mandibles_organic_chitin": "OPEN: verify visible mandibles and organic chitin after geometry adaptation; source jaw/texture existence does not equal final art acceptance.",
+    "live_pursuit": "OPEN: native centered velocity sampling is not live server pursuit on terrain."
+  },
+  "final_art_accepted": false
+}

@@ -1,0 +1,249 @@
+{
+  "event_ledger": [
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-05",
+      "at": 2000,
+      "endsAt": 3400.0,
+      "impactAt": 2700.0,
+      "kind": "attack",
+      "sequence": 1,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-05",
+      "amount": 10,
+      "at": 2700.0,
+      "kind": "hit",
+      "sequence": 2,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-05",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 3
+    }
+  ],
+  "godot": {
+    "build": "official",
+    "hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+    "hex": 263683,
+    "major": 4,
+    "minor": 6,
+    "patch": 3,
+    "status": "stable",
+    "string": "4.6.3-stable (official)",
+    "timestamp": 0
+  },
+  "live_server_tested": false,
+  "models": {
+    "MOB-05": {
+      "attack_skinned_bounds": "[P: (-0.344143, 0.000471, -0.277656), S: (0.630725, 0.558687, 0.502559)]",
+      "captures": [
+        "MOB-05_idle.png",
+        "MOB-05_attack.png",
+        "MOB-05_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "proposed_pursuit1_6_rate_supported": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 1.21666669845581,
+          "poses_change": true
+        },
+        "death": {
+          "length": 1.83333337306976,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.333333343267441,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 4.16666650772095,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.583333313465118,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 1.0,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.374491, -0.0, -0.2947), S: (0.713457, 0.311536, 0.694727)]",
+      "idle_skinned_bounds": "[P: (-0.231594, -0.000005, -0.236545), S: (0.463188, 0.428458, 0.631412)]",
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/alternatives/roach/V3RoachCandidate.glb",
+        "attack_contact": 0.42,
+        "author": "Danimal; original model Atmostatic",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.3,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ArmatureAction.002_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              100.0
+            ]
+          },
+          {
+            "clip": "walk",
+            "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee.",
+            "duration_factor": 0.6,
+            "kind": "source_nla_cycle_window",
+            "source_action": "Walk_Armature",
+            "source_frame_window_at_24fps": [
+              10.0,
+              50.0
+            ]
+          },
+          {
+            "clip": "run",
+            "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee.",
+            "duration_factor": 0.35,
+            "kind": "source_nla_cycle_window",
+            "source_action": "Walk_Armature",
+            "source_frame_window_at_24fps": [
+              10.0,
+              50.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ArmatureAction.001_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              29.0
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ArmatureAction.009_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              44.0
+            ]
+          },
+          {
+            "clip": "hit",
+            "description": "local spine/head recoil",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              8.0
+            ],
+            "kind": "authored_local_rig_action"
+          }
+        ],
+        "floor_clearance_guards": {
+
+        },
+        "gait": {
+          "run": 1.038502,
+          "walk": 0.605793
+        },
+        "gait_provenance": {
+          "run": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints.",
+          "walk": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints."
+        },
+        "ground_min_dense": -0.00035944581031799,
+        "height": 0.45,
+        "hit_point": [
+          0.0,
+          0.2475,
+          0.0
+        ],
+        "license": "CC-BY-SA-3.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "maximum_supported_speed": 1.7135283,
+        "mob_id": "MOB-05",
+        "model": "V3RoachCandidate",
+        "native_bounds": {
+          "name": "V3RoachCandidate",
+          "sourceDepth": 0.636389285326004,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.45,
+          "sourceWidth": 0.463501423597336,
+          "targetHeight": 0.45
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "pick_size": [
+          0.75,
+          0.45,
+          0.75
+        ],
+        "proposed_p2_movement_speed": 1.6,
+        "qa_attack_duration_ms": 1400.0,
+        "qa_server_contact_fraction": 0.5,
+        "sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
+        "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+        "status": "source_cycle_visual_candidate; native QA pending",
+        "title": "Панцирное существо · Roach"
+      },
+      "proposed_pursuit_contract": {
+        "applied_rate": 1.54068073421318,
+        "clip": "run",
+        "kind": "gait",
+        "maximum_rate": 1.65,
+        "maximum_supported_speed": 1.7135283,
+        "mob_id": "MOB-05",
+        "rendered_speed": 1.60000002384186,
+        "requested_rate": 1.54068073421318,
+        "source_stride_speed": 1.038502
+      }
+    }
+  },
+  "native_controller": "VarendorAnimationController subclass",
+  "native_factory": "VarendorWorld.make_actor",
+  "native_render": true,
+  "ok": true
+}
