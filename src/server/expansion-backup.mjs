@@ -3,6 +3,7 @@ import {existsSync} from 'node:fs';
 import {MAX_LEVEL,xpNeeded} from '../core/game-rules.ts';
 import {ACCESSORY_MIGRATION_VERSION} from '../data/accessories-v3.ts';
 import {backupWorld} from '../../scripts/p0-backup-world.mjs';
+import {obsoleteFinalPopulation} from '../world/legacy-final-population-repair.ts';
 
 /** This inspection happens before WorldStore or simulation migrations open the
  * existing save for writing. A failed verified backup aborts the launcher. */
@@ -18,6 +19,7 @@ export async function backupBeforeExpansion(database,backups,populationPlan,back
  }finally{db.close();}
  const heroes=Object.values(state.characters??{});if(!heroes.length)return null;
  const reasons=[];
+ if(populationPlan?.slots&&obsoleteFinalPopulation(state.monsters??[],populationPlan.slots).length)reasons.push('legacy-final-population-repair');
  if(heroes.some(p=>p.accessoryMigrationVersion!==ACCESSORY_MIGRATION_VERSION))reasons.push('accessories-v3');
  if(heroes.some(p=>p.level>MAX_LEVEL||p.level===MAX_LEVEL&&p.xp>=xpNeeded(MAX_LEVEL)))reasons.push('level-cap-90');
  if(heroes.some(p=>p.starterProgress?.version!==1))reasons.push('starter-quests-v3');

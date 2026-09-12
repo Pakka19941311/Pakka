@@ -10,6 +10,8 @@ import {resolveHeroDamageV3,enemyHitChanceV3} from '../core/encounter-combat-v3.
 import {resolveTypedMonsterDamage,PHYSICAL_DAMAGE,legacyStatusDotChannel} from '../core/monster-damage.ts';
 import type {MonsterDamagePacket,MonsterDamageDefense} from '../core/monster-damage.ts';
 import {remapP2SavedMonsters} from '../world/p2-population.ts';
+import {repairLegacyFinalPopulation,LEGACY_FINAL_POPULATION_REPAIR_VERSION} from '../world/legacy-final-population-repair.ts';
+import type {LegacyPopulationArchive} from '../world/legacy-final-population-repair.ts';
 import type {P2ArchivedMonster} from '../world/p2-population.ts';
 import type {EncounterDamageTypeV3,EncounterElementV3} from '../core/encounter-combat-v3.ts';
 import {RING_RECIPES,ACCESSORY_MIGRATION_VERSION,itemSellPrice} from '../data/accessories-v3.ts';
@@ -72,6 +74,7 @@ type PendingAttack = {
 type Projectile = {actor:string;target:string;generation:number;actorGeneration:number;skill:number|null;damage:number;critical:boolean;accuracy:number;damageType?:EncounterDamageTypeV3;element?:EncounterElementV3;startedAt:number;endsAt:number;origin:Position & {y:number};point:Position & {y:number}};
 const motion=(now:number):WorldMotion=>({yOffset:0,grounded:true,yaw:0,action:'idle',actionStartedAt:now,actionEndsAt:0,velocityX:0,velocityZ:0,verticalVelocity:0,locomotionState:'ground',combatState:'idle',hitAt:0,hitUntil:0});
 export type PersistedWorld = {
+  legacyFinalPopulationRepairs?:Array<{version:number;at:number;sourceMapVersion?:string;reason:'duplicate-small-map-slots';archived:LegacyPopulationArchive[]}>;
   starterPopulationVersion?:string;starterPopulationDigest?:string;starterPopulationArchive?:P2ArchivedMonster<WorldMonster>[];
   accessoryMigrationBackups?:Record<string,{at:number;version:number;items:AccessoryBackup}>;
   mapVersion?:string; territoryVersion?:number; finalWorldRevision?:string;
@@ -191,6 +194,8 @@ export class WorldSimulation {
     this.mapContentVersion=this.finalWorld?.mapVersion??mapVersion(this.collision,this.terrain);
     this.random = options.random ?? Math.random; this.identifier = options.identifier; this.beta = Boolean(options.beta);
     const loaded=this.store.load();
+    const originalMapVersion=loaded?.mapVersion;
+    if(loaded?.finalWorldRevision&&!this.finalWorld)throw Error('saved-final-world-requires-final-runtime');
     this.state = loaded ?? {schema:1,mapVersion:this.mapContentVersion,territoryVersion:TERRITORY_VERSION,time:options.now,revision:0,sequence:0,characters:{},monsters:[],summons:[],pending:[]};
     if (this.state.schema !== 1) throw Error('unsupported-world-schema');
     // The cave timer advances only while the game process runs. Other existing
@@ -204,7 +209,7 @@ export class WorldSimulation {
     }
     if(this.finalWorld)this.migrateFinalWorld();
     else if(loaded)migrateTerritory(this.state,this.collision,this.mapContentVersion);
-    if(this.finalWorld)this.reconcileStarterPopulation();
+    if(this.finalWorld){this.reconcileLegacyFinalPopulation(originalMapVersion);this.reconcileStarterPopulation();}
     this.state.projectiles??=[];
     this.state.cycleEpoch??=this.state.time-PHASE_MS/4;this.state.chat??=[];this.state.chatSequence??=0;
     for(const actor of [...Object.values(this.state.characters),...this.state.monsters,...this.state.summons])Object.assign(actor,{...motion(this.state.time),...actor});
@@ -249,6 +254,20 @@ export class WorldSimulation {
       }
     }
     this.state.mapVersion=world.mapVersion;
+  }
+
+  private reconcileLegacyFinalPopulation(sourceMapVersion?:string):void {
+    const repair=repairLegacyFinalPopulation(this.state.monsters,this.finalWorld!.slots);
+    if(!repair.archived.length)return;
+    this.state.monsters=repair.monsters;
+    this.state.legacyFinalPopulationRepairs??=[];
+    this.state.legacyFinalPopulationRepairs.push({version:LEGACY_FINAL_POPULATION_REPAIR_VERSION,at:this.state.time,sourceMapVersion,reason:'duplicate-small-map-slots',archived:repair.archived});
+    const retired=new Set(repair.retiredUids);
+    this.state.pending=this.state.pending.filter(a=>!retired.has(a.actor)&&!retired.has(a.target)&&!(a.owner&&retired.has(a.owner)));
+    this.state.projectiles=this.state.projectiles?.filter(a=>!retired.has(a.actor)&&!retired.has(a.target));
+    for(const p of Object.values(this.state.characters))if(p.target&&retired.has(p.target)){
+      p.target=null;p.autoAttack=false;p.singleAttack=false;p.destination=null;
+    }
   }
 
   private reconcileStarterPopulation():void {

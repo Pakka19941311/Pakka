@@ -65,3 +65,14 @@ test('changed P2 geometry is backed up independently of unchanged population',as
  f.world.state.mapVersion=plan.mapVersion;f.store.save(f.world.state);
  assert.equal(await backupBeforeExpansion(f.database,f.backups,plan),null);
 });
+
+test('obsolete final-world slots trigger a verified backup even when content versions already match',async t=>{
+ const f=fixture(t),plan={mode:'starter-v3',version:'p2-1',digest:'layout-a',mapVersion:'same-map',
+  slots:[{uid:'wf:retained-wolf:000',speciesId:'wolf',boss:false}]};
+ Object.assign(f.world.state,{starterPopulationVersion:plan.version,starterPopulationDigest:plan.digest,mapVersion:plan.mapVersion});
+ f.store.save(f.world.state);const before=f.store.load();
+ const result=await backupBeforeExpansion(f.database,f.backups,plan);
+ assert.deepEqual(result.reasons,['legacy-final-population-repair']);
+ const copy=new WorldStore(result.filename);try{assert.deepEqual(copy.load(),before);}finally{copy.close();}
+ assert.deepEqual(f.store.load(),before);
+});
