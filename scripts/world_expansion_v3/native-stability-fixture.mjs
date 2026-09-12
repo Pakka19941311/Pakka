@@ -1,7 +1,35 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {findNavigationPath} from '../../src/world/navigation.ts';
 
 const digest=world=>createHash('sha256').update(JSON.stringify(world.state.monsters)).digest('hex');
+/** Soak may have one initial approach; reject accidental per-cycle resets. */
+export function createNativeStabilityFixtureRunner(world,geography,hero,{soakSeconds=0}={}){
+ assert.ok(soakSeconds===0||soakSeconds===180,'Only the bounded 180-second soak is supported');
+ let used=false;
+ return stage=>{
+  if(soakSeconds){
+   assert.match(stage,/^stability:teleporter:\d+$/,'Soak permits only the initial teleporter approach');
+   assert.equal(used,false,'Soak forbids repeated hero placement');
+  }
+  const rest=soakSeconds?chooseNativeStabilityRest(world,geography):null;
+  const result=prepareNativeStabilityFixture(world,geography,hero,stage);used=true;
+  return rest?{...result,soakRest:rest}:result;
+ };
+}
+/** A nearby route destination, never a relocation or a safe-zone change. */
+export function chooseNativeStabilityRest(world,geography){
+ const start=geography.teleports['Чёрный лес'],collision=geography.spaces.surface.collision;
+ const nearby=world.state.monsters.filter(m=>(m.spaceId??'surface')==='surface'&&Math.hypot(m.home.x-start.x,m.home.z-start.z)<110);
+ for(const radius of [24,30,36])for(let i=0;i<32;i++){
+  const point={x:start.x+Math.cos(i*Math.PI/16)*radius,z:start.z+Math.sin(i*Math.PI/16)*radius};
+  if(collision.isBlocked(point,.46))continue;
+  if(nearby.some(m=>Math.hypot(m.home.x-point.x,m.home.z-point.z)<Math.max(27,(geography.slotById.get(m.uid)?.leashRadius??14)+8)))continue;
+  const path=findNavigationPath(collision,start,point,{actorRadius:.46,cellSize:.85,margin:24,maxVisited:4500});
+  if(path.length)return point;
+ }
+ throw Error('No nearby reachable soak resting point outside monster home leashes');
+}
 /** Disposable hero placement only. The following TP/portal is a normal command. */
 export function prepareNativeStabilityFixture(world,geography,hero,stage){
  assert.match(stage,/^stability:(teleporter|portal-mine|portal-great_cave):\d+$/);

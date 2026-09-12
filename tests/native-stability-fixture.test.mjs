@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {makeP2Simulation} from '../scripts/world_expansion_v3/p2-combat-smoke.mjs';
-import {prepareNativeStabilityFixture} from '../scripts/world_expansion_v3/native-stability-fixture.mjs';
+import {prepareNativeStabilityFixture,createNativeStabilityFixtureRunner} from '../scripts/world_expansion_v3/native-stability-fixture.mjs';
 
 test('stability approach fixtures preserve actual population, clock and resources',()=>{
  const world=makeP2Simulation(),hero=world.createCharacter('Synthetic stability','knight');
@@ -23,4 +23,15 @@ test('stability approach fixtures preserve actual population, clock and resource
   }
  }
  assert.throws(()=>prepareNativeStabilityFixture(world,geography,hero,'stability:kill-boss:1'));
+});
+
+test('soak rejects subsequent relocation and all portal fixtures without changing the live test hero',()=>{
+ const world=makeP2Simulation(),hero=world.createCharacter('Synthetic soak','knight');
+ const run=createNativeStabilityFixtureRunner(world,world.finalWorld,hero,{soakSeconds:180});
+ run('stability:teleporter:1');
+ const before=JSON.stringify(hero),monsters=JSON.stringify(world.state.monsters),time=world.state.time;
+ assert.throws(()=>run('stability:teleporter:2'),/repeated hero placement/);
+ assert.throws(()=>run('stability:portal-mine:3'),/initial teleporter approach/);
+ assert.equal(JSON.stringify(hero),before);assert.equal(JSON.stringify(world.state.monsters),monsters);assert.equal(world.state.time,time);
+ assert.throws(()=>createNativeStabilityFixtureRunner(world,world.finalWorld,hero,{soakSeconds:30}),/180-second/);
 });

@@ -1,0 +1,434 @@
+{
+  "schema": "native-stability-sanitized-v1",
+  "run": "audit-native-stability-01",
+  "package": "32bb3320f9ec",
+  "graphics": "partial-functional-QA-overrides",
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "status": "PASS_WITH_SCOPE_LIMITS",
+  "checks": {
+    "passed": 121,
+    "total": 121,
+    "failed": []
+  },
+  "timing": {
+    "gameplayTraceMs": 79136,
+    "processSeconds": 121.141,
+    "configuredMaximumSeconds": 240
+  },
+  "sourceCopy": {
+    "used": true,
+    "unchanged": true
+  },
+  "syntheticHero": {
+    "class": "knight",
+    "level": 40
+  },
+  "population": 1151,
+  "metrics": {
+    "frame_max_ms": 636,
+    "frame_p50_ms": 16,
+    "frame_p95_ms": 22,
+    "frame_p99_ms": 27,
+    "frames": 4374,
+    "max_network_bookkeeping": 2,
+    "max_sse_age_ms": 121,
+    "max_unsent": 1,
+    "max_visual_correction_m": 0.785018861293793,
+    "mean_observed_fps": 55.3460711122359,
+    "play_frame_max_ms": 216
+  },
+  "wrapper": {
+    "exit": 0,
+    "cleanErrorLog": true,
+    "crashDetected": false,
+    "peakWorkingSetBytes": 2106089472,
+    "peakPrivateBytes": 5460574208
+  },
+  "observedFramesOver": {
+    "ms50": 23,
+    "ms100": 19,
+    "ms200": 11
+  },
+  "disconnectCount": 0,
+  "phaseMetrics": [
+    {
+      "phase": "tp0:approach-fixture",
+      "frames": 42,
+      "firstWallMs": 39,
+      "lastWallMs": 705,
+      "p95FrameMs": 20,
+      "maxFrameMs": 33,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 59
+    },
+    {
+      "phase": "tp0:transition",
+      "frames": 4,
+      "firstWallMs": 723,
+      "lastWallMs": 771,
+      "p95FrameMs": 18,
+      "maxFrameMs": 18,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 69
+    },
+    {
+      "phase": "surface-0:movement",
+      "frames": 137,
+      "firstWallMs": 797,
+      "lastWallMs": 3340,
+      "p95FrameMs": 19,
+      "maxFrameMs": 180,
+      "framesOver100ms": 2,
+      "maxVisualCorrectionM": 0.17765949405518533,
+      "maxObservedSSEAgeMs": 55
+    },
+    {
+      "phase": "surface-0:ui",
+      "frames": 32,
+      "firstWallMs": 3373,
+      "lastWallMs": 3873,
+      "p95FrameMs": 22,
+      "maxFrameMs": 33,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.0000292979904134638,
+      "maxObservedSSEAgeMs": 52
+    },
+    {
+      "phase": "surface-0:post-teleport-observation",
+      "frames": 445,
+      "firstWallMs": 4407,
+      "lastWallMs": 11795,
+      "p95FrameMs": 19,
+      "maxFrameMs": 534,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.0000292979904134638,
+      "maxObservedSSEAgeMs": 69
+    },
+    {
+      "phase": "tp1:approach-fixture",
+      "frames": 43,
+      "firstWallMs": 11813,
+      "lastWallMs": 12530,
+      "p95FrameMs": 21,
+      "maxFrameMs": 40,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.0000292979904134638,
+      "maxObservedSSEAgeMs": 54
+    },
+    {
+      "phase": "tp1:transition",
+      "frames": 4,
+      "firstWallMs": 12550,
+      "lastWallMs": 12596,
+      "p95FrameMs": 20,
+      "maxFrameMs": 20,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 37
+    },
+    {
+      "phase": "surface-1:movement",
+      "frames": 158,
+      "firstWallMs": 12622,
+      "lastWallMs": 15232,
+      "p95FrameMs": 20,
+      "maxFrameMs": 26,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.133489370346069,
+      "maxObservedSSEAgeMs": 55
+    },
+    {
+      "phase": "surface-1:ui",
+      "frames": 30,
+      "firstWallMs": 15252,
+      "lastWallMs": 15729,
+      "p95FrameMs": 20,
+      "maxFrameMs": 22,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.062302807022641064,
+      "maxObservedSSEAgeMs": 54
+    },
+    {
+      "phase": "surface-1:post-teleport-observation",
+      "frames": 436,
+      "firstWallMs": 16321,
+      "lastWallMs": 23609,
+      "p95FrameMs": 20,
+      "maxFrameMs": 592,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.062302807022641064,
+      "maxObservedSSEAgeMs": 69
+    },
+    {
+      "phase": "tp2:approach-fixture",
+      "frames": 43,
+      "firstWallMs": 23623,
+      "lastWallMs": 24319,
+      "p95FrameMs": 20,
+      "maxFrameMs": 22,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.062302807022641064,
+      "maxObservedSSEAgeMs": 51
+    },
+    {
+      "phase": "tp2:transition",
+      "frames": 4,
+      "firstWallMs": 24337,
+      "lastWallMs": 24384,
+      "p95FrameMs": 19,
+      "maxFrameMs": 19,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 69
+    },
+    {
+      "phase": "surface-2:movement",
+      "frames": 157,
+      "firstWallMs": 24514,
+      "lastWallMs": 27312,
+      "p95FrameMs": 22,
+      "maxFrameMs": 216,
+      "framesOver100ms": 2,
+      "maxVisualCorrectionM": 0.17163991590325853,
+      "maxObservedSSEAgeMs": 106
+    },
+    {
+      "phase": "surface-2:ui",
+      "frames": 30,
+      "firstWallMs": 27332,
+      "lastWallMs": 27833,
+      "p95FrameMs": 28,
+      "maxFrameMs": 34,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.038553899012119544,
+      "maxObservedSSEAgeMs": 60
+    },
+    {
+      "phase": "surface-2:post-teleport-observation",
+      "frames": 418,
+      "firstWallMs": 28458,
+      "lastWallMs": 35404,
+      "p95FrameMs": 22,
+      "maxFrameMs": 625,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.038553899012119544,
+      "maxObservedSSEAgeMs": 71
+    },
+    {
+      "phase": "tp3:approach-fixture",
+      "frames": 41,
+      "firstWallMs": 35420,
+      "lastWallMs": 36111,
+      "p95FrameMs": 21,
+      "maxFrameMs": 27,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.038553899012119544,
+      "maxObservedSSEAgeMs": 52
+    },
+    {
+      "phase": "tp3:transition",
+      "frames": 4,
+      "firstWallMs": 36132,
+      "lastWallMs": 36183,
+      "p95FrameMs": 22,
+      "maxFrameMs": 22,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 56
+    },
+    {
+      "phase": "surface-3:movement",
+      "frames": 149,
+      "firstWallMs": 36316,
+      "lastWallMs": 38783,
+      "p95FrameMs": 22,
+      "maxFrameMs": 133,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.17756845726288933,
+      "maxObservedSSEAgeMs": 110
+    },
+    {
+      "phase": "surface-3:ui",
+      "frames": 30,
+      "firstWallMs": 38801,
+      "lastWallMs": 39280,
+      "p95FrameMs": 23,
+      "maxFrameMs": 23,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.01360477613440177,
+      "maxObservedSSEAgeMs": 54
+    },
+    {
+      "phase": "surface-3:post-teleport-observation",
+      "frames": 439,
+      "firstWallMs": 39916,
+      "lastWallMs": 47197,
+      "p95FrameMs": 22,
+      "maxFrameMs": 636,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.01360477613440177,
+      "maxObservedSSEAgeMs": 72
+    },
+    {
+      "phase": "mine:entrance-fixture",
+      "frames": 29,
+      "firstWallMs": 47219,
+      "lastWallMs": 47844,
+      "p95FrameMs": 22,
+      "maxFrameMs": 187,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.01360477613440177,
+      "maxObservedSSEAgeMs": 55
+    },
+    {
+      "phase": "mine:enter",
+      "frames": 18,
+      "firstWallMs": 47868,
+      "lastWallMs": 48340,
+      "p95FrameMs": 168,
+      "maxFrameMs": 168,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 72
+    },
+    {
+      "phase": "mine:movement",
+      "frames": 158,
+      "firstWallMs": 48537,
+      "lastWallMs": 51133,
+      "p95FrameMs": 24,
+      "maxFrameMs": 197,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.09361621362450967,
+      "maxObservedSSEAgeMs": 65
+    },
+    {
+      "phase": "mine:ui",
+      "frames": 31,
+      "firstWallMs": 51157,
+      "lastWallMs": 51647,
+      "p95FrameMs": 24,
+      "maxFrameMs": 24,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.004413438025007029,
+      "maxObservedSSEAgeMs": 69
+    },
+    {
+      "phase": "mine:walk-to-exit",
+      "frames": 21,
+      "firstWallMs": 51919,
+      "lastWallMs": 52235,
+      "p95FrameMs": 25,
+      "maxFrameMs": 272,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.6867501704843744,
+      "maxObservedSSEAgeMs": 52
+    },
+    {
+      "phase": "mine:exit",
+      "frames": 7,
+      "firstWallMs": 52249,
+      "lastWallMs": 52578,
+      "p95FrameMs": 237,
+      "maxFrameMs": 237,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.47594577667188104,
+      "maxObservedSSEAgeMs": 121
+    },
+    {
+      "phase": "great_cave:entrance-fixture",
+      "frames": 29,
+      "firstWallMs": 53202,
+      "lastWallMs": 53995,
+      "p95FrameMs": 331,
+      "maxFrameMs": 624,
+      "framesOver100ms": 2,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 54
+    },
+    {
+      "phase": "great_cave:enter",
+      "frames": 15,
+      "firstWallMs": 54016,
+      "lastWallMs": 54357,
+      "p95FrameMs": 82,
+      "maxFrameMs": 82,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 70
+    },
+    {
+      "phase": "great_cave:movement",
+      "frames": 158,
+      "firstWallMs": 54390,
+      "lastWallMs": 56988,
+      "p95FrameMs": 27,
+      "maxFrameMs": 33,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.09733745405636603,
+      "maxObservedSSEAgeMs": 55
+    },
+    {
+      "phase": "great_cave:ui",
+      "frames": 32,
+      "firstWallMs": 57005,
+      "lastWallMs": 57520,
+      "p95FrameMs": 29,
+      "maxFrameMs": 30,
+      "framesOver100ms": 0,
+      "maxVisualCorrectionM": 0.000032557272807840046,
+      "maxObservedSSEAgeMs": 52
+    },
+    {
+      "phase": "great_cave:walk-to-exit",
+      "frames": 21,
+      "firstWallMs": 57865,
+      "lastWallMs": 58189,
+      "p95FrameMs": 28,
+      "maxFrameMs": 345,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.7850188493778415,
+      "maxObservedSSEAgeMs": 53
+    },
+    {
+      "phase": "great_cave:exit",
+      "frames": 8,
+      "firstWallMs": 58203,
+      "lastWallMs": 58456,
+      "p95FrameMs": 152,
+      "maxFrameMs": 152,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0.5440499279848411,
+      "maxObservedSSEAgeMs": 80
+    },
+    {
+      "phase": "settled-observation",
+      "frames": 1201,
+      "firstWallMs": 59030,
+      "lastWallMs": 79005,
+      "p95FrameMs": 22,
+      "maxFrameMs": 574,
+      "framesOver100ms": 1,
+      "maxVisualCorrectionM": 0,
+      "maxObservedSSEAgeMs": 69
+    }
+  ],
+  "limitations": [
+    "Gameplay was 79.136 seconds; budget240 is a maximum, not a measured soak duration.",
+    "Surface input checks ran in the first seconds after TP; later observation was idle.",
+    "Screenshot capture boundaries correlate with 534-636ms frames; no timer isolated screenshot cost.",
+    "216ms Black Forest first-presentation hitch remains unattributed.",
+    "Local visual correction near cave exit is not cross-map rollback; its full cause is not recorded.",
+    "SSE age samples describe callback reception and can miss a main-thread stall while callbacks catch up.",
+    "No combat, server restart, artificial delayed transport, or remote multi-player scenario in this graphical run."
+  ],
+  "evidenceSha256": {
+    "stability.json": "0e6599ba8c72da5f133a6cf693b2d3475c83183a55f9b27c5f82e39ed5b23e4e",
+    "stability-trace.json": "455b6fac5a946986bc8a64cf7e3d1384cb2cf8fbeb16fb157664741139e5437e",
+    "stability-summary.json": "30de62093d4bda5a2776041a25765d6a4628b27c25ce19a86136e6a2d37308f3",
+    "native/result.json": "1e33f7398cac5b091cd14a602029827376940ee56ac06f40f0d0657b963f6342"
+  },
+  "graphicsCaveat": "Low was requested but this historical block did not apply graphics_profile. Scale .5, MSAA off, shadows off; full150m/24m Low not confirmed."
+}
