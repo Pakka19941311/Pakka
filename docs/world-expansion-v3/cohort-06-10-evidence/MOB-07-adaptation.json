@@ -1,0 +1,104 @@
+{
+  "mob_id": "MOB-07",
+  "name": "CohortBrigandSource",
+  "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\cohort-06-10\\MOB-07\\extracted\\Defender.blend",
+  "source_sha256": "3951410d2d096e5ec2e0f9d49082326b2e4da721abdeda0e66c24bff07ecdc2b",
+  "path": "godot-pc\\world-expansion-v3\\actors\\cohort-06-10\\MOB-07\\CohortBrigandSource.glb",
+  "sha256": "6211c08f3dc52aa6b29dfb565d0c8bd622928b14bd688d528ed038cc0986da86",
+  "bytes": 2373876,
+  "triangles": 15953,
+  "bones": 31,
+  "target_body_height_m": 1.85,
+  "blender_bounds": {
+    "min": [
+      -0.37857380509376526,
+      -1.723781704902649,
+      3.899913281202316e-09
+    ],
+    "max": [
+      0.32167649269104004,
+      0.7286205887794495,
+      1.8500003814697266
+    ]
+  },
+  "clips": [
+    {
+      "name": "walk",
+      "source_action": "Walk-normal.001",
+      "source_frames": [
+        1,
+        87
+      ],
+      "duration_seconds": 2.52,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "run",
+      "source_action": "Run-flee.001",
+      "source_frames": [
+        1,
+        22
+      ],
+      "duration_seconds": 0.84,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "attack",
+      "source_action": "Attack-two handed2",
+      "source_frames": [
+        108,
+        136
+      ],
+      "duration_seconds": 1.12,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "attack_2",
+      "source_action": "Attack-two handed2",
+      "source_frames": [
+        216,
+        246
+      ],
+      "duration_seconds": 1.2,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "death",
+      "source_action": "Death-Backwards",
+      "source_frames": [
+        2,
+        98
+      ],
+      "duration_seconds": 3.84,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "idle",
+      "kind": "authored_quiet_pose_from_source_walk_frame_20_111",
+      "duration_seconds": 4
+    }
+  ],
+  "images": [
+    {
+      "name": "Done3.png",
+      "size": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "name": "DoneWeps.png",
+      "size": [
+        512,
+        512
+      ]
+    }
+  ],
+  "status": "source_candidate_not_runtime_accepted",
+  "gaps": [
+    "hit",
+    "visual_role_fit",
+    "gait_measurement",
+    "attack_contract"
+  ]
+}

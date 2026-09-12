@@ -1,0 +1,374 @@
+{
+  "mob_id": "MOB-10",
+  "name": "CohortPoacherBase",
+  "source": "Pinned MakeHuman/MPFB core + selected Suits02 CC0; conventional authored geometry/poses",
+  "macros": {
+    "gender": 1.0,
+    "age": 0.42,
+    "muscle": 0.4,
+    "weight": 0.33
+  },
+  "selected_assets": [
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\extracted\\eyes\\low-poly\\low-poly.mhclo",
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\extracted\\eyebrows\\eyebrow001\\eyebrow001.mhclo",
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\extracted\\hair\\short02\\short02.mhclo",
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\city-p2\\suits02\\extracted\\clothes\\rehmanpolanski_viking_tunic\\rehmanpolanski_viking_tunic.mhclo",
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\city-p2\\suits02\\extracted\\clothes\\rehmanpolanski_viking_pants\\rehmanpolanski_viking_pants.mhclo",
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\city-p2\\suits02\\extracted\\clothes\\rehmanpolanski_viking_boots\\rehmanpolanski_viking_boots.mhclo"
+  ],
+  "target_height_m": 1.84,
+  "triangles": 36602,
+  "bones": 53,
+  "bounds": [
+    [
+      -0.32331812381744385,
+      -0.23398728668689728,
+      1.1827796697616577e-07
+    ],
+    [
+      0.3317035734653473,
+      0.2365237921476364,
+      1.8220000267028809
+    ]
+  ],
+  "sha256": "8576a62832efe92e935cd70356f30465fe8cbd36ee5e064b901c4e30799e5c50",
+  "bytes": 7855688,
+  "clips": [
+    {
+      "name": "idle",
+      "seconds": 4,
+      "kind": "authored"
+    },
+    {
+      "name": "walk",
+      "seconds": 1.4,
+      "kind": "authored"
+    }
+  ],
+  "walk_audit": {
+    "rootSpeedMps": 0.9,
+    "walkCycleSeconds": 1.4,
+    "maxStanceStepSlipM": 2.7476383618393204e-07,
+    "maxBoneScaleDeviation": 7.152557373046875e-07,
+    "loopSeams": {
+      "idle": {
+        "positionM": 0.0,
+        "angleRad": 0.0
+      },
+      "walk": {
+        "positionM": 0.0,
+        "angleRad": 0.0
+      }
+    },
+    "stanceSamples": [
+      {
+        "side": "l",
+        "phase": 0.09523809523809523,
+        "worldFoot": [
+          -0.11300001293420792,
+          0.3305879533290863,
+          0.08624730259180069
+        ],
+        "stepSlipM": 1.999200562387517e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.11904761904761904,
+        "worldFoot": [
+          -0.11300001293420792,
+          0.3305879831314087,
+          0.08624725043773651
+        ],
+        "stepSlipM": 6.006850114687196e-08
+      },
+      {
+        "side": "l",
+        "phase": 0.14285714285714285,
+        "worldFoot": [
+          -0.11300002783536911,
+          0.33058804273605347,
+          0.08624743670225143
+        ],
+        "stepSlipM": 1.96135738210204e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.16666666666666666,
+        "worldFoot": [
+          -0.11299999803304672,
+          0.3305879235267639,
+          0.0862472876906395
+        ],
+        "stepSlipM": 1.9314112360500873e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.19047619047619047,
+        "worldFoot": [
+          -0.11299999803304672,
+          0.3305879831314087,
+          0.08624755591154099
+        ],
+        "stepSlipM": 2.7476383618393204e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.21428571428571427,
+        "worldFoot": [
+          -0.11300002783536911,
+          0.33058789372444153,
+          0.08624736964702606
+        ],
+        "stepSlipM": 2.0874926039758176e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.23809523809523808,
+        "worldFoot": [
+          -0.11299999058246613,
+          0.3305879831314087,
+          0.08624748885631561
+        ],
+        "stepSlipM": 1.5359765386647212e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.2619047619047619,
+        "worldFoot": [
+          -0.11299999803304672,
+          0.3305879235267639,
+          0.08624743670225143
+        ],
+        "stepSlipM": 7.955043205642187e-08
+      },
+      {
+        "side": "l",
+        "phase": 0.2857142857142857,
+        "worldFoot": [
+          -0.11300000548362732,
+          0.3305879235267639,
+          0.08624743670225143
+        ],
+        "stepSlipM": 7.450580596923828e-09
+      },
+      {
+        "side": "l",
+        "phase": 0.30952380952380953,
+        "worldFoot": [
+          -0.11299999058246613,
+          0.33058789372444153,
+          0.08624736964702606
+        ],
+        "stepSlipM": 7.487740830422111e-08
+      },
+      {
+        "side": "l",
+        "phase": 0.3333333333333333,
+        "worldFoot": [
+          -0.11300002038478851,
+          0.33058780431747437,
+          0.08624730259180069
+        ],
+        "stepSlipM": 1.156641147752108e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.35714285714285715,
+        "worldFoot": [
+          -0.11300000548362732,
+          0.3305879533290863,
+          0.08624737709760666
+        ],
+        "stepSlipM": 1.6726511955740786e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.38095238095238093,
+        "worldFoot": [
+          -0.1130000427365303,
+          0.3305879235267639,
+          0.08624733239412308
+        ],
+        "stepSlipM": 6.537857940340133e-08
+      },
+      {
+        "side": "l",
+        "phase": 0.40476190476190477,
+        "worldFoot": [
+          -0.11300001293420792,
+          0.3305879235267639,
+          0.08624743670225143
+        ],
+        "stepSlipM": 1.0848209096909341e-07
+      },
+      {
+        "side": "l",
+        "phase": 0.42857142857142855,
+        "worldFoot": [
+          -0.11300003528594971,
+          0.33058786392211914,
+          0.08624717593193054
+        ],
+        "stepSlipM": 2.6842778227704497e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.5952380952380952,
+        "worldFoot": [
+          0.11299998313188553,
+          0.9605879783630371,
+          0.08624760806560516
+        ],
+        "stepSlipM": 1.5141368979887348e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.6190476190476191,
+        "worldFoot": [
+          0.11299996078014374,
+          0.9605878591537476,
+          0.08624769002199173
+        ],
+        "stepSlipM": 1.463806830673553e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.6428571428571429,
+        "worldFoot": [
+          0.11300000548362732,
+          0.9605879783630371,
+          0.08624763786792755
+        ],
+        "stepSlipM": 1.3758380198940178e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.6666666666666666,
+        "worldFoot": [
+          0.11299998313188553,
+          0.9605878591537476,
+          0.08624744415283203
+        ],
+        "stepSlipM": 2.285519488182361e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.6904761904761905,
+        "worldFoot": [
+          0.11299996823072433,
+          0.9605879187583923,
+          0.08624762296676636
+        ],
+        "stepSlipM": 1.8907453925087333e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.7142857142857143,
+        "worldFoot": [
+          0.11299999058246613,
+          0.9605877995491028,
+          0.08624760061502457
+        ],
+        "stepSlipM": 1.2332905350064373e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.7380952380952381,
+        "worldFoot": [
+          0.11299994587898254,
+          0.9605879783630371,
+          0.08624763041734695
+        ],
+        "stepSlipM": 1.8671101460071903e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.7619047619047619,
+        "worldFoot": [
+          0.11299997568130493,
+          0.9605879187583923,
+          0.08624766767024994
+        ],
+        "stepSlipM": 7.634573255449234e-08
+      },
+      {
+        "side": "r",
+        "phase": 0.7857142857142857,
+        "worldFoot": [
+          0.11299996823072433,
+          0.9605879187583923,
+          0.08624771982431412
+        ],
+        "stepSlipM": 5.268356063861754e-08
+      },
+      {
+        "side": "r",
+        "phase": 0.8095238095238095,
+        "worldFoot": [
+          0.11299995332956314,
+          0.9605879187583923,
+          0.08624763041734695
+        ],
+        "stepSlipM": 9.06402249678704e-08
+      },
+      {
+        "side": "r",
+        "phase": 0.8333333333333334,
+        "worldFoot": [
+          0.11299998313188553,
+          0.9605878591537476,
+          0.08624757081270218
+        ],
+        "stepSlipM": 8.940696716308594e-08
+      },
+      {
+        "side": "r",
+        "phase": 0.8571428571428571,
+        "worldFoot": [
+          0.11299994587898254,
+          0.9605880379676819,
+          0.08624767512083054
+        ],
+        "stepSlipM": 2.1033874472220397e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.8809523809523809,
+        "worldFoot": [
+          0.11299997568130493,
+          0.9605879783630371,
+          0.08624749630689621
+        ],
+        "stepSlipM": 1.9082797281243946e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.9047619047619048,
+        "worldFoot": [
+          0.11299998313188553,
+          0.9605880379676819,
+          0.08624763786792755
+        ],
+        "stepSlipM": 1.537782508175842e-07
+      },
+      {
+        "side": "r",
+        "phase": 0.9285714285714286,
+        "worldFoot": [
+          0.11299996078014374,
+          0.9605878591537476,
+          0.08624754101037979
+        ],
+        "stepSlipM": 2.0458594289043518e-07
+      }
+    ],
+    "passed": true
+  },
+  "status": "visual_basis_not_runtime_accepted",
+  "gaps": [
+    "full_run_attack_hit_death",
+    "silhouette_art_acceptance",
+    "floor_and_cloth_native_check",
+    "rigged_cloak_or_chain_secondary_motion"
+  ]
+}

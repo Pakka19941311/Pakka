@@ -1,0 +1,397 @@
+[
+  {
+    "mob_id": "MOB-06",
+    "file": "CohortSpiderSource.glb",
+    "sha256": "c5bfbd40fbe7406b361f135084a939b176c00941faccd6491d75404af4fe471b",
+    "bytes": 333092,
+    "triangles_exported": 222,
+    "skin_joint_counts": [
+      45
+    ],
+    "mesh_count": 1,
+    "texture_dimensions": [
+      {
+        "name": "spider",
+        "size": [
+          256,
+          256
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "attack",
+      "idle",
+      "walk"
+    ],
+    "imported_animation_tracks": [
+      "attack",
+      "idle",
+      "walk"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "attack",
+        "duration_seconds": 0.6666666666666666,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.018986117094755173,
+        "max_floor_m": 0.0004389773530419916,
+        "max_extent_m": 2.119442343711853,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "idle",
+        "duration_seconds": 0.6666666666666666,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.00013282193685881793,
+        "max_floor_m": -1.0674865791315824e-07,
+        "max_extent_m": 2.1179087162017822,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "walk",
+        "duration_seconds": 0.6666666666666666,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.00034179689828306437,
+        "max_floor_m": -1.0674865791315824e-07,
+        "max_extent_m": 2.1182100772857666,
+        "bounds_loop_difference_m": 0.0
+      }
+    ]
+  },
+  {
+    "mob_id": "MOB-07",
+    "file": "CohortBrigandSource.glb",
+    "sha256": "6211c08f3dc52aa6b29dfb565d0c8bd622928b14bd688d528ed038cc0986da86",
+    "bytes": 2373876,
+    "triangles_exported": 15953,
+    "skin_joint_counts": [
+      31
+    ],
+    "mesh_count": 1,
+    "texture_dimensions": [
+      {
+        "name": "Done3",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "DoneWeps",
+        "size": [
+          512,
+          512
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "attack",
+      "attack_2",
+      "death",
+      "idle",
+      "run",
+      "walk"
+    ],
+    "imported_animation_tracks": [
+      "attack",
+      "attack_2",
+      "death",
+      "idle",
+      "run",
+      "walk"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "attack",
+        "duration_seconds": 1.1199999491373698,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.40133431553840637,
+        "max_floor_m": -0.03677668794989586,
+        "max_extent_m": 3.653077404946089,
+        "bounds_loop_difference_m": 0.4986039400100708
+      },
+      {
+        "name": "attack_2",
+        "duration_seconds": 1.2,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.21268120408058167,
+        "max_floor_m": -0.02704194001853466,
+        "max_extent_m": 3.584502052515745,
+        "bounds_loop_difference_m": 0.4284076690673828
+      },
+      {
+        "name": "death",
+        "duration_seconds": 3.8399998982747396,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.9071481823921204,
+        "max_floor_m": -0.06729409843683243,
+        "max_extent_m": 3.1831796169281006,
+        "bounds_loop_difference_m": 1.630368024110794
+      },
+      {
+        "name": "idle",
+        "duration_seconds": 4.0,
+        "sample_count": 31,
+        "distinct_mesh_samples": 25,
+        "min_floor_m": 3.6391429603099823e-07,
+        "max_floor_m": 3.6391429603099823e-07,
+        "max_extent_m": 2.464082360267639,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "run",
+        "duration_seconds": 0.8399999618530274,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.038763463497161865,
+        "max_floor_m": 0.03084159828722477,
+        "max_extent_m": 3.1490347031503916,
+        "bounds_loop_difference_m": 0.00728839635848999
+      },
+      {
+        "name": "walk",
+        "duration_seconds": 2.51999994913737,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.09805162996053696,
+        "max_floor_m": 0.033306702971458435,
+        "max_extent_m": 2.648238229798153,
+        "bounds_loop_difference_m": 1.2030071020126343
+      }
+    ]
+  },
+  {
+    "mob_id": "MOB-08",
+    "file": "CohortCatReference.glb",
+    "sha256": "478b7250ca31f86a2fdae84d1daff63c1881721b0eeff3ca3b0dc2dcd8c42eb8",
+    "bytes": 324700,
+    "triangles_exported": 114,
+    "skin_joint_counts": [],
+    "mesh_count": 1,
+    "texture_dimensions": [
+      {
+        "name": "cat_free",
+        "size": [
+          512,
+          512
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "KeyAction"
+    ],
+    "imported_animation_tracks": [
+      "KeyAction"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "KeyAction",
+        "duration_seconds": 1.2083333333333333,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": 0.0,
+        "max_floor_m": 0.012459635734558105,
+        "max_extent_m": 0.8373061120510101,
+        "bounds_loop_difference_m": 0.0
+      }
+    ]
+  },
+  {
+    "mob_id": "MOB-09",
+    "file": "CohortExileBase.glb",
+    "sha256": "24c1517328c5d2f19d3a3a9ce9040e07b714ebca3a8fa94faecad30c5124c5ee",
+    "bytes": 6815748,
+    "triangles_exported": 52486,
+    "skin_joint_counts": [
+      53
+    ],
+    "mesh_count": 15,
+    "texture_dimensions": [
+      {
+        "name": "BootsViking",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "brown_eye",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "eyebrow001",
+        "size": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "robe__normal_gl",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "robe_brown__diffuse",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "young_lightskinned_male_diffuse",
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "idle",
+      "walk"
+    ],
+    "imported_animation_tracks": [
+      "idle",
+      "walk"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "idle",
+        "duration_seconds": 4.0,
+        "sample_count": 31,
+        "distinct_mesh_samples": 15,
+        "min_floor_m": 5.774199962615967e-08,
+        "max_floor_m": 2.8219074010849e-07,
+        "max_extent_m": 1.7632608683779836,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "walk",
+        "duration_seconds": 1.4,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.00041168835014104843,
+        "max_floor_m": 5.68293035030365e-06,
+        "max_extent_m": 1.7119996463879943,
+        "bounds_loop_difference_m": 0.0
+      }
+    ]
+  },
+  {
+    "mob_id": "MOB-10",
+    "file": "CohortPoacherBase.glb",
+    "sha256": "8576a62832efe92e935cd70356f30465fe8cbd36ee5e064b901c4e30799e5c50",
+    "bytes": 7855688,
+    "triangles_exported": 36602,
+    "skin_joint_counts": [
+      53
+    ],
+    "mesh_count": 21,
+    "texture_dimensions": [
+      {
+        "name": "BootsViking",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "brown_eye",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "eyebrow001",
+        "size": [
+          512,
+          512
+        ]
+      },
+      {
+        "name": "PantsViking",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "short02_diffuse",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "TUNIC_Viking",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "young_lightskinned_male_diffuse",
+        "size": [
+          1024,
+          1024
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "idle",
+      "walk"
+    ],
+    "imported_animation_tracks": [
+      "idle",
+      "walk"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "idle",
+        "duration_seconds": 4.0,
+        "sample_count": 31,
+        "distinct_mesh_samples": 15,
+        "min_floor_m": -3.0081719160079956e-07,
+        "max_floor_m": 2.514570951461792e-08,
+        "max_extent_m": 1.8234532633796334,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "walk",
+        "duration_seconds": 1.4,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.00040010735392570496,
+        "max_floor_m": 1.779012382030487e-05,
+        "max_extent_m": 1.7720373896881938,
+        "bounds_loop_difference_m": 0.0
+      }
+    ]
+  }
+]

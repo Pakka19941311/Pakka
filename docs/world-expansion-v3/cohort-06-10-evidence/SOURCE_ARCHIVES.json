@@ -1,0 +1,111 @@
+[
+  {
+    "mob_id": "MOB-06",
+    "page": "https://opengameart.org/content/spider-2",
+    "url": "https://opengameart.org/sites/default/files/spider_1.blend",
+    "filename": "spider.blend",
+    "license": "CC0-1.0",
+    "author": "br-n518",
+    "source-page.html": {
+      "bytes": 24351,
+      "sha256": "a18b6f39808c99f1c6a249036cc8ecef596cceaefeaaa8621246d0f0709d3ba2"
+    },
+    "spider.blend": {
+      "bytes": 784128,
+      "sha256": "01e0d50597ba9d4a1d5ebaaa78da89ef6fd79df207f3fa9962b3e4e069b0112b"
+    }
+  },
+  {
+    "mob_id": "MOB-07",
+    "page": "https://opengameart.org/content/animated-defender-aka-brigand",
+    "url": "https://opengameart.org/sites/default/files/Defender.zip",
+    "filename": "Defender.zip",
+    "license": "CC-BY-3.0",
+    "author": "Danimal; Anthony Myers; Konstantin Maystrenko",
+    "source-page.html": {
+      "bytes": 22847,
+      "sha256": "60c6d94b2387f4ccabee7f6303502ef6bac73268472dee7bca69e88fe2f4bd15"
+    },
+    "Defender.zip": {
+      "bytes": 13107375,
+      "sha256": "c4be8bf1b95ae8b4d80999bec0627627f58b7ac8c0dc83e0dd51c2f83eedeb74"
+    },
+    "archive": [
+      {
+        "name": "Defender.blend",
+        "bytes": 25756356
+      }
+    ]
+  },
+  {
+    "mob_id": "MOB-08",
+    "page": "https://opengameart.org/content/simple-cat",
+    "url": "https://opengameart.org/sites/default/files/cat.zip",
+    "filename": "cat.zip",
+    "license": "CC0-1.0",
+    "author": "Drummyfish",
+    "source-page.html": {
+      "bytes": 33338,
+      "sha256": "ca338c58bb409c8b6ca80d356a574517245477c7e7276fa3c7aa71579848f7d8"
+    },
+    "cat.zip": {
+      "bytes": 497695,
+      "sha256": "266e1b999c0507afe54dd10be9720352cb1fec76298b79f442f47f0435e58e1a"
+    },
+    "cat_free.png": {
+      "bytes": 312561,
+      "sha256": "d95bce8cf81320c25e413c6530128107c3cd8590548e2c9b818b955be9d7726f"
+    },
+    "archive": [
+      {
+        "name": "cat.mtl",
+        "bytes": 236
+      },
+      {
+        "name": "cat.obj",
+        "bytes": 8375
+      },
+      {
+        "name": "cat.png",
+        "bytes": 394606
+      },
+      {
+        "name": "cat_2-80.blend",
+        "bytes": 710856
+      }
+    ]
+  },
+  {
+    "id": "city-p2/suits02",
+    "url": "https://files2.makehumancommunity.org/asset_packs/suits02/suits02_cc0.zip",
+    "page": "https://static.makehumancommunity.org/assets/assetpacks/suits02.html",
+    "license": "CC0-1.0",
+    "cache_file": "city-p2/suits02/suits02.zip",
+    "sha256": "437f4d7ab92b698c1fb1047e7d62b22c11f195b2473e936118661dc8e6b7eb7a",
+    "bytes": 192511027,
+    "extract_to": "city-p2/suits02/extracted"
+  },
+  {
+    "id": "A03",
+    "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+    "page": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html",
+    "license": "CC0-1.0",
+    "cache_file": "A03/makehuman_system_assets_cc0.zip",
+    "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+    "bytes": 280737770,
+    "extract_to": "A03/extracted"
+  },
+  {
+    "id": "MPFB2",
+    "url": "https://codeload.github.com/makehumancommunity/mpfb2/zip/refs/heads/master",
+    "pinned_commit": "437dd513888a92399d1d3200d2e80859fae55abc",
+    "pinned_commit_url": "https://github.com/makehumancommunity/mpfb2/tree/437dd513888a92399d1d3200d2e80859fae55abc",
+    "cache_file": "city-p2/mpfb/mpfb2-master.zip",
+    "sha256": "e82923cd5a8b5fe2587605419a6d9bdd3c3757fcdb11248e14137d868b3d82b9",
+    "bytes": 44656319,
+    "extract_to": "city-p2/mpfb/extracted",
+    "required_directory_name": "mpfb2-master",
+    "tool_license": "GPL; executable tool only; generated core/selected clothing artCC0",
+    "note": "ZIP comment pins source tree. Pinned-commit archive has a different ZIP digest/root name; use recorded archive or independently verify its tree and normalize directory name."
+  }
+]

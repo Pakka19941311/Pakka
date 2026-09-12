@@ -1,0 +1,72 @@
+{
+  "mob_id": "MOB-06",
+  "name": "CohortSpiderSource",
+  "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\cohort-06-10\\MOB-06\\spider.blend",
+  "source_sha256": "01e0d50597ba9d4a1d5ebaaa78da89ef6fd79df207f3fa9962b3e4e069b0112b",
+  "path": "godot-pc\\world-expansion-v3\\actors\\cohort-06-10\\MOB-06\\CohortSpiderSource.glb",
+  "sha256": "c5bfbd40fbe7406b361f135084a939b176c00941faccd6491d75404af4fe471b",
+  "bytes": 333092,
+  "triangles": 222,
+  "bones": 45,
+  "target_body_height_m": 0.55,
+  "blender_bounds": {
+    "min": [
+      -1.0587314367294312,
+      -0.5252651572227478,
+      0.0
+    ],
+    "max": [
+      1.0587313175201416,
+      0.5252651572227478,
+      0.550000011920929
+    ]
+  },
+  "clips": [
+    {
+      "name": "idle",
+      "source_action": "IDLE",
+      "source_frames": [
+        0,
+        16
+      ],
+      "duration_seconds": 0.6666666666666666,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "walk",
+      "source_action": "WALK",
+      "source_frames": [
+        0,
+        16
+      ],
+      "duration_seconds": 0.6666666666666666,
+      "kind": "source_window_baked"
+    },
+    {
+      "name": "attack",
+      "source_action": "ATTACK",
+      "source_frames": [
+        0,
+        16
+      ],
+      "duration_seconds": 0.6666666666666666,
+      "kind": "source_window_baked"
+    }
+  ],
+  "images": [
+    {
+      "name": "spider.png.001",
+      "size": [
+        256,
+        256
+      ]
+    }
+  ],
+  "status": "source_candidate_not_runtime_accepted",
+  "gaps": [
+    "new_anatomical_mesh",
+    "hit",
+    "death",
+    "natural_gait"
+  ]
+}

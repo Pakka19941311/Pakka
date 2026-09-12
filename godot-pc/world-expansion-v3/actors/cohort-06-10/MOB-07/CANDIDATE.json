@@ -1,0 +1,262 @@
+{
+  "mob_id": "MOB-07",
+  "model": "CohortBrigandSource.glb",
+  "sha256": "6211c08f3dc52aa6b29dfb565d0c8bd622928b14bd688d528ed038cc0986da86",
+  "status": "source_basis",
+  "upstream_license": "CC-BY-3.0",
+  "credit": "Konstantin Maystrenko — concept; Anthony Myers — original model; Danimal — retopology, rigging and animation. Animated Defender AKA Brigand.",
+  "source_urls": [
+    "https://opengameart.org/content/animated-defender-aka-brigand"
+  ],
+  "sources": [
+    {
+      "mob_id": "MOB-07",
+      "page": "https://opengameart.org/content/animated-defender-aka-brigand",
+      "url": "https://opengameart.org/sites/default/files/Defender.zip",
+      "filename": "Defender.zip",
+      "license": "CC-BY-3.0",
+      "author": "Danimal; Anthony Myers; Konstantin Maystrenko",
+      "source-page.html": {
+        "bytes": 22847,
+        "sha256": "60c6d94b2387f4ccabee7f6303502ef6bac73268472dee7bca69e88fe2f4bd15"
+      },
+      "Defender.zip": {
+        "bytes": 13107375,
+        "sha256": "c4be8bf1b95ae8b4d80999bec0627627f58b7ac8c0dc83e0dd51c2f83eedeb74"
+      },
+      "archive": [
+        {
+          "name": "Defender.blend",
+          "bytes": 25756356
+        }
+      ]
+    }
+  ],
+  "measurements": {
+    "mob_id": "MOB-07",
+    "file": "CohortBrigandSource.glb",
+    "sha256": "6211c08f3dc52aa6b29dfb565d0c8bd622928b14bd688d528ed038cc0986da86",
+    "bytes": 2373876,
+    "triangles_exported": 15953,
+    "skin_joint_counts": [
+      31
+    ],
+    "mesh_count": 1,
+    "texture_dimensions": [
+      {
+        "name": "Done3",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "DoneWeps",
+        "size": [
+          512,
+          512
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "attack",
+      "attack_2",
+      "death",
+      "idle",
+      "run",
+      "walk"
+    ],
+    "imported_animation_tracks": [
+      "attack",
+      "attack_2",
+      "death",
+      "idle",
+      "run",
+      "walk"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "attack",
+        "duration_seconds": 1.1199999491373698,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.40133431553840637,
+        "max_floor_m": -0.03677668794989586,
+        "max_extent_m": 3.653077404946089,
+        "bounds_loop_difference_m": 0.4986039400100708
+      },
+      {
+        "name": "attack_2",
+        "duration_seconds": 1.2,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.21268120408058167,
+        "max_floor_m": -0.02704194001853466,
+        "max_extent_m": 3.584502052515745,
+        "bounds_loop_difference_m": 0.4284076690673828
+      },
+      {
+        "name": "death",
+        "duration_seconds": 3.8399998982747396,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.9071481823921204,
+        "max_floor_m": -0.06729409843683243,
+        "max_extent_m": 3.1831796169281006,
+        "bounds_loop_difference_m": 1.630368024110794
+      },
+      {
+        "name": "idle",
+        "duration_seconds": 4.0,
+        "sample_count": 31,
+        "distinct_mesh_samples": 25,
+        "min_floor_m": 3.6391429603099823e-07,
+        "max_floor_m": 3.6391429603099823e-07,
+        "max_extent_m": 2.464082360267639,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "run",
+        "duration_seconds": 0.8399999618530274,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.038763463497161865,
+        "max_floor_m": 0.03084159828722477,
+        "max_extent_m": 3.1490347031503916,
+        "bounds_loop_difference_m": 0.00728839635848999
+      },
+      {
+        "name": "walk",
+        "duration_seconds": 2.51999994913737,
+        "sample_count": 31,
+        "distinct_mesh_samples": 31,
+        "min_floor_m": -0.09805162996053696,
+        "max_floor_m": 0.033306702971458435,
+        "max_extent_m": 2.648238229798153,
+        "bounds_loop_difference_m": 1.2030071020126343
+      }
+    ]
+  },
+  "adaptation": {
+    "mob_id": "MOB-07",
+    "name": "CohortBrigandSource",
+    "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\cohort-06-10\\MOB-07\\extracted\\Defender.blend",
+    "source_sha256": "3951410d2d096e5ec2e0f9d49082326b2e4da721abdeda0e66c24bff07ecdc2b",
+    "path": "godot-pc\\world-expansion-v3\\actors\\cohort-06-10\\MOB-07\\CohortBrigandSource.glb",
+    "sha256": "6211c08f3dc52aa6b29dfb565d0c8bd622928b14bd688d528ed038cc0986da86",
+    "bytes": 2373876,
+    "triangles": 15953,
+    "bones": 31,
+    "target_body_height_m": 1.85,
+    "blender_bounds": {
+      "min": [
+        -0.37857380509376526,
+        -1.723781704902649,
+        3.899913281202316e-09
+      ],
+      "max": [
+        0.32167649269104004,
+        0.7286205887794495,
+        1.8500003814697266
+      ]
+    },
+    "clips": [
+      {
+        "name": "walk",
+        "source_action": "Walk-normal.001",
+        "source_frames": [
+          1,
+          87
+        ],
+        "duration_seconds": 2.52,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "run",
+        "source_action": "Run-flee.001",
+        "source_frames": [
+          1,
+          22
+        ],
+        "duration_seconds": 0.84,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "attack",
+        "source_action": "Attack-two handed2",
+        "source_frames": [
+          108,
+          136
+        ],
+        "duration_seconds": 1.12,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "attack_2",
+        "source_action": "Attack-two handed2",
+        "source_frames": [
+          216,
+          246
+        ],
+        "duration_seconds": 1.2,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "death",
+        "source_action": "Death-Backwards",
+        "source_frames": [
+          2,
+          98
+        ],
+        "duration_seconds": 3.84,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "idle",
+        "kind": "authored_quiet_pose_from_source_walk_frame_20_111",
+        "duration_seconds": 4
+      }
+    ],
+    "images": [
+      {
+        "name": "Done3.png",
+        "size": [
+          1024,
+          1024
+        ]
+      },
+      {
+        "name": "DoneWeps.png",
+        "size": [
+          512,
+          512
+        ]
+      }
+    ],
+    "status": "source_candidate_not_runtime_accepted",
+    "gaps": [
+      "hit",
+      "visual_role_fit",
+      "gait_measurement",
+      "attack_contract"
+    ]
+  },
+  "gates": {
+    "card": "source_verified",
+    "import": "blender_export_readback_only_godot_pending",
+    "art": "not_accepted",
+    "runtime": "not_tested"
+  },
+  "active_in_population": false,
+  "canonical_profile_added": false,
+  "blocking_findings": [
+    "walk has a large seam including source transition; recut or replace before runtime",
+    "weapon/body floor intersections in attacks and death; retarget/rebase required",
+    "halberd silhouette does not match accepted short-blade bandit",
+    "no hit clip",
+    "no measured gait or damage-event contract"
+  ]
+}

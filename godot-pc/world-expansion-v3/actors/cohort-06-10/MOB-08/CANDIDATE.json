@@ -1,0 +1,145 @@
+{
+  "mob_id": "MOB-08",
+  "model": "CohortCatReference.glb",
+  "sha256": "478b7250ca31f86a2fdae84d1daff63c1881721b0eeff3ca3b0dc2dcd8c42eb8",
+  "status": "reference_only_gap",
+  "upstream_license": "CC0-1.0",
+  "credit": "Drummyfish — Simple Cat; cat_free.png is the author-drawn replacement texture.",
+  "source_urls": [
+    "https://opengameart.org/content/simple-cat"
+  ],
+  "sources": [
+    {
+      "mob_id": "MOB-08",
+      "page": "https://opengameart.org/content/simple-cat",
+      "url": "https://opengameart.org/sites/default/files/cat.zip",
+      "filename": "cat.zip",
+      "license": "CC0-1.0",
+      "author": "Drummyfish",
+      "source-page.html": {
+        "bytes": 33338,
+        "sha256": "ca338c58bb409c8b6ca80d356a574517245477c7e7276fa3c7aa71579848f7d8"
+      },
+      "cat.zip": {
+        "bytes": 497695,
+        "sha256": "266e1b999c0507afe54dd10be9720352cb1fec76298b79f442f47f0435e58e1a"
+      },
+      "cat_free.png": {
+        "bytes": 312561,
+        "sha256": "d95bce8cf81320c25e413c6530128107c3cd8590548e2c9b818b955be9d7726f"
+      },
+      "archive": [
+        {
+          "name": "cat.mtl",
+          "bytes": 236
+        },
+        {
+          "name": "cat.obj",
+          "bytes": 8375
+        },
+        {
+          "name": "cat.png",
+          "bytes": 394606
+        },
+        {
+          "name": "cat_2-80.blend",
+          "bytes": 710856
+        }
+      ]
+    }
+  ],
+  "measurements": {
+    "mob_id": "MOB-08",
+    "file": "CohortCatReference.glb",
+    "sha256": "478b7250ca31f86a2fdae84d1daff63c1881721b0eeff3ca3b0dc2dcd8c42eb8",
+    "bytes": 324700,
+    "triangles_exported": 114,
+    "skin_joint_counts": [],
+    "mesh_count": 1,
+    "texture_dimensions": [
+      {
+        "name": "cat_free",
+        "size": [
+          512,
+          512
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "KeyAction"
+    ],
+    "imported_animation_tracks": [
+      "KeyAction"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "KeyAction",
+        "duration_seconds": 1.2083333333333333,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": 0.0,
+        "max_floor_m": 0.012459635734558105,
+        "max_extent_m": 0.8373061120510101,
+        "bounds_loop_difference_m": 0.0
+      }
+    ]
+  },
+  "adaptation": {
+    "mob_id": "MOB-08",
+    "name": "CohortCatReference",
+    "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\cohort-06-10\\MOB-08\\extracted\\cat_2-80.blend",
+    "source_sha256": "3f911c286c20b681045aba6f7be6c27919692b76d9fe6db15ce1a57c14a8974c",
+    "path": "godot-pc\\world-expansion-v3\\actors\\cohort-06-10\\MOB-08\\CohortCatReference.glb",
+    "sha256": "478b7250ca31f86a2fdae84d1daff63c1881721b0eeff3ca3b0dc2dcd8c42eb8",
+    "bytes": 324700,
+    "triangles": 114,
+    "bones": 0,
+    "target_body_height_m": 0.65,
+    "blender_bounds": {
+      "min": [
+        -0.10713616013526917,
+        -0.41865304112434387,
+        0.0
+      ],
+      "max": [
+        0.10713616013526917,
+        0.41865307092666626,
+        0.6500000357627869
+      ]
+    },
+    "clips": [
+      {
+        "name": "KeyAction",
+        "kind": "source_two_shape_keys",
+        "duration_seconds": 1.2083333333333333,
+        "skeletal": false
+      }
+    ],
+    "images": [
+      {
+        "name": "cat_free.png",
+        "size": [
+          512,
+          512
+        ]
+      }
+    ],
+    "status": "source_candidate_not_runtime_accepted",
+    "gaps": [
+      "lynx_anatomy",
+      "skeletal_rig",
+      "full_combat_cycle"
+    ]
+  },
+  "gates": {
+    "card": "source_verified",
+    "import": "blender_export_readback_only_godot_pending",
+    "art": "not_accepted",
+    "runtime": "not_tested"
+  },
+  "active_in_population": false,
+  "canonical_profile_added": false
+}

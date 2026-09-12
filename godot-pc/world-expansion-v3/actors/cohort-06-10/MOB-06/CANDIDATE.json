@@ -1,0 +1,179 @@
+{
+  "mob_id": "MOB-06",
+  "model": "CohortSpiderSource.glb",
+  "sha256": "c5bfbd40fbe7406b361f135084a939b176c00941faccd6491d75404af4fe471b",
+  "status": "source_basis",
+  "upstream_license": "CC0-1.0",
+  "credit": "br-n518 — Spider.",
+  "source_urls": [
+    "https://opengameart.org/content/spider-2"
+  ],
+  "sources": [
+    {
+      "mob_id": "MOB-06",
+      "page": "https://opengameart.org/content/spider-2",
+      "url": "https://opengameart.org/sites/default/files/spider_1.blend",
+      "filename": "spider.blend",
+      "license": "CC0-1.0",
+      "author": "br-n518",
+      "source-page.html": {
+        "bytes": 24351,
+        "sha256": "a18b6f39808c99f1c6a249036cc8ecef596cceaefeaaa8621246d0f0709d3ba2"
+      },
+      "spider.blend": {
+        "bytes": 784128,
+        "sha256": "01e0d50597ba9d4a1d5ebaaa78da89ef6fd79df207f3fa9962b3e4e069b0112b"
+      },
+      "texture": {
+        "url": "https://opengameart.org/sites/default/files/spider_7.png",
+        "sha256": "d7845fd1ef1b2387767f62296b44d6dfd0de9770ec77de5f37245b57720ed003",
+        "bytes": 170489
+      }
+    }
+  ],
+  "measurements": {
+    "mob_id": "MOB-06",
+    "file": "CohortSpiderSource.glb",
+    "sha256": "c5bfbd40fbe7406b361f135084a939b176c00941faccd6491d75404af4fe471b",
+    "bytes": 333092,
+    "triangles_exported": 222,
+    "skin_joint_counts": [
+      45
+    ],
+    "mesh_count": 1,
+    "texture_dimensions": [
+      {
+        "name": "spider",
+        "size": [
+          256,
+          256
+        ]
+      }
+    ],
+    "animation_names_in_glb": [
+      "attack",
+      "idle",
+      "walk"
+    ],
+    "imported_animation_tracks": [
+      "attack",
+      "idle",
+      "walk"
+    ],
+    "all_samples_finite": true,
+    "godot_import_tested": false,
+    "runtime_accepted": false,
+    "clips": [
+      {
+        "name": "attack",
+        "duration_seconds": 0.6666666666666666,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.018986117094755173,
+        "max_floor_m": 0.0004389773530419916,
+        "max_extent_m": 2.119442343711853,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "idle",
+        "duration_seconds": 0.6666666666666666,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.00013282193685881793,
+        "max_floor_m": -1.0674865791315824e-07,
+        "max_extent_m": 2.1179087162017822,
+        "bounds_loop_difference_m": 0.0
+      },
+      {
+        "name": "walk",
+        "duration_seconds": 0.6666666666666666,
+        "sample_count": 31,
+        "distinct_mesh_samples": 30,
+        "min_floor_m": -0.00034179689828306437,
+        "max_floor_m": -1.0674865791315824e-07,
+        "max_extent_m": 2.1182100772857666,
+        "bounds_loop_difference_m": 0.0
+      }
+    ]
+  },
+  "adaptation": {
+    "mob_id": "MOB-06",
+    "name": "CohortSpiderSource",
+    "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\cohort-06-10\\MOB-06\\spider.blend",
+    "source_sha256": "01e0d50597ba9d4a1d5ebaaa78da89ef6fd79df207f3fa9962b3e4e069b0112b",
+    "path": "godot-pc\\world-expansion-v3\\actors\\cohort-06-10\\MOB-06\\CohortSpiderSource.glb",
+    "sha256": "c5bfbd40fbe7406b361f135084a939b176c00941faccd6491d75404af4fe471b",
+    "bytes": 333092,
+    "triangles": 222,
+    "bones": 45,
+    "target_body_height_m": 0.55,
+    "blender_bounds": {
+      "min": [
+        -1.0587314367294312,
+        -0.5252651572227478,
+        0.0
+      ],
+      "max": [
+        1.0587313175201416,
+        0.5252651572227478,
+        0.550000011920929
+      ]
+    },
+    "clips": [
+      {
+        "name": "idle",
+        "source_action": "IDLE",
+        "source_frames": [
+          0,
+          16
+        ],
+        "duration_seconds": 0.6666666666666666,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "walk",
+        "source_action": "WALK",
+        "source_frames": [
+          0,
+          16
+        ],
+        "duration_seconds": 0.6666666666666666,
+        "kind": "source_window_baked"
+      },
+      {
+        "name": "attack",
+        "source_action": "ATTACK",
+        "source_frames": [
+          0,
+          16
+        ],
+        "duration_seconds": 0.6666666666666666,
+        "kind": "source_window_baked"
+      }
+    ],
+    "images": [
+      {
+        "name": "spider.png.001",
+        "size": [
+          256,
+          256
+        ]
+      }
+    ],
+    "status": "source_candidate_not_runtime_accepted",
+    "gaps": [
+      "new_anatomical_mesh",
+      "hit",
+      "death",
+      "natural_gait"
+    ]
+  },
+  "gates": {
+    "card": "source_verified",
+    "import": "blender_export_readback_only_godot_pending",
+    "art": "not_accepted",
+    "runtime": "not_tested"
+  },
+  "active_in_population": false,
+  "canonical_profile_added": false
+}
