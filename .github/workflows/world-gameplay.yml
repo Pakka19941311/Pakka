@@ -154,7 +154,9 @@ jobs:
           # Exercise the release input path while no Camera3D exists yet.
           # This happens before login, so it needs no personal save/server.
           python scripts/godot_run_checked.py --exe (Join-Path $gamePackage 'Varendor.exe') --packaged --cwd $gamePackage --output qa-artifacts/gameplay-startup --timeout 240 -- --headless --audio-driver Dummy -- ("--qa-startup=" + (Join-Path $PWD 'qa-artifacts/gameplay-startup/startup.json'))
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $startupStatus = $LASTEXITCODE
+          if (Test-Path qa-artifacts/gameplay-startup/startup.json) { Get-Content qa-artifacts/gameplay-startup/startup.json }
+          if ($startupStatus -ne 0) { exit $startupStatus }
           $startupResult = Get-Content qa-artifacts/gameplay-startup/startup.json | ConvertFrom-Json
           if (-not $startupResult.ok) { throw 'Startup input verification failed' }
           & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --headless ("--package=" + $gamePackage)

@@ -32,13 +32,18 @@ static func run(app: Node, path: String) -> void:
 		await app.get_tree().process_frame
 	checks["login_reached"] = true
 	checks["game_ui_restored"] = app.ui.visible and app.startup_complete
-	checks["service_npcs"] = app.world.actors.keys().filter(func(id: String): return id.begins_with("npc:")).size() == 12
+	# Both towns retain their six services; Severin adds the tavern bookshop.
+	# Check identities as well as the total, so another NPC cannot mask a missing one.
+	var expected_services: Array = ["npc:shop","npc:elder","npc:smith","npc:teleport","npc:alchemist","npc:storage","npc:asterhold:shop","npc:asterhold:elder","npc:asterhold:smith","npc:asterhold:teleport","npc:asterhold:alchemist","npc:asterhold:storage","npc:books"]
+	var service_ids: Array = app.world.actors.keys().filter(func(id: String): return id.begins_with("npc:"))
+	expected_services.sort(); service_ids.sort()
+	checks["service_npcs"] = service_ids == expected_services
 	checks["world_surface_ready"] = app.world.final_environment.active_space == "surface"
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		app.get_viewport().get_texture().get_image().save_png(path.get_basename()+".png")
 	var file: FileAccess = FileAccess.open(path, FileAccess.WRITE)
-	file.store_string(JSON.stringify({"ok":not checks.values().has(false),"checks":checks,"window":str(DisplayServer.window_get_size()),"adapter":RenderingServer.get_video_adapter_name()}))
+	file.store_string(JSON.stringify({"ok":not checks.values().has(false),"checks":checks,"serviceNpcIds":service_ids,"window":str(DisplayServer.window_get_size()),"adapter":RenderingServer.get_video_adapter_name()}))
 	file.close()
 	print("STARTUP_QA ", JSON.stringify(checks))
 	app.get_tree().quit(0 if not checks.values().has(false) else 2)
