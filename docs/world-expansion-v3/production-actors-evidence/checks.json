@@ -1,0 +1,206 @@
+{
+  "bind_trace": {
+    "counts": {
+
+    },
+    "events": [],
+    "frames": [
+      {
+        "calls": {
+          "actor.animation_bind": 5,
+          "actor.create": 5
+        },
+        "frame": 0,
+        "timings_ms": {
+          "actor.animation_bind": 14.095,
+          "actor.create": 12.077
+        }
+      }
+    ],
+    "metrics": {
+      "actors": {
+        "count": 0
+      },
+      "draw_calls_previous": {
+        "count": 0
+      },
+      "engine_physics_ms_previous": {
+        "count": 0
+      },
+      "engine_process_ms_previous": {
+        "count": 0
+      },
+      "snapshot_monsters": {
+        "count": 0
+      },
+      "wall_interval_ms": {
+        "count": 0
+      }
+    },
+    "phase": "p2-bind-count",
+    "timings": {
+      "actor.animation_bind": {
+        "per_call_ms": {
+          "count": 5,
+          "max": 4.474,
+          "mean": 2.819,
+          "median": 3.233,
+          "p95": 3.329,
+          "total": 14.095
+        },
+        "per_frame_ms": {
+          "count": 1,
+          "max": 14.095,
+          "mean": 14.095,
+          "median": 14.095,
+          "p95": 14.095,
+          "total": 14.095
+        }
+      },
+      "actor.create": {
+        "per_call_ms": {
+          "count": 5,
+          "max": 8.63,
+          "mean": 2.4154,
+          "median": 0.857,
+          "p95": 1.103,
+          "total": 12.077
+        },
+        "per_frame_ms": {
+          "count": 1,
+          "max": 12.077,
+          "mean": 12.077,
+          "median": 12.077,
+          "p95": 12.077,
+          "total": 12.077
+        }
+      }
+    },
+    "wall_duration_ms": 184.566
+  },
+  "checks": {
+    "FireGolem_height": true,
+    "IceGolem_height": true,
+    "MOB-01_attack": true,
+    "MOB-01_death": true,
+    "MOB-01_hit": true,
+    "MOB-01_idle": true,
+    "MOB-01_owns_controller": true,
+    "MOB-01_run": true,
+    "MOB-01_walk": true,
+    "MOB-02_attack": true,
+    "MOB-02_death": true,
+    "MOB-02_hit": true,
+    "MOB-02_idle": true,
+    "MOB-02_owns_controller": true,
+    "MOB-02_run": true,
+    "MOB-02_walk": true,
+    "MOB-03_attack": true,
+    "MOB-03_death": true,
+    "MOB-03_hit": true,
+    "MOB-03_idle": true,
+    "MOB-03_owns_controller": true,
+    "MOB-03_run": true,
+    "MOB-03_walk": true,
+    "MOB-04_attack": true,
+    "MOB-04_death": true,
+    "MOB-04_hit": true,
+    "MOB-04_idle": true,
+    "MOB-04_owns_controller": true,
+    "MOB-04_run": true,
+    "MOB-04_walk": true,
+    "MOB-05_attack": true,
+    "MOB-05_death": true,
+    "MOB-05_hit": true,
+    "MOB-05_idle": true,
+    "MOB-05_owns_controller": true,
+    "MOB-05_run": true,
+    "MOB-05_walk": true,
+    "RiftWarden_height": true,
+    "all_guards": true,
+    "beetle_ground_radius": true,
+    "beetle_ground_slope": true,
+    "beetle_height": true,
+    "beetle_pick_width": true,
+    "beetle_scaled_stride": true,
+    "guard_idle": true,
+    "guard_talk": true,
+    "guard_turn_left": true,
+    "guard_turn_right": true,
+    "guard_walk": true,
+    "npc:alchemist_appearance": true,
+    "npc:asterhold:alchemist_appearance": true,
+    "npc:asterhold:elder_appearance": true,
+    "npc:asterhold:shop_appearance": true,
+    "npc:asterhold:smith_appearance": true,
+    "npc:asterhold:storage_appearance": true,
+    "npc:asterhold:teleport_appearance": true,
+    "npc:books_appearance": true,
+    "npc:elder_appearance": true,
+    "npc:shop_appearance": true,
+    "npc:smith_appearance": true,
+    "npc:storage_appearance": true,
+    "npc:teleport_appearance": true,
+    "one_bind_per_p2_actor": true,
+    "resident_101": true,
+    "resident_102": true,
+    "resident_103": true,
+    "resident_104": true,
+    "resident_105": true,
+    "resident_106": true,
+    "resident_107": true,
+    "resident_108": true,
+    "resident_109": true,
+    "resident_110": true,
+    "resident_111": true,
+    "resident_112": true,
+    "resident_113": true,
+    "resident_114": true,
+    "resident_115": true,
+    "resident_116": true,
+    "resident_117": true,
+    "resident_118": true,
+    "resident_119": true,
+    "resident_120": true,
+    "resident_121": true,
+    "resident_122": true,
+    "resident_123": true,
+    "resident_124": true,
+    "resident_125": true,
+    "resident_126": true,
+    "resident_127": true,
+    "resident_128": true,
+    "resident_129": true,
+    "resident_130": true,
+    "resident_131": true,
+    "resident_132": true,
+    "resident_133": true,
+    "resident_134": true,
+    "resident_135": true,
+    "resident_136": true,
+    "resident_137": true,
+    "resident_138": true,
+    "resident_139": true,
+    "resident_idle": true,
+    "resident_talk": true,
+    "resident_turn_left": true,
+    "resident_turn_right": true,
+    "resident_walk": true,
+    "woman_idle": true,
+    "woman_talk": true,
+    "woman_turn_left": true,
+    "woman_turn_right": true,
+    "woman_walk": true,
+    "worker_idle": true,
+    "worker_talk": true,
+    "worker_turn_left": true,
+    "worker_turn_right": true,
+    "worker_walk": true
+  },
+  "roles": {
+    "guard": 7,
+    "resident": 4,
+    "woman": 10,
+    "worker": 18
+  }
+}

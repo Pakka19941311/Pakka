@@ -21,12 +21,15 @@ License: CC0 1.0 Universal.
 License text: https://creativecommons.org/publicdomain/zero/1.0/legalcode.en
 Changes: converted legacy material using supplied bug_diffuse.png; selected and renamed six existing clips; converted to GLB; adjusted scale, floor origin and forward axis. The archive also supplies a normal texture; it is not connected in this minimal material adaptation. This model explicitly replaces the rejected Beetle Golem source candidate, without changing an existing game scene.
 
-## P2 starter Slime — Quaternius
+## Historical P2 starter Slime — Quaternius (replaced in the production profile)
 Reused existing godot-pc/generated/actors/Slime.glb from Animated Monster Pack.
 Source: https://quaternius.com/packs/animatedmonster.html
 License: CC0 1.0 Universal, https://creativecommons.org/publicdomain/zero/1.0/
 Existing project credit: public/assets/licenses/Quaternius_Animated_Monster_Pack_CC0.txt
 Changes: selected and renamed four existing actions; run derived from walk timing; authored local Body-bone squash recoil; compact GLB export; metric floor origin and forward axis; baked local floor correction. No new source hit clip is claimed.
+
+## Current P2 starter Slime — original Varendor faceless mantle
+`actors/production/V3FacelessSlime.glb` is original authored mesh, vertex colours, ten-bone rig and six actions. License: CC0 1.0 Universal, https://creativecommons.org/publicdomain/zero/1.0/legalcode.en . No Quaternius or ryuuji-biz geometry, textures or animation are used in this replacement. The requested Simple Slime archive was unavailable during intake; the replacement does not claim to be that product. Asymmetrical low mantle, extended lip, eight flowing perimeter bones, wet opaque material and vertex colour variation; authored idle, walk, run, attack, hit and collapse. Source and editable master: `scripts/assets/production-creatures/prepare_slime.py`, `art/production-creatures/V3FacelessSlime.blend`.
 
 ## P2 starter Boar — Teh_Bucket
 Source: https://opengameart.org/content/boar

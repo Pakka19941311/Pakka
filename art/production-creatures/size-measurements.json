@@ -1,0 +1,406 @@
+[
+  {
+    "model": "FireGolem",
+    "height": 6.2,
+    "source_height": 3.104865216097096,
+    "scale": 1.9968660693727558,
+    "full_width": 6.136674989534532,
+    "full_depth": 2.7765289781411577,
+    "lower_18pct_bounds": [
+      [
+        -2.5058162212371826,
+        -0.8610293865203857,
+        0.0
+      ],
+      [
+        2.493718385696411,
+        1.100101113319397,
+        1.1150662899017334
+      ]
+    ],
+    "support_radius": 2.517669297715634,
+    "slices": {
+      "weighted_torso": {
+        "bounds": [
+          [
+            -0.9632154107093811,
+            -0.9237926006317139,
+            2.2089107036590576
+          ],
+          [
+            0.9818410873413086,
+            1.3882734775543213,
+            5.465908050537109
+          ]
+        ],
+        "max_radius": 1.4481635297944444,
+        "selection": "sum of Hips/Chest (golem), MasterBone/Spine/Shoulder (roach) weights >= 0.6"
+      },
+      "contact_5pct": {
+        "bounds": [
+          [
+            -1.9592453241348267,
+            -0.8610293865203857,
+            0.0
+          ],
+          [
+            1.957027554512024,
+            1.100101113319397,
+            0.3093765676021576
+          ]
+        ],
+        "max_radius": 2.0189186766489033
+      },
+      "torso_35_60pct": {
+        "bounds": [
+          [
+            -3.0696730613708496,
+            -0.6982315182685852,
+            2.171607494354248
+          ],
+          [
+            3.0670018196105957,
+            1.1084823608398438,
+            3.719827651977539
+          ]
+        ],
+        "max_radius": 3.0787208067967584
+      }
+    },
+    "head_height": 4.890901120051995,
+    "bones": [
+      "Root",
+      "Hips",
+      "Chest",
+      "Head",
+      "UpperArm.L",
+      "Forearm.L",
+      "Hand.L",
+      "UpperArm.R",
+      "Forearm.R",
+      "Hand.R",
+      "Thigh.L",
+      "Shin.L",
+      "Foot.L",
+      "Thigh.R",
+      "Shin.R",
+      "Foot.R"
+    ],
+    "source": "generated/actors/FireGolem.glb"
+  },
+  {
+    "model": "IceGolem",
+    "height": 6.2,
+    "source_height": 3.1001689805141552,
+    "scale": 1.9998909862557703,
+    "full_width": 5.475085550908199,
+    "full_depth": 5.029795654660602,
+    "lower_18pct_bounds": [
+      [
+        -2.7329607009887695,
+        -2.514896869659424,
+        0.0
+      ],
+      [
+        2.6201870441436768,
+        2.5148987770080566,
+        1.1112570762634277
+      ]
+    ],
+    "support_radius": 3.368167911740832,
+    "slices": {
+      "weighted_torso": {
+        "bounds": [
+          [
+            -0.9187935590744019,
+            -0.4438839852809906,
+            2.467432737350464
+          ],
+          [
+            0.9323585033416748,
+            1.2323431968688965,
+            5.307126045227051
+          ]
+        ],
+        "max_radius": 1.2595316200024085,
+        "selection": "sum of Hips/Chest (golem), MasterBone/Spine/Shoulder (roach) weights >= 0.6"
+      },
+      "contact_5pct": {
+        "bounds": [
+          [
+            -2.5553534030914307,
+            -2.514896869659424,
+            0.0
+          ],
+          [
+            2.125645160675049,
+            2.048269748687744,
+            0.3095552325248718
+          ]
+        ],
+        "max_radius": 2.984585885190647
+      },
+      "torso_35_60pct": {
+        "bounds": [
+          [
+            -2.657175064086914,
+            -2.2469098567962646,
+            2.177184581756592
+          ],
+          [
+            2.56943416595459,
+            2.1307759284973145,
+            3.7194764614105225
+          ]
+        ],
+        "max_radius": 2.855766187774865
+      }
+    },
+    "head_height": 4.339762236535056,
+    "bones": [
+      "Root",
+      "Hips",
+      "Chest",
+      "Head",
+      "UpperArm.L",
+      "Forearm.L",
+      "Hand.L",
+      "UpperArm.R",
+      "Forearm.R",
+      "Hand.R",
+      "Thigh.L",
+      "Shin.L",
+      "Foot.L",
+      "Thigh.R",
+      "Shin.R",
+      "Foot.R"
+    ],
+    "source": "generated/actors/IceGolem.glb"
+  },
+  {
+    "model": "RiftWarden",
+    "height": 10.2,
+    "source_height": 5.102183665180519,
+    "scale": 1.9991440272150838,
+    "full_width": 9.79849413456925,
+    "full_depth": 4.653807723367197,
+    "lower_18pct_bounds": [
+      [
+        -3.252768039703369,
+        -1.54708993434906,
+        0.0
+      ],
+      [
+        3.249042272567749,
+        1.9842958450317383,
+        1.8357428312301636
+      ]
+    ],
+    "support_radius": 3.339552234102984,
+    "slices": {
+      "weighted_torso": {
+        "bounds": [
+          [
+            -1.6270097494125366,
+            -1.3616180419921875,
+            3.6060538291931152
+          ],
+          [
+            1.629311203956604,
+            2.3233089447021484,
+            9.231935501098633
+          ]
+        ],
+        "max_radius": 2.381357777813074,
+        "selection": "sum of Hips/Chest (golem), MasterBone/Spine/Shoulder (roach) weights >= 0.6"
+      },
+      "contact_5pct": {
+        "bounds": [
+          [
+            -3.252768039703369,
+            -1.54708993434906,
+            0.0
+          ],
+          [
+            3.249042272567749,
+            1.9842958450317383,
+            0.5096430778503418
+          ]
+        ],
+        "max_radius": 3.339552234102984
+      },
+      "torso_35_60pct": {
+        "bounds": [
+          [
+            -4.898195743560791,
+            -1.2831090688705444,
+            3.5706379413604736
+          ],
+          [
+            4.900298595428467,
+            1.9314628839492798,
+            6.119454383850098
+          ]
+        ],
+        "max_radius": 4.92230237814465
+      }
+    },
+    "head_height": 8.054545823244466,
+    "bones": [
+      "Root",
+      "Hips",
+      "Chest",
+      "Head",
+      "UpperArm.L",
+      "Forearm.L",
+      "Hand.L",
+      "UpperArm.R",
+      "Forearm.R",
+      "Hand.R",
+      "Thigh.L",
+      "Shin.L",
+      "Foot.L",
+      "Thigh.R",
+      "Shin.R",
+      "Foot.R"
+    ],
+    "source": "generated/actors/RiftWarden.glb"
+  },
+  {
+    "model": "V3RoachSixLeg",
+    "height": 2.05,
+    "source_height": 0.44999998807907104,
+    "scale": 4.555555676236567,
+    "full_width": 2.3763710724346123,
+    "full_depth": 2.9104857205810997,
+    "lower_18pct_bounds": [
+      [
+        -1.1881860494613647,
+        -1.165579915046692,
+        0.0
+      ],
+      [
+        1.1881850957870483,
+        1.0756664276123047,
+        0.3433900475502014
+      ]
+    ],
+    "support_radius": 1.4088042767152882,
+    "slices": {
+      "weighted_torso": {
+        "bounds": [
+          [
+            -0.35438328981399536,
+            -0.9226935505867004,
+            1.0472314357757568
+          ],
+          [
+            0.35438334941864014,
+            0.4748455882072449,
+            2.049999952316284
+          ]
+        ],
+        "max_radius": 0.931368329267106,
+        "selection": "sum of Hips/Chest (golem), MasterBone/Spine/Shoulder (roach) weights >= 0.6"
+      },
+      "contact_5pct": {
+        "bounds": [
+          [
+            -1.1881860494613647,
+            -0.9304218888282776,
+            0.0
+          ],
+          [
+            1.1881850957870483,
+            1.004263162612915,
+            0.09960265457630157
+          ]
+        ],
+        "max_radius": 1.4076880558913787
+      },
+      "torso_35_60pct": {
+        "bounds": [
+          [
+            -0.752251148223877,
+            -1.8223438262939453,
+            0.7189782857894897
+          ],
+          [
+            0.7522509694099426,
+            1.088141918182373,
+            1.2290633916854858
+          ]
+        ],
+        "max_radius": 1.822343826293951
+      }
+    },
+    "head_height": 1.1576251892944225,
+    "bones": [
+      "MasterBone",
+      "SpineHigh",
+      "Shoulder",
+      "Neck",
+      "Head",
+      "TongeRoot",
+      "Tongue",
+      "Tongue2",
+      "Tongue3",
+      "Tongue4",
+      "TongueEnd",
+      "JawRootL",
+      "JawL",
+      "JawRootR",
+      "JawR",
+      "JR",
+      "JL",
+      "TongueEndM",
+      "ArmRootL",
+      "ArmL",
+      "ForearmFrontL",
+      "ClawFrontL",
+      "ArmRootR",
+      "ArmR",
+      "ForearmFrontR",
+      "ClawFrontR",
+      "MiddleRootL",
+      "MiddleUpperL",
+      "MiddleLowerL",
+      "MiddleClawL",
+      "MiddleContactL",
+      "MiddleRootR",
+      "MiddleUpperR",
+      "MiddleLowerR",
+      "MiddleClawR",
+      "MiddleContactR",
+      "SpineLow",
+      "Tail",
+      "Tail2",
+      "Tail3",
+      "TailEnd",
+      "LegRootL",
+      "LegL",
+      "ForeLegL",
+      "ClawBackL",
+      "LegRootR",
+      "LegR",
+      "ForeLegR",
+      "ClawBackR",
+      "TailEndM",
+      "LH.001",
+      "Floor",
+      "FloorLH",
+      "LH",
+      "ClawFrontLH",
+      "FloorRH",
+      "RH",
+      "ClawFrontRH",
+      "FloorLL",
+      "LL",
+      "ClawBackLL",
+      "FloorRL",
+      "RL",
+      "ClawBackRL"
+    ],
+    "source": "world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb"
+  }
+]

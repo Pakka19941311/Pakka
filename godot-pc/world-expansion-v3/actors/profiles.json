@@ -1,22 +1,22 @@
 {
   "MOB-01": {
     "mob_id": "MOB-01",
-    "model": "V3StarterSlime",
+    "model": "V3FacelessSlime",
     "title": "Лесной слизень",
-    "asset_path": "res://world-expansion-v3/actors/models/V3StarterSlime.glb",
+    "asset_path": "res://world-expansion-v3/actors/production/V3FacelessSlime.glb",
     "height": 0.65,
     "native_bounds": {
-      "name": "V3StarterSlime",
+      "name": "V3FacelessSlime",
       "targetHeight": 0.65,
       "sourceHeight": 0.65,
       "sourceFloor": 0.0,
-      "sourceWidth": 1.022661566734314,
-      "sourceDepth": 0.8462065160274506
+      "sourceWidth": 1.0601636931210177,
+      "sourceDepth": 1.0515334353605437
     },
     "pick_size": [
-      1.022661566734314,
+      1.0601636931210177,
       0.65,
-      0.8462065160274506
+      1.0515334353605437
     ],
     "body_radius_proposed": 0.4,
     "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
@@ -39,75 +39,52 @@
       "walk": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value",
       "run": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value"
     },
-    "status": "visual_candidate",
+    "status": "production candidate; native QA required",
     "clip_provenance": [
       {
         "clip": "idle",
-        "source_action": "Armature|Slime_Idle_Armature",
-        "source_frame_window_at_24fps": [
-          0.0,
-          60.0
-        ],
-        "duration_factor": 1.0,
-        "kind": "source_clip"
+        "kind": "original authored flow action",
+        "duration_seconds": 3.0,
+        "source": "scripts/assets/production-creatures/prepare_slime.py"
       },
       {
         "clip": "walk",
-        "source_action": "Armature|Slime_Walk_Armature",
-        "source_frame_window_at_24fps": [
-          0.0,
-          20.0
-        ],
-        "duration_factor": 1.0,
-        "kind": "source_clip"
+        "kind": "original authored flow action",
+        "duration_seconds": 1.6,
+        "source": "scripts/assets/production-creatures/prepare_slime.py"
       },
       {
         "clip": "run",
-        "source_action": "Armature|Slime_Walk_Armature",
-        "source_frame_window_at_24fps": [
-          0.0,
-          20.0
-        ],
-        "duration_factor": 0.72,
-        "kind": "derived_timing"
+        "kind": "original authored flow action",
+        "duration_seconds": 1.0,
+        "source": "scripts/assets/production-creatures/prepare_slime.py"
       },
       {
         "clip": "attack",
-        "source_action": "Armature|Slime_Attack_Armature",
-        "source_frame_window_at_24fps": [
-          0.0,
-          15.0
-        ],
-        "duration_factor": 1.0,
-        "kind": "source_clip"
-      },
-      {
-        "clip": "death",
-        "source_action": "Armature|Slime_Death_Armature",
-        "source_frame_window_at_24fps": [
-          0.0,
-          10.0
-        ],
-        "duration_factor": 1.0,
-        "kind": "source_clip"
+        "kind": "original authored flow action",
+        "duration_seconds": 0.6333333333333333,
+        "source": "scripts/assets/production-creatures/prepare_slime.py"
       },
       {
         "clip": "hit",
-        "kind": "authored_local_rig_action",
-        "description": "local squash recoil on existing Body bone",
-        "frames": [
-          0,
-          8
-        ],
-        "fps": 24
+        "kind": "original authored flow action",
+        "duration_seconds": 0.5,
+        "source": "scripts/assets/production-creatures/prepare_slime.py"
+      },
+      {
+        "clip": "death",
+        "kind": "original authored flow action",
+        "duration_seconds": 1.6,
+        "source": "scripts/assets/production-creatures/prepare_slime.py"
       }
     ],
-    "source_url": "https://quaternius.com/packs/animatedmonster.html",
+    "source_url": null,
     "license": "CC0-1.0",
-    "author": "Quaternius",
-    "sha256": "bc8c9fcf1714e5de8e2050d7da8db41778108b27bca125bcfdfa13d2002a78ed",
-    "ground_min_dense": -0.00024323859543073922,
-    "floor_clearance_guards": {}
+    "author": "Varendor original asset",
+    "sha256": "3c901fd070562c9afaa457e5b43cc2c5f5f09ef230ced993b18b621ed456b572",
+    "asset_license": "CC0-1.0 original Varendor geometry/rig/actions",
+    "source_author": "Original Varendor authored geometry, rig and actions",
+    "source_reference": "scripts/assets/production-creatures/prepare_slime.py"
   },
   "MOB-02": {
     "mob_id": "MOB-02",
@@ -493,26 +470,26 @@
     "model": "V3RoachSixLeg",
     "title": "Панцирник",
     "asset_path": "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb",
-    "height": 0.45,
+    "height": 2.05,
     "native_bounds": {
       "name": "V3RoachSixLeg",
-      "targetHeight": 0.45,
+      "targetHeight": 2.05,
       "sourceHeight": 0.45,
       "sourceFloor": 0.0,
       "sourceWidth": 0.521308,
       "sourceDepth": 0.636389285326004
     },
     "pick_size": [
-      0.75,
-      0.45,
-      0.75
+      2.376371,
+      2.05,
+      2.910486
     ],
-    "body_radius_proposed": 0.3,
+    "body_radius_proposed": 1.0,
     "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
     "hit_point": [
-      0.0,
-      0.2475,
-      0.0
+      0,
+      1.1275,
+      0
     ],
     "native_visual_yaw_offset_radians": 3.141592653589793,
     "attack_contact": 0.42,
@@ -521,8 +498,8 @@
     "maximum_attack_rate": 1.5,
     "maximum_gait_rate": 1.65,
     "gait": {
-      "walk": 0.605793,
-      "run": 1.038502
+      "walk": 2.7597236666666665,
+      "run": 4.730953555555556
     },
     "gait_provenance": {
       "walk": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints.",
@@ -628,6 +605,8 @@
       "actual_weighted_geometry": true,
       "mandibles": "Two curved volume meshes weighted to JawL and JawR",
       "middle_gait": "Authored stance55%, stroke0.3331m, swing70mm, left/right phase0.25/0.75; three-joint IK baked; no runtime IK dependency"
-    }
+    },
+    "ground_radius": 1.42,
+    "size_provenance": "Requested 2.05 m height; geometry measured by measure_sizes.py. Source GLB remains .45 m, actor scales uniformly; stride speed scales by 2.05/.45."
   }
 }

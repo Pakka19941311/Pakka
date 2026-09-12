@@ -6,16 +6,32 @@ extends RefCounted
 const PROFILES: Dictionary = {
 	"guard":{"body_height":1.8,"walk_mps":1.0,"walk_seconds":1.3},
 	"resident":{"body_height":1.74,"walk_mps":.9,"walk_seconds":1.4},
+	"worker":{"body_height":1.8,"source_height":1.78203,"walk_mps":.9,"walk_seconds":1.4},
+	"woman":{"body_height":1.74,"source_height":1.722,"walk_mps":.9,"walk_seconds":1.4},
 }
+
+static func role_for(id: String, definition: Dictionary) -> String:
+	# Visual assignment only: persistent IDs, services, routes and interaction
+	# permissions remain in the original service/resident definitions.
+	if id.begins_with("npc:"):
+		if id in ["npc:alchemist","npc:asterhold:alchemist","npc:shop"]: return "woman"
+		if id.ends_with(":smith") or id.ends_with(":storage") or id.ends_with(":shop"): return "worker"
+		return "resident"
+	var job: String = str(definition.get("role",""))
+	if job in ["gate","patrol","instructor","trainee","archer"] or not bool(definition.get("civilian",true)): return "guard"
+	if id in ["ambient:105","ambient:114","ambient:121","ambient:123","ambient:125","ambient:127","ambient:129","ambient:131","ambient:133","ambient:139"]: return "woman"
+	if job in ["worker","porter","merchant","barkeep","drinker","buyer"]: return "worker"
+	return "resident"
 
 static func create_actor(world: VarendorWorld, id: String, role: String) -> Node3D:
 	assert(PROFILES.has(role))
 	var profile: Dictionary = PROFILES[role]
 	var model: String = "P2CityMotion" + role.capitalize()
-	world.templates[model] = load("res://world-expansion-v3/city/motion/assets/P2_" + role + "_motion.glb")
+	var folder: String = "production/" if role in ["worker","woman"] else "motion/assets/"
+	world.templates[model] = load("res://world-expansion-v3/city/" + folder + "P2_" + role + "_motion.glb")
 	var bounds_profiles: Dictionary = VarendorWorld.monster_asset_profiles()
 	var previous_profile: Variant = bounds_profiles.get(model)
-	bounds_profiles[model] = {"sourceHeight":profile.body_height,"sourceFloor":0.0,"sourceWidth":.8,"sourceDepth":.55}
+	bounds_profiles[model] = {"sourceHeight":profile.get("source_height",profile.body_height),"sourceFloor":0.0,"sourceWidth":.8,"sourceDepth":.55}
 	var actor: Node3D = world.make_actor(id,model,float(profile.body_height),"Страж" if role == "guard" else "Житель",Color("ddc4a4"))
 	# Bounds are needed only while the actor is constructed. Do not advertise
 	# these local resident assets as generated monsters to later world instances.

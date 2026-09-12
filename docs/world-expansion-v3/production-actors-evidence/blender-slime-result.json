@@ -1,0 +1,122 @@
+{
+  "command": [
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\tools\\blender-4.2.3-windows-x64\\blender.exe",
+    "--background",
+    "--python-exit-code",
+    "86",
+    "--python",
+    "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka\\scripts\\assets\\production-creatures\\prepare_slime.py"
+  ],
+  "cwd": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "utc_start": "2026-09-12T17:50:25.173093+00:00",
+  "timeout_seconds": 120.0,
+  "timed_out": false,
+  "samples": [
+    {
+      "system": {
+        "load_percent": 38,
+        "physical_total": 34046353408,
+        "physical_available": 20819435520,
+        "commit_limit": 36193837056,
+        "commit_available": 18528444416,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733078659072,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 28688,
+          "parent_pid": 20524,
+          "exe": "blender.exe",
+          "working_set": 2699264,
+          "peak_working_set": 2699264,
+          "private_bytes": 9322496,
+          "peak_pagefile": 9322496
+        },
+        {
+          "pid": 29460,
+          "parent_pid": 28688,
+          "exe": "conhost.exe",
+          "working_set": 6569984,
+          "peak_working_set": 6569984,
+          "private_bytes": 1073152,
+          "peak_pagefile": 1073152
+        }
+      ],
+      "elapsed_s": 0.016
+    },
+    {
+      "system": {
+        "load_percent": 39,
+        "physical_total": 34046353408,
+        "physical_available": 20647325696,
+        "commit_limit": 36193837056,
+        "commit_available": 18362863616,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733078659072,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 28688,
+          "parent_pid": 20524,
+          "exe": "blender.exe",
+          "working_set": 147922944,
+          "peak_working_set": 147922944,
+          "private_bytes": 153919488,
+          "peak_pagefile": 153919488
+        },
+        {
+          "pid": 29460,
+          "parent_pid": 28688,
+          "exe": "conhost.exe",
+          "working_set": 8216576,
+          "peak_working_set": 8228864,
+          "private_bytes": 1294336,
+          "peak_pagefile": 1454080
+        }
+      ],
+      "elapsed_s": 0.516
+    },
+    {
+      "system": {
+        "load_percent": 39,
+        "physical_total": 34046353408,
+        "physical_available": 20646535168,
+        "commit_limit": 36193837056,
+        "commit_available": 18359259136,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733078659072,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 28688,
+          "parent_pid": 20524,
+          "exe": "blender.exe",
+          "working_set": 171855872,
+          "peak_working_set": 171855872,
+          "private_bytes": 175341568,
+          "peak_pagefile": 175349760
+        },
+        {
+          "pid": 29460,
+          "parent_pid": 28688,
+          "exe": "conhost.exe",
+          "working_set": 8216576,
+          "peak_working_set": 8228864,
+          "private_bytes": 1294336,
+          "peak_pagefile": 1454080
+        }
+      ],
+      "elapsed_s": 1.032
+    }
+  ],
+  "pid": 28688,
+  "exit_code": 0,
+  "elapsed_s": 1.532,
+  "peak_working_set_bytes": 171855872,
+  "min_available_bytes": 20646535168,
+  "python_exception": false,
+  "operation_completed": true
+}

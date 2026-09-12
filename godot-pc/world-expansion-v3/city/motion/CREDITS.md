@@ -8,3 +8,7 @@ The original five CC0 city sample assets remain unchanged. These **separate** mo
 - All five clips (`idle`, `walk`, `talk`, `turn_left`, `turn_right`) are authored in the Varendor Blender script using anatomical joint positions and two-bone IK. They are **not** copies of Quaternius UAL clips. No third-party addon code is packaged in either GLB. No AI-generated geometry or image edits are used.
 
 Reproduction and measured runtime checks: `docs/world-expansion-v3/P2_NPC_MOTION.md` and `scripts/assets/city/run_npc_motion.py`. The derivative guard is not wholly CC0: its helmet and sword retain CC BY 4.0 obligations.
+
+## Production population variants, 12 September 2026
+
+`city/production/P2_worker_motion.glb` and `P2_woman_motion.glb` use the same pinned MakeHuman/MPFB and Suits02 CC0 sources. Worker: male body, Viking tunic, trousers and boots, short02 hair. Woman: female macro body, middle-aged Caucasian female skin, ponytail01 hair, Monk Robe and Viking boots. Both have five authored motions from the reviewed anatomical pose generator. The woman's hem and covered boot surfaces use the resident garment adjustment. These two variants include no Forgotten Knight equipment and are wholly CC0 artwork. Reproduce with `prepare_production_variants.py`, then `prepare_production_npc_motion.py` in a fresh Blender process; editable masters are in `art/city-production/`. All IDs, shops, quests and original movement routes remain owned by gameplay definitions. Role selection chooses an appearance only; it grants no gameplay permission.

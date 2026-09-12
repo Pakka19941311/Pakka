@@ -7,7 +7,11 @@ static func run(app: Node, checks: Dictionary) -> void:
 	checks.npc_fixture = not (await Mouse.fixture(app,"p2-npc")).is_empty()
 	checks.npc_original_population = app.world.ambient_residents.residents.size()==39
 	checks.npc_original_services = VarendorNpcInteraction.SERVICES.size()==13
-	checks.npc_exact_two_replacements = app.world.actors.values().filter(func(a): return a.has_meta("p2_npc_role")).size()==2
+	checks.npc_all_52_replacements = app.world.actors.values().filter(func(a): return a.has_meta("p2_npc_role")).size()==52
+	var expected_profiles: Dictionary = {"guard":7,"resident":9,"woman":13,"worker":23}
+	checks.npc_expected_profile_counts = expected_profiles.keys().all(func(role): return app.world.actors.values().filter(func(a): return str(a.get_meta("p2_npc_role",""))==role).size()==expected_profiles[role])
+	checks.npc_service_ids_preserved = VarendorNpcInteraction.SERVICES.keys().all(func(id): return app.world.actors.has(id))
+	checks.npc_resident_ids_preserved = app.world.ambient_residents.residents.all(func(resident): return app.world.actors.has(str(resident.id)))
 	var observed: Dictionary = {}
 	for id: String in ["ambient:103","ambient:115"]:
 		var actor: Node3D = app.world.actors[id]
