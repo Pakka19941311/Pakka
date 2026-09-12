@@ -16,7 +16,10 @@ const {WorldStore}=await import(pathToFileURL(join(pkg,'server/world-store.mjs')
 const {startNativeBridge}=await import(pathToFileURL(join(pkg,'launch-native.mjs')));
 const load=()=>{const store=new WorldStore(database);try{return store.load();}finally{store.close();}};
 const before=load(),progress=s=>Object.fromEntries(Object.entries(s.characters).map(([id,h])=>[id,Object.fromEntries(
- ['gold','level','xp','inventory','equipment','quests','starterQuests','progressionQuests'].filter(k=>k in h).map(k=>[k,h[k]]))]));
+ ['id','name','classId','gold','level','xp','inventory','equipment','storage','lootBuffer',
+  'migrationReserve','accessoryMigrationVersion','legacyProgression','starterProgress',
+  'progressionQuests','bookQuests','betaScrollGrant','legacyScrolls','quest','kills','bossKills']
+  .filter(k=>k in h).map(k=>[k,h[k]]))]));
 const originalProgress=progress(before),originalPopulation=before.monsters.map(m=>m.uid).sort();
 assert.ok(new Set(originalPopulation).size===originalPopulation.length,'Source population must be unique');
 const checks={},runs=[];

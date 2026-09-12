@@ -1,0 +1,388 @@
+{
+  "schema": 1,
+  "candidatePackage": "Varendor_World_Gameplay_846c7a349862",
+  "candidateBuildCommit": "846c7a3498629bf8a0ae55fe4cbecd857c114f7c",
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "city": {
+    "evidenceDirectory": "work/qa/audit-native-city-02",
+    "utcStart": "2026-09-12T22:30:44.341433+00:00",
+    "compiledExe": true,
+    "checksPassed": 45,
+    "checksTotal": 45,
+    "checks": {
+      "city_alive": true,
+      "city_camera_clear_at_wall": true,
+      "city_camera_recovers_after_rotation": true,
+      "city_canopy_restored": true,
+      "city_fixture": true,
+      "city_frontage": true,
+      "city_ground_return": true,
+      "city_hero_clear_of_hud_after_rotation": true,
+      "city_hero_in_frame_at_wall": true,
+      "city_leave_stair_approach": true,
+      "city_p2_source": true,
+      "city_real_height_gain": true,
+      "city_stair_approach": true,
+      "city_stair_canopy_cutaway": true,
+      "city_stairs_down": true,
+      "city_stairs_up": true,
+      "city_stop": true,
+      "city_underpass": true,
+      "city_underpass_return": true,
+      "connected": true,
+      "house_loaded": true,
+      "native_city_render": true,
+      "p2_city_stair_bottom_capture": true,
+      "p2_city_stair_clear_view_capture": true,
+      "p2_city_stair_top_capture": true,
+      "p2_city_street_capture": true,
+      "p2_city_upgrade_guardhouse_capture": true,
+      "p2_city_upgrade_market_capture": true,
+      "p2_city_upgrade_tavern_capture": true,
+      "upgrade_citadel_street": true,
+      "upgrade_city_alive": true,
+      "upgrade_city_version": true,
+      "upgrade_eight_buildings": true,
+      "upgrade_eight_roots_loaded": true,
+      "upgrade_guard_approach": true,
+      "upgrade_guard_arch_entry": true,
+      "upgrade_guard_arch_passage": true,
+      "upgrade_guard_arch_return": true,
+      "upgrade_indoor_precipitation_hidden": true,
+      "upgrade_market_route": true,
+      "upgrade_outdoor_precipitation_restored": true,
+      "upgrade_tavern_entry": true,
+      "upgrade_tavern_exit": true,
+      "upgrade_tavern_inside": true,
+      "upgrade_tavern_lane": true
+    },
+    "elapsedSeconds": 95.578,
+    "exitCode": 0,
+    "timeout": false,
+    "crash": false,
+    "cleanErrorLog": true,
+    "errorLines": [],
+    "stageSha256": "1fb9f001deded578ce0f928bb4e84b37da6fca775adad1ca46011e9f16e30c69",
+    "captures": [
+      {
+        "name": "p2-city-stair-bottom",
+        "phase": "complete",
+        "drawWaitMs": 18,
+        "readbackMs": 8,
+        "pngSaveMs": 591,
+        "totalMs": 617,
+        "png": {
+          "name": "p2-city-stair-bottom.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 1991580,
+          "sha256": "dd3f81b55149979886a8449351e4c4e3bc7e62b795ac86a9ba493b91b1e3a875",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "name": "p2-city-stair-clear-view",
+        "phase": "complete",
+        "drawWaitMs": 38,
+        "readbackMs": 6,
+        "pngSaveMs": 509,
+        "totalMs": 553,
+        "png": {
+          "name": "p2-city-stair-clear-view.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 1774798,
+          "sha256": "8663ee2e4f343649013806d752565c8e49bcd7e5288c17b1723b3d12cadbf468",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "name": "p2-city-stair-top",
+        "phase": "complete",
+        "drawWaitMs": 47,
+        "readbackMs": 8,
+        "pngSaveMs": 632,
+        "totalMs": 687,
+        "png": {
+          "name": "p2-city-stair-top.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 2029149,
+          "sha256": "2c1d4bb3c5ad656f78daac1004e809438e4ae61c2ff14d9f95963187dc342109",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "name": "p2-city-street",
+        "phase": "complete",
+        "drawWaitMs": 17,
+        "readbackMs": 9,
+        "pngSaveMs": 601,
+        "totalMs": 627,
+        "png": {
+          "name": "p2-city-street.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 2046682,
+          "sha256": "4d12d27db30bd4955d85ef7093cc4924727a6bfcaf6bf2774dc776fa9f7b4ef9",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "name": "p2-city-upgrade-guardhouse",
+        "phase": "complete",
+        "drawWaitMs": 17,
+        "readbackMs": 7,
+        "pngSaveMs": 609,
+        "totalMs": 633,
+        "png": {
+          "name": "p2-city-upgrade-guardhouse.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 1788060,
+          "sha256": "871f5897e611027ada4aa73fd97dae1eb8536f59418e74db6c707026676f0dff",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "name": "p2-city-upgrade-market",
+        "phase": "complete",
+        "drawWaitMs": 19,
+        "readbackMs": 7,
+        "pngSaveMs": 573,
+        "totalMs": 599,
+        "png": {
+          "name": "p2-city-upgrade-market.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 2144286,
+          "sha256": "f08730c98147f7408b742f11012f35554d85c94d63ddf7c2b48fa338dcc156db",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "name": "p2-city-upgrade-tavern",
+        "phase": "complete",
+        "drawWaitMs": 15,
+        "readbackMs": 7,
+        "pngSaveMs": 371,
+        "totalMs": 393,
+        "png": {
+          "name": "p2-city-upgrade-tavern.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 1566155,
+          "sha256": "9cd43441f1d64c712c5df82fa54e5490c4804729b187dc6d27a4ecc6d15de3eb",
+          "visuallyReviewed": true
+        }
+      }
+    ],
+    "visualFindings": [
+      "No rain streaks remain inside the tavern; rain is visible outdoors. Actual exit and restored outdoor precipitation pass.",
+      "All seven city images reviewed; route, stairs, guardhouse and arch are visible. Close stair camera still partly places the lower body behind HUD."
+    ],
+    "graphicsScope": "Existing city QA graphics/settings. The city block does not claim full LOW profile or FPS acceptance."
+  },
+  "line": {
+    "evidenceDirectory": "work/qa/audit-native-line-01",
+    "utcStart": "2026-09-12T22:33:12.792176+00:00",
+    "compiledExe": true,
+    "checksPassed": 36,
+    "checksTotal": 36,
+    "checks": {
+      "connected": true,
+      "p2_line_fire_actual_mesh_matches_server_width": true,
+      "p2_line_fire_capsule_half_width": true,
+      "p2_line_fire_connected_before_input": true,
+      "p2_line_fire_directed_pulse_presented": true,
+      "p2_line_fire_element_color": true,
+      "p2_line_fire_fixed_endpoint_during_movement": true,
+      "p2_line_fire_fixture": true,
+      "p2_line_fire_hero_survived": true,
+      "p2_line_fire_no_legacy_circle": true,
+      "p2_line_fire_one_release_event": true,
+      "p2_line_fire_population_unchanged": true,
+      "p2_line_fire_real_windup_visible": true,
+      "p2_line_fire_release_endpoint_exact": true,
+      "p2_line_fire_server_windup_1200ms": true,
+      "p2_line_fire_stationary_receives_one_real_hit": true,
+      "p2_line_fire_telegraph_and_pulse_expired": true,
+      "p2_line_fire_warm_setup_no_damage": true,
+      "p2_line_ice_dodge_actual_mesh_matches_server_width": true,
+      "p2_line_ice_dodge_capsule_half_width": true,
+      "p2_line_ice_dodge_connected_before_input": true,
+      "p2_line_ice_dodge_directed_pulse_presented": true,
+      "p2_line_ice_dodge_element_color": true,
+      "p2_line_ice_dodge_fixed_endpoint_during_movement": true,
+      "p2_line_ice_dodge_fixture": true,
+      "p2_line_ice_dodge_hero_survived": true,
+      "p2_line_ice_dodge_no_legacy_circle": true,
+      "p2_line_ice_dodge_one_release_event": true,
+      "p2_line_ice_dodge_ordinary_sidestep_over_2m": true,
+      "p2_line_ice_dodge_population_unchanged": true,
+      "p2_line_ice_dodge_real_windup_visible": true,
+      "p2_line_ice_dodge_release_endpoint_exact": true,
+      "p2_line_ice_dodge_server_windup_1200ms": true,
+      "p2_line_ice_dodge_sidestep_avoids_real_damage": true,
+      "p2_line_ice_dodge_telegraph_and_pulse_expired": true,
+      "p2_line_ice_dodge_warm_setup_no_damage": true
+    },
+    "elapsedSeconds": 44.297,
+    "exitCode": 0,
+    "timeout": false,
+    "crash": false,
+    "cleanErrorLog": true,
+    "errorLines": [],
+    "stageSha256": "9ad84332fde10fc4b9f708c465e5f5a6a2c5349d55ca09d3b3bb36416e06d118",
+    "graphics": "low",
+    "liveEvidenceSha256": "1fa8d15a420dcd26c6fed7d70a21be0c12fcb7c3c2782c014ccb36dd45b0c45f",
+    "cases": [
+      {
+        "stage": "p2-line-fire",
+        "speciesId": "fire_golem",
+        "targetHp": 650.0,
+        "population": 1151.0,
+        "populationHashUnchanged": true,
+        "initialHp": 884.0,
+        "finalHp": 816.0,
+        "movedMeters": 0.0,
+        "pulseCount": 1,
+        "responseObservedFrames": 72,
+        "inputAcks": [
+          {
+            "type": "destination",
+            "sequence": 1,
+            "milliseconds": 69
+          },
+          {
+            "type": "attack",
+            "sequence": 2,
+            "milliseconds": 55
+          },
+          {
+            "type": "cancel",
+            "sequence": 3,
+            "milliseconds": 33
+          }
+        ],
+        "pendingAckCount": 0,
+        "disconnectCount": 0,
+        "rejectionCount": 0,
+        "timings": {
+          "approach_reserved_sequence": 1,
+          "approach_sent": 30394,
+          "attack_reserved_sequence": 2,
+          "attack_sent": 32694,
+          "fixture_ack": 26378,
+          "response_reserved_sequence": 3,
+          "response_sent": 33167,
+          "warm_end": 30382,
+          "windup_seen": 33167,
+          "windup_seen_presentation": 1789252425726.81,
+          "windup_seen_server": 1789252425775.0
+        },
+        "serverWindupMilliseconds": 1200.0,
+        "responseFrameIntervalsMs": {
+          "count": 71,
+          "p50": 17,
+          "p95": 17,
+          "p99": 56,
+          "max": 56
+        },
+        "wholePhaseFrameIntervalsMs": {
+          "count": 512,
+          "max": 202.747,
+          "mean": 17.2546796875,
+          "median": 16.552,
+          "p95": 21.382,
+          "total": 8834.396
+        },
+        "afterCombatPng": {
+          "name": "p2-line-fire-after.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 1216053,
+          "sha256": "86db3549f38f49abee5354905d5ba0ab36d2fa26b985cbf167d3f759fae0055e",
+          "visuallyReviewed": true
+        }
+      },
+      {
+        "stage": "p2-line-ice-dodge",
+        "speciesId": "ice_golem",
+        "targetHp": 750.0,
+        "population": 1151.0,
+        "populationHashUnchanged": true,
+        "initialHp": 884.0,
+        "finalHp": 884.0,
+        "movedMeters": 3.42339396476746,
+        "pulseCount": 1,
+        "responseObservedFrames": 84,
+        "inputAcks": [
+          {
+            "type": "destination",
+            "sequence": 5,
+            "milliseconds": 53
+          },
+          {
+            "type": "attack",
+            "sequence": 6,
+            "milliseconds": 33
+          },
+          {
+            "type": "destination",
+            "sequence": 7,
+            "milliseconds": 43
+          }
+        ],
+        "pendingAckCount": 0,
+        "disconnectCount": 0,
+        "rejectionCount": 0,
+        "timings": {
+          "approach_reserved_sequence": 5,
+          "approach_sent": 39752,
+          "attack_reserved_sequence": 6,
+          "attack_sent": 40790,
+          "fixture_ack": 35747,
+          "response_reserved_sequence": 7,
+          "response_sent": 40899,
+          "warm_end": 39739,
+          "windup_seen": 40899,
+          "windup_seen_presentation": 1789252433636.88,
+          "windup_seen_server": 1789252433675.0
+        },
+        "serverWindupMilliseconds": 1200.0,
+        "responseFrameIntervalsMs": {
+          "count": 83,
+          "p50": 17,
+          "p95": 21,
+          "p99": 26,
+          "max": 26
+        },
+        "wholePhaseFrameIntervalsMs": {
+          "count": 426,
+          "max": 266.856,
+          "mean": 17.3234248826291,
+          "median": 16.4,
+          "p95": 23.542,
+          "total": 7379.779
+        },
+        "afterCombatPng": {
+          "name": "p2-line-ice-dodge-after.png",
+          "width": 1600,
+          "height": 900,
+          "bytes": 1167332,
+          "sha256": "d7889662d65af219e631065523daf71878ce90f3492f764cdb88c67e1c819de4",
+          "visuallyReviewed": true
+        }
+      }
+    ]
+  },
+  "limits": [
+    "One clean synthetic save per run; no personal save or session token included.",
+    "Aimed-line is a warmed scene check with full original monsters and ordinary destination/attack inputs; not a full kill or level balance acceptance.",
+    "Warning mesh width/color/immutable endpoints and pulse presentation are proven by runtime geometry/event/frame callbacks. The two combat PNGs are after-impact images and do not visually prove the warning itself.",
+    "Whole-phase cold/fixture load spikes remain recorded separately from the response window; short scenario PASS is not global performance acceptance.",
+    "Frame-interval statistics require two adjacent recorded frames: the first observed phase frame has no preceding wall timestamp. Reported maxima do not bound first-frame or startup-to-world latency; combat starts after a four-second scene warmup.",
+    "Historical failed timeout/disconnection/113-of-114 fog reports remain unchanged."
+  ]
+}
