@@ -1,5 +1,6 @@
 class_name SnapshotTimeline
 extends RefCounted
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 # The server owns simulation and rewards. This clock only presents immutable
 # snapshots/events on one time axis, one 30 Hz network frame behind the server. Motion
@@ -55,6 +56,12 @@ func reset() -> void:
 	_generation = -1
 
 func ingest(snapshot: Dictionary) -> bool:
+	var cpu_ingest: int = CPU_TRACE.begin()
+	var result: bool = _profiled_ingest(snapshot)
+	CPU_TRACE.end("timeline.ingest",cpu_ingest)
+	return result
+
+func _profiled_ingest(snapshot: Dictionary) -> bool:
 	did_resynchronize = false
 	if not snapshot.has("time") or not snapshot.get("character", {}) is Dictionary:
 		return false
@@ -138,6 +145,12 @@ func ingest(snapshot: Dictionary) -> bool:
 	return true
 
 func advance(delta: float) -> Dictionary:
+	var cpu_advance: int = CPU_TRACE.begin()
+	var result: Dictionary = _profiled_advance(delta)
+	CPU_TRACE.end("timeline.advance",cpu_advance)
+	return result
+
+func _profiled_advance(delta: float) -> Dictionary:
 	var result: Dictionary = {"snapshot":{}, "events":[], "transitions":[]}
 	if current.is_empty():
 		return result

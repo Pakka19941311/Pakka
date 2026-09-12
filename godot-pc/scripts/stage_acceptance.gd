@@ -29,6 +29,7 @@ static func run(app: Node) -> void:
 	if block == "p2-cloak": await preload("res://scripts/p2_cloak_acceptance.gd").run(app,checks)
 	if block == "p2-npc": await preload("res://scripts/p2_npc_acceptance.gd").run(app,checks)
 	if block == "p2-nature": await preload("res://scripts/p2_nature_acceptance.gd").run(app,checks)
+	if block == "p2-cpu": await preload("res://scripts/p2_cpu_acceptance.gd").run(app,checks)
 	if block == "p2-pursuit" or block.begins_with("p2-pursuit:"): await preload("res://scripts/p2_pursuit_acceptance.gd").run(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)

@@ -1,5 +1,6 @@
 class_name VarendorAnimationController
 extends RefCounted
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 # One presentation owner per actor. The server owns combat/lifecycle clocks;
 # movement owns body position. This controller samples only the rig and its
@@ -76,6 +77,11 @@ var knight_hips: int = -1
 var knight_hips_origin: Vector3 = Vector3.ZERO
 
 func bind(body: Node3D) -> void:
+	var cpu_bind: int = CPU_TRACE.begin()
+	_profiled_bind(body)
+	CPU_TRACE.end("actor.animation_bind",cpu_bind)
+
+func _profiled_bind(body: Node3D) -> void:
 	actor = body
 	visual = actor.get_meta("visual")
 	base_visual = actor.get_meta("base_visual", visual.transform)

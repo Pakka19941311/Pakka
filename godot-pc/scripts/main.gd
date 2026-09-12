@@ -1,4 +1,5 @@
 extends Node3D
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 var data: Dictionary
 var net: VarendorNetwork
@@ -321,6 +322,11 @@ func snapshot_received(snapshot: Dictionary) -> void:
 	polish.refresh(snapshot)
 
 func present_snapshot(snapshot: Dictionary) -> void:
+	var cpu_present: int = CPU_TRACE.begin()
+	_profiled_present_snapshot(snapshot)
+	CPU_TRACE.end("main.present_snapshot",cpu_present)
+
+func _profiled_present_snapshot(snapshot: Dictionary) -> void:
 	var hero: Dictionary = snapshot.character
 	if login != null:
 		login.hide()
@@ -994,6 +1000,11 @@ func text_focused() -> bool:
 	return get_viewport().gui_get_focus_owner() is LineEdit or get_viewport().gui_get_focus_owner() is TextEdit or (is_instance_valid(active_dialog) and not active_dialog.get_meta("nonmodal",false)) or (login != null and login.visible)
 
 func _process(delta: float) -> void:
+	var cpu_process: int = CPU_TRACE.begin()
+	_profiled_process(delta)
+	CPU_TRACE.end("main.process",cpu_process)
+
+func _profiled_process(delta: float) -> void:
 	trade_session.poll()
 	crafting.poll()
 	starter_quests.poll()

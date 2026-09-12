@@ -1,5 +1,6 @@
 class_name VarendorWorld
 extends Node3D
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 # Art selection stays client-only: server class model still owns attack timings.
 const P2_ADAPTER = preload("res://world-expansion-v3/actors/profile_adapter.gd")
@@ -127,7 +128,9 @@ func receive_snapshot(snapshot: Dictionary) -> void:
 		for floater: Dictionary in floaters:
 			if is_instance_valid(floater.get("node")): floater.node.queue_free()
 		floaters.clear()
+	var cpu_reconcile: int = CPU_TRACE.begin()
 	var reset: bool = player_motion.reconcile(snapshot)
+	CPU_TRACE.end("player.reconcile",cpu_reconcile)
 	server_position = point(snapshot.character.x,snapshot.character.z,snapshot.character.yOffset)
 	if reset:
 		last_event = 0
@@ -165,10 +168,16 @@ func reject_intent(value: Dictionary, input_sequence: int, error: String) -> voi
 
 func _physics_process(delta: float) -> void:
 	if space_loading: return
+	var cpu_physics: int = CPU_TRACE.begin()
+	var cpu_player: int = CPU_TRACE.begin()
 	player_motion.physics_step(delta)
+	CPU_TRACE.end("player.physics",cpu_player)
 	if not current_snapshot.is_empty() and ambient_active():
+		var cpu_ambient: int = CPU_TRACE.begin()
 		ambient_residents.visitor_positions = [player_motion.position_value]
 		ambient_residents.physics_step(delta)
+		CPU_TRACE.end("ambient.physics",cpu_ambient)
+	CPU_TRACE.end("world.physics",cpu_physics)
 
 func ambient_active() -> bool:
 	return final_environment == null or (final_environment.active_space == "surface" and player_motion.position_value.distance_to(Vector2(-100,-150)) < 210)
@@ -421,6 +430,12 @@ func monster_definition(monster: Dictionary) -> Dictionary:
 	return definition
 
 func make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
+	var cpu_create: int = CPU_TRACE.begin() if not actors.has(id) else 0
+	var result: Node3D = _profiled_make_actor(id,model,size,title,color)
+	CPU_TRACE.end("actor.create",cpu_create)
+	return result
+
+func _profiled_make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
 	if actors.has(id):
 		var existing: Node3D = actors[id]
 		(existing.get_meta("screen_label") as Label).text = title
@@ -512,6 +527,11 @@ static func monster_asset_profiles() -> Dictionary:
 	return cached_monster_profiles
 
 func apply_snapshot(snapshot: Dictionary) -> void:
+	var cpu_apply: int = CPU_TRACE.begin()
+	_profiled_apply_snapshot(snapshot)
+	CPU_TRACE.end("world.apply_snapshot",cpu_apply)
+
+func _profiled_apply_snapshot(snapshot: Dictionary) -> void:
 	current_snapshot = snapshot
 	book_ground.apply(snapshot)
 	var hero: Dictionary = snapshot.character
@@ -680,6 +700,12 @@ func record_intent(value: Dictionary, input_sequence: int) -> void:
 	player_motion.sent(value,input_sequence)
 
 func _process(delta: float) -> void:
+	var cpu_process: int = CPU_TRACE.begin()
+	_profiled_process(delta)
+	CPU_TRACE.end("world.process",cpu_process)
+	if CPU_TRACE.enabled: CPU_TRACE.observe(self)
+
+func _profiled_process(delta: float) -> void:
 	if camera == null or space_loading: return
 	book_ground.update_preview()
 	var before_clock: float = timeline.clock_ms
@@ -694,7 +720,9 @@ func _process(delta: float) -> void:
 	var ambient_time: float = maxf(0,ambient_residents.clock_ms - ambient_residents.last_delta * 1000.0 * (1.0-alpha))
 	var local_pose: Dictionary = player_motion.render_pose(alpha)
 	hero_position = point(local_pose.x,local_pose.z,local_pose.yOffset)
+	var cpu_actors: int = CPU_TRACE.begin()
 	for id: String in actors:
+		CPU_TRACE.count("actor_iterations")
 		var actor: Node3D = actors[id]
 		if id.begins_with("ambient:") and not ambient_active():
 			actor.hide()
@@ -752,6 +780,9 @@ func _process(delta: float) -> void:
 		var pose_delta: float = float(actor.get_meta("pose_delta", 0.0)) + (delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
 		var interval: float = 0.0 if id == hero_id or id == target_id or distance_sq < 24.0*24.0 else .1 if distance_sq < 50.0*50.0 else .5
 		if bool(actor.get_meta("pose_dirty",false)) or (pose_delta >= interval and (not remote_clock or pose_delta > .000001)):
+			var cpu_rig: int = CPU_TRACE.begin()
+			CPU_TRACE.count("rig_near" if interval==0.0 else "rig_middle" if interval==.1 else "rig_far")
+			if not actor.visible: CPU_TRACE.count("rig_hidden")
 			if remote_clock: rendered_velocity = actor.get_meta("pose_motion").consume()
 			if actor.has_meta("p2_npc_role"):
 				var travelled: float = float(actor.get_meta("p2_npc_travel",0.0))
@@ -760,22 +791,31 @@ func _process(delta: float) -> void:
 				actor.set_meta("p2_npc_travel",0.0)
 			else:
 				controller.update(motion,rendered_velocity,actor_clock,pose_delta)
+				CPU_TRACE.end("rig.controller",cpu_rig)
 				if controller is VarendorP2AnimationController:
+					var cpu_ground: int = CPU_TRACE.begin()
 					controller.align_to_ground(func(x: float,z: float) -> float: return point(x,-z).y)
+					CPU_TRACE.end("rig.ground_fit",cpu_ground)
 			if actor.has_meta("cloak_visual"):
 				actor.get_meta("cloak_visual").tick(actor_clock,motion,rendered_velocity)
+			CPU_TRACE.end("rig.total",cpu_rig)
 			pose_delta = 0.0
 			actor.set_meta("pose_dirty",false)
 		actor.set_meta("pose_delta",pose_delta)
 		actor.visible = not controller.corpse_complete and (id == hero_id or distance_sq < 85.0*85.0)
 		update_corpse_fade(actor,controller,actor_clock)
 		(actor.get_meta("label") as Label3D).hide()
+	CPU_TRACE.end("world.actor_loop",cpu_actors)
 	if final_environment != null and final_environment.courtyard != null and final_environment.courtyard.tavern != null:
 		final_environment.courtyard.tavern.before_camera()
 	if final_environment != null and final_environment.p2_house_cutaway != null:
 		final_environment.p2_house_cutaway.before_camera()
+	var cpu_camera: int = CPU_TRACE.begin()
 	camera_controller.update_pose(delta,hero_position,jump_offset)
+	CPU_TRACE.end("world.camera",cpu_camera)
+	var cpu_names: int = CPU_TRACE.begin()
 	update_nameplates()
+	CPU_TRACE.end("world.nameplates",cpu_names)
 	target_ring.visible = actors.has(target_id) and actors[target_id].visible and actors[target_id].get_meta("pickable", false)
 	if target_ring.visible:
 		target_ring.position = actors[target_id].position + Vector3(0, .13, 0)

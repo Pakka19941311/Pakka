@@ -1,5 +1,6 @@
 class_name VarendorNetwork
 extends Node
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 const InputTransport = preload("res://scripts/input_transport.gd")
 
@@ -229,6 +230,12 @@ func _process(delta: float) -> void:
 		stream_failed()
 
 func consume_stream() -> void:
+	var cpu_stream: int = CPU_TRACE.begin()
+	CPU_TRACE.count("stream_bytes",stream_bytes.size())
+	_profiled_consume_stream()
+	CPU_TRACE.end("network.consume_stream",cpu_stream)
+
+func _profiled_consume_stream() -> void:
 	# Decode UTF-8 only after a complete SSE packet; Cyrillic may span TCP chunks.
 	# Render only the newest state from a burst. Replaying every stale UI/actor
 	# snapshot after a slow frame creates a backlog; all discrete events survive.
@@ -248,6 +255,7 @@ func consume_stream() -> void:
 			for line: String in packet.split("\n"):
 				if line.begins_with("data:"):
 					var value = JSON.parse_string(line.trim_prefix("data:").strip_edges())
+					CPU_TRACE.count("sse_packets")
 					if value is Dictionary:
 						silence = 0
 						for event: Dictionary in value.get("events", []):
