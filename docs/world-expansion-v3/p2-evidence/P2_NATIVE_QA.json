@@ -1,0 +1,1087 @@
+{
+  "event_ledger": [
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-01",
+      "at": 2000,
+      "endsAt": 2625.0,
+      "impactAt": 2262.5,
+      "kind": "attack",
+      "sequence": 1,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-01",
+      "amount": 10,
+      "at": 2262.5,
+      "kind": "hit",
+      "sequence": 2,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-01",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 3
+    },
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-02",
+      "at": 2000,
+      "endsAt": 2800.0,
+      "impactAt": 2336.0,
+      "kind": "attack",
+      "sequence": 4,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-02",
+      "amount": 10,
+      "at": 2336.0,
+      "kind": "hit",
+      "sequence": 5,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-02",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 6
+    },
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-03",
+      "at": 2000,
+      "endsAt": 2800.0,
+      "impactAt": 2336.0,
+      "kind": "attack",
+      "sequence": 7,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-03",
+      "amount": 10,
+      "at": 2336.0,
+      "kind": "hit",
+      "sequence": 8,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-03",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 9
+    },
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-04",
+      "at": 2000,
+      "endsAt": 2800.0,
+      "impactAt": 2336.0,
+      "kind": "attack",
+      "sequence": 10,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-04",
+      "amount": 10,
+      "at": 2336.0,
+      "kind": "hit",
+      "sequence": 11,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-04",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 12
+    },
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-05",
+      "at": 2000,
+      "endsAt": 2800.0,
+      "impactAt": 2336.0,
+      "kind": "attack",
+      "sequence": 13,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-05",
+      "amount": 10,
+      "at": 2336.0,
+      "kind": "hit",
+      "sequence": 14,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-05",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 15
+    }
+  ],
+  "godot": {
+    "build": "official",
+    "hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+    "hex": 263683,
+    "major": 4,
+    "minor": 6,
+    "patch": 3,
+    "status": "stable",
+    "string": "4.6.3-stable (official)",
+    "timestamp": 0
+  },
+  "live_server_tested": false,
+  "models": {
+    "MOB-01": {
+      "attack_skinned_bounds": "[P: (-0.504285, 0.0, -0.717686), S: (0.992543, 0.948547, 1.0709)]",
+      "captures": [
+        "MOB-01_idle.png",
+        "MOB-01_attack.png",
+        "MOB-01_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 0.633333325386047,
+          "poses_change": true
+        },
+        "death": {
+          "length": 0.416666656732559,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.333333343267441,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 2.5,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.600000023841858,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 0.833333313465118,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.395543, 0.0, -0.406207), S: (0.78909, 0.220245, 0.797685)]",
+      "idle_skinned_bounds": "[P: (-0.507801, 0.0, -0.423646), S: (1.015865, 0.658169, 0.847285)]",
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/models/V3StarterSlime.glb",
+        "attack_contact": 0.42,
+        "author": "Quaternius",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.4,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|Slime_Idle_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              60.0
+            ]
+          },
+          {
+            "clip": "walk",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|Slime_Walk_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              20.0
+            ]
+          },
+          {
+            "clip": "run",
+            "duration_factor": 0.72,
+            "kind": "derived_timing",
+            "source_action": "Armature|Slime_Walk_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              20.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|Slime_Attack_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              15.0
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|Slime_Death_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "clip": "hit",
+            "description": "local squash recoil on existing Body bone",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              8.0
+            ],
+            "kind": "authored_local_rig_action"
+          }
+        ],
+        "floor_clearance_guards": {
+
+        },
+        "gait": {
+          "run": 1.0,
+          "walk": 0.6
+        },
+        "gait_provenance": {
+          "run": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value",
+          "walk": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value"
+        },
+        "ground_min_dense": -0.00024323859543073,
+        "height": 0.65,
+        "hit_point": [
+          0.0,
+          0.3575,
+          0.0
+        ],
+        "license": "CC0-1.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "mob_id": "MOB-01",
+        "model": "V3StarterSlime",
+        "native_bounds": {
+          "name": "V3StarterSlime",
+          "sourceDepth": 0.846206516027451,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.65,
+          "sourceWidth": 1.02266156673431,
+          "targetHeight": 0.65
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "pick_size": [
+          1.02266156673431,
+          0.65,
+          0.846206516027451
+        ],
+        "qa_attack_duration_ms": 625.0,
+        "qa_server_contact_fraction": 0.42,
+        "sha256": "bc8c9fcf1714e5de8e2050d7da8db41778108b27bca125bcfdfa13d2002a78ed",
+        "source_url": "https://quaternius.com/packs/animatedmonster.html",
+        "status": "visual_candidate",
+        "title": "Лесной слизень"
+      }
+    },
+    "MOB-02": {
+      "attack_skinned_bounds": "[P: (-0.467832, 0.02256, -1.137588), S: (0.852805, 0.9811, 1.778369)]",
+      "captures": [
+        "MOB-02_idle.png",
+        "MOB-02_attack.png",
+        "MOB-02_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 1.04999995231628,
+          "poses_change": true
+        },
+        "death": {
+          "length": 0.883333325386047,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 1.21666669845581,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 1.29999995231628,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.633333325386047,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 1.10000002384186,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.548502, 0.004509, -0.458623), S: (1.436646, 0.463515, 1.927728)]",
+      "idle_skinned_bounds": "[P: (-0.436139, 0.000017, -0.872876), S: (0.861683, 0.794751, 1.736814)]",
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/models/V3StarterWolf.glb",
+        "attack_contact": 0.36,
+        "author": "CoinCoin",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.46,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|idle|Baked frames_Armature",
+            "source_frame_window_at_24fps": [
+              0.400000035762787,
+              31.1999988555908
+            ]
+          },
+          {
+            "clip": "walk",
+            "duration_factor": 1.75,
+            "kind": "derived_timing",
+            "source_action": "Armature|run|Baked frames_Armature",
+            "source_frame_window_at_24fps": [
+              0.400000035762787,
+              14.8000001907349
+            ]
+          },
+          {
+            "clip": "run",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|run|Baked frames_Armature",
+            "source_frame_window_at_24fps": [
+              0.400000035762787,
+              14.8000001907349
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_window",
+            "source_action": "Armature|ATK2|Baked frames_Armature",
+            "source_frame_window_at_24fps": [
+              18.0,
+              43.0
+            ]
+          },
+          {
+            "clip": "hit",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|hit|Baked frames_Armature",
+            "source_frame_window_at_24fps": [
+              0.400000035762787,
+              29.2000007629395
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Armature|death|Baked frames_Armature",
+            "source_frame_window_at_24fps": [
+              0.400000035762787,
+              21.2000007629395
+            ]
+          },
+          {
+            "clip": "death",
+            "description": "Bassin world XY pinned to idle projection while retaining source fall rotation and vertical movement; prevents corpse sliding away from authoritative actor root.",
+            "kind": "authored_planar_stabilization"
+          }
+        ],
+        "floor_clearance_guards": {
+          "attack": 0.0185806554853916,
+          "death": 0.00450834297761321,
+          "hit": 0.00161292162910103,
+          "run": 0.00382605373114347,
+          "walk": 0.00171554546058177
+        },
+        "gait": {
+          "run": 3.97909,
+          "walk": 2.28181
+        },
+        "gait_provenance": {
+          "run": "measured support-bone estimate; visual calibration pending",
+          "walk": "measured support-bone estimate; visual calibration pending"
+        },
+        "ground_min_dense": -0.00000425182679464342,
+        "height": 0.85,
+        "hit_point": [
+          0.0,
+          0.4675,
+          0.0
+        ],
+        "license": "CC-BY-4.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "mob_id": "MOB-02",
+        "model": "V3StarterWolf",
+        "native_bounds": {
+          "name": "V3StarterWolf",
+          "sourceDepth": 1.77529990673065,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.85,
+          "sourceWidth": 0.861482173204422,
+          "targetHeight": 0.85
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "pick_size": [
+          0.861482173204422,
+          0.85,
+          1.77529990673065
+        ],
+        "qa_attack_duration_ms": 800.0,
+        "qa_server_contact_fraction": 0.42,
+        "sha256": "aad9a3def876a41b5ee6f9c41cc3d4e804805b39428fc5fadaadee7c285a3ee4",
+        "source_url": "https://opengameart.org/content/animated-wolf",
+        "status": "visual_candidate",
+        "title": "Серый волк"
+      }
+    },
+    "MOB-03": {
+      "attack_skinned_bounds": "[P: (-0.146751, -0.000398, -0.511641), S: (0.315227, 0.344229, 1.342226)]",
+      "captures": [
+        "MOB-03_idle.png",
+        "MOB-03_attack.png",
+        "MOB-03_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 0.883333325386047,
+          "poses_change": true
+        },
+        "death": {
+          "length": 1.13333332538605,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.416666656732559,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 3.75,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.416666656732559,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 1.16666662693024,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.184952, -0.0, -0.442067), S: (0.430608, 0.242143, 1.288449)]",
+      "idle_skinned_bounds": "[P: (-0.14546, 0.0, -0.429073), S: (0.291688, 0.349995, 1.276076)]",
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/models/V3StarterRat.glb",
+        "attack_contact": 0.42,
+        "author": "CDmir / Cestmir Dammer; TinyWorlds",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.22,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Idle.001_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              90.0
+            ]
+          },
+          {
+            "clip": "walk",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Walk_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              28.0
+            ]
+          },
+          {
+            "clip": "run",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Run_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Attack.000_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              21.0
+            ]
+          },
+          {
+            "clip": "hit",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Hit_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              10.0
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Die_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              27.0
+            ]
+          }
+        ],
+        "floor_clearance_guards": {
+          "hit": 0.00158654052019119,
+          "run": 0.00698362934589386
+        },
+        "gait": {
+          "run": 1.24686,
+          "walk": 0.37965
+        },
+        "gait_provenance": {
+          "run": "measured support-bone estimate; visual calibration pending",
+          "walk": "measured support-bone estimate; visual calibration pending"
+        },
+        "ground_min_dense": -0.00082873553037643,
+        "height": 0.35,
+        "hit_point": [
+          0.0,
+          0.1925,
+          0.0
+        ],
+        "license": "CC0-1.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "mob_id": "MOB-03",
+        "model": "V3StarterRat",
+        "native_bounds": {
+          "name": "V3StarterRat",
+          "sourceDepth": 1.27580142021179,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.35,
+          "sourceWidth": 0.291692703962326,
+          "targetHeight": 0.35
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "pick_size": [
+          0.75,
+          0.35,
+          1.27580142021179
+        ],
+        "qa_attack_duration_ms": 800.0,
+        "qa_server_contact_fraction": 0.42,
+        "sha256": "af60c2a559ea43473d2084e164daa65f611004a270ccb5310b7ee4a8f56b35be",
+        "source_url": "https://opengameart.org/content/evil-giant-rat",
+        "status": "visual_candidate",
+        "title": "Полевая крыса"
+      }
+    },
+    "MOB-04": {
+      "attack_skinned_bounds": "[P: (-0.237044, -0.000033, -0.859992), S: (0.487887, 0.895755, 1.269009)]",
+      "captures": [
+        "MOB-04_idle.png",
+        "MOB-04_attack.png",
+        "MOB-04_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 0.800000011920929,
+          "poses_change": true
+        },
+        "death": {
+          "length": 1.16666662693024,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.333333343267441,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 2.0,
+          "poses_change": true
+        },
+        "run": {
+          "length": 1.20000004768372,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 1.66666662693024,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.282449, 0.0, -0.842455), S: (0.813152, 0.500817, 1.266422)]",
+      "idle_skinned_bounds": "[P: (-0.236988, 0.0, -0.842312), S: (0.473976, 0.807758, 1.266279)]",
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/models/V3StarterBoar.glb",
+        "attack_contact": 0.42,
+        "author": "Teh_Bucket",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.48,
+        "clip_provenance": [
+          {
+            "clip": "walk",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "walk_boar_armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              40.0
+            ]
+          },
+          {
+            "clip": "run",
+            "duration_factor": 0.72,
+            "kind": "derived_timing",
+            "source_action": "walk_boar_armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              40.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "attack_boar_armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              19.0
+            ]
+          },
+          {
+            "clip": "idle",
+            "description": "gentle breath",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              48.0
+            ],
+            "kind": "authored_local_rig_action"
+          },
+          {
+            "clip": "hit",
+            "description": "local spine/head recoil",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              8.0
+            ],
+            "kind": "authored_local_rig_action"
+          },
+          {
+            "clip": "death",
+            "description": "authored roll and settle on existing ROOT rig; floor correction baked",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              28.0
+            ],
+            "kind": "authored_local_rig_action"
+          }
+        ],
+        "floor_clearance_guards": {
+
+        },
+        "gait": {
+          "run": 0.36666,
+          "walk": 0.26399
+        },
+        "gait_provenance": {
+          "run": "measured support-bone estimate; visual calibration pending",
+          "walk": "measured support-bone estimate; visual calibration pending"
+        },
+        "ground_min_dense": -0.00017035007476806,
+        "height": 0.8,
+        "hit_point": [
+          0.0,
+          0.44,
+          0.0
+        ],
+        "license": "CC0-1.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "mob_id": "MOB-04",
+        "model": "V3StarterBoar",
+        "native_bounds": {
+          "name": "V3StarterBoar",
+          "sourceDepth": 1.26642155647278,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.8,
+          "sourceWidth": 0.473982945084572,
+          "targetHeight": 0.8
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "pick_size": [
+          0.75,
+          0.8,
+          1.26642155647278
+        ],
+        "qa_attack_duration_ms": 800.0,
+        "qa_server_contact_fraction": 0.42,
+        "sha256": "453a9e8d6119484a26c25cabf5a580b2cb7b1999ab3c1d889f03e6441426ac5b",
+        "source_url": "https://opengameart.org/content/boar",
+        "status": "visual_candidate",
+        "title": "Дикий кабан"
+      }
+    },
+    "MOB-05": {
+      "attack_skinned_bounds": "[P: (-0.198107, -0.000009, -0.71618), S: (0.400693, 0.479353, 0.851899)]",
+      "captures": [
+        "MOB-05_idle.png",
+        "MOB-05_attack.png",
+        "MOB-05_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 0.666666686534882,
+          "poses_change": true
+        },
+        "death": {
+          "length": 0.666666686534882,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.633333325386047,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 0.633333325386047,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.300000011920929,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 0.633333325386047,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.260192, 0.0, -0.462167), S: (0.524267, 0.323851, 0.674934)]",
+      "idle_skinned_bounds": "[P: (-0.199425, -0.000021, -0.535533), S: (0.400693, 0.453082, 0.720135)]",
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/models/V3StarterBeetle.glb",
+        "attack_contact": 0.42,
+        "author": "br-n518",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.3,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "IDLE_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              15.0
+            ]
+          },
+          {
+            "clip": "walk",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "WALK_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              15.0
+            ]
+          },
+          {
+            "clip": "run",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "RUN_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              7.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ATTACK_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              16.0
+            ]
+          },
+          {
+            "clip": "hit",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "TAKE_DAMAGE_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              15.0
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "DEATH_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              16.0
+            ]
+          }
+        ],
+        "floor_clearance_guards": {
+
+        },
+        "gait": {
+          "run": 0.9,
+          "walk": 0.4
+        },
+        "gait_provenance": {
+          "run": "PROJECT calibration fallback: support-bone estimate contradicts walk/run ordering and was rejected",
+          "walk": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value"
+        },
+        "ground_min_dense": -0.00098583847284317,
+        "height": 0.45,
+        "hit_point": [
+          0.0,
+          0.2475,
+          0.0
+        ],
+        "license": "CC0-1.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "mob_id": "MOB-05",
+        "model": "V3StarterBeetle",
+        "native_bounds": {
+          "name": "V3StarterBeetle",
+          "sourceDepth": 0.705605417490005,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.45,
+          "sourceWidth": 0.400693476200104,
+          "targetHeight": 0.45
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "pick_size": [
+          0.75,
+          0.45,
+          0.75
+        ],
+        "qa_attack_duration_ms": 800.0,
+        "qa_server_contact_fraction": 0.42,
+        "sha256": "bd7e6ab4051aaf7fa215f8133c12f912e1a1b1ab4e679bc5ca47c5b0093d478d",
+        "source_url": "https://opengameart.org/content/shell-bug",
+        "status": "visual_candidate",
+        "title": "Панцирный жук"
+      }
+    }
+  },
+  "native_controller": "VarendorAnimationController subclass",
+  "native_factory": "VarendorWorld.make_actor",
+  "native_render": true,
+  "ok": true
+}

@@ -1,0 +1,6249 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-09-12T11:08:57.473353+00:00",
+  "scope": "First five MOB source candidates and city A01/A03/A05/A06/A07/A09; intake and isolated probes only.",
+  "intake_root": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3",
+  "source_archives_in_public_repository": false,
+  "existing_game_scenes_modified": false,
+  "committed_by_intake_agent": false,
+  "blender": "4.2.3 LTS",
+  "godot": {
+    "build": "official",
+    "hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+    "hex": 263683,
+    "major": 4,
+    "minor": 6,
+    "patch": 3,
+    "status": "stable",
+    "string": "4.6.3-stable (official)",
+    "timestamp": 0
+  },
+  "downloaded_source_count": 6,
+  "blocked_source_count": 6,
+  "proof_limits": [
+    "Headless engine import and three sampled poses per animation are distinct from combat, collision and game acceptance.",
+    "Neutral Blender stills inspected. Separate normalized wolf, rat and Shell Bug adaptations also passed an isolated Godot OpenGL render; see ASSET_ADAPTATION_MANIFEST.json."
+  ],
+  "assets": [
+    {
+      "id": "MOB-01",
+      "receipt": {
+        "id": "MOB-01",
+        "page": "https://www.cgtrader.com/free-3d-models/animal/other/simple-slime",
+        "license": "Royalty Free (no AI), prior primary card verified",
+        "status": "not_acquired",
+        "browser_attempt": "CUA getBrowser: No browser is available",
+        "archive_verified": false,
+        "import_verified": false,
+        "page_receipt": {
+          "url": "https://www.cgtrader.com/free-3d-models/animal/other/simple-slime",
+          "final_url": "https://www.cgtrader.com/free-3d-models/animal/other/simple-slime",
+          "http_status": 202,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-01\\source-page.html",
+          "content_type": "text/html; charset=UTF-8"
+        },
+        "observed_download_links": [],
+        "authentication_terms_present": false,
+        "blocker": "Observed HTTP 202 with an empty response body. No source download link or archive obtained. CUA reports no browser available. Authentication requirements were not established.",
+        "authentication_requirement": "unknown; not inferred from HTTP 202",
+        "license_verification": "prior card research only; current response contains no license text"
+      },
+      "status": "blocked_download",
+      "gates": {
+        "G1_card_license": "prior_card_only_current_response_empty",
+        "G2_import": "not_run",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "limitations": [
+        "Source archive unavailable; no model, rig, texture or import claims can be verified."
+      ]
+    },
+    {
+      "id": "MOB-02",
+      "receipt": {
+        "id": "MOB-02",
+        "title": "[Animated] Wolf",
+        "author": "CoinCoin",
+        "page": "https://opengameart.org/content/animated-wolf",
+        "url": "https://opengameart.org/sites/default/files/low-poly-wolf.zip",
+        "filename": "low-poly-wolf.zip",
+        "license": "CC-BY-4.0",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+        "acquired_utc": "2026-09-12T10:33:52.684326+00:00",
+        "status": "acquired_source",
+        "page_receipt": {
+          "url": "https://opengameart.org/content/animated-wolf",
+          "final_url": "https://opengameart.org/content/animated-wolf",
+          "http_status": 200,
+          "bytes": 20894,
+          "sha256": "4711e80975835b6c91e22de9e782d5b36d93f9bf6a21ffd4ff5492b80cc23571",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\source-page.html",
+          "content_type": "text/html; charset=utf-8"
+        },
+        "license_receipt": {
+          "url": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+          "final_url": "https://creativecommons.org/licenses/by/4.0/legalcode.en",
+          "http_status": 200,
+          "bytes": 48970,
+          "sha256": "6d55b998ed5c54f43426d059a8c549ed58a3321e5463e6a6af1c6b56ab78c333",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\license.html",
+          "content_type": "text/html"
+        },
+        "source_receipt": {
+          "url": "https://opengameart.org/sites/default/files/low-poly-wolf.zip",
+          "final_url": "https://opengameart.org/sites/default/files/low-poly-wolf.zip",
+          "http_status": 200,
+          "bytes": 3096809,
+          "sha256": "6ea91928a630225fdd7dd76a84371d2390fe78be8e07bc410681e7b5e87e79be",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\low-poly-wolf.zip",
+          "content_type": "application/zip"
+        },
+        "archive_members": [
+          {
+            "path": "source/loup.fbx",
+            "bytes": 3030160,
+            "compressed_bytes": 3030160
+          },
+          {
+            "path": "textures/wolf_Tex.png",
+            "bytes": 66403,
+            "compressed_bytes": 66403
+          }
+        ]
+      },
+      "status": "source_verified",
+      "gates": {
+        "G1_card_license": "source_and_license_receipts",
+        "G2_import": "headless_import_skin_and_sampled_animation_passed",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "blender_inventory": {
+        "id": "MOB-02",
+        "blender": "4.2.3 LTS",
+        "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\extracted\\source\\loup.fbx",
+        "automatic_scripts_enabled": false,
+        "art_approved": false,
+        "runtime_approved": false,
+        "opened": true,
+        "units": {
+          "system": "METRIC",
+          "scale_length": 1.0,
+          "fps": 60
+        },
+        "meshes": [
+          {
+            "name": "Forest Wolf",
+            "vertices": 711,
+            "triangles": 1334,
+            "dimensions": [
+              0.939194,
+              1.935449,
+              0.92668
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "wolf_TEX"
+            ],
+            "vertex_groups": 31,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          }
+        ],
+        "armatures": [
+          {
+            "name": "Armature",
+            "bones": 32,
+            "deform_bones": 32,
+            "bone_names": [
+              "Root",
+              "bassin",
+              "spine1",
+              "spine2",
+              "spine3",
+              "thorax",
+              "epaule_R",
+              "coude_R",
+              "poignet_R",
+              "doigt_R",
+              "cou",
+              "tete",
+              "machoire",
+              "museau",
+              "epaule_L",
+              "coude_L",
+              "poignet_L",
+              "doigt_L",
+              "hanche_R",
+              "genou_R",
+              "cheville_R",
+              "pied_R",
+              "orteil_R",
+              "queue1",
+              "queue2",
+              "queue3",
+              "queue4",
+              "hanche_L",
+              "genou_L",
+              "cheville_L",
+              "pied_L",
+              "orteil_L"
+            ],
+            "scale": [
+              0.01,
+              0.01,
+              0.01
+            ],
+            "nla_tracks": []
+          }
+        ],
+        "actions": [
+          {
+            "name": "Armature|ATK1|Baked frames",
+            "frames": [
+              1.0,
+              161.0
+            ],
+            "fcurves": 320
+          },
+          {
+            "name": "Armature|ATK2|Baked frames",
+            "frames": [
+              1.0,
+              114.000008
+            ],
+            "fcurves": 320
+          },
+          {
+            "name": "Armature|death|Baked frames",
+            "frames": [
+              1.0,
+              53.000004
+            ],
+            "fcurves": 320
+          },
+          {
+            "name": "Armature|hit|Baked frames",
+            "frames": [
+              1.0,
+              73.0
+            ],
+            "fcurves": 320
+          },
+          {
+            "name": "Armature|idle|Baked frames",
+            "frames": [
+              1.0,
+              78.000008
+            ],
+            "fcurves": 320
+          },
+          {
+            "name": "Armature|rotation|Baked frames",
+            "frames": [
+              1.0,
+              38.0
+            ],
+            "fcurves": 320
+          },
+          {
+            "name": "Armature|run|Baked frames",
+            "frames": [
+              1.0,
+              37.0
+            ],
+            "fcurves": 320
+          }
+        ],
+        "materials": [
+          {
+            "name": "wolf_TEX",
+            "use_nodes": true,
+            "node_types": [
+              "BSDF_PRINCIPLED",
+              "OUTPUT_MATERIAL",
+              "NORMAL_MAP",
+              "TEX_IMAGE"
+            ]
+          }
+        ],
+        "images": [
+          {
+            "name": "Diffuse Texture",
+            "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\extracted\\source\\loup_FBX_Textures\\wolf_Tex.png",
+            "packed": true,
+            "size": [
+              256,
+              256
+            ],
+            "source": "FILE",
+            "external_exists": false
+          }
+        ],
+        "embedded_text_blocks": [],
+        "action_pose_samples": [
+          {
+            "armature": "Armature",
+            "action": "Armature|ATK1|Baked frames",
+            "frames": [
+              1,
+              81,
+              161
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Armature|ATK2|Baked frames",
+            "frames": [
+              1,
+              57,
+              114
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Armature|death|Baked frames",
+            "frames": [
+              1,
+              27,
+              53
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Armature|hit|Baked frames",
+            "frames": [
+              1,
+              37,
+              73
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Armature|idle|Baked frames",
+            "frames": [
+              1,
+              39,
+              78
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Armature|rotation|Baked frames",
+            "frames": [
+              1,
+              19,
+              38
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Armature|run|Baked frames",
+            "frames": [
+              1,
+              19,
+              37
+            ],
+            "pose_changes": true
+          }
+        ],
+        "export_options": {
+          "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\probe.glb",
+          "export_format": "GLB",
+          "use_selection": true,
+          "export_animations": true,
+          "export_skins": true,
+          "export_nla_strips": true,
+          "export_force_sampling": true,
+          "export_optimize_animation_size": false,
+          "export_all_influences": false,
+          "export_cameras": false,
+          "export_lights": false
+        },
+        "glb": {
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\probe.glb",
+          "bytes": 998200,
+          "sha256": "4c273ca3adcd2bb29a225ef969fd46601919d762824847efdec59c6e23636841"
+        }
+      },
+      "archive_extension_counts": {
+        ".fbx": 1,
+        ".png": 1
+      },
+      "archive_file_count": 2,
+      "export": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\prepared.glb",
+        "intake_relative_path": "MOB-02/prepared.glb",
+        "bytes": 592044,
+        "sha256": "fa58879b1b3ca643d8d31fc330fa443db7a92f5ba799f37ca431ad9c82a5c22e",
+        "triangles": 1334,
+        "animations": [
+          "Armature|ATK1|Baked frames",
+          "Armature|ATK2|Baked frames",
+          "Armature|death|Baked frames",
+          "Armature|hit|Baked frames",
+          "Armature|idle|Baked frames",
+          "Armature|rotation|Baked frames",
+          "Armature|run|Baked frames"
+        ],
+        "skin_count": 1,
+        "mesh_count": 1,
+        "images": [
+          {
+            "name": "wolf_Tex",
+            "mime_type": "image/png",
+            "embedded": true
+          }
+        ]
+      },
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 2.68333339691162,
+            "name": "Armature|ATK1|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 1.89999997615814,
+            "name": "Armature|ATK2|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 0.883333325386047,
+            "name": "Armature|death|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 1.21666669845581,
+            "name": "Armature|hit|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 1.29999995231628,
+            "name": "Armature|idle|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 0.633333325386047,
+            "name": "Armature|rotation|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 0.616666674613953,
+            "name": "Armature|run|Baked frames",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          }
+        ],
+        "id": "MOB-02",
+        "loaded": true,
+        "meshes": [
+          {
+            "aabb": "[P: (-0.250805, -0.002272, -1.03565), S: (0.50161, 0.979662, 2.042692)]",
+            "name": "Forest Wolf",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": true,
+                "material": "wolf_TEX"
+              }
+            ]
+          }
+        ],
+        "path": "res://assets/MOB-02.glb",
+        "runtime_combat_verified": false,
+        "skeleton_bones": [
+          32
+        ],
+        "visual_godot_verified": false
+      },
+      "scale_normalized": false,
+      "orientation_approved": false,
+      "gameplay_integrated": false,
+      "preparation": {
+        "id": "MOB-02",
+        "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\prepared.glb",
+        "excluded_objects": [],
+        "material_changes": [],
+        "dimensions_original_units": [
+          0.939193844795227,
+          1.935449481010437,
+          0.9266799688339233
+        ],
+        "normalization": "none; source units retained; integration must choose gameplay dimensions",
+        "art_approved": false,
+        "animation_export_fix": "Assigned each source bone action once before export so all seven FBX actions are bound and retained."
+      },
+      "blender_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\review.png",
+        "intake_relative_path": "MOB-02/review.png",
+        "bytes": 528460,
+        "sha256": "32c29b55e1a4e4493e239178508fe5f7cad5e51b36e7532b70f43da70823b23a"
+      },
+      "limitations": [
+        "Technical integration candidate; seven source clips, no separately named walk.",
+        "Ice-blue stylized texture and silhouette require the agreed wolf art review."
+      ]
+    },
+    {
+      "id": "MOB-03",
+      "receipt": {
+        "id": "MOB-03",
+        "title": "Evil Giant Rat",
+        "author": "CDmir / Cestmir Dammer; TinyWorlds",
+        "page": "https://opengameart.org/content/evil-giant-rat",
+        "url": "https://opengameart.org/sites/default/files/rat_2.blend",
+        "filename": "rat_2.blend",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+        "acquired_utc": "2026-09-12T10:33:52.685322+00:00",
+        "status": "acquired_source",
+        "page_receipt": {
+          "url": "https://opengameart.org/content/evil-giant-rat",
+          "final_url": "https://opengameart.org/content/evil-giant-rat",
+          "http_status": 200,
+          "bytes": 38086,
+          "sha256": "ca4e2590dc6c387813de096f0e95c63c35bb91df58617993d48127e2a1df2930",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\source-page.html",
+          "content_type": "text/html; charset=utf-8"
+        },
+        "license_receipt": {
+          "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+          "final_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+          "http_status": 200,
+          "bytes": 32451,
+          "sha256": "001e3d1c905c18b1d034b34200cc952026abb38457c2294c23eaef7f6bda64df",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\license.html",
+          "content_type": "text/html"
+        },
+        "source_receipt": {
+          "url": "https://opengameart.org/sites/default/files/rat_2.blend",
+          "final_url": "https://opengameart.org/sites/default/files/rat_2.blend",
+          "http_status": 200,
+          "bytes": 6833728,
+          "sha256": "52530520c71787da6c9ced7130cca02ddaf2b0af567bc38221b746d2297b5be2",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\rat_2.blend",
+          "content_type": "application/octet-stream"
+        }
+      },
+      "status": "source_verified",
+      "gates": {
+        "G1_card_license": "source_and_license_receipts",
+        "G2_import": "headless_import_skin_and_sampled_animation_passed",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "blender_inventory": {
+        "id": "MOB-03",
+        "blender": "4.2.3 LTS",
+        "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\rat_2.blend",
+        "automatic_scripts_enabled": false,
+        "art_approved": false,
+        "runtime_approved": false,
+        "opened": true,
+        "units": {
+          "system": "NONE",
+          "scale_length": 1.0,
+          "fps": 24
+        },
+        "meshes": [
+          {
+            "name": "Body",
+            "vertices": 2159,
+            "triangles": 4210,
+            "dimensions": [
+              1.180443,
+              4.402579,
+              1.426712
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "body",
+              "head",
+              "Material.002",
+              "Teeth",
+              "head.001"
+            ],
+            "vertex_groups": 26,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          },
+          {
+            "name": "Eyes",
+            "vertices": 26,
+            "triangles": 36,
+            "dimensions": [
+              0.343747,
+              0.088951,
+              0.117072
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "body",
+              "head",
+              "Material.002",
+              "Teeth",
+              "head.001"
+            ],
+            "vertex_groups": 26,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          },
+          {
+            "name": "Hair",
+            "vertices": 336,
+            "triangles": 256,
+            "dimensions": [
+              15.022141,
+              25.615692,
+              17.057615
+            ],
+            "scale": [
+              0.085294,
+              0.085294,
+              0.085294
+            ],
+            "location": [
+              0.316538,
+              -1.006736,
+              0.213811
+            ],
+            "material_slots": [
+              "Material.001"
+            ],
+            "vertex_groups": 26,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          },
+          {
+            "name": "Head",
+            "vertices": 795,
+            "triangles": 1484,
+            "dimensions": [
+              0.975155,
+              0.905528,
+              0.731844
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "body",
+              "head",
+              "Material.002",
+              "Teeth",
+              "head.001"
+            ],
+            "vertex_groups": 26,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          },
+          {
+            "name": "Plane",
+            "vertices": 4,
+            "triangles": 2,
+            "dimensions": [
+              2.0,
+              2.0,
+              0.0
+            ],
+            "scale": [
+              9.180717,
+              9.180717,
+              9.180717
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "Material"
+            ],
+            "vertex_groups": 0,
+            "vertices_without_groups": 4,
+            "modifiers": []
+          },
+          {
+            "name": "Plane.001",
+            "vertices": 4,
+            "triangles": 2,
+            "dimensions": [
+              2.0,
+              2.0,
+              0.0
+            ],
+            "scale": [
+              0.11212,
+              0.11212,
+              0.11212
+            ],
+            "location": [
+              0.92429,
+              -1.468678,
+              0.682257
+            ],
+            "material_slots": [
+              "Material.001"
+            ],
+            "vertex_groups": 0,
+            "vertices_without_groups": 4,
+            "modifiers": []
+          },
+          {
+            "name": "Teeth",
+            "vertices": 157,
+            "triangles": 200,
+            "dimensions": [
+              0.219218,
+              0.361138,
+              0.239225
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "body",
+              "head",
+              "Material.002",
+              "Teeth",
+              "head.001"
+            ],
+            "vertex_groups": 26,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          }
+        ],
+        "armatures": [
+          {
+            "name": "Armature",
+            "bones": 39,
+            "deform_bones": 26,
+            "bone_names": [
+              "Main",
+              "Hip",
+              "Backbone",
+              "Backbone.001",
+              "Backbone.002",
+              "Head",
+              "Backbone.003",
+              "FrontLeg_L",
+              "FrontLeg_L.001",
+              "FrontLeg_L.002",
+              "FrontLeg_L.003",
+              "FrontLeg_R",
+              "FrontLeg_R.001",
+              "FrontLeg_R.002",
+              "FrontLeg_R.003",
+              "Tail",
+              "Tail.001",
+              "Tail.002",
+              "Tail.003",
+              "BackLeg_L",
+              "BackLeg_L.001",
+              "BackLeg_L.002",
+              "BackLeg_L.003",
+              "BackLeg_R",
+              "BackLeg_R.001",
+              "BackLeg_R.002",
+              "BackLeg_R.003",
+              "IK-Hip",
+              "IK-Backbone",
+              "IK-BackLeg_L",
+              "IK-BackLeg_R",
+              "IK-Head",
+              "IK-Tail",
+              "IK-FrontLegT_L",
+              "IK-FrontLegT_R",
+              "IK-BackLegT_L",
+              "IK-BackLegT_R",
+              "IK-FrontLeg_L",
+              "IK-FrontLeg_R"
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "nla_tracks": []
+          }
+        ],
+        "actions": [
+          {
+            "name": "Attack.000",
+            "frames": [
+              0.0,
+              21.0
+            ],
+            "fcurves": 187
+          },
+          {
+            "name": "Attack.001",
+            "frames": [
+              0.0,
+              21.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Attack.002",
+            "frames": [
+              0.0,
+              20.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Attack.003",
+            "frames": [
+              0.0,
+              20.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Attack.Begin",
+            "frames": [
+              0.0,
+              20.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Attack.End",
+            "frames": [
+              0.0,
+              20.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Die",
+            "frames": [
+              0.0,
+              27.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Hit",
+            "frames": [
+              0.0,
+              10.0
+            ],
+            "fcurves": 187
+          },
+          {
+            "name": "Idle.000",
+            "frames": [
+              0.0,
+              1553.0
+            ],
+            "fcurves": 327
+          },
+          {
+            "name": "Idle.001",
+            "frames": [
+              0.0,
+              90.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Idle.002",
+            "frames": [
+              0.0,
+              90.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Run",
+            "frames": [
+              0.0,
+              10.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Stand",
+            "frames": [
+              0.0,
+              0.0
+            ],
+            "fcurves": 180
+          },
+          {
+            "name": "Walk",
+            "frames": [
+              0.0,
+              28.0
+            ],
+            "fcurves": 180
+          }
+        ],
+        "materials": [
+          {
+            "name": "body",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "head",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "head.001",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "Material",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "Material.001",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "Material.002",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "Teeth",
+            "use_nodes": false,
+            "node_types": []
+          }
+        ],
+        "images": [
+          {
+            "name": "hair",
+            "filepath": "//..\\textures\\rat-hair.png",
+            "packed": true,
+            "size": [
+              512,
+              512
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "rat-body",
+            "filepath": "//rat-body.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "rat-body-AO.png",
+            "filepath": "//rat-body-AO.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "rat-body-Normalmap.png",
+            "filepath": "//rat-body-Normalmap.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "rat-head",
+            "filepath": "//rat-head.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "rat-head-AO.png",
+            "filepath": "//rat-head-AO.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "rat-head-Normalmap.png",
+            "filepath": "//rat-head-Normalmap.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "Render Result",
+            "filepath": "",
+            "packed": false,
+            "size": [
+              0,
+              0
+            ],
+            "source": "VIEWER",
+            "external_exists": false
+          }
+        ],
+        "embedded_text_blocks": [
+          "License"
+        ],
+        "action_pose_samples": [
+          {
+            "armature": "Armature",
+            "action": "Attack.000",
+            "frames": [
+              0,
+              10,
+              21
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Attack.001",
+            "frames": [
+              0,
+              10,
+              21
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Attack.002",
+            "frames": [
+              0,
+              10,
+              20
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Attack.003",
+            "frames": [
+              0,
+              10,
+              20
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Attack.Begin",
+            "frames": [
+              0,
+              10,
+              20
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Attack.End",
+            "frames": [
+              0,
+              10,
+              20
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Die",
+            "frames": [
+              0,
+              13,
+              27
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Hit",
+            "frames": [
+              0,
+              5,
+              10
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Idle.000",
+            "frames": [
+              0,
+              776,
+              1553
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Idle.001",
+            "frames": [
+              0,
+              45,
+              90
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Idle.002",
+            "frames": [
+              0,
+              45,
+              90
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Run",
+            "frames": [
+              0,
+              5,
+              10
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Stand",
+            "frames": [
+              0,
+              0,
+              0
+            ],
+            "pose_changes": false
+          },
+          {
+            "armature": "Armature",
+            "action": "Walk",
+            "frames": [
+              0,
+              14,
+              28
+            ],
+            "pose_changes": true
+          }
+        ],
+        "export_options": {
+          "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\probe.glb",
+          "export_format": "GLB",
+          "use_selection": true,
+          "export_animations": true,
+          "export_skins": true,
+          "export_nla_strips": true,
+          "export_force_sampling": true,
+          "export_optimize_animation_size": false,
+          "export_all_influences": false,
+          "export_cameras": false,
+          "export_lights": false
+        },
+        "glb": {
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\probe.glb",
+          "bytes": 3761608,
+          "sha256": "c118954c9fb343539957692c390c9fc52ef8d4a5c5bf0b92f6199d20d54a43df"
+        }
+      },
+      "archive_extension_counts": {},
+      "archive_file_count": 1,
+      "export": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\prepared.glb",
+        "intake_relative_path": "MOB-03/prepared.glb",
+        "bytes": 3343864,
+        "sha256": "b3146ca71d6d65128ff55e6ca71554470147c716a9c9e284f99639e3709061c4",
+        "triangles": 5930,
+        "animations": [
+          "Attack.000",
+          "Attack.001",
+          "Attack.002",
+          "Attack.003",
+          "Attack.Begin",
+          "Attack.End",
+          "Die",
+          "Hit",
+          "Idle.000",
+          "Idle.001",
+          "Idle.002",
+          "Run",
+          "Stand",
+          "Walk"
+        ],
+        "skin_count": 1,
+        "mesh_count": 4,
+        "images": [
+          {
+            "name": "rat-body",
+            "mime_type": "image/png",
+            "embedded": true
+          },
+          {
+            "name": "rat-head",
+            "mime_type": "image/png",
+            "embedded": true
+          }
+        ]
+      },
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 0.875,
+            "name": "Attack_000",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.875,
+            "name": "Attack_001",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.833333313465118,
+            "name": "Attack_002",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.833333313465118,
+            "name": "Attack_003",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.833333313465118,
+            "name": "Attack_Begin",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.833333313465118,
+            "name": "Attack_End",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 1.125,
+            "name": "Die",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.416666656732559,
+            "name": "Hit",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 64.7083358764648,
+            "name": "Idle_000",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 3.75,
+            "name": "Idle_001",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 3.75,
+            "name": "Idle_002",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.416666656732559,
+            "name": "Run",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.00100000004749745,
+            "name": "Stand",
+            "sampled_pose_changes": false,
+            "tracks": 47
+          },
+          {
+            "length": 1.16666662693024,
+            "name": "Walk",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          }
+        ],
+        "id": "MOB-03",
+        "loaded": true,
+        "meshes": [
+          {
+            "aabb": "[P: (-0.586677, -0.018907, -2.853529), S: (1.173354, 1.411781, 4.477382)]",
+            "name": "Body",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": true,
+                "material": "intake_Body"
+              }
+            ]
+          },
+          {
+            "aabb": "[P: (-0.171874, 0.716418, 1.648668), S: (0.343747, 0.125006, 0.082079)]",
+            "name": "Eyes",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": false,
+                "material": "intake_Eyes"
+              }
+            ]
+          },
+          {
+            "aabb": "[P: (-0.487577, 0.239353, 1.258628), S: (0.975154, 0.726411, 0.995317)]",
+            "name": "Head",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": true,
+                "material": "intake_Head"
+              }
+            ]
+          },
+          {
+            "aabb": "[P: (-0.109609, 0.337223, 1.745672), S: (0.219218, 0.36993, 0.37808)]",
+            "name": "Teeth",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": false,
+                "material": "intake_Teeth"
+              }
+            ]
+          }
+        ],
+        "path": "res://assets/MOB-03.glb",
+        "runtime_combat_verified": false,
+        "skeleton_bones": [
+          39
+        ],
+        "visual_godot_verified": false
+      },
+      "scale_normalized": false,
+      "orientation_approved": false,
+      "gameplay_integrated": false,
+      "preparation": {
+        "id": "MOB-03",
+        "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\prepared.glb",
+        "excluded_objects": [
+          "Camera",
+          "Hemi",
+          "Lamp",
+          "Plane",
+          "Plane.001",
+          "Sun",
+          "Hair"
+        ],
+        "material_changes": [
+          {
+            "mesh": "Body",
+            "image": "rat-body",
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          },
+          {
+            "mesh": "Eyes",
+            "image": null,
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          },
+          {
+            "mesh": "Head",
+            "image": "rat-head",
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          },
+          {
+            "mesh": "Teeth",
+            "image": null,
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          }
+        ],
+        "dimensions_original_units": [
+          1.1765892505645752,
+          5.146193504333496,
+          1.4117807149887085
+        ],
+        "normalization": "none; source units retained; integration must choose gameplay dimensions",
+        "art_approved": false
+      },
+      "blender_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\review.png",
+        "intake_relative_path": "MOB-03/review.png",
+        "bytes": 57573,
+        "sha256": "05c39adc6b411fc9299f57ae3beefad49c57898c576f86537afcb14ca08f2639"
+      },
+      "limitations": [
+        "Technical integration candidate; removed malformed hair card and scene helpers; converted legacy materials.",
+        "Fourteen source actions include one static Stand and a 64.7-second Idle_000; prefer short idle actions for the game."
+      ]
+    },
+    {
+      "id": "MOB-04",
+      "receipt": {
+        "id": "MOB-04",
+        "title": "Boar",
+        "author": "Teh_Bucket",
+        "page": "https://opengameart.org/content/boar",
+        "url": "https://opengameart.org/sites/default/files/boar_0.blend",
+        "filename": "boar_0.blend",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+        "acquired_utc": "2026-09-12T10:33:52.686332+00:00",
+        "status": "acquired_source",
+        "page_receipt": {
+          "url": "https://opengameart.org/content/boar",
+          "final_url": "https://opengameart.org/content/boar",
+          "http_status": 200,
+          "bytes": 23356,
+          "sha256": "6627801dae975c1708040939cab8113cc2f22513943ec06a526d864e428723e9",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\source-page.html",
+          "content_type": "text/html; charset=utf-8"
+        },
+        "license_receipt": {
+          "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+          "final_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+          "http_status": 200,
+          "bytes": 32451,
+          "sha256": "001e3d1c905c18b1d034b34200cc952026abb38457c2294c23eaef7f6bda64df",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\license.html",
+          "content_type": "text/html"
+        },
+        "source_receipt": {
+          "url": "https://opengameart.org/sites/default/files/boar_0.blend",
+          "final_url": "https://opengameart.org/sites/default/files/boar_0.blend",
+          "http_status": 200,
+          "bytes": 1780848,
+          "sha256": "c16625680d056f0402d1be209c41d16a63394aec94b082a63ad32f562e9f2d2d",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\boar_0.blend",
+          "content_type": "application/octet-stream"
+        }
+      },
+      "status": "source_verified",
+      "gates": {
+        "G1_card_license": "source_and_license_receipts",
+        "G2_import": "headless_import_skin_and_sampled_animation_passed",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "blender_inventory": {
+        "id": "MOB-04",
+        "blender": "4.2.3 LTS",
+        "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\boar_0.blend",
+        "automatic_scripts_enabled": false,
+        "art_approved": false,
+        "runtime_approved": false,
+        "opened": true,
+        "units": {
+          "system": "NONE",
+          "scale_length": 1.0,
+          "fps": 24
+        },
+        "meshes": [
+          {
+            "name": "boar_mesh.000",
+            "vertices": 313,
+            "triangles": 572,
+            "dimensions": [
+              1.29071,
+              3.416988,
+              2.119863
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              -0.797479,
+              0.288611
+            ],
+            "material_slots": [
+              "Material"
+            ],
+            "vertex_groups": 26,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "MIRROR",
+                "name": "Mirror"
+              },
+              {
+                "type": "EDGE_SPLIT",
+                "name": "EdgeSplit"
+              },
+              {
+                "type": "TRIANGULATE",
+                "name": "Triangulate"
+              },
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          }
+        ],
+        "armatures": [
+          {
+            "name": "boar_armature",
+            "bones": 32,
+            "deform_bones": 32,
+            "bone_names": [
+              "ROOT",
+              "body.001_L.004",
+              "body.001_R.004",
+              "body_L.004",
+              "body_R.004",
+              "tail.004",
+              "Hips",
+              "body",
+              "body.001",
+              "body.002",
+              "head",
+              "nose",
+              "body.001_L",
+              "body.001_L.001",
+              "body.001_L.003",
+              "body.001_L.002",
+              "body.001_R",
+              "body.001_R.001",
+              "body.001_R.003",
+              "body.001_R.002",
+              "tail",
+              "tail.001",
+              "tail.002",
+              "tail.003",
+              "body_L",
+              "body_L.001",
+              "body_L.003",
+              "body_L.002",
+              "body_R",
+              "body_R.001",
+              "body_R.003",
+              "body_R.002"
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "nla_tracks": [
+              {
+                "name": "[Action Stash]",
+                "strips": [
+                  {
+                    "name": "walk",
+                    "action": "walk",
+                    "frames": [
+                      0.0,
+                      40.0
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "name": "attack",
+            "frames": [
+              0.0,
+              19.0
+            ],
+            "fcurves": 77
+          },
+          {
+            "name": "default",
+            "frames": [
+              0.0,
+              0.0
+            ],
+            "fcurves": 247
+          },
+          {
+            "name": "walk",
+            "frames": [
+              0.0,
+              40.0
+            ],
+            "fcurves": 110
+          }
+        ],
+        "materials": [
+          {
+            "name": "Material",
+            "use_nodes": false,
+            "node_types": []
+          }
+        ],
+        "images": [
+          {
+            "name": "boar",
+            "filepath": "//boar.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          }
+        ],
+        "embedded_text_blocks": [],
+        "action_pose_samples": [
+          {
+            "armature": "boar_armature",
+            "action": "attack",
+            "frames": [
+              0,
+              9,
+              19
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "boar_armature",
+            "action": "default",
+            "frames": [
+              0,
+              0,
+              0
+            ],
+            "pose_changes": false
+          },
+          {
+            "armature": "boar_armature",
+            "action": "walk",
+            "frames": [
+              0,
+              20,
+              40
+            ],
+            "pose_changes": true
+          }
+        ],
+        "export_options": {
+          "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\probe.glb",
+          "export_format": "GLB",
+          "use_selection": true,
+          "export_animations": true,
+          "export_skins": true,
+          "export_nla_strips": true,
+          "export_force_sampling": true,
+          "export_optimize_animation_size": false,
+          "export_all_influences": false,
+          "export_cameras": false,
+          "export_lights": false
+        },
+        "glb": {
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\probe.glb",
+          "bytes": 184064,
+          "sha256": "c8d51b01f5168459d9042897b58e3fe47cb17fe85e5caae8e2c92e5aa320fd5f"
+        }
+      },
+      "archive_extension_counts": {},
+      "archive_file_count": 1,
+      "export": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\prepared.glb",
+        "intake_relative_path": "MOB-04/prepared.glb",
+        "bytes": 1013724,
+        "sha256": "d8e416f03a2f583fec277da65bf2c7a7778181a0135eedc82f9bc1de2be269e6",
+        "triangles": 1144,
+        "animations": [
+          "attack",
+          "default",
+          "walk"
+        ],
+        "skin_count": 1,
+        "mesh_count": 1,
+        "images": [
+          {
+            "name": "boar",
+            "mime_type": "image/png",
+            "embedded": true
+          }
+        ]
+      },
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 0.791666686534882,
+            "name": "attack",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.00100000004749745,
+            "name": "default",
+            "sampled_pose_changes": false,
+            "tracks": 31
+          },
+          {
+            "length": 1.66666662693024,
+            "name": "walk",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          }
+        ],
+        "id": "MOB-04",
+        "loaded": true,
+        "meshes": [
+          {
+            "aabb": "[P: (-0.639062, -1.031602, -1.790574), S: (1.278123, 2.157247, 3.414982)]",
+            "name": "boar_mesh_000",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": true,
+                "material": "intake_boar_mesh.000"
+              }
+            ]
+          }
+        ],
+        "path": "res://assets/MOB-04.glb",
+        "runtime_combat_verified": false,
+        "skeleton_bones": [
+          32
+        ],
+        "visual_godot_verified": false
+      },
+      "scale_normalized": false,
+      "orientation_approved": false,
+      "gameplay_integrated": false,
+      "preparation": {
+        "id": "MOB-04",
+        "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\prepared.glb",
+        "excluded_objects": [],
+        "material_changes": [
+          {
+            "mesh": "boar_mesh.000",
+            "image": "boar",
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          }
+        ],
+        "dimensions_original_units": [
+          1.278123140335083,
+          3.4149818420410156,
+          2.157247543334961
+        ],
+        "normalization": "none; source units retained; integration must choose gameplay dimensions",
+        "art_approved": false,
+        "geometry_changes": [
+          "Applied Mirror, Edge Split and Triangulate during GLB export; retained the armature and three source actions. Godot AABB width changed from 0.639062 to 1.278123 source units, restoring both halves."
+        ]
+      },
+      "blender_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04\\review.png",
+        "intake_relative_path": "MOB-04/review.png",
+        "bytes": 213773,
+        "sha256": "fe713950c741f8b4d3df3212b0387f133f175e861ee9de418b894247860d52ef"
+      },
+      "limitations": [
+        "Only attack and walk are changing clips; default is static. No source hit, death or run.",
+        "Mirror export repaired. Final creature scale, floor offset and orientation remain pending."
+      ]
+    },
+    {
+      "id": "MOB-05",
+      "receipt": {
+        "id": "MOB-05",
+        "title": "Beetle Golem Animated",
+        "author": "killyoverdrive; animation Dm3d",
+        "page": "https://opengameart.org/content/beetle-golem-animated",
+        "url": "https://opengameart.org/sites/default/files/BeetleGolem_v3.blend",
+        "filename": "BeetleGolem_v3.blend",
+        "license": "CC-BY-SA-3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0/legalcode",
+        "acquired_utc": "2026-09-12T10:33:52.686332+00:00",
+        "status": "acquired_source",
+        "page_receipt": {
+          "url": "https://opengameart.org/content/beetle-golem-animated",
+          "final_url": "https://opengameart.org/content/beetle-golem-animated",
+          "http_status": 200,
+          "bytes": 34289,
+          "sha256": "f10f19003af244447ec5dd2915fbd0e67a54e1aff9e6cce56ee6a339e3cd8457",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\source-page.html",
+          "content_type": "text/html; charset=utf-8"
+        },
+        "license_receipt": {
+          "url": "https://creativecommons.org/licenses/by-sa/3.0/legalcode",
+          "final_url": "https://creativecommons.org/licenses/by-sa/3.0/legalcode",
+          "http_status": 200,
+          "bytes": 54307,
+          "sha256": "7e09ceffbcaa8dab3e66625f6264a7274912be272fc80e9cd94a29f94090b00c",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\license.html",
+          "content_type": "text/html"
+        },
+        "source_receipt": {
+          "url": "https://opengameart.org/sites/default/files/BeetleGolem_v3.blend",
+          "final_url": "https://opengameart.org/sites/default/files/BeetleGolem_v3.blend",
+          "http_status": 200,
+          "bytes": 6731864,
+          "sha256": "cb730dd5dcf0f25835bd276dfd6bf38cb1d55a1d4ccefa7e94391ee0ce412c42",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\BeetleGolem_v3.blend",
+          "content_type": "application/octet-stream"
+        }
+      },
+      "status": "source_verified",
+      "gates": {
+        "G1_card_license": "source_and_license_receipts",
+        "G2_import": "headless_import_skin_and_sampled_animation_passed",
+        "G3_art": "rejected_for_beetle_species",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "blender_inventory": {
+        "id": "MOB-05",
+        "blender": "4.2.3 LTS",
+        "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\BeetleGolem_v3.blend",
+        "automatic_scripts_enabled": false,
+        "art_approved": false,
+        "runtime_approved": false,
+        "opened": true,
+        "units": {
+          "system": "NONE",
+          "scale_length": 1.0,
+          "fps": 24
+        },
+        "meshes": [
+          {
+            "name": "Mesh.001",
+            "vertices": 312,
+            "triangles": 620,
+            "dimensions": [
+              5.668341,
+              5.839871,
+              3.238508
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "Material.002"
+            ],
+            "vertex_groups": 29,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          },
+          {
+            "name": "Plane",
+            "vertices": 4,
+            "triangles": 2,
+            "dimensions": [
+              18.30851,
+              18.30851,
+              0.0
+            ],
+            "scale": [
+              10.171394,
+              10.171394,
+              10.171394
+            ],
+            "location": [
+              -0.2193,
+              0.130557,
+              -3.671942
+            ],
+            "material_slots": [
+              "Material"
+            ],
+            "vertex_groups": 0,
+            "vertices_without_groups": 4,
+            "modifiers": []
+          }
+        ],
+        "armatures": [
+          {
+            "name": "Armature",
+            "bones": 29,
+            "deform_bones": 29,
+            "bone_names": [
+              "Bone",
+              "Bone.001",
+              "Bone.002",
+              "Bone.003",
+              "Bone.004",
+              "Bone.001_L",
+              "Bone.001_L.001",
+              "Bone.001_L.002",
+              "Bone.001_L.003",
+              "Bone.001_L.004",
+              "Bone.001_L.005",
+              "Bone.001_L.006",
+              "Bone.001_L.007",
+              "Bone.001_R",
+              "Bone.001_R.001",
+              "Bone.001_R.002",
+              "Bone.001_R.003",
+              "Bone.001_R.004",
+              "Bone.001_R.005",
+              "Bone.001_R.006",
+              "Bone.001_R.007",
+              "Bone_L",
+              "Bone_L.001",
+              "Bone_L.002",
+              "Bone_L.003",
+              "Bone_R",
+              "Bone_R.001",
+              "Bone_R.002",
+              "Bone_R.003"
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "nla_tracks": [
+              {
+                "name": "NlaTrack",
+                "strips": [
+                  {
+                    "name": "Idle_Heavy",
+                    "action": "Idle_Heavy",
+                    "frames": [
+                      0.0,
+                      50.0
+                    ]
+                  },
+                  {
+                    "name": "Idle_Normal",
+                    "action": "Idle_Normal",
+                    "frames": [
+                      50.0,
+                      100.0
+                    ]
+                  },
+                  {
+                    "name": "Walk",
+                    "action": "Walk",
+                    "frames": [
+                      100.0,
+                      140.0
+                    ]
+                  },
+                  {
+                    "name": "Sleep_Start",
+                    "action": "Sleep_Start",
+                    "frames": [
+                      140.0,
+                      210.0
+                    ]
+                  },
+                  {
+                    "name": "Sleep_Idle",
+                    "action": "Sleep_Idle",
+                    "frames": [
+                      210.0,
+                      300.0
+                    ]
+                  },
+                  {
+                    "name": "Sleep_End",
+                    "action": "Sleep_End",
+                    "frames": [
+                      300.0,
+                      370.0
+                    ]
+                  },
+                  {
+                    "name": "Attack1",
+                    "action": "Attack1",
+                    "frames": [
+                      370.0,
+                      420.0
+                    ]
+                  },
+                  {
+                    "name": "Attack2",
+                    "action": "Attack2",
+                    "frames": [
+                      420.0,
+                      470.0
+                    ]
+                  },
+                  {
+                    "name": "Hurt1",
+                    "action": "Hurt1",
+                    "frames": [
+                      470.0,
+                      500.0
+                    ]
+                  },
+                  {
+                    "name": "Hurt2",
+                    "action": "Hurt2",
+                    "frames": [
+                      500.0,
+                      530.0
+                    ]
+                  },
+                  {
+                    "name": "Death",
+                    "action": "Death",
+                    "frames": [
+                      530.0,
+                      585.0
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "name": "Attack1",
+            "frames": [
+              0.0,
+              50.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Attack2",
+            "frames": [
+              0.0,
+              50.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Death",
+            "frames": [
+              0.0,
+              55.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Hurt1",
+            "frames": [
+              0.0,
+              30.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Hurt2",
+            "frames": [
+              0.0,
+              30.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Idle_Heavy",
+            "frames": [
+              1.0,
+              50.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Idle_Normal",
+            "frames": [
+              0.0,
+              50.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "OLD_AnimationLine",
+            "frames": [
+              1.0,
+              530.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Sleep_End",
+            "frames": [
+              0.0,
+              70.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Sleep_Idle",
+            "frames": [
+              0.0,
+              90.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Sleep_Start",
+            "frames": [
+              0.0,
+              70.0
+            ],
+            "fcurves": 290
+          },
+          {
+            "name": "Walk",
+            "frames": [
+              0.0,
+              40.0
+            ],
+            "fcurves": 290
+          }
+        ],
+        "materials": [
+          {
+            "name": "Material",
+            "use_nodes": false,
+            "node_types": []
+          },
+          {
+            "name": "Material.002",
+            "use_nodes": false,
+            "node_types": []
+          }
+        ],
+        "images": [
+          {
+            "name": "untitled",
+            "filepath": "//ESCARABAJO LOW.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          },
+          {
+            "name": "untitled.001",
+            "filepath": "//ESCARABAJO LOW2color.png",
+            "packed": true,
+            "size": [
+              1024,
+              1024
+            ],
+            "source": "FILE",
+            "external_exists": false
+          }
+        ],
+        "embedded_text_blocks": [],
+        "action_pose_samples": [
+          {
+            "armature": "Armature",
+            "action": "Attack1",
+            "frames": [
+              0,
+              25,
+              50
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Attack2",
+            "frames": [
+              0,
+              25,
+              50
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Death",
+            "frames": [
+              0,
+              27,
+              55
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Hurt1",
+            "frames": [
+              0,
+              15,
+              30
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Hurt2",
+            "frames": [
+              0,
+              15,
+              30
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Idle_Heavy",
+            "frames": [
+              0,
+              25,
+              50
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Idle_Normal",
+            "frames": [
+              0,
+              25,
+              50
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "OLD_AnimationLine",
+            "frames": [
+              0,
+              265,
+              530
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Sleep_End",
+            "frames": [
+              0,
+              35,
+              70
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Sleep_Idle",
+            "frames": [
+              0,
+              45,
+              90
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Sleep_Start",
+            "frames": [
+              0,
+              35,
+              70
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "Walk",
+            "frames": [
+              0,
+              20,
+              40
+            ],
+            "pose_changes": true
+          }
+        ],
+        "export_options": {
+          "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\probe.glb",
+          "export_format": "GLB",
+          "use_selection": true,
+          "export_animations": true,
+          "export_skins": true,
+          "export_nla_strips": true,
+          "export_force_sampling": true,
+          "export_optimize_animation_size": false,
+          "export_all_influences": false,
+          "export_cameras": false,
+          "export_lights": false
+        },
+        "glb": {
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\probe.glb",
+          "bytes": 1582056,
+          "sha256": "03ca8f671c5939c176cf53918533d9c3b34b6ff5157062683162abba3928b7f1"
+        }
+      },
+      "archive_extension_counts": {},
+      "archive_file_count": 1,
+      "export": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\prepared.glb",
+        "intake_relative_path": "MOB-05/prepared.glb",
+        "bytes": 2107980,
+        "sha256": "9ee2425a411f436f58c27fe50bcab71fd478dec2d0dd120604dca3f76bf36fc0",
+        "triangles": 620,
+        "animations": [
+          "Attack1",
+          "Attack2",
+          "Death",
+          "Hurt1",
+          "Hurt2",
+          "Idle_Heavy",
+          "Idle_Normal",
+          "OLD_AnimationLine",
+          "Sleep_End",
+          "Sleep_Idle",
+          "Sleep_Start",
+          "Walk"
+        ],
+        "skin_count": 1,
+        "mesh_count": 1,
+        "images": [
+          {
+            "name": "untitled",
+            "mime_type": "image/png",
+            "embedded": true
+          }
+        ]
+      },
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 2.08333325386047,
+            "name": "Attack1",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 2.08333325386047,
+            "name": "Attack2",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 2.29166674613953,
+            "name": "Death",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 1.25,
+            "name": "Hurt1",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 1.25,
+            "name": "Hurt2",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 2.08333325386047,
+            "name": "Idle_Heavy",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 2.08333325386047,
+            "name": "Idle_Normal",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 22.0833339691162,
+            "name": "OLD_AnimationLine",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 2.91666674613953,
+            "name": "Sleep_End",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 3.75,
+            "name": "Sleep_Idle",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 2.91666674613953,
+            "name": "Sleep_Start",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          },
+          {
+            "length": 1.66666662693024,
+            "name": "Walk",
+            "sampled_pose_changes": true,
+            "tracks": 32
+          }
+        ],
+        "id": "MOB-05",
+        "loaded": true,
+        "meshes": [
+          {
+            "aabb": "[P: (-3.045901, -3.691141, -1.236203), S: (6.091802, 5.856024, 3.239211)]",
+            "name": "Mesh_001",
+            "skin": true,
+            "surfaces": [
+              {
+                "albedo_texture": true,
+                "material": "intake_Mesh.001"
+              }
+            ]
+          }
+        ],
+        "path": "res://assets/MOB-05.glb",
+        "runtime_combat_verified": false,
+        "skeleton_bones": [
+          29
+        ],
+        "visual_godot_verified": false
+      },
+      "scale_normalized": false,
+      "orientation_approved": false,
+      "gameplay_integrated": false,
+      "preparation": {
+        "id": "MOB-05",
+        "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\prepared.glb",
+        "excluded_objects": [
+          "Camera",
+          "Lamp",
+          "Lamp.001",
+          "Plane"
+        ],
+        "material_changes": [
+          {
+            "mesh": "Mesh.001",
+            "image": "untitled.001",
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          }
+        ],
+        "dimensions_original_units": [
+          5.668498992919922,
+          3.2381839752197266,
+          5.840400695800781
+        ],
+        "normalization": "none; source units retained; integration must choose gameplay dimensions",
+        "art_approved": false
+      },
+      "blender_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05\\review.png",
+        "intake_relative_path": "MOB-05/review.png",
+        "bytes": 329080,
+        "sha256": "d182b6364e8c417187b97ea68a03d5cdfa0a4e54d8ff9b27db9eaba98f99ba3c"
+      },
+      "limitations": [
+        "G3 rejected for MOB-05 beetle: actual source is a two-legged stone humanoid with oversized forearms, not a six-legged insect.",
+        "Twelve actions include OLD_AnimationLine; this full timeline is not an additional independent gameplay clip.",
+        "CC BY-SA 3.0: retain attribution and ShareAlike obligations for distributed adapted model."
+      ]
+    },
+    {
+      "id": "MOB-05-shellbug",
+      "receipt": {
+        "id": "MOB-05-shellbug",
+        "title": "Shell Bug",
+        "author": "br-n518",
+        "page": "https://opengameart.org/content/shell-bug",
+        "url": "https://opengameart.org/sites/default/files/shellbug.zip",
+        "filename": "shellbug.zip",
+        "license": "CC0-1.0",
+        "license_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+        "acquired_utc": "2026-09-12T10:57:24.097006+00:00",
+        "status": "acquired_source",
+        "page_receipt": {
+          "url": "https://opengameart.org/content/shell-bug",
+          "final_url": "https://opengameart.org/content/shell-bug",
+          "http_status": 200,
+          "bytes": 27687,
+          "sha256": "f9d52b7c955e40e7dbf8517afc4ad35de781e8925e0da4318693b5ec337d4c06",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\source-page.html",
+          "content_type": "text/html; charset=utf-8"
+        },
+        "license_receipt": {
+          "url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+          "final_url": "https://creativecommons.org/publicdomain/zero/1.0/legalcode.en",
+          "http_status": 200,
+          "bytes": 32451,
+          "sha256": "001e3d1c905c18b1d034b34200cc952026abb38457c2294c23eaef7f6bda64df",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\license.html",
+          "content_type": "text/html"
+        },
+        "source_receipt": {
+          "url": "https://opengameart.org/sites/default/files/shellbug.zip",
+          "final_url": "https://opengameart.org/sites/default/files/shellbug.zip",
+          "http_status": 200,
+          "bytes": 521755,
+          "sha256": "11419a3df5eb3d567868db9435d0c48d0fb26e9f952c5808c7d0775597c445b5",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\shellbug.zip",
+          "content_type": "application/zip"
+        },
+        "archive_members": [
+          {
+            "path": "bug.blend",
+            "bytes": 1408504,
+            "compressed_bytes": 182382
+          },
+          {
+            "path": "bug_diffuse.png",
+            "bytes": 6721,
+            "compressed_bytes": 5537
+          },
+          {
+            "path": "bug_normal.png",
+            "bytes": 333655,
+            "compressed_bytes": 333270
+          }
+        ]
+      },
+      "status": "source_verified",
+      "gates": {
+        "G1_card_license": "source_and_license_receipts",
+        "G2_import": "headless_import_skin_and_sampled_animation_passed",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "blender_inventory": {
+        "id": "MOB-05-shellbug",
+        "blender": "4.2.3 LTS",
+        "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\extracted\\bug.blend",
+        "automatic_scripts_enabled": false,
+        "art_approved": false,
+        "runtime_approved": false,
+        "opened": true,
+        "units": {
+          "system": "NONE",
+          "scale_length": 1.0,
+          "fps": 24
+        },
+        "meshes": [
+          {
+            "name": "Shellbug",
+            "vertices": 206,
+            "triangles": 332,
+            "dimensions": [
+              2.289618,
+              4.031927,
+              2.571362
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [
+              "MAT-shellbug"
+            ],
+            "vertex_groups": 22,
+            "vertices_without_groups": 0,
+            "modifiers": [
+              {
+                "type": "ARMATURE",
+                "name": "Armature"
+              }
+            ]
+          }
+        ],
+        "armatures": [
+          {
+            "name": "Armature",
+            "bones": 32,
+            "deform_bones": 31,
+            "bone_names": [
+              "root",
+              "Bone",
+              "Bone_L",
+              "Bone_L.001",
+              "Bone_R",
+              "Bone_R.001",
+              "Bone_L.002",
+              "Bone_L.003",
+              "Bone_R.002",
+              "Bone_R.003",
+              "Bone_L.004",
+              "Bone_L.005",
+              "Bone_R.004",
+              "Bone_R.005",
+              "Bone_L.006",
+              "Bone_L.007",
+              "Bone_L.008",
+              "Bone_L.009",
+              "Bone_R.006",
+              "Bone_R.007",
+              "Bone_R.008",
+              "Bone_R.009",
+              "Bone.001",
+              "Bone.002",
+              "Bone_L.010",
+              "Bone_R.010",
+              "Bone_L.011",
+              "Bone_R.011",
+              "Bone_L.012",
+              "Bone_R.012",
+              "Bone_L.013",
+              "Bone_R.013"
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "nla_tracks": [
+              {
+                "name": "[Action Stash]",
+                "strips": [
+                  {
+                    "name": "WALK",
+                    "action": "WALK",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "[Action Stash].001",
+                "strips": [
+                  {
+                    "name": "ATTACK",
+                    "action": "ATTACK",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "[Action Stash].002",
+                "strips": [
+                  {
+                    "name": "TAKE_DAMAGE",
+                    "action": "TAKE_DAMAGE",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "[Action Stash].003",
+                "strips": [
+                  {
+                    "name": "IDLE",
+                    "action": "IDLE",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "[Action Stash].004",
+                "strips": [
+                  {
+                    "name": "ATTACK_2",
+                    "action": "ATTACK_2",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "[Action Stash].005",
+                "strips": [
+                  {
+                    "name": "RUN",
+                    "action": "RUN",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "[Action Stash].006",
+                "strips": [
+                  {
+                    "name": "DEATH",
+                    "action": "DEATH",
+                    "frames": [
+                      0.0,
+                      16.0
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "actions": [
+          {
+            "name": "ATTACK",
+            "frames": [
+              0.0,
+              16.0
+            ],
+            "fcurves": 252
+          },
+          {
+            "name": "ATTACK_2",
+            "frames": [
+              0.0,
+              16.0
+            ],
+            "fcurves": 254
+          },
+          {
+            "name": "DEATH",
+            "frames": [
+              0.0,
+              16.0
+            ],
+            "fcurves": 260
+          },
+          {
+            "name": "IDLE",
+            "frames": [
+              0.0,
+              15.0
+            ],
+            "fcurves": 260
+          },
+          {
+            "name": "RUN",
+            "frames": [
+              0.0,
+              7.0
+            ],
+            "fcurves": 260
+          },
+          {
+            "name": "TAKE_DAMAGE",
+            "frames": [
+              0.0,
+              15.0
+            ],
+            "fcurves": 233
+          },
+          {
+            "name": "WALK",
+            "frames": [
+              0.0,
+              15.0
+            ],
+            "fcurves": 239
+          }
+        ],
+        "materials": [
+          {
+            "name": "MAT-shellbug",
+            "use_nodes": false,
+            "node_types": []
+          }
+        ],
+        "images": [
+          {
+            "name": "bug_normal.png",
+            "filepath": "//bug_diffuse.png",
+            "packed": false,
+            "size": [
+              512,
+              512
+            ],
+            "source": "FILE",
+            "external_exists": true
+          },
+          {
+            "name": "hair_normal.png",
+            "filepath": "//bug_normal.png",
+            "packed": false,
+            "size": [
+              512,
+              512
+            ],
+            "source": "FILE",
+            "external_exists": true
+          },
+          {
+            "name": "Render Result",
+            "filepath": "",
+            "packed": false,
+            "size": [
+              0,
+              0
+            ],
+            "source": "VIEWER",
+            "external_exists": false
+          }
+        ],
+        "embedded_text_blocks": [],
+        "action_pose_samples": [
+          {
+            "armature": "Armature",
+            "action": "ATTACK",
+            "frames": [
+              0,
+              8,
+              16
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "ATTACK_2",
+            "frames": [
+              0,
+              8,
+              16
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "DEATH",
+            "frames": [
+              0,
+              8,
+              16
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "IDLE",
+            "frames": [
+              0,
+              7,
+              15
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "RUN",
+            "frames": [
+              0,
+              3,
+              7
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "TAKE_DAMAGE",
+            "frames": [
+              0,
+              7,
+              15
+            ],
+            "pose_changes": true
+          },
+          {
+            "armature": "Armature",
+            "action": "WALK",
+            "frames": [
+              0,
+              7,
+              15
+            ],
+            "pose_changes": true
+          }
+        ],
+        "export_options": {
+          "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\probe.glb",
+          "export_format": "GLB",
+          "use_selection": true,
+          "export_animations": true,
+          "export_skins": true,
+          "export_nla_strips": true,
+          "export_force_sampling": true,
+          "export_optimize_animation_size": false,
+          "export_all_influences": false,
+          "export_cameras": false,
+          "export_lights": false
+        },
+        "glb": {
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\probe.glb",
+          "bytes": 311372,
+          "sha256": "19992c68d6b7bedcdaf5a105c96aef4c6a4a8f9ed4fcd1499a4d2a18068925bb"
+        }
+      },
+      "archive_extension_counts": {
+        ".blend": 1,
+        ".png": 2
+      },
+      "archive_file_count": 3,
+      "export": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\prepared.glb",
+        "intake_relative_path": "MOB-05-shellbug/prepared.glb",
+        "bytes": 235088,
+        "sha256": "b3b964cb4d85fa88ac6bab7872cb634a9dd06ae435e05b7c83498a2a7766d5ad",
+        "triangles": 332,
+        "animations": [
+          "ATTACK",
+          "ATTACK_2",
+          "DEATH",
+          "IDLE",
+          "RUN",
+          "TAKE_DAMAGE",
+          "WALK"
+        ],
+        "skin_count": 1,
+        "mesh_count": 1,
+        "images": [
+          {
+            "name": "bug_normal",
+            "mime_type": "image/png",
+            "embedded": true
+          }
+        ]
+      },
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 0.625,
+            "name": "idle",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.625,
+            "name": "walk",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.291666656732559,
+            "name": "run",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.666666686534882,
+            "name": "attack",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.625,
+            "name": "hit",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.666666686534882,
+            "name": "death",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          }
+        ],
+        "combat_verified": false,
+        "id": "mob_05_shellbug",
+        "idle_bone_world_positions": [
+          {
+            "name": "root",
+            "world_origin": "(0.00224, -0.000135, -0.090779)"
+          },
+          {
+            "name": "Bone",
+            "world_origin": "(0.00224, 0.190216, -0.004886)"
+          },
+          {
+            "name": "Bone_L",
+            "world_origin": "(-0.023823, 0.174036, -0.089004)"
+          },
+          {
+            "name": "Bone_L.001",
+            "world_origin": "(-0.122262, 0.105016, -0.089004)"
+          },
+          {
+            "name": "Bone_R",
+            "world_origin": "(0.028304, 0.174036, -0.089004)"
+          },
+          {
+            "name": "Bone_R.001",
+            "world_origin": "(0.126742, 0.105016, -0.089004)"
+          },
+          {
+            "name": "Bone_L.002",
+            "world_origin": "(-0.023823, 0.174036, 0.0)"
+          },
+          {
+            "name": "Bone_L.003",
+            "world_origin": "(-0.122261, 0.105016, 0.0)"
+          },
+          {
+            "name": "Bone_R.002",
+            "world_origin": "(0.028304, 0.174036, 0.0)"
+          },
+          {
+            "name": "Bone_R.003",
+            "world_origin": "(0.126742, 0.105016, 0.0)"
+          },
+          {
+            "name": "Bone_L.004",
+            "world_origin": "(-0.023823, 0.174036, 0.089004)"
+          },
+          {
+            "name": "Bone_L.005",
+            "world_origin": "(-0.135702, 0.130025, 0.089004)"
+          },
+          {
+            "name": "Bone_R.004",
+            "world_origin": "(0.028304, 0.174036, 0.089004)"
+          },
+          {
+            "name": "Bone_R.005",
+            "world_origin": "(0.126742, 0.105016, 0.089004)"
+          },
+          {
+            "name": "Bone_L.006",
+            "world_origin": "(-0.069597, 0.243852, -0.100262)"
+          },
+          {
+            "name": "Bone_L.007",
+            "world_origin": "(-0.069597, 0.243852, -0.175463)"
+          },
+          {
+            "name": "Bone_L.008",
+            "world_origin": "(-0.069597, 0.161709, -0.238414)"
+          },
+          {
+            "name": "Bone_L.009",
+            "world_origin": "(-0.069597, 0.243856, -0.34457)"
+          },
+          {
+            "name": "Bone_R.006",
+            "world_origin": "(0.074078, 0.243852, -0.100262)"
+          },
+          {
+            "name": "Bone_R.007",
+            "world_origin": "(0.074078, 0.243852, -0.175463)"
+          },
+          {
+            "name": "Bone_R.008",
+            "world_origin": "(0.074078, 0.161709, -0.238414)"
+          },
+          {
+            "name": "Bone_R.009",
+            "world_origin": "(0.074078, 0.243856, -0.34457)"
+          },
+          {
+            "name": "Bone.001",
+            "world_origin": "(0.00224, 0.332441, -0.219367)"
+          },
+          {
+            "name": "Bone.002",
+            "world_origin": "(0.00224, 0.332441, -0.50461)"
+          },
+          {
+            "name": "Bone_L.010",
+            "world_origin": "(-0.189025, 0.001295, -0.089004)"
+          },
+          {
+            "name": "Bone_R.010",
+            "world_origin": "(0.193506, 0.001295, -0.089004)"
+          },
+          {
+            "name": "Bone_L.011",
+            "world_origin": "(-0.189025, 0.001295, -0.0)"
+          },
+          {
+            "name": "Bone_R.011",
+            "world_origin": "(0.193506, 0.001295, -0.0)"
+          },
+          {
+            "name": "Bone_L.012",
+            "world_origin": "(-0.189025, 0.018795, 0.089004)"
+          },
+          {
+            "name": "Bone_R.012",
+            "world_origin": "(0.193506, 0.001295, 0.089004)"
+          },
+          {
+            "name": "Bone_L.013",
+            "world_origin": "(-0.069597, 0.243852, -0.344559)"
+          },
+          {
+            "name": "Bone_R.013",
+            "world_origin": "(0.074078, 0.243852, -0.344559)"
+          }
+        ],
+        "loaded": true,
+        "meshes": [
+          {
+            "global_aabb": "[P: (-0.033213, -0.000135, -0.123213), S: (0.070123, 0.078752, 0.152814)]",
+            "name": "Shellbug",
+            "skin": true
+          }
+        ],
+        "render_saved": true,
+        "renderer": "NVIDIA GeForce RTX 3070 Laptop GPU",
+        "rest_mesh_aabb_not_deformed_bounds": "[P: (-0.033213, -0.000135, -0.123213), S: (0.070123, 0.078752, 0.152814)]",
+        "skeleton_bones": 32
+      },
+      "scale_normalized": false,
+      "orientation_approved": false,
+      "gameplay_integrated": false,
+      "preparation": {
+        "id": "MOB-05-shellbug",
+        "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\prepared.glb",
+        "excluded_objects": [
+          "Camera",
+          "Hemi"
+        ],
+        "material_changes": [
+          {
+            "mesh": "Shellbug",
+            "image": "bug_normal.png",
+            "operation": "legacy Blender Internal material converted to Principled preview"
+          }
+        ],
+        "dimensions_original_units": [
+          2.2896180152893066,
+          4.036820888519287,
+          2.5704753398895264
+        ],
+        "normalization": "none; source units retained; integration must choose gameplay dimensions",
+        "art_approved": false
+      },
+      "blender_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\review.png",
+        "intake_relative_path": "MOB-05-shellbug/review.png",
+        "bytes": 216279,
+        "sha256": "60f3efc019d5a9f8f5800a29adf01e75c4dbabebeebb4d374426d8fe7685f24d"
+      },
+      "limitations": [
+        "Explicit new CC0 source candidate for canonical MOB-05, replacing the rejected golem candidate only; no game scene substitution.",
+        "332 triangles, 32 bones and seven existing source actions. Carapace and six visible limb appendages match the insect direction; final art not approved.",
+        "Godot proof for this source is the six-clip metric adaptation, not the unnormalized prepared GLB; see ASSET_ADAPTATION_MANIFEST.json."
+      ]
+    },
+    {
+      "id": "A01",
+      "receipt": {
+        "id": "A01",
+        "page": "https://www.cgtrader.com/free-3d-models/character/man/crusader-with-a-club",
+        "license": "Royalty Free (no AI), prior primary card verified",
+        "status": "not_acquired",
+        "browser_attempt": "CUA getBrowser: No browser is available",
+        "archive_verified": false,
+        "import_verified": false,
+        "page_receipt": {
+          "url": "https://www.cgtrader.com/free-3d-models/character/man/crusader-with-a-club",
+          "final_url": "https://www.cgtrader.com/free-3d-models/character/man/crusader-with-a-club",
+          "http_status": 202,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A01\\source-page.html",
+          "content_type": "text/html; charset=UTF-8"
+        },
+        "observed_download_links": [],
+        "authentication_terms_present": false,
+        "blocker": "Observed HTTP 202 with an empty response body. No source download link or archive obtained. CUA reports no browser available. Authentication requirements were not established.",
+        "authentication_requirement": "unknown; not inferred from HTTP 202",
+        "license_verification": "prior card research only; current response contains no license text"
+      },
+      "status": "blocked_download",
+      "gates": {
+        "G1_card_license": "prior_card_only_current_response_empty",
+        "G2_import": "not_run",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "limitations": [
+        "Source archive unavailable; no model, rig, texture or import claims can be verified."
+      ]
+    },
+    {
+      "id": "A03",
+      "receipt": {
+        "id": "A03",
+        "title": "MakeHuman core system assets",
+        "author": "MakeHuman Community",
+        "page": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html",
+        "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+        "filename": "makehuman_system_assets_cc0.zip",
+        "license": "CC0-1.0",
+        "license_url": "https://static.makehumancommunity.org/about/license.html",
+        "acquired_utc": "2026-09-12T10:37:06.624427+00:00",
+        "status": "acquired_source",
+        "page_receipt": {
+          "url": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html",
+          "final_url": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html",
+          "http_status": 200,
+          "bytes": 158297,
+          "sha256": "be5b1e49846722467564fee46512316ca6f0f4d84360b74848fb960b97c9b656",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\source-page.html",
+          "content_type": "text/html"
+        },
+        "license_receipt": {
+          "url": "https://static.makehumancommunity.org/about/license.html",
+          "final_url": "https://static.makehumancommunity.org/about/license.html",
+          "http_status": 200,
+          "bytes": 73824,
+          "sha256": "43d9e3e6c05a1a973c4cbd9d351f6c74b1ccd5558478fd23755aca2b7f2b5b7b",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\license.html",
+          "content_type": "text/html"
+        },
+        "source_receipt": {
+          "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+          "final_url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+          "http_status": 200,
+          "bytes": 280737770,
+          "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\makehuman_system_assets_cc0.zip",
+          "content_type": "application/zip"
+        },
+        "archive_members": [
+          {
+            "path": "skins/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_african_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_african_female/old_african_female.mhmat",
+            "bytes": 1451,
+            "compressed_bytes": 701
+          },
+          {
+            "path": "skins/old_african_female/old_african_female.thumb",
+            "bytes": 77565,
+            "compressed_bytes": 77357
+          },
+          {
+            "path": "skins/old_african_female/old_darkskinned_female_diffuse.png",
+            "bytes": 4229797,
+            "compressed_bytes": 4230025
+          },
+          {
+            "path": "skins/young_caucasian_male_special_suit/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_caucasian_male_special_suit/young_caucasian_male_special_suit.mhmat",
+            "bytes": 1478,
+            "compressed_bytes": 702
+          },
+          {
+            "path": "skins/young_caucasian_male_special_suit/young_caucasian_male_special_suit.png",
+            "bytes": 4367336,
+            "compressed_bytes": 4360216
+          },
+          {
+            "path": "skins/young_caucasian_male_special_suit/young_caucasian_male_special_suit.thumb",
+            "bytes": 83891,
+            "compressed_bytes": 83702
+          },
+          {
+            "path": "skins/young_african_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_african_male/young_african_male.thumb",
+            "bytes": 78682,
+            "compressed_bytes": 78504
+          },
+          {
+            "path": "skins/young_african_male/young_darkskinned_male_diffuse.png",
+            "bytes": 2976491,
+            "compressed_bytes": 2972845
+          },
+          {
+            "path": "skins/young_african_male/young_african_male.mhmat",
+            "bytes": 1453,
+            "compressed_bytes": 697
+          },
+          {
+            "path": "skins/middleage_asian_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/middleage_asian_male/middleage_asian_male.thumb",
+            "bytes": 80426,
+            "compressed_bytes": 80258
+          },
+          {
+            "path": "skins/middleage_asian_male/middleage_asian_male.mhmat",
+            "bytes": 1463,
+            "compressed_bytes": 704
+          },
+          {
+            "path": "skins/middleage_asian_male/middleage_lightskinned_male_diffuse2.png",
+            "bytes": 3730636,
+            "compressed_bytes": 3726706
+          },
+          {
+            "path": "skins/middleage_asian_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/middleage_asian_female/middleage_asian_female.mhmat",
+            "bytes": 1468,
+            "compressed_bytes": 705
+          },
+          {
+            "path": "skins/middleage_asian_female/middleage_asian_female.thumb",
+            "bytes": 80500,
+            "compressed_bytes": 80279
+          },
+          {
+            "path": "skins/middleage_asian_female/middleage_lightskinned_female_diffuse2.png",
+            "bytes": 3810424,
+            "compressed_bytes": 3808476
+          },
+          {
+            "path": "skins/toon01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/toon01/toon01.thumb",
+            "bytes": 86805,
+            "compressed_bytes": 86649
+          },
+          {
+            "path": "skins/toon01/toon01.mhmat",
+            "bytes": 1155,
+            "compressed_bytes": 582
+          },
+          {
+            "path": "skins/young_caucasian_female2/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_caucasian_female2/young_caucasian_female2.mhmat",
+            "bytes": 1465,
+            "compressed_bytes": 706
+          },
+          {
+            "path": "skins/young_caucasian_female2/young_lightskinned_female_diffuse2.png",
+            "bytes": 3724137,
+            "compressed_bytes": 3724586
+          },
+          {
+            "path": "skins/young_caucasian_female2/young_caucasian_female2.thumb",
+            "bytes": 77592,
+            "compressed_bytes": 77405
+          },
+          {
+            "path": "skins/young_caucasian_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_caucasian_male/young_lightskinned_male_diffuse.png",
+            "bytes": 3693828,
+            "compressed_bytes": 3690012
+          },
+          {
+            "path": "skins/young_caucasian_male/young_caucasian_male.thumb",
+            "bytes": 79031,
+            "compressed_bytes": 78826
+          },
+          {
+            "path": "skins/young_caucasian_male/young_caucasian_male.mhmat",
+            "bytes": 1462,
+            "compressed_bytes": 703
+          },
+          {
+            "path": "skins/young_african_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_african_female/young_african_female.thumb",
+            "bytes": 74156,
+            "compressed_bytes": 73926
+          },
+          {
+            "path": "skins/young_african_female/young_african_female.mhmat",
+            "bytes": 1457,
+            "compressed_bytes": 699
+          },
+          {
+            "path": "skins/young_african_female/young_darkskinned_female_diffuse.png",
+            "bytes": 4427634,
+            "compressed_bytes": 4427955
+          },
+          {
+            "path": "skins/young_asian_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_asian_female/young_asian_female.mhmat",
+            "bytes": 1459,
+            "compressed_bytes": 708
+          },
+          {
+            "path": "skins/young_asian_female/young_asian_female.thumb",
+            "bytes": 79011,
+            "compressed_bytes": 78823
+          },
+          {
+            "path": "skins/young_asian_female/young_lightskinned_female_diffuse3.png",
+            "bytes": 3884420,
+            "compressed_bytes": 3884836
+          },
+          {
+            "path": "skins/young_caucasian_male2/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_caucasian_male2/young_lightskinned_male_diffuse2.png",
+            "bytes": 3595270,
+            "compressed_bytes": 3591956
+          },
+          {
+            "path": "skins/young_caucasian_male2/young_caucasian_male2.mhmat",
+            "bytes": 1464,
+            "compressed_bytes": 705
+          },
+          {
+            "path": "skins/young_caucasian_male2/young_caucasian_male2.thumb",
+            "bytes": 81183,
+            "compressed_bytes": 80967
+          },
+          {
+            "path": "skins/old_asian_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_asian_male/old_lightskinned_male_diffuse2.png",
+            "bytes": 4485072,
+            "compressed_bytes": 4480595
+          },
+          {
+            "path": "skins/old_asian_male/old_asian_male.mhmat",
+            "bytes": 1442,
+            "compressed_bytes": 691
+          },
+          {
+            "path": "skins/old_asian_male/old_asian_male.thumb",
+            "bytes": 80465,
+            "compressed_bytes": 80267
+          },
+          {
+            "path": "skins/middleage_caucasian_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/middleage_caucasian_male/middleage_lightskinned_male_diffuse.png",
+            "bytes": 3668589,
+            "compressed_bytes": 3664897
+          },
+          {
+            "path": "skins/middleage_caucasian_male/middleage_caucasian_male.thumb",
+            "bytes": 81315,
+            "compressed_bytes": 81110
+          },
+          {
+            "path": "skins/middleage_caucasian_male/middleage_caucasian_male.mhmat",
+            "bytes": 1469,
+            "compressed_bytes": 707
+          },
+          {
+            "path": "skins/middleage_african_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/middleage_african_female/middleage_african_female.mhmat",
+            "bytes": 1472,
+            "compressed_bytes": 709
+          },
+          {
+            "path": "skins/middleage_african_female/middleage_african_female.thumb",
+            "bytes": 76080,
+            "compressed_bytes": 75890
+          },
+          {
+            "path": "skins/middleage_african_female/middleage_darkskinned_female_diffuse.png",
+            "bytes": 4197671,
+            "compressed_bytes": 4197913
+          },
+          {
+            "path": "skins/middleage_african_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/middleage_african_male/middleage_darkskinned_male_diffuse.png",
+            "bytes": 3046762,
+            "compressed_bytes": 3043083
+          },
+          {
+            "path": "skins/middleage_african_male/middleage_african_male.thumb",
+            "bytes": 79294,
+            "compressed_bytes": 79098
+          },
+          {
+            "path": "skins/middleage_african_male/middleage_african_male.mhmat",
+            "bytes": 1465,
+            "compressed_bytes": 704
+          },
+          {
+            "path": "skins/young_asian_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_asian_male/young_asian_male.mhmat",
+            "bytes": 1452,
+            "compressed_bytes": 700
+          },
+          {
+            "path": "skins/young_asian_male/young_asian_male.thumb",
+            "bytes": 79327,
+            "compressed_bytes": 79134
+          },
+          {
+            "path": "skins/young_asian_male/young_lightskinned_male_diffuse3.png",
+            "bytes": 3593099,
+            "compressed_bytes": 3589718
+          },
+          {
+            "path": "skins/young_caucasian_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_caucasian_female/young_caucasian_female.mhmat",
+            "bytes": 1464,
+            "compressed_bytes": 704
+          },
+          {
+            "path": "skins/young_caucasian_female/young_caucasian_female.thumb",
+            "bytes": 78304,
+            "compressed_bytes": 78139
+          },
+          {
+            "path": "skins/young_caucasian_female/young_lightskinned_female_diffuse.png",
+            "bytes": 4391156,
+            "compressed_bytes": 4391823
+          },
+          {
+            "path": "skins/old_african_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_african_male/old_african_male.mhmat",
+            "bytes": 1444,
+            "compressed_bytes": 692
+          },
+          {
+            "path": "skins/old_african_male/old_african_male.thumb",
+            "bytes": 81929,
+            "compressed_bytes": 81751
+          },
+          {
+            "path": "skins/old_african_male/old_darkskinned_male_diffuse.png",
+            "bytes": 3336963,
+            "compressed_bytes": 3332979
+          },
+          {
+            "path": "skins/old_asian_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_asian_female/old_asian_female.thumb",
+            "bytes": 81888,
+            "compressed_bytes": 81708
+          },
+          {
+            "path": "skins/old_asian_female/old_asian_female.mhmat",
+            "bytes": 1450,
+            "compressed_bytes": 700
+          },
+          {
+            "path": "skins/old_asian_female/old_lightskinned_female_diffuse2.png",
+            "bytes": 4766265,
+            "compressed_bytes": 4762680
+          },
+          {
+            "path": "skins/old_caucasian_male/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_caucasian_male/old_caucasian_male.mhmat",
+            "bytes": 1449,
+            "compressed_bytes": 694
+          },
+          {
+            "path": "skins/old_caucasian_male/old_caucasian_male.thumb",
+            "bytes": 82772,
+            "compressed_bytes": 82571
+          },
+          {
+            "path": "skins/old_caucasian_male/old_lightskinned_male_diffuse.png",
+            "bytes": 4306141,
+            "compressed_bytes": 4301174
+          },
+          {
+            "path": "skins/old_caucasian_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/old_caucasian_female/old_caucasian_female.mhmat",
+            "bytes": 1457,
+            "compressed_bytes": 702
+          },
+          {
+            "path": "skins/old_caucasian_female/old_lightskinned_female_diffuse.png",
+            "bytes": 4716109,
+            "compressed_bytes": 4712799
+          },
+          {
+            "path": "skins/old_caucasian_female/old_caucasian_female.thumb",
+            "bytes": 81695,
+            "compressed_bytes": 81484
+          },
+          {
+            "path": "skins/young_caucasian_female_special_suit/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/young_caucasian_female_special_suit/young_caucasian_female_special_suit.png",
+            "bytes": 3680870,
+            "compressed_bytes": 3680862
+          },
+          {
+            "path": "skins/young_caucasian_female_special_suit/young_caucasian_female_special_suit.mhmat",
+            "bytes": 1482,
+            "compressed_bytes": 706
+          },
+          {
+            "path": "skins/young_caucasian_female_special_suit/young_caucasian_female_special_suit.thumb",
+            "bytes": 81249,
+            "compressed_bytes": 81040
+          },
+          {
+            "path": "skins/middleage_caucasian_female/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "skins/middleage_caucasian_female/middleage_caucasian_female.mhmat",
+            "bytes": 1475,
+            "compressed_bytes": 705
+          },
+          {
+            "path": "skins/middleage_caucasian_female/middleage_caucasian_female.thumb",
+            "bytes": 78480,
+            "compressed_bytes": 78280
+          },
+          {
+            "path": "skins/middleage_caucasian_female/middleage_lightskinned_female_diffuse.png",
+            "bytes": 4363877,
+            "compressed_bytes": 4364342
+          },
+          {
+            "path": "clothes/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/fedora_cocked/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/fedora_cocked/fedora_cocked.thumb",
+            "bytes": 32211,
+            "compressed_bytes": 31078
+          },
+          {
+            "path": "clothes/fedora_cocked/fedora.mhmat",
+            "bytes": 1394,
+            "compressed_bytes": 626
+          },
+          {
+            "path": "clothes/fedora_cocked/fedora_cocked.obj",
+            "bytes": 47872,
+            "compressed_bytes": 17213
+          },
+          {
+            "path": "clothes/fedora_cocked/fedora_normal.png",
+            "bytes": 158434,
+            "compressed_bytes": 158135
+          },
+          {
+            "path": "clothes/fedora_cocked/fedora_diffuse.png",
+            "bytes": 7418240,
+            "compressed_bytes": 7397906
+          },
+          {
+            "path": "clothes/fedora_cocked/fedora_cocked.mhclo",
+            "bytes": 43504,
+            "compressed_bytes": 15704
+          },
+          {
+            "path": "clothes/shoes04/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/shoes04/shoes04.obj",
+            "bytes": 136910,
+            "compressed_bytes": 37631
+          },
+          {
+            "path": "clothes/shoes04/shoes04.mhmat",
+            "bytes": 1161,
+            "compressed_bytes": 556
+          },
+          {
+            "path": "clothes/shoes04/shoes04_diffuse.png",
+            "bytes": 714208,
+            "compressed_bytes": 712627
+          },
+          {
+            "path": "clothes/shoes04/shoes04_normal.png",
+            "bytes": 875473,
+            "compressed_bytes": 875242
+          },
+          {
+            "path": "clothes/shoes04/shoes04.thumb",
+            "bytes": 37350,
+            "compressed_bytes": 36498
+          },
+          {
+            "path": "clothes/shoes04/shoes04.mhclo",
+            "bytes": 119049,
+            "compressed_bytes": 37559
+          },
+          {
+            "path": "clothes/shoes04/shoes04.mhw",
+            "bytes": 324727,
+            "compressed_bytes": 25130
+          },
+          {
+            "path": "clothes/male_casualsuit04/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04_normal.png",
+            "bytes": 6112410,
+            "compressed_bytes": 6053909
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04.thumb",
+            "bytes": 32838,
+            "compressed_bytes": 32258
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04.obj",
+            "bytes": 133848,
+            "compressed_bytes": 43117
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04_diffuse.png",
+            "bytes": 2742499,
+            "compressed_bytes": 2732840
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04.mhclo",
+            "bytes": 116682,
+            "compressed_bytes": 42767
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04_ao.png",
+            "bytes": 1755179,
+            "compressed_bytes": 1740944
+          },
+          {
+            "path": "clothes/male_casualsuit04/male_casualsuit04.mhmat",
+            "bytes": 1396,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "clothes/shoes05/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/shoes05/shoes05.mhmat",
+            "bytes": 1184,
+            "compressed_bytes": 586
+          },
+          {
+            "path": "clothes/shoes05/shoes05_diffuse.png",
+            "bytes": 1291907,
+            "compressed_bytes": 1289694
+          },
+          {
+            "path": "clothes/shoes05/shoes05.thumb",
+            "bytes": 41218,
+            "compressed_bytes": 40368
+          },
+          {
+            "path": "clothes/shoes05/shoes05.obj",
+            "bytes": 125457,
+            "compressed_bytes": 34275
+          },
+          {
+            "path": "clothes/shoes05/shoes05.mhw",
+            "bytes": 309023,
+            "compressed_bytes": 24109
+          },
+          {
+            "path": "clothes/shoes05/shoes05.mhclo",
+            "bytes": 110217,
+            "compressed_bytes": 25723
+          },
+          {
+            "path": "clothes/male_casualsuit02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02.mhclo",
+            "bytes": 145975,
+            "compressed_bytes": 55662
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02_diffuse.png",
+            "bytes": 3094130,
+            "compressed_bytes": 3090328
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02.mhmat",
+            "bytes": 1396,
+            "compressed_bytes": 633
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02.thumb",
+            "bytes": 37906,
+            "compressed_bytes": 37451
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02_normal.png",
+            "bytes": 6036834,
+            "compressed_bytes": 5977953
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02_ao.png",
+            "bytes": 722980,
+            "compressed_bytes": 717238
+          },
+          {
+            "path": "clothes/male_casualsuit02/male_casualsuit02.obj",
+            "bytes": 170324,
+            "compressed_bytes": 53781
+          },
+          {
+            "path": "clothes/female_casualsuit02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02_diffuse.png",
+            "bytes": 4340869,
+            "compressed_bytes": 4338517
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02.mhmat",
+            "bytes": 1404,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02_ao.png",
+            "bytes": 1653679,
+            "compressed_bytes": 1638936
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02.mhclo",
+            "bytes": 196616,
+            "compressed_bytes": 68634
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02.thumb",
+            "bytes": 52518,
+            "compressed_bytes": 52031
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02.obj",
+            "bytes": 231599,
+            "compressed_bytes": 77272
+          },
+          {
+            "path": "clothes/female_casualsuit02/female_casualsuit02_normal.png",
+            "bytes": 1646961,
+            "compressed_bytes": 1589189
+          },
+          {
+            "path": "clothes/male_casualsuit05/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05.mhclo",
+            "bytes": 217422,
+            "compressed_bytes": 78965
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05.thumb",
+            "bytes": 39378,
+            "compressed_bytes": 38934
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05.mhmat",
+            "bytes": 1396,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05_ao.png",
+            "bytes": 1724222,
+            "compressed_bytes": 1710818
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05.obj",
+            "bytes": 261223,
+            "compressed_bytes": 85137
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05_normal.png",
+            "bytes": 9295328,
+            "compressed_bytes": 9260982
+          },
+          {
+            "path": "clothes/male_casualsuit05/male_casualsuit05_diffuse.png",
+            "bytes": 3345738,
+            "compressed_bytes": 3336906
+          },
+          {
+            "path": "clothes/male_worksuit01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01.obj",
+            "bytes": 302272,
+            "compressed_bytes": 99631
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01.thumb",
+            "bytes": 33917,
+            "compressed_bytes": 33376
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01_diffuse.png",
+            "bytes": 3230491,
+            "compressed_bytes": 3223344
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01_normal.png",
+            "bytes": 7345267,
+            "compressed_bytes": 7339643
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01.mhmat",
+            "bytes": 1389,
+            "compressed_bytes": 633
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01.mhclo",
+            "bytes": 254911,
+            "compressed_bytes": 93877
+          },
+          {
+            "path": "clothes/male_worksuit01/male_worksuit01_ao.png",
+            "bytes": 1205288,
+            "compressed_bytes": 1203092
+          },
+          {
+            "path": "clothes/male_casualsuit03/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03.obj",
+            "bytes": 200956,
+            "compressed_bytes": 66669
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03_normal.png",
+            "bytes": 9610278,
+            "compressed_bytes": 9574331
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03_ao.png",
+            "bytes": 2214964,
+            "compressed_bytes": 2202083
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03_diffuse.png",
+            "bytes": 3439064,
+            "compressed_bytes": 3435986
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03.mhclo",
+            "bytes": 170546,
+            "compressed_bytes": 65267
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03.thumb",
+            "bytes": 40578,
+            "compressed_bytes": 40108
+          },
+          {
+            "path": "clothes/male_casualsuit03/male_casualsuit03.mhmat",
+            "bytes": 1396,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "clothes/shoes01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/shoes01/shoes01.mhclo",
+            "bytes": 119049,
+            "compressed_bytes": 37561
+          },
+          {
+            "path": "clothes/shoes01/shoes01_diffuse.png",
+            "bytes": 1335772,
+            "compressed_bytes": 1331187
+          },
+          {
+            "path": "clothes/shoes01/shoes01.thumb",
+            "bytes": 40319,
+            "compressed_bytes": 39421
+          },
+          {
+            "path": "clothes/shoes01/shoes01_normal.png",
+            "bytes": 875473,
+            "compressed_bytes": 875242
+          },
+          {
+            "path": "clothes/shoes01/shoes01.mhw",
+            "bytes": 324727,
+            "compressed_bytes": 25130
+          },
+          {
+            "path": "clothes/shoes01/shoes01.mhmat",
+            "bytes": 1161,
+            "compressed_bytes": 556
+          },
+          {
+            "path": "clothes/shoes01/shoes01.obj",
+            "bytes": 136910,
+            "compressed_bytes": 37631
+          },
+          {
+            "path": "clothes/male_casualsuit06/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06.thumb",
+            "bytes": 31691,
+            "compressed_bytes": 31116
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06.obj",
+            "bytes": 300507,
+            "compressed_bytes": 100775
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06.mhmat",
+            "bytes": 1396,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06_ao.png",
+            "bytes": 1663549,
+            "compressed_bytes": 1648980
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06.mhclo",
+            "bytes": 252642,
+            "compressed_bytes": 96135
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06_normal.png",
+            "bytes": 2235477,
+            "compressed_bytes": 2227595
+          },
+          {
+            "path": "clothes/male_casualsuit06/male_casualsuit06_diffuse.png",
+            "bytes": 1923464,
+            "compressed_bytes": 1913786
+          },
+          {
+            "path": "clothes/shoes03/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/shoes03/shoes03_diffuse.png",
+            "bytes": 309009,
+            "compressed_bytes": 305551
+          },
+          {
+            "path": "clothes/shoes03/shoes03.obj",
+            "bytes": 177420,
+            "compressed_bytes": 49614
+          },
+          {
+            "path": "clothes/shoes03/shoes03.thumb",
+            "bytes": 37720,
+            "compressed_bytes": 36927
+          },
+          {
+            "path": "clothes/shoes03/shoes03.mhmat",
+            "bytes": 1184,
+            "compressed_bytes": 583
+          },
+          {
+            "path": "clothes/shoes03/shoes03.mhclo",
+            "bytes": 152873,
+            "compressed_bytes": 48615
+          },
+          {
+            "path": "clothes/shoes03/shoes03.mhw",
+            "bytes": 410069,
+            "compressed_bytes": 31210
+          },
+          {
+            "path": "clothes/shoes06/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/shoes06/shoes06_diffuse.png",
+            "bytes": 1463398,
+            "compressed_bytes": 1461229
+          },
+          {
+            "path": "clothes/shoes06/shoes06.obj",
+            "bytes": 125457,
+            "compressed_bytes": 34275
+          },
+          {
+            "path": "clothes/shoes06/shoes06.mhclo",
+            "bytes": 110217,
+            "compressed_bytes": 25724
+          },
+          {
+            "path": "clothes/shoes06/shoes06.mhw",
+            "bytes": 309023,
+            "compressed_bytes": 24109
+          },
+          {
+            "path": "clothes/shoes06/shoes06.mhmat",
+            "bytes": 1184,
+            "compressed_bytes": 587
+          },
+          {
+            "path": "clothes/shoes06/shoes06.thumb",
+            "bytes": 43267,
+            "compressed_bytes": 42429
+          },
+          {
+            "path": "clothes/fedora01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/fedora01/fedora01.thumb",
+            "bytes": 27659,
+            "compressed_bytes": 26357
+          },
+          {
+            "path": "clothes/fedora01/fedora.obj",
+            "bytes": 47959,
+            "compressed_bytes": 16808
+          },
+          {
+            "path": "clothes/fedora01/fedora01.mhclo",
+            "bytes": 43570,
+            "compressed_bytes": 15642
+          },
+          {
+            "path": "clothes/fedora01/fedora.mhmat",
+            "bytes": 1394,
+            "compressed_bytes": 626
+          },
+          {
+            "path": "clothes/fedora01/fedora_normal.png",
+            "bytes": 158434,
+            "compressed_bytes": 158135
+          },
+          {
+            "path": "clothes/fedora01/fedora_diffuse.png",
+            "bytes": 7418240,
+            "compressed_bytes": 7397906
+          },
+          {
+            "path": "clothes/female_sportsuit01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01_ao.png",
+            "bytes": 1692805,
+            "compressed_bytes": 1676641
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01.mhclo",
+            "bytes": 124049,
+            "compressed_bytes": 46737
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01.thumb",
+            "bytes": 25816,
+            "compressed_bytes": 24995
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01.mhmat",
+            "bytes": 1400,
+            "compressed_bytes": 633
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01_normal.png",
+            "bytes": 250945,
+            "compressed_bytes": 249312
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01_diffuse.png",
+            "bytes": 1396429,
+            "compressed_bytes": 1386038
+          },
+          {
+            "path": "clothes/female_sportsuit01/female_sportsuit01.obj",
+            "bytes": 142064,
+            "compressed_bytes": 48797
+          },
+          {
+            "path": "clothes/female_casualsuit01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01.mhmat",
+            "bytes": 1404,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01_ao.png",
+            "bytes": 2153148,
+            "compressed_bytes": 2140214
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01_diffuse.png",
+            "bytes": 3019656,
+            "compressed_bytes": 3013925
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01.thumb",
+            "bytes": 31184,
+            "compressed_bytes": 30658
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01.mhclo",
+            "bytes": 150568,
+            "compressed_bytes": 56690
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01.obj",
+            "bytes": 175427,
+            "compressed_bytes": 59617
+          },
+          {
+            "path": "clothes/female_casualsuit01/female_casualsuit01_normal.png",
+            "bytes": 5744103,
+            "compressed_bytes": 5682822
+          },
+          {
+            "path": "clothes/male_elegantsuit01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_elegantsuit01/male_elegantsuit01.mhclo",
+            "bytes": 515810,
+            "compressed_bytes": 183353
+          },
+          {
+            "path": "clothes/male_elegantsuit01/male_elegantsuit01.thumb",
+            "bytes": 36659,
+            "compressed_bytes": 36222
+          },
+          {
+            "path": "clothes/male_elegantsuit01/male_elegantsuit01.mhmat",
+            "bytes": 1293,
+            "compressed_bytes": 614
+          },
+          {
+            "path": "clothes/male_elegantsuit01/male_elegantsuit01_diffuse.png",
+            "bytes": 1945326,
+            "compressed_bytes": 1924154
+          },
+          {
+            "path": "clothes/male_elegantsuit01/male_elegantsuit01.obj",
+            "bytes": 633330,
+            "compressed_bytes": 210399
+          },
+          {
+            "path": "clothes/shoes02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/shoes02/shoes02.mhw",
+            "bytes": 309023,
+            "compressed_bytes": 24109
+          },
+          {
+            "path": "clothes/shoes02/shoes02.mhclo",
+            "bytes": 110217,
+            "compressed_bytes": 25726
+          },
+          {
+            "path": "clothes/shoes02/shoes02.mhmat",
+            "bytes": 1184,
+            "compressed_bytes": 586
+          },
+          {
+            "path": "clothes/shoes02/shoes02_diffuse.png",
+            "bytes": 1282057,
+            "compressed_bytes": 1280653
+          },
+          {
+            "path": "clothes/shoes02/shoes02.obj",
+            "bytes": 125457,
+            "compressed_bytes": 34275
+          },
+          {
+            "path": "clothes/shoes02/shoes02.thumb",
+            "bytes": 43978,
+            "compressed_bytes": 43142
+          },
+          {
+            "path": "clothes/male_casualsuit01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01_diffuse.png",
+            "bytes": 5531728,
+            "compressed_bytes": 5525333
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01_normal.png",
+            "bytes": 1738660,
+            "compressed_bytes": 1729674
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01.thumb",
+            "bytes": 39401,
+            "compressed_bytes": 38960
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01.mhmat",
+            "bytes": 1345,
+            "compressed_bytes": 606
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01.mhclo",
+            "bytes": 570419,
+            "compressed_bytes": 199174
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01_ao.png",
+            "bytes": 785596,
+            "compressed_bytes": 753676
+          },
+          {
+            "path": "clothes/male_casualsuit01/male_casualsuit01.obj",
+            "bytes": 699545,
+            "compressed_bytes": 232791
+          },
+          {
+            "path": "clothes/female_elegantsuit01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01_ao.png",
+            "bytes": 1350953,
+            "compressed_bytes": 1342328
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01.mhmat",
+            "bytes": 1408,
+            "compressed_bytes": 633
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01_diffuse.png",
+            "bytes": 1996561,
+            "compressed_bytes": 1969155
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01.obj",
+            "bytes": 174924,
+            "compressed_bytes": 58815
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01_normal.png",
+            "bytes": 1549042,
+            "compressed_bytes": 1523337
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01.thumb",
+            "bytes": 50008,
+            "compressed_bytes": 49463
+          },
+          {
+            "path": "clothes/female_elegantsuit01/female_elegantsuit01.mhclo",
+            "bytes": 151008,
+            "compressed_bytes": 55164
+          },
+          {
+            "path": "teeth/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_shape02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_shape02/teeth_shape02.thumb",
+            "bytes": 52201,
+            "compressed_bytes": 51284
+          },
+          {
+            "path": "teeth/teeth_shape02/teeth_shape02.mhclo",
+            "bytes": 263309,
+            "compressed_bytes": 70038
+          },
+          {
+            "path": "teeth/teeth_shape02/teeth.mhmat",
+            "bytes": 1086,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "teeth/teeth_shape02/teeth.png",
+            "bytes": 1799930,
+            "compressed_bytes": 1791924
+          },
+          {
+            "path": "teeth/teeth_shape02/teeth_shape02.obj",
+            "bytes": 313139,
+            "compressed_bytes": 92273
+          },
+          {
+            "path": "teeth/teeth_shape01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_shape01/teeth_shape01.mhclo",
+            "bytes": 263298,
+            "compressed_bytes": 69652
+          },
+          {
+            "path": "teeth/teeth_shape01/teeth_shape01.obj",
+            "bytes": 313110,
+            "compressed_bytes": 92330
+          },
+          {
+            "path": "teeth/teeth_shape01/teeth.mhmat",
+            "bytes": 1086,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "teeth/teeth_shape01/teeth.png",
+            "bytes": 1799930,
+            "compressed_bytes": 1791924
+          },
+          {
+            "path": "teeth/teeth_shape01/teeth_shape01.thumb",
+            "bytes": 50417,
+            "compressed_bytes": 49489
+          },
+          {
+            "path": "teeth/teeth_base/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_base/teeth_base.obj",
+            "bytes": 313110,
+            "compressed_bytes": 92301
+          },
+          {
+            "path": "teeth/teeth_base/teeth_base.mhclo",
+            "bytes": 263220,
+            "compressed_bytes": 69749
+          },
+          {
+            "path": "teeth/teeth_base/teeth.mhmat",
+            "bytes": 1086,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "teeth/teeth_base/teeth.png",
+            "bytes": 1799930,
+            "compressed_bytes": 1791924
+          },
+          {
+            "path": "teeth/teeth_base/teeth_base.thumb",
+            "bytes": 50147,
+            "compressed_bytes": 49218
+          },
+          {
+            "path": "teeth/teeth_shape05/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_shape05/teeth_shape05.thumb",
+            "bytes": 50387,
+            "compressed_bytes": 49464
+          },
+          {
+            "path": "teeth/teeth_shape05/teeth_shape05.mhclo",
+            "bytes": 263247,
+            "compressed_bytes": 69725
+          },
+          {
+            "path": "teeth/teeth_shape05/teeth.mhmat",
+            "bytes": 1086,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "teeth/teeth_shape05/teeth_shape05.obj",
+            "bytes": 313110,
+            "compressed_bytes": 92301
+          },
+          {
+            "path": "teeth/teeth_shape05/teeth.png",
+            "bytes": 1799930,
+            "compressed_bytes": 1791924
+          },
+          {
+            "path": "teeth/teeth_shape03/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_shape03/teeth_shape03.thumb",
+            "bytes": 50360,
+            "compressed_bytes": 49437
+          },
+          {
+            "path": "teeth/teeth_shape03/teeth_shape03.mhclo",
+            "bytes": 263281,
+            "compressed_bytes": 69727
+          },
+          {
+            "path": "teeth/teeth_shape03/teeth.mhmat",
+            "bytes": 1086,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "teeth/teeth_shape03/teeth.png",
+            "bytes": 1799930,
+            "compressed_bytes": 1791924
+          },
+          {
+            "path": "teeth/teeth_shape03/teeth_shape03.obj",
+            "bytes": 313140,
+            "compressed_bytes": 92339
+          },
+          {
+            "path": "teeth/teeth_shape04/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "teeth/teeth_shape04/teeth_shape04.thumb",
+            "bytes": 51052,
+            "compressed_bytes": 50121
+          },
+          {
+            "path": "teeth/teeth_shape04/teeth_shape04.mhclo",
+            "bytes": 263244,
+            "compressed_bytes": 69771
+          },
+          {
+            "path": "teeth/teeth_shape04/teeth.mhmat",
+            "bytes": 1086,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "teeth/teeth_shape04/teeth.png",
+            "bytes": 1799930,
+            "compressed_bytes": 1791924
+          },
+          {
+            "path": "teeth/teeth_shape04/teeth_shape04.obj",
+            "bytes": 313110,
+            "compressed_bytes": 92315
+          },
+          {
+            "path": "eyelashes/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyelashes/eyelashes01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyelashes/eyelashes01/eyelashes01.obj",
+            "bytes": 18832,
+            "compressed_bytes": 6080
+          },
+          {
+            "path": "eyelashes/eyelashes01/eyelashes01.mhclo",
+            "bytes": 2265,
+            "compressed_bytes": 952
+          },
+          {
+            "path": "eyelashes/eyelashes01/eyelashes01.png",
+            "bytes": 91600,
+            "compressed_bytes": 90109
+          },
+          {
+            "path": "eyelashes/eyelashes01/eyelashes01.mhmat",
+            "bytes": 1074,
+            "compressed_bytes": 553
+          },
+          {
+            "path": "eyelashes/eyelashes01/eyelashes01.thumb",
+            "bytes": 140641,
+            "compressed_bytes": 140570
+          },
+          {
+            "path": "eyelashes/eyelashes03/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyelashes/eyelashes03/eyelashes03.png",
+            "bytes": 132260,
+            "compressed_bytes": 131286
+          },
+          {
+            "path": "eyelashes/eyelashes03/eyelashes03.mhmat",
+            "bytes": 1074,
+            "compressed_bytes": 553
+          },
+          {
+            "path": "eyelashes/eyelashes03/eyelashes03.thumb",
+            "bytes": 141232,
+            "compressed_bytes": 141160
+          },
+          {
+            "path": "eyelashes/eyelashes03/eyelashes03.mhclo",
+            "bytes": 8191,
+            "compressed_bytes": 2341
+          },
+          {
+            "path": "eyelashes/eyelashes03/eyelashes03.obj",
+            "bytes": 18836,
+            "compressed_bytes": 6092
+          },
+          {
+            "path": "eyelashes/eyelashes02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyelashes/eyelashes02/eyelashes02.png",
+            "bytes": 132278,
+            "compressed_bytes": 131313
+          },
+          {
+            "path": "eyelashes/eyelashes02/eyelashes02.mhclo",
+            "bytes": 6717,
+            "compressed_bytes": 2093
+          },
+          {
+            "path": "eyelashes/eyelashes02/eyelashes02.thumb",
+            "bytes": 140984,
+            "compressed_bytes": 140911
+          },
+          {
+            "path": "eyelashes/eyelashes02/eyelashes02.mhmat",
+            "bytes": 1074,
+            "compressed_bytes": 553
+          },
+          {
+            "path": "eyelashes/eyelashes02/eyelashes02.obj",
+            "bytes": 18832,
+            "compressed_bytes": 6079
+          },
+          {
+            "path": "eyelashes/eyelashes04/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyelashes/eyelashes04/eyelashes04.png",
+            "bytes": 93914,
+            "compressed_bytes": 93083
+          },
+          {
+            "path": "eyelashes/eyelashes04/eyelashes04.mhclo",
+            "bytes": 8271,
+            "compressed_bytes": 2893
+          },
+          {
+            "path": "eyelashes/eyelashes04/eyelashes04.obj",
+            "bytes": 16389,
+            "compressed_bytes": 5451
+          },
+          {
+            "path": "eyelashes/eyelashes04/eyelashes04.mhmat",
+            "bytes": 1072,
+            "compressed_bytes": 551
+          },
+          {
+            "path": "eyelashes/eyelashes04/eyelashes04.thumb",
+            "bytes": 140585,
+            "compressed_bytes": 140519
+          },
+          {
+            "path": "hair/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/bob02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/bob02/bob02.mhclo",
+            "bytes": 112326,
+            "compressed_bytes": 42079
+          },
+          {
+            "path": "hair/bob02/bob02_diffuse.png",
+            "bytes": 3373723,
+            "compressed_bytes": 3363284
+          },
+          {
+            "path": "hair/bob02/bob02.thumb",
+            "bytes": 54657,
+            "compressed_bytes": 53958
+          },
+          {
+            "path": "hair/bob02/bob02.obj",
+            "bytes": 109498,
+            "compressed_bytes": 40254
+          },
+          {
+            "path": "hair/bob02/bob02.mhmat",
+            "bytes": 1319,
+            "compressed_bytes": 644
+          },
+          {
+            "path": "hair/short01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/short01/short01.thumb",
+            "bytes": 35055,
+            "compressed_bytes": 34218
+          },
+          {
+            "path": "hair/short01/short01.mhclo",
+            "bytes": 201588,
+            "compressed_bytes": 68368
+          },
+          {
+            "path": "hair/short01/short01.mhmat",
+            "bytes": 1314,
+            "compressed_bytes": 642
+          },
+          {
+            "path": "hair/short01/short01.obj",
+            "bytes": 194450,
+            "compressed_bytes": 67065
+          },
+          {
+            "path": "hair/short01/short01_diffuse.png",
+            "bytes": 2354146,
+            "compressed_bytes": 2338834
+          },
+          {
+            "path": "hair/afro01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/afro01/afro01.thumb",
+            "bytes": 47414,
+            "compressed_bytes": 46616
+          },
+          {
+            "path": "hair/afro01/afro01.mhclo",
+            "bytes": 149574,
+            "compressed_bytes": 51632
+          },
+          {
+            "path": "hair/afro01/afro01.mhmat",
+            "bytes": 1030,
+            "compressed_bytes": 531
+          },
+          {
+            "path": "hair/afro01/afro01.obj",
+            "bytes": 130040,
+            "compressed_bytes": 34735
+          },
+          {
+            "path": "hair/afro01/afro_diffuse.png",
+            "bytes": 4817185,
+            "compressed_bytes": 4807104
+          },
+          {
+            "path": "hair/short03/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/short03/short03.thumb",
+            "bytes": 39414,
+            "compressed_bytes": 38550
+          },
+          {
+            "path": "hair/short03/short03_diffuse.png",
+            "bytes": 2392930,
+            "compressed_bytes": 2379485
+          },
+          {
+            "path": "hair/short03/short03.obj",
+            "bytes": 74766,
+            "compressed_bytes": 27104
+          },
+          {
+            "path": "hair/short03/short03.mhclo",
+            "bytes": 69048,
+            "compressed_bytes": 25622
+          },
+          {
+            "path": "hair/short03/short03.mhmat",
+            "bytes": 1309,
+            "compressed_bytes": 634
+          },
+          {
+            "path": "hair/bob01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/bob01/bob01.thumb",
+            "bytes": 53628,
+            "compressed_bytes": 52918
+          },
+          {
+            "path": "hair/bob01/bob01.mhclo",
+            "bytes": 352019,
+            "compressed_bytes": 116992
+          },
+          {
+            "path": "hair/bob01/bob01.mhmat",
+            "bytes": 1312,
+            "compressed_bytes": 640
+          },
+          {
+            "path": "hair/bob01/bob01_diffuse.png",
+            "bytes": 4243598,
+            "compressed_bytes": 4241081
+          },
+          {
+            "path": "hair/bob01/bob01.obj",
+            "bytes": 396190,
+            "compressed_bytes": 136544
+          },
+          {
+            "path": "hair/ponytail01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/ponytail01/ponytail01.obj",
+            "bytes": 264384,
+            "compressed_bytes": 87120
+          },
+          {
+            "path": "hair/ponytail01/ponytail01_diffuse.png",
+            "bytes": 3910782,
+            "compressed_bytes": 3906581
+          },
+          {
+            "path": "hair/ponytail01/ponytail01.mhclo",
+            "bytes": 252080,
+            "compressed_bytes": 82028
+          },
+          {
+            "path": "hair/ponytail01/ponytail01.thumb",
+            "bytes": 47981,
+            "compressed_bytes": 47809
+          },
+          {
+            "path": "hair/ponytail01/ponytail01.mhmat",
+            "bytes": 1305,
+            "compressed_bytes": 631
+          },
+          {
+            "path": "hair/short02/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/short02/short02.thumb",
+            "bytes": 41127,
+            "compressed_bytes": 40255
+          },
+          {
+            "path": "hair/short02/short02.obj",
+            "bytes": 139742,
+            "compressed_bytes": 50161
+          },
+          {
+            "path": "hair/short02/short02.mhclo",
+            "bytes": 119240,
+            "compressed_bytes": 43333
+          },
+          {
+            "path": "hair/short02/short02.mhmat",
+            "bytes": 1323,
+            "compressed_bytes": 644
+          },
+          {
+            "path": "hair/short02/short02_diffuse.png",
+            "bytes": 3553543,
+            "compressed_bytes": 3526253
+          },
+          {
+            "path": "hair/short02/short02_normal.png",
+            "bytes": 1626745,
+            "compressed_bytes": 1608604
+          },
+          {
+            "path": "hair/braid01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/braid01/braid01.obj",
+            "bytes": 302165,
+            "compressed_bytes": 101271
+          },
+          {
+            "path": "hair/braid01/braid01.mhclo",
+            "bytes": 305086,
+            "compressed_bytes": 94741
+          },
+          {
+            "path": "hair/braid01/braid01.thumb",
+            "bytes": 28768,
+            "compressed_bytes": 28475
+          },
+          {
+            "path": "hair/braid01/braid01.mhmat",
+            "bytes": 1299,
+            "compressed_bytes": 630
+          },
+          {
+            "path": "hair/braid01/braid01_diffuse.png",
+            "bytes": 2615248,
+            "compressed_bytes": 2604367
+          },
+          {
+            "path": "hair/long01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/long01/long01_diffuse.png",
+            "bytes": 2915253,
+            "compressed_bytes": 2906544
+          },
+          {
+            "path": "hair/long01/long01.mhmat",
+            "bytes": 1297,
+            "compressed_bytes": 629
+          },
+          {
+            "path": "hair/long01/long01.obj",
+            "bytes": 215324,
+            "compressed_bytes": 72272
+          },
+          {
+            "path": "hair/long01/long01.mhclo",
+            "bytes": 220891,
+            "compressed_bytes": 73147
+          },
+          {
+            "path": "hair/long01/long01.thumb",
+            "bytes": 35530,
+            "compressed_bytes": 35140
+          },
+          {
+            "path": "hair/short04/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "hair/short04/short04.mhmat",
+            "bytes": 1316,
+            "compressed_bytes": 641
+          },
+          {
+            "path": "hair/short04/short04.obj",
+            "bytes": 55152,
+            "compressed_bytes": 20042
+          },
+          {
+            "path": "hair/short04/short04.mhclo",
+            "bytes": 59195,
+            "compressed_bytes": 20793
+          },
+          {
+            "path": "hair/short04/short04_diffuse.png",
+            "bytes": 2308132,
+            "compressed_bytes": 2294596
+          },
+          {
+            "path": "hair/short04/short04.thumb",
+            "bytes": 41792,
+            "compressed_bytes": 40914
+          },
+          {
+            "path": "tongue/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "tongue/tongue01/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "tongue/tongue01/tongue01.thumb",
+            "bytes": 49815,
+            "compressed_bytes": 49112
+          },
+          {
+            "path": "tongue/tongue01/tongue01.obj",
+            "bytes": 17155,
+            "compressed_bytes": 5666
+          },
+          {
+            "path": "tongue/tongue01/tongue01.mhmat",
+            "bytes": 1261,
+            "compressed_bytes": 599
+          },
+          {
+            "path": "tongue/tongue01/tongue01_diffuse.png",
+            "bytes": 625419,
+            "compressed_bytes": 621916
+          },
+          {
+            "path": "tongue/tongue01/tongue01.mhclo",
+            "bytes": 2113,
+            "compressed_bytes": 906
+          },
+          {
+            "path": "packs/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "packs/makehuman_system_assets.json",
+            "bytes": 39220,
+            "compressed_bytes": 1219
+          },
+          {
+            "path": "proxymeshes/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/female_muscle_13442/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/female_muscle_13442/female_muscle_13442.obj",
+            "bytes": 1300679,
+            "compressed_bytes": 419591
+          },
+          {
+            "path": "proxymeshes/female_muscle_13442/female_muscle_13442.proxy",
+            "bytes": 323533,
+            "compressed_bytes": 115517
+          },
+          {
+            "path": "proxymeshes/female_muscle_13442/female_muscle_13442.thumb",
+            "bytes": 70929,
+            "compressed_bytes": 70695
+          },
+          {
+            "path": "proxymeshes/male_generic/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/male_generic/male_generic.thumb",
+            "bytes": 72166,
+            "compressed_bytes": 71961
+          },
+          {
+            "path": "proxymeshes/male_generic/male_generic.proxy",
+            "bytes": 233465,
+            "compressed_bytes": 81452
+          },
+          {
+            "path": "proxymeshes/male_generic/male_generic.obj",
+            "bytes": 1315832,
+            "compressed_bytes": 394846
+          },
+          {
+            "path": "proxymeshes/male_muscle_13290/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/male_muscle_13290/male_muscle_13290.thumb",
+            "bytes": 72231,
+            "compressed_bytes": 72046
+          },
+          {
+            "path": "proxymeshes/male_muscle_13290/male_muscle_13290.proxy",
+            "bytes": 324446,
+            "compressed_bytes": 118105
+          },
+          {
+            "path": "proxymeshes/male_muscle_13290/male_muscle_13290.obj",
+            "bytes": 1168318,
+            "compressed_bytes": 367157
+          },
+          {
+            "path": "proxymeshes/female_generic/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/female_generic/female_generic.thumb",
+            "bytes": 70139,
+            "compressed_bytes": 69904
+          },
+          {
+            "path": "proxymeshes/female_generic/female_generic.obj",
+            "bytes": 1216200,
+            "compressed_bytes": 376758
+          },
+          {
+            "path": "proxymeshes/female_generic/female_generic.proxy",
+            "bytes": 208044,
+            "compressed_bytes": 73204
+          },
+          {
+            "path": "proxymeshes/female1605/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/female1605/female1605.thumb",
+            "bytes": 61202,
+            "compressed_bytes": 60989
+          },
+          {
+            "path": "proxymeshes/female1605/female1605.obj",
+            "bytes": 131067,
+            "compressed_bytes": 41213
+          },
+          {
+            "path": "proxymeshes/female1605/female1605.proxy",
+            "bytes": 109182,
+            "compressed_bytes": 41559
+          },
+          {
+            "path": "proxymeshes/male1591/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/male1591/male1591.thumb",
+            "bytes": 62851,
+            "compressed_bytes": 62636
+          },
+          {
+            "path": "proxymeshes/male1591/male1591.proxy",
+            "bytes": 108133,
+            "compressed_bytes": 39038
+          },
+          {
+            "path": "proxymeshes/male1591/male1591.obj",
+            "bytes": 129940,
+            "compressed_bytes": 40247
+          },
+          {
+            "path": "proxymeshes/proxy741/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "proxymeshes/proxy741/proxy741.obj",
+            "bytes": 58768,
+            "compressed_bytes": 19339
+          },
+          {
+            "path": "proxymeshes/proxy741/proxy741.proxy",
+            "bytes": 50775,
+            "compressed_bytes": 18148
+          },
+          {
+            "path": "proxymeshes/proxy741/proxy741.thumb",
+            "bytes": 58430,
+            "compressed_bytes": 58204
+          },
+          {
+            "path": "eyebrows/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow001/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow001/eyebrow001.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2873
+          },
+          {
+            "path": "eyebrows/eyebrow001/eyebrow001.png",
+            "bytes": 89619,
+            "compressed_bytes": 88049
+          },
+          {
+            "path": "eyebrows/eyebrow001/eyebrow001.mhclo",
+            "bytes": 9141,
+            "compressed_bytes": 3038
+          },
+          {
+            "path": "eyebrows/eyebrow001/eyebrow001.thumb",
+            "bytes": 137534,
+            "compressed_bytes": 137464
+          },
+          {
+            "path": "eyebrows/eyebrow001/eyebrow001.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow005/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow005/eyebrow005.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2836
+          },
+          {
+            "path": "eyebrows/eyebrow005/eyebrow005.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow005/eyebrow005.png",
+            "bytes": 75733,
+            "compressed_bytes": 74340
+          },
+          {
+            "path": "eyebrows/eyebrow005/eyebrow005.thumb",
+            "bytes": 136820,
+            "compressed_bytes": 136748
+          },
+          {
+            "path": "eyebrows/eyebrow005/eyebrow005.mhclo",
+            "bytes": 9120,
+            "compressed_bytes": 2950
+          },
+          {
+            "path": "eyebrows/eyebrow009/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow009/eyebrow009.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 556
+          },
+          {
+            "path": "eyebrows/eyebrow009/eyebrow009.png",
+            "bytes": 230800,
+            "compressed_bytes": 229383
+          },
+          {
+            "path": "eyebrows/eyebrow009/eyebrow009.mhclo",
+            "bytes": 9122,
+            "compressed_bytes": 3173
+          },
+          {
+            "path": "eyebrows/eyebrow009/eyebrow009.thumb",
+            "bytes": 137369,
+            "compressed_bytes": 137295
+          },
+          {
+            "path": "eyebrows/eyebrow009/eyebrow009.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2894
+          },
+          {
+            "path": "eyebrows/eyebrow007/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow007/eyebrow007.thumb",
+            "bytes": 136558,
+            "compressed_bytes": 136486
+          },
+          {
+            "path": "eyebrows/eyebrow007/eyebrow007.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow007/eyebrow007.mhclo",
+            "bytes": 9134,
+            "compressed_bytes": 2859
+          },
+          {
+            "path": "eyebrows/eyebrow007/eyebrow007.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2797
+          },
+          {
+            "path": "eyebrows/eyebrow007/eyebrow007.png",
+            "bytes": 18685,
+            "compressed_bytes": 17410
+          },
+          {
+            "path": "eyebrows/eyebrow011/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow011/eyebrow011.png",
+            "bytes": 42634,
+            "compressed_bytes": 41078
+          },
+          {
+            "path": "eyebrows/eyebrow011/eyebrow011.mhclo",
+            "bytes": 9156,
+            "compressed_bytes": 3058
+          },
+          {
+            "path": "eyebrows/eyebrow011/eyebrow011.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2885
+          },
+          {
+            "path": "eyebrows/eyebrow011/eyebrow011.thumb",
+            "bytes": 137113,
+            "compressed_bytes": 137037
+          },
+          {
+            "path": "eyebrows/eyebrow011/eyebrow011.mhmat",
+            "bytes": 1099,
+            "compressed_bytes": 556
+          },
+          {
+            "path": "eyebrows/eyebrow010/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow010/eyebrow010.mhmat",
+            "bytes": 1099,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow010/eyebrow010.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2877
+          },
+          {
+            "path": "eyebrows/eyebrow010/eyebrow010.thumb",
+            "bytes": 137287,
+            "compressed_bytes": 137215
+          },
+          {
+            "path": "eyebrows/eyebrow010/eyebrow010.png",
+            "bytes": 72383,
+            "compressed_bytes": 70491
+          },
+          {
+            "path": "eyebrows/eyebrow010/eyebrow010.mhclo",
+            "bytes": 9142,
+            "compressed_bytes": 3031
+          },
+          {
+            "path": "eyebrows/eyebrow002/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow002/eyebrow002.thumb",
+            "bytes": 137855,
+            "compressed_bytes": 137774
+          },
+          {
+            "path": "eyebrows/eyebrow002/eyebrow002.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow002/eyebrow002.mhclo",
+            "bytes": 9132,
+            "compressed_bytes": 2993
+          },
+          {
+            "path": "eyebrows/eyebrow002/eyebrow002.png",
+            "bytes": 96277,
+            "compressed_bytes": 94747
+          },
+          {
+            "path": "eyebrows/eyebrow002/eyebrow002.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2874
+          },
+          {
+            "path": "eyebrows/eyebrow012/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow012/eyebrow012.thumb",
+            "bytes": 136682,
+            "compressed_bytes": 136606
+          },
+          {
+            "path": "eyebrows/eyebrow012/eyebrow012.png",
+            "bytes": 94186,
+            "compressed_bytes": 92558
+          },
+          {
+            "path": "eyebrows/eyebrow012/eyebrow012.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2881
+          },
+          {
+            "path": "eyebrows/eyebrow012/eyebrow012.mhmat",
+            "bytes": 1099,
+            "compressed_bytes": 556
+          },
+          {
+            "path": "eyebrows/eyebrow012/eyebrow012.mhclo",
+            "bytes": 9158,
+            "compressed_bytes": 3196
+          },
+          {
+            "path": "eyebrows/eyebrow006/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow006/eyebrow006.png",
+            "bytes": 19381,
+            "compressed_bytes": 18324
+          },
+          {
+            "path": "eyebrows/eyebrow006/eyebrow006.thumb",
+            "bytes": 136833,
+            "compressed_bytes": 136766
+          },
+          {
+            "path": "eyebrows/eyebrow006/eyebrow006.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2845
+          },
+          {
+            "path": "eyebrows/eyebrow006/eyebrow006.mhclo",
+            "bytes": 9142,
+            "compressed_bytes": 2898
+          },
+          {
+            "path": "eyebrows/eyebrow006/eyebrow006.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 556
+          },
+          {
+            "path": "eyebrows/eyebrow004/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow004/eyebrow004.png",
+            "bytes": 88931,
+            "compressed_bytes": 87675
+          },
+          {
+            "path": "eyebrows/eyebrow004/eyebrow004.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2828
+          },
+          {
+            "path": "eyebrows/eyebrow004/eyebrow004.mhclo",
+            "bytes": 9147,
+            "compressed_bytes": 3013
+          },
+          {
+            "path": "eyebrows/eyebrow004/eyebrow004.thumb",
+            "bytes": 136616,
+            "compressed_bytes": 136548
+          },
+          {
+            "path": "eyebrows/eyebrow004/eyebrow004.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow008/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow008/eyebrow008.png",
+            "bytes": 100364,
+            "compressed_bytes": 98981
+          },
+          {
+            "path": "eyebrows/eyebrow008/eyebrow008.mhclo",
+            "bytes": 9142,
+            "compressed_bytes": 3033
+          },
+          {
+            "path": "eyebrows/eyebrow008/eyebrow008.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2862
+          },
+          {
+            "path": "eyebrows/eyebrow008/eyebrow008.thumb",
+            "bytes": 137457,
+            "compressed_bytes": 137378
+          },
+          {
+            "path": "eyebrows/eyebrow008/eyebrow008.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow003/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyebrows/eyebrow003/eyebrow003.mhmat",
+            "bytes": 1098,
+            "compressed_bytes": 555
+          },
+          {
+            "path": "eyebrows/eyebrow003/eyebrow003.mhclo",
+            "bytes": 9148,
+            "compressed_bytes": 2997
+          },
+          {
+            "path": "eyebrows/eyebrow003/eyebrow003.thumb",
+            "bytes": 137706,
+            "compressed_bytes": 137629
+          },
+          {
+            "path": "eyebrows/eyebrow003/eyebrow003.png",
+            "bytes": 92174,
+            "compressed_bytes": 90809
+          },
+          {
+            "path": "eyebrows/eyebrow003/eyebrow003.obj",
+            "bytes": 8227,
+            "compressed_bytes": 2848
+          },
+          {
+            "path": "eyes/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyes/materials/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyes/materials/brown.thumb",
+            "bytes": 29627,
+            "compressed_bytes": 29627
+          },
+          {
+            "path": "eyes/materials/brownlight.thumb",
+            "bytes": 34947,
+            "compressed_bytes": 34957
+          },
+          {
+            "path": "eyes/materials/brownlight.mhmat",
+            "bytes": 1256,
+            "compressed_bytes": 598
+          },
+          {
+            "path": "eyes/materials/bluegreen_eye.png",
+            "bytes": 697879,
+            "compressed_bytes": 695142
+          },
+          {
+            "path": "eyes/materials/ice.mhmat",
+            "bytes": 1242,
+            "compressed_bytes": 593
+          },
+          {
+            "path": "eyes/materials/brown.mhmat",
+            "bytes": 1247,
+            "compressed_bytes": 595
+          },
+          {
+            "path": "eyes/materials/deepblue_eye.png",
+            "bytes": 658984,
+            "compressed_bytes": 656033
+          },
+          {
+            "path": "eyes/materials/grey_eye.png",
+            "bytes": 669883,
+            "compressed_bytes": 666778
+          },
+          {
+            "path": "eyes/materials/grey.thumb",
+            "bytes": 32862,
+            "compressed_bytes": 32862
+          },
+          {
+            "path": "eyes/materials/bluegreen.thumb",
+            "bytes": 36549,
+            "compressed_bytes": 36559
+          },
+          {
+            "path": "eyes/materials/green.thumb",
+            "bytes": 32775,
+            "compressed_bytes": 32775
+          },
+          {
+            "path": "eyes/materials/green_eye.png",
+            "bytes": 662241,
+            "compressed_bytes": 659403
+          },
+          {
+            "path": "eyes/materials/bluegreen.mhmat",
+            "bytes": 1250,
+            "compressed_bytes": 595
+          },
+          {
+            "path": "eyes/materials/brown_eye.png",
+            "bytes": 610817,
+            "compressed_bytes": 607878
+          },
+          {
+            "path": "eyes/materials/deepblue.thumb",
+            "bytes": 32356,
+            "compressed_bytes": 32356
+          },
+          {
+            "path": "eyes/materials/green.mhmat",
+            "bytes": 1246,
+            "compressed_bytes": 596
+          },
+          {
+            "path": "eyes/materials/lightblue.thumb",
+            "bytes": 36919,
+            "compressed_bytes": 36929
+          },
+          {
+            "path": "eyes/materials/lightblue_eye.png",
+            "bytes": 701486,
+            "compressed_bytes": 698750
+          },
+          {
+            "path": "eyes/materials/lightblue.mhmat",
+            "bytes": 1254,
+            "compressed_bytes": 597
+          },
+          {
+            "path": "eyes/materials/ice.thumb",
+            "bytes": 34110,
+            "compressed_bytes": 34120
+          },
+          {
+            "path": "eyes/materials/blue.thumb",
+            "bytes": 33300,
+            "compressed_bytes": 33310
+          },
+          {
+            "path": "eyes/materials/blue.mhmat",
+            "bytes": 1243,
+            "compressed_bytes": 593
+          },
+          {
+            "path": "eyes/materials/deepblue.mhmat",
+            "bytes": 1252,
+            "compressed_bytes": 596
+          },
+          {
+            "path": "eyes/materials/brownlight_eye.png",
+            "bytes": 680577,
+            "compressed_bytes": 677796
+          },
+          {
+            "path": "eyes/materials/blue_eye.png",
+            "bytes": 666029,
+            "compressed_bytes": 663267
+          },
+          {
+            "path": "eyes/materials/ice_eye.png",
+            "bytes": 676501,
+            "compressed_bytes": 673628
+          },
+          {
+            "path": "eyes/materials/grey.mhmat",
+            "bytes": 1244,
+            "compressed_bytes": 593
+          },
+          {
+            "path": "eyes/high-poly/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyes/high-poly/high-poly.obj",
+            "bytes": 100882,
+            "compressed_bytes": 29513
+          },
+          {
+            "path": "eyes/high-poly/high-poly.thumb",
+            "bytes": 21076,
+            "compressed_bytes": 20161
+          },
+          {
+            "path": "eyes/high-poly/high-poly.mhclo",
+            "bytes": 72490,
+            "compressed_bytes": 21322
+          },
+          {
+            "path": "eyes/low-poly/",
+            "bytes": 0,
+            "compressed_bytes": 0
+          },
+          {
+            "path": "eyes/low-poly/low-poly.thumb",
+            "bytes": 15938,
+            "compressed_bytes": 15539
+          },
+          {
+            "path": "eyes/low-poly/low-poly.mhclo",
+            "bytes": 1344,
+            "compressed_bytes": 673
+          },
+          {
+            "path": "eyes/low-poly/low-poly.obj",
+            "bytes": 6604,
+            "compressed_bytes": 2161
+          }
+        ]
+      },
+      "status": "source_verified",
+      "gates": {
+        "G1_card_license": "source_and_license_receipts",
+        "G2_import": "one_static_component_passed",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "blender_inventory": {
+        "id": "A03",
+        "blender": "4.2.3 LTS",
+        "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\extracted\\proxymeshes\\male_generic\\male_generic.obj",
+        "automatic_scripts_enabled": false,
+        "art_approved": false,
+        "runtime_approved": false,
+        "opened": true,
+        "units": {
+          "system": "METRIC",
+          "scale_length": 1.0,
+          "fps": 24
+        },
+        "meshes": [
+          {
+            "name": "male_generic_male-proxy-new:Average",
+            "vertices": 13652,
+            "triangles": 27300,
+            "dimensions": [
+              11.3714,
+              17.4813,
+              4.750579
+            ],
+            "scale": [
+              1.0,
+              1.0,
+              1.0
+            ],
+            "location": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "material_slots": [],
+            "vertex_groups": 0,
+            "vertices_without_groups": 13652,
+            "modifiers": []
+          }
+        ],
+        "armatures": [],
+        "actions": [],
+        "materials": [],
+        "images": [],
+        "embedded_text_blocks": [],
+        "action_pose_samples": [],
+        "export_options": {
+          "filepath": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\probe.glb",
+          "export_format": "GLB",
+          "use_selection": true,
+          "export_animations": true,
+          "export_skins": true,
+          "export_nla_strips": true,
+          "export_force_sampling": true,
+          "export_optimize_animation_size": false,
+          "export_all_influences": false,
+          "export_cameras": false,
+          "export_lights": false
+        },
+        "glb": {
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\probe.glb",
+          "bytes": 638252,
+          "sha256": "033821a3ec42f51968ab1cb70d222984ccc6cdfb9ff794f4c689fc8b0a2d3d71"
+        }
+      },
+      "archive_extension_counts": {
+        ".mhmat": 85,
+        ".thumb": 94,
+        ".png": 111,
+        ".obj": 62,
+        ".mhclo": 55,
+        ".mhw": 6,
+        ".json": 1,
+        ".proxy": 7
+      },
+      "archive_file_count": 421,
+      "export": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A03\\probe.glb",
+        "intake_relative_path": "A03/probe.glb",
+        "bytes": 638252,
+        "sha256": "033821a3ec42f51968ab1cb70d222984ccc6cdfb9ff794f4c689fc8b0a2d3d71",
+        "triangles": 27300,
+        "animations": [],
+        "skin_count": 0,
+        "mesh_count": 1,
+        "images": []
+      },
+      "godot_probe": {
+        "animations": [],
+        "id": "A03",
+        "loaded": true,
+        "meshes": [
+          {
+            "aabb": "[P: (-5.6857, -0.971879, -9.3003), S: (11.3714, 4.750579, 17.4813)]",
+            "name": "male_generic_male-proxy-new_Average",
+            "skin": false,
+            "surfaces": [
+              {
+                "albedo_texture": false,
+                "material": ""
+              }
+            ]
+          }
+        ],
+        "path": "res://assets/A03.glb",
+        "runtime_combat_verified": false,
+        "skeleton_bones": [],
+        "visual_godot_verified": false
+      },
+      "scale_normalized": false,
+      "orientation_approved": false,
+      "gameplay_integrated": false,
+      "limitations": [
+        "421 files acquired; only male_generic.obj imported as a probe.",
+        "This unrigged untextured proxy is a component, not a completed NPC. OBJ axis and scale are not normalized. MPFB generation, clothing binding and NPC animation are not tested."
+      ]
+    },
+    {
+      "id": "A05",
+      "receipt": {
+        "id": "A05",
+        "page": "https://www.cgtrader.com/free-3d-models/exterior/cityscape/medieval-village-house-3981165b-a827-41ed-87a9-bb1b06f2bbf8",
+        "license": "Royalty Free (no AI), prior primary card verified",
+        "status": "not_acquired",
+        "browser_attempt": "CUA getBrowser: No browser is available",
+        "archive_verified": false,
+        "import_verified": false,
+        "page_receipt": {
+          "url": "https://www.cgtrader.com/free-3d-models/exterior/cityscape/medieval-village-house-3981165b-a827-41ed-87a9-bb1b06f2bbf8",
+          "final_url": "https://www.cgtrader.com/free-3d-models/exterior/cityscape/medieval-village-house-3981165b-a827-41ed-87a9-bb1b06f2bbf8",
+          "http_status": 202,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A05\\source-page.html",
+          "content_type": "text/html; charset=UTF-8"
+        },
+        "observed_download_links": [],
+        "authentication_terms_present": false,
+        "blocker": "Observed HTTP 202 with an empty response body. No source download link or archive obtained. CUA reports no browser available. Authentication requirements were not established.",
+        "authentication_requirement": "unknown; not inferred from HTTP 202",
+        "license_verification": "prior card research only; current response contains no license text"
+      },
+      "status": "blocked_download",
+      "gates": {
+        "G1_card_license": "prior_card_only_current_response_empty",
+        "G2_import": "not_run",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "limitations": [
+        "Source archive unavailable; no model, rig, texture or import claims can be verified."
+      ]
+    },
+    {
+      "id": "A06",
+      "receipt": {
+        "id": "A06",
+        "page": "https://www.cgtrader.com/free-3d-models/exterior/house/medieval-fantasy-2-storey-house-inn-bar-or-hotel-game-ready",
+        "license": "Royalty Free (no AI), prior primary card verified",
+        "status": "not_acquired",
+        "browser_attempt": "CUA getBrowser: No browser is available",
+        "archive_verified": false,
+        "import_verified": false,
+        "page_receipt": {
+          "url": "https://www.cgtrader.com/free-3d-models/exterior/house/medieval-fantasy-2-storey-house-inn-bar-or-hotel-game-ready",
+          "final_url": "https://www.cgtrader.com/free-3d-models/exterior/house/medieval-fantasy-2-storey-house-inn-bar-or-hotel-game-ready",
+          "http_status": 202,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A06\\source-page.html",
+          "content_type": "text/html; charset=UTF-8"
+        },
+        "observed_download_links": [],
+        "authentication_terms_present": false,
+        "blocker": "Observed HTTP 202 with an empty response body. No source download link or archive obtained. CUA reports no browser available. Authentication requirements were not established.",
+        "authentication_requirement": "unknown; not inferred from HTTP 202",
+        "license_verification": "prior card research only; current response contains no license text"
+      },
+      "status": "blocked_download",
+      "gates": {
+        "G1_card_license": "prior_card_only_current_response_empty",
+        "G2_import": "not_run",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "limitations": [
+        "Source archive unavailable; no model, rig, texture or import claims can be verified."
+      ]
+    },
+    {
+      "id": "A07",
+      "receipt": {
+        "id": "A07",
+        "page": "https://www.cgtrader.com/free-3d-models/exterior/historic-exterior/free-castle-from-my-mega-castle-kitbash-set",
+        "license": "Royalty Free (no AI), prior primary card verified",
+        "status": "not_acquired",
+        "browser_attempt": "CUA getBrowser: No browser is available",
+        "archive_verified": false,
+        "import_verified": false,
+        "page_receipt": {
+          "url": "https://www.cgtrader.com/free-3d-models/exterior/historic-exterior/free-castle-from-my-mega-castle-kitbash-set",
+          "final_url": "https://www.cgtrader.com/free-3d-models/exterior/historic-exterior/free-castle-from-my-mega-castle-kitbash-set",
+          "http_status": 202,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A07\\source-page.html",
+          "content_type": "text/html; charset=UTF-8"
+        },
+        "observed_download_links": [],
+        "authentication_terms_present": false,
+        "blocker": "Observed HTTP 202 with an empty response body. No source download link or archive obtained. CUA reports no browser available. Authentication requirements were not established.",
+        "authentication_requirement": "unknown; not inferred from HTTP 202",
+        "license_verification": "prior card research only; current response contains no license text"
+      },
+      "status": "blocked_download",
+      "gates": {
+        "G1_card_license": "prior_card_only_current_response_empty",
+        "G2_import": "not_run",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "limitations": [
+        "Source archive unavailable; no model, rig, texture or import claims can be verified."
+      ]
+    },
+    {
+      "id": "A09",
+      "receipt": {
+        "id": "A09",
+        "page": "https://www.cgtrader.com/free-3d-models/exterior/house/medieval-blacksmith-house-3d-asset",
+        "license": "Royalty Free (no AI), prior primary card verified",
+        "status": "not_acquired",
+        "browser_attempt": "CUA getBrowser: No browser is available",
+        "archive_verified": false,
+        "import_verified": false,
+        "page_receipt": {
+          "url": "https://www.cgtrader.com/free-3d-models/exterior/house/medieval-blacksmith-house-3d-asset",
+          "final_url": "https://www.cgtrader.com/free-3d-models/exterior/house/medieval-blacksmith-house-3d-asset",
+          "http_status": 202,
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\A09\\source-page.html",
+          "content_type": "text/html; charset=UTF-8"
+        },
+        "observed_download_links": [],
+        "authentication_terms_present": false,
+        "blocker": "Observed HTTP 202 with an empty response body. No source download link or archive obtained. CUA reports no browser available. Authentication requirements were not established.",
+        "authentication_requirement": "unknown; not inferred from HTTP 202",
+        "license_verification": "prior card research only; current response contains no license text"
+      },
+      "status": "blocked_download",
+      "gates": {
+        "G1_card_license": "prior_card_only_current_response_empty",
+        "G2_import": "not_run",
+        "G3_art": "not_approved",
+        "G4_gameplay_runtime": "not_run"
+      },
+      "limitations": [
+        "Source archive unavailable; no model, rig, texture or import claims can be verified."
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\intake_sources.py",
+      "intake_relative_path": "intake_sources.py",
+      "bytes": 4025,
+      "sha256": "64a7ab570a52da1f003e0b86d519a4839e27665c78c53b872649a12c57f42855"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\intake_city.py",
+      "intake_relative_path": "intake_city.py",
+      "bytes": 2731,
+      "sha256": "8cd4012318b0e4579afa2d72af3f07b50077bf05c3f1f7083a7bb82d72fdc45f"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\probe_blender.py",
+      "intake_relative_path": "probe_blender.py",
+      "bytes": 5857,
+      "sha256": "16d20c875befe9a38884e6ec1fbf129847fdb2d5903a44858b906f298f69cb5d"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\prepare_probe.py",
+      "intake_relative_path": "prepare_probe.py",
+      "bytes": 6406,
+      "sha256": "9d5ff6a9818775181812eee1b37a30b16576ba83ec369835f41e2f4931fc0d99"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot_probe\\probe.gd",
+      "intake_relative_path": "godot_probe/probe.gd",
+      "bytes": 2982,
+      "sha256": "053d373972dea925f26fb9dd50223d84376e90d9a4bb6f7276152960ceb1a0bb"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot_probe\\project.godot",
+      "intake_relative_path": "godot_probe/project.godot",
+      "bytes": 187,
+      "sha256": "15bd8e89c03e4423a278e26fbfb8a357b3772bdb5fb450e6d869a10900595543"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot_probe\\godot-probe.json",
+      "intake_relative_path": "godot_probe/godot-probe.json",
+      "bytes": 9703,
+      "sha256": "2e6d921aaec68d5c0546a272eafd0652c3539f3656d76d1d8a92ed0617999e7b"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot-import.log",
+      "intake_relative_path": "godot-import.log",
+      "bytes": 3387,
+      "sha256": "6386c64a1d3beb7a01d626b8ad26f46591f9a268942943d5148ccf5d04725c28"
+    },
+    {
+      "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot-probe.log",
+      "intake_relative_path": "godot-probe.log",
+      "bytes": 5652,
+      "sha256": "8c58fae9e7a3fb411d5920bbfec284bd0bc70dc40d88c99253b1fb76b1ebde49"
+    }
+  ]
+}

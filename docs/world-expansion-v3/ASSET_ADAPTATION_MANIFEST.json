@@ -1,0 +1,1793 @@
+{
+  "schema_version": 1,
+  "status": "three isolated gameplay adaptation candidates",
+  "godot": {
+    "build": "official",
+    "hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+    "hex": 263683,
+    "major": 4,
+    "minor": 6,
+    "patch": 3,
+    "status": "stable",
+    "string": "4.6.3-stable (official)",
+    "timestamp": 0
+  },
+  "game_sources_modified": false,
+  "existing_monster_models_replaced": false,
+  "notes": [
+    "Only GLB derivatives and credits are candidates for later explicit integration; source packages remain in the intake cache.",
+    "A successful renderer probe is distinct from full G4 combat acceptance."
+  ],
+  "assets": [
+    {
+      "id": "MOB-02",
+      "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\adapted\\mob_02_gameplay_v3.glb",
+      "sha256": "acbc5119e8e6f86a2afc150f77de4b0ace67774c84f58f488d84bf3cd012b3d0",
+      "bytes": 366248,
+      "source_prepared_sha256": "fa58879b1b3ca643d8d31fc330fa443db7a92f5ba799f37ca431ad9c82a5c22e",
+      "author": "CoinCoin",
+      "license": "CC-BY-4.0",
+      "source_receipt": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-02\\receipt.json",
+      "clip_mapping": [
+        {
+          "name": "idle",
+          "source_action": "Armature|idle|Baked frames_Armature",
+          "source_duration_seconds": 1.2833332841595013,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "walk",
+          "source_action": "Armature|run|Baked frames_Armature",
+          "source_duration_seconds": 0.6000000064571699,
+          "duration_multiplier": 1.75,
+          "provenance": "timing-derived run preview; not a separately authored walk gait",
+          "loop_recommended": true
+        },
+        {
+          "name": "run",
+          "source_action": "Armature|run|Baked frames_Armature",
+          "source_duration_seconds": 0.6000000064571699,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "attack",
+          "source_action": "Armature|ATK1|Baked frames_Armature",
+          "source_duration_seconds": 2.6666667287548385,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        },
+        {
+          "name": "hit",
+          "source_action": "Armature|hit|Baked frames_Armature",
+          "source_duration_seconds": 1.2000000302990277,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        },
+        {
+          "name": "death",
+          "source_action": "Armature|death|Baked frames_Armature",
+          "source_duration_seconds": 0.8666666969656944,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        }
+      ],
+      "texture_changes": [],
+      "normalization": {
+        "up_godot": "+Y",
+        "forward_godot": "-Z",
+        "origin": "mean XY position of selected support-foot bones; idle evaluated creature-mesh minimum on floor 0",
+        "uniform_scale": 0.9172544640924403,
+        "idle_height_meters": 0.85,
+        "idle_minimum_blender_xyz": [
+          -0.43609267473220825,
+          -0.954778790473938,
+          1.0556804319605817e-09
+        ],
+        "idle_maximum_blender_xyz": [
+          0.42538949847221375,
+          0.8205211162567139,
+          0.8499999642372131
+        ],
+        "bones_renamed": false,
+        "existing_game_scene_modified": false,
+        "excluded_from_bounds": "unlinked Icosphere used by Blender glTF importer for bone display"
+      },
+      "evaluated_mesh_samples": [
+        {
+          "clip": "idle",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.43609267473220825,
+            -0.954778790473938,
+            1.0556804319605817e-09
+          ],
+          "maximum_blender_xyz": [
+            0.42538949847221375,
+            0.8205211162567139,
+            0.8499999642372131
+          ],
+          "finite": true
+        },
+        {
+          "clip": "idle",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.4360935091972351,
+            -0.9014853239059448,
+            -1.1486619087008876e-06
+          ],
+          "maximum_blender_xyz": [
+            0.4253941476345062,
+            0.9311358332633972,
+            0.7367305755615234
+          ],
+          "finite": true
+        },
+        {
+          "clip": "idle",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.4360942840576172,
+            -0.9295801520347595,
+            -3.389423909538891e-06
+          ],
+          "maximum_blender_xyz": [
+            0.42539137601852417,
+            0.8194482326507568,
+            0.8560202121734619
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.20236016809940338,
+            -0.9340716600418091,
+            -0.007078516762703657
+          ],
+          "maximum_blender_xyz": [
+            0.2662881016731262,
+            0.8004328012466431,
+            1.083166241645813
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.172350212931633,
+            -1.1028701066970825,
+            -0.011119658127427101
+          ],
+          "maximum_blender_xyz": [
+            0.26687777042388916,
+            1.1648296117782593,
+            0.9502409100532532
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.22883068025112152,
+            -0.9158393740653992,
+            0.003201226005330682
+          ],
+          "maximum_blender_xyz": [
+            0.31872421503067017,
+            0.8637205362319946,
+            0.981093168258667
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.20236016809940338,
+            -0.9340716600418091,
+            -0.007078516762703657
+          ],
+          "maximum_blender_xyz": [
+            0.2662881016731262,
+            0.8004328012466431,
+            1.083166241645813
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.17346139252185822,
+            -1.0796457529067993,
+            -0.00988885946571827
+          ],
+          "maximum_blender_xyz": [
+            0.26698365807533264,
+            1.146768569946289,
+            0.949723482131958
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.2343020886182785,
+            -0.9080466628074646,
+            -0.015584301203489304
+          ],
+          "maximum_blender_xyz": [
+            0.3240744471549988,
+            0.8710883855819702,
+            0.9690540432929993
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.43609267473220825,
+            -0.954778790473938,
+            1.0556804319605817e-09
+          ],
+          "maximum_blender_xyz": [
+            0.42538949847221375,
+            0.8205211162567139,
+            0.8499999642372131
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.4360920488834381,
+            -0.7760810852050781,
+            -0.06005456671118736
+          ],
+          "maximum_blender_xyz": [
+            0.4337947368621826,
+            0.2553781270980835,
+            1.662589192390442
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.43609288334846497,
+            -0.8160491585731506,
+            3.656685407804616e-07
+          ],
+          "maximum_blender_xyz": [
+            0.4253897964954376,
+            0.8385244607925415,
+            0.8822468519210815
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.43609267473220825,
+            -0.954778790473938,
+            1.0556804319605817e-09
+          ],
+          "maximum_blender_xyz": [
+            0.42538949847221375,
+            0.8205211162567139,
+            0.8499999642372131
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.43609365820884705,
+            -1.0675437450408936,
+            -0.035074565559625626
+          ],
+          "maximum_blender_xyz": [
+            0.4253905117511749,
+            0.5972827076911926,
+            0.9113844633102417
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.43609699606895447,
+            -0.9305670261383057,
+            -3.5742914406000637e-06
+          ],
+          "maximum_blender_xyz": [
+            0.42538806796073914,
+            0.8243480324745178,
+            0.850654125213623
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.43609267473220825,
+            -0.954778790473938,
+            1.0556804319605817e-09
+          ],
+          "maximum_blender_xyz": [
+            0.42538949847221375,
+            0.8205211162567139,
+            0.8499999642372131
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.3392341732978821,
+            -1.8790616989135742,
+            -0.030032983049750328
+          ],
+          "maximum_blender_xyz": [
+            0.4988584816455841,
+            -0.6149098873138428,
+            1.1651204824447632
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.567598283290863,
+            -2.5143585205078125,
+            -0.053764257580041885
+          ],
+          "maximum_blender_xyz": [
+            0.878609299659729,
+            -0.5222539305686951,
+            0.375679612159729
+          ],
+          "finite": true
+        }
+      ],
+      "status": "gameplay_adaptation_candidate",
+      "final_art_approved": false,
+      "combat_runtime_approved": false,
+      "missing_authored_clip": [
+        "walk"
+      ],
+      "canonical_mob_id": "MOB-02",
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 1.25,
+            "name": "idle",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 1.04166662693024,
+            "name": "walk",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 0.583333313465118,
+            "name": "run",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 2.66666674613953,
+            "name": "attack",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 1.16666662693024,
+            "name": "hit",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          },
+          {
+            "length": 0.833333313465118,
+            "name": "death",
+            "sampled_pose_changes": true,
+            "tracks": 63
+          }
+        ],
+        "combat_verified": false,
+        "id": "mob_02",
+        "idle_bone_world_positions": [
+          {
+            "name": "Root",
+            "world_origin": "(0.045685, 0.007046, 0.042605)"
+          },
+          {
+            "name": "bassin",
+            "world_origin": "(-0.044034, 0.561901, 0.349133)"
+          },
+          {
+            "name": "spine1",
+            "world_origin": "(-0.006468, 0.531653, 0.256074)"
+          },
+          {
+            "name": "spine2",
+            "world_origin": "(0.042325, 0.510663, 0.133971)"
+          },
+          {
+            "name": "spine3",
+            "world_origin": "(0.096907, 0.566805, -0.00798)"
+          },
+          {
+            "name": "thorax",
+            "world_origin": "(0.07928, 0.591328, -0.180097)"
+          },
+          {
+            "name": "epaule_R",
+            "world_origin": "(0.235305, 0.481709, -0.262276)"
+          },
+          {
+            "name": "coude_R",
+            "world_origin": "(0.319356, 0.281854, -0.074422)"
+          },
+          {
+            "name": "poignet_R",
+            "world_origin": "(0.367159, 0.103794, -0.21731)"
+          },
+          {
+            "name": "doigt_R",
+            "world_origin": "(0.363203, 0.035646, -0.346507)"
+          },
+          {
+            "name": "cou",
+            "world_origin": "(0.06504, 0.595798, -0.327739)"
+          },
+          {
+            "name": "tete",
+            "world_origin": "(0.053909, 0.530727, -0.481571)"
+          },
+          {
+            "name": "machoire",
+            "world_origin": "(0.058431, 0.312577, -0.556155)"
+          },
+          {
+            "name": "museau",
+            "world_origin": "(0.044076, 0.417727, -0.64858)"
+          },
+          {
+            "name": "epaule_L",
+            "world_origin": "(-0.076988, 0.465109, -0.232658)"
+          },
+          {
+            "name": "coude_L",
+            "world_origin": "(-0.190721, 0.214186, -0.152665)"
+          },
+          {
+            "name": "poignet_L",
+            "world_origin": "(-0.275044, 0.103792, -0.340045)"
+          },
+          {
+            "name": "doigt_L",
+            "world_origin": "(-0.231356, 0.035645, -0.461697)"
+          },
+          {
+            "name": "hanche_R",
+            "world_origin": "(0.065107, 0.490069, 0.405664)"
+          },
+          {
+            "name": "genou_R",
+            "world_origin": "(0.099778, 0.250842, 0.38986)"
+          },
+          {
+            "name": "cheville_R",
+            "world_origin": "(0.107961, 0.188587, 0.563263)"
+          },
+          {
+            "name": "pied_R",
+            "world_origin": "(0.245343, 0.039592, 0.48562)"
+          },
+          {
+            "name": "orteil_R",
+            "world_origin": "(0.278959, 0.043158, 0.389373)"
+          },
+          {
+            "name": "queue1",
+            "world_origin": "(-0.074226, 0.555658, 0.425983)"
+          },
+          {
+            "name": "queue2",
+            "world_origin": "(-0.114934, 0.536529, 0.530321)"
+          },
+          {
+            "name": "queue3",
+            "world_origin": "(-0.154585, 0.502329, 0.632997)"
+          },
+          {
+            "name": "queue4",
+            "world_origin": "(-0.214562, 0.477781, 0.786476)"
+          },
+          {
+            "name": "hanche_L",
+            "world_origin": "(-0.158902, 0.484111, 0.317172)"
+          },
+          {
+            "name": "genou_L",
+            "world_origin": "(-0.162379, 0.243868, 0.286294)"
+          },
+          {
+            "name": "cheville_L",
+            "world_origin": "(-0.289235, 0.2077, 0.415179)"
+          },
+          {
+            "name": "pied_L",
+            "world_origin": "(-0.377189, 0.032223, 0.322584)"
+          },
+          {
+            "name": "orteil_L",
+            "world_origin": "(-0.363773, 0.035267, 0.221502)"
+          }
+        ],
+        "loaded": true,
+        "meshes": [
+          {
+            "global_aabb": "[P: (0.043156, -0.002058, 0.034317), S: (0.00422, 0.017186, 0.008242)]",
+            "name": "Forest Wolf",
+            "skin": true
+          }
+        ],
+        "render_saved": true,
+        "renderer": "NVIDIA GeForce RTX 3070 Laptop GPU",
+        "rest_mesh_aabb_not_deformed_bounds": "[P: (0.043156, -0.002058, 0.034317), S: (0.00422, 0.017186, 0.008242)]",
+        "skeleton_bones": 32
+      },
+      "godot_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot_adapted\\mob_02_godot.png",
+        "inspected": true,
+        "art_approved": false
+      },
+      "sampled_ground_penetration_max_meters": 0.06005456671118736,
+      "remaining_work": [
+        "Contact polish: inherited animation poses intersect the ground in some sampled frames; no per-frame grounding or IK applied.",
+        "Animation loops and combat event timings must be bound explicitly in the game controller.",
+        "Game collision, navigation, attack damage synchronization and mass performance not tested.",
+        "Source art retained; final Greenfall appearance not approved.",
+        "walk uses a slower run gait as an explicit technical substitute; a true walk cycle is still missing."
+      ],
+      "checks": {
+        "source_hash_valid": true,
+        "license_receipt_saved": true,
+        "mesh_skin_retained": true,
+        "six_named_clips_present": true,
+        "six_clips_pose_sampled": true,
+        "texture_images_embedded": true,
+        "idle_ground_origin_normalized": true,
+        "forward_negative_z": true,
+        "godot_opengl_render_inspected": true,
+        "combat_and_contact_gate_passed": false
+      }
+    },
+    {
+      "id": "MOB-03",
+      "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\adapted\\mob_03_gameplay_v3.glb",
+      "sha256": "fb231d3b06f1657b8810423424ebe183cb6166c37f66120e35e19aac362a191c",
+      "bytes": 1153252,
+      "source_prepared_sha256": "b3146ca71d6d65128ff55e6ca71554470147c716a9c9e284f99639e3709061c4",
+      "author": "CDmir / Cestmir Dammer; TinyWorlds",
+      "license": "CC0-1.0",
+      "source_receipt": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-03\\receipt.json",
+      "clip_mapping": [
+        {
+          "name": "idle",
+          "source_action": "Idle.001_Armature",
+          "source_duration_seconds": 3.75,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "walk",
+          "source_action": "Walk_Armature",
+          "source_duration_seconds": 1.1666666666666667,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "run",
+          "source_action": "Run_Armature",
+          "source_duration_seconds": 0.4166666666666667,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "attack",
+          "source_action": "Attack.000_Armature",
+          "source_duration_seconds": 0.875,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        },
+        {
+          "name": "hit",
+          "source_action": "Hit_Armature",
+          "source_duration_seconds": 0.4166666666666667,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        },
+        {
+          "name": "death",
+          "source_action": "Die_Armature",
+          "source_duration_seconds": 1.125,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        }
+      ],
+      "texture_changes": [
+        {
+          "image": "rat-body",
+          "from": [
+            1024,
+            1024
+          ],
+          "to": [
+            512,
+            512
+          ],
+          "operation": "Blender resize for compact 3D texture export"
+        },
+        {
+          "image": "rat-head",
+          "from": [
+            1024,
+            1024
+          ],
+          "to": [
+            512,
+            512
+          ],
+          "operation": "Blender resize for compact 3D texture export"
+        }
+      ],
+      "normalization": {
+        "up_godot": "+Y",
+        "forward_godot": "-Z",
+        "origin": "mean XY position of selected support-foot bones; idle evaluated creature-mesh minimum on floor 0",
+        "uniform_scale": 0.2479138965901847,
+        "idle_height_meters": 0.35,
+        "idle_minimum_blender_xyz": [
+          -0.1454620659351349,
+          -0.8470039963722229,
+          0.0
+        ],
+        "idle_maximum_blender_xyz": [
+          0.14623063802719116,
+          0.4287974238395691,
+          0.3500000238418579
+        ],
+        "bones_renamed": false,
+        "existing_game_scene_modified": false,
+        "excluded_from_bounds": "unlinked Icosphere used by Blender glTF importer for bone display"
+      },
+      "evaluated_mesh_samples": [
+        {
+          "clip": "idle",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.1454620659351349,
+            -0.8470039963722229,
+            0.0
+          ],
+          "maximum_blender_xyz": [
+            0.14623063802719116,
+            0.4287974238395691,
+            0.3500000238418579
+          ],
+          "finite": true
+        },
+        {
+          "clip": "idle",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.1454620659351349,
+            -0.8470039963722229,
+            0.0
+          ],
+          "maximum_blender_xyz": [
+            0.14623063802719116,
+            0.438967227935791,
+            0.3500000238418579
+          ],
+          "finite": true
+        },
+        {
+          "clip": "idle",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.1454620659351349,
+            -0.8470039963722229,
+            0.0
+          ],
+          "maximum_blender_xyz": [
+            0.14623063802719116,
+            0.42915111780166626,
+            0.3500000238418579
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.1454620659351349,
+            -0.8470039963722229,
+            -1.5366822481155396e-08
+          ],
+          "maximum_blender_xyz": [
+            0.15802912414073944,
+            0.4330049157142639,
+            0.3500000238418579
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.14902040362358093,
+            -0.8470039963722229,
+            -8.381903171539307e-09
+          ],
+          "maximum_blender_xyz": [
+            0.14623060822486877,
+            0.4330049157142639,
+            0.3500000238418579
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.14493943750858307,
+            -0.8470039367675781,
+            -0.02594805136322975
+          ],
+          "maximum_blender_xyz": [
+            0.14921565353870392,
+            0.43248581886291504,
+            0.34998878836631775
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.14610208570957184,
+            -0.8470038771629333,
+            -1.1175870895385742e-08
+          ],
+          "maximum_blender_xyz": [
+            0.14753350615501404,
+            0.43634194135665894,
+            0.3294484317302704
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.14591728150844574,
+            -0.8223239183425903,
+            -0.007720532827079296
+          ],
+          "maximum_blender_xyz": [
+            0.15693674981594086,
+            0.4245219826698303,
+            0.36863985657691956
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.14930179715156555,
+            -0.8346381783485413,
+            -0.008129329420626163
+          ],
+          "maximum_blender_xyz": [
+            0.15157213807106018,
+            0.4478060007095337,
+            0.336221843957901
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.14588116109371185,
+            -0.8284593820571899,
+            -0.002523141447454691
+          ],
+          "maximum_blender_xyz": [
+            0.14676707983016968,
+            0.41378170251846313,
+            0.34992533922195435
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.14672526717185974,
+            -0.8179609775543213,
+            -6.193295121192932e-08
+          ],
+          "maximum_blender_xyz": [
+            0.24130871891975403,
+            0.5049467086791992,
+            0.3533290922641754
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.14594751596450806,
+            -0.81342613697052,
+            -3.3993273973464966e-08
+          ],
+          "maximum_blender_xyz": [
+            0.1466488540172577,
+            0.4292093515396118,
+            0.34647300839424133
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.1454620659351349,
+            -0.8470030426979065,
+            -6.845220923423767e-08
+          ],
+          "maximum_blender_xyz": [
+            0.14513283967971802,
+            0.41921037435531616,
+            0.4102676808834076
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.1449785977602005,
+            -0.8536962270736694,
+            -2.1420419216156006e-07
+          ],
+          "maximum_blender_xyz": [
+            0.14777454733848572,
+            0.31804370880126953,
+            0.3153558373451233
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.14545613527297974,
+            -0.8486201167106628,
+            -1.5133991837501526e-07
+          ],
+          "maximum_blender_xyz": [
+            0.14563384652137756,
+            0.41448187828063965,
+            0.3735184669494629
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.1454620659351349,
+            -0.8470030426979065,
+            -6.845220923423767e-08
+          ],
+          "maximum_blender_xyz": [
+            0.14623063802719116,
+            0.41921037435531616,
+            0.4102676808834076
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.14576254785060883,
+            -0.8210293054580688,
+            -1.1920928955078125e-07
+          ],
+          "maximum_blender_xyz": [
+            0.14610816538333893,
+            0.4059786796569824,
+            0.40598875284194946
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.18495473265647888,
+            -0.8463821411132812,
+            -0.016300339251756668
+          ],
+          "maximum_blender_xyz": [
+            0.2456601858139038,
+            0.44206708669662476,
+            0.22584958374500275
+          ],
+          "finite": true
+        }
+      ],
+      "status": "gameplay_adaptation_candidate",
+      "final_art_approved": false,
+      "combat_runtime_approved": false,
+      "missing_authored_clip": [],
+      "canonical_mob_id": "MOB-03",
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 3.75,
+            "name": "idle",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 1.16666662693024,
+            "name": "walk",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.416666656732559,
+            "name": "run",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.875,
+            "name": "attack",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 0.416666656732559,
+            "name": "hit",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          },
+          {
+            "length": 1.125,
+            "name": "death",
+            "sampled_pose_changes": true,
+            "tracks": 47
+          }
+        ],
+        "combat_verified": false,
+        "id": "mob_03",
+        "idle_bone_world_positions": [
+          {
+            "name": "Main",
+            "world_origin": "(0.0, 0.004687, 0.139574)"
+          },
+          {
+            "name": "Hip",
+            "world_origin": "(0.0, 0.253631, 0.174809)"
+          },
+          {
+            "name": "Backbone",
+            "world_origin": "(-0.0, 0.291485, 0.050866)"
+          },
+          {
+            "name": "Backbone.001",
+            "world_origin": "(-0.0, 0.237065, -0.061595)"
+          },
+          {
+            "name": "Backbone.002",
+            "world_origin": "(0.017433, 0.202602, -0.167319)"
+          },
+          {
+            "name": "Head_2",
+            "world_origin": "(-0.001111, 0.189798, -0.223621)"
+          },
+          {
+            "name": "Backbone.003",
+            "world_origin": "(-0.001111, 0.172048, -0.226649)"
+          },
+          {
+            "name": "FrontLeg_L",
+            "world_origin": "(-0.039642, 0.178171, -0.143377)"
+          },
+          {
+            "name": "FrontLeg_L.001",
+            "world_origin": "(-0.065846, 0.09107, -0.083691)"
+          },
+          {
+            "name": "FrontLeg_L.002",
+            "world_origin": "(-0.087675, 0.019723, -0.162176)"
+          },
+          {
+            "name": "FrontLeg_L.003",
+            "world_origin": "(-0.093703, 0.01336, -0.194509)"
+          },
+          {
+            "name": "FrontLeg_R",
+            "world_origin": "(0.06943, 0.187792, -0.128528)"
+          },
+          {
+            "name": "FrontLeg_R.001",
+            "world_origin": "(0.07743, 0.090379, -0.080753)"
+          },
+          {
+            "name": "FrontLeg_R.002",
+            "world_origin": "(0.087675, 0.019723, -0.162176)"
+          },
+          {
+            "name": "FrontLeg_R.003",
+            "world_origin": "(0.093703, 0.01336, -0.194509)"
+          },
+          {
+            "name": "Tail",
+            "world_origin": "(0.0, 0.227514, 0.224379)"
+          },
+          {
+            "name": "Tail.001",
+            "world_origin": "(0.0, 0.117196, 0.365801)"
+          },
+          {
+            "name": "Tail.002",
+            "world_origin": "(0.0, 0.049159, 0.527387)"
+          },
+          {
+            "name": "Tail.003",
+            "world_origin": "(0.0, 0.023646, 0.673179)"
+          },
+          {
+            "name": "BackLeg_L",
+            "world_origin": "(-0.068979, 0.247992, 0.102272)"
+          },
+          {
+            "name": "BackLeg_L.001",
+            "world_origin": "(-0.107555, 0.125273, 0.090508)"
+          },
+          {
+            "name": "BackLeg_L.002",
+            "world_origin": "(-0.101948, 0.038276, 0.235252)"
+          },
+          {
+            "name": "BackLeg_L.003",
+            "world_origin": "(-0.107379, 0.021203, 0.194509)"
+          },
+          {
+            "name": "BackLeg_R",
+            "world_origin": "(0.068979, 0.247992, 0.102272)"
+          },
+          {
+            "name": "BackLeg_R.001",
+            "world_origin": "(0.115694, 0.12794, 0.092696)"
+          },
+          {
+            "name": "BackLeg_R.002",
+            "world_origin": "(0.101948, 0.038276, 0.235252)"
+          },
+          {
+            "name": "BackLeg_R.003",
+            "world_origin": "(0.107379, 0.021203, 0.194509)"
+          },
+          {
+            "name": "IK-Hip",
+            "world_origin": "(0.0, 0.253631, 0.174809)"
+          },
+          {
+            "name": "IK-Backbone",
+            "world_origin": "(-0.0, 0.237065, -0.061595)"
+          },
+          {
+            "name": "IK-BackLeg_L",
+            "world_origin": "(-0.101948, 0.038276, 0.235252)"
+          },
+          {
+            "name": "IK-BackLeg_R",
+            "world_origin": "(0.101948, 0.038276, 0.235252)"
+          },
+          {
+            "name": "IK-Head",
+            "world_origin": "(-0.0, 0.190565, -0.220249)"
+          },
+          {
+            "name": "IK-Tail",
+            "world_origin": "(0.0, 0.023646, 0.673179)"
+          },
+          {
+            "name": "IK-FrontLegT_L",
+            "world_origin": "(-0.05127, 0.086761, 0.099181)"
+          },
+          {
+            "name": "IK-FrontLegT_R",
+            "world_origin": "(0.05127, 0.086761, 0.099181)"
+          },
+          {
+            "name": "IK-BackLegT_L",
+            "world_origin": "(-0.128746, 0.125222, -0.00817)"
+          },
+          {
+            "name": "IK-BackLegT_R",
+            "world_origin": "(0.128746, 0.125222, -0.00817)"
+          },
+          {
+            "name": "IK-FrontLeg_L",
+            "world_origin": "(-0.087675, 0.019723, -0.162176)"
+          },
+          {
+            "name": "IK-FrontLeg_R",
+            "world_origin": "(0.087675, 0.019723, -0.162176)"
+          }
+        ],
+        "loaded": true,
+        "meshes": [
+          {
+            "global_aabb": "[P: (-0.036058, 0.004687, -0.07041), S: (0.072116, 0.08677, 0.275186)]",
+            "name": "Body",
+            "skin": true
+          },
+          {
+            "global_aabb": "[P: (-0.010564, 0.049881, 0.206301), S: (0.021127, 0.007683, 0.005045)]",
+            "name": "Eyes",
+            "skin": true
+          },
+          {
+            "global_aabb": "[P: (-0.029967, 0.02056, 0.182329), S: (0.059934, 0.044646, 0.061174)]",
+            "name": "Head",
+            "skin": true
+          },
+          {
+            "global_aabb": "[P: (-0.006737, 0.026576, 0.212263), S: (0.013473, 0.022736, 0.023237)]",
+            "name": "Teeth",
+            "skin": true
+          }
+        ],
+        "render_saved": true,
+        "renderer": "NVIDIA GeForce RTX 3070 Laptop GPU",
+        "rest_mesh_aabb_not_deformed_bounds": "[P: (-0.036058, 0.004687, -0.07041), S: (0.072116, 0.08677, 0.313912)]",
+        "skeleton_bones": 39
+      },
+      "godot_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot_adapted\\mob_03_godot.png",
+        "inspected": true,
+        "art_approved": false
+      },
+      "sampled_ground_penetration_max_meters": 0.02594805136322975,
+      "remaining_work": [
+        "Contact polish: inherited animation poses intersect the ground in some sampled frames; no per-frame grounding or IK applied.",
+        "Animation loops and combat event timings must be bound explicitly in the game controller.",
+        "Game collision, navigation, attack damage synchronization and mass performance not tested.",
+        "Source art retained; final Greenfall appearance not approved."
+      ],
+      "checks": {
+        "source_hash_valid": true,
+        "license_receipt_saved": true,
+        "mesh_skin_retained": true,
+        "six_named_clips_present": true,
+        "six_clips_pose_sampled": true,
+        "texture_images_embedded": true,
+        "idle_ground_origin_normalized": true,
+        "forward_negative_z": true,
+        "godot_opengl_render_inspected": true,
+        "combat_and_contact_gate_passed": false
+      }
+    },
+    {
+      "id": "MOB-05-shellbug",
+      "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\adapted\\mob_05_shellbug_gameplay_v3.glb",
+      "sha256": "4ea0f0ff216aa45956f0f674848d944d0c43ac4740b52f6e8418eea8ce611a04",
+      "bytes": 207340,
+      "source_prepared_sha256": "b3b964cb4d85fa88ac6bab7872cb634a9dd06ae435e05b7c83498a2a7766d5ad",
+      "author": "br-n518",
+      "license": "CC0-1.0",
+      "source_receipt": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-05-shellbug\\receipt.json",
+      "clip_mapping": [
+        {
+          "name": "idle",
+          "source_action": "IDLE_Armature",
+          "source_duration_seconds": 0.625,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "walk",
+          "source_action": "WALK_Armature",
+          "source_duration_seconds": 0.625,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "run",
+          "source_action": "RUN_Armature",
+          "source_duration_seconds": 0.2916666666666667,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": true
+        },
+        {
+          "name": "attack",
+          "source_action": "ATTACK_Armature",
+          "source_duration_seconds": 0.6666666666666666,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        },
+        {
+          "name": "hit",
+          "source_action": "TAKE_DAMAGE_Armature",
+          "source_duration_seconds": 0.625,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        },
+        {
+          "name": "death",
+          "source_action": "DEATH_Armature",
+          "source_duration_seconds": 0.6666666666666666,
+          "duration_multiplier": 1.0,
+          "provenance": "existing source clip, renamed and time origin normalized",
+          "loop_recommended": false
+        }
+      ],
+      "texture_changes": [],
+      "normalization": {
+        "up_godot": "+Y",
+        "forward_godot": "-Z",
+        "origin": "mean XY position of selected support-foot bones; idle evaluated creature-mesh minimum on floor 0",
+        "uniform_scale": 0.17500450952092997,
+        "idle_height_meters": 0.45,
+        "idle_minimum_blender_xyz": [
+          -0.19810651242733002,
+          -0.18532942235469818,
+          1.4551915228366852e-11
+        ],
+        "idle_maximum_blender_xyz": [
+          0.20258696377277374,
+          0.5202760100364685,
+          0.45000001788139343
+        ],
+        "bones_renamed": false,
+        "existing_game_scene_modified": false,
+        "excluded_from_bounds": "unlinked Icosphere used by Blender glTF importer for bone display"
+      },
+      "evaluated_mesh_samples": [
+        {
+          "clip": "idle",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            1.4551915228366852e-11
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5202760100364685,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "idle",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.19706469774246216,
+            -0.18658246099948883,
+            -0.02213720604777336
+          ],
+          "maximum_blender_xyz": [
+            0.2036287784576416,
+            0.5392956733703613,
+            0.4321126937866211
+          ],
+          "finite": true
+        },
+        {
+          "clip": "idle",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.19852693378925323,
+            -0.18529735505580902,
+            3.746026777662337e-06
+          ],
+          "maximum_blender_xyz": [
+            0.20216655731201172,
+            0.5223761796951294,
+            0.44692301750183105
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            -0.0006310337921604514
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5202760100364685,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            -0.0020637591369450092
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5449445843696594,
+            0.45242005586624146
+          ],
+          "finite": true
+        },
+        {
+          "clip": "walk",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            -0.00023052006145007908
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.534053385257721,
+            0.45606279373168945
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            -0.036470722407102585
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.45427942276000977,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18463750183582306,
+            -0.03647038713097572
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5400517582893372,
+            0.45716115832328796
+          ],
+          "finite": true
+        },
+        {
+          "clip": "run",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18506570160388947,
+            -0.03647047281265259
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.4673389792442322,
+            0.4528990089893341
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            1.4551915228366852e-11
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5202760100364685,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.13202983140945435,
+            -0.029598642140626907
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.7410293221473694,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "attack",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18347980082035065,
+            -6.753265188308433e-05
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5261361598968506,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            1.4551915228366852e-11
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5202760100364685,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.19810649752616882,
+            -0.2351313680410385,
+            -0.0022110017016530037
+          ],
+          "maximum_blender_xyz": [
+            0.20258697867393494,
+            0.4704633951187134,
+            0.4088076651096344
+          ],
+          "finite": true
+        },
+        {
+          "clip": "hit",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18731285631656647,
+            -6.923959881532937e-05
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5182912349700928,
+            0.4483594596385956
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0,
+          "minimum_blender_xyz": [
+            -0.19810651242733002,
+            -0.18532942235469818,
+            1.4551915228366852e-11
+          ],
+          "maximum_blender_xyz": [
+            0.20258696377277374,
+            0.5202760100364685,
+            0.45000001788139343
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0.5,
+          "minimum_blender_xyz": [
+            -0.25242000818252563,
+            -0.2178582400083542,
+            -0.001323148375377059
+          ],
+          "maximum_blender_xyz": [
+            0.24869507551193237,
+            0.5099759101867676,
+            0.3851636052131653
+          ],
+          "finite": true
+        },
+        {
+          "clip": "death",
+          "ratio": 0.95,
+          "minimum_blender_xyz": [
+            -0.260384738445282,
+            -0.21264563500881195,
+            0.0015865768073126674
+          ],
+          "maximum_blender_xyz": [
+            0.2637382745742798,
+            0.46392160654067993,
+            0.32872873544692993
+          ],
+          "finite": true
+        }
+      ],
+      "status": "gameplay_adaptation_candidate",
+      "final_art_approved": false,
+      "combat_runtime_approved": false,
+      "missing_authored_clip": [],
+      "canonical_mob_id": "MOB-05",
+      "godot_probe": {
+        "animations": [
+          {
+            "length": 0.625,
+            "name": "idle",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.625,
+            "name": "walk",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.291666656732559,
+            "name": "run",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.666666686534882,
+            "name": "attack",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.625,
+            "name": "hit",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          },
+          {
+            "length": 0.666666686534882,
+            "name": "death",
+            "sampled_pose_changes": true,
+            "tracks": 31
+          }
+        ],
+        "combat_verified": false,
+        "id": "mob_05_shellbug",
+        "idle_bone_world_positions": [
+          {
+            "name": "root",
+            "world_origin": "(0.00224, -0.000135, -0.090779)"
+          },
+          {
+            "name": "Bone",
+            "world_origin": "(0.00224, 0.190216, -0.004886)"
+          },
+          {
+            "name": "Bone_L",
+            "world_origin": "(-0.023823, 0.174036, -0.089004)"
+          },
+          {
+            "name": "Bone_L.001",
+            "world_origin": "(-0.122262, 0.105016, -0.089004)"
+          },
+          {
+            "name": "Bone_R",
+            "world_origin": "(0.028304, 0.174036, -0.089004)"
+          },
+          {
+            "name": "Bone_R.001",
+            "world_origin": "(0.126742, 0.105016, -0.089004)"
+          },
+          {
+            "name": "Bone_L.002",
+            "world_origin": "(-0.023823, 0.174036, 0.0)"
+          },
+          {
+            "name": "Bone_L.003",
+            "world_origin": "(-0.122261, 0.105016, 0.0)"
+          },
+          {
+            "name": "Bone_R.002",
+            "world_origin": "(0.028304, 0.174036, 0.0)"
+          },
+          {
+            "name": "Bone_R.003",
+            "world_origin": "(0.126742, 0.105016, 0.0)"
+          },
+          {
+            "name": "Bone_L.004",
+            "world_origin": "(-0.023823, 0.174036, 0.089004)"
+          },
+          {
+            "name": "Bone_L.005",
+            "world_origin": "(-0.135702, 0.130025, 0.089004)"
+          },
+          {
+            "name": "Bone_R.004",
+            "world_origin": "(0.028304, 0.174036, 0.089004)"
+          },
+          {
+            "name": "Bone_R.005",
+            "world_origin": "(0.126742, 0.105016, 0.089004)"
+          },
+          {
+            "name": "Bone_L.006",
+            "world_origin": "(-0.069597, 0.243852, -0.100262)"
+          },
+          {
+            "name": "Bone_L.007",
+            "world_origin": "(-0.069597, 0.243852, -0.175463)"
+          },
+          {
+            "name": "Bone_L.008",
+            "world_origin": "(-0.069597, 0.161709, -0.238414)"
+          },
+          {
+            "name": "Bone_L.009",
+            "world_origin": "(-0.069597, 0.243856, -0.34457)"
+          },
+          {
+            "name": "Bone_R.006",
+            "world_origin": "(0.074078, 0.243852, -0.100262)"
+          },
+          {
+            "name": "Bone_R.007",
+            "world_origin": "(0.074078, 0.243852, -0.175463)"
+          },
+          {
+            "name": "Bone_R.008",
+            "world_origin": "(0.074078, 0.161709, -0.238414)"
+          },
+          {
+            "name": "Bone_R.009",
+            "world_origin": "(0.074078, 0.243856, -0.34457)"
+          },
+          {
+            "name": "Bone.001",
+            "world_origin": "(0.00224, 0.332441, -0.219367)"
+          },
+          {
+            "name": "Bone.002",
+            "world_origin": "(0.00224, 0.332441, -0.50461)"
+          },
+          {
+            "name": "Bone_L.010",
+            "world_origin": "(-0.189025, 0.001295, -0.089004)"
+          },
+          {
+            "name": "Bone_R.010",
+            "world_origin": "(0.193506, 0.001295, -0.089004)"
+          },
+          {
+            "name": "Bone_L.011",
+            "world_origin": "(-0.189025, 0.001295, -0.0)"
+          },
+          {
+            "name": "Bone_R.011",
+            "world_origin": "(0.193506, 0.001295, -0.0)"
+          },
+          {
+            "name": "Bone_L.012",
+            "world_origin": "(-0.189025, 0.018795, 0.089004)"
+          },
+          {
+            "name": "Bone_R.012",
+            "world_origin": "(0.193506, 0.001295, 0.089004)"
+          },
+          {
+            "name": "Bone_L.013",
+            "world_origin": "(-0.069597, 0.243852, -0.344559)"
+          },
+          {
+            "name": "Bone_R.013",
+            "world_origin": "(0.074078, 0.243852, -0.344559)"
+          }
+        ],
+        "loaded": true,
+        "meshes": [
+          {
+            "global_aabb": "[P: (-0.033213, -0.000135, -0.123213), S: (0.070123, 0.078752, 0.152814)]",
+            "name": "Shellbug",
+            "skin": true
+          }
+        ],
+        "render_saved": true,
+        "renderer": "NVIDIA GeForce RTX 3070 Laptop GPU",
+        "rest_mesh_aabb_not_deformed_bounds": "[P: (-0.033213, -0.000135, -0.123213), S: (0.070123, 0.078752, 0.152814)]",
+        "skeleton_bones": 32
+      },
+      "godot_visual_review": {
+        "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\godot_adapted\\mob_05_shellbug_godot.png",
+        "inspected": true,
+        "art_approved": false
+      },
+      "sampled_ground_penetration_max_meters": 0.036470722407102585,
+      "remaining_work": [
+        "Contact polish: inherited animation poses intersect the ground in some sampled frames; no per-frame grounding or IK applied.",
+        "Animation loops and combat event timings must be bound explicitly in the game controller.",
+        "Game collision, navigation, attack damage synchronization and mass performance not tested.",
+        "Source art retained; final Greenfall appearance not approved.",
+        "Shell Bug is a new explicit CC0 candidate replacing the rejected golem source for MOB-05; low detail fantasy insect style needs art review."
+      ],
+      "checks": {
+        "source_hash_valid": true,
+        "license_receipt_saved": true,
+        "mesh_skin_retained": true,
+        "six_named_clips_present": true,
+        "six_clips_pose_sampled": true,
+        "texture_images_embedded": true,
+        "idle_ground_origin_normalized": true,
+        "forward_negative_z": true,
+        "godot_opengl_render_inspected": true,
+        "combat_and_contact_gate_passed": false
+      }
+    }
+  ]
+}

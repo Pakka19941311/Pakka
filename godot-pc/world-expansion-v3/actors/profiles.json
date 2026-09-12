@@ -1,0 +1,566 @@
+{
+  "MOB-01": {
+    "mob_id": "MOB-01",
+    "model": "V3StarterSlime",
+    "title": "Лесной слизень",
+    "asset_path": "res://world-expansion-v3/actors/models/V3StarterSlime.glb",
+    "height": 0.65,
+    "native_bounds": {
+      "name": "V3StarterSlime",
+      "targetHeight": 0.65,
+      "sourceHeight": 0.65,
+      "sourceFloor": 0.0,
+      "sourceWidth": 1.022661566734314,
+      "sourceDepth": 0.8462065160274506
+    },
+    "pick_size": [
+      1.022661566734314,
+      0.65,
+      0.8462065160274506
+    ],
+    "body_radius_proposed": 0.4,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.3575,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.42,
+    "qa_attack_duration_ms": 625,
+    "qa_server_contact_fraction": 0.42,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 0.6,
+      "run": 1.0
+    },
+    "gait_provenance": {
+      "walk": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value",
+      "run": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value"
+    },
+    "status": "visual_candidate",
+    "clip_provenance": [
+      {
+        "clip": "idle",
+        "source_action": "Armature|Slime_Idle_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          60.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Armature|Slime_Walk_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          20.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "run",
+        "source_action": "Armature|Slime_Walk_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          20.0
+        ],
+        "duration_factor": 0.72,
+        "kind": "derived_timing"
+      },
+      {
+        "clip": "attack",
+        "source_action": "Armature|Slime_Attack_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          15.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "Armature|Slime_Death_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          10.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "hit",
+        "kind": "authored_local_rig_action",
+        "description": "local squash recoil on existing Body bone",
+        "frames": [
+          0,
+          8
+        ],
+        "fps": 24
+      }
+    ],
+    "source_url": "https://quaternius.com/packs/animatedmonster.html",
+    "license": "CC0-1.0",
+    "author": "Quaternius",
+    "sha256": "bc8c9fcf1714e5de8e2050d7da8db41778108b27bca125bcfdfa13d2002a78ed",
+    "ground_min_dense": -0.00024323859543073922,
+    "floor_clearance_guards": {}
+  },
+  "MOB-02": {
+    "mob_id": "MOB-02",
+    "model": "V3StarterWolf",
+    "title": "Серый волк",
+    "asset_path": "res://world-expansion-v3/actors/models/V3StarterWolf.glb",
+    "height": 0.85,
+    "native_bounds": {
+      "name": "V3StarterWolf",
+      "targetHeight": 0.85,
+      "sourceHeight": 0.85,
+      "sourceFloor": 0.0,
+      "sourceWidth": 0.861482173204422,
+      "sourceDepth": 1.7752999067306519
+    },
+    "pick_size": [
+      0.861482173204422,
+      0.85,
+      1.7752999067306519
+    ],
+    "body_radius_proposed": 0.46,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.4675,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.36,
+    "qa_attack_duration_ms": 800,
+    "qa_server_contact_fraction": 0.42,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 2.28181,
+      "run": 3.97909
+    },
+    "gait_provenance": {
+      "walk": "measured support-bone estimate; visual calibration pending",
+      "run": "measured support-bone estimate; visual calibration pending"
+    },
+    "status": "visual_candidate",
+    "clip_provenance": [
+      {
+        "clip": "idle",
+        "source_action": "Armature|idle|Baked frames_Armature",
+        "source_frame_window_at_24fps": [
+          0.40000003576278687,
+          31.19999885559082
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Armature|run|Baked frames_Armature",
+        "source_frame_window_at_24fps": [
+          0.40000003576278687,
+          14.800000190734863
+        ],
+        "duration_factor": 1.75,
+        "kind": "derived_timing"
+      },
+      {
+        "clip": "run",
+        "source_action": "Armature|run|Baked frames_Armature",
+        "source_frame_window_at_24fps": [
+          0.40000003576278687,
+          14.800000190734863
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "attack",
+        "source_action": "Armature|ATK2|Baked frames_Armature",
+        "source_frame_window_at_24fps": [
+          18.0,
+          43.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_window"
+      },
+      {
+        "clip": "hit",
+        "source_action": "Armature|hit|Baked frames_Armature",
+        "source_frame_window_at_24fps": [
+          0.40000003576278687,
+          29.200000762939453
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "Armature|death|Baked frames_Armature",
+        "source_frame_window_at_24fps": [
+          0.40000003576278687,
+          21.200000762939453
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "kind": "authored_planar_stabilization",
+        "description": "Bassin world XY pinned to idle projection while retaining source fall rotation and vertical movement; prevents corpse sliding away from authoritative actor root."
+      }
+    ],
+    "source_url": "https://opengameart.org/content/animated-wolf",
+    "license": "CC-BY-4.0",
+    "author": "CoinCoin",
+    "sha256": "aad9a3def876a41b5ee6f9c41cc3d4e804805b39428fc5fadaadee7c285a3ee4",
+    "ground_min_dense": -4.251826794643421e-06,
+    "floor_clearance_guards": {
+      "walk": 0.0017155454605817795,
+      "run": 0.0038260537311434746,
+      "attack": 0.018580655485391617,
+      "hit": 0.001612921629101038,
+      "death": 0.004508342977613211
+    }
+  },
+  "MOB-03": {
+    "mob_id": "MOB-03",
+    "model": "V3StarterRat",
+    "title": "Полевая крыса",
+    "asset_path": "res://world-expansion-v3/actors/models/V3StarterRat.glb",
+    "height": 0.35,
+    "native_bounds": {
+      "name": "V3StarterRat",
+      "targetHeight": 0.35,
+      "sourceHeight": 0.35,
+      "sourceFloor": 0.0,
+      "sourceWidth": 0.29169270396232605,
+      "sourceDepth": 1.275801420211792
+    },
+    "pick_size": [
+      0.75,
+      0.35,
+      1.275801420211792
+    ],
+    "body_radius_proposed": 0.22,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.1925,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.42,
+    "qa_attack_duration_ms": 800,
+    "qa_server_contact_fraction": 0.42,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 0.37965,
+      "run": 1.24686
+    },
+    "gait_provenance": {
+      "walk": "measured support-bone estimate; visual calibration pending",
+      "run": "measured support-bone estimate; visual calibration pending"
+    },
+    "status": "visual_candidate",
+    "clip_provenance": [
+      {
+        "clip": "idle",
+        "source_action": "Idle.001_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          90.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          28.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "run",
+        "source_action": "Run_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          10.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "attack",
+        "source_action": "Attack.000_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          21.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "hit",
+        "source_action": "Hit_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          10.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "Die_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          27.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      }
+    ],
+    "source_url": "https://opengameart.org/content/evil-giant-rat",
+    "license": "CC0-1.0",
+    "author": "CDmir / Cestmir Dammer; TinyWorlds",
+    "sha256": "af60c2a559ea43473d2084e164daa65f611004a270ccb5310b7ee4a8f56b35be",
+    "ground_min_dense": -0.0008287355303764343,
+    "floor_clearance_guards": {
+      "run": 0.00698362934589386,
+      "hit": 0.0015865405201911926
+    }
+  },
+  "MOB-04": {
+    "mob_id": "MOB-04",
+    "model": "V3StarterBoar",
+    "title": "Дикий кабан",
+    "asset_path": "res://world-expansion-v3/actors/models/V3StarterBoar.glb",
+    "height": 0.8,
+    "native_bounds": {
+      "name": "V3StarterBoar",
+      "targetHeight": 0.8,
+      "sourceHeight": 0.8,
+      "sourceFloor": 0.0,
+      "sourceWidth": 0.47398294508457184,
+      "sourceDepth": 1.2664215564727783
+    },
+    "pick_size": [
+      0.75,
+      0.8,
+      1.2664215564727783
+    ],
+    "body_radius_proposed": 0.48,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.44,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.42,
+    "qa_attack_duration_ms": 800,
+    "qa_server_contact_fraction": 0.42,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 0.26399,
+      "run": 0.36666
+    },
+    "gait_provenance": {
+      "walk": "measured support-bone estimate; visual calibration pending",
+      "run": "measured support-bone estimate; visual calibration pending"
+    },
+    "status": "visual_candidate",
+    "clip_provenance": [
+      {
+        "clip": "walk",
+        "source_action": "walk_boar_armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          40.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "run",
+        "source_action": "walk_boar_armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          40.0
+        ],
+        "duration_factor": 0.72,
+        "kind": "derived_timing"
+      },
+      {
+        "clip": "attack",
+        "source_action": "attack_boar_armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          19.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "idle",
+        "kind": "authored_local_rig_action",
+        "description": "gentle breath",
+        "frames": [
+          0,
+          48
+        ],
+        "fps": 24
+      },
+      {
+        "clip": "hit",
+        "kind": "authored_local_rig_action",
+        "description": "local spine/head recoil",
+        "frames": [
+          0,
+          8
+        ],
+        "fps": 24
+      },
+      {
+        "clip": "death",
+        "kind": "authored_local_rig_action",
+        "description": "authored roll and settle on existing ROOT rig; floor correction baked",
+        "frames": [
+          0,
+          28
+        ],
+        "fps": 24
+      }
+    ],
+    "source_url": "https://opengameart.org/content/boar",
+    "license": "CC0-1.0",
+    "author": "Teh_Bucket",
+    "sha256": "453a9e8d6119484a26c25cabf5a580b2cb7b1999ab3c1d889f03e6441426ac5b",
+    "ground_min_dense": -0.0001703500747680664,
+    "floor_clearance_guards": {}
+  },
+  "MOB-05": {
+    "mob_id": "MOB-05",
+    "model": "V3StarterBeetle",
+    "title": "Панцирный жук",
+    "asset_path": "res://world-expansion-v3/actors/models/V3StarterBeetle.glb",
+    "height": 0.45,
+    "native_bounds": {
+      "name": "V3StarterBeetle",
+      "targetHeight": 0.45,
+      "sourceHeight": 0.45,
+      "sourceFloor": 0.0,
+      "sourceWidth": 0.40069347620010376,
+      "sourceDepth": 0.7056054174900055
+    },
+    "pick_size": [
+      0.75,
+      0.45,
+      0.75
+    ],
+    "body_radius_proposed": 0.3,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.2475,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.42,
+    "qa_attack_duration_ms": 800,
+    "qa_server_contact_fraction": 0.42,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 0.4,
+      "run": 0.9
+    },
+    "gait_provenance": {
+      "walk": "PROJECT calibration fallback; source has no reliable planted-foot sample, not a measured value",
+      "run": "PROJECT calibration fallback: support-bone estimate contradicts walk/run ordering and was rejected"
+    },
+    "status": "visual_candidate",
+    "clip_provenance": [
+      {
+        "clip": "idle",
+        "source_action": "IDLE_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          15.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "WALK_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          15.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "run",
+        "source_action": "RUN_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          7.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "attack",
+        "source_action": "ATTACK_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          16.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "hit",
+        "source_action": "TAKE_DAMAGE_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          15.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "DEATH_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          16.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      }
+    ],
+    "source_url": "https://opengameart.org/content/shell-bug",
+    "license": "CC0-1.0",
+    "author": "br-n518",
+    "sha256": "bd7e6ab4051aaf7fa215f8133c12f912e1a1b1ab4e679bc5ca47c5b0093d478d",
+    "ground_min_dense": -0.0009858384728431702,
+    "floor_clearance_guards": {}
+  }
+}
