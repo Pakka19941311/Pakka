@@ -10,6 +10,7 @@ import {spaceOf} from './world-space.ts';
 import type {SpaceId,SpatialPoint} from './world-space.ts';
 import {selectP2Population} from './p2-population.ts';
 import type {P2PopulationMode,P2PopulationPlan} from './p2-population.ts';
+import {P2_L02_HUNTING_CONTOUR} from '../data/p2-habitat-layout.ts';
 
 export type TerrainSupport = {heights:Float32Array;heightAt(x:number,z:number):number;supportAt(x:number,z:number):number;platformManifest():TerrainPlatform[]};
 export type SpawnSlot = SpatialPoint & {uid:string;speciesId:string;locationId:string;subzoneId:string;groupId:string;boss:boolean;patrol:SpatialPoint[];aggroRadius:number;leashRadius:number;
@@ -155,6 +156,12 @@ export class FinalWorld {
     this.mapVersion=this.revision+(this.populationMode==='legacy'?'':'-'+this.populationMode)+'-'+digest.digest('hex');
   }
   space(p:SpatialPoint):FinalSpace{return this.spaces[spaceOf(p)];}
+  /** Hunting identity is distinct from the unchanged protected city contour. */
+  populationLocation(p:SpatialPoint):string {
+    if(spaceOf(p)!=='surface')return '';
+    if(this.populationMode==='starter-v3'&&inPolygon(p.x,-p.z,P2_L02_HUNTING_CONTOUR))return 'L02';
+    return this.layout.locations.find((location:any)=>inPolygon(p.x,-p.z,location.outline_xz))?.id??'';
+  }
   safe(p:SpatialPoint,margin=0):boolean{
     if(spaceOf(p)!=='surface')return false;
     const x=p.x,z=-p.z;

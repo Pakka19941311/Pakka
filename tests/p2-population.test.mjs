@@ -7,6 +7,7 @@ import {MOBS_V3,SURFACE_LOCATION_OVERRIDES_V3} from '../src/data/world-expansion
 import {buildAccessGraph} from '../scripts/world_expansion_v3/access-graph.mjs';
 import {roadDistance} from '../scripts/world_expansion_v3/spatial.mjs';
 import {pathSegmentIsClear} from '../src/world/navigation.ts';
+import {P2_L02_HUNTING_CONTOUR,P2_LOCATION_OVERRIDES} from '../src/data/p2-habitat-layout.ts';
 const legacy=new FinalWorld(),p2=new FinalWorld(undefined,true,{populationMode:'starter-v3'});
 const staged=p2.slots.filter(s=>s.canonicalMobId),source=JSON.parse(readFileSync('docs/world-expansion-v3/population.json','utf8'));
 
@@ -28,11 +29,36 @@ test('canonical identity, level and exact legacy/new distinction survive placeme
   assert.equal(slot.locationId,'L02');assert.equal(slot.boss,false);assert.equal(slot.spaceId,'surface');
   assert.ok(slot.level>=mob.levelBand[0]&&slot.level<=mob.levelBand[1]);assert.ok(slot.level<=9);
   assert.equal(slot.balanceVersion,'encounter-balance-v3-candidate-1');
-  assert.ok(inPolygon(slot.x,-slot.z,SURFACE_LOCATION_OVERRIDES_V3.L02));
+  assert.ok(inPolygon(slot.x,-slot.z,P2_L02_HUNTING_CONTOUR));
+  assert.equal(p2.populationLocation(slot),'L02');
  }
  assert.equal(staged.find(s=>s.canonicalMobId==='MOB-01').name,'Теневой слизень');
  assert.ok(legacy.slots.some(s=>s.speciesId==='wolf'&&!s.canonicalMobId));
  assert.ok(staged.every(s=>Number(s.canonicalMobId.slice(4))<=5));
+});
+
+test('natural habitats separate weak species and contain no long grid column; labels share the administrative resolver only',()=>{
+ const manifest=JSON.parse(readFileSync('docs/world-expansion-v3/P2_POPULATION.json','utf8'));
+ assert.deepEqual(P2_LOCATION_OVERRIDES[0].outline_xz,manifest.habitatLayout.outline);
+ assert.equal(manifest.habitatLayout.safeChanged,false);
+ assert.ok(staged.some(s=>!inPolygon(s.x,-s.z,SURFACE_LOCATION_OVERRIDES_V3.L02)));
+ for(const s of staged){assert.equal(p2.populationLocation(s),'L02');assert.equal(p2.safe(s),false);}
+ assert.equal(p2.populationLocation({x:-240,z:-200,spaceId:'mine'}),'');
+ for(const habitat of manifest.habitats){
+  const bodies=habitat.uids.map(uid=>p2.slotById.get(uid));assert.ok(bodies.length>=2&&bodies.length<=5);
+  assert.ok(bodies.every(s=>s.groupId===habitat.groupId&&s.canonicalMobId===habitat.mobId));
+  assert.ok(bodies.every(s=>!Number.isInteger(s.x)&&!Number.isInteger(s.z)));
+ }
+ const weak=staged.filter(s=>['MOB-01','MOB-03'].includes(s.canonicalMobId));
+ for(const a of weak)for(const b of weak)if(a.canonicalMobId!==b.canonicalMobId)assert.ok(Math.hypot(a.x-b.x,a.z-b.z)>=5.5);
+ for(const id of ['MOB-01','MOB-03']){
+  const bodies=weak.filter(s=>s.canonicalMobId===id);
+  for(const a of bodies)for(const b of bodies){
+   const dx=b.x-a.x,dz=b.z-a.z,d=Math.hypot(dx,dz);if(d<15||d>40)continue;
+   const row=bodies.filter(p=>{const t=((p.x-a.x)*dx+(p.z-a.z)*dz)/d;return t>=-.3&&t<=d+.3&&Math.abs((p.x-a.x)*dz-(p.z-a.z)*dx)/d<.3;});
+   assert.ok(row.length<6,'Unnatural straight row: '+row.map(s=>s.uid).join(','));
+  }
+ }
 });
 
 test('P2 preserves terrain, city safe contours, protected roads, services and world revision',()=>{
@@ -44,7 +70,7 @@ test('P2 preserves terrain, city safe contours, protected roads, services and wo
   const q={x,z,spaceId:'surface'};assert.equal(p2.safe(q),legacy.safe(q));assert.equal(p2.safe(q,10),legacy.safe(q,10));
  }
  const outside=staged[0];assert.equal(p2.safe(outside),false);
- assert.ok(inPolygon(outside.x,-outside.z,SURFACE_LOCATION_OVERRIDES_V3.L02));
+ assert.ok(inPolygon(outside.x,-outside.z,P2_L02_HUNTING_CONTOUR));
  for(const slot of staged)assert.equal(p2.safe(slot,10+slot.bodyRadius),false,slot.uid);
 });
 
@@ -134,4 +160,18 @@ test('disabling and reenabling P2 archives/restores a dead ordinary verbatim wit
  assert.ok(!on.missingSlotUids.includes(dead.uid));
  const again=remapP2SavedMonsters(on.monsters,p2.populationPlan,on.archive);
  assert.deepEqual(again.monsters,on.monsters);assert.deepEqual(again.restoredUids,[]);
+});
+
+test('habitat relayout moves only idle living bodies, preserves wounds/deaths and leaves engaged bodies until return',()=>{
+ const slots=staged.slice(0,3),records=slots.map((s,i)=>({uid:s.uid,id:s.speciesId,home:{x:s.x+4,z:s.z+3,spaceId:'surface'},x:s.x+4,z:s.z+3,spaceId:'surface',
+  hp:i===2?0:31,alive:i!==2,generation:8,respawnAt:i===2?90000:0,status:{stun:2300,dot:7000},
+  action:i===1?'attack':i===2?'death':'idle',combatState:i===1?'windup':i===2?'dead':'idle',targetId:i===1?'hero':null}));
+ const before=structuredClone(records),result=remapP2SavedMonsters(records,p2.populationPlan);
+ assert.deepEqual(records,before);assert.deepEqual(result.relocatedUids,[slots[0].uid]);
+ for(let i=0;i<3;i++){
+  const actual=result.monsters[i];assert.equal(actual.hp,before[i].hp);assert.equal(actual.generation,8);assert.deepEqual(actual.status,before[i].status);assert.equal(actual.respawnAt,before[i].respawnAt);
+  assert.deepEqual(actual.home,{x:slots[i].x,z:slots[i].z,spaceId:'surface'});
+  assert.equal(actual.x,i===0?slots[i].x:before[i].x);assert.equal(actual.z,i===0?slots[i].z:before[i].z);
+ }
+ assert.deepEqual(remapP2SavedMonsters(result.monsters,p2.populationPlan).relocatedUids,[]);
 });

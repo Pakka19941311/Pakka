@@ -32,7 +32,7 @@ export type P2ArchivedMonster<T>={uid:string;reason:'replaced-l02-slot'|'populat
  * fields verbatim. Nothing regenerates a boss or rolls a timer here.
  */
 export function remapP2SavedMonsters<T extends {uid:string;id:string}>(current:readonly T[],plan:P2PopulationPlan,
- previousArchive:readonly P2ArchivedMonster<T>[]=[]):{monsters:T[];archive:P2ArchivedMonster<T>[];missingSlotUids:string[];restoredUids:string[];retiredUids:string[]}{
+ previousArchive:readonly P2ArchivedMonster<T>[]=[]):{monsters:T[];archive:P2ArchivedMonster<T>[];missingSlotUids:string[];restoredUids:string[];retiredUids:string[];relocatedUids:string[]}{
  if(new Set(current.map(m=>m.uid)).size!==current.length)throw Error('duplicate-saved-monster-uid');
  const retired=new Set(plan.retiredLegacyUids),active=new Set(plan.slots.map(s=>s.uid));
  const archive=new Map(previousArchive.map(entry=>[entry.uid,structuredClone(entry)]));
@@ -49,6 +49,19 @@ export function remapP2SavedMonsters<T extends {uid:string;id:string}>(current:r
    monsters.push(structuredClone(entry.monster));present.add(uid);archive.delete(uid);restoredUids.push(uid);
   }
  }
+ const relocatedUids:string[]=[];
+ if(plan.mode==='starter-v3')for(const original of monsters){
+  const slot=plan.slots.find(s=>s.uid===original.uid&&s.canonicalMobId);if(!slot)continue;
+  const m=original as T&{home?:{x:number;z:number;spaceId?:string};x?:number;z?:number;spaceId?:string;
+   alive?:boolean;action?:string;combatState?:string;targetId?:string|null;provokedBy?:string};
+  if(!m.home||!Number.isFinite(m.home.x)||!Number.isFinite(m.home.z)||Math.hypot(m.home.x-slot.x,m.home.z-slot.z)<.001)continue;
+  // A layout revision never heals, revives, rerolls a clock or teleports an
+  // active combatant. Engaged bodies receive only their eventual return home.
+  m.home={x:slot.x,z:slot.z,spaceId:slot.spaceId};
+  if(m.alive&&(m.action??'idle')==='idle'&&(m.combatState??'idle')==='idle'&&!m.targetId&&!m.provokedBy){
+   Object.assign(m,{x:slot.x,z:slot.z,spaceId:slot.spaceId});relocatedUids.push(m.uid);
+  }
+ }
  return {monsters,archive:[...archive.values()].sort((a,b)=>a.uid.localeCompare(b.uid)),
-  missingSlotUids:plan.slots.filter(s=>!present.has(s.uid)).map(s=>s.uid),restoredUids,retiredUids};
+  missingSlotUids:plan.slots.filter(s=>!present.has(s.uid)).map(s=>s.uid),restoredUids,retiredUids,relocatedUids};
 }
