@@ -55,6 +55,7 @@ var qa_last_frame_usec: int = 0
 var player_input: VarendorPlayerInput = VarendorPlayerInput.new()
 var npc_interaction: VarendorNpcInteraction = VarendorNpcInteraction.new()
 var trade_session = preload("res://scripts/trade_session.gd").new()
+var crafting = preload("res://scripts/crafting_dialog.gd").new()
 var mouse_orbit: bool:
 	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
@@ -81,6 +82,7 @@ var loading_status: Label
 
 func _ready() -> void:
 	trade_session.app = self
+	crafting.app = self
 	if "--qa-scope=monsters" in OS.get_cmdline_user_args():
 		set_process(false)
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/monster_qa.tscn")
@@ -94,7 +96,7 @@ func _ready() -> void:
 	get_viewport().gui_embed_subwindows = true
 	configure_input()
 	data = JSON.parse_string(FileAccess.get_file_as_string("res://generated/game.json"))
-	data.quickKeys = data.quickKeys.filter(func(k): return not str(k).ends_with("KeyR"))
+	data.quickKeys = data.quickKeys.filter(func(k): return not str(k).ends_with("KeyR") and not str(k).ends_with("KeyJ"))
 	quick = data.quickDefaults.duplicate(true)
 	net = VarendorNetwork.new()
 	add_child(net)
@@ -371,7 +373,7 @@ func item_tip(item: Dictionary) -> String:
 
 func resolve_slot(item_slot: String) -> String:
 	# Same selection order as the existing core/inventory-commands.ts resolver.
-	var slots: Array = ["ring1", "ring2"] if item_slot == "ring" else ["ear1", "ear2"] if item_slot in ["ear", "earring"] else [item_slot]
+	var slots: Array = ["ring1", "ring2"] if item_slot == "ring" else ["ear1"] if item_slot in ["ear", "earring"] else [item_slot]
 	if chosen_equipment in slots:
 		return chosen_equipment
 	for slot: String in slots:
@@ -606,6 +608,7 @@ func controls_dialog() -> void:
 				slider.value_changed.connect(func(value: float): game_settings["sensitivity"] = value; apply_settings(); save_preferences())
 				var keys: GridContainer = GridContainer.new()
 				keys.columns = 2
+				page.add_child(label("R — автобег · J — крафт колец",13))
 				page.add_child(keys)
 				for action: String in DEFAULT_BINDINGS:
 					var code: int = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
@@ -708,7 +711,7 @@ func configure_input() -> void:
 		InputMap.action_erase_events(action)
 		var event: InputEventKey = InputEventKey.new()
 		event.physical_keycode = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
-		if event.physical_keycode == KEY_R: event.physical_keycode = DEFAULT_BINDINGS[action]
+		if event.physical_keycode in [KEY_R,KEY_J]: event.physical_keycode = DEFAULT_BINDINGS[action]
 		InputMap.action_add_event(action, event)
 		if action in ["move_forward","move_back","move_left","move_right"] and event.physical_keycode == DEFAULT_BINDINGS[action]:
 			var arrow: InputEventKey = InputEventKey.new()
@@ -717,7 +720,7 @@ func configure_input() -> void:
 
 func assign_movement_binding(event: InputEventKey) -> void:
 	var key: int = event.physical_keycode
-	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_R, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
+	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_R, KEY_J, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
 		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, R / M, Enter и 1–8 заняты интерфейсом."
 		return
 	var bindings: Dictionary = game_settings.get("bindings", {}).duplicate()
@@ -862,6 +865,8 @@ func activate(action: String) -> void:
 func item_clicked(payload: Dictionary, double_click: bool) -> void:
 	if net.command_busy:
 		return
+	if payload.get("kind") == "craft_source":
+		crafting.choose_item(payload.get("item",{})); return
 	selected_item = payload.duplicate(true)
 	if payload.get("kind") == "storage":
 		reference_hud.refresh_inventory_state()
@@ -915,6 +920,10 @@ func sell_selected(return_to: Callable = Callable()) -> void:
 		notice("Выберите предмет в сумке")
 		return
 	preload("res://scripts/sale_dialog.gd").open(self,item.duplicate(true),return_to)
+
+func item_sell_price(item: Dictionary) -> int:
+	var definition: Dictionary = data.items.get(item.get("id",""),{})
+	return maxi(0,int(definition.get("sellValue",floorf(float(definition.get("value",0))*.48))))
 
 func transfer_storage(item: Dictionary, direction: String, index: int = -1) -> void:
 	if net.hero.get("dead",true) or net.command_busy or not reference_hud.has_item_version(item): return
@@ -974,6 +983,7 @@ func notice(message: String) -> void:
 	if not qa_path.is_empty():
 		print("VARENDOR_QA_NOTICE " + message)
 	var translations: Dictionary = {"invalid-storage-quantity":"Укажите целое количество от 1 до размера стопки", "book-required":"Умения применяются через книги", "book-level":"Недостаточный уровень для книги", "book-not-owned":"Книга должна находиться в сумке", "book-already-owned":"Эта книга уже куплена", "invalid-target":"Выберите живого противника", "invalid-ally":"Выберите союзника", "out-of-range":"Цель слишком далеко или закрыта препятствием", "safe-zone":"В городе нельзя применять боевые умения", "resource":"Недостаточно ресурса", "cannot-cast":"Дождитесь приземления", "cast-busy":"Дождитесь завершения применения", "cannot-sell-book":"Книга умения не продаётся обратно", "storage-unavailable":"Подойдите ближе к кладовщику", "storage-full":"Склад заполнен", "storage-slot-occupied":"Эта ячейка склада занята", "invalid-storage-slot":"Недоступная ячейка склада", "chat-too-fast":"Подождите перед следующим сообщением", "invalid-chat":"Введите сообщение до 240 символов", "skill-cooldown":"Умение восстанавливается", "shop-unavailable":"Подойдите ближе к торговцу", "teleport-unavailable":"Подойдите ближе к хранителю портала", "elder-unavailable":"Подойдите ближе к старейшине", "insufficient-gold":"Недостаточно золота", "level-required":"Недостаточный уровень", "cannot-use":"Этот предмет сейчас нельзя использовать", "bag-full":"Сумка заполнена", "stale-item":"Предмет уже изменился. Выберите его заново", "class-restricted":"Предмет не подходит вашему классу", "invalid-name":"Недопустимое имя персонажа", "missing-target":"Цель уже недоступна", "cooldown":"Умение восстанавливается", "insufficient-resource":"Недостаточно ресурса", "airborne":"Дождитесь приземления", "attack-in-progress":"Текущее действие ещё выполняется", "no-free-path":"До этой точки нет свободного пути", "dead":"Действие недоступно после гибели", "no-free-arrival":"Точка прибытия занята"}
+	translations.merge({"craft-must-stand-still":"Для крафта остановитесь и дождитесь приземления", "craft-in-combat":"Завершите бой и отойдите от противников перед крафтом", "craft-inactive":"Дождитесь подключения к миру", "craft-four-inputs-required":"Заполните основу и три ячейки материалов", "craft-duplicate-input":"В каждой ячейке должна быть отдельная стопка", "craft-invalid-target":"Эта основа не подходит к выбранному рецепту", "craft-wrong-material":"Материал не соответствует рецепту", "craft-insufficient-material":"Недостаточно материалов", "unknown-recipe":"Рецепт недоступен. Откройте крафт заново", "merchant-unavailable":"Продавать вещи можно у оружейника или алхимика в городе", "merchant-out-of-range":"Подойдите ближе к торговцу", "merchant-occluded":"Подойдите к торговцу, обойдя препятствие", "trade-session-required":"Откройте торговлю заново у оружейника или алхимика"})
 	if log_text != null:
 		var translated: String = str(translations.get(message,message))
 		reference_hud.add_log(translated,"loot" if translated.begins_with("Добыча:") else "system")
@@ -985,6 +995,7 @@ func text_focused() -> bool:
 
 func _process(delta: float) -> void:
 	trade_session.poll()
+	crafting.poll()
 	if not startup_complete or world == null or net == null:
 		return
 	# The frame's catch-up physics belongs to the previously held input.
@@ -1089,6 +1100,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					return
 		match event.physical_keycode:
 			KEY_I, KEY_C, KEY_TAB: toggle_inventory()
+			KEY_J: crafting.open()
 			KEY_N: reference_hud.skills_dialog()
 			KEY_M: reference_hud.map_dialog()
 			KEY_ENTER: reference_hud.chat.grab_focus()
@@ -1146,7 +1158,7 @@ func can_enhance(item: Dictionary) -> bool:
 	if selected_scroll.is_empty() or item.is_empty() or int(item.get("plus", 0)) >= 15:
 		return false
 	var slot: String = str(data.items.get(item.id, {}).get("slot", ""))
-	return not slot.is_empty() and data.scrolls[selected_scroll.id].category == ("weapon" if slot == "weapon" else "armor")
+	return not slot.is_empty() and slot != "ring" and data.scrolls[selected_scroll.id].category == ("weapon" if slot == "weapon" else "armor")
 
 func switch_profile() -> void:
 	release_orbit(false)

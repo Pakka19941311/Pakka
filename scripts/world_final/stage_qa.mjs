@@ -6,6 +6,8 @@ import {once} from 'node:events';
 import {pathToFileURL} from 'node:url';
 import {startWorldServer} from '../../server/http-server.mjs';
 import {FinalWorld} from '../../src/world/final-world.ts';
+import {RING_RECIPES} from '../../src/data/accessories-v3.ts';
+import {ITEMS} from '../../src/data/game-data.ts';
 const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
 const castlePreview=options.includes('--castle-preview'),castle=options.includes('--castle')||castlePreview,reportName=castle?'castle.json':'stage.json';
 mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
@@ -34,6 +36,14 @@ try{
   else if(request.stage.startsWith('trade-')){
    const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');
    world.relocate(hero,{...geography.services[id],x:geography.services[id].x+2});
+  }
+  else if(request.stage==='craft-v3'){
+   const recipe=RING_RECIPES.find(r=>r.id==='ring_str_g1');
+   hero.inventory=[world.item(recipe.targetId),...recipe.materials.map(m=>world.item(m.id,m.count))];
+   hero.gold=1000;world.random=()=>0;
+   const earId=Object.entries(ITEMS).find(([,d])=>d.slot==='ear'||d.slot==='earring')[0];
+   hero.migrationReserve=[world.item(earId)];
+   world.relocate(hero,{...geography.services['npc:smith'],x:geography.services['npc:smith'].x+2});
   }
   else if(request.stage==='cave-entrance'){world.relocate(hero,{x:245,z:278,spaceId:'surface'});hero.hp=hero.maxHp;}
   else if(request.stage==='cave-finish'){

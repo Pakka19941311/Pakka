@@ -1,5 +1,6 @@
 import {CAVE_BOSS_DEFINITION} from './cave-boss.ts';
 import { BOOK_ITEMS } from './skill-books.ts';
+import {RING_ITEMS,CLOAK_ITEMS,CRAFT_MATERIAL_ITEMS} from './accessories-v3.ts';
 // Centralized gameplay manifest. Presentation code must not invent balance values.
 export const CLASSES = {
   knight: { name:'Рыцарь', title:'Несокрушимый авангард', model:'Warrior', color:0xcda15d, resource:'Ярость', ranged:false, hp:642, mp:96, stats:{str:12,dex:6,int:2,vit:14,spi:4}, weapon:'wardens_blade', armor:'militia_plate', skills:[
@@ -29,7 +30,6 @@ export const ITEMS = {
   wolf_gloves:{"visualModel":"armor_gloves","name":"Перчатки Серой стаи","slot":"gloves","icon":"♢","def":5,"crit":3,"value":190,"origin":"Серые волки","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":true},
   grave_boots:{"visualModel":"armor_boots","name":"Сапоги могильщика","slot":"boots","icon":"♞","def":5,"speed":8,"value":220,"origin":"Безымянные мертвецы","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":true},
   fallen_helm:{"visualModel":"helmet_closed","name":"Шлем павшего командира","slot":"head","icon":"♛","def":13,"hp":70,"value":480,"origin":"Падший командир","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":true},
-  ember_ring:{"name":"Кольцо тлеющего угля","slot":"ring","icon":"○","matk":8,"crit":3,"value":420,"origin":"Сектанты Пепла","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   fang_necklace:{"name":"Ожерелье волчьих клыков","slot":"neck","icon":"◇","atk":[4,6],"value":360,"origin":"Кровавый Оборотень","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   ash_belt:{"visualModel":"armor_belt","name":"Пояс Пепельной клятвы","slot":"belt","icon":"═","def":7,"hp":35,"value":390,"origin":"Изгнанники","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   fallen_helm_open:{"name":"Открытый шлем павшего командира","slot":"head","visualModel":"helmet_open","icon":"♛","def":13,"hp":70,"value":480,"origin":"Падший командир","desc":"Открытый вариант шлема павшего командира. Характеристики совпадают с закрытым шлемом.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":true},
@@ -39,8 +39,8 @@ export const ITEMS = {
   sovereign_seal:{"name":"Печать древнего владыки","slot":"neck","icon":"☼","atk":[5,7],"matk":8,"hp":40,"value":3200,"origin":"Хозяин Гнилого Леса","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   weapon_scroll:{"name":"Свиток оружия · обычный","type":"enhance","icon":"▤","value":185,"desc":"Оружие: безопасно до +3. Двойной клик — выбрать вещь для одной попытки."},
   weapon_scroll_improved:{"name":"Свиток оружия · улучшенный","type":"enhance","icon":"▤","value":1850,"desc":"Повышенный шанс заточки оружия. Не защищает от уничтожения."},
-  armor_scroll:{"name":"Свиток доспехов · обычный","type":"enhance","icon":"▤","value":185,"desc":"Доспехи, украшения, щит и фокус. Безопасно до +1."},
-  armor_scroll_improved:{"name":"Свиток доспехов · улучшенный","type":"enhance","icon":"▤","value":1850,"desc":"Доспехи, украшения, щит и фокус. Безопасно до +2; далее повышенный шанс."},
+  armor_scroll:{"name":"Свиток доспехов · обычный","type":"enhance","icon":"▤","value":185,"desc":"Доспехи, плащи, ожерелья, серьга, щит и фокус; кольца не подходят. Безопасно до +1."},
+  armor_scroll_improved:{"name":"Свиток доспехов · улучшенный","type":"enhance","icon":"▤","value":1850,"desc":"Доспехи, плащи, ожерелья, серьга, щит и фокус; кольца не подходят. Безопасно до +2; далее повышенный шанс."},
   haste:{"name":"Зелье стремительности","type":"consumable","icon":"»","value":100,"desc":"На 10 минут: бег +50%, скорость атаки +15%. Повторное использование обновляет время."},
   potion:{"name":"Багровое зелье","type":"consumable","icon":"♥","value":32,"heal":37,"desc":"Мгновенно восстанавливает 37 HP."},
   potion_large:{"name":"Большое багровое зелье","type":"consumable","icon":"♥","value":64,"heal":70,"desc":"Мгновенно восстанавливает 70 HP."},
@@ -69,8 +69,6 @@ export const ITEMS = {
   shade_gloves:{"name":"Перчатки Безлунной тени","slot":"gloves","def":5,"crit":3,"evasion":1,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["assassin"],"assassinForeign":false},
   shade_boots:{"name":"Сапоги Безлунной тени","slot":"boots","def":5,"evasion":2,"speed":8,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["assassin"],"assassinForeign":false},
   rift_belt:{"name":"Пояс древних рун","slot":"belt","def":8,"hp":40,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false,"visualModel":"armor_belt"},
-  rift_ring_blade:{"name":"Кольцо пепельного клинка","slot":"ring","atk":[2,3],"crit":1,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
-  rift_ring_soul:{"name":"Кольцо морозной души","slot":"ring","matk":9,"crit":3,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   rift_neck_blade:{"name":"Амулет расколотого клыка","slot":"neck","atk":[5,7],"hp":20,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   rift_neck_soul:{"name":"Амулет ледяного сердца","slot":"neck","matk":9,"mp":25,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
   rift_ear_guard:{"name":"Серьга базальтовой воли","slot":"ear","def":2,"hp":15,"accuracy":1,"icon":"◆","value":650,"origin":"Големы 20/22 ур.","classes":["knight","mage","ranger","necro","assassin"],"assassinForeign":false},
@@ -87,6 +85,7 @@ export const ITEMS = {
   fire_core:{"name":"Огненное ядро","type":"material","icon":"◆","value":45,"origin":"Разлом големов"},
   ice_core:{"name":"Ледяное ядро","type":"material","icon":"◆","value":45,"origin":"Разлом големов"},
   ancient_shard:{"name":"Осколок древнего камня","type":"material","icon":"◆","value":90,"origin":"Разлом големов"},
+  ...RING_ITEMS,...CLOAK_ITEMS,...CRAFT_MATERIAL_ITEMS,
 };
 
 export const MONSTERS = {
@@ -94,22 +93,22 @@ export const MONSTERS = {
   ice_golem:{visualModel:'IceGolem',visualHeight:3.1,name:'Ледяной голем',model:'IceGolem',level:22,hp:750,atk:66,xp:950,gold:[55,90],tint:0x86d6ee,scale:1.5,drops:[]},
   cave_boss:CAVE_BOSS_DEFINITION,
   rift_boss:{visualModel:'RiftWarden',visualHeight:5.1,name:'Страж раскалённого разлома',model:'RiftWarden',level:25,hp:9000,atk:90,xp:9000,gold:[1400,2000],tint:0xff963e,scale:2.3,boss:'big',drops:[]},
-  night_zombie:{visualModel:'Zombie',visualHeight:1.92,name:'Ночной зомби',model:'Monk',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0x70885b,scale:.8,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['ember_ring',.01],['fang_necklace',.01]]},
-  night_skeleton:{visualModel:'SkeletonV3',visualHeight:1.92,name:'Лунный скелет',model:'Skeleton',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0xc3d1bd,scale:.78,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['ember_ring',.01],['fang_necklace',.01]]},
+  night_zombie:{visualModel:'Zombie',visualHeight:1.92,name:'Ночной зомби',model:'Monk',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0x70885b,scale:.8,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['fang_necklace',.01]]},
+  night_skeleton:{visualModel:'SkeletonV3',visualHeight:1.92,name:'Лунный скелет',model:'Skeleton',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0xc3d1bd,scale:.78,drops:[['weapon_scroll_improved',.005],['armor_scroll_improved',.005],['fang_necklace',.01]]},
   wolf:{name:'Пепельный гончий',model:'Fox',level:1,hp:85,atk:10,xp:30,gold:[4,9],tint:0x8b8478,scale:.55,drops:[['wolf_fang',.78],['potion',.12],['wolf_gloves',.035]]},
   exile:{name:'Проклятый изгнанник',model:'Rogue',level:2,hp:110,atk:13,xp:42,gold:[6,13],tint:0x9d6a54,scale:.72,drops:[['ash_belt',.025]]},
   spider:{name:'Теневой слизень',model:'Slime',level:3,hp:125,atk:15,xp:54,gold:[7,15],tint:0x5b426d,scale:.62,drops:[['venom',.74],['ether',.11],['night_leather',.018]]},
   undead:{visualModel:'SkeletonV3',visualHeight:1.92,name:'Безымянный мертвец',model:'Skeleton',level:4,hp:155,atk:18,xp:70,gold:[9,18],tint:0xb5ad95,scale:.78,drops:[['black_bone',.72],['grave_boots',.027]]},
   bat:{visualModel:'GiantBat',visualHeight:1.6,name:'Пещерный кровопийца',model:'Bat',level:5,hp:135,atk:21,xp:85,gold:[11,21],tint:0x642f38,scale:.72,drops:[['potion',.17],['fang_necklace',.018]]},
-  cultist:{name:'Сектант Пепла',model:'Wizard',level:6,hp:190,atk:24,xp:105,gold:[14,26],tint:0xa54c43,scale:.82,drops:[['ember_ring',.022]]},
+  cultist:{name:'Сектант Пепла',model:'Wizard',level:6,hp:190,atk:24,xp:105,gold:[14,26],tint:0xa54c43,scale:.82,drops:[]},
   miner:{visualModel:'Zombie',visualHeight:1.92,name:'Одержимый рудокоп',model:'Warrior',level:7,hp:235,atk:27,xp:130,gold:[17,31],tint:0x99734d,scale:.9,drops:[['iron',.82],['fallen_helm',.018]]},
   wraith:{visualModel:'WraithV3',visualHeight:2.15,name:'Болотный призрак',model:'Monk',level:8,hp:210,atk:31,xp:158,gold:[20,38],tint:0x4bc2a2,scale:.9,drops:[['ether',.19],['oracle_robe',.014]]},
   mini:{visualModel:'Werewolf',visualHeight:3.2,name:'Кровавый Оборотень',model:'Fox',level:10,hp:1750,atk:43,xp:1100,gold:[180,290],tint:0xb52f32,scale:1.45,boss:'mini',drops:[['fallen_helm',.55],['fang_necklace',.65],['executioner',.22]]},
   big:{name:'Хозяин Гнилого Леса',model:'Dragon',visualModel:'ForestLord',visualHeight:5.2,level:14,hp:6200,atk:64,xp:3900,gold:[650,950],tint:0x477943,scale:1.45,boss:'big',drops:[['boss_seal',1],['rotten_root',.4],['dead_king_plate',.32],['sovereign_seal',.22]]}
 };
 
-export const EQUIP_SLOTS=['head','neck','chest','gloves','weapon','offhand','ring1','ring2','ear1','ear2','belt','boots'];
-export const SLOT_NAMES={head:'Голова',neck:'Ожерелье',chest:'Нагрудник',gloves:'Перчатки',weapon:'Оружие',offhand:'Щит / фокус',ring1:'Кольцо I',ring2:'Кольцо II',ear1:'Серьга I',ear2:'Серьга II',belt:'Пояс',boots:'Обувь'};
+export const EQUIP_SLOTS=['head','neck','chest','gloves','weapon','offhand','ring1','ring2','ear1','cloak','belt','boots'];
+export const SLOT_NAMES={head:'Голова',neck:'Ожерелье',chest:'Нагрудник',gloves:'Перчатки',weapon:'Оружие',offhand:'Щит / фокус',ring1:'Кольцо I',ring2:'Кольцо II',ear1:'Серьга',cloak:'Плащ',belt:'Пояс',boots:'Обувь'};
 export const LOCATIONS=[
   {name:'Астерхолд',level:'Столица',desc:'Последний бастион живых.',x:-108,z:-82,kind:'safe'},
   {name:'Гринфолл',level:'1–10',desc:'Пограничная крепость: площадь, ремесло, донжон.',x:-7,z:-5,kind:'safe'},

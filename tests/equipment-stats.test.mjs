@@ -51,16 +51,16 @@ test('initial Knight uses whole actual attack, defense and accuracy while base i
   assert.equal(result.stats.spi, 4);
 });
 
-test('second-ring comparison projects the exact validated swap, including enhancement and vitals', () => {
+test('second-ring comparison projects the exact validated unenhanced ring swap and vitals', () => {
   const definitions = {
     oldLeft: { slot: 'ring', matk: 4, hp: 15 },
     oldRight: { slot: 'ring', matk: 8, hp: 30, mp: 12 },
     newRing: { slot: 'ring', matk: 12, hp: 40, mp: 25, crit: 3 },
   };
-  const incoming = instance('new', 'newRing', 7);
+  const incoming = instance('new', 'newRing');
   const before = {
     classId: 'mage', dead: false, inventory: [incoming],
-    equipment: { ring1: instance('left', 'oldLeft', 1), ring2: instance('right', 'oldRight', 3) },
+    equipment: { ring1: instance('left', 'oldLeft'), ring2: instance('right', 'oldRight') },
   };
   const definitionFor = item => definitions[item.id];
   const initial = calculateEquipmentStats('mage', CLASSES.mage.stats, 20, before.equipment, definitionFor);
@@ -71,10 +71,10 @@ test('second-ring comparison projects the exact validated swap, including enhanc
   assert.equal(operation.ok, true);
   const actual = calculateEquipmentStats('mage', CLASSES.mage.stats, 20, operation.equipment, definitionFor);
   assert.deepEqual(actual, preview);
-  close(actual.stats.matk - initial.stats.matk, 10);
-  assert.equal(actual.maxHp - initial.maxHp, 18);
-  assert.equal(actual.maxMp - initial.maxMp, 19);
-  close(actual.stats.crit - initial.stats.crit, 6);
+  close(actual.stats.matk - initial.stats.matk, 4);
+  assert.equal(actual.maxHp - initial.maxHp, 10);
+  assert.equal(actual.maxMp - initial.maxMp, 13);
+  close(actual.stats.crit - initial.stats.crit, 3);
   assert.equal(operation.equipment.ring1, before.equipment.ring1);
 });
 

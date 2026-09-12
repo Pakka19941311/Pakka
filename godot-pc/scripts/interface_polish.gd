@@ -243,14 +243,16 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 	tabs.current_tab = clampi(selected_tab,0,tabs.get_tab_count()-1)
 	if kind == "smith": purchase.add_child(app.wrapped_label("Кузница: выберите свиток в сумке, затем предмет для усиления.",12))
 	if kind == "books": purchase.add_child(app.button("Книги умений · выбрать класс",app.book_ui.shop_classes))
-	for id: String in ([] if kind in ["books","smith"] else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]):
+	var stock: Array = [] if kind == "books" else ["ring_blank","cloak_defense"] if kind == "smith" else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]
+	for id: String in stock:
+		if not app.data.items.has(id): continue
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); purchase.add_child(row)
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id; cell.custom_minimum_size = CELL
 		cell.artwork = app.book_ui.item_icon({"id":id}); row.add_child(cell)
-		var price: int = int({"haste":100,"potion":55,"potion_large":110,"ether":70,"teleport":130}[id])
+		var price: int = int(app.data.items[id].get("buyPrice",{"haste":100,"potion":55,"potion_large":110,"ether":70,"teleport":130}.get(id,0)))
 		var column: VBoxContainer = VBoxContainer.new(); column.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(column)
 		column.add_child(app.label(str(app.data.items[id].name),13))
-		var desc: Label = app.label(str(app.data.items[id].desc),11); desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(desc)
+		var desc: Label = app.label(str(app.data.items[id].get("desc","")),11); desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(desc)
 		var buy: Button = app.button("%d ◈" % price,func():
 			if app.net.command_busy: return
 			await app.net.command({"type":"buy","itemId":id})
@@ -268,7 +270,7 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",10); sale.add_child(row)
 		var icon: VarendorItemSlot = VarendorItemSlot.new(); icon.owner_ui = app; icon.payload = {"kind":"bag","item":item.duplicate(true)}; row.add_child(icon); icon.update_item(item)
 		var name_label: Label = app.wrapped_label(app.item_name(item)+" ×"+str(int(item.count)),12); name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(name_label)
-		var price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))
+		var price: int = app.item_sell_price(item)
 		var sell: Button = app.button("%d ◈" % price,func():
 			app.selected_item = {"kind":"bag","item":item.duplicate(true)}
 			app.sell_selected(func(): shop(kind,title,1)))

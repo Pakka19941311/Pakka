@@ -3,7 +3,7 @@ extends RefCounted
 
 # Native presentation port of src/hud.css + src/ui/character-inventory.ts at
 # 1e94a0d1. This owns layout, formatting and views; authority remains in net.
-const GEAR_LAYOUT: Array = [["ear1","Серьга I"],["head","Голова"],["ear2","Серьга II"],["neck","Ожерелье"],["chest","Нагрудник"],["offhand","Щит / фокус"],["weapon","Оружие"],["belt","Пояс"],["gloves","Перчатки"],["ring1","Кольцо I"],["boots","Обувь"],["ring2","Кольцо II"]]
+const GEAR_LAYOUT: Array = [["ear1","Серьга"],["head","Голова"],["cloak","Плащ"],["neck","Ожерелье"],["chest","Нагрудник"],["offhand","Щит / фокус"],["weapon","Оружие"],["belt","Пояс"],["gloves","Перчатки"],["ring1","Кольцо I"],["boots","Обувь"],["ring2","Кольцо II"]]
 const STAT_LAYOUT: Array = [["level","Уровень"],["xp","Опыт"],["hp","HP"],["mp","MP"],["str","Сила"],["dex","Ловкость"],["int","Интеллект"],["physicalAttack","Физическая атака"],["matk","Магическая атака"],["physicalAccuracy","Точность физ. атак"],["magicAccuracy","Точность магии"],["def","Общая защита"],["mdef","Магическая защита"],["evasion","Уклонение"],["attackRate","Атак в секунду"],["manaRegen","MP в секунду"]]
 const ITEM_STAT_LABELS: Dictionary = {"str":"Сила","dex":"Ловкость","int":"Интеллект","vit":"Выносливость","spi":"Дух","atkMin":"Мин. физ. атака","atkMax":"Макс. физ. атака","matk":"Магическая атака","def":"Физическая защита","mdef":"Магическая защита","hp":"Макс. HP","mp":"Макс. MP","crit":"Критический шанс","accuracy":"Точность","evasion":"Уклонение","speed":"Скорость передвижения"}
 const WINDOW_SIZE: Vector2 = Vector2(332,516)
@@ -493,6 +493,7 @@ func refresh_inventory_state() -> void:
 	if enhancing:
 		enhancement_banner.text = app.item_name(app.selected_scroll)+"\nОдин клик по подсвеченной вещи — одна попытка.\nШанс показан при наведении.\nНа рискованной ступени при неудаче предмет уничтожается.\nEsc / ПКМ — отменить."
 	inventory_status.text = "Персонаж погиб · только просмотр" if app.net.hero.get("dead",false) else "Наведение — свойства · двойной клик — действие"
+	if not app.net.hero.get("migrationReserve",[]).is_empty(): inventory_status.text = "Сохранено: %d предм. · J — забрать" % app.net.hero.migrationReserve.size()
 	var actions: Array = []
 	var definition: Dictionary = app.data.items.get(selected.get("id",""),{})
 	if enhancing: actions.append(["cancel-enhance","Отменить заточку"])
@@ -502,7 +503,7 @@ func refresh_inventory_state() -> void:
 			elif app.selected_item.get("kind") == "equipment": actions.append(["use","Снять"])
 			elif definition.has("slot"): actions.append(["use","Надеть"])
 			elif definition.get("type") in ["consumable","book"]: actions.append(["use","Использовать"])
-			if app.trade_session.allowed() and app.selected_item.get("kind") == "bag" and definition.get("type") != "book": actions.append(["sell","Продать · %d ◈" % (floorf(float(definition.get("value",0))*.48)*int(selected.count))])
+			if app.trade_session.allowed() and app.selected_item.get("kind") == "bag" and definition.get("type") != "book": actions.append(["sell","Продать…"])
 		var loot: Array = display_hero().get("lootBuffer",[])
 		if not loot.is_empty(): actions.append(["collect","Забрать добычу (%d)" % loot.size()])
 	var signature: String = JSON.stringify([actions,app.net.hero.get("dead",false),app.net.command_busy])
@@ -556,10 +557,20 @@ func skills_dialog() -> void:
 func map_dialog() -> void:
 	app.polish.toggle_map()
 
+func item_breakdown(item: Dictionary) -> Dictionary:
+	if item.is_empty() or not app.data.itemStats.has(item.id): return {"total":{},"base":{},"bonus":{}}
+	var result: Dictionary = app.data.itemStats[item.id][clampi(int(item.plus),0,15)].duplicate(true)
+	for key: String in item.get("legacyRingBonus",{}):
+		if not result.total.has(key): continue
+		var value: int = int(item.legacyRingBonus[key])
+		result.total[key] += value
+		result.bonus[key] += value
+	return result
+
 func item_rows(item: Dictionary) -> Array:
 	var result: Array = []
 	if item.is_empty() or not app.data.itemStats.has(item.id): return result
-	var breakdown: Dictionary = app.data.itemStats[item.id][clampi(int(item.plus),0,15)]
+	var breakdown: Dictionary = item_breakdown(item)
 	var total: Dictionary = breakdown.total
 	var base: Dictionary = breakdown.base
 	var bonus: Dictionary = breakdown.bonus
@@ -591,7 +602,11 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 		var total_penalty: Dictionary = app.data.itemStats[item.id][clampi(int(item.plus),0,15)].total
 		for stat: String in ["def","mdef","evasion"]:
 			result.rows.append({"key":"penalty_"+stat,"label":ITEM_STAT_LABELS[stat]+" для ассасина","value":stat_number(float(total_penalty.get(stat,0))-2),"delta":-2,"detail":"С учётом фиксированного штрафа этой вещи"})
-	if not item_slot.is_empty(): result.restrictions.append("Без требования уровня.")
+	if not item_slot.is_empty():
+		var exempt: bool = item_slot == "ring" and bool(item.get("legacyRingLevelExempt",false)) and int(definition.get("ringGrade",0)) == 1
+		result.restrictions.append("Прежнее кольцо: требование уровня сохранено без ограничений." if exempt else "Требуется уровень %d." % int(definition.requiredLevel) if int(definition.get("requiredLevel",0)) > 1 else "Без требования уровня.")
+	if item_slot == "ring": result.restrictions.append("Повышение грейда — только крафт [J]. Свитки не применяются.")
+	if not item.get("legacyRingBonus",{}).is_empty(): result.restrictions.append("Прежнее усиление сохранено в характеристиках этого экземпляра.")
 	if definition.has("classes"):
 		var classes: Array = []
 		for class_id: String in definition.classes: classes.append(app.data.classes[class_id].name)
@@ -600,7 +615,7 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 		var chance: float = 0
 		var category_key: String = "weapon" if item_slot == "weapon" else "armor"
 		var scroll: Dictionary = app.data.scrolls[app.selected_scroll.id]
-		if scroll.category == category_key and int(item.plus)<15: chance = float(app.data.chances[category_key+"_"+scroll.quality][int(item.plus)])
+		if item_slot != "ring" and scroll.category == category_key and int(item.plus)<15: chance = float(app.data.chances[category_key+"_"+scroll.quality][int(item.plus)])
 		result.restrictions = [app.item_name(app.selected_scroll)+": "+("предел +15" if int(item.plus)>=15 else "+%d → +%d" % [int(item.plus),int(item.plus)+1]),"Шанс: %s%%" % stat_number(chance),"Безопасно." if chance == 100 else "При неудаче предмет уничтожается." if chance > 0 else "Этот предмет нельзя усилить выбранным свитком."]
 		result.actions = ["Один клик — одна попытка заточки." if chance > 0 else "Выберите подходящий предмет или отмените заточку.","Esc / ПКМ — отменить без расхода свитка."]
 	elif app.net.hero.get("dead",false): result.actions = ["После возрождения действия снова будут доступны."]
@@ -609,13 +624,13 @@ func tooltip_model(item: Dictionary, kind: String = "bag") -> Dictionary:
 	elif definition.get("type") == "consumable": result.actions = ["Двойной клик — использовать одну единицу."]
 	elif app.data.scrolls.has(item.id): result.actions = ["Двойной клик — выбрать предмет для одной попытки заточки."]
 	if kind == "bag" and not item_slot.is_empty() and app.data.itemStats.has(item.id):
-		var slots: Array = ["ring1","ring2"] if item_slot == "ring" else ["ear1","ear2"] if item_slot in ["ear","earring"] else [selected_slot]
+		var slots: Array = ["ring1","ring2"] if item_slot == "ring" else ["ear1"] if item_slot in ["ear","earring"] else [selected_slot]
 		if slots.size() == 2 and (not display_hero().get("equipment",{}).get(slots[0]) or not display_hero().get("equipment",{}).get(slots[1])): slots = [selected_slot]
-		var total: Dictionary = app.data.itemStats[item.id][clampi(int(item.plus),0,15)].total
+		var total: Dictionary = item_breakdown(item).total
 		for slot: String in slots:
 			var other = display_hero().get("equipment",{}).get(slot)
 			var equipped: Dictionary = other if other is Dictionary else {}
-			var other_stats: Dictionary = app.data.itemStats[equipped.id][clampi(int(equipped.plus),0,15)].total if not equipped.is_empty() and app.data.itemStats.has(equipped.id) else {}
+			var other_stats: Dictionary = item_breakdown(equipped).total
 			var rows: Array = []
 			for key: String in ITEM_STAT_LABELS:
 				var delta: float = float(total.get(key,0))-float(other_stats.get(key,0))
@@ -749,7 +764,7 @@ func display_hero() -> Dictionary:
 	return app.net.hero
 
 func comparison_slot(item_slot: String) -> String:
-	var slots: Array = ["ring1","ring2"] if item_slot == "ring" else ["ear1","ear2"] if item_slot in ["ear","earring"] else [item_slot]
+	var slots: Array = ["ring1","ring2"] if item_slot == "ring" else ["ear1"] if item_slot in ["ear","earring"] else [item_slot]
 	if app.chosen_equipment in slots: return app.chosen_equipment
 	for slot: String in slots:
 		if not display_hero().get("equipment",{}).get(slot): return slot

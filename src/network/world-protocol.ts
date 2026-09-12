@@ -4,6 +4,7 @@ import type { InventoryItem, ItemReference } from '../core/inventory-commands.ts
 import type { MonsterAiState } from '../world/monster-ai.ts';
 import type { LocomotionState } from '../controls/character-motor.ts';
 import type { EquipmentCombatStats } from '../core/equipment-stats.ts';
+import type {RingRecipe} from '../data/accessories-v3.ts';
 
 export const WORLD_PROTOCOL = 1;
 export const DISCONNECT_GRACE_MS = 30_000;
@@ -15,6 +16,7 @@ export type WorldCharacter = Position & WorldMotion & {
   hp: number; mp: number; maxHp: number; maxMp: number; stats: EquipmentCombatStats;
   bookEffects?:BookEffect[]; bookCooldowns?:Record<string,number>; bookCastReadyAt?:number; bookQuests?:Record<string,'active'|'ready'|'claimed'>;
   storage?: Array<InventoryItem|null>;
+  migrationReserve?:InventoryItem[];accessoryMigrationVersion?:number;
   inventory: InventoryItem[]; equipment: Record<string, InventoryItem | undefined>;
   lootBuffer: InventoryItem[]; betaScrollGrant?: string; legacyScrolls?: number; quest: number; kills: number; bossKills: number;
   dead: boolean; cooldowns: number[]; attackReadyAt: number; buffs: { guard: number; vanish: number; haste?:number };
@@ -41,6 +43,7 @@ export type WorldEvent = {
   gold?: number; xp?: number; items?: string[];
 };
 export type WorldSnapshot = {
+  craftRecipes?:RingRecipe[];
   spaceId?:SpaceId;worldRevision?:string;populationCapacity?:number;
   groundEffects?:Array<{id:string;kind:'trap'|'area'|'slam';owner:string;point:Position;radius:number;expiresAt:number;effect:string}>;
   environment?: import("../world/world-cycle.ts").WorldCycleSnapshot; chat?: WorldChatMessage[];
@@ -51,6 +54,8 @@ export type WorldSnapshot = {
 };
 // The wire format contains intentions only. Damage, prices, dice and rewards are server-owned.
 export type WorldCommand =
+  | {type:'craftRing';recipeId:string;target:ItemReference;materials:ItemReference[]}
+  | {type:'claimMigration';item:ItemReference}
   | {type:'castBook';bookId:string;targetId?:string;point?:Position}
   | {type:'bookQuest';level:50|60}
   | { type: 'equip'; item: ItemReference; slot?: string }

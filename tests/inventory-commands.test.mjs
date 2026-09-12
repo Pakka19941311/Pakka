@@ -15,7 +15,7 @@ const definitionFor = item => definitions[item.id];
 const allUids = state => [...state.inventory, ...Object.values(state.equipment).filter(Boolean)].map(item => item.uid).sort();
 
 test('paired gear uses the same free-first and left fallback for comparison and equip', () => {
-  for (const [kind, left, right] of [['ring', 'ring1', 'ring2'], ['ear', 'ear1', 'ear2']]) {
+  for (const [kind, left, right] of [['ring', 'ring1', 'ring2']]) {
     assert.deepEqual(compatibleEquipmentSlots(kind), [left, right]);
     assert.equal(resolveEquipmentSlot(kind, {}), left);
     assert.equal(resolveEquipmentSlot(kind, { [right]: {} }), left);
@@ -25,6 +25,8 @@ test('paired gear uses the same free-first and left fallback for comparison and 
     assert.equal(resolveEquipmentSlot(kind, {}, 'weapon'), undefined);
   }
   assert.deepEqual(compatibleEquipmentSlots('not-a-slot'), []);
+  assert.deepEqual(compatibleEquipmentSlots('ear'), ['ear1']);assert.deepEqual(compatibleEquipmentSlots('earring'), ['ear1']);
+  assert.deepEqual(compatibleEquipmentSlots('cloak'), ['cloak']);assert.equal(resolveEquipmentSlot('ear',{},'ear2'),undefined);
 });
 
 test('a full bag swaps gear into the exact freed cell without losing any UID or item properties', () => {
@@ -44,8 +46,8 @@ test('a full bag swaps gear into the exact freed cell without losing any UID or 
   assert.deepEqual(unequipInventoryItem({ ...before, ...result }, itemReference(result.equipment.weapon), 'weapon'), { ok: false, reason: 'bag-full' });
 });
 
-test('explicit second ring or earring replaces that exact item and retains the first one', () => {
-  for (const [kind, left, right] of [['ring', 'ring1', 'ring2'], ['earring', 'ear1', 'ear2']]) {
+test('explicit second ring replaces that exact item and retains the first one', () => {
+  for (const [kind, left, right] of [['ring', 'ring1', 'ring2']]) {
     const incoming = item('incoming', kind, 5);
     const first = item('first', kind, 1);
     const second = item('second', kind, 2);

@@ -2,19 +2,20 @@ import { EQUIP_SLOTS } from '../data/game-data.ts';
 import { INVENTORY_CAPACITY } from './game-rules.ts';
 import type { ItemStatContribution } from './item-progression.ts';
 
-export type InventoryItem = { uid: string; id: string; plus: number; count: number; legacyRingBonus?: Partial<ItemStatContribution>; ringMigrationVersion?: number };
+export type InventoryItem = { uid: string; id: string; plus: number; count: number; legacyRingBonus?: Partial<ItemStatContribution>; ringMigrationVersion?: number;legacyRingLevelExempt?:boolean };
 export type ItemReference = Readonly<InventoryItem>;
-export type EquipmentDefinition = { slot?: string; classes?: readonly string[] };
+export type EquipmentDefinition = { slot?: string; classes?: readonly string[];requiredLevel?:number;ringGrade?:number };
 export type InventoryState<T extends InventoryItem> = {
   inventory: readonly T[];
   equipment: Readonly<Record<string, T | undefined>>;
   classId: string;
+  level?:number;
   dead: boolean;
 };
 export type InventoryFailureReason =
   | 'dead' | 'missing-item' | 'stale-item' | 'ambiguous-item' | 'invalid-item'
   | 'unknown-item' | 'not-equippable' | 'invalid-slot' | 'class-restricted'
-  | 'stacked-equipment' | 'bag-full' | 'invalid-position';
+  | 'stacked-equipment' | 'bag-full' | 'invalid-position' | 'level-required';
 export type InventoryFailure = { ok: false; reason: InventoryFailureReason };
 export type InventoryChange<T extends InventoryItem> = {
   ok: true;
@@ -34,7 +35,7 @@ export function itemReference(item: InventoryItem): ItemReference {
 
 export function compatibleEquipmentSlots(itemSlot: string | undefined): string[] {
   if (itemSlot === 'ring') return ['ring1', 'ring2'];
-  if (itemSlot === 'ear' || itemSlot === 'earring') return ['ear1', 'ear2'];
+  if (itemSlot === 'ear' || itemSlot === 'earring') return ['ear1'];
   return itemSlot && EQUIP_SLOTS.includes(itemSlot) ? [itemSlot] : [];
 }
 
@@ -96,6 +97,8 @@ export function equipInventoryItem<T extends InventoryItem>(
   if (definition.classes?.length && !definition.classes.includes(state.classId)) {
     return { ok: false, reason: 'class-restricted' };
   }
+  const grandfathered=definition.slot==='ring'&&definition.ringGrade===1&&item.legacyRingLevelExempt&&item.ringMigrationVersion===1;
+  if(definition.requiredLevel&&(state.level??1)<definition.requiredLevel&&!grandfathered)return {ok:false,reason:'level-required'};
   if (item.count !== 1) return { ok: false, reason: 'stacked-equipment' };
   const replaced = state.equipment[slot];
   const inventory = [...state.inventory];

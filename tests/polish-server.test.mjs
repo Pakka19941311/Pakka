@@ -11,7 +11,7 @@ import {worldCycleAt,rollNightDrops,PHASE_MS,CYCLE_MS} from '../src/world/world-
 import {CLASSES} from '../src/data/game-data.ts';
 import {findNavigationPath} from '../src/world/navigation.ts';
 let serial=0;
-test('night loot uses exclusive 1% scroll and 2% jewelry bands',()=>{for(const[a,b,expected]of [[0,0,['weapon_scroll_improved','ember_ring']],[.005,.01,['armor_scroll_improved','fang_necklace']],[.01,.02,[]]]){const rolls=[a,b];assert.deepEqual(rollNightDrops(()=>rolls.shift()),expected);}});
+test('night loot preserves scroll and necklace bands but removes the ordinary ring band',()=>{for(const[a,b,expected]of [[0,0,['weapon_scroll_improved']],[.005,.01,['armor_scroll_improved','fang_necklace']],[.01,.02,[]]]){const rolls=[a,b];assert.deepEqual(rollNightDrops(()=>rolls.shift()),expected);}});
 function setup(){const store=new WorldStore(':memory:');const sim=new WorldSimulation({store,collision:new CollisionWorld(),terrain:new TerrainSurface(),now:100000,identifier:()=>`polish-${++serial}`,random:()=>.4});const p=sim.createCharacter('Тест','ranger');Object.assign(p,{x:45,z:-50,activeUntil:1e10});sim.state.monsters.forEach(m=>{m.alive=false;m.respawnAt=1e12});const m=sim.state.monsters[0];Object.assign(m,{id:'undead',x:50,z:-50,home:{x:50,z:-50},alive:true,hp:10000,attackReadyAt:1e12,regionId:undefined});return{sim,store,p,m};}
 function run(sim,seconds){for(let i=0;i<Math.ceil(seconds*60);i++)sim.advance(sim.state.time+1000/60+.00001);}
 function cmd(sim,p,value,id=`command-${++serial}`){return sim.command(p.id,id,value);}

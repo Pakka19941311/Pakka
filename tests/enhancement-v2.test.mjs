@@ -28,9 +28,9 @@ test('equipped destruction clears exact slot and old request cannot be replayed'
  const result=enhanceItem(f.player,f.scroll,f.target,definition,.9);assert.ok(result.ok);assert.equal(result.equipment.weapon,undefined);
  assert.equal(enhanceItem({...f.player,...result},f.scroll,f.target,definition,0).ok,false);
 });
-test('all real nonweapon slots use armor category, attack bonus does not change category',()=>{
- for(const slot of ['head','chest','boots','gloves','belt','neck','ring','ear','offhand'])assert.equal(enhancementCategory(slot),'armor');
- assert.equal(enhancementCategory('material'),null);assert.equal(scrollChance('armor_scroll_improved','ring',1),1);assert.equal(scrollChance('armor_scroll','ring',1),.65);
+test('cloak and remaining nonweapon slots use armor category; all ring aliases reject scrolls',()=>{
+ for(const slot of ['head','chest','boots','gloves','belt','neck','cloak','ear','offhand'])assert.equal(enhancementCategory(slot),'armor');
+ assert.equal(enhancementCategory('material'),null);for(const slot of ['ring','ring1','ring2']){assert.equal(enhancementCategory(slot),null);assert.equal(scrollChance('armor_scroll_improved',slot,1),0);assert.equal(scrollChance('armor_scroll',slot,1),0);}
 });
 test('migration preserves progress and reserve from inventory and loot buffer exactly once',()=>{
  const old={schema:1,player:{name:'Mage',level:9,inventory:[item('scroll',0,4),item('weapon',7)]},lootBuffer:[item('scroll',0,2,'buffer')],settings:{uiScale:1.25}};

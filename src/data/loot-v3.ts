@@ -1,24 +1,25 @@
 import {SKILL_BOOKS} from './skill-books.ts';
+import {rollAccessoryLoot} from './accessory-loot-v3.ts';
 // One equipment pool roll, separate resources and scrolls. XP rate never enters loot.
 export type LootStack={id:string;count:number};
 const pools:Record<string,string[]>={
  wolf:['wardens_blade','blackwood_bow','wolf_gloves','tracker_coat','fang_necklace'],
  exile:['wardens_blade','bone_fangs','militia_plate','night_leather','ash_belt'],
- spider:['ember_staff','mourn_grimoire','oracle_robe','night_leather','ember_ring'],
+ spider:['ember_staff','mourn_grimoire','oracle_robe','night_leather'],
  undead:['wardens_blade','mourn_grimoire','militia_plate','bone_raiment','grave_boots','fang_necklace'],
  bat:['bone_fangs','blackwood_bow','tracker_coat','night_leather','wolf_gloves','fang_necklace'],
- cultist:['ember_staff','mourn_grimoire','oracle_robe','bone_raiment','ember_ring','ash_belt'],
+ cultist:['ember_staff','mourn_grimoire','oracle_robe','bone_raiment','ash_belt'],
  miner:['wardens_blade','blackwood_bow','militia_plate','fallen_helm','fallen_helm_open','grave_boots','ash_belt'],
- wraith:['mourn_grimoire','ember_staff','oracle_robe','bone_raiment','grave_boots','ember_ring'],
+ wraith:['mourn_grimoire','ember_staff','oracle_robe','bone_raiment','grave_boots'],
  night_zombie:['wardens_blade','bone_fangs','militia_plate','night_leather','grave_boots','fang_necklace'],
- night_skeleton:['blackwood_bow','mourn_grimoire','tracker_coat','bone_raiment','fallen_helm_open','ember_ring'],
+ night_skeleton:['blackwood_bow','mourn_grimoire','tracker_coat','bone_raiment','fallen_helm_open'],
  mini:['executioner','fallen_helm','fallen_helm_open','fang_necklace','wolf_gloves','ash_belt'],
  big:['rotten_root','dead_king_plate','sovereign_seal','executioner'],
 };
-export const GOLEM_EQUIPMENT=['rift_sword','rift_staff','rift_daggers','rift_bow','rift_grimoire','rift_plate','rift_helm','rift_gloves','rift_boots','rift_shield','rift_coat','rift_robe','shade_chest','shade_helm','shade_gloves','shade_boots','rift_belt','rift_ring_blade','rift_ring_soul','rift_neck_blade','rift_neck_soul','rift_ear_guard','rift_ear_soul'];
+export const GOLEM_EQUIPMENT=['rift_sword','rift_staff','rift_daggers','rift_bow','rift_grimoire','rift_plate','rift_helm','rift_gloves','rift_boots','rift_shield','rift_coat','rift_robe','shade_chest','shade_helm','shade_gloves','shade_boots','rift_belt','rift_neck_blade','rift_neck_soul','rift_ear_guard','rift_ear_soul'];
 export const WARDEN_EQUIPMENT=['warden_sword','warden_staff','warden_daggers','warden_bow','warden_grimoire','warden_plate','warden_vestment','warden_shade','warden_seal'];
-const firePool=GOLEM_EQUIPMENT.filter(id=>!['rift_boots','rift_robe','shade_helm','shade_boots','rift_ring_soul','rift_neck_soul','rift_ear_soul'].includes(id));
-const icePool=GOLEM_EQUIPMENT.filter(id=>!['rift_plate','rift_gloves','rift_shield','rift_coat','shade_chest','shade_gloves','rift_ring_blade','rift_neck_blade','rift_ear_guard'].includes(id));
+const firePool=GOLEM_EQUIPMENT.filter(id=>!['rift_boots','rift_robe','shade_helm','shade_boots','rift_neck_soul','rift_ear_soul'].includes(id));
+const icePool=GOLEM_EQUIPMENT.filter(id=>!['rift_plate','rift_gloves','rift_shield','rift_coat','shade_chest','shade_gloves','rift_neck_blade','rift_ear_guard'].includes(id));
 export function rollLootV3(id:string,random:()=>number):LootStack[]{
  const loot:LootStack[]=[];
  const add=(id:string,count=1)=>{const old=loot.find(i=>i.id===id);if(old)old.count+=count;else loot.push({id,count});};
@@ -47,5 +48,6 @@ export function rollLootV3(id:string,random:()=>number):LootStack[]{
  else if(id==='big'){roll('weapon_scroll',.5);roll('armor_scroll',.5);add(random()<.5?'weapon_scroll_improved':'armor_scroll_improved');}
  else{const high=['cultist','miner','wraith'].includes(id),low=['wolf','exile','spider'].includes(id);const normal=id==='mini'?.35:golem?.10:high?.05:low?.03:.04,improved=id==='mini'?.05:golem?.02:high?.008:low?.003:.005;
    for(const kind of ['weapon','armor']){const value=random();if(value<improved)add(kind+'_scroll_improved');else if(value<improved+normal)add(kind+'_scroll');}}
+ for(const item of rollAccessoryLoot(id,random))add(item.id,item.count);
  return loot;
 }

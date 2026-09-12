@@ -16,7 +16,9 @@ static func run(app: Node) -> void:
 		if arg.begins_with("--block="): block = arg.trim_prefix("--block=")
 	if block in ["all","sale"]: await sale(app,checks)
 	if block in ["all","potions"]: await potions(app,checks)
-	if block in ["all","drag"]: await drag(app,checks)
+	if block in ["all","drag","ui-v3"]: await drag(app,checks)
+	if block == "ui-v3": await stats_view(app,checks)
+	if block == "craft": await preload("res://scripts/craft_acceptance.gd").run(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)
@@ -112,6 +114,7 @@ static func drag_end(app: Node, point: Vector2) -> void:
 	await Keys.wait_ms(app.get_tree(),150)
 
 static func drag(app: Node, checks: Dictionary) -> void:
+	checks.drag_completed = false
 	app.close_dialog()
 	await Mouse.fixture(app,"trade-smith")
 	await Wait.until(app,func(): return not app.net.command_busy and app.trade_session.closing_tokens.is_empty(),3000)
@@ -144,6 +147,24 @@ static func drag(app: Node, checks: Dictionary) -> void:
 	app.quick[2].action = "potion"; app.polish.finish_quick_drag(2,false)
 	checks.quick_cancel_keeps_reference = app.quick[2].action == "potion"
 	app.quick[2].action = previous; app.refresh_quick()
+	checks.drag_completed = true
+
+static func stats_view(app: Node, checks: Dictionary) -> void:
+	checks.stats_completed = false
+	app.close_dialog(); app.inventory_panel.show(); app.refresh_inventory()
+	await Keys.wait_ms(app.get_tree(),180)
+	checks.stats_primary = true
+	for stat: String in ["str","dex","int"]:
+		checks.stats_primary = checks.stats_primary and app.stat_values[stat].text == str(int(app.net.hero.stats[stat]))
+	checks.stats_accuracy_channels = app.stat_values.physicalAccuracy.text == str(int(app.net.hero.stats.physicalAccuracy)) and app.stat_values.magicAccuracy.text == str(int(app.net.hero.stats.magicAccuracy))
+	checks.stats_cadence = app.stat_values.attackRate.text == "%.2f" % (1.0/float(app.net.hero.stats.attackInterval))
+	checks.stats_regen = app.stat_values.manaRegen.text == "%.2f" % float(app.net.hero.stats.manaRegen)
+	app.reference_hud.stats_scroll.scroll_vertical = 1000
+	await Keys.wait_ms(app.get_tree(),180)
+	await Wait.capture(app,"class-derived-stats")
+	checks.stats_scroll_access = app.stat_values.manaRegen.get_global_rect().intersects(app.reference_hud.stats_scroll.get_global_rect())
+	app.inventory_panel.hide()
+	checks.stats_completed = true
 
 static func key(app: Node, code: Key, echo: bool = false) -> void:
 	var event: InputEventKey = InputEventKey.new()

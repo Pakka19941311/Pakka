@@ -26,9 +26,10 @@ export function resolveEnhancement(currentLevel: number, roll = Math.random()): 
   return { kind: 'success', level: currentLevel + 1 };
 }
 
-export function addOrStackItem<T extends StackableItem>(inventory: T[], item: T, stackable: boolean, capacity = INVENTORY_CAPACITY): 'stacked' | 'added' | 'full' {
+export function addOrStackItem<T extends StackableItem>(inventory: T[], item: T, stackable: boolean, capacity = INVENTORY_CAPACITY, maxStack=Number.MAX_SAFE_INTEGER): 'stacked' | 'added' | 'full' {
+  if(!Number.isSafeInteger(item.count)||item.count<1||item.count>maxStack)return 'full';
   if (stackable) {
-    const stack = inventory.find((candidate) => candidate.id === item.id);
+    const stack = inventory.find((candidate) => candidate.id === item.id&&Number.isSafeInteger(candidate.count+item.count)&&candidate.count+item.count<=maxStack);
     if (stack) {
       stack.count += item.count;
       return 'stacked';

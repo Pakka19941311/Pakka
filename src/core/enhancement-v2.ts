@@ -1,4 +1,5 @@
 import type { ItemReference } from './inventory-commands.ts';
+import {RING_ITEMS} from '../data/accessories-v3.ts';
 export type EnhancementCategory = 'weapon' | 'armor';
 export type ScrollQuality = 'normal' | 'improved';
 export const SCROLLS: Record<string,{category: EnhancementCategory; quality: ScrollQuality}> = {
@@ -13,7 +14,7 @@ export const ENHANCEMENT_PERCENT = {
 } as const;
 export function enhancementCategory(slot?: string): EnhancementCategory | null {
  if(slot==='weapon')return 'weapon';
- return slot && ['head','chest','gloves','boots','belt','neck','ring','ring1','ring2','ear','earring','ear1','ear2','offhand'].includes(slot) ? 'armor' : null;
+ return slot && ['head','chest','gloves','boots','belt','neck','cloak','ear','earring','ear1','offhand'].includes(slot) ? 'armor' : null;
 }
 export function scrollChance(scrollId: string, slot: string|undefined, current: number): number {
  const scroll=SCROLLS[scrollId];
@@ -31,6 +32,7 @@ export function enhanceItem<T extends EnhancementItem>(player:EnhancementPlayer<
  const source=player.inventory.find(i=>i.uid===scroll.uid);
  const item=target.location==='bag'?player.inventory.find(i=>i.uid===target.uid):player.equipment[target.slot??''];
  if(!same(source,scroll)||!same(item,target)||!source||!item||source.count<1||item.count!==1||source.uid===item.uid)return {ok:false as const,reason:'Предмет или свиток изменился. Выберите заново.'};
+ if(Object.hasOwn(RING_ITEMS,item.id))return {ok:false as const,reason:'Кольца улучшаются только крафтом.'};
  const chance=scrollChance(source.id,definition(item).slot,item.plus);
  if(!chance)return {ok:false as const,reason:item.plus>=15?'Достигнут предел +15.':'Свиток не подходит к предмету.'};
  if(!Number.isFinite(roll)||roll<0||roll>=1)return {ok:false as const,reason:'Некорректный случайный исход.'};

@@ -4,6 +4,8 @@ extends RefCounted
 # Exact code-native SVG silhouettes from the owner-approved browser build 1e94a0d1.
 # Kept as text and rendered once per kind: no dependency on fonts or emoji glyphs.
 const PATHS: Dictionary = {
+	"cloak": "<path d=\"M14 5q6-4 12 0l5 7 5 23-8-2-8 4-8-4-8 2 5-23Z\"/><path d=\"M14 5q6 10 12 0M13 14l-2 18m9-17v20m7-21 2 18\"/>",
+	"wings": "<path d=\"M19 30C9 29 3 19 4 5l6 9 6 2 4 8 4-8 6-2 6-9c1 14-5 24-15 25l-1 6Z\"/><path d=\"m7 15 9 10M10 22l7 5m16-12-9 10m6-3-7 5\"/>",
 	"sword": "<path d=\"m7 34 4-4m-5-3 9 9m-4-9L29 7l6-2-2 7-18 19Z\"/><path d=\"m15 27 16-17\"/>",
 	"staff": "<path d=\"m11 36 14-22m-4-3 2-6 7-1 4 6-3 6-7 1Z\"/><path d=\"m24 10 4-2 2 4-4 2Z\"/>",
 	"bow": "<path d=\"M10 4c25 7 25 25 0 32l7-16Z\"/><path d=\"M7 20h28m-4-4 4 4-4 4\"/>",
@@ -29,6 +31,11 @@ static var cache: Dictionary = {}
 
 static func kind(item: Dictionary, definition: Dictionary = {}, empty_slot: String = "") -> String:
 	var id: String = str(item.get("id", ""))
+	if id == "cloak_sky": return "wings"
+	if id.begins_with("ring_str_"): return "ring_str"
+	if id.begins_with("ring_dex_"): return "ring_dex"
+	if id.begins_with("ring_int_"): return "ring_int"
+	if id == "ring_blank": return "ring"
 	if id == "haste": return "haste"
 	if "staff" in id or "root" in id: return "staff"
 	if "bow" in id: return "bow"
@@ -52,7 +59,8 @@ static func texture(kind_value: String, empty: bool = false) -> Texture2D:
 	var key: String = kind_value + (":empty" if empty else "")
 	if cache.has(key): return cache[key]
 	var color: String = "#829199" if empty else {"sword":"#d0d6c7","daggers":"#d0d6c7","staff":"#bfa7c9","book":"#bfa7c9","bow":"#c6ad80","ring":"#cbb581","neck":"#cbb581","ear":"#cbb581","scroll":"#cbb99a","potion":"#c6b6b3","ether":"#c6b6b3"}.get(kind_value,"#bbc8c9")
-	var paths: String = str(PATHS.get("potion" if kind_value == "ether" else kind_value, PATHS.gem))
+	if kind_value in ["ring_str","ring_dex","ring_int"]: color = {"ring_str":"#dc8074","ring_dex":"#83cfa4","ring_int":"#a19ce8"}[kind_value]
+	var paths: String = str(PATHS.get("potion" if kind_value == "ether" else "ring" if kind_value.begins_with("ring_") else kind_value, PATHS.gem))
 	paths = paths.replace('class="ci-icon-liquid"', 'fill="%s" stroke="%s"' % (["#3b81aa","#8dbdd1"] if kind_value == "ether" else ["#bb434b","#ce7070"]))
 	var svg: String = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 40 40"><g fill="%s" stroke="%s" stroke-width="%s" stroke-linejoin="round" stroke-linecap="round">%s</g></svg>' % ["none" if empty else "#4e5f684d",color,"1.25" if empty else "1.5",paths]
 	var image: Image = Image.new()

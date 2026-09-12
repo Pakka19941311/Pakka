@@ -20,7 +20,7 @@ test('the requested illustrative sword has the exact +0…+9 damage range and ac
   });
 });
 
-test('every real gear item at every enhancement level has integer nondecreasing stats and a strict power gain', () => {
+test('enhanceable gear gains integer power; ring stats ignore forbidden plus values', () => {
   for (const [id, definition] of gear) {
     const snapshot = structuredClone(definition);
     let previous;
@@ -33,7 +33,8 @@ test('every real gear item at every enhancement level has integer nondecreasing 
         if (previous) assert.ok(value >= previous[key], `${id}+${plus} ${key} must never decline`);
       }
       assert.ok(total.atkMin <= total.atkMax, `${id} damage range ordering`);
-      if (previous) assert.ok(['atkMin','atkMax','matk','def','mdef'].some(key => total[key] > previous[key]), `${id}+${plus} must improve its power`);
+      if (previous&&definition.slot!=='ring') assert.ok(['atkMin','atkMax','matk','def','mdef'].some(key => total[key] > previous[key]), `${id}+${plus} must improve its power`);
+      if(definition.slot==='ring')assert.deepEqual(total,base);
       previous = total;
     }
     assert.deepEqual(definition, snapshot);
@@ -73,11 +74,11 @@ test('visible attributes and defenses are actual integers for every class and le
   }
 });
 
-test('the delivered table covers all real gear and +0…+15 with exact live values', () => {
+test('the delivered table covers all real gear and only their permitted enhancement levels', () => {
   const table = JSON.parse(readFileSync(new URL('../docs/ITEM_PROGRESSION_V3.json', import.meta.url)));
   assert.deepEqual(table.items.map(item => item.id), gear.map(([id]) => id));
   for (const item of table.items) {
-    assert.deepEqual(item.levels.map(row => row.plus), Array.from({length: 16}, (_, i) => i));
+    assert.deepEqual(item.levels.map(row => row.plus), Array.from({length: ITEMS[item.id].slot==='ring'?1:16}, (_, i) => i));
     for (const row of item.levels) {
       const live = itemStatContribution(ITEMS[item.id], row.plus);
       assert.deepEqual(row.stats, Object.fromEntries(Object.entries(live).filter(([, value]) => value !== 0)));

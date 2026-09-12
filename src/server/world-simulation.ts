@@ -1,6 +1,10 @@
 import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss.ts';
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
+import {RING_RECIPES,ACCESSORY_MIGRATION_VERSION,itemSellPrice} from '../data/accessories-v3.ts';
+import {craftRing} from '../core/ring-crafting.ts';
+import {migrateAccessories,claimMigrationItem} from '../core/accessory-migration.ts';
+import type {AccessoryBackup} from '../core/accessory-migration.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
 import {BookSystem} from './book-system.ts';
 import type {BookArea,BookTrap} from './book-system.ts';
@@ -46,6 +50,7 @@ type PendingAttack = {
 type Projectile = {actor:string;target:string;generation:number;actorGeneration:number;skill:number|null;damage:number;critical:boolean;accuracy:number;startedAt:number;endsAt:number;origin:Position & {y:number};point:Position & {y:number}};
 const motion=(now:number):WorldMotion=>({yOffset:0,grounded:true,yaw:0,action:'idle',actionStartedAt:now,actionEndsAt:0,velocityX:0,velocityZ:0,verticalVelocity:0,locomotionState:'ground',combatState:'idle',hitAt:0,hitUntil:0});
 export type PersistedWorld = {
+  accessoryMigrationBackups?:Record<string,{at:number;version:number;items:AccessoryBackup}>;
   mapVersion?:string; territoryVersion?:number; finalWorldRevision?:string;
   previousWorld?:{mapVersion?:string;monsters:WorldMonster[]};
   coordinateMigrations?:Array<{at:number;from:string;to:string;positions:Array<{id:string;kind:string;from:Position;to:Position;oldHome?:Position}>}>;
@@ -169,7 +174,7 @@ export class WorldSimulation {
     }else for(const region of SPAWN_REGIONS)for(let i=0;i<region.population;i++)if(!this.state.monsters.some(m=>m.uid===`${region.id}:${i}`))this.spawnMonster(region.monsterId,spawnPointInRegion(region,i),`${region.id}:${i}`,region.id,i);
     // A process restart breaks all connections. Never renew their exposure deadline.
     for (const p of Object.values(this.state.characters)) {
-      p.storage??=[];p.buffs.haste??=0;this.migrateEquipment(p);this.recalculate(p);
+      p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);
       p.activeUntil = Math.min(p.activeUntil, this.state.time + DISCONNECT_GRACE_MS);
       p.direction = {x:0,z:0};p.destination=null;p.target=null;p.skill=null;p.bufferedSkill=undefined;p.autoAttack=false;p.singleAttack=false;
       Object.assign(p,{...motion(this.state.time),yaw:p.yaw,action:p.dead?'death':'idle',combatState:p.dead?'dead':'idle'});
@@ -221,10 +226,11 @@ export class WorldSimulation {
     // retained in the same durable transaction as the remapped character.
     const remap=(item:InventoryItem)=>({...item,uid:this.identifier()});
     p.inventory=p.inventory.map(remap);p.lootBuffer=p.lootBuffer.map(remap);
+    p.storage=p.storage?.map(item=>item?remap(item):null);p.migrationReserve=p.migrationReserve?.map(remap);p.accessoryMigrationVersion=undefined;
     p.equipment=Object.fromEntries(Object.entries(p.equipment).map(([slot,item])=>[slot,item?remap(item):undefined]));
     const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
     p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
-    this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
+    this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
     const oldPosition={x:p.x,z:p.z};
     if(this.finalWorld)p.spaceId='surface';
     Object.assign(p,this.collision.findNearestFree(this.finalWorld?this.finalWorld.start:legacyTerritoryPosition(p),.46));
@@ -248,7 +254,7 @@ export class WorldSimulation {
       ...this.startPoint(), ...calculated, ...motion(this.state.time), id:this.identifier(),name:name.trim().slice(0,24)||'Странник',classId,
       level:1,xp:0,gold:320,hp:calculated.maxHp,mp:calculated.maxMp,
       inventory:[this.item('potion',6),this.item('ether',4),this.item('teleport'),...(classId==='knight'?Object.values(starterGear):[])],equipment,
-      storage:[],lootBuffer:[],quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
+      storage:[],lootBuffer:[],migrationReserve:[],accessoryMigrationVersion:ACCESSORY_MIGRATION_VERSION,quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
       buffs:{guard:0,vanish:0,haste:0},activeUntil:0,lastInputSequence:-1,lastInputAt:0,
       direction:{x:0,z:0},destination:null,target:null,skill:null,generation:1,
     };
@@ -364,6 +370,13 @@ export class WorldSimulation {
       return;
     }
     if (p.dead) throw Error('dead');
+    if(command.type==='craftRing'){
+      this.validateCraftPosition(p);
+      const result=craftRing(p,command,this.random,this.identifier);p.inventory=result.inventory;p.gold=result.gold;return result.outcome;
+    }
+    if(command.type==='claimMigration'){
+      claimMigrationItem(p,command.item,item=>Object.hasOwn(ITEMS,item.id));return {itemUid:command.item.uid};
+    }
     if(command.type==='tradeOpen'){
       this.tradeService(p,command.npcId);
       const session={npcId:command.npcId,token:this.identifier(),spaceId:spaceOf(p),generation:p.generation};
@@ -380,7 +393,7 @@ export class WorldSimulation {
     }
     if(command.type==='storage'){
       if(!this.nearService(p,'storage'))throw Error('storage-unavailable');
-      transferStorage(p,command,item=>{const definition=itemDef(item);return Boolean(definition)&&!definition.slot&&!SKILL_BOOKS[item.id];},()=>this.identifier(),STORAGE_CAPACITY);
+      transferStorage(p,command,item=>{const definition=itemDef(item);return Boolean(definition)&&!definition.slot&&definition.maxStack!==1&&!SKILL_BOOKS[item.id];},()=>this.identifier(),STORAGE_CAPACITY,item=>itemDef(item)?.maxStack??Number.MAX_SAFE_INTEGER);
       return;
     }
     if (command.type==='equip' || command.type==='unequip' || command.type==='reorder') {
@@ -418,7 +431,7 @@ export class WorldSimulation {
       if(SKILL_BOOKS[item.id])throw Error('cannot-sell-book');
       const quantity=command.quantity??item.count;
       if(!Number.isSafeInteger(quantity)||quantity<1||quantity>item.count)throw Error('invalid-quantity');
-      p.gold+=Math.floor(ITEMS[item.id as ItemId].value*.48)*quantity;
+      p.gold+=itemSellPrice(ITEMS[item.id as ItemId])*quantity;
       item.count-=quantity;if(item.count===0)p.inventory=p.inventory.filter(i=>i.uid!==item.uid);return;
     }
     if (command.type==='buy'&&SKILL_BOOKS[command.itemId]) {
@@ -433,6 +446,14 @@ export class WorldSimulation {
       p.gold-=book.price;return;
     }
     if (command.type==='buy') {
+      if(['ring_blank','cloak_defense'].includes(command.itemId)){
+        const npcId=['npc:smith','npc:asterhold:smith'].find(id=>{try{this.tradeService(p,id);return true;}catch{return false;}});
+        if(!npcId)throw Error('shop-unavailable');
+        const definition=ITEMS[command.itemId as 'ring_blank'|'cloak_defense'];
+        if(p.gold<definition.buyPrice)throw Error('insufficient-gold');
+        if(this.addInventoryItem(p,this.item(command.itemId))==='full')throw Error('bag-full');
+        p.gold-=definition.buyPrice;return;
+      }
       const cost: Record<string,number>={potion:55,potion_large:110,ether:70,teleport:130,haste:100};
       const atShop=this.nearService(p,'shop'),atAlchemist=command.itemId==='haste'&&this.nearService(p,'alchemist');
       if (!Object.hasOwn(cost,command.itemId) || !(atShop||atAlchemist)) throw Error('shop-unavailable');
@@ -461,7 +482,7 @@ export class WorldSimulation {
     }
     if (command.type==='collect') {
       const retained: InventoryItem[]=[];
-      for(const item of p.lootBuffer) if(addOrStackItem(p.inventory,item,!('slot' in itemDef(item)))==='full') retained.push(item);
+      for(const item of p.lootBuffer) if(this.addInventoryItem(p,item)==='full') retained.push(item);
       p.lootBuffer=retained;return;
     }
     if (command.type==='quest') {
@@ -502,7 +523,7 @@ export class WorldSimulation {
       ...(this.state.bookAreas??[]).filter(a=>a.remaining>0).map(a=>({id:a.owner+':'+a.id,kind:'area' as const,owner:a.owner,point:a.point,radius:a.radius,expiresAt:a.nextAt+(a.remaining-1)*a.interval,effect:a.fx})),
       ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'}))
     ];
-    return structuredClone({groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
+    return structuredClone({craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
       monsters:this.state.monsters.filter(m=>sameSpace(m,character)&&(!this.finalWorld||distance(m,character)<135)).map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons.filter(m=>sameSpace(m,character)),events:this.events.filter(e=>e.sequence>afterEvent&&(!this.finalWorld||e.spaceId===spaceOf(character)))});
   }
@@ -1035,7 +1056,27 @@ export class WorldSimulation {
   private migrateEquipment(p:WorldCharacter):void {
     for(const [slot,item] of Object.entries(p.equipment)){if(!item)continue;const def=itemDef(item);if(def.classes&&!def.classes.includes(p.classId)){delete p.equipment[slot];if(p.inventory.length<42)p.inventory.push(item);else p.lootBuffer.push(item);}}
   }
-  private addItem(p:WorldCharacter,id:string):void {const item=this.item(id);if(addOrStackItem(p.inventory,item,!('slot' in itemDef(item)))==='full')p.lootBuffer.push(item);}
+  private migrateAccessories(p:WorldCharacter):void {
+    const result=migrateAccessories(p,item=>Object.hasOwn(ITEMS,item.id)?itemDef(item):undefined);
+    if(result.backup){
+      this.state.accessoryMigrationBackups??={};
+      this.state.accessoryMigrationBackups[p.id]??={at:this.state.time,version:ACCESSORY_MIGRATION_VERSION,items:result.backup};
+      Object.assign(p,result.state);
+    }
+  }
+  private validateCraftPosition(p:WorldCharacter):void {
+    if(p.dead||p.hp<=0)throw Error('dead');
+    if(p.activeUntil<=this.state.time)throw Error('craft-inactive');
+    if(!p.grounded||p.destination||Math.hypot(p.direction.x,p.direction.z)>0.01||Math.hypot(p.velocityX??0,p.velocityZ??0)>0.01)throw Error('craft-must-stand-still');
+    if(p.target||p.autoAttack||p.singleAttack||p.skill!==null||(p.hitUntil??0)>this.state.time||
+      this.state.pending.some(a=>a.actor===p.id||a.target===p.id||a.owner===p.id)||this.state.projectiles?.some(a=>a.actor===p.id)||
+      this.state.monsters.some(m=>m.alive&&sameSpace(m,p)&&(m.targetId===p.id||m.provokedBy===p.id||
+        !this.safe(p)&&distance(m,p)<(this.finalWorld?.slotById.get(m.uid)?.aggroRadius??SPAWN_REGIONS.find(r=>r.id===m.regionId)?.aggroRadius??('boss' in monsterDef(m)?11:9))&&this.lineOfSight(p,m))))throw Error('craft-in-combat');
+  }
+  private addInventoryItem(p:WorldCharacter,item:InventoryItem):'stacked'|'added'|'full' {
+    const def=itemDef(item);return addOrStackItem(p.inventory,item,Boolean(def)&&!def.slot&&def.maxStack!==1,42,def?.maxStack??Number.MAX_SAFE_INTEGER);
+  }
+  private addItem(p:WorldCharacter,id:string):void {const item=this.item(id);if(this.addInventoryItem(p,item)==='full')p.lootBuffer.push(item);}
   private item(id:string,count=1):InventoryItem {if(!Object.hasOwn(ITEMS,id))throw Error('unknown-item');return {id,uid:this.identifier(),plus:0,count};}
   private character(id:string):WorldCharacter {const p=this.state.characters[id];if(!p)throw Error('unknown-character');return p;}
   private event(kind:WorldEvent['kind'],actor:string,target?:string,extra:Partial<WorldEvent>={}):void {

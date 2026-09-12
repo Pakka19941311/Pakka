@@ -55,6 +55,11 @@ func _draw() -> void:
 		var count_text: String = str(int(item.count))
 		draw_string_outline(font,Vector2(2,size.y-3),count_text,HORIZONTAL_ALIGNMENT_RIGHT,size.x-6,11,3,Color.BLACK)
 		draw_string(font,Vector2(2,size.y-3),count_text,HORIZONTAL_ALIGNMENT_RIGHT,size.x-6,11,Color("edf0e3"))
+	var grade: int = int(owner_ui.data.items.get(item.get("id",""),{}).get("ringGrade",0))
+	if grade in [1,2,3]:
+		var grade_text: String = ["I","II","III"][grade-1]
+		draw_string_outline(font,Vector2(3,12),grade_text,HORIZONTAL_ALIGNMENT_LEFT,-1,10,3,Color.BLACK)
+		draw_string(font,Vector2(3,12),grade_text,HORIZONTAL_ALIGNMENT_LEFT,-1,10,Color("e7cea0"))
 	if payload.kind == "equipment" and owner_ui.chosen_equipment == payload.slot:
 		for x: int in range(4,int(size.x)-4,5):
 			draw_line(Vector2(x,4),Vector2(mini(x+3,int(size.x)-4),4),Color("c5b688aa"))
@@ -78,11 +83,12 @@ func _can_drop_data(_position: Vector2, data) -> bool:
 	if data is not Dictionary or not data.has("item") or data.item.is_empty() or owner_ui.net.command_busy:
 		return false
 	if not owner_ui.reference_hud.has_item_version(data.item): return false
+	if data.get("kind") == "craft_source": return false
 	if payload.kind == "storage": return data.get("kind") in ["bag","storage"]
 	if payload.kind == "equipment":
 		if data.get("kind") in ["equipment","storage"]: return false
 		var slot: String = owner_ui.data.items.get(data.item.id, {}).get("slot", "")
-		return str(payload.slot) in (["ring1", "ring2"] if slot == "ring" else ["ear1", "ear2"] if slot in ["ear", "earring"] else [slot])
+		return str(payload.slot) in (["ring1", "ring2"] if slot == "ring" else ["ear1"] if slot in ["ear", "earring"] else [slot])
 	return true
 
 func _drop_data(_position: Vector2, data) -> void:

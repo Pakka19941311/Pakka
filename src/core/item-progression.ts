@@ -11,6 +11,7 @@ export const ITEM_PROGRESSION = {
 
 export type ItemStatDefinition = {
   classes?:readonly string[];assassinForeign?:boolean;
+  requiredLevel?:number;ringGrade?:number;maxStack?:number;
   slot?: string;
   atk?: readonly [number, number];
   matk?: number;
@@ -65,7 +66,7 @@ function increased(value: number | undefined, bonus: number): number {
 }
 
 export function integerItemStats(definition: ItemStatDefinition, plus: number, legacyBonus?: Partial<ItemStatContribution>): ItemStatContribution {
-  const level = definition.slot ? itemEnhancementLevel(plus) : 0;
+  const level = definition.slot&&!['ring','ring1','ring2'].includes(definition.slot) ? itemEnhancementLevel(plus) : 0;
   const weapon = definition.slot === 'weapon';
   const minBonus = weapon ? ITEM_PROGRESSION.weaponMin[level] : ITEM_PROGRESSION.accessoryAttack[level];
   const maxBonus = weapon ? ITEM_PROGRESSION.weaponMax[level] : ITEM_PROGRESSION.accessoryAttack[level];

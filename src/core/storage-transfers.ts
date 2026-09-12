@@ -5,7 +5,7 @@ export type StorageTransfer = {direction:'deposit'|'withdraw'|'reorder';item:Ite
 
 /** Validate the version and capacity before changing either container. The world
  * command transaction persists both sides and the receipt together. */
-export function transferStorage(state:StorageState, command:StorageTransfer, stackable:(item:InventoryItem)=>boolean, uid:()=>string, capacity=500):void {
+export function transferStorage(state:StorageState, command:StorageTransfer, stackable:(item:InventoryItem)=>boolean, uid:()=>string, capacity=500,maxStack:(item:InventoryItem)=>number=()=>Number.MAX_SAFE_INTEGER):void {
   const storage=state.storage??[],bag=state.inventory,reference=command.item;
   const depositing=command.direction==='deposit',withdrawing=command.direction==='withdraw';
   if(!depositing&&!withdrawing&&command.direction!=='reorder')throw Error('invalid-storage-operation');
@@ -22,8 +22,9 @@ export function transferStorage(state:StorageState, command:StorageTransfer, sta
     while(storage.length<=command.index)storage.push(null);
     [storage[from],storage[command.index]]=[storage[command.index],storage[from]];state.storage=storage;return;
   }
+  if(quantity>maxStack(item))throw Error('stack-limit');
   const destination=depositing?storage:bag;
-  const compatible=(candidate:InventoryItem|null|undefined)=>candidate&&candidate.id===item.id&&candidate.plus===item.plus&&stackable(item);
+  const compatible=(candidate:InventoryItem|null|undefined)=>candidate&&candidate.id===item.id&&candidate.plus===item.plus&&stackable(item)&&candidate.count+quantity<=maxStack(item);
   let into=command.index;
   // A requested empty slot creates a separate stack. Automatic withdrawal can
   // merge without requiring a free bag cell, including a completely full bag.

@@ -5,13 +5,18 @@
   "accepted": "2026-09-12: user accepted the complete v3 specification and instructed implementation",
   "branch": "work/character-art-v3",
   "baseline": "f79d8a81fa824f01fa1d35678ab7391cd17ea208",
-  "current": "P0/P1 and dependencies for P2",
+  "current": "P0/P1, P2 actor preparation, P3 integrated attribute/trade/crafting foundations",
   "stages": {
     "P0": "in_progress: accepted specification preserved; live sources, migrations and asset intake",
-    "P1": "in_progress: canonical population data and spatial hunting plan",
-    "P2": "pending: playable, visually finished Greenfall outskirts sample",
-    "P3": "in_progress_dependencies: real primary equipment stats and city-only selling",
-    "P4": "pending", "P5": "pending", "P6": "pending", "P7": "pending", "P8": "pending", "P9": "pending"
+    "P1": "candidate_data: 48 species / 2416 reachable points / 30 routes; terrain and visual composition not yet rebuilt",
+    "P2": "in_progress: 3 new native-rendered model candidates; starter actor adapters, real combat calibration and starter quest cycle pending",
+    "P3": "in_progress: class attributes and city sales committed; rings, cloaks and native J verified and checkpointed",
+    "P4": "pending",
+    "P5": "pending",
+    "P6": "pending",
+    "P7": "pending",
+    "P8": "pending",
+    "P9": "pending"
   },
   "constraints": {
     "max_level": 90,
@@ -23,7 +28,35 @@
     "equipment": "left earring and right cloak; rings upgrade only through crafting",
     "old_world_contract": "historical only; v3 supersedes old quotas and stages"
   },
-  "personal_save_backup": "not_claimed: no user save has been opened or migrated; implementation uses isolated fixtures",
+  "personal_save_backup": "not_claimed: only isolated SQLite fixtures touched; real user saves unopened and unchanged",
   "release": "no new candidate yet",
-  "next_action": "Implement and verify independent source blocks, then integrate the P2 playable sample; maintain accepted visual checkpoints."
+  "next_action": "Checkpoint tested accessory block; integrate level cap migration; first-five actor adapters + real damage calibration + starter quests, then playable visual P2 review. No final ZIP until end-to-end release checks.",
+  "last_updated_utc": "2026-09-12T11:38:40.776660+00:00",
+  "completed_blocks": [
+    {
+      "commit": "bcde7b6",
+      "block": "Primary equipment stats before derived stats",
+      "checks": "17 scoped tests"
+    },
+    {
+      "commit": "57a47e0",
+      "block": "Exact five-class primary growth, two accuracy channels, class secondary links",
+      "checks": "66 scoped server/core tests; class UI part of 13 native checks"
+    },
+    {
+      "commit": "035f8b2",
+      "block": "City-only sales with runtime server session",
+      "checks": "17 server tests; 14 native sale checks"
+    },
+    {
+      "commit": "551db7b",
+      "block": "Staged canonical habitat population and routes",
+      "checks": "10 tests; generator --check byte-identical; typecheck"
+    }
+  ],
+  "in_progress_checks": {
+    "rings_and_cloaks": "150 scoped server/core checks and 21 native UI/craft/merchant checks passed; final source import parsed",
+    "assets": "wolf, rat, shellbug adapted and graphically checked; five-actor real render adapters in progress",
+    "combat": "Actual monster DEF/MDEF application and old maxHP-percent book impacts require explicit integration; arithmetic estimates are not accepted balance"
+  }
 }

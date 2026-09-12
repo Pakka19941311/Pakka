@@ -4,11 +4,11 @@ export const CYCLE_MS=PHASE_MS*2;
 export const HASTE_DURATION_MS=10*60*1000;
 export const STORAGE_CAPACITY=500;
 
-/** Mutually exclusive outcomes within each category: exactly 1% and 2%. */
+/** The old one-percent ring band is now empty; scroll and necklace bands are unchanged. */
 export function rollNightDrops(random:()=>number):string[]{
  const scroll=random(),jewelry=random(),drops:string[]=[];
  if(scroll<.01)drops.push(scroll<.005?'weapon_scroll_improved':'armor_scroll_improved');
- if(jewelry<.02)drops.push(jewelry<.01?'ember_ring':'fang_necklace');
+ if(jewelry>=.01&&jewelry<.02)drops.push('fang_necklace');
  return drops;
 }
 export type WorldCycleSnapshot={epoch:number;serverTime:number;elapsed:number;hour:number;night:boolean;cycle:number;fullMoon:boolean;phaseRemainingMs:number;daylight:number;weather:'sun'|'clouds'|'rain';clouds:number};

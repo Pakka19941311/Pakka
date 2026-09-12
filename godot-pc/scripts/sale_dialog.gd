@@ -9,7 +9,7 @@ static func amount(text: String, maximum: int) -> int:
 static func open(app: Node, item: Dictionary, return_to: Callable = Callable()) -> void:
 	if not app.trade_session.allowed(): return
 	var maximum: int = int(item.count)
-	var unit_price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))
+	var unit_price: int = app.item_sell_price(item)
 	var box: VBoxContainer = app.dialog("Продать предмет",Vector2i(500,280),true)
 	var header: HBoxContainer = HBoxContainer.new(); box.add_child(header)
 	var icon: TextureRect = TextureRect.new(); icon.texture = app.book_ui.item_icon(item)
