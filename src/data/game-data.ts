@@ -19,10 +19,10 @@ export const CLASSES = {
 export const ITEMS = {
 ...BOOK_ITEMS,
   wardens_blade:{"visualModel":"sword","name":"Меч северного дозора","slot":"weapon","icon":"⚔","atk":[12,18],"accuracy":1,"value":140,"origin":"Оружейная Астерхолда","classes":["knight"],"assassinForeign":false},
-  ember_staff:{"name":"Посох тлеющего камня","slot":"weapon","icon":"ϟ","matk":22,"accuracy":1,"value":140,"origin":"Архив Серого круга","classes":["mage"],"assassinForeign":false},
+  ember_staff:{"name":"Посох тлеющего камня","slot":"weapon","icon":"ϟ","matk":22,"atk":[7,11],"accuracy":1,"value":140,"origin":"Архив Серого круга","classes":["mage"],"assassinForeign":false},
   bone_fangs:{"name":"Парные костяные клинки","slot":"weapon","icon":"†","atk":[10,16],"crit":5,"accuracy":2,"value":140,"origin":"Катакомбы границы","classes":["assassin"],"assassinForeign":false},
   blackwood_bow:{"name":"Лук Чёрного леса","slot":"weapon","icon":"➶","atk":[11,18],"accuracy":7,"value":140,"origin":"Лесная застава","classes":["ranger"],"assassinForeign":false},
-  mourn_grimoire:{"name":"Гримуар Последнего вздоха","slot":"weapon","icon":"▣","matk":24,"spirit":3,"accuracy":2,"value":140,"origin":"Склеп Безымянных","classes":["necro"],"assassinForeign":false},
+  mourn_grimoire:{"name":"Гримуар Последнего вздоха","slot":"weapon","icon":"▣","matk":24,"atk":[11,18],"spirit":3,"accuracy":2,"value":140,"origin":"Склеп Безымянных","classes":["necro"],"assassinForeign":false},
   militia_plate:{"visualModel":"armor_chest","name":"Латы пограничной стражи","slot":"chest","icon":"▥","def":14,"hp":45,"value":115,"origin":"Астерхолд","classes":["knight"],"assassinForeign":false},
   oracle_robe:{"name":"Мантия пепельного оракула","slot":"chest","icon":"♜","mdef":16,"mp":60,"value":115,"origin":"Серый круг","classes":["mage","ranger","necro","assassin"],"assassinForeign":true},
   night_leather:{"name":"Теневой панцирь","slot":"chest","icon":"◩","def":10,"evasion":5,"value":115,"origin":"Теневой рынок","classes":["assassin"],"assassinForeign":false},

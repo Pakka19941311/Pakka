@@ -8,9 +8,14 @@ import type {TerrainPlatform} from './terrain-surface.ts';
 import {SERVICES} from './territory.ts';
 import {spaceOf} from './world-space.ts';
 import type {SpaceId,SpatialPoint} from './world-space.ts';
+import {selectP2Population} from './p2-population.ts';
+import type {P2PopulationMode,P2PopulationPlan} from './p2-population.ts';
 
 export type TerrainSupport = {heights:Float32Array;heightAt(x:number,z:number):number;supportAt(x:number,z:number):number;platformManifest():TerrainPlatform[]};
-export type SpawnSlot = SpatialPoint & {uid:string;speciesId:string;locationId:string;subzoneId:string;groupId:string;boss:boolean;patrol:SpatialPoint[];aggroRadius:number;leashRadius:number};
+export type SpawnSlot = SpatialPoint & {uid:string;speciesId:string;locationId:string;subzoneId:string;groupId:string;boss:boolean;patrol:SpatialPoint[];aggroRadius:number;leashRadius:number;
+ level?:number;canonicalMobId?:string;name?:string;balanceVersion?:string;bodyRadius?:number;
+ behavior?:{stance:string;provocation:string;socialAggro:boolean}};
+export type FinalWorldOptions={populationMode?:P2PopulationMode};
 type Support = {kind:string;x:number;z:number;halfX:number;halfZ:number;angle:number;y:number;high?:number};
 export function inPolygon(x:number,z:number,polygon:number[][]):boolean {
   let inside=false;
@@ -90,12 +95,15 @@ export class FinalWorld {
   readonly slots:SpawnSlot[];
   readonly slotById:Map<string,SpawnSlot>;
   readonly mapVersion:string;
+  readonly populationMode:P2PopulationMode;
+  readonly populationPlan:P2PopulationPlan;
   readonly teleports:Record<string,SpatialPoint&{level:number;cost:number}>={
     'Гринфолл':{...this.start,level:1,cost:25},'Астерхолд':{x:-490,z:-356,spaceId:'surface',level:1,cost:0},
     'Чёрный лес':{x:-310,z:278,spaceId:'surface',level:10,cost:90},'Вход в шахту':{x:35,z:395,spaceId:'surface',level:10,cost:150},
   };
-  constructor(root=resolve('godot-pc/world-final'),loadPopulation=true){
+  constructor(root=resolve('godot-pc/world-final'),loadPopulation=true,options:FinalWorldOptions={}){
     this.root=root;
+    this.populationMode=options.populationMode??'legacy';
     const json=(p:string)=>JSON.parse(readFileSync(resolve(root,p),'utf8'));
     this.layout=json('world_layout.json');
     const courtyard=json('castle/courtyard.json');
@@ -135,12 +143,16 @@ export class FinalWorld {
       if(this.spaces.surface.collision.isBlocked(bookSeller,.8))throw Error('tavern-bookseller-blocked');
       this.services[id]={...bookSeller,spaceId:'surface'};
     }
-    this.slots=loadPopulation?json('gameplay/spawn-manifest.json').slots:[];
-    if(loadPopulation&&(this.slots.length!==1000||new Set(this.slots.map(s=>s.uid)).size!==1000))throw Error('final-population-capacity');
-    if(loadPopulation)this.slots.push(structuredClone(CAVE_BOSS_SLOT));
+    const legacySlots:SpawnSlot[]=loadPopulation?json('gameplay/spawn-manifest.json').slots:[];
+    if(loadPopulation&&(legacySlots.length!==1000||new Set(legacySlots.map(s=>s.uid)).size!==1000))throw Error('final-population-capacity');
+    if(loadPopulation)legacySlots.push(structuredClone(CAVE_BOSS_SLOT));
+    if(!loadPopulation&&this.populationMode!=='legacy')throw Error('population-mode-requires-population');
+    this.populationPlan=selectP2Population(legacySlots,this.populationMode);
+    this.slots=this.populationPlan.slots;
     this.slotById=new Map(this.slots.map(s=>[s.uid,s]));
     digest.update(JSON.stringify({layout:this.layout,slots:this.slots,services:this.services}));
-    this.mapVersion=this.revision+'-'+digest.digest('hex');
+    if(this.populationMode!=='legacy')digest.update(JSON.stringify({populationMode:this.populationMode,populationDigest:this.populationPlan.digest}));
+    this.mapVersion=this.revision+(this.populationMode==='legacy'?'':'-'+this.populationMode)+'-'+digest.digest('hex');
   }
   space(p:SpatialPoint):FinalSpace{return this.spaces[spaceOf(p)];}
   safe(p:SpatialPoint,margin=0):boolean{

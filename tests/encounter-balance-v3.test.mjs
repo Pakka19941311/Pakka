@@ -46,7 +46,7 @@ test('starter is exactly fourteen accepted items; caster physical stats are expl
  assert.equal(Object.keys(STARTER_ITEMS_V3).length,14);
  assert.deepEqual(STARTER_ITEMS_V3.starter_weapon_knight.atk,[8,12]);
  assert.equal(STARTER_ITEMS_V3.starter_weapon_necro.matk,14);
- assert.equal(STARTER_ITEMS_V3.starter_weapon_necro.atk,undefined);
+ assert.deepEqual(STARTER_ITEMS_V3.starter_weapon_necro.atk,[9,13]);
  assert.equal(STARTER_ITEMS_V3.starter_chest_knight.hp,20);
  assert.equal(STARTER_ITEMS_V3.starter_chest_mage.mdef,8);
  for(const item of Object.values(STARTER_ITEMS_V3)){

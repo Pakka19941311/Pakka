@@ -29,6 +29,7 @@ export type WorldCharacter = Position & WorldMotion & {
   generation: number; autoAttack?:boolean; singleAttack?:boolean; bufferedSkill?:{target:string;index:number;expiresAt:number};
 };
 export type WorldMonster = Position & WorldMotion & {
+  canonicalMobId?:string;level?:number;maxHp?:number;name?:string;balanceVersion?:string;
   bookEffects?:BookEffect[];bookDots?:BookDot[];returnFromTaunt?:boolean;nextSlamAt?:number;
   uid: string; id: string; home: Position; regionId?: string; patrolIndex: number; patrolStep?:number;
   hp: number; alive: boolean; respawnAt: number; attackReadyAt: number; generation: number;
