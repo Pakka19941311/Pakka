@@ -14,7 +14,7 @@ test('integer enhancement changes real contributions and exposes exact base plus
     hp: 100, mp: 80, crit: 7, accuracy: 6, evasion: 4, speed: 8, spirit: 50,
   };
   const { base, bonus, total } = itemStatBreakdown(definition, 7);
-  assert.deepEqual(total, {atkMin: 33, atkMax: 55, matk: 59, def: 24, mdef: 19,
+  assert.deepEqual(total, {str:0,dex:0,int:0,vit:0,spi:0,atkMin: 33, atkMax: 55, matk: 59, def: 24, mdef: 19,
     hp: 127, mp: 102, crit: 10, accuracy: 15, evasion: 7, speed: 11});
   for (const [key, value] of Object.entries({ hp: 100, mp: 80, crit: 7, accuracy: 6, evasion: 4, speed: 8 })) close(base[key], value);
   assert.equal('spirit' in total, false);

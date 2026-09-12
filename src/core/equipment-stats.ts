@@ -8,24 +8,24 @@ export type EquipmentCombatStats = BaseStats & Omit<ItemStatContribution, 'hp' |
 export type EquipmentStats = { stats: EquipmentCombatStats; maxHp: number; maxMp: number };
 
 /** Exact integer contribution used by the item tooltip and combat. Speed is in percent. */
-export function itemStatContribution(definition: ItemStatDefinition, plus: number): ItemStatContribution {
-  return integerItemStats(definition, plus);
+export function itemStatContribution(definition: ItemStatDefinition, plus: number, legacyBonus?: Partial<ItemStatContribution>): ItemStatContribution {
+  return integerItemStats(definition, plus, legacyBonus);
 }
 
-export function itemStatBreakdown(definition: ItemStatDefinition, plus: number): {
+export function itemStatBreakdown(definition: ItemStatDefinition, plus: number, legacyBonus?: Partial<ItemStatContribution>): {
   base: ItemStatContribution;
   bonus: ItemStatContribution;
   total: ItemStatContribution;
 } {
   const base = itemStatContribution(definition, 0);
-  const total = itemStatContribution(definition, plus);
+  const total = itemStatContribution(definition, plus, legacyBonus);
   const bonus = { ...total };
   for (const key of Object.keys(total) as Array<keyof ItemStatContribution>) bonus[key] -= base[key];
   return { base, bonus, total };
 }
 
 /** Shared by the live character and previews of a validated equipment replacement. */
-export function calculateEquipmentStats<T extends { plus: number }>(
+export function calculateEquipmentStats<T extends { plus: number; legacyRingBonus?: Partial<ItemStatContribution> }>(
   classId: string,
   baseStats: BaseStats,
   level: number,
@@ -37,6 +37,11 @@ export function calculateEquipmentStats<T extends { plus: number }>(
     str: Math.round(grown.str), dex: Math.round(grown.dex), int: Math.round(grown.int),
     vit: Math.round(grown.vit), spi: Math.round(grown.spi),
   };
+  const contributions = Object.values(equipment).filter((item): item is T => !!item)
+    .map(item => itemStatContribution(definitionFor(item), item.plus, item.legacyRingBonus));
+  for (const contribution of contributions) {
+    for (const key of ['str', 'dex', 'int', 'vit', 'spi'] as const) stats[key] += contribution[key];
+  }
   const profile = classCombatProfile(classId, level, stats);
   const computed: EquipmentCombatStats = {
     ...stats,
@@ -52,9 +57,7 @@ export function calculateEquipmentStats<T extends { plus: number }>(
   };
   let gearHp = 0;
   let gearMp = 0;
-  for (const item of Object.values(equipment)) {
-    if (!item) continue;
-    const contribution = itemStatContribution(definitionFor(item), item.plus);
+  for (const contribution of contributions) {
     for (const key of ['atkMin', 'atkMax', 'matk', 'def', 'mdef', 'crit', 'accuracy', 'evasion'] as const) {
       computed[key] += contribution[key];
     }

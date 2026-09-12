@@ -23,10 +23,20 @@ export type ItemStatDefinition = {
   evasion?: number;
   /** Percentage points of the common 6.2 m/s reference, not meters per second. */
   speed?: number;
+  str?: number;
+  dex?: number;
+  int?: number;
+  vit?: number;
+  spi?: number;
 };
 
 /** Every field is an integer in item units. Percentages are stored as whole points. */
 export type ItemStatContribution = {
+  str: number;
+  dex: number;
+  int: number;
+  vit: number;
+  spi: number;
   atkMin: number;
   atkMax: number;
   matk: number;
@@ -54,7 +64,7 @@ function increased(value: number | undefined, bonus: number): number {
   return base === 0 ? 0 : base + bonus;
 }
 
-export function integerItemStats(definition: ItemStatDefinition, plus: number): ItemStatContribution {
+export function integerItemStats(definition: ItemStatDefinition, plus: number, legacyBonus?: Partial<ItemStatContribution>): ItemStatContribution {
   const level = definition.slot ? itemEnhancementLevel(plus) : 0;
   const weapon = definition.slot === 'weapon';
   const minBonus = weapon ? ITEM_PROGRESSION.weaponMin[level] : ITEM_PROGRESSION.accessoryAttack[level];
@@ -64,7 +74,9 @@ export function integerItemStats(definition: ItemStatDefinition, plus: number): 
     const base = whole(value);
     return base + Math.round(base * ITEM_PROGRESSION.vitalPercent[level] / 100);
   };
-  return {
+  const result: ItemStatContribution = {
+    str: whole(definition.str), dex: whole(definition.dex), int: whole(definition.int),
+    vit: whole(definition.vit), spi: whole(definition.spi),
     atkMin: increased(definition.atk?.[0], minBonus),
     atkMax: increased(definition.atk?.[1], maxBonus),
     matk: increased(definition.matk, magicBonus),
@@ -77,6 +89,10 @@ export function integerItemStats(definition: ItemStatDefinition, plus: number): 
     evasion: increased(definition.evasion, ITEM_PROGRESSION.secondary[level]),
     speed: increased(definition.speed, ITEM_PROGRESSION.secondary[level]),
   };
+  if (legacyBonus) {
+    for (const key of Object.keys(result) as Array<keyof ItemStatContribution>) result[key] += whole(legacyBonus[key]);
+  }
+  return result;
 }
 
 /** Conversion is applied only at the boundary between item units and world movement. */

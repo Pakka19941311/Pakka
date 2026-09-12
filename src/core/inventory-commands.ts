@@ -1,7 +1,8 @@
 import { EQUIP_SLOTS } from '../data/game-data.ts';
 import { INVENTORY_CAPACITY } from './game-rules.ts';
+import type { ItemStatContribution } from './item-progression.ts';
 
-export type InventoryItem = { uid: string; id: string; plus: number; count: number };
+export type InventoryItem = { uid: string; id: string; plus: number; count: number; legacyRingBonus?: Partial<ItemStatContribution>; ringMigrationVersion?: number };
 export type ItemReference = Readonly<InventoryItem>;
 export type EquipmentDefinition = { slot?: string; classes?: readonly string[] };
 export type InventoryState<T extends InventoryItem> = {
