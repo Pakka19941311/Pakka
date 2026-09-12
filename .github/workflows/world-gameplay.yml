@@ -88,7 +88,7 @@ jobs:
       - name: Connect final-world gameplay and verify authority
         run: |
           python scripts/world_final/materialize_payload.py
-          node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs
+          node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs --starter-v3
           node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs tests/stage-cave.test.mjs tests/stage-potions.test.mjs tests/castle-courtyard.test.mjs tests/castle-tavern.test.mjs tests/castle-quarter.test.mjs tests/ambient-npc.test.mjs
       - name: Import and export the gameplay client
         timeout-minutes: 25
@@ -106,9 +106,9 @@ jobs:
           # Always import this clean checkout and verify the real dependencies.
           python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-dependencies --timeout 180 -- --headless --script "$PWD/scripts/world_final/verify_gameplay_import.gd"
           tail -n 12 qa-artifacts/gameplay-dependencies/engine.log
-          "$GODOT" --headless --path godot-pc --script res://scripts/stage_format_qa.gd
-          "$GODOT" --headless --path godot-pc --export-release 'Windows PC' "$PWD/qa-artifacts/gameplay-build/Varendor.exe"
-          "$GODOT" --headless --path godot-pc --script "$PWD/scripts/world_final/write_godot_license.gd" -- --license-output="$PWD/qa-artifacts/gameplay-build/Godot-LICENSE.txt"
+          python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-format --timeout 180 -- --headless --script res://scripts/stage_format_qa.gd
+          python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-export --timeout 900 -- --headless --export-release 'Windows PC' "$PWD/qa-artifacts/gameplay-build/Varendor.exe"
+          python scripts/godot_run_checked.py --exe "$GODOT" --project godot-pc --output qa-artifacts/gameplay-license --timeout 180 -- --headless --script "$PWD/scripts/world_final/write_godot_license.gd" -- --license-output="$PWD/qa-artifacts/gameplay-build/Godot-LICENSE.txt"
       - uses: actions/upload-artifact@v4
         with:
           name: world-gameplay-windows-input
@@ -121,6 +121,9 @@ jobs:
           path: |
             qa-artifacts/gameplay-import
             qa-artifacts/gameplay-dependencies
+            qa-artifacts/gameplay-format
+            qa-artifacts/gameplay-export
+            qa-artifacts/gameplay-license
   windows-check-publish:
     needs: native-build
     runs-on: windows-latest
@@ -144,7 +147,11 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python scripts/world_final/materialize_payload.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          node scripts/world_final/package_gameplay.mjs qa-artifacts/gameplay-build/Varendor.exe qa-artifacts/gameplay-release qa-artifacts/gameplay-build/Godot-LICENSE.txt
+          node --experimental-strip-types scripts/godot-pc-data.mjs
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs --starter-v3
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          node scripts/world_final/package_gameplay.mjs qa-artifacts/gameplay-build/Varendor.exe qa-artifacts/gameplay-release qa-artifacts/gameplay-build/Godot-LICENSE.txt --starter-v3
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Verify shipped Windows EXE and portable server
         env:
@@ -159,12 +166,16 @@ jobs:
           if ($startupStatus -ne 0) { exit $startupStatus }
           $startupResult = Get-Content qa-artifacts/gameplay-startup/startup.json | ConvertFrom-Json
           if (-not $startupResult.ok) { throw 'Startup input verification failed' }
-          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --headless ("--package=" + $gamePackage)
+          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/gameplay-windows --starter-v3 --headless ("--package=" + $gamePackage)
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/castle-windows --castle --headless ("--package=" + $gamePackage)
+          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/castle-windows --starter-v3 --castle --headless ("--package=" + $gamePackage)
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/quarter-windows --castle-preview --headless ("--package=" + $gamePackage)
+          & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') qa-artifacts/quarter-windows --starter-v3 --castle-preview --headless ("--package=" + $gamePackage)
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          foreach ($gameBlock in @('craft', 'starter', 'ui-v3')) {
+            & (Join-Path $gamePackage 'runtime/node.exe') --experimental-strip-types scripts/world_final/stage_qa.mjs (Join-Path $gamePackage 'Varendor.exe') ("qa-artifacts/p2-" + $gameBlock + "-windows") --starter-v3 --headless ("--block=" + $gameBlock) ("--package=" + $gamePackage)
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
       - name: Publish verified gameplay ZIP
         env:
           GH_TOKEN: ${{ github.token }}
@@ -175,7 +186,7 @@ jobs:
           $gameZip = Join-Path $PWD ('qa-artifacts/gameplay-release/' + $gameResult.name + '.zip')
           $gameHash = (Get-FileHash -LiteralPath $gameZip -Algorithm SHA256).Hash.ToLower()
           $gameTag = 'world-gameplay-' + $env:GITHUB_SHA.Substring(0,12)
-          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — замковый квартал, ярмарка и таверна' --notes-file qa-artifacts/gameplay-release/release-notes.md
+          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — Гринфолл, игровой этап P2' --notes-file qa-artifacts/gameplay-release/release-notes.md
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $gameRelease = gh api ('repos/' + $env:GITHUB_REPOSITORY + '/releases/tags/' + $gameTag) | ConvertFrom-Json
           $gameAsset = $gameRelease.assets | Where-Object name -eq ($gameResult.name + '.zip')
@@ -199,4 +210,7 @@ jobs:
             qa-artifacts/quarter-windows/castle.json
             qa-artifacts/quarter-windows/native/result.json
             qa-artifacts/quarter-windows/native/engine.log
+            qa-artifacts/p2-*-windows/stage.json
+            qa-artifacts/p2-*-windows/native/result.json
+            qa-artifacts/p2-*-windows/native/engine.log
             qa-artifacts/gameplay-release/publish-result.json
