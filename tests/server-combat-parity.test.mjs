@@ -8,6 +8,7 @@ import { WorldSimulation } from '../src/server/world-simulation.ts';
 import { CollisionWorld } from '../src/world/collision-world.ts';
 import { CharacterMotor } from '../src/controls/character-motor.ts';
 import { CLASSES } from '../src/data/game-data.ts';
+import { SERVICES } from '../src/world/territory.ts';
 
 function fixture(t,cls='mage') {
   const directory=mkdtempSync(join(tmpdir(),'varendor-parity-'));const store=new WorldStore(join(directory,'world.sqlite'));
@@ -91,8 +92,10 @@ test('existing sell/drag and elder behavior remain atomic and preserve pre-quest
   const weapon=structuredClone(p.equipment.weapon);
   let receipt=w.command(p.id,'unequip-position',{type:'unequip',slot:'weapon',index:0,item:weapon});
   assert.equal(receipt.ok,true);assert.equal(p.inventory[0].uid,weapon.uid);
-  receipt=w.command(p.id,'sell-item-once',{type:'sell',item:weapon});assert.equal(receipt.ok,true);assert.equal(p.gold,320+Math.floor(140*.48));
-  assert.deepEqual(w.command(p.id,'sell-item-once',{type:'sell',item:weapon}),receipt);
-  Object.assign(p,{x:-7,z:-2.6,kills:7});assert.equal(w.command(p.id,'elder-existing-kills',{type:'quest'}).ok,true);
+  Object.assign(p,{x:SERVICES['npc:smith'].x,z:SERVICES['npc:smith'].z});
+  const trade=w.command(p.id,'open-sell-once',{type:'tradeOpen',npcId:'npc:smith'}).outcome;
+  receipt=w.command(p.id,'sell-item-once',{type:'sell',item:weapon,trade});assert.equal(receipt.ok,true);assert.equal(p.gold,320+Math.floor(140*.48));
+  assert.deepEqual(w.command(p.id,'sell-item-once',{type:'sell',item:weapon,trade}),receipt);
+  Object.assign(p,{x:SERVICES['npc:elder'].x,z:SERVICES['npc:elder'].z,kills:7});assert.equal(w.command(p.id,'elder-existing-kills',{type:'quest'}).ok,true);
   assert.equal(p.quest,1);assert.equal(p.kills,7);
 });

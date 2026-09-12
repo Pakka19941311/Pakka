@@ -29,9 +29,13 @@ var drag_cancelled: bool = false
 
 func configure_startup(value: Node) -> void:
 	app = value
-	if FileAccess.file_exists("user://display-settings-v2.json"):
-		var read = JSON.parse_string(FileAccess.get_file_as_string("user://display-settings-v2.json"))
-		if read is Dictionary: startup_display = read
+	# Native acceptance uses its own bootstrap and never inherits personal display settings.
+	var isolated: bool = Array(OS.get_cmdline_user_args()).any(func(v: String): return v.begins_with("--qa="))
+	if not isolated and FileAccess.file_exists("user://display-settings-v2.json"):
+		var saved: FileAccess = FileAccess.open("user://display-settings-v2.json",FileAccess.READ)
+		if saved != null:
+			var parsed: JSON = JSON.new()
+			if parsed.parse(saved.get_as_text()) == OK and parsed.data is Dictionary: startup_display = parsed.data
 	for key: String in ["display","resolution","ui_scale"]:
 		if not startup_display.has(key): startup_display[key] = 1
 	app.game_settings = startup_display.duplicate()
@@ -226,16 +230,20 @@ func refresh_storage() -> void:
 	storage_count.text = "%d / 500 ячеек · общий склад двух городов" % items.filter(func(i): return i is Dictionary).size()
 
 func shop(kind: String, title: String, selected_tab: int = 0) -> void:
-	var body: VBoxContainer = app.dialog(title,Vector2i(480,350))
+	var can_sell: bool = kind in ["smith","alchemist"] and app.trade_session.allowed()
+	var body: VBoxContainer = app.dialog(title,Vector2i(480,350),can_sell)
 	body.add_child(app.label("Ваше золото: %d ◈" % int(app.net.hero.gold),13))
 	var tabs: TabContainer = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(tabs)
 	var purchase: VBoxContainer = VBoxContainer.new(); purchase.name = "Купить"; purchase.add_theme_constant_override("separation",10); tabs.add_child(purchase)
-	var sale: VBoxContainer = VBoxContainer.new(); sale.name = "Продать"; sale.add_theme_constant_override("separation",8); tabs.add_child(sale)
-	tabs.current_tab = selected_tab
+	var sale: VBoxContainer = VBoxContainer.new(); sale.name = "Продать"; sale.add_theme_constant_override("separation",8)
+	if can_sell: tabs.add_child(sale)
+	else: sale.free()
+	tabs.current_tab = clampi(selected_tab,0,tabs.get_tab_count()-1)
+	if kind == "smith": purchase.add_child(app.wrapped_label("Кузница: выберите свиток в сумке, затем предмет для усиления.",12))
 	if kind == "books": purchase.add_child(app.button("Книги умений · выбрать класс",app.book_ui.shop_classes))
-	for id: String in ([] if kind == "books" else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]):
+	for id: String in ([] if kind in ["books","smith"] else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]):
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); purchase.add_child(row)
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id; cell.custom_minimum_size = CELL
 		cell.artwork = app.book_ui.item_icon({"id":id}); row.add_child(cell)
@@ -248,6 +256,7 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 			await app.net.command({"type":"buy","itemId":id})
 			if is_instance_valid(body): shop(kind,title,0))
 		buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
+	if not can_sell: return
 	var drop_area = preload("res://scripts/sale_drop.gd").new()
 	drop_area.app = app; drop_area.reopen = func(): shop(kind,title,1)
 	sale.add_child(drop_area)

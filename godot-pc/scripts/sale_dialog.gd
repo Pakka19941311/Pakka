@@ -7,9 +7,10 @@ static func amount(text: String, maximum: int) -> int:
 	return number if number >= 1 and number <= maximum else 0
 
 static func open(app: Node, item: Dictionary, return_to: Callable = Callable()) -> void:
+	if not app.trade_session.allowed(): return
 	var maximum: int = int(item.count)
 	var unit_price: int = int(floorf(float(app.data.items[item.id].get("value",0))*.48))
-	var box: VBoxContainer = app.dialog("Продать предмет",Vector2i(500,280))
+	var box: VBoxContainer = app.dialog("Продать предмет",Vector2i(500,280),true)
 	var header: HBoxContainer = HBoxContainer.new(); box.add_child(header)
 	var icon: TextureRect = TextureRect.new(); icon.texture = app.book_ui.item_icon(item)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -29,22 +30,22 @@ static func open(app: Node, item: Dictionary, return_to: Callable = Callable()) 
 	var confirm: Button = app.button("",func(): pass); confirm.name = "SaleConfirm"; box.add_child(confirm)
 	var refresh: Callable = func(_text: String = ""):
 		var quantity: int = amount(field.text,maximum)
-		confirm.disabled = quantity == 0 or app.net.command_busy
+		confirm.disabled = quantity == 0 or app.net.command_busy or not app.trade_session.allowed()
 		error.text = "Введите целое количество от 1 до %d" % maximum if quantity == 0 else ""
 		confirm.text = "Продать %d за %d золота" % [quantity,quantity*unit_price] if quantity > 0 else "Продать"
 	field.text_changed.connect(refresh)
 	confirm.pressed.connect(func():
 		var quantity: int = amount(field.text,maximum)
-		if quantity == 0 or app.net.command_busy or not is_instance_valid(box): return
+		if quantity == 0 or app.net.command_busy or not is_instance_valid(box) or not app.trade_session.allowed(): return
 		if not app.reference_hud.has_item_version(item): error.text = "Предмет уже изменился. Откройте продажу заново."; confirm.disabled = true; return
 		confirm.disabled = true
-		await app.net.command({"type":"sell","item":item.duplicate(true),"quantity":quantity})
+		await app.net.command({"type":"sell","item":item.duplicate(true),"quantity":quantity,"trade":app.trade_session.command_reference()})
 		if not is_instance_valid(box): return
 		var remainder: int = 0
 		for current: Dictionary in app.net.hero.inventory:
 			if current.uid == item.uid: remainder = int(current.count)
 		if remainder != maximum-quantity: refresh.call(); return
-		app.close_dialog()
+		app.close_dialog(return_to.is_valid())
 		if return_to.is_valid(): return_to.call())
 	box.add_child(app.button("Отмена",app.close_dialog))
 	field.text_submitted.connect(func(_text: String): if not confirm.disabled: confirm.pressed.emit())

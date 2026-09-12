@@ -54,6 +54,7 @@ var qa_times: Array = []
 var qa_last_frame_usec: int = 0
 var player_input: VarendorPlayerInput = VarendorPlayerInput.new()
 var npc_interaction: VarendorNpcInteraction = VarendorNpcInteraction.new()
+var trade_session = preload("res://scripts/trade_session.gd").new()
 var mouse_orbit: bool:
 	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
@@ -79,6 +80,7 @@ var loading_layer: CanvasLayer
 var loading_status: Label
 
 func _ready() -> void:
+	trade_session.app = self
 	if "--qa-scope=monsters" in OS.get_cmdline_user_args():
 		set_process(false)
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/monster_qa.tscn")
@@ -520,10 +522,11 @@ func save_preferences() -> void:
 	if not net.save_private_json(preference_path, preferences):
 		notice("Не удалось сохранить назначения клавиш")
 
-func dialog(title: String, size: Vector2i = Vector2i(480, 270)) -> VBoxContainer:
+func dialog(title: String, size: Vector2i = Vector2i(480, 270), preserve_trade: bool = false) -> VBoxContainer:
 	player_input.stop_autorun()
 	world.camera_controller.release_for_modal()
-	if is_instance_valid(active_dialog): close_dialog()
+	if is_instance_valid(active_dialog): close_dialog(preserve_trade)
+	elif not preserve_trade: trade_session.close()
 	active_dialog = polish.floating(title,Vector2(size)+Vector2(0,40))
 	var shell: VBoxContainer = polish.shell(active_dialog,title,close_dialog,"dialog")
 	var scroll: ScrollContainer = ScrollContainer.new()
@@ -778,6 +781,7 @@ func interact() -> void:
 	npc_interaction.begin(world.target_id)
 
 func open_npc_service(id: String) -> void:
+	trade_session.app = self
 	if id in ["npc:asterhold:shop","npc:books"]:
 		book_ui.merchant_name = str(VarendorNpcInteraction.SERVICES[id].name)
 		book_ui.shop_classes()
@@ -785,7 +789,12 @@ func open_npc_service(id: String) -> void:
 	if id == "npc:asterhold:elder": book_ui.quest_menu(); return
 	var service: Dictionary = VarendorNpcInteraction.SERVICES.get(id,{})
 	var kind: String = id.get_slice(":",id.get_slice_count(":")-1)
-	if kind in ["shop","alchemist"]:
+	if kind in ["alchemist","smith"]:
+		if not await trade_session.open(id): return
+		polish.shop(kind,str(service.get("name","Торговля")))
+		return
+	if kind == "shop":
+		trade_session.close()
 		polish.shop(kind,str(service.get("name","Торговля")))
 		return
 	if kind == "storage":
@@ -898,6 +907,9 @@ func use_selected() -> void:
 		net.command({"type":"use","item":item.duplicate()})
 
 func sell_selected(return_to: Callable = Callable()) -> void:
+	if not trade_session.allowed():
+		notice("Продавать вещи можно только у оружейника или алхимика в городе")
+		return
 	var item: Dictionary = selected_item.get("item", {})
 	if item.is_empty() or selected_item.get("kind") != "bag":
 		notice("Выберите предмет в сумке")
@@ -972,6 +984,7 @@ func text_focused() -> bool:
 	return get_viewport().gui_get_focus_owner() is LineEdit or get_viewport().gui_get_focus_owner() is TextEdit or (is_instance_valid(active_dialog) and not active_dialog.get_meta("nonmodal",false)) or (login != null and login.visible)
 
 func _process(delta: float) -> void:
+	trade_session.poll()
 	if not startup_complete or world == null or net == null:
 		return
 	# The frame's catch-up physics belongs to the previously held input.
@@ -1321,7 +1334,9 @@ func run_qa() -> void:
 	await get_tree().process_frame
 	get_tree().quit(0 if success else 2)
 
-func close_dialog() -> void:
+func close_dialog(preserve_trade: bool = false) -> void:
+	trade_session.app = self
+	if not preserve_trade: trade_session.close()
 	var closing: PanelContainer = active_dialog
 	active_dialog = null
 	rebinding_action = ""

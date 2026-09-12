@@ -502,7 +502,7 @@ func refresh_inventory_state() -> void:
 			elif app.selected_item.get("kind") == "equipment": actions.append(["use","Снять"])
 			elif definition.has("slot"): actions.append(["use","Надеть"])
 			elif definition.get("type") in ["consumable","book"]: actions.append(["use","Использовать"])
-			if app.selected_item.get("kind") == "bag" and definition.get("type") != "book": actions.append(["sell","Продать · %d ◈" % (floorf(float(definition.get("value",0))*.48)*int(selected.count))])
+			if app.trade_session.allowed() and app.selected_item.get("kind") == "bag" and definition.get("type") != "book": actions.append(["sell","Продать · %d ◈" % (floorf(float(definition.get("value",0))*.48)*int(selected.count))])
 		var loot: Array = display_hero().get("lootBuffer",[])
 		if not loot.is_empty(): actions.append(["collect","Забрать добычу (%d)" % loot.size()])
 	var signature: String = JSON.stringify([actions,app.net.hero.get("dead",false),app.net.command_busy])

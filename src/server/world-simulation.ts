@@ -21,8 +21,9 @@ import { CONTENT_VERSION, mapVersion } from './content-manifest.ts';
 import { findNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
 import type {FinalWorld, TerrainSupport} from '../world/final-world.ts';
+import {inPolygon} from '../world/final-world.ts';
 import {sameSpace,spaceOf} from '../world/world-space.ts';
-import { START_POINT, SERVICES, isTerritorySafe, TERRITORY_VERSION } from '../world/territory.ts';
+import { START_POINT, SERVICES, FORT, CAPITAL, isTerritorySafe, TERRITORY_VERSION } from '../world/territory.ts';
 import { migrateTerritory, legacyTerritoryPosition } from '../world/territory-migration.ts';
 import { CharacterMotor, smoothAngle } from '../controls/character-motor.ts';
 import { slidePastActor } from '../controls/actor-spacing.ts';
@@ -31,7 +32,7 @@ import { combatSpacing, approachPoint, facingTarget, attackTimings } from '../co
 import { MonsterAiBrain } from '../world/monster-ai.ts';
 import { WORLD_PROTOCOL, DISCONNECT_GRACE_MS } from '../network/world-protocol.ts';
 import { parseBetaSave } from './beta-import.ts';
-import type { WorldCharacter, WorldMonster, WorldSummon, WorldCommand, WorldIntent, WorldEvent, WorldSnapshot, CommandReceipt, Position, WorldMotion } from '../network/world-protocol.ts';
+import type { WorldCharacter, WorldMonster, WorldSummon, WorldCommand, WorldIntent, WorldEvent, WorldSnapshot, CommandReceipt, Position, WorldMotion, TradeSession } from '../network/world-protocol.ts';
 
 type ClassId = keyof typeof CLASSES;
 type ItemId = keyof typeof ITEMS;
@@ -68,6 +69,7 @@ const REFERENCE_DEATH_MS = 420;
 const REFERENCE_CORPSE_MS = 2580;
 const SPAWN = START_POINT;
 const distance = (a: Position, b: Position) => Math.hypot(a.x - b.x, a.z - b.z);
+const SELLER_IDS = new Set(['npc:smith','npc:asterhold:smith','npc:alchemist','npc:asterhold:alchemist']);
 
 const itemDef = (item: InventoryItem): ItemStatDefinition & {slot?:string} => ITEMS[item.id as ItemId] as ItemStatDefinition & {slot?:string};
 const monsterDef = (m: WorldMonster) => MONSTERS[m.id as MonsterId];
@@ -111,6 +113,33 @@ export class WorldSimulation {
   private firingPositions=new Map<string,{target:string;origin:Position;goal:Position;expiresAt:number}>();
   private patrols=new Map<string,Position[]>();
   private pursuit=new Map<string,{x:number;z:number;since:number}>();
+  // Runtime capability only: never restored from saves or command receipts.
+  private tradeSessions=new Map<string,TradeSession>();
+
+  private tradeService(p:WorldCharacter,npcId:string):void {
+    const npc=(this.finalWorld?.services??SERVICES)[npcId as keyof typeof SERVICES];
+    if(!SELLER_IDS.has(npcId)||!npc||!('merchantRole' in npc)||!['weapon_vendor','alchemist'].includes(npc.merchantRole))throw Error('merchant-unavailable');
+    if(p.dead||p.hp<=0)throw Error('dead');
+    if(p.activeUntil<=this.state.time)throw Error('trade-session-required');
+    const inCity=(point:Position)=>{
+      if(spaceOf(point)!=='surface')return false;
+      if(this.finalWorld){
+        const city=this.finalWorld.layout.locations.find((l:{id:string})=>l.id===npc.tradeCity);
+        return Boolean(city?.safe&&city.space_id==='surface'&&Array.isArray(city.outline_xz)&&inPolygon(point.x,-point.z,city.outline_xz));
+      }
+      const city=npc.tradeCity==='L02'?FORT:npc.tradeCity==='L01'?CAPITAL:undefined;
+      return Boolean(city&&Math.abs(point.x-city.x)<city.width/2&&Math.abs(point.z-city.z)<city.depth/2);
+    };
+    if(!sameSpace(p,npc)||!inCity(p)||!inCity(npc))throw Error('merchant-unavailable');
+    const terrain=this.terrainFor(p),dy=terrain.supportAt(p.x,p.z)+p.yOffset-terrain.supportAt(npc.x,npc.z);
+    if(!Number.isFinite(dy)||Math.hypot(p.x-npc.x,p.z-npc.z,dy)>3.2)throw Error('merchant-out-of-range');
+    if(!this.lineOfSight(p,npc))throw Error('merchant-occluded');
+  }
+  private pruneTradeSession(p:WorldCharacter):void {
+    const session=this.tradeSessions.get(p.id);if(!session)return;
+    if(session.spaceId!==spaceOf(p)||session.generation!==p.generation){this.tradeSessions.delete(p.id);return;}
+    try{this.tradeService(p,session.npcId);}catch{this.tradeSessions.delete(p.id);}
+  }
 
   constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSupport; finalWorld?:FinalWorld; now: number; random?: () => number; identifier: () => string; beta?: boolean; xpRate?:number}) {
     this.finalWorld=options.finalWorld;
@@ -233,9 +262,14 @@ export class WorldSimulation {
     return p;
   }
 
-  heartbeat(id: string): void { this.character(id).activeUntil = this.state.time + DISCONNECT_GRACE_MS; }
+  heartbeat(id: string): void {
+    const p=this.character(id);
+    if(p.activeUntil<=this.state.time)this.tradeSessions.delete(id);
+    p.activeUntil=this.state.time+DISCONNECT_GRACE_MS;
+  }
   disconnect(id: string): void {
     const p = this.character(id);
+    this.tradeSessions.delete(id);
     p.activeUntil = Math.min(p.activeUntil,this.state.time + DISCONNECT_GRACE_MS);
     p.direction = {x:0,z:0}; p.destination=null;
     this.store.save(this.state);
@@ -283,27 +317,40 @@ export class WorldSimulation {
 
   command(id: string, commandId: string, command: WorldCommand): CommandReceipt {
     if (!/^[a-zA-Z0-9:_-]{8,128}$/.test(commandId)) throw Error('invalid-command-id');
-    this.character(id);
+    this.pruneTradeSession(this.character(id));
     const previous=this.store.receipt(id,commandId,command);
     if (previous) return previous;
     const before=structuredClone(this.state);const eventsBefore=[...this.events];
+    const tradeBefore=this.tradeSessions.get(id);
     let receipt: CommandReceipt;
     try {
       this.applyingCommand=true;
       const outcome=this.applyCommand(this.character(id),command);
       receipt={id:commandId,ok:true,at:this.state.time,...(outcome===undefined?{}:{outcome})};
     } catch (error) {
+      if(command?.type==='tradeOpen')this.tradeSessions.delete(id);
       this.state=before;this.events.splice(0,this.events.length,...eventsBefore);this.brains.clear();this.paths.clear();
       receipt={id:commandId,ok:false,at:this.state.time,reason:error instanceof Error?error.message:'invalid-command'};
     }
     this.applyingCommand=false;
     this.state.revision++;
     try {this.store.commit(this.state,id,commandId,command,receipt);}
-    catch (error) {this.state=before;this.events.splice(0,this.events.length,...eventsBefore);this.brains.clear();this.paths.clear();throw error;}
+    catch (error) {
+      this.state=before;this.events.splice(0,this.events.length,...eventsBefore);this.brains.clear();this.paths.clear();
+      if(command?.type==='tradeOpen'||command?.type==='tradeClose'){
+        if(tradeBefore)this.tradeSessions.set(id,tradeBefore);else this.tradeSessions.delete(id);
+        this.pruneTradeSession(this.character(id));
+      }
+      throw error;
+    }
     return receipt;
   }
 
   private applyCommand(p: WorldCharacter, command: WorldCommand): unknown {
+    if(command.type==='tradeClose'){
+      if(this.tradeSessions.get(p.id)?.token===command.token)this.tradeSessions.delete(p.id);
+      return;
+    }
     if(command.type==='chat'){
       if(!['world','trade'].includes(command.channel)||typeof command.text!=='string')throw Error('invalid-chat');
       const message=command.text.replace(/[\x00-\x1f\x7f]/g,' ').trim();if(!message||message.length>240)throw Error('invalid-chat');
@@ -317,6 +364,11 @@ export class WorldSimulation {
       return;
     }
     if (p.dead) throw Error('dead');
+    if(command.type==='tradeOpen'){
+      this.tradeService(p,command.npcId);
+      const session={npcId:command.npcId,token:this.identifier(),spaceId:spaceOf(p),generation:p.generation};
+      this.tradeSessions.set(p.id,session);return {...session};
+    }
     if(command.type==='castBook'){this.books.cast(p,command.bookId,command.targetId,command.point?{x:command.point.x,z:command.point.z,spaceId:p.spaceId}:undefined);return;}
     if(command.type==='bookQuest'){
       const elder=(this.finalWorld?.services??SERVICES)['npc:asterhold:elder'];
@@ -358,6 +410,9 @@ export class WorldSimulation {
       return;
     }
     if(command.type==='sell'){
+      const session=this.tradeSessions.get(p.id);
+      if(!session||!command.trade||session.token!==command.trade.token||session.npcId!==command.trade.npcId)throw Error('trade-session-required');
+      this.tradeService(p,session.npcId);
       const item=p.inventory.find(i=>i.uid===command.item.uid);
       if(!item||item.id!==command.item.id||item.plus!==command.item.plus||item.count!==command.item.count)throw Error('stale-item');
       if(SKILL_BOOKS[item.id])throw Error('cannot-sell-book');
@@ -536,6 +591,7 @@ export class WorldSimulation {
       const dead='alive' in actor?!actor.alive:'dead' in actor&&actor.dead;
       actor.velocityX=dead?0:(actor.x-before.x)/dt;actor.velocityZ=dead?0:(actor.z-before.z)/dt;
     }
+    for(const id of this.tradeSessions.keys())this.pruneTradeSession(this.character(id));
   }
   private expireDeadlines(): void {
     this.books.tick();this.state.bookAreas=this.state.bookAreas?.filter(a=>a.remaining>0);this.state.bookTraps=this.state.bookTraps?.filter(t=>t.expiresAt>this.state.time);
@@ -952,6 +1008,7 @@ export class WorldSimulation {
   private relocate(p:WorldCharacter,point:Position):void {
     const free=this.collisionFor(point).findNearestFree(point,.46);
     if(this.collisionFor(point).isBlocked(free,.46))throw Error('no-free-arrival');
+    this.tradeSessions.delete(p.id);
     this.cancelControl(p);this.motor(p).reset();this.paths.delete(p.id);this.pursuit.delete(p.id);this.approaching.delete(p.id);
     // Destination metadata (notably its required level) is never character data.
     Object.assign(p,{x:free.x,z:free.z,...(this.finalWorld?{spaceId:spaceOf(point)}:{})},motion(this.state.time),{generation:p.generation+1});

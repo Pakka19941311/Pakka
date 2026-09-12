@@ -24,6 +24,15 @@ static func run(app: Node) -> void:
 	app.get_tree().quit(0 if ok else 2)
 
 static func sale(app: Node, checks: Dictionary) -> void:
+	checks.sale_completed = false
+	app.close_dialog()
+	app.selected_item = {"kind":"bag","item":app.net.hero.inventory.filter(func(i): return i.id == "potion")[0].duplicate(true)}
+	app.sell_selected()
+	checks.sale_without_merchant_blocked = not is_instance_valid(app.active_dialog)
+	await Mouse.fixture(app,"trade-smith")
+	await app.open_npc_service("npc:smith")
+	checks.sale_city_session = app.trade_session.allowed()
+	if not checks.sale_city_session: return
 	var item: Dictionary = app.net.hero.inventory.filter(func(i): return i.id == "potion")[0].duplicate(true)
 	var before_gold: int = int(app.net.hero.gold)
 	var before: Vector2 = Vector2(app.net.hero.x,app.net.hero.z)
@@ -44,10 +53,16 @@ static func sale(app: Node, checks: Dictionary) -> void:
 	checks.sale_gold_once = int(app.net.hero.gold) == before_gold+45
 	checks.sale_ui_consumes_click = before.distance_to(Vector2(app.net.hero.x,app.net.hero.z)) < .02
 	item = app.net.hero.inventory.filter(func(i): return i.uid == item.uid)[0].duplicate(true)
+	await Wait.until(app,func(): return not app.net.command_busy and app.trade_session.closing_tokens.is_empty(),3000)
+	await app.open_npc_service("npc:smith")
 	app.selected_item = {"kind":"bag","item":item}; app.sell_selected(); app.close_dialog()
 	await Keys.wait_ms(app.get_tree(),150)
 	checks.sale_cancel = int(app.net.hero.gold) == before_gold+45 and app.net.hero.inventory.any(func(i): return i.uid == item.uid and int(i.count) == 7)
-	app.sell_selected(); await Keys.wait_ms(app.get_tree(),100)
+	app.sell_selected()
+	checks.sale_closed_session_not_reused = not is_instance_valid(app.active_dialog)
+	await Wait.until(app,func(): return not app.net.command_busy and app.trade_session.closing_tokens.is_empty(),3000)
+	await app.open_npc_service("npc:smith")
+	app.selected_item = {"kind":"bag","item":item}; app.sell_selected(); await Keys.wait_ms(app.get_tree(),100)
 	var all: Button = app.active_dialog.find_child("SaleAll",true,false)
 	Mouse.mouse(app,all.get_global_rect().get_center()); await Keys.wait_ms(app.get_tree(),80)
 	confirm = app.active_dialog.find_child("SaleConfirm",true,false)
@@ -55,8 +70,10 @@ static func sale(app: Node, checks: Dictionary) -> void:
 	checks.sale_all = await Wait.until(app,func(): return not app.net.hero.inventory.any(func(i): return i.uid == item.uid),5000)
 	checks.sale_full_gold = int(app.net.hero.gold) == before_gold+150
 	app.close_dialog()
+	checks.sale_completed = true
 
 static func potions(app: Node, checks: Dictionary) -> void:
+	await Mouse.fixture(app,"trade-elza")
 	for id: String in ["potion_large","haste"]:
 		app.open_npc_service("npc:shop"); await Keys.wait_ms(app.get_tree(),200)
 		var buttons: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(b): return b.get_meta("npc_action","") == "buy:"+id)
@@ -95,11 +112,15 @@ static func drag_end(app: Node, point: Vector2) -> void:
 	await Keys.wait_ms(app.get_tree(),150)
 
 static func drag(app: Node, checks: Dictionary) -> void:
+	app.close_dialog()
+	await Mouse.fixture(app,"trade-smith")
+	await Wait.until(app,func(): return not app.net.command_busy and app.trade_session.closing_tokens.is_empty(),3000)
+	await app.open_npc_service("npc:smith")
 	var inventory: String = JSON.stringify(app.net.hero.inventory)
 	checks.drag_size_and_cancel = true
 	for ui_scale: float in [1.0,1.5]:
 		app.get_window().content_scale_factor = ui_scale
-		app.polish.shop("shop","Торговка Эльза",1)
+		app.polish.shop("smith","Оружейник Бран",1)
 		await Keys.wait_ms(app.get_tree(),300)
 		var slots: Array = app.active_dialog.find_children("*","Button",true,false).filter(func(n): return n is VarendorItemSlot)
 		if slots.is_empty(): checks.drag_size_and_cancel = false; continue
@@ -111,7 +132,7 @@ static func drag(app: Node, checks: Dictionary) -> void:
 		await drag_end(app,Vector2(15,15))
 		checks.drag_size_and_cancel = checks.drag_size_and_cancel and JSON.stringify(app.net.hero.inventory) == inventory
 	app.get_window().content_scale_factor = 1.0
-	app.polish.shop("shop","Торговка Эльза",1); await Keys.wait_ms(app.get_tree(),200)
+	app.polish.shop("smith","Оружейник Бран",1); await Keys.wait_ms(app.get_tree(),200)
 	var slot: Control = app.active_dialog.find_children("*","Button",true,false).filter(func(n): return n is VarendorItemSlot)[0]
 	var drop: Control = app.active_dialog.find_child("SaleDrop",true,false)
 	var point: Vector2 = drop.get_global_rect().get_center()

@@ -15,7 +15,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_DRAG_BEGIN or what == NOTIFICATION_DRAG_END:
 		if is_inside_tree(): style(what == NOTIFICATION_DRAG_BEGIN and _can_drop_data(Vector2.ZERO,get_viewport().gui_get_drag_data()))
 func _can_drop_data(_point: Vector2, data) -> bool:
-	return data is Dictionary and data.get("kind","") == "bag" and not data.get("item",{}).is_empty() and not app.net.command_busy and not app.net.hero.get("dead",true) and not app.data.books.has(data.item.id) and app.reference_hud.has_item_version(data.item)
+	return app.trade_session.allowed() and data is Dictionary and data.get("kind","") == "bag" and not data.get("item",{}).is_empty() and not app.net.command_busy and not app.net.hero.get("dead",true) and not app.data.books.has(data.item.id) and app.reference_hud.has_item_version(data.item)
 func _drop_data(_point: Vector2, data) -> void:
 	app.selected_item = data.duplicate(true)
 	app.sell_selected.call_deferred(reopen)

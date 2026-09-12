@@ -1,0 +1,28 @@
+{
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "checks": {
+    "connected": true,
+    "sale_all": true,
+    "sale_cancel": true,
+    "sale_city_session": true,
+    "sale_closed_session_not_reused": true,
+    "sale_completed": true,
+    "sale_default_one": true,
+    "sale_full_gold": true,
+    "sale_gold_once": true,
+    "sale_invalid_input": true,
+    "sale_partial": true,
+    "sale_price": true,
+    "sale_ui_consumes_click": true,
+    "sale_without_merchant_blocked": true
+  },
+  "ok": true,
+  "scope": "Windows Godot source client + real HTTP server, isolated SQLite; sale only",
+  "visual_inspected": true,
+  "personal_save_used": false,
+  "environment_notes": [
+    "Restricted Windows process could not use user shader cache/certificate store; no script errors in final scoped run.",
+    "Separate missing/empty display preference read corrected and QA isolated from personal display preferences."
+  ],
+  "release_tested": false
+}

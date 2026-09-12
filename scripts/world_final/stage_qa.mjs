@@ -31,6 +31,10 @@ try{
    const key=request.stage.slice(7),point=positions[key];assert.ok(point,'unknown courtyard QA point');
    world.relocate(hero,{x:point[0],z:point[1],spaceId:key==='interior'?'great_cave':'surface'});
   }
+  else if(request.stage.startsWith('trade-')){
+   const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');
+   world.relocate(hero,{...geography.services[id],x:geography.services[id].x+2});
+  }
   else if(request.stage==='cave-entrance'){world.relocate(hero,{x:245,z:278,spaceId:'surface'});hero.hp=hero.maxHp;}
   else if(request.stage==='cave-finish'){
    // Keep the native regression short after observing real damage/animation.

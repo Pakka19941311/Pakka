@@ -8,6 +8,7 @@ import type { EquipmentCombatStats } from '../core/equipment-stats.ts';
 export const WORLD_PROTOCOL = 1;
 export const DISCONNECT_GRACE_MS = 30_000;
 export type Position = { x: number; z: number; spaceId?:SpaceId };
+export type TradeSession = {npcId:string;token:string;spaceId:SpaceId;generation:number};
 export type WorldMotion = { yOffset:number; grounded:boolean; yaw:number; action:'idle'|'walk'|'jump'|'attack'|'death'; actionStartedAt:number; actionEndsAt:number; velocityX?:number; velocityZ?:number; verticalVelocity?:number; locomotionState?:LocomotionState; combatState?:'idle'|'approach'|'face'|'windup'|'recovery'|'dead'; hitAt?:number; hitUntil?:number; bodyRadius?:number; attackRange?:number };
 export type WorldCharacter = Position & WorldMotion & {
   id: string; name: string; classId: string; level: number; xp: number; gold: number;
@@ -57,7 +58,10 @@ export type WorldCommand =
   | { type: 'reorder'; item: ItemReference; index: number }
   | { type: 'enhance'; item: ItemReference; scroll: ItemReference }
   | { type: 'use'; item: ItemReference }
-  | { type: 'sell'; item: ItemReference; quantity?:number }
+  | { type: 'tradeOpen'; npcId:string }
+  | { type: 'tradeClose'; token:string }
+  // Legacy clients may omit trade on the wire; the server rejects such sales.
+  | { type: 'sell'; item: ItemReference; quantity?:number; trade?:Pick<TradeSession,'npcId'|'token'> }
   | { type: 'buy'; itemId: string }
   | { type: 'teleport'; destination: string }
   | { type: 'portal'; destination:'mine'|'great_cave' }
