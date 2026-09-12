@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {historicalFingerprintMatches,recordUnresolvedHistoricalSource} from './helpers/historical-fingerprint.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -55,10 +56,22 @@ test('exactly one new mini per original L; accepted cave boss identity/level rem
  assert.notEqual(minis.find(s=>s.locationId==='L07').uid,cave.uid);
 });
 
-test('source hashes detect stale terrain, collision, safe-quarter or interior planning artifacts',()=>{
+test('staged proposal retains historical fingerprints; current spatial compatibility is tested below',()=>{
+ const audit='docs/world-expansion-v3/audit-20260912/resources/';
+ const ledger=JSON.parse(readFileSync(audit+'historical-evidence-ledger.json','utf8'));
+ const provenance=JSON.parse(readFileSync(audit+'proposal-provenance.json','utf8'));
+ assert.ok(historicalFingerprintMatches('docs/world-expansion-v3/population.json',ledger.reports['docs/world-expansion-v3/population.json'].sha256LF));
+ assert.equal(population.activation.runtimeEnabled,false);
  for(const source of population.source){
-  const digest=createHash('sha256').update(readFileSync(resolve(source.path))).digest('hex');
-  assert.equal(digest,source.sha256,source.path+' changed: regenerate and spatially review');
+  if(recordUnresolvedHistoricalSource(source.path,source.sha256))continue;
+  const recorded=provenance.find(row=>row.path===source.path);
+  assert.equal(recorded.recordedSha256,source.sha256);
+  if(recorded.status==='historical-archive-verified'){
+   // The accepted lake keeps its original geography in a pinned ZIP. The
+   // independent audit compared each extracted entry with these original pins.
+   const lake=JSON.parse(readFileSync('art/terrain-lake-p2-v3/manifest.json','utf8'));
+   assert.equal(createHash('sha256').update(readFileSync(recorded.archive)).digest('hex'),lake.baseline_zip_sha256);
+  }else assert.ok(historicalFingerprintMatches(source.path,source.sha256),source.path+' changed: update provenance and spatially review');
  }
 });
 

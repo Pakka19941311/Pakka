@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {historicalFingerprintMatches} from './helpers/historical-fingerprint.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -189,7 +190,7 @@ test('report exposes unresolved numerical cases, hashes real inputs and never mu
  assert.ok(renderBalanceReport(report).includes('не пройденный баланс всей карты'));
  const history=JSON.parse(readFileSync('docs/world-expansion-v3/BOOK_TYPED_DAMAGE_HISTORY.json','utf8'));
  assert.equal(history.status,'historical-before-typed-damage');
- for(const [path,hash]of Object.entries(history.artifacts))assert.equal(createHash('sha256').update(readFileSync(path)).digest('hex'),hash,'Never rewrite historical evidence: '+path);
+ for(const [path,hash]of Object.entries(history.artifacts))assert.ok(historicalFingerprintMatches(path,hash),'Never rewrite historical evidence: '+path);
  const saved=JSON.parse(readFileSync('docs/world-expansion-v3/BALANCE_DATA.json','utf8'));
  assert.ok(saved.percentHpStress.every(r=>r.ttk===33.55),'The old no-mitigation observation stays historical');
 });

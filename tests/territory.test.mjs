@@ -24,16 +24,16 @@ test('both Greenfall gates pass two walking bodies and have real overhead collis
     assert.equal(world.collision.hasLineOfSight({x:x-3,z,y:5},{x:x+3,z,y:5}),false);
   }
 });
-test('all four services and six residents have free reachable positions',()=>{
-  assert.equal(Object.keys(SERVICES).length,4);assert.equal(RESIDENTS.length,6);
+test('all twelve authored legacy services and six residents have free reachable positions',()=>{
+  assert.equal(Object.keys(SERVICES).length,12);assert.equal(RESIDENTS.length,6);
   for(const p of [...Object.values(SERVICES),...RESIDENTS.flatMap(r=>r.route)]){
     assert.equal(world.collision.isBlocked(p,.46),false,JSON.stringify(p));
     assert.ok(findNavigationPath(world.collision,START_POINT,p).length>0,JSON.stringify(p));
   }
 });
-test('all 53 original monster identities and 10 types spawn outside protected zones',()=>{
-  assert.equal(SPAWN_REGIONS.reduce((sum,r)=>sum+r.population,0),53);
-  assert.equal(new Set(SPAWN_REGIONS.map(r=>r.monsterId)).size,10);
+test('all 102 authored legacy monster identities and 13 types spawn outside protected zones',()=>{
+  assert.equal(SPAWN_REGIONS.reduce((sum,r)=>sum+r.population,0),102);
+  assert.equal(new Set(SPAWN_REGIONS.map(r=>r.monsterId)).size,13);
   for(const r of SPAWN_REGIONS)for(let i=0;i<r.population;i++){
     const p=spawnPointInRegion(r,i);assert.equal(world.collision.isBlocked(p,r.boss?1.2:.5),false,r.id);assert.equal(isTerritorySafe(p),false,r.id);
   }

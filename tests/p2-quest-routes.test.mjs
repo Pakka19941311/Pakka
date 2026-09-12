@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {historicalFingerprintMatches} from './helpers/historical-fingerprint.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -19,7 +20,7 @@ test('historical real quest routes retain population provenance and unchanged ob
   assert.match(source.sha256,/^[a-f0-9]{64}$/);
   if(['src/server/world-simulation.ts','src/world/final-world.ts'].includes(source.path))continue;
   const archive=history.archives.find(a=>a.path===source.path);
-  assert.equal(createHash('sha256').update(readFileSync(archive?.archive??source.path)).digest('hex'),source.sha256,source.path);
+  assert.ok(historicalFingerprintMatches(archive?.archive??source.path,source.sha256),source.path);
  }
 });
 test('all four objectives were claimed after real deaths and continuous walking, with level fixtures disclosed',()=>{

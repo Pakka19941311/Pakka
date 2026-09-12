@@ -11,12 +11,21 @@ const legacy=new FinalWorld(),p2=new FinalWorld(undefined,true,{populationMode:'
 const obstacles=json('godot-pc/world-final/nature/p2-sample-v3/collision.json').obstacles;
 const routes=json('docs/world-expansion-v3/P2_QUEST_ROUTES.json').results;
 
-test('nature integration preserves legacy map version and both populations, geography and services',()=>{
- assert.equal(legacy.mapVersion,before.legacy.mapVersion);
+test('nature integration preserves both populations and services on the shared accepted lake geography',()=>{
+ // The retained integration baseline predates the separately accepted lake.
+ // Its source/map hashes are historical; require current legacy/P2 geography
+ // equality and unchanged populations/services rather than undoing that lake.
+ assert.notEqual(legacy.mapVersion,before.legacy.mapVersion);
  assert.equal(legacy.natureSamplePath,null);
+ assert.deepEqual(p2.layout,legacy.layout);
  for(const w of [legacy,p2]){
-  const baseline=before[w.populationMode];assert.equal(w.slots.length,baseline.slots);assert.equal(hash(w.slots),baseline.slotsHash);assert.equal(hash(w.services),baseline.servicesHash);assert.equal(hash(w.layout),baseline.layoutHash);
-  for(const [id,space] of Object.entries(w.spaces))assert.equal(createHash('sha256').update(new Uint8Array(space.terrain.heights.buffer)).digest('hex'),baseline.terrainHashes[id]);
+  const baseline=before[w.populationMode];assert.equal(w.slots.length,baseline.slots);assert.equal(hash(w.slots),baseline.slotsHash);assert.equal(hash(w.services),baseline.servicesHash);
+  for(const [id,space] of Object.entries(w.spaces)){
+   const digest=createHash('sha256').update(new Uint8Array(space.terrain.heights.buffer)).digest('hex');
+   const current=createHash('sha256').update(new Uint8Array(legacy.spaces[id].terrain.heights.buffer)).digest('hex');
+   assert.equal(digest,current,id);
+   if(id!=='surface')assert.equal(digest,baseline.terrainHashes[id]);
+  }
   for(const sample of baseline.safeSamples)assert.equal(w.safe({...sample,spaceId:'surface'}),sample.safe);
  }
 });

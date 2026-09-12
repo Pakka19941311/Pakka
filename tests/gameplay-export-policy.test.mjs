@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,readdirSync,existsSync,statSync} from 'node:fs';
-import {EXCLUDED_ACTOR_PREFIXES,isExcludedActorPath,updateGameplayExportFilters} from '../scripts/world_final/gameplay-export-policy.mjs';
+import {EXCLUDED_ACTOR_PREFIXES,EXCLUDED_REVIEW_RESOURCES,isExcludedActorPath,isExcludedReviewPath,updateGameplayExportFilters} from '../scripts/world_final/gameplay-export-policy.mjs';
 
 test('every export preset excludes staged art while retaining custom settings and active JSON',()=>{
   const original=readFileSync('godot-pc/export_presets.cfg','utf8');
@@ -10,7 +10,7 @@ test('every export preset excludes staged art while retaining custom settings an
     'world-expansion-v3/actors/cohort-06-10/exile/CANDIDATE.json',
     'world-expansion-v3/actors/alternatives/roach/profile.json'];
   const updated=updateGameplayExportFilters(original,raw);
-  const eraseFilters=text=>text.replace(/^(include|exclude)_filter="[^"]*"/gm,'');
+  const eraseFilters=text=>text.replace(/^(?:(?:include|exclude|export)_filter|export_files)=.*\r?\n?/gm,'').replaceAll('\r\n','\n');
   assert.equal(eraseFilters(updated),eraseFilters(original));
   assert.equal(updateGameplayExportFilters(updated,raw),updated);
   const includes=[...updated.matchAll(/^include_filter="([^"]*)"/gm)];
@@ -27,7 +27,7 @@ test('retained scripts/scenes and canonical profiles do not reference excluded a
   // Literal preload/load/ext_resource paths cover exported QA dependencies too.
   for(const entry of readdirSync('godot-pc',{recursive:true})){
     const file=entry.replaceAll('\\','/');
-    if(file==='.godot'||file.startsWith('.godot/')||isExcludedActorPath(file)||! /\.(gd|tscn|tres|godot)$/.test(file)||!statSync('godot-pc/'+file).isFile())continue;
+    if(file==='.godot'||file.startsWith('.godot/')||isExcludedActorPath(file)||isExcludedReviewPath(file)||! /\.(gd|tscn|tres|godot)$/.test(file)||!statSync('godot-pc/'+file).isFile())continue;
     for(const [,target] of readFileSync('godot-pc/'+file,'utf8').matchAll(/["'](res:\/\/[^"'\r\n]+)["']/g))
       assert.equal(isExcludedActorPath(target),false,`${file} references excluded ${target}`);
   }
@@ -42,4 +42,16 @@ test('retained scripts/scenes and canonical profiles do not reference excluded a
     'world-final/nature/p2-sample-v3/nature_sample.gd']){
     assert.equal(isExcludedActorPath(file),false);assert.ok(existsSync('godot-pc/'+file));
   }
+});
+
+test('isolated review scenes are excluded as resources, while packaged acceptance stays available',()=>{
+ const original=readFileSync('godot-pc/export_presets.cfg','utf8');
+ const updated=updateGameplayExportFilters(original,['generated/game.json']);
+ for(const section of updated.split(/\[preset\.\d+\]/).slice(1)){
+  const body=section.split(/\[preset\.\d+\.options\]/)[0];
+  assert.match(body,/^export_filter="exclude"/m);
+  const list=body.match(/^export_files=PackedStringArray\((.*)\)$/m)[1];
+  for(const path of EXCLUDED_REVIEW_RESOURCES)assert.ok(list.includes(JSON.stringify('res://'+path)),path);
+  for(const path of ['scripts/stage_acceptance.gd','scripts/p2_pursuit_acceptance.gd','scripts/p2_nature_acceptance.gd'])assert.ok(!list.includes(path));
+ }
 });

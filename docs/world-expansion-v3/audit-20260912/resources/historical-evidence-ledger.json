@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "status": "historical-evidence-with-explicit-source-gaps",
+  "claims": "Report integrity and internal arithmetic are tested; historical source gaps do not certify current runtime. No saved report or source SHA was rewritten.",
+  "reports": {
+    "docs/world-expansion-v3/P2_ENDURANCE.json": {
+      "sha256LF": "532793913e814e05a87fc141935ad376dc25d6cd8784dc210d66b70b4cdc2a1a"
+    },
+    "docs/world-expansion-v3/P2_PLUS3_ECONOMY.json": {
+      "sha256LF": "799ca95cb9285c93bdab30fe5fc97ab6bf48e57c5edd75cee9772371f6bd17cc"
+    },
+    "docs/world-expansion-v3/population.json": {
+      "sha256LF": "67b25cef17d24c9ee197614a6d15af09b395d1f510ee150173cc70d6d304adac"
+    }
+  },
+  "unresolvedSources": [
+    {
+      "path": "src/core/game-rules.ts",
+      "recordedSha256": "22bf719b879b98a23ab4b6fcce7f594de0a8e9f99e672173791670315d73b395",
+      "provenance": "unresolved",
+      "reason": "No current bytes, LF/CRLF representation, or available git revision matches the original recorded source SHA. Later typed-damage changes exist. Original report retained; not asserted to represent current code."
+    },
+    {
+      "path": "src/core/equipment-stats.ts",
+      "recordedSha256": "6482303e763568a128b70589894ced5bb72b0ee7daf64f15404e0f454d8a9629",
+      "provenance": "unresolved",
+      "reason": "No current bytes, LF/CRLF representation, or available git revision matches the original recorded source SHA. Later typed-damage changes exist. Original report retained; not asserted to represent current code."
+    },
+    {
+      "path": "src/world/final-world.ts",
+      "recordedSha256": "aeb78cdae45cd64575db05df4cfb71efd4b1d08f22c9d76da718744ba63e815d",
+      "provenance": "unresolved",
+      "reason": "Staged proposal predates subsequent collision/navigation and support fixes. No available git representation matches original source SHA. Current spatial tests remain mandatory; proposal runtimeEnabled=false."
+    },
+    {
+      "path": "src/world/collision-world.ts",
+      "recordedSha256": "394c6167884a0bb6b14fb01e7933debb1c019e22ed38f3dfac3ee324cbc40abe",
+      "provenance": "unresolved",
+      "reason": "Staged proposal predates subsequent collision/navigation and support fixes. No available git representation matches original source SHA. Current spatial tests remain mandatory; proposal runtimeEnabled=false."
+    },
+    {
+      "path": "src/world/navigation.ts",
+      "recordedSha256": "0208fa3753852930870be5e8d0d384f8f0e167b5b5a12b084509757075dd902b",
+      "provenance": "unresolved",
+      "reason": "Staged proposal predates subsequent collision/navigation and support fixes. No available git representation matches original source SHA. Current spatial tests remain mandatory; proposal runtimeEnabled=false."
+    }
+  ]
+}
