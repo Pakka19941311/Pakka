@@ -146,8 +146,8 @@ test('Necro ordinary projectile takes physical damage/accuracy while its book ta
 test('book contacts use physical/magic accuracy by damage path and a missed burning slash applies no DOT',()=>{
  const f=fixture('mage',()=>.005),p=f.hero(),m=f.monster;
  Object.assign(p.stats,{accuracy:999,physicalAccuracy:80,magicAccuracy:200});const before=m.hp;
- assert.equal(f.world.books.hit(p,m,100,'slash'),false);assert.equal(m.hp,before);
- assert.equal(f.world.books.hit(p,m,100,'fire'),true);assert.equal(m.hp,before-100);
+ assert.equal(f.world.books.hit(p,m,100,'slash',{type:'physical',element:'none'}),false);assert.equal(m.hp,before);
+ assert.equal(f.world.books.hit(p,m,100,'fire',{type:'magic',element:'fire'}),true);assert.equal(m.hp,before-100);
  const knight=fixture('knight',()=>.005);Object.assign(knight.hero().stats,{physicalAccuracy:80,magicAccuracy:200});
  knight.hero().inventory.push({uid:'burn-book',id:'book_knight_60',count:1,plus:0});
  assert.equal(knight.command({type:'castBook',bookId:'book_knight_60',targetId:knight.monster.uid}).ok,true);

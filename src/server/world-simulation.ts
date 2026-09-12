@@ -2,7 +2,9 @@ import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
 import {p2Encounter,rollP2StarterLoot,P2_BALANCE_VERSION} from '../data/p2-encounters.ts';
-import {resolveMonsterDamageV3,resolveHeroDamageV3,enemyHitChanceV3} from '../core/encounter-combat-v3.ts';
+import {resolveHeroDamageV3,enemyHitChanceV3} from '../core/encounter-combat-v3.ts';
+import {resolveTypedMonsterDamage,PHYSICAL_DAMAGE,legacyStatusDotChannel} from '../core/monster-damage.ts';
+import type {MonsterDamagePacket,MonsterDamageDefense} from '../core/monster-damage.ts';
 import {remapP2SavedMonsters} from '../world/p2-population.ts';
 import type {P2ArchivedMonster} from '../world/p2-population.ts';
 import type {EncounterDamageTypeV3,EncounterElementV3} from '../core/encounter-combat-v3.ts';
@@ -178,7 +180,7 @@ export class WorldSimulation {
     this.finalWorld=options.finalWorld;
     this.progressionWorld=bindProgressionQuestWorld(this.finalWorld);
     this.xpRate=options.xpRate??1;if(!Number.isFinite(this.xpRate)||this.xpRate<1||this.xpRate>100)throw Error('invalid-xp-rate');
-    this.books=new BookSystem({now:()=>this.state.time,heroes:()=>Object.values(this.state.characters),monsters:()=>this.state.monsters,summons:()=>this.state.summons,areas:()=>this.state.bookAreas??=[],traps:()=>this.state.bookTraps??=[],random:()=>this.random(),uid:()=>this.identifier(),hp:m=>monsterDef(m).hp,safe:this.safe,visible:(a,b)=>this.lineOfSight(a,b),damage:(m,n,p,c)=>this.damage(m,n,p,c),recalculate:p=>this.recalculate(p),event:(k,a,t,e)=>this.event(k,a,t,e),provoke:(m,p)=>this.provoke(m,p),release:m=>{this.cancelAttack(m.uid);m.provokedBy=undefined;m.targetId=null;m.returnFromTaunt=true;this.brains.delete(m.uid);},cancel:id=>this.cancelAttack(id),summonPoint:p=>({...this.collisionFor(p).findNearestFree({x:p.x+1,z:p.z},.46),spaceId:p.spaceId})});
+    this.books=new BookSystem({now:()=>this.state.time,heroes:()=>Object.values(this.state.characters),monsters:()=>this.state.monsters,summons:()=>this.state.summons,areas:()=>this.state.bookAreas??=[],traps:()=>this.state.bookTraps??=[],random:()=>this.random(),uid:()=>this.identifier(),hp:m=>monsterDef(m).hp,safe:this.safe,visible:(a,b)=>this.lineOfSight(a,b),damage:(m,packet,p)=>this.applyTypedMonsterDamage(m,p,packet),recalculate:p=>this.recalculate(p),event:(k,a,t,e)=>this.event(k,a,t,e),provoke:(m,p)=>this.provoke(m,p),release:m=>{this.cancelAttack(m.uid);m.provokedBy=undefined;m.targetId=null;m.returnFromTaunt=true;this.brains.delete(m.uid);},cancel:id=>this.cancelAttack(id),summonPoint:p=>({...this.collisionFor(p).findNearestFree({x:p.x+1,z:p.z},.46),spaceId:p.spaceId})});
     this.store = options.store; this.collision = options.collision;
     this.terrain = options.terrain ?? new TerrainSurface();
     this.mapContentVersion=this.finalWorld?.mapVersion??mapVersion(this.collision,this.terrain);
@@ -752,7 +754,7 @@ export class WorldSimulation {
   private resolveAttack(a:PendingAttack):void {
     if(a.summon){const s=this.state.summons.find(s=>s.uid===a.actor)!,p=this.state.characters[a.owner!],m=this.state.monsters.find(m=>m.uid===a.target&&m.alive)!;
       s.combatState='recovery';if(distance(s,m)>Math.max(1.8,this.bodyRadius(s)+this.bodyRadius(m)+.04)+.1||!this.lineOfSight(s,m)||!facingTarget(s.yaw,s,m))return;
-      this.event('release',s.uid,m.uid,{effect:'slash',durationMs:0,generation:m.generation});this.damage(m,a.damage!,p,false);return;}
+      this.event('release',s.uid,m.uid,{effect:'slash',durationMs:0,generation:m.generation});this.applyTypedMonsterDamage(m,p,{...PHYSICAL_DAMAGE,raw:a.damage!,source:'summon',critical:false});return;}
     if(a.monster){
       const m=this.state.monsters.find(m=>m.uid===a.actor&&m.alive)!;const p=this.state.characters[a.target];
       if(a.slam){for(const victim of Object.values(this.state.characters).filter(v=>sameSpace(m,v)&&!v.dead&&v.activeUntil>this.state.time&&!this.safe(v)&&distance(v,a.slam!)<=4&&this.lineOfSight(m,v)))this.monsterHit(m,victim,1.4);return;}
@@ -804,10 +806,9 @@ export class WorldSimulation {
     const skill=a.skill===null?undefined:CLASSES[p.classId as ClassId].skills[a.skill] as Skill;
     const hit=(m:WorldMonster,amount:number,critical=false)=>{
       if(!resolveAttackAccuracy(a.accuracy,this.random()).hit){this.event('miss',p.id,m.uid,{skill:a.skill,generation:m.generation});return false;}
-      const type=a.damageType??attackDamageType(p.classId,Boolean(skill)),magical=type==='magic',p2=p2Encounter(m);
-      const raw=this.books.normalDamage(p,amount),reduction=this.books.value(m,magical?'mdefDown':'defDown');
-      const resolved=p2?resolveMonsterDamageV3(raw,type,p2,a.element??'none',reduction):raw+reduction*.2;
-      this.damage(m,resolved,p,critical);if(!magical)this.books.physicalHit(p,m);return true;
+      const type=a.damageType??attackDamageType(p.classId,Boolean(skill)),magical=type==='magic';
+      this.applyTypedMonsterDamage(m,p,{type,element:a.element??'none',raw:this.books.normalDamage(p,amount),source:'ordinary',critical});
+      if(!magical)this.books.physicalHit(p,m);return true;
     };
     let primary=false;
     if(skill?.chain){
@@ -834,7 +835,7 @@ export class WorldSimulation {
   private monsterTick(m:WorldMonster,dt:number):void {
     const region=this.finalWorld?.slotById.get(m.uid)??SPAWN_REGIONS.find(r=>r.id===m.regionId);
     const def=monsterDef(m),p2=p2Encounter(m),radius=this.monsterRadius(m),boss='boss' in def;
-    if(m.status.dot>this.state.time&&this.random()<dt){const p=this.state.characters[m.status.dotOwner??''];if(p)this.damage(m,Math.max(2,Math.round(p.stats.matk*.08)),p,false);m.status.nextDot=this.state.time;}
+    if(m.status.dot>this.state.time&&this.random()<dt){const p=this.state.characters[m.status.dotOwner??''];if(p)this.applyTypedMonsterDamage(m,p,{...legacyStatusDotChannel(p.classId),raw:Math.max(2,Math.round(p.stats.matk*.08)),source:'dot',critical:false});m.status.nextDot=this.state.time;}
     if(!m.alive)return;
     const ambientSpeed=p2?.locomotionOverride?p2.movementSpeed:monsterMovementSpeed(boss);
     if(m.returnFromTaunt){this.cancelAttack(m.uid);if(distance(m,m.home)>.6)this.walk(m,m.home,ambientSpeed*dt,radius,m.uid,dt);else m.returnFromTaunt=false;return;}
@@ -941,6 +942,14 @@ export class WorldSimulation {
         this.event('attack',s.uid,target.uid,{impactAt:s.hitAt,endsAt:s.actionEndsAt,generation:target.generation});
       }
     }
+  }
+  /** All production sources enter here with raw owner-scaled damage. The final
+   * commit below alone owns HP, aggro, phase changes, attribution and loot. */
+  private applyTypedMonsterDamage(m:WorldMonster,p:WorldCharacter,packet:MonsterDamagePacket):void {
+    if(!m.alive||packet.raw<=0)return;
+    const amount=resolveTypedMonsterDamage(packet,monsterDef(m) as MonsterDamageDefense,
+      {defDown:this.books.value(m,'defDown'),mdefDown:this.books.value(m,'mdefDown')});
+    this.damage(m,amount,p,packet.critical);
   }
   private damage(m:WorldMonster,amount:number,p:WorldCharacter,critical:boolean):void {
     if(!m.alive||!sameSpace(m,p)||m.canonicalMobId&&(this.safe(p)||this.safe(m)))return;for(const e of m.bookEffects??[])if(e.values.taunt&&e.owner===p.id)e.values.struck=1;this.provoke(m,p);m.hp=Math.max(0,m.hp-amount);m.owner??=p.id;m.hitUntil=this.state.time+180;this.event('hit',p.id,m.uid,{amount,critical,targetHp:m.hp,targetMaxHp:monsterDef(m).hp,targetGeneration:m.generation,generation:m.generation});

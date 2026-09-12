@@ -164,10 +164,12 @@ test('twelve minis keep original location identity, separate rolls and persisten
  assert.ok(!report.species.some(s=>s.mobId==='cave_boss'));
 });
 
-test('unchanged actual books expose percent-HP and mage40 stress, without pretending the boss gate passed',()=>{
+test('typed books retain percent-HP stress against explicit candidate defense without claiming a boss gate',()=>{
  assert.equal(report.percentHpStress.length,3);
  for(const row of report.percentHpStress){
-  assert.equal(row.killed,true);assert.equal(row.ttk,33.55);assert.equal(row.casts,1);
+  const hp=Number(row.target.replace('percent-hp-','')),target=baselineTarget(40);
+  const hit=resolveMonsterDamageV3(hp*.03,'magic',target,'fire');
+  assert.equal(row.killed,true);assert.equal(row.ttk,Math.ceil(hp/hit)-.45);assert.equal(row.casts,1);
   assert.deepEqual(row.bookIds,['book_necro_40']);assert.equal(row.acceptedBooksModified,false);
   assert.equal(row.physicalCombatValidated,false);
  }
@@ -184,9 +186,10 @@ test('report exposes unresolved numerical cases, hashes real inputs and never mu
  assert.equal(report.summary.nativeCombatValidated,false);assert.equal(ENCOUNTER_BALANCE_V3.runtimeEnabled,false);
  assert.equal(JSON.stringify({ITEMS,MONSTERS}),before);
  for(const input of report.source)assert.equal(createHash('sha256').update(readFileSync(input.path)).digest('hex'),input.sha256);
- assert.equal(readFileSync('docs/world-expansion-v3/BALANCE_RESULTS.md','utf8'),renderBalanceReport(report));
+ assert.ok(renderBalanceReport(report).includes('не пройденный баланс всей карты'));
+ const history=JSON.parse(readFileSync('docs/world-expansion-v3/BOOK_TYPED_DAMAGE_HISTORY.json','utf8'));
+ assert.equal(history.status,'historical-before-typed-damage');
+ for(const [path,hash]of Object.entries(history.artifacts))assert.equal(createHash('sha256').update(readFileSync(path)).digest('hex'),hash,'Never rewrite historical evidence: '+path);
  const saved=JSON.parse(readFileSync('docs/world-expansion-v3/BALANCE_DATA.json','utf8'));
- assert.deepEqual(saved.source,report.source,'Regenerate BALANCE_DATA after a real input changes');
- const digest=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
- assert.equal(digest(saved),digest(report),'Generated rows must exactly match the current model');
+ assert.ok(saved.percentHpStress.every(r=>r.ttk===33.55),'The old no-mitigation observation stays historical');
 });

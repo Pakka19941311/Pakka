@@ -1,5 +1,7 @@
 import {readFileSync,writeFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
+import {pathToFileURL} from 'node:url';
+import {resolve} from 'node:path';
 import {MONSTERS} from '../../src/data/game-data.ts';
 import {SKILL_BOOKS} from '../../src/data/skill-books.ts';
 import {encounterV3} from '../../src/data/encounter-balance-v3.ts';
@@ -49,7 +51,7 @@ function driver(geography,{classId,level,targetId,bookId}){
  return {sim,p,m,input,command,advance,moveArc,trace,get walkMetres(){return walkMetres;},get resets(){return resets;}};
 }
 
-function fight(geography,recipe){
+export function fight(geography,recipe){
  const d=driver(geography,recipe),{sim,p,m}=d,start=sim.state.time,initial={hp:p.hp,mp:p.mp,gold:p.gold,targetHp:m.hp};
  let cast=null,failure=null;
  try{
@@ -86,6 +88,7 @@ function bookGates(geography){
  }
  return rows;
 }
+if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href){
 const before=hashes(),geography=makeP2Geography();
 const fights=[fight(geography,{classId:'ranger',level:15,targetId:'fire_golem'}),fight(geography,{classId:'necro',level:40,targetId:'rift_boss',bookId:'book_necro_40'})];
 const gates=bookGates(geography),hero=referenceHero('ranger',15,3,'live');
@@ -95,3 +98,4 @@ const report={schema:1,readOnlyProduction:true,sourceHashes:before,sourcesChange
 writeFileSync('docs/world-expansion-v3/P2_GOLEM_BOOK_AUDIT.json',JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify({fights:fights.map(({classId,level,targetId,killed,heroDead,ttk,damageTaken,damageDealt,enemyAttacks,targetHpResets,failure})=>({classId,level,targetId,killed,heroDead,ttk,damageTaken,damageDealt,enemyAttacks,targetHpResets,failure})),gates,staged:staged.map(s=>({mob:s.target.mobId,hp:s.target.hp,ttk:s.stationaryPotentialTtk}))},null,2));
 if(report.sourcesChangedDuringRun)process.exitCode=1;
+}

@@ -1,4 +1,4 @@
-/** Pure V3 damage proposal. Not wired into the live simulation yet.
+/** Pure V3 damage formulas used by the server through monster-damage.ts.
  * No player/monster level parameter: strength comes from authored stats and AI.
  */
 export type EncounterDamageTypeV3='physical'|'magic';

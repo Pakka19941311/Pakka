@@ -5,6 +5,7 @@ import {createHash} from 'node:crypto';
 import {CLASSES,ITEMS} from '../../src/data/game-data.ts';
 import {SKILL_BOOKS} from '../../src/data/skill-books.ts';
 import {BookSystem} from '../../src/server/book-system.ts';
+import {resolveTypedMonsterDamage} from '../../src/core/monster-damage.ts';
 import {calculateEquipmentStats} from '../../src/core/equipment-stats.ts';
 import {classCombatProfile,attackDamageType,accuracyForDamage,xpNeeded} from '../../src/core/game-rules.ts';
 import {resolveAttackAccuracy} from '../../src/core/attack-accuracy.ts';
@@ -130,9 +131,9 @@ export function estimateEncounter(hero,monster,{defense='proposed',active=true,m
  posture:active?'estimated active contact; no native movement':'stationary arithmetic',rotation:'auto-only'}};
 }
 /** Runs the ACTUAL BookSystem against an isolated host at favorable 1.8 m
- * distance and clear LOS. Existing book damage stays unchanged. This is a
+ * distance and clear LOS. Raw book parameters stay unchanged. This is a
  * deterministic engine-logic stress test, not physics/native combat and not
- * validation of the still-unwired monster DEF/MDEF pipeline.
+ * validation of real combat movement. Candidate defense is explicit here.
  */
 export function runActualBookStress(reference,definition,{maxSeconds=600,bookLevelCap=reference.level,onlyBooks=null,autoAttack=true}={}){
  let now=0,sequence=0,casts=0,damageBySource={},source='book',sourcePrefix='',nextAttack=0,nextEnemy=0;
@@ -145,7 +146,7 @@ export function runActualBookStress(reference,definition,{maxSeconds=600,bookLev
   hp:definition.hp,alive:true,generation:1,bookEffects:[],bookDots:[],status:{stun:0,slow:0},home:{x:1.8,z:0},targetId:p.id};
  const host={now:()=>now,heroes:()=>[p],monsters:()=>[m],summons:()=>summons,areas:()=>areas,traps:()=>traps,
   random:()=>.5,uid:()=>String(++sequence),hp:()=>definition.hp,safe:()=>false,visible:()=>true,
-  damage:(_m,amount)=>{if(!m.alive)return;const key=sourcePrefix+source;damageBySource[key]=(damageBySource[key]??0)+amount;m.hp=Math.max(0,m.hp-amount);m.alive=m.hp>0;},
+  damage:(_m,packet)=>{if(!m.alive)return;const amount=resolveTypedMonsterDamage(packet,definition,{defDown:books.value(m,'defDown'),mdefDown:books.value(m,'mdefDown')});const key=sourcePrefix+source;damageBySource[key]=(damageBySource[key]??0)+amount;m.hp=Math.max(0,m.hp-amount);m.alive=m.hp>0;},
   recalculate:()=>{p.stats=structuredClone(reference.stats);p.maxHp=reference.maxHp;p.maxMp=reference.maxMp;books.modifyStats(p);},
   event:(kind,_actor,_target,extra)=>{if(kind==='release')source=extra?.effect??'book';},provoke:()=>{},release:()=>{},cancel:()=>{},
   summonPoint:()=>({x:1,z:0,spaceId:'surface'})};
@@ -169,14 +170,14 @@ export function runActualBookStress(reference,definition,{maxSeconds=600,bookLev
   if(autoAttack&&now>=nextAttack&&m.alive){
    p.profile=classCombatProfile(p.classId,p.level,p.stats);
    const hit=expectedPlayerHit(p,m,{defense:'current'});
-   source='auto';host.damage(m,books.normalDamage(p,hit.damage));
+   source='auto';host.damage(m,{raw:books.normalDamage(p,hit.damage),type:attackDamageType(p.classId),element:'none',source:'ordinary',critical:false});
    if(attackDamageType(p.classId)==='physical')books.physicalHit(p,m);
    nextAttack=now+p.profile.attackInterval/books.attackSpeed(p)*1000;
   }
  }
  return {classId:p.classId,level:p.level,target:definition.id??definition.mobId??definition.speciesId,ttk:round(now/1000),
   killed:!m.alive,casts,bookIds:available.map(b=>b.id),damageBySource,mpRemaining:round(p.mp),
-  actualModule:'src/server/book-system.ts',mode:'current-book-damage-on-candidate-HP; favorable fixed geometry; no monster mitigation',
+  actualModule:'src/server/book-system.ts',mode:'current-typed-book-damage-on-explicit-candidate-defense; favorable fixed geometry; no physics',
   rng:.5,physicalCombatValidated:false,acceptedBooksModified:false};
 }
 

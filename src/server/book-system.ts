@@ -3,15 +3,18 @@ import {SKILL_BOOKS} from '../data/skill-books.ts';
 import {classAttackRange,classCombatProfile,accuracyForDamage,attackDamageType} from '../core/game-rules.ts';
 import type {AttackDamageType} from '../core/game-rules.ts';
 import {resolveAttackAccuracy} from '../core/attack-accuracy.ts';
+import {PHYSICAL_DAMAGE,FIRE_DAMAGE,SHADOW_DAMAGE,MAGIC_DAMAGE,POISON_DAMAGE,savedBookDamageChannel} from '../core/monster-damage.ts';
+import type {MonsterDamageChannel,MonsterDamagePacket} from '../core/monster-damage.ts';
 import type {WorldCharacter as Hero,WorldMonster as Mob,WorldSummon,Position,WorldEvent} from '../network/world-protocol.ts';
 export type BookEffect={id:string;owner:string;appliedAt:number;expiresAt:number;values:Record<string,number>};
-export type BookDot={id:string;owner:string;expiresAt:number;nextAt:number;damage:number;range?:number;carry?:number};
-export type BookArea={id:string;owner:string;generation:number;point:Position;radius:number;damage:number;remaining:number;nextAt:number;interval:number;limit:number;fx:string};
-export type BookTrap={id:string;owner:string;generation:number;point:Position;expiresAt:number;damage:number;hit:string[]};
+export type BookDot={id:string;owner:string;expiresAt:number;nextAt:number;damage:number;range?:number;carry?:number;channel?:MonsterDamageChannel};
+export type BookArea={id:string;owner:string;generation:number;point:Position;radius:number;damage:number;remaining:number;nextAt:number;interval:number;limit:number;fx:string;channel?:MonsterDamageChannel};
+export type BookTrap={id:string;owner:string;generation:number;point:Position;expiresAt:number;damage:number;hit:string[];channel?:MonsterDamageChannel};
+type HitOptions={critical?:boolean;ownerScaling?:'none'|'direct'|'opener'|'alreadyApplied';source?:MonsterDamagePacket['source'];bookId?:string};
 type Host={
   now():number;heroes():Hero[];monsters():Mob[];summons():WorldSummon[];areas():BookArea[];traps():BookTrap[];
   random():number;uid():string;hp(m:Mob):number;safe(p:Position):boolean;visible(a:Position,b:Position):boolean;
-  damage(m:Mob,n:number,p:Hero,critical:boolean):void;recalculate(p:Hero):void;
+  damage(m:Mob,packet:MonsterDamagePacket,p:Hero):void;recalculate(p:Hero):void;
   event(kind:WorldEvent['kind'],actor:string,target?:string,extra?:Partial<WorldEvent>):void;
   provoke(m:Mob,p:Hero):void;release(m:Mob):void;cancel(id:string):void;
   summonPoint?(p:Position):Position;
@@ -59,26 +62,26 @@ export class BookSystem {
     }
     return Math.max(1,Math.round(amount));
   }
-  dot(m:Mob,p:Hero,id:string,damage:number,seconds:number,range?:number):void{
+  dot(m:Mob,p:Hero,id:string,damage:number,seconds:number,range?:number,channel=savedBookDamageChannel('dot',id)):void{
     m.bookDots??=[];const old=m.bookDots.find(d=>d.id===id&&d.owner===p.id);
     m.bookDots=m.bookDots.filter(d=>d!==old);
-    m.bookDots.push({id,owner:p.id,expiresAt:this.host.now()+seconds*1000,nextAt:old?.nextAt??this.host.now()+1000,damage,range,carry:old?.carry??0});
+    m.bookDots.push({id,owner:p.id,expiresAt:this.host.now()+seconds*1000,nextAt:old?.nextAt??this.host.now()+1000,damage,range,carry:old?.carry??0,channel});
   }
-  physicalHit(p:Hero,m:Mob):void{if(this.value(p,'poison')&&m.alive)this.dot(m,p,'poison',this.host.hp(m)*.035/5,5);}
-  attacked(p:Hero,m:Mob):void{if(this.value(p,'retaliation')&&dist(p,m)<=3)this.dot(m,p,'lightning',75,10,3);}
+  physicalHit(p:Hero,m:Mob):void{if(this.value(p,'poison')&&m.alive)this.dot(m,p,'poison',this.host.hp(m)*.035/5,5,undefined,POISON_DAMAGE);}
+  attacked(p:Hero,m:Mob):void{if(this.value(p,'retaliation')&&dist(p,m)<=3)this.dot(m,p,'lightning',75,10,3,MAGIC_DAMAGE);}
   private contact(p:Hero,m:Mob,type:AttackDamageType):boolean{
     if(!m.alive||!sameSpace(p,m)||this.host.safe(p)||!this.host.visible(p,m))return false;
     if(resolveAttackAccuracy(accuracyForDamage(p.stats,type),this.host.random()).hit)return true;
     this.host.event('miss',p.id,m.uid,{generation:m.generation});return false;
   }
-  hit(p:Hero,m:Mob,amount:number,fx:string,critical=false,fixed=false,opener=false):boolean{
+  hit(p:Hero,m:Mob,amount:number,fx:string,channel:MonsterDamageChannel,options:HitOptions={}):boolean{
     if(!m.alive||!sameSpace(p,m)||this.host.safe(p)||!this.host.visible(p,m))return false;
-    const magical=['fire','ice','bone','lightning','curse','drain'].includes(fx);
-    const debuff=fixed?0:this.value(m,magical?'mdefDown':'defDown')*.2;
+    const {critical=false,ownerScaling='direct',source='book',bookId}=options;
     this.host.event('release',p.id,m.uid,{effect:fx,durationMs:0,generation:m.generation});
-    if(!this.contact(p,m,magical?'magic':'physical'))return false;
-    this.host.damage(m,Math.max(1,Math.round((fixed?amount:opener?this.normalDamage(p,amount):this.directDamage(p,amount))+debuff)),p,critical);
-    if(!magical&&!fixed)this.physicalHit(p,m);
+    if(!this.contact(p,m,channel.type))return false;
+    const raw=ownerScaling==='opener'?this.normalDamage(p,amount):ownerScaling==='direct'?this.directDamage(p,amount):amount;
+    this.host.damage(m,{...channel,raw:Math.max(1,raw),source,critical,bookId},p);
+    if(channel.type==='physical'&&(ownerScaling==='direct'||ownerScaling==='opener'))this.physicalHit(p,m);
     return true;
   }
   owns(p:Hero,id:string):boolean{return p.inventory.some(i=>i.id===id&&i.count>0);}
@@ -102,27 +105,27 @@ export class BookSystem {
     const level=b.level,c=p.classId;
     this.host.event('attack',p.id,target?.uid,{bookId:id,skill:Math.min(b.column,3),impactAt:this.host.now(),endsAt:this.host.now()+350,readyAt:p.attackReadyAt});
     const buff=(values:Record<string,number>,who:Hero|Mob=p)=>this.effect(who,id,p.id,b.duration,values);
-    if(level===10){this.hit(p,target!,(['mage','necro'].includes(c)?p.stats.matk:this.physical(p))*1.5,b.fx,true,false,true);return;}
+    if(level===10){this.hit(p,target!,(['mage','necro'].includes(c)?p.stats.matk:this.physical(p))*1.5,b.fx,c==='mage'?FIRE_DAMAGE:c==='necro'?SHADOW_DAMAGE:PHYSICAL_DAMAGE,{critical:true,ownerScaling:'opener',bookId:id});return;}
     if(c==='knight'){
       if(level===20)buff({speed:10,attackSpeed:8});
       if(level===30)buff({def:5});
       if(level===40){buff({});for(const m of this.near(p,7)){this.effect(m,id,p.id,15,{taunt:1});this.host.provoke(m,p);}}
       if(level===50){const base=p.maxHp/(1+this.value(p,'hp')/100);buff({hp:45});p.hp=Math.min(p.maxHp,p.hp+Math.round(base*.45));}
-      if(level===60&&this.hit(p,target!,this.physical(p)*1.1,'slash'))this.dot(target!,p,'fire',5+this.host.random()*4+p.stats.matk*.1,7);
+      if(level===60&&this.hit(p,target!,this.physical(p)*1.1,'slash',PHYSICAL_DAMAGE,{bookId:id}))this.dot(target!,p,'fire',5+this.host.random()*4+p.stats.matk*.1,7,undefined,FIRE_DAMAGE);
     }else if(c==='ranger'){
       if(level===20)buff({dex:10});if(level===30&&this.contact(p,target!,'physical'))buff({slow:40},target!);if(level===40)buff({attackSpeed:25});if(level===50)buff({range:20});
-      if(level===60){const point={spaceId:p.spaceId,x:p.x+Math.sin(p.yaw)*1.8,z:p.z+Math.cos(p.yaw)*1.8};this.host.traps().push({id:this.host.uid(),owner:p.id,generation:p.generation,point,expiresAt:this.host.now()+30000,damage:this.directDamage(p,this.physical(p)*3),hit:[]});}
+      if(level===60){const point={spaceId:p.spaceId,x:p.x+Math.sin(p.yaw)*1.8,z:p.z+Math.cos(p.yaw)*1.8};this.host.traps().push({id:this.host.uid(),owner:p.id,generation:p.generation,point,expiresAt:this.host.now()+30000,damage:this.directDamage(p,this.physical(p)*3),hit:[],channel:PHYSICAL_DAMAGE});}
     }else if(c==='mage'){
       if(level===20)buff({speed:10,attackSpeed:10});
       if(level===30){for(const h of this.host.heroes().filter(h=>!h.dead&&h.activeUntil>this.host.now()&&(h.id===ally.id||dist(h,p)<=4)&&this.host.visible(p,h)))buff({def:10,mdef:13,evasion:3},h);}
       if(level===40)buff({damage:100});
-      if(level===50)this.area(p,id,center,4,(p.stats.def+p.stats.mdef)*.3,5,1000,999,b.fx);
+      if(level===50)this.area(p,id,center,4,(p.stats.def+p.stats.mdef)*.3,5,1000,999,b.fx,MAGIC_DAMAGE);
       if(level===60)this.summon(p,id,'infernal',15);
     }else if(c==='necro'){
       if(level===20)this.summon(p,id,'skeleton',7);
       if(level===30)for(const m of this.near(target!,3).filter(m=>dist(p,m)<=this.range(p)))if(this.contact(p,m,'magic'))buff({defDown:10,mdefDown:10,attackSlow:7},m);
       if(level===40)this.summon(p,id,'fire_golem',115);
-      if(level===50)this.area(p,id,center,4,p.stats.matk*1.2,3,700,4,b.fx);
+      if(level===50)this.area(p,id,center,4,p.stats.matk*1.2,3,700,4,b.fx,FIRE_DAMAGE);
       if(level===60&&this.contact(p,target!,'magic')){buff({sleep:1},target!);this.host.cancel(target!.uid);}
     }else if(c==='assassin'){
       if(level===20)buff({evasionPercent:50});if(level===30)buff({poison:1});
@@ -131,8 +134,8 @@ export class BookSystem {
     }
   }
   private near(point:Position,radius:number):Mob[]{return this.host.monsters().filter(m=>m.alive&&dist(m,point)<=radius).sort((a,b)=>dist(a,point)-dist(b,point));}
-  private area(p:Hero,id:string,point:Position,radius:number,damage:number,remaining:number,interval:number,limit:number,fx:string):void{
-    this.host.areas().push({id,owner:p.id,generation:p.generation,point:{x:point.x,z:point.z,spaceId:p.spaceId},radius,damage:this.directDamage(p,damage),remaining,nextAt:this.host.now()+interval,interval,limit,fx});
+  private area(p:Hero,id:string,point:Position,radius:number,damage:number,remaining:number,interval:number,limit:number,fx:string,channel:MonsterDamageChannel):void{
+    this.host.areas().push({id,owner:p.id,generation:p.generation,point:{x:point.x,z:point.z,spaceId:p.spaceId},radius,damage:this.directDamage(p,damage),remaining,nextAt:this.host.now()+interval,interval,limit,fx,channel});
   }
   private summon(p:Hero,id:string,kind:string,duration:number):void{
     // One summon of each kind per owner, including refresh after reconnect.
@@ -153,7 +156,7 @@ export class BookSystem {
           if(!d.range||dist(p,actor)<=d.range){
             const raw=d.damage+(d.carry??0);const amount=d.nextAt+1000>d.expiresAt+1e-6?Math.round(raw):Math.floor(raw+1e-8);d.carry=raw-amount;
             // An applied burn/poison continues behind cover. Only retaliation has a range condition.
-            if(amount>0){this.host.event('release',p.id,actor.uid,{effect:d.id,durationMs:0,generation:actor.generation});this.host.damage(actor,amount,p,false);}
+            if(amount>0){this.host.event('release',p.id,actor.uid,{effect:d.id,durationMs:0,generation:actor.generation});this.host.damage(actor,{...savedBookDamageChannel('dot',d.id,d.channel),raw:amount,source:'dot',critical:false},p);}
           }
           d.nextAt+=1000;
         }
@@ -162,11 +165,11 @@ export class BookSystem {
     }
     for(const a of this.host.areas())if(a.remaining>0&&a.nextAt<=now){
       const p=this.host.heroes().find(p=>p.id===a.owner&&p.generation===a.generation&&!p.dead&&p.activeUntil>now);
-      if(!p){a.remaining=0;continue;}for(const m of this.near(a.point,a.radius).slice(0,a.limit))this.hit(p,m,a.damage,a.fx,false,true);a.remaining--;a.nextAt=now+a.interval;
+      if(!p){a.remaining=0;continue;}for(const m of this.near(a.point,a.radius).slice(0,a.limit))this.hit(p,m,a.damage,a.fx,savedBookDamageChannel('area',a.id,a.channel),{ownerScaling:'alreadyApplied',source:'area',bookId:a.id});a.remaining--;a.nextAt=now+a.interval;
     }
     for(const t of this.host.traps())if(t.expiresAt>now){
       const p=this.host.heroes().find(p=>p.id===t.owner&&p.generation===t.generation&&!p.dead&&p.activeUntil>now);
-      if(!p){t.expiresAt=now;continue;}for(const m of this.near(t.point,1.4)){const key=m.uid+':'+m.generation;if(t.hit.includes(key))continue;t.hit.push(key);this.hit(p,m,t.damage,'impact',false,true);}
+      if(!p){t.expiresAt=now;continue;}for(const m of this.near(t.point,1.4)){const key=m.uid+':'+m.generation;if(t.hit.includes(key))continue;t.hit.push(key);this.hit(p,m,t.damage,'impact',savedBookDamageChannel('trap',t.id,t.channel),{ownerScaling:'alreadyApplied',source:'trap',bookId:'book_ranger_60'});}
     }
   }
   summonTick(s:WorldSummon,dt:number,walk:(s:WorldSummon,goal:Position,step:number)=>void):boolean{
@@ -181,9 +184,9 @@ export class BookSystem {
     s.yaw=Math.atan2(target.x-s.x,target.z-s.z);s.attackReadyAt=this.host.now()+1000;s.action='attack';s.actionStartedAt=this.host.now();s.actionEndsAt=this.host.now()+650;
     this.host.event('attack',s.uid,target.uid,{endsAt:s.actionEndsAt,impactAt:this.host.now()});
     for(const m of (s.bookKind==='skeleton'?[target]:this.near(s,3))){
-      if(s.bookKind==='fire_golem')this.hit(p,m,this.host.hp(m)*.03,'fire',false,true);
-      else if(s.bookKind==='infernal'){this.hit(p,m,this.physical(p),'slash');this.hit(p,m,p.stats.matk,'fire');}
-      else this.hit(p,m,this.physical(p),'slash');
+      if(s.bookKind==='fire_golem')this.hit(p,m,this.host.hp(m)*.03,'fire',FIRE_DAMAGE,{ownerScaling:'none',source:'summon',bookId:'book_necro_40'});
+      else if(s.bookKind==='infernal'){this.hit(p,m,this.physical(p),'slash',PHYSICAL_DAMAGE,{source:'summon',bookId:'book_mage_60'});this.hit(p,m,p.stats.matk,'fire',FIRE_DAMAGE,{source:'summon',bookId:'book_mage_60'});}
+      else this.hit(p,m,this.physical(p),'slash',PHYSICAL_DAMAGE,{source:'summon',bookId:'book_necro_20'});
     }return true;
   }
 }
