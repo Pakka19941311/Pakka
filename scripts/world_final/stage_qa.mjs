@@ -14,7 +14,7 @@ import {p2Encounter} from '../../src/data/p2-encounters.ts';
 import {prepareNativePursuitFixture} from '../world_expansion_v3/p2-native-pursuit-fixture.mjs';
 import {prepareNativeNatureFixture} from '../world_expansion_v3/p2-native-nature-fixture.mjs';
 import {prepareNativeLineFixture} from '../world_expansion_v3/p2-native-line-fixture.mjs';
-const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
+const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package=')),qaUserRootArg=options.find(x=>x.startsWith('--qa-user-root='));
 const castlePreview=options.includes('--castle-preview'),castle=options.includes('--castle')||castlePreview,reportName=castle?'castle.json':'stage.json';
 mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
 const geography=new FinalWorld(undefined,true,options.includes('--starter-v3')?{populationMode:'starter-v3'}:{});let bridge,fixtureTimer;
@@ -127,6 +127,7 @@ try{
  },100);
  const bootstrap=join(output,'bootstrap.json');writeFileSync(bootstrap,JSON.stringify({server_url,profiles:[{id:p.id,token:session.token,name:p.name,classId:p.classId,level:p.level}]}));
  const mode=packageArg?['--packaged','--cwd',dirname(resolve(binary))]:['--project','godot-pc'];
+ if(qaUserRootArg)mode.push('--qa-user-root',resolve(qaUserRootArg.slice('--qa-user-root='.length)));
  const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),...mode,'--output',join(output,'native'),'--timeout','360','--',...options.filter(x=>x==='--headless'),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,reportName)}`,`--qa-scope=${castlePreview?'castle-preview':castle?'castle':'stage'}`,...(packageArg?['--qa-packaged']:[]),...options.filter(x=>x.startsWith('--block='))];
  if(options.includes('--qa-graphics=low'))args.push('--qa-graphics=low');
  const process=spawn(globalThis.process.env.PYTHON??'python',args,{stdio:'inherit',windowsHide:true});const [code]=await once(process,'exit');assert.equal(code,0);

@@ -1,6 +1,7 @@
 extends RefCounted
 ## Continue the actual city walk. No second fixture or position/HP reset.
 const Wait = preload("res://scripts/content_acceptance.gd")
+const Capture = preload("res://scripts/p2_city_capture.gd")
 
 static func walk(app: Node, target: Vector2, timeout_ms: int = 20000) -> bool:
 	app.net.intent({"type":"destination","x":target.x,"z":target.y})
@@ -17,10 +18,10 @@ static func run(app: Node, checks: Dictionary) -> void:
 	app.world.camera_distance = 14
 	app.world.camera_yaw = 0.0
 	checks.upgrade_market_route = await walk(app,Vector2(-100,-198))
-	await Wait.capture(app,"p2-city-upgrade-market")
+	checks.p2_city_upgrade_market_capture = await Capture.capture(app,"p2-city-upgrade-market")
 	checks.upgrade_citadel_street = await walk(app,Vector2(-100,-145))
 	checks.upgrade_guard_approach = await walk(app,Vector2(-136,-121))
-	await Wait.capture(app,"p2-city-upgrade-guardhouse")
+	checks.p2_city_upgrade_guardhouse_capture = await Capture.capture(app,"p2-city-upgrade-guardhouse")
 	checks.upgrade_guard_arch_entry = await walk(app,Vector2(-136,-117))
 	checks.upgrade_guard_arch_passage = await walk(app,Vector2(-136,-104))
 	checks.upgrade_guard_arch_return = await walk(app,Vector2(-136,-121))
@@ -28,5 +29,5 @@ static func run(app: Node, checks: Dictionary) -> void:
 	checks.upgrade_tavern_entry = await walk(app,Vector2(-139,-199))
 	checks.upgrade_tavern_inside = await walk(app,Vector2(-147,-199))
 	app.world.camera_distance = 8
-	await Wait.capture(app,"p2-city-upgrade-tavern")
+	checks.p2_city_upgrade_tavern_capture = await Capture.capture(app,"p2-city-upgrade-tavern")
 	checks.upgrade_city_alive = not bool(app.net.hero.dead)
