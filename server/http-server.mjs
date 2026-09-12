@@ -9,7 +9,7 @@ import { createWorldStream } from './world-stream.mjs';
 import { WorldSimulation } from '../src/server/world-simulation.ts';
 import { restoreWorldTopology } from '../src/world/world-topology.ts';
 
-export function startWorldServer({database, collision, terrain, finalWorld, port=4173, host='127.0.0.1', beta=false, xpRate=Number(process.env.VARENDOR_XP_RATE??20), allowLocalImport=false, staticRoot, now=Date.now}) {
+export function startWorldServer({database, collision, terrain, finalWorld, port=4173, host='127.0.0.1', beta=false, xpRate=Number(process.env.VARENDOR_XP_RATE??(finalWorld?.populationMode==='starter-v3'?1:20)), allowLocalImport=false, staticRoot, now=Date.now}) {
   const loopback=address=>['127.0.0.1','::1','::ffff:127.0.0.1'].includes(address);
   if(allowLocalImport&&(!beta||!loopback(host)))throw Error('Local import requires a private loopback beta server');
   const store=new WorldStore(database);
