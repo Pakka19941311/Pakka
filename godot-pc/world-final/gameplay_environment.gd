@@ -10,6 +10,7 @@ var active_space: String = ""
 var terrain: Dictionary
 var heights: PackedFloat32Array
 var supports: Array = []
+var support_index: RefCounted = preload("res://scripts/support_height_index.gd").new()
 var definition: Dictionary = {}
 var bounds: Array = []
 var nature: Node3D
@@ -136,6 +137,7 @@ func activate_space(id: String) -> bool:
 	terrain = saved.terrain
 	heights = saved.heights
 	supports = saved.supports
+	support_index.setup(supports)
 	definition = spaces.get(id,{})
 	bounds = [-796,-696,796,696] if id == "surface" else [terrain.bounds[0]+1,-terrain.bounds[3]+1,terrain.bounds[2]-1,-terrain.bounds[1]-1]
 	world.collision.setup(saved.obstacles)
@@ -176,10 +178,7 @@ func height_at(x: float,z: float,with_support: bool = true) -> float:
 	var d: float = heights[i+c+2]
 	var y: float = a+u*(bb-a)+v*(d-bb) if u>=v else a+u*(d-cc)+v*(cc-a)
 	if with_support:
-		for s: Dictionary in supports:
-			var local: Vector2 = Vector2(x-float(s.x),-z-float(s.z)).rotated(float(s.angle))
-			if absf(local.x)<=float(s.halfX) and absf(local.y)<=float(s.halfZ):
-				y = maxf(y,lerpf(float(s.high),float(s.y),(local.y+float(s.halfZ))/(2*float(s.halfZ))) if s.kind == "ramp_z" else float(s.y))
+		y = support_index.height_at(x,-z,y)
 	return y
 
 func polygon_has(x: float,z: float,polygon: Array) -> bool:
