@@ -79,7 +79,7 @@ test('starter cave respects nine-second slam cooldown and every intervening slas
  const start=sim.state.time;let meleeHits=0;
  while(sim.state.time-start<15000&&sim.events.filter(e=>e.kind==='attack'&&e.actor===m.uid&&e.effect==='slam').length<2){
   const hp=p.hp;f.advance(50);const pending=sim.state.pending.find(a=>a.actor===m.uid);
-  if(p.hp<hp&&pending&&!pending.slam){meleeHits++;assert.ok(gap(p,m)<2.54);}
+  if(p.hp<hp&&pending&&!pending.slam){meleeHits++;assert.ok(gap(p,m)<sim.monsterMeleeRange(m)+.25);}
  }
  const slams=sim.events.filter(e=>e.kind==='attack'&&e.actor===m.uid&&e.effect==='slam');assert.equal(slams.length,2);assert.ok(slams[1].at-slams[0].at>=9000);assert.ok(meleeHits>0);
  assert.equal(m.hp,MONSTERS.cave_boss.hp-sim.events.filter(e=>e.kind==='hit'&&e.actor===p.id&&e.target===m.uid).reduce((n,e)=>n+e.amount,0));

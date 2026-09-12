@@ -1,4 +1,5 @@
 import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss.ts';
+import {actorGeometryV3,bodyContactReach,ACTOR_GEOMETRY_VERSION} from '../data/actor-geometry-v3.ts';
 import {monsterInInterest} from '../network/monster-interest.ts';
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
@@ -212,6 +213,7 @@ export class WorldSimulation {
       const existing=new Set(this.state.monsters.map(m=>m.uid));
       for(const slot of this.finalWorld.slots)if(!existing.has(slot.uid))this.spawnMonster(slot.speciesId,slot,slot.uid,slot.groupId);
     }else for(const region of SPAWN_REGIONS)for(let i=0;i<region.population;i++)if(!this.state.monsters.some(m=>m.uid===`${region.id}:${i}`))this.spawnMonster(region.monsterId,spawnPointInRegion(region,i),`${region.id}:${i}`,region.id,i);
+    this.reconcileActorGeometry();
     // A process restart breaks all connections. Never renew their exposure deadline.
     for (const p of Object.values(this.state.characters)) {
       Object.assign(p,normalizeProgressionV3(p));p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));Object.assign(p,initializeProgressionQuests(p));this.migrateEquipment(p);this.recalculate(p);
@@ -394,7 +396,7 @@ export class WorldSimulation {
     if(active&&p.target!==target!.uid)this.cancelAttack(p.id);
     p.target=target!.uid;p.skill=intent.skill;p.destination=null;p.direction={x:0,z:0};p.bufferedSkill=undefined;
     if(intent.skill===null){p.autoAttack=intent.mode==='auto';p.singleAttack=!p.autoAttack;}
-    if(skill&&distance(p,target!)<=this.books.range(p)){p.yaw=Math.atan2(target!.x-p.x,target!.z-p.z);this.beginPlayerAttack(p,target!);}
+    if(skill&&distance(p,target!)<=this.playerAttackRange(p,target!)){p.yaw=Math.atan2(target!.x-p.x,target!.z-p.z);this.beginPlayerAttack(p,target!);}
     this.approaching.delete(p.id);this.pursuit.delete(p.id);
   }
 
@@ -613,9 +615,9 @@ export class WorldSimulation {
         endPoint:{x:a.counter!.endPoint.x,z:a.counter!.endPoint.z,spaceId:a.counter!.endPoint.spaceId},
         radius:a.counter!.halfWidth,halfWidth:a.counter!.halfWidth,expiresAt:a.hitAt,effect:a.counter!.element}))
     ];
-    return structuredClone({progressionQuests:this.progressionViews(character),starterQuests:starterQuestViews(character),craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
-      heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
-      monsters:this.state.monsters.filter(m=>sameSpace(m,character)&&(!this.finalWorld||monsterInInterest(m,character))).map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons.filter(m=>sameSpace(m,character)),events:this.events.filter(e=>e.sequence>afterEvent&&(!this.finalWorld||e.spaceId===spaceOf(character)))});
+    return structuredClone({progressionQuests:this.progressionViews(character),starterQuests:starterQuestViews(character),craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.playerAttackRange(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
+      heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.playerAttackRange(p)})),
+      monsters:this.state.monsters.filter(m=>sameSpace(m,character)&&(!this.finalWorld||monsterInInterest(m,character))).map((m):WorldMonster=>({...m,...this.geometrySnapshot(m),bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons.filter(m=>sameSpace(m,character)),events:this.events.filter(e=>e.sequence>afterEvent&&(!this.finalWorld||e.spaceId===spaceOf(character)))});
   }
   private tick(dt: number): void {
     this.expireDeadlines();
@@ -642,7 +644,7 @@ export class WorldSimulation {
         if(target&&!p.destination&&(p.autoAttack||p.singleAttack||p.skill!==null)){
           const skill=p.skill===null?undefined:CLASSES[p.classId as ClassId].skills[p.skill] as Skill;
           if(skill&&(p.mp<skill.cost||p.cooldowns[p.skill!]>this.state.time))p.skill=null;
-          const range=this.books.range(p);
+          const range=this.playerAttackRange(p,target);
           const visible=this.lineOfSight(p,target);
           const spacing=combatSpacing(range,this.bodyRadius(p),this.bodyRadius(target));
           const approachRange=spacing.destinationDistance;
@@ -787,7 +789,7 @@ export class WorldSimulation {
     const p=this.state.characters[a.actor];const target=this.state.monsters.find(m=>m.uid===a.target&&m.alive&&m.generation===a.generation)!;
     const cls=CLASSES[p.classId as ClassId];
 
-    if(distance(p,target)>this.books.range(p)+(cls.ranged ? .05 : .25)||!this.lineOfSight(p,target)){this.cancelAttack(p.id);this.event('cancel',p.id,target.uid,{skill:a.skill,reason:'out-of-reach'});return;}
+    if(distance(p,target)>this.playerAttackRange(p,target)+(cls.ranged ? .05 : .25)||!this.lineOfSight(p,target)){this.cancelAttack(p.id);this.event('cancel',p.id,target.uid,{skill:a.skill,reason:'out-of-reach'});return;}
     const skill=a.skill===null?undefined:cls.skills[a.skill] as Skill;
     if(skill){
       if(!a.resourcePaid){if(p.mp<skill.cost||p.cooldowns[a.skill!]>this.state.time){this.cancelAttack(p.id);return;}p.mp-=skill.cost;p.cooldowns[a.skill!]=this.state.time+skill.cd*1000;}
@@ -795,7 +797,7 @@ export class WorldSimulation {
     p.combatState='recovery';
     const effect=skill?.fx??(p.classId==='mage'||p.classId==='necro'?'fire':'arrow');
     const origin={spaceId:p.spaceId,x:p.x,z:p.z,y:this.terrainFor(p).supportAt(p.x,p.z)+1.4};
-    this.event('release',p.id,target.uid,{skill:a.skill,generation:a.generation,actorGeneration:p.generation,effect:cls.ranged?effect:'slash',durationMs:cls.ranged&&effect!=='lightning'&&effect!=='slash'?280:0,origin,destination:{x:target.x,z:target.z,y:this.terrainFor(target).supportAt(target.x,target.z)+1.4}});
+    this.event('release',p.id,target.uid,{skill:a.skill,generation:a.generation,actorGeneration:p.generation,effect:cls.ranged?effect:'slash',durationMs:cls.ranged&&effect!=='lightning'&&effect!=='slash'?280:0,origin,destination:{x:target.x,z:target.z,y:this.terrainFor(target).supportAt(target.x,target.z)+this.impactHeight(target)}});
     const strike={actor:p.id,target:target.uid,generation:target.generation,actorGeneration:p.generation,skill:a.skill,damage:a.damage!,critical:Boolean(a.critical),accuracy:a.accuracy!,damageType:a.damageType,element:a.element};
     if(!cls.ranged||effect==='lightning'||effect==='slash')this.strike(strike);
     else{this.state.projectiles!.push({...strike,origin,point:{...origin},startedAt:this.state.time,endsAt:this.state.time+280});}
@@ -816,7 +818,7 @@ export class WorldSimulation {
     const remove=()=>{this.state.projectiles=this.state.projectiles!.filter(p=>p!==projectile);};
     if(!target||!sameSpace(projectile.origin,target)){remove();return;}
     const t=Math.min(1,(this.state.time-projectile.startedAt)/(projectile.endsAt-projectile.startedAt));
-    const end={x:target.x,z:target.z,y:this.terrainFor(target).supportAt(target.x,target.z)+1.4};
+    const end={x:target.x,z:target.z,y:this.terrainFor(target).supportAt(target.x,target.z)+this.impactHeight(target)};
     const next={spaceId:projectile.origin.spaceId,x:projectile.origin.x+(end.x-projectile.origin.x)*t,z:projectile.origin.z+(end.z-projectile.origin.z)*t,y:projectile.origin.y+(end.y-projectile.origin.y)*t};
     if(!this.collisionFor(target).hasLineOfSight(projectile.point,next,.025)||next.y<this.terrainFor(target).heightAt(next.x,next.z)+.04){remove();return;}
     projectile.point=next;if(this.state.time>=projectile.endsAt){remove();this.strike(projectile);}
@@ -1017,9 +1019,9 @@ export class WorldSimulation {
   private spawnMonster(id:string,point:Position,uid:string,regionId?:string,index=0):void {
     const slot=this.finalWorld?.slotById.get(uid),p2=slot?p2Encounter(slot):null,def=p2??MONSTERS[id as MonsterId];
     if(!def)throw Error('unregistered-monster:'+id);
-    const body=p2?slot!.bodyRadius??.46:[CAVE_BOSS_ID,'rift_boss'].includes(id)?1.5:id.includes('golem')?1:id==='big'?1.2:id==='mini'?.9:.42;
+    const body=actorGeometryV3({id,canonicalMobId:slot?.canonicalMobId},this.finalWorld?.populationMode)?.bodyRadius??(p2?slot!.bodyRadius??.46:[CAVE_BOSS_ID,'rift_boss'].includes(id)?1.5:id.includes('golem')?1:id==='big'?1.2:id==='mini'?.9:.42);
     const home={...this.collisionFor(point).findNearestFree(point,body),...(this.finalWorld?{spaceId:spaceOf(point)}:{})};
-    if(this.finalWorld&&this.collisionFor(point).isBlocked(home,.46)){
+    if(this.finalWorld&&this.collisionFor(point).isBlocked(home,body)){
       if(this.finalWorld.slotById.has(uid))throw Error('final-spawn-blocked:'+uid);
       return; // A temporary summon cannot materialize inside a wall or cliff.
     }
@@ -1157,15 +1159,15 @@ export class WorldSimulation {
   private lineOfSight(a:Position,b:Position):boolean {
     if(!sameSpace(a,b))return false;
     const terrain=this.terrainFor(a);
-    const height=(p:Position)=>{const m=this.state.monsters.find(m=>m===p);return m?Math.min(1.4,(m.id==='big'?4.6:m.id==='mini'?3.4:m.id==='bat'?1.4:1.9)*.65):1.3325;};
-    const start={...a,y:terrain.supportAt(a.x,a.z)+height(a)};const end={...b,y:terrain.supportAt(b.x,b.z)+height(b)};
+    const height=(p:Position,source:boolean)=>{const m=this.state.monsters.find(m=>m===p);const geometry=m?this.actorGeometry(m):null;return geometry?(source?geometry.sourceHeight:geometry.impactHeight):m?Math.min(1.4,(m.id==='big'?4.6:m.id==='mini'?3.4:m.id==='bat'?1.4:1.9)*.65):1.3325;};
+    const start={...a,y:terrain.supportAt(a.x,a.z)+height(a,true)};const end={...b,y:terrain.supportAt(b.x,b.z)+height(b,false)};
     if(!this.collisionFor(a).hasLineOfSight(start,end,.04))return false;
     const length=Math.hypot(start.x-end.x,start.y-end.y,start.z-end.z);
     for(let d=.4;d<length;d+=.4){const t=d/length;const x=start.x+(end.x-start.x)*t,z=start.z+(end.z-start.z)*t,y=start.y+(end.y-start.y)*t;if(y<terrain.heightAt(x,z)+.06)return false;}return true;
   }
   private rangedResponse(m:WorldMonster){return this.finalWorld?.populationMode==='starter-v3'?rangedResponseV3(m.id,m.canonicalMobId):null;}
   private candidateCave(m:WorldMonster):boolean{return this.finalWorld?.populationMode==='starter-v3'&&m.id===CAVE_BOSS_ID;}
-  private monsterMeleeRange(m:WorldMonster):number{return Math.max(1.65,this.bodyRadius(m)+.64);}
+  private monsterMeleeRange(m:WorldMonster):number{return this.actorGeometry(m)?bodyContactReach(1.65,this.bodyRadius(m),.46):Math.max(1.65,this.bodyRadius(m)+.64);}
   private monsterLeash(m:WorldMonster):number{return (this.finalWorld?.slotById.get(m.uid)??SPAWN_REGIONS.find(r=>r.id===m.regionId))?.leashRadius??('boss' in monsterDef(m)?18:14);}
   private counterContains(c:NonNullable<PendingAttack['counter']>,p:Position):boolean {
     if(!sameSpace(c.origin,p))return false;
@@ -1175,8 +1177,8 @@ export class WorldSimulation {
   }
   private beginRangedResponse(m:WorldMonster,p:WorldCharacter,profile:NonNullable<ReturnType<typeof rangedResponseV3>>):void {
     const terrain=this.terrainFor(m),distanceToTarget=Math.max(.001,distance(m,p));
-    // Match the existing server LOS eye heights; native receives these exact endpoints.
-    const origin={spaceId:m.spaceId,x:m.x,z:m.z,y:terrain.supportAt(m.x,m.z)+1.235};
+    // Measured rig head/torso heights share the LOS and projectile contract.
+    const origin={spaceId:m.spaceId,x:m.x,z:m.z,y:terrain.supportAt(m.x,m.z)+(this.actorGeometry(m)?.sourceHeight??1.235)};
     const scale=profile.range/distanceToTarget;
     const intended={spaceId:m.spaceId,x:origin.x+(p.x-m.x)*scale,z:origin.z+(p.z-m.z)*scale,
       y:origin.y+(terrain.supportAt(p.x,p.z)+1.3325-origin.y)*scale};
@@ -1194,9 +1196,29 @@ export class WorldSimulation {
     this.event('attack',m.uid,p.id,{impactAt:hitAt,endsAt,generation:p.generation,actorGeneration:m.generation,effect:profile.element,
       attackKind:'aimed-line',halfWidth:profile.halfWidth,origin,destination:endPoint,durationMs:profile.windup*1000});
   }
-  private monsterRadius(m:WorldMonster):number{if(m.canonicalMobId)return m.bodyRadius??.46;return [CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.5:m.id.includes('golem')?1:m.id==='big'?1.2:m.id==='mini'?.9:.42;}
-  private bodyRadius(actor:Position):number {if('canonicalMobId' in actor&&actor.canonicalMobId)return (actor as WorldMonster).bodyRadius??.46;const m=('uid' in actor&&'id' in actor&&Object.hasOwn(MONSTERS,String(actor.id)))?actor as WorldMonster:undefined;return m?[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.65:m.id.includes('golem')?1.05:m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
-  private monsterRange(m:WorldMonster):number{const p2=p2Encounter(m);if(p2)return p2.attackRange;if(m.id===CAVE_BOSS_ID)return classAttackRange('ranger');return Math.max(1.65,this.bodyRadius(m)+.64);}
+  private monsterRadius(m:WorldMonster):number{const geometry=this.actorGeometry(m);if(geometry)return geometry.bodyRadius;if(m.canonicalMobId)return m.bodyRadius??.46;return [CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.5:m.id.includes('golem')?1:m.id==='big'?1.2:m.id==='mini'?.9:.42;}
+  private bodyRadius(actor:Position):number {const geometry=this.actorGeometry(actor);if(geometry)return geometry.bodyRadius;if('canonicalMobId' in actor&&actor.canonicalMobId)return (actor as WorldMonster).bodyRadius??.46;const m=('uid' in actor&&'id' in actor&&Object.hasOwn(MONSTERS,String(actor.id)))?actor as WorldMonster:undefined;return m?[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.65:m.id.includes('golem')?1.05:m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}
+  private monsterRange(m:WorldMonster):number{const p2=p2Encounter(m);if(p2)return this.actorGeometry(m)?bodyContactReach(p2.attackRange,this.bodyRadius(m),.46):p2.attackRange;if(m.id===CAVE_BOSS_ID)return classAttackRange('ranger');return this.monsterMeleeRange(m);}
+  private actorGeometry(actor:Position){return actorGeometryV3(actor as WorldMonster,this.finalWorld?.populationMode);}
+  private geometrySnapshot(actor:WorldMonster){const g=this.actorGeometry(actor);return g?{visualHeight:g.height,sourceHeight:g.sourceHeight,impactHeight:g.impactHeight,geometryVersion:ACTOR_GEOMETRY_VERSION}:{};}
+  private impactHeight(actor:WorldMonster):number{return this.actorGeometry(actor)?.impactHeight??1.4;}
+  private playerAttackRange(p:WorldCharacter,target?:WorldMonster):number {
+    const base=this.books.range(p);if(CLASSES[p.classId as ClassId].ranged)return base;
+    target??=this.state.monsters.find(m=>m.uid===p.target&&m.alive&&sameSpace(m,p));
+    return target&&this.actorGeometry(target)?bodyContactReach(base,this.bodyRadius(p),this.bodyRadius(target)):base;
+  }
+  private reconcileActorGeometry():void {
+    if(this.finalWorld?.populationMode!=='starter-v3')return;
+    for(const m of this.state.monsters){const geometry=this.actorGeometry(m);if(!geometry)continue;
+      if(m.canonicalMobId)m.bodyRadius=geometry.bodyRadius;const collision=this.collisionFor(m);
+      const home=collision.findNearestFree(m.home,geometry.bodyRadius);
+      if(collision.isBlocked(home,geometry.bodyRadius))throw Error('actor-geometry-home-blocked:'+m.uid);
+      m.home={...m.home,...home};
+      // Keep deaths, wounds, ownership and respawn generations. An idle actor
+      // embedded by its enlarged torso can move to the validated nearby home.
+      if(m.alive&&!m.targetId&&!m.provokedBy&&collision.isBlocked(m,geometry.bodyRadius))Object.assign(m,m.home);
+    }
+  }
   private relocate(p:WorldCharacter,point:Position):void {
     const free=this.collisionFor(point).findNearestFree(point,.46);
     if(this.collisionFor(point).isBlocked(free,.46))throw Error('no-free-arrival');
