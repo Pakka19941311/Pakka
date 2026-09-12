@@ -5,12 +5,12 @@ import { CollisionWorld } from '../src/world/collision-world.ts';
 import { TerrainSurface } from '../src/world/terrain-surface.ts';
 import { classAttackRange } from '../src/core/game-rules.ts';
 
-function fixture(classId='ranger', obstacle) {
+function fixture(classId='ranger', obstacle, random=()=>.01) {
   const collision=new CollisionWorld();obstacle?.(collision);
   const terrain=new TerrainSurface();terrain.heights.fill(0);
   let serial=0;
   const store={load:()=>null,save:()=>{}};
-  const world=new WorldSimulation({store,collision,terrain,now:1000,identifier:()=>`feedback-${++serial}`,random:()=>.01});
+  const world=new WorldSimulation({store,collision,terrain,now:1000,identifier:()=>`feedback-${++serial}`,random});
   const p=world.createCharacter('Проверка',classId);
   const m=world.state.monsters.find(m=>m.id==='wolf');
   Object.assign(p,{x:30,z:18});world.heartbeat(p.id);
@@ -78,13 +78,19 @@ test('ranged impact precedes death and loot, dead actor stops immediately and ca
   m.status.stun=0;advance(650);
   assert.deepEqual({x:m.x,z:m.z},deathPosition);
   assert.equal(world.snapshot(p.id).monsters[0].aiState,'corpse','after death animation only the noncombat corpse remains');
-  advance(450);assert.equal(world.snapshot(p.id).monsters[0].aiState,'despawn');
+  // The server's corpse deadline is the contract; 1100 ms was an obsolete fixture delay.
+  const corpseUntil=m.corpseUntil;assert.ok(corpseUntil>world.state.time);
+  world.heartbeat(p.id);world.advance(corpseUntil-.01);
+  assert.ok(world.state.time<corpseUntil);assert.equal(world.snapshot(p.id).monsters[0].aiState,'corpse');
+  world.advance(corpseUntil+50);assert.ok(world.state.time>=corpseUntil);
+  assert.equal(world.snapshot(p.id).monsters[0].aiState,'despawn');assert.equal(m.alive,false);assert.equal(m.hp,0);
+  assert.deepEqual({x:m.x,z:m.z},deathPosition);
   assert.equal(world.events.some(e=>e.sequence>sequence&&e.actor===m.uid&&e.kind==='attack'),false);
   assert.equal(world.events.filter(e=>e.kind==='loot').length,1);
 });
 
 test('world AI approaches an active player, attacks and returns home after losing the player',()=>{
-  const {world,p,m,advance}=fixture('knight');
+  const {world,p,m,advance}=fixture('knight',undefined,()=>.5);
   Object.assign(p,{x:30,z:24,hp:10000,maxHp:10000});m.status.stun=0;
   const states=new Set();const initial=gap(p,m);
   advance(5000,()=>states.add(world.snapshot(p.id).monsters[0].aiState));
@@ -98,6 +104,19 @@ test('world AI approaches an active player, attacks and returns home after losin
   assert.ok(states.has('leash')||states.has('return'));
   assert.ok(gap(m,m.home)<=.55,'monster returns to its own home');
   assert.equal(world.events.some(e=>e.sequence>sequence&&e.kind==='hit'&&e.actor===m.uid),false);
+});
+
+test('world AI reaches actual contact but RNG .01 produces evasion misses without HP loss',()=>{
+  const {world,p,m,advance}=fixture('knight',undefined,()=>.01);
+  Object.assign(p,{x:30,z:24});m.status.stun=0;const before=p.hp;
+  assert.ok(p.stats.evasion/100>.01,'fixture roll is explicitly inside the live evasion interval');
+  advance(5000);
+  const attacks=world.events.filter(e=>e.kind==='attack'&&e.actor===m.uid&&e.target===p.id);
+  const misses=world.events.filter(e=>e.kind==='miss'&&e.actor===m.uid&&e.target===p.id);
+  assert.ok(attacks.length>=2);assert.equal(misses.length,attacks.length);
+  for(const miss of misses)assert.ok(attacks.some(a=>a.impactAt<=miss.at+1e-6&&a.endsAt>=miss.at),'miss occurs at an actual attack contact');
+  assert.equal(world.events.some(e=>e.kind==='hit'&&e.actor===m.uid&&e.target===p.id),false);
+  assert.equal(p.hp,before);
 });
 
 test('ordinary world monsters patrol with no eligible players, and heroes expose integer level',()=>{
