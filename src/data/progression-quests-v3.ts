@@ -5,7 +5,7 @@ import type {StarterClass} from './starter-progression-v3.ts';
 import type {SpaceId} from '../world/world-space.ts';
 
 export const PROGRESSION_QUEST_CATALOG_VERSION='progression-quests-v3-1';
-export const PROGRESSION_QUEST_RUNTIME_STATUS='staged-not-integrated';
+export const PROGRESSION_QUEST_RUNTIME_STATUS='server-integrated-population-gated';
 export type ProgressionQuestId='QUEST-110'|'QUEST-115'|'QUEST-120'|'QUEST-125'|'QUEST-130'|'QUEST-131'|'QUEST-140'|'QUEST-141'|'QUEST-150'|'QUEST-160';
 export type QuestRewardStack={id:string;count:number};
 export type QuestMarker={id:string;text:string;locationId:string;spaceId:SpaceId};

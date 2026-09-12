@@ -126,12 +126,15 @@ func shop_classes() -> void:
 
 func quest_menu() -> void:
 	var body: VBoxContainer = app.dialog("Арден · Книги высших умений",Vector2i(540,330))
-	for level: int in [50,60]:
-		var id: String = "book_%s_%d" % [app.net.hero.classId,level]
-		var state: String = str(app.net.hero.get("bookQuests",{}).get(id,""))
-		body.add_child(app.label("%d+ · %s\nПобедите: %s" % [level,app.data.books[id].name,"Хозяин Гнилого Леса" if level==50 else "Страж раскалённого разлома"],14))
-		var btn: Button = app.button({"":"Принять задание","active":"Задание выполняется","ready":"Получить книгу","claimed":"Книга получена"}.get(state,""),func(): await app.net.command({"type":"bookQuest","level":level}); quest_menu())
-		btn.disabled = state in ["active","claimed"] or int(app.net.hero.level)<level; body.add_child(btn)
+	body.add_child(app.wrapped_label("Новые испытания класса выдаёт Северин в Гринфолле. Прежнее право на книгу сохранено; готовую награду можно забрать и здесь.",13))
+	for quest: Dictionary in app.net.progression_quests:
+		if str(quest.giverId) != "npc:books": continue
+		var state: String = str(quest.status)
+		body.add_child(app.wrapped_label("%d+ · %s" % [int(quest.level),str(quest.title)],14))
+		if state in ["ready","pending"]:
+			var level: int = int(quest.level)
+			body.add_child(app.button("Забрать сохранённую награду",func(): await app.net.command({"type":"bookQuest","level":level}); quest_menu()))
+		else: body.add_child(app.wrapped_label("Награда получена" if state == "claimed" else "Подробности испытания — у Северина",12))
 
 static func buff_time(milliseconds: float) -> String:
 	var seconds: int = ceili(milliseconds / 1000.0)

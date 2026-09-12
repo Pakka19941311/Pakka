@@ -437,7 +437,8 @@ func refresh(hero: Dictionary) -> void:
 		elif key == "manaRegen": value = "%.2f" % float(hero.stats.get("manaRegen",0))
 		elif key == "evasion": value = stat_number(hero.stats.get(key,0))
 		app.stat_values[key].text = value
-	region_text.text = app.starter_quests.tracker_text()+"\n\nВладыки региона\n"
+	var later_quests: String = app.progression_quests.tracker_text()
+	region_text.text = app.starter_quests.tracker_text()+("\n\n"+later_quests if not later_quests.is_empty() else "")+"\n\nВладыки региона\n"
 	for monster_id: String in ["mini","big","rift_boss"]:
 		var definition: Dictionary = app.data.monsters.get(monster_id,{})
 		if definition.is_empty(): continue

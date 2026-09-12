@@ -47,5 +47,5 @@ export const SKILL_BOOKS:Record<string,BookDefinition> = Object.fromEntries(Obje
   const level=(column+1)*10,id=`book_${classId}_${level}`;
   return [id,{id,classId,level,name,cd,cost,duration,mode,fx,description,price:[2000,5000,15000,200000,0,0][column],column}];
 })));
-export const BOOK_ITEMS = Object.fromEntries(Object.values(SKILL_BOOKS).map(b=>[b.id,{name:`Книга: ${b.name}`,type:'book',bookId:b.id,classes:[b.classId],requiredLevel:b.level,icon:'▣',value:0,origin:b.price?'Книготорговец Астерхолда':b.level===50?'Задание: Хозяин Гнилого Леса':'Задание: Страж разлома',desc:b.description}]));
+export const BOOK_ITEMS = Object.fromEntries(Object.values(SKILL_BOOKS).map(b=>[b.id,{name:`Книга: ${b.name}`,type:'book',bookId:b.id,classes:[b.classId],requiredLevel:b.level,icon:'▣',value:0,origin:b.price?'Книготорговец Астерхолда':b.level===50?'Северин: Знание класса I':'Северин: Знание класса II',desc:b.description}]));
 export const BOOK_TEST_DEFAULTS = {xpRate:20,areaRadius:4,tauntRadius:7,allyRadius:4,summonLeash:14,curseDuration:15,trapDuration:30,retaliationDuration:10};

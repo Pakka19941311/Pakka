@@ -7,6 +7,7 @@ import type { EquipmentCombatStats } from '../core/equipment-stats.ts';
 import type {RingRecipe} from '../data/accessories-v3.ts';
 import type {StarterProgress,StarterQuestView} from '../core/starter-quests-v3.ts';
 import type {LegacyProgression} from '../core/progression-migration-v3.ts';
+import type {ProgressionQuestLedger,ProgressionQuestView} from '../core/progression-quests-v3.ts';
 
 export const WORLD_PROTOCOL = 1;
 export const DISCONNECT_GRACE_MS = 30_000;
@@ -20,6 +21,7 @@ export type WorldCharacter = Position & WorldMotion & {
   storage?: Array<InventoryItem|null>;
   migrationReserve?:InventoryItem[];accessoryMigrationVersion?:number;legacyProgression?:LegacyProgression;
   starterProgress?:StarterProgress;
+  progressionQuests?:ProgressionQuestLedger;
   inventory: InventoryItem[]; equipment: Record<string, InventoryItem | undefined>;
   lootBuffer: InventoryItem[]; betaScrollGrant?: string; legacyScrolls?: number; quest: number; kills: number; bossKills: number;
   dead: boolean; cooldowns: number[]; attackReadyAt: number; buffs: { guard: number; vanish: number; haste?:number };
@@ -47,6 +49,7 @@ export type WorldEvent = {
   gold?: number; xp?: number; items?: string[];
 };
 export type WorldSnapshot = {
+  progressionQuests?:ProgressionQuestView[];
   starterQuests?:StarterQuestView[];
   craftRecipes?:RingRecipe[];
   spaceId?:SpaceId;worldRevision?:string;populationCapacity?:number;
@@ -59,6 +62,7 @@ export type WorldSnapshot = {
 };
 // The wire format contains intentions only. Damage, prices, dice and rewards are server-owned.
 export type WorldCommand =
+  | {type:'progressionQuest';questId:string;action:'accept'|'claim';rewardChoice?:string}
   | {type:'starterQuest';questId:string;action:'accept'|'claim'}
   | {type:'craftRing';recipeId:string;target:ItemReference;materials:ItemReference[]}
   | {type:'claimMigration';item:ItemReference}

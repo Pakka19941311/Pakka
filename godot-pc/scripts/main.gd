@@ -57,6 +57,7 @@ var npc_interaction: VarendorNpcInteraction = VarendorNpcInteraction.new()
 var trade_session = preload("res://scripts/trade_session.gd").new()
 var crafting = preload("res://scripts/crafting_dialog.gd").new()
 var starter_quests = preload("res://scripts/starter_quests.gd").new()
+var progression_quests = preload("res://scripts/progression_quests.gd").new()
 var mouse_orbit: bool:
 	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
@@ -85,6 +86,7 @@ func _ready() -> void:
 	trade_session.app = self
 	crafting.app = self
 	starter_quests.app = self
+	progression_quests.app = self
 	if "--qa-scope=monsters" in OS.get_cmdline_user_args():
 		set_process(false)
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/monster_qa.tscn")
@@ -168,6 +170,9 @@ func _ready() -> void:
 			await net.create_character("PC Test", "knight")
 		if "--qa-scope=castle-preview" in OS.get_cmdline_user_args():
 			await preload("res://world-final/castle/tavern_acceptance.gd").run(self)
+			return
+		if "--qa-scope=progression" in OS.get_cmdline_user_args():
+			await preload("res://scripts/progression_quests_acceptance.gd").run(self)
 			return
 		if "--qa-scope=castle" in OS.get_cmdline_user_args():
 			await preload("res://world-final/castle/courtyard_acceptance.gd").run(self)
@@ -787,6 +792,10 @@ func interact() -> void:
 
 func open_npc_service(id: String) -> void:
 	trade_session.app = self
+	if id == "npc:books":
+		book_ui.merchant_name = str(VarendorNpcInteraction.SERVICES[id].name)
+		progression_quests.open(id)
+		return
 	if id in ["npc:asterhold:shop","npc:books"]:
 		book_ui.merchant_name = str(VarendorNpcInteraction.SERVICES[id].name)
 		book_ui.shop_classes()
@@ -988,6 +997,7 @@ func _process(delta: float) -> void:
 	trade_session.poll()
 	crafting.poll()
 	starter_quests.poll()
+	progression_quests.poll()
 	if not startup_complete or world == null or net == null:
 		return
 	# The frame's catch-up physics belongs to the previously held input.

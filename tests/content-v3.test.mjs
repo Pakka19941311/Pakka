@@ -127,12 +127,12 @@ test('summons use their specified damage and expire when owner generation change
   f.p.generation++;f.w.books.summonTick(summon,.05,()=>{});assert.equal(summon.expiresAt,f.w.state.time);
  }
 });
-test('level 50/60 books require the correct boss quest and are granted once at Arden',()=>{
+test('legacy ready level 50/60 book entitlements are migrated and granted only once at Arden',()=>{
  for(const level of [50,60]){
   const f=setup('mage');Object.assign(f.p,SERVICES['npc:asterhold:elder']);f.p.level=level-1;assert.equal(f.command({type:'bookQuest',level}).reason,'book-level');f.p.level=level;
-  assert.equal(f.command({type:'bookQuest',level}).ok,true);const id=`book_mage_${level}`;assert.equal(f.p.bookQuests[id],'active');assert.ok(!f.p.inventory.some(i=>i.id===id));
-  Object.assign(f.p,{x:50,z:50});f.m.id=level===50?'big':'rift_boss';f.w.damage(f.m,1e6,f.p,false);assert.equal(f.p.bookQuests[id],'ready');assert.equal(f.command({type:'bookQuest',level}).reason,'elder-unavailable');
-  Object.assign(f.p,SERVICES['npc:asterhold:elder']);assert.equal(f.command({type:'bookQuest',level}).ok,true);assert.equal(f.p.inventory.filter(i=>i.id===id).length,1);assert.equal(f.command({type:'bookQuest',level}).reason,'already-claimed');
+  const id=`book_mage_${level}`;f.p.bookQuests={[id]:'ready'};
+  Object.assign(f.p,{x:50,z:50});assert.equal(f.command({type:'bookQuest',level}).reason,'quest-giver-unavailable');
+  Object.assign(f.p,SERVICES['npc:asterhold:elder']);assert.equal(f.command({type:'bookQuest',level}).ok,true);assert.equal(f.p.inventory.filter(i=>i.id===id).length,1);assert.equal(f.command({type:'bookQuest',level}).outcome.xpAwarded,0);assert.equal(f.p.inventory.filter(i=>i.id===id).length,1);
  }
 });
 test('failed damaging book transaction rolls back rewards, effects, hit events and aggro caches',()=>{

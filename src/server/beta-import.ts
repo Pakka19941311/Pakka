@@ -8,6 +8,7 @@ import {starterQuestDefinition,starterRewardIds} from '../data/starter-progressi
 import type {StarterQuestId,StarterEvidence} from '../data/starter-progression-v3.ts';
 import type {StarterProgress,StarterQuestStatus} from '../core/starter-quests-v3.ts';
 import type {LegacyProgression} from '../core/progression-migration-v3.ts';
+import {parseLegacyBookQuests,parseProgressionQuestLedger} from './progression-quest-import.ts';
 
 const invalid = (): never => { throw Error('invalid-beta-save: original data retained'); };
 function record(value: unknown): Record<string, unknown> {
@@ -90,10 +91,11 @@ export function parseBetaSave(raw: unknown) {
     legacyProgression={version:3,reason:'level-cap-90',originalLevel:integer(old.originalLevel,90,100),originalXp:integer(old.originalXp,0)};
   }
   const hp = finite(player.hp,0,Number.MAX_SAFE_INTEGER);
+  const bookQuests=parseLegacyBookQuests(player.bookQuests??save.bookQuests),progressionQuests=parseProgressionQuestLedger(player.progressionQuests,classId,item);
   return {
     name:player.name.trim(),classId,legacyProgression,level:integer(player.level,1,100),xp:integer(player.xp,0),gold:integer(player.gold,0),
     x:finite(player.x,-158,158),z:finite(player.z,-138,138),hp,mp:finite(player.mp,0,Number.MAX_SAFE_INTEGER),
-    dead:Boolean(player.dead || hp <= 0),inventory:migrated.player.inventory,equipment,lootBuffer:migrated.lootBuffer,storage,migrationReserve,starterProgress,
+    dead:Boolean(player.dead || hp <= 0),inventory:migrated.player.inventory,equipment,lootBuffer:migrated.lootBuffer,storage,migrationReserve,starterProgress,bookQuests,progressionQuests,
     quest:integer(save.quest??0,0,4),kills:integer(save.kills??0,0),bossKills:integer(save.bossKills??0,0),
     legacyScrolls:migrated.legacyScrolls,betaScrollGrant:save.betaScrollGrant as string|undefined,
   };

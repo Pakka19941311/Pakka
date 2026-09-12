@@ -13,6 +13,7 @@ func active() -> bool:
 func open() -> void:
 	if app.net.hero.is_empty(): return
 	box = app.dialog("Роэн · Дороги Гринфолла",Vector2i(590,500))
+	box.add_child(app.button("Дальние поручения · уровни 10–40",func(): app.progression_quests.open("npc:elder")))
 	box.add_child(app.wrapped_label("За стенами каждый участок требует внимания. Выберите поручение по силам. Награда подходит вашему классу; получить её можно здесь, у Роэна.",13))
 	cards = VBoxContainer.new(); cards.name = "StarterQuestCards"; cards.add_theme_constant_override("separation",12); box.add_child(cards)
 	signature = ""; refresh()

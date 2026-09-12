@@ -127,6 +127,7 @@ test('SQLite transaction contract stores reward and receipt together, survives r
 });
 test('views expose fixed rewards, binding readiness and legacy credit, while leaving all source state untouched',()=>{
  const p={...hero('ranger'),bookQuests:{book_ranger_50:'ready'}},before=structuredClone(p),views=progressionQuestViews(p,EMPTY_PROGRESSION_BINDINGS);assert.deepEqual(p,before);assert.equal(views.length,10);
- const book=views.find(v=>v.id==='QUEST-150');assert.equal(book.status,'ready');assert.equal(book.legacyCredit,true);assert.equal(book.requirementsAvailable,false);assert.deepEqual(book.rewards,[{id:'book_ranger_50',count:1}]);assert.ok(book.objectives[0].text.includes('Сектант'));
+ const book=views.find(v=>v.id==='QUEST-150');assert.equal(book.status,'ready');assert.equal(book.legacyCredit,true);assert.equal(book.requirementsAvailable,false);assert.deepEqual(book.rewards,[{id:'book_ranger_50',count:1}]);assert.equal(book.objectives[0].id,'legacy-completed');assert.equal(book.objectives[0].complete,true);
+ assert.ok(progressionQuestViews(hero('ranger'),EMPTY_PROGRESSION_BINDINGS).find(v=>v.id==='QUEST-150').objectives[0].text.includes('Сектант'));
  const choice=views.find(v=>v.id==='QUEST-125');assert.equal(choice.rewardChoices.length,2);assert.deepEqual(choice.rewards,[]);
 });

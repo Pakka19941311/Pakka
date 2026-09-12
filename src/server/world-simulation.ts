@@ -14,6 +14,10 @@ import {initializeStarterQuests,acceptStarterQuest,claimStarterQuest,recordStart
 import type {StarterQuestEvent} from '../core/starter-quests-v3.ts';
 import {observeStarterQuestObjectives} from '../core/starter-quest-observation.ts';
 import {normalizeProgressionV3} from '../core/progression-migration-v3.ts';
+import {initializeProgressionQuests,acceptProgressionQuest,claimProgressionQuest,recordProgressionQuestEvent,progressionQuestViews} from '../core/progression-quests-v3.ts';
+import {progressionQuestDefinition} from '../data/progression-quests-v3.ts';
+import {bindProgressionQuestWorld,ProgressionQuestObserver} from './progression-quest-world.ts';
+import type {ProgressionWorldRuntime} from './progression-quest-world.ts';
 import type {AccessoryBackup} from '../core/accessory-migration.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
 import {BookSystem} from './book-system.ts';
@@ -133,6 +137,8 @@ export class WorldSimulation {
   private physicsTick = 0;
   private nextEnvironmentCheck=0;
   private nextStarterObservation=0;
+  readonly progressionWorld:ProgressionWorldRuntime;
+  private progressionObserver=new ProgressionQuestObserver();
   private paths = new Map<string, { goal: Position; points: Position[]; expiresAt: number }>();
   private brains = new Map<string,MonsterAiBrain>();
   private motors=new Map<string,CharacterMotor>();
@@ -170,6 +176,7 @@ export class WorldSimulation {
 
   constructor(options: {store: SimulationStore; collision: CollisionWorld; terrain?: TerrainSupport; finalWorld?:FinalWorld; now: number; random?: () => number; identifier: () => string; beta?: boolean; xpRate?:number}) {
     this.finalWorld=options.finalWorld;
+    this.progressionWorld=bindProgressionQuestWorld(this.finalWorld);
     this.xpRate=options.xpRate??1;if(!Number.isFinite(this.xpRate)||this.xpRate<1||this.xpRate>100)throw Error('invalid-xp-rate');
     this.books=new BookSystem({now:()=>this.state.time,heroes:()=>Object.values(this.state.characters),monsters:()=>this.state.monsters,summons:()=>this.state.summons,areas:()=>this.state.bookAreas??=[],traps:()=>this.state.bookTraps??=[],random:()=>this.random(),uid:()=>this.identifier(),hp:m=>monsterDef(m).hp,safe:this.safe,visible:(a,b)=>this.lineOfSight(a,b),damage:(m,n,p,c)=>this.damage(m,n,p,c),recalculate:p=>this.recalculate(p),event:(k,a,t,e)=>this.event(k,a,t,e),provoke:(m,p)=>this.provoke(m,p),release:m=>{this.cancelAttack(m.uid);m.provokedBy=undefined;m.targetId=null;m.returnFromTaunt=true;this.brains.delete(m.uid);},cancel:id=>this.cancelAttack(id),summonPoint:p=>({...this.collisionFor(p).findNearestFree({x:p.x+1,z:p.z},.46),spaceId:p.spaceId})});
     this.store = options.store; this.collision = options.collision;
@@ -197,7 +204,7 @@ export class WorldSimulation {
     }else for(const region of SPAWN_REGIONS)for(let i=0;i<region.population;i++)if(!this.state.monsters.some(m=>m.uid===`${region.id}:${i}`))this.spawnMonster(region.monsterId,spawnPointInRegion(region,i),`${region.id}:${i}`,region.id,i);
     // A process restart breaks all connections. Never renew their exposure deadline.
     for (const p of Object.values(this.state.characters)) {
-      Object.assign(p,normalizeProgressionV3(p));p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));this.migrateEquipment(p);this.recalculate(p);
+      Object.assign(p,normalizeProgressionV3(p));p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));Object.assign(p,initializeProgressionQuests(p));this.migrateEquipment(p);this.recalculate(p);
       p.activeUntil = Math.min(p.activeUntil, this.state.time + DISCONNECT_GRACE_MS);
       p.direction = {x:0,z:0};p.destination=null;p.target=null;p.skill=null;p.bufferedSkill=undefined;p.autoAttack=false;p.singleAttack=false;
       Object.assign(p,{...motion(this.state.time),yaw:p.yaw,action:p.dead?'death':'idle',combatState:p.dead?'dead':'idle'});
@@ -274,10 +281,11 @@ export class WorldSimulation {
     p.inventory=p.inventory.map(remap);p.lootBuffer=p.lootBuffer.map(remap);
     p.storage=p.storage?.map(item=>item?remap(item):null);p.migrationReserve=p.migrationReserve?.map(remap);p.accessoryMigrationVersion=undefined;
     for(const quest of Object.values(p.starterProgress?.quests??{}))if(quest)quest.pendingItems=quest.pendingItems.map(remap);
+    for(const quest of Object.values(p.progressionQuests?.quests??{}))if(quest)quest.pendingItems=quest.pendingItems.map(remap);
     p.equipment=Object.fromEntries(Object.entries(p.equipment).map(([slot,item])=>[slot,item?remap(item):undefined]));
     const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
     p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
-    Object.assign(p,normalizeProgressionV3(p));this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
+    Object.assign(p,normalizeProgressionV3(p));this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));Object.assign(p,initializeProgressionQuests(p));this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
     const oldPosition={x:p.x,z:p.z};
     if(this.finalWorld)p.spaceId='surface';
     Object.assign(p,this.collision.findNearestFree(this.finalWorld?this.finalWorld.start:legacyTerritoryPosition(p),.46));
@@ -301,7 +309,7 @@ export class WorldSimulation {
       ...this.startPoint(), ...calculated, ...motion(this.state.time), id:this.identifier(),name:name.trim().slice(0,24)||'Странник',classId,
       level:1,xp:0,gold:320,hp:calculated.maxHp,mp:calculated.maxMp,
       inventory:[this.item('potion',6),this.item('ether',4),this.item('teleport'),...(classId==='knight'?Object.values(starterGear):[])],equipment,
-      storage:[],lootBuffer:[],migrationReserve:[],accessoryMigrationVersion:ACCESSORY_MIGRATION_VERSION,starterProgress:{version:1,quests:{}},quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
+      storage:[],lootBuffer:[],migrationReserve:[],accessoryMigrationVersion:ACCESSORY_MIGRATION_VERSION,starterProgress:{version:1,quests:{}},progressionQuests:{version:1,quests:{},legacy:{}},quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
       buffs:{guard:0,vanish:0,haste:0},activeUntil:0,lastInputSequence:-1,lastInputAt:0,
       direction:{x:0,z:0},destination:null,target:null,skill:null,generation:1,
     };
@@ -429,6 +437,7 @@ export class WorldSimulation {
       return;
     }
     if (p.dead) throw Error('dead');
+    if(command.type==='progressionQuest')return this.progressionQuestCommand(p,command);
     if(command.type==='starterQuest'){
       const services=this.finalWorld?.services??SERVICES,position=services['npc:elder'];if(!position)throw Error('elder-unavailable');
       const context={npcId:'npc:elder',position,now:this.state.time,heightDifference:this.terrainFor(p).supportAt(p.x,p.z)+p.yOffset-this.terrainFor(position).supportAt(position.x,position.z),lineOfSight:(a:Position,b:Position)=>this.lineOfSight(a,b)};
@@ -452,12 +461,10 @@ export class WorldSimulation {
     }
     if(command.type==='castBook'){this.books.cast(p,command.bookId,command.targetId,command.point?{x:command.point.x,z:command.point.z,spaceId:p.spaceId}:undefined);return;}
     if(command.type==='bookQuest'){
-      const elder=(this.finalWorld?.services??SERVICES)['npc:asterhold:elder'];
-      if(!sameSpace(p,elder)||distance(p,elder)>3.2)throw Error('elder-unavailable');
       if(![50,60].includes(command.level)||p.level<command.level)throw Error('book-level');
-      const id=`book_${p.classId}_${command.level}`;p.bookQuests??={};
-      if(p.bookQuests[id]==='claimed')throw Error('already-claimed');
-      if(p.bookQuests[id]==='ready'){this.addItem(p,id);p.bookQuests[id]='claimed';}else p.bookQuests[id]='active';return;
+      Object.assign(p,initializeProgressionQuests(p));
+      const questId=command.level===50?'QUEST-150':'QUEST-160',record=p.progressionQuests!.quests[questId];
+      return this.progressionQuestCommand(p,{questId,action:record&&record.status!=='active'?'claim':'accept'},true);
     }
     if(command.type==='storage'){
       if(!this.nearService(p,'storage'))throw Error('storage-unavailable');
@@ -592,7 +599,7 @@ export class WorldSimulation {
       ...(this.state.bookAreas??[]).filter(a=>a.remaining>0).map(a=>({id:a.owner+':'+a.id,kind:'area' as const,owner:a.owner,point:a.point,radius:a.radius,expiresAt:a.nextAt+(a.remaining-1)*a.interval,effect:a.fx})),
       ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'}))
     ];
-    return structuredClone({starterQuests:starterQuestViews(character),craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
+    return structuredClone({progressionQuests:this.progressionViews(character),starterQuests:starterQuestViews(character),craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
       monsters:this.state.monsters.filter(m=>sameSpace(m,character)&&(!this.finalWorld||distance(m,character)<135)).map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons.filter(m=>sameSpace(m,character)),events:this.events.filter(e=>e.sequence>afterEvent&&(!this.finalWorld||e.spaceId===spaceOf(character)))});
   }
@@ -684,7 +691,13 @@ export class WorldSimulation {
     for(const id of this.tradeSessions.keys())this.pruneTradeSession(this.character(id));
     if(this.state.time>=this.nextStarterObservation){
       this.nextStarterObservation=this.state.time+250;
-      for(const p of observers)this.observeStarterQuests(p);
+      for(const p of observers){
+        this.observeStarterQuests(p);let next=this.progressionObserver.observe(p,this.state.time,this.progressionWorld,(a,b)=>this.lineOfSight(a,b));
+        const elder=(this.finalWorld?.services??SERVICES)['npc:elder'];
+        if(next.progressionQuests?.quests['QUEST-141']?.status==='active'&&elder&&sameSpace(p,elder)&&Math.hypot(distance(p,elder),this.terrainFor(p).supportAt(p.x,p.z)+p.yOffset-this.terrainFor(elder).supportAt(elder.x,elder.z))<=3.2&&this.lineOfSight(p,elder))
+          next=recordProgressionQuestEvent(next,{kind:'service',npcId:'npc:elder'},this.progressionWorld.bindings);
+        p.progressionQuests=next.progressionQuests;p.bookQuests=next.bookQuests;
+      }
     }
   }
   private expireDeadlines(): void {
@@ -956,7 +969,10 @@ export class WorldSimulation {
       if(owner.quest===1&&owner.kills>=8)owner.quest=2;
       if(owner.quest===2&&m.id==='mini')owner.quest=3;
       if(owner.quest===3&&m.id==='big')owner.quest=4;
-      for(const level of [50,60]){const id=`book_${owner.classId}_${level}`;if(owner.bookQuests?.[id]==='active'&&m.id===(level===50?'big':'rift_boss'))owner.bookQuests[id]='ready';}
+      const questSlot=this.finalWorld?.slotById.get(m.uid);
+      if(questSlot){const next=recordProgressionQuestEvent(owner,{kind:'kill',creditedHeroId:owner.id,entityUid:m.uid,generation:m.generation,speciesId:m.id,
+        level:m.level??questSlot.level??0,subzoneId:questSlot.subzoneId,locationId:questSlot.locationId,spaceId:spaceOf(m)},this.progressionWorld.bindings);
+        owner.progressionQuests=next.progressionQuests;owner.bookQuests=next.bookQuests;}
       this.event('loot',owner.id,m.uid,{gold,xp:earnedXp,items});this.checkpoint();
     }
   }
@@ -1141,12 +1157,37 @@ export class WorldSimulation {
   }
   private starterLocation(p:Position):string {
     if(spaceOf(p)!=='surface')return '';
-    if(this.finalWorld)return this.finalWorld.layout.locations.find((location:any)=>inPolygon(p.x,-p.z,location.outline_xz))?.id??'';
+    if(this.finalWorld)return this.finalWorld.populationLocation(p);
     // The old diagnostic territory has no canonical polygons. Its bounded Greenfall surroundings are the only fallback.
     return Math.abs(p.x-FORT.x)<=FORT.width/2+45&&Math.abs(p.z-FORT.z)<=FORT.depth/2+45?STARTER_LOCATION_ID:'';
   }
   private starterEvent(p:WorldCharacter,event:StarterQuestEvent):void {
     p.starterProgress=recordStarterQuestEvent(p,event).starterProgress;
+  }
+  private progressionQuestCommand(p:WorldCharacter,command:{questId:string;action:'accept'|'claim';rewardChoice?:string},legacy=false):unknown {
+    const quest=progressionQuestDefinition(command.questId),services:Record<string,Position>=this.finalWorld?.services??SERVICES;
+    // The legacy wire may still be used at Arden. Both entry points share one entitlement ledger.
+    const legacyGiver=legacy?services['npc:asterhold:elder']:undefined;
+    const position=legacyGiver&&sameSpace(p,legacyGiver)&&distance(p,legacyGiver)<=3.2?legacyGiver:services[quest.giverId];
+    if(!position)throw Error('quest-giver-unavailable');
+    const context={npcId:quest.giverId,position,now:this.state.time,heightDifference:this.terrainFor(p).supportAt(p.x,p.z)+p.yOffset-this.terrainFor(position).supportAt(position.x,position.z),lineOfSight:(a:Position,b:Position)=>this.lineOfSight(a,b)};
+    if(command.action==='accept'){
+      if(command.rewardChoice!==undefined)throw Error('unexpected-quest-reward-choice');
+      Object.assign(p,acceptProgressionQuest(p,command.questId,context,this.progressionWorld.bindings));
+      return {questId:quest.id,status:progressionQuestViews(p,this.progressionWorld.bindings).find(q=>q.id===quest.id)!.status};
+    }
+    if(command.action!=='claim')throw Error('invalid-quest-action');
+    if(sameSpace(p,position)&&Math.hypot(distance(p,position),context.heightDifference)<=3.2&&this.lineOfSight(p,position)){
+      const next=recordProgressionQuestEvent(p,{kind:'service',npcId:quest.giverId},this.progressionWorld.bindings);p.progressionQuests=next.progressionQuests;p.bookQuests=next.bookQuests;
+    }
+    const oldLevel=p.level,result=claimProgressionQuest(p,command,context,this.identifier,id=>ITEMS[id as ItemId]);Object.assign(p,result.state);
+    if(p.level>oldLevel){this.recalculate(p);p.hp=p.maxHp;p.mp=p.maxMp;}return result.outcome;
+  }
+  private progressionViews(p:WorldCharacter){
+    return progressionQuestViews(p,this.progressionWorld.bindings).map(q=>({...q,objectives:q.objectives.map(objective=>{
+      const marker=this.progressionWorld.markers.find(m=>m.id===objective.id),target=marker&&!objective.complete?this.progressionObserver.target(p.id,marker):undefined;
+      return {...objective,...(target?{target}:{} )};
+    })}));
   }
   private observeStarterQuests(p:WorldCharacter):void {
     if(!p.starterProgress||!Object.values(p.starterProgress.quests).some(q=>q&&['active','ready'].includes(q.status)))return;

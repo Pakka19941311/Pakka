@@ -20,7 +20,7 @@ export type ProgressionQuestEvent=
  |{kind:'marker';runtimeId:string;locationId:string;spaceId:SpaceId}
  |{kind:'service';npcId:string};
 export type QuestRewardDefinition={slot?:string;type?:string;maxStack?:number};
-export type ProgressionQuestView={id:ProgressionQuestId;title:string;level:number;giverId:string;status:'available'|'locked'|'active'|'ready'|'pending'|'claimed';xp:number;rewards:QuestRewardStack[];rewardChoices:QuestRewardStack[];objectives:Array<{id:string;text:string;complete:boolean;count?:number;required?:number}>;pendingItemCount:number;requirementsAvailable:boolean;prerequisite?:ProgressionQuestId;legacyCredit:boolean};
+export type ProgressionQuestView={id:ProgressionQuestId;title:string;level:number;giverId:string;status:'available'|'locked'|'active'|'ready'|'pending'|'claimed';xp:number;rewards:QuestRewardStack[];rewardChoices:QuestRewardStack[];rewardChoice?:string;objectives:Array<{id:string;text:string;complete:boolean;count?:number;required?:number}>;pendingItemCount:number;requirementsAvailable:boolean;prerequisite?:ProgressionQuestId;legacyCredit:boolean};
 
 const emptyRecord=(classId:string,now:number):ProgressionQuestRecord=>({status:'active',classId,acceptedAt:now,kills:0,killKeys:[],evidence:[],xpGranted:false,pendingItems:[],origin:'new'});
 const submitted=(record:ProgressionQuestRecord|undefined)=>Boolean(record&&['claimed','reward-pending'].includes(record.status));
@@ -148,12 +148,13 @@ export function progressionQuestViews(state:ProgressionQuestState,bindings:Progr
  const current=initializeProgressionQuests(state);
  return PROGRESSION_QUESTS.map(quest=>{
   const record=current.progressionQuests!.quests[quest.id],hunt=progressionQuestHunt(quest.id,state.classId);
-  const objectives:ProgressionQuestView['objectives']=quest.markers.map(marker=>({id:marker.id,text:marker.text,complete:record?.evidence.includes(marker.id)??false}));
+  let objectives:ProgressionQuestView['objectives']=quest.markers.map(marker=>({id:marker.id,text:marker.text,complete:record?.evidence.includes(marker.id)??false}));
   if(hunt)objectives.unshift({id:'hunt',text:`${hunt.name}: ${hunt.count}, ${hunt.areaName}, уровень ${hunt.levelMin===hunt.levelMax?hunt.levelMin:hunt.levelMin+'–'+hunt.levelMax}`,complete:(record?.kills??0)>=hunt.count,count:record?.kills??0,required:hunt.count});
   if(quest.returnToGiver)objectives.push({id:'returned-to-giver',text:'Вернуться к Роэну после разведки',complete:record?.evidence.includes('returned-to-giver')??false});
+  if(record&&['legacy-ready','legacy-claimed'].includes(record.origin))objectives=[{id:'legacy-completed',text:'Прежние условия выполнены; повторная охота не требуется',complete:true}];
   const available=progressionRequirementsAvailable(quest,state.classId,bindings),unlocked=state.level>=quest.level&&(!quest.prerequisite||submitted(current.progressionQuests!.quests[quest.prerequisite]));
   return {id:quest.id,title:quest.title,level:quest.level,giverId:quest.giverId,status:record?(record.status==='reward-pending'?'pending':record.status):unlocked?'available':'locked',
    xp:quest.xp,rewards:quest.rewardChoices?[]:progressionRewardStacks(quest.id,state.classId),rewardChoices:quest.rewardChoices?.map(r=>({...r}))??[],objectives,
-   pendingItemCount:record?.pendingItems.length??0,requirementsAvailable:available,prerequisite:quest.prerequisite,legacyCredit:Boolean(record&&record.origin!=='new')};
+   pendingItemCount:record?.pendingItems.length??0,requirementsAvailable:available,prerequisite:quest.prerequisite,legacyCredit:Boolean(record&&record.origin!=='new'),...(record?.rewardChoice?{rewardChoice:record.rewardChoice}:{})};
  });
 }
