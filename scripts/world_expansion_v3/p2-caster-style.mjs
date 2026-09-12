@@ -27,7 +27,7 @@ function maneuver(context,d,m){
  }
  return choices.sort((a,b)=>b.score-a.score)[0]?.q;
 }
-function kiteFight(context,d,m){
+export function kiteFight(context,d,m){
  const before=d.snapshot(),initialMonsterHp=m.hp,startSequence=d.sim.state.sequence,movement=[],distances=[];
  while(m.alive&&!d.p().dead&&d.sim.state.time-before.at<120000){
   const sequence=d.sim.state.sequence;d.input({type:'attack',entityId:m.uid,skill:null,mode:'single'});let released=false;

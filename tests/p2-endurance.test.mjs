@@ -7,8 +7,10 @@ import {encounterV3} from '../src/data/encounter-balance-v3.ts';
 import {enduranceLedger} from '../scripts/world_expansion_v3/p2-endurance-report.mjs';
 const report=JSON.parse(readFileSync('docs/world-expansion-v3/P2_ENDURANCE.json'));
 test('accepted locomotion is canonical-only and does not rebalance combat statistics',()=>{
- assert.equal(P2_MOVEMENT_V3.version,'p2-locomotion-v3-2');assert.equal(p2Encounter({id:'spider'}),null);
- for(const [id,level,speed,override]of [['MOB-01',2,1.5,true],['MOB-03',2,1.9,true],['MOB-05',8,1.6,true],['MOB-02',5,4.7,false],['MOB-04',5,4.7,false]]){
+ // The subsequently accepted boar model calibrated MOB-04 to 1.6 m/s;
+ // ENDURANCE.json remains the historical pre-boar comparison, not a rerun.
+ assert.equal(P2_MOVEMENT_V3.version,'p2-locomotion-v3-3');assert.equal(p2Encounter({id:'spider'}),null);
+ for(const [id,level,speed,override]of [['MOB-01',2,1.5,true],['MOB-03',2,1.9,true],['MOB-05',8,1.6,true],['MOB-02',5,4.7,false],['MOB-04',5,1.6,true]]){
   const e=p2Encounter({canonicalMobId:id,level}),base=encounterV3(id,level);
   assert.equal(e.movementSpeed,speed);assert.equal(e.locomotionOverride,override);
   for(const key of ['hp','atk','def','mdef','accuracy','attackRange','attackInterval','xp'])assert.deepEqual(e[key],base[key],id+':'+key);

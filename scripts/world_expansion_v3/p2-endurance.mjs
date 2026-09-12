@@ -17,10 +17,10 @@ function pathBetween({graph,collision},start,goal){
  for(let i=0;i<raw.length-1;){let next=i+1;for(let j=Math.min(raw.length-1,i+35);j>next;j--)if(pathSegmentIsClear(collision,raw[i],raw[j],.46)){next=j;break;}out.push(raw[next]);i=next;}
  return out;
 }
-export function enduranceDriver(context,{classId,level,seed=11}={}){
+export function enduranceDriver(context,{classId,level,seed=11,plus=0}={}){
  const sim=makeP2Simulation({geography:context.geography,random:seededRandom(seed)}),initial=sim.createCharacter('Серия '+classId,classId),id=initial.id;
- // The only administrative setup: level and +0 reference gear, once, at the real spawn.
- equipP2Reference(sim,initial,level);let seq=0,commandId=0,cursor=0,walked=0,nextHealAt=0;
+ // The only administrative setup: level and reference gear, once, at the real spawn.
+ equipP2Reference(sim,initial,level,plus);let seq=0,commandId=0,cursor=0,walked=0,nextHealAt=0;
  const events=[],purchases=[],healing=[],trace=[],p=()=>sim.state.characters[id];
  const capture=()=>{for(const e of sim.events)if(e.sequence>cursor)events.push(structuredClone(e));cursor=sim.state.sequence;};
  const input=intent=>sim.input(id,++seq,intent);
