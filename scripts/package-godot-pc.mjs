@@ -21,7 +21,9 @@ export function stageNativeServer(root, destination, {finalWorld=false,populatio
   if (finalWorld) {
     writeFileSync(resolve(destination,'world-runtime.json'),JSON.stringify({schema:1,populationMode})+'\n');
     for (const file of ['world_layout.json','geology-D13/terrain.json','geology-D13/heightmap.f32','geography/collision.json','geography/support-surfaces.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','castle/courtyard.json','interiors/spaces.json','interiors/mine.json','interiors/great_cave.json','gameplay/spawn-manifest.json']) copy('godot-pc/world-final/'+file,'world-final/'+file);
-    if(populationMode==='starter-v3')copy('godot-pc/world-final/castle/courtyard-p2.json','world-final/castle/courtyard-p2.json');
+    if(populationMode==='starter-v3')for(const file of [
+      'castle/courtyard-p2.json','nature/p2-sample-v3/collision.json',
+    ])copy('godot-pc/world-final/'+file,'world-final/'+file);
     for (const id of ['mine','great_cave']) {
       const meta=JSON.parse(readFileSync(resolve(root,`godot-pc/world-final/interiors/${id}.json`),'utf8'));
       copy('godot-pc/world-final/interiors/'+meta.floor,'world-final/interiors/'+meta.floor);
