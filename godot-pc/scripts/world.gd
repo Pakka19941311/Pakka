@@ -904,12 +904,12 @@ func update_nameplates() -> void:
 		var title: Label = actor.get_meta("screen_label")
 		title.hide()
 		if id.begins_with("ambient:") and actor.position.distance_to(hero_position)>12: continue
+		if not show_names or not actor.visible or actor.get_meta("dead", false) or actor.position.distance_to(hero_position) > 26 or used.size() >= 10:
+			continue
 		if id == "npc:books" or (id.begins_with("ambient:") and int(id.get_slice(":",1)) >= 116):
 			var eye: Vector3 = hero_position+Vector3.UP*1.5
 			var head: Vector3 = actor.position+Vector3.UP*1.5
 			if collision.ray_distance(eye,head) < eye.distance_to(head)-.1: continue
-		if not show_names or not actor.visible or actor.get_meta("dead", false) or actor.position.distance_to(hero_position) > 26 or used.size() >= 10:
-			continue
 		var point_value: Vector3 = actor.position + Vector3(0, (actor.get_meta("pick_size") as Vector3).y + .3, 0)
 		if camera.is_position_behind(point_value):
 			continue
