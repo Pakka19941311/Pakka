@@ -7,6 +7,32 @@ const ROOT: String="res://world-final/nature/"
 @export var grass_shader: String=ROOT+"grass_mesh.gdshader"
 var data: Dictionary
 var batch_count: int=0
+const GRASS_CELL_BUFFER: float=32.0
+const GRASS_LOD_START: float=25.0
+const GRASS_LOD_END: float=36.0
+var detail_distance: float=80.0
+var grass_materials: Array[ShaderMaterial]=[]
+var grass_batches: Array[MultiMeshInstance3D]=[]
+
+func apply_detail_distance(meters: float) -> void:
+	# Store the choice before build too; never move or rebuild authored points.
+	detail_distance=clampf(meters,24.0,80.0)
+	for material: ShaderMaterial in grass_materials:
+		material.set_shader_parameter("draw_distance",detail_distance)
+	for batch: MultiMeshInstance3D in grass_batches:
+		if is_instance_valid(batch): _apply_grass_batch_distance(batch,int(batch.get_meta("grass_lod",0)))
+
+func _apply_grass_batch_distance(batch: MultiMeshInstance3D, lod: int) -> void:
+	# Coarse whole-cell culling cannot replace per-instance shader distance.
+	# Keep a full 32 m cell buffer so an edge tuft survives camera movement.
+	batch.visibility_range_begin=0.0
+	batch.visibility_range_end=(minf(detail_distance,GRASS_LOD_END) if lod==0 else detail_distance)+GRASS_CELL_BUFFER
+	batch.visible=lod==0 or detail_distance>GRASS_LOD_START
+
+func register_grass_batch(batch: MultiMeshInstance3D, lod: int) -> void:
+	batch.set_meta("grass_lod",lod)
+	grass_batches.append(batch)
+	_apply_grass_batch_distance(batch,lod)
 
 func parts(node: Node, transform: Transform3D=Transform3D.IDENTITY) -> Array:
 	var result: Array=[]
@@ -28,7 +54,8 @@ func build() -> void:
 				part.mesh=part.mesh.duplicate()
 				for surface: int in range(part.mesh.get_surface_count()):
 					var material: ShaderMaterial=ShaderMaterial.new();material.shader=load(grass_shader)
-					material.set_shader_parameter("lod_index",lod);part.mesh.surface_set_material(surface,material)
+					material.set_shader_parameter("lod_index",lod);material.set_shader_parameter("draw_distance",detail_distance)
+					grass_materials.append(material);part.mesh.surface_set_material(surface,material)
 			prototypes[key].append(meshes);node.free()
 	var built: int=0
 	for cell: Dictionary in data.grass_cells:
@@ -46,7 +73,7 @@ func build() -> void:
 					mm.set_instance_color(index,Color.WHITE);mm.set_instance_custom_data(index,Color(p[0],p[1],p[2],p[4]))
 				var batch: MultiMeshInstance3D=MultiMeshInstance3D.new();batch.multimesh=mm;batch.position=center
 				batch.name="D11_"+str(cell.asset)+"_%s_%s_LOD%s"%[cell.cell[0],cell.cell[1],lod]
-				batch.visibility_range_begin=0 if lod==0 else 6;batch.visibility_range_end=66 if lod==0 else 114
+				register_grass_batch(batch,lod)
 				batch.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF;batch.lod_bias=100000
 				add_child(batch);batch_count+=1
 		built+=1

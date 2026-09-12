@@ -1,0 +1,157 @@
+{
+  "command": [
+    "C:/Users/ttonn/Documents/Codex/2026-09-11/varendor-world-gameplay/work/tools/Godot_v4.6.3-stable_win64_console.exe",
+    "--path",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc",
+    "--log-file",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/work/qa/groundcover-distance-01/engine.log",
+    "--verbose",
+    "--headless",
+    "--script",
+    "res://scripts/groundcover_distance_acceptance.gd",
+    "--",
+    "--evidence=C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/work/qa/groundcover-distance-01/checks.json"
+  ],
+  "windows_command_line": "C:/Users/ttonn/Documents/Codex/2026-09-11/varendor-world-gameplay/work/tools/Godot_v4.6.3-stable_win64_console.exe --path C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc --log-file C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/work/qa/groundcover-distance-01/engine.log --verbose --headless --script res://scripts/groundcover_distance_acceptance.gd -- --evidence=C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/work/qa/groundcover-distance-01/checks.json",
+  "cwd": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "utc_start": "2026-09-12T18:17:52.846558+00:00",
+  "environment_overrides": {},
+  "project_settings_changed": false,
+  "log_precreated_and_writable": true,
+  "timeout_seconds": 30.0,
+  "visual_check": false,
+  "samples": [
+    {
+      "system": {
+        "load_percent": 39,
+        "physical_total": 34046353408,
+        "physical_available": 20429357056,
+        "commit_limit": 36193837056,
+        "commit_available": 18106990592,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733078659072,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 24104,
+          "parent_pid": 24560,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 2699264,
+          "peak_working_set": 2699264,
+          "private_bytes": 483328,
+          "peak_pagefile": 483328
+        },
+        {
+          "pid": 19500,
+          "parent_pid": 24104,
+          "exe": "conhost.exe",
+          "working_set": 6881280,
+          "peak_working_set": 6881280,
+          "private_bytes": 1089536,
+          "peak_pagefile": 1089536
+        }
+      ],
+      "elapsed_s": 0.016
+    },
+    {
+      "system": {
+        "load_percent": 40,
+        "physical_total": 34046353408,
+        "physical_available": 20376801280,
+        "commit_limit": 36193837056,
+        "commit_available": 18078093312,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733078659072,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 24104,
+          "parent_pid": 24560,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6696960,
+          "peak_working_set": 6696960,
+          "private_bytes": 1339392,
+          "peak_pagefile": 1339392
+        },
+        {
+          "pid": 19500,
+          "parent_pid": 24104,
+          "exe": "conhost.exe",
+          "working_set": 8208384,
+          "peak_working_set": 8212480,
+          "private_bytes": 1277952,
+          "peak_pagefile": 1277952
+        },
+        {
+          "pid": 21836,
+          "parent_pid": 24104,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 58929152,
+          "peak_working_set": 58929152,
+          "private_bytes": 27275264,
+          "peak_pagefile": 27275264
+        }
+      ],
+      "elapsed_s": 0.219
+    },
+    {
+      "system": {
+        "load_percent": 40,
+        "physical_total": 34046353408,
+        "physical_available": 20374745088,
+        "commit_limit": 36193837056,
+        "commit_available": 18088382464,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733078659072,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 24104,
+          "parent_pid": 24560,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 32768,
+          "peak_working_set": 7217152,
+          "private_bytes": 77824,
+          "peak_pagefile": 1339392
+        },
+        {
+          "pid": 19500,
+          "parent_pid": 24104,
+          "exe": "conhost.exe",
+          "working_set": 8646656,
+          "peak_working_set": 8654848,
+          "private_bytes": 1236992,
+          "peak_pagefile": 1277952
+        },
+        {
+          "pid": 21836,
+          "parent_pid": 24104,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 32768,
+          "peak_working_set": 89956352,
+          "private_bytes": 77824,
+          "peak_pagefile": 41226240
+        }
+      ],
+      "elapsed_s": 0.438
+    }
+  ],
+  "launcher_pid": 24104,
+  "timed_out": false,
+  "exit_code": 2,
+  "elapsed_s": 0.641,
+  "error_lines": [
+    "ERROR: Failed to read the root certificate store.",
+    "ERROR: Failed to read the root certificate store."
+  ],
+  "clean_error_log": false,
+  "native_exception_code": null,
+  "crash_detected": false,
+  "operation_completed": false,
+  "peak_process_working_set_bytes": 89956352,
+  "peak_process_private_bytes": 27275264,
+  "minimum_available_physical_bytes": 20374745088
+}

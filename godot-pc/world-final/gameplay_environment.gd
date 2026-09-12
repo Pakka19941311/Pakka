@@ -14,6 +14,7 @@ var support_index: RefCounted = preload("res://scripts/support_height_index.gd")
 var definition: Dictionary = {}
 var bounds: Array = []
 var nature: Node3D
+var groundcover: Node3D
 var roots: Dictionary = {}
 var loaded_data: Dictionary = {}
 var courtyard: Node3D
@@ -108,7 +109,7 @@ func activate_space(id: String) -> bool:
 			for material: ShaderMaterial in nature.focus_materials:
 				var source: Material = material.get_meta("unmodified_source_material")
 				if "pine_tree_01_twig" in source.resource_name: material.set_shader_parameter("base_color",Color(.70,.96,.72))
-			var groundcover: Node3D = load(ROOT+"nature/groundcover_layer.gd").new()
+			groundcover = load(ROOT+"nature/groundcover_layer.gd").new()
 			groundcover.authored_revision = "D13"
 			groundcover.geology_material_revision = "D13"
 			groundcover.grass_shader = ROOT+"nature/grass_lit_D13.gdshader"

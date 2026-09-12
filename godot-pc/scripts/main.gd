@@ -704,6 +704,8 @@ func apply_settings() -> void:
 		world.camera.far = [150.0, 240.0, 360.0][clampi(int(game_settings.get("distance", 2)), 0, 2)]
 		for mesh: GeometryInstance3D in world.decorations:
 			mesh.visibility_range_end = [24.0, 45.0, 80.0][clampi(int(game_settings.get("vegetation", 2)), 0, 2)]
+	if world.final_environment != null and is_instance_valid(world.final_environment.groundcover):
+		world.final_environment.groundcover.apply_detail_distance([24.0,45.0,80.0][clampi(int(game_settings.get("vegetation",2)),0,2)])
 	get_viewport().scaling_3d_scale = [.5, .75, 1.0][clampi(int(game_settings.get("render_scale", 2)), 0, 2)]
 	get_window().content_scale_factor = [.8, 1.0, 1.25, 1.5][clampi(int(game_settings.get("ui_scale", 1)), 0, 3)]
 	get_viewport().msaa_3d = clampi(int(game_settings.get("msaa", 2)), 0, 3) as Viewport.MSAA
