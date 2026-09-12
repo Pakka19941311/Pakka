@@ -41,8 +41,9 @@ test('Windows one-click launch and every production build enforce the stable pip
   assert.match(setup, /npmCmd\s+ci/);
   assert.match(setup, /npmCmd\s+run\s+build/);
   assert.match(setup, /npmCmd.*preview/);
-  assert.match(portableServer, /\.IndexOf\('\?'\)/);
-  assert.doesNotMatch(portableServer, /-split\s+["']\\\\\?["']/);
+  assert.match(portableServer, /server\\launch-world\.mjs/);
+  assert.match(portableServer, /& \$node @launchArgs/);
+  assert.match(portableServer, /exit \$LASTEXITCODE/);
   assert.match(pkg.scripts.build, /verify:assets/);
 });
 

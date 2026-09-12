@@ -34,6 +34,16 @@ export function startWorldServer({database, collision, terrain, finalWorld, port
     res.setHeader('X-Content-Type-Options','nosniff');
     const json=(code,value)=>{res.writeHead(code,{'Content-Type':'application/json; charset=utf-8'});res.end(JSON.stringify(value));};
     try {
+      // A matching Origin is insufficient after DNS rebinding. The packaged
+      // server is private: accept only explicit loopback names and its own port.
+      if(loopback(host)){
+        const localPort=server.address()?.port;
+        const names=['127.0.0.1','localhost','[::1]','[::ffff:127.0.0.1]'];
+        const allowed=names.flatMap(name=>localPort===80?[name,`${name}:80`]:[`${name}:${localPort}`]);
+        if(typeof req.headers.host!=='string'||!allowed.includes(req.headers.host.toLowerCase())){
+          json(403,{error:'host-not-allowed'});return;
+        }
+      }
       const url=new URL(req.url,'http://localhost');
       if(!url.pathname.startsWith('/api/')){
         if(url.pathname==='/favicon.ico'&&['GET','HEAD'].includes(req.method)){res.writeHead(204);res.end();return;}

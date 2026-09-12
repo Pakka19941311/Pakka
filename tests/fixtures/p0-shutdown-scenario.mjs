@@ -15,7 +15,7 @@ const running = startWorldServer({database, collision: new CollisionWorld(), por
 await once(running.server, 'listening');
 const base = `http://127.0.0.1:${running.server.address().port}/api`;
 const session = await fetch(base + '/session', {method: 'POST',
-  headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: 'P0 fixture', classId: 'knight'})}).then(r => r.json());
+  headers: {'Content-Type': 'application/json'}, body: JSON.stringify({name: 'P0 fixture', classId: 'mage'})}).then(r => r.json());
 const hero = Object.values(running.world.state.characters)[0];
 hero.gold = 1234; hero.xp = 17; hero.quest = 2;
 const command = {type: 'enhance', item: structuredClone(hero.equipment.weapon),
@@ -53,7 +53,7 @@ try {
     identifier: () => {throw Error('unexpected replacement identity');}});
   assert.deepEqual(world.command(hero.id, 'shutdown-receipt', command), receipt);
   // Existing restart logic clears transient combat controls.
-  assert.deepEqual(world.state.characters[hero.id], {...expectedHero, bufferedSkill: undefined, autoAttack: false});
+  assert.deepEqual(world.state.characters[hero.id], {...expectedHero, bufferedSkill: undefined, autoAttack: false, singleAttack: false});
   console.log('synthetic shutdown verified');
 } finally {
   restored.close(); rmSync(dir, {recursive: true, force: true});

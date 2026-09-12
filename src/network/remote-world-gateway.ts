@@ -35,6 +35,7 @@ export class RemoteWorldGateway {
   private readonly storage:Storage;
   private readonly base:string;
   private token:string|null;
+  private profileGeneration=0;
   private sequence=0;
   private connection:AbortController|null=null;
   private reconnectTimer:ReturnType<typeof setTimeout>|undefined;
@@ -59,8 +60,8 @@ export class RemoteWorldGateway {
   selectProfile(id:string):void{
     if(this.storage.getItem('varendor_world_pending_v1'))throw Error('Сначала продолжите текущего персонажа: сервер должен подтвердить предыдущее действие.');
     const profile=this.savedProfiles().find(p=>p.id===id);if(!profile)throw Error('Персонаж не найден.');
-    this.close();this.storage.setItem('varendor_world_token_v1',profile.token);this.token=profile.token;
-    this.latest=null;this.lastEventSequence=0;this.sequence=0;
+    this.close();this.storage.setItem('varendor_world_token_v1',profile.token);this.token=profile.token;this.profileGeneration++;
+    this.latest=null;this.lastEventSequence=0;this.sequence=0;this.refreshing=null;
   }
   private savedProfiles():Array<{id:string;name:string;classId:string;token:string}>{
     const raw=this.storage.getItem('varendor_world_profiles_v1');if(!raw)return [];
@@ -71,7 +72,9 @@ export class RemoteWorldGateway {
     const profiles=this.savedProfiles().filter(p=>p.id!==snapshot.character.id);
     profiles.push({id:snapshot.character.id,name:snapshot.character.name,classId:snapshot.character.classId,token});
     this.storage.setItem('varendor_world_profiles_v1',JSON.stringify(profiles));
-    this.storage.setItem('varendor_world_token_v1',token);this.token=token;
+    this.storage.setItem('varendor_world_token_v1',token);
+    if(this.token!==token){this.profileGeneration++;this.refreshing=null;}
+    this.token=token;
   }
   get hasPendingImport():boolean{return this.storage.getItem('varendor_world_import_pending_v1')!==null;}
   async importLocal(save?:unknown):Promise<WorldSnapshot>{
@@ -102,8 +105,9 @@ export class RemoteWorldGateway {
   }
   async refresh():Promise<WorldSnapshot>{
     if(this.refreshing)return this.refreshing;
-    this.refreshing=(async()=>{const snapshot=await this.request('/world');this.accept(snapshot);await this.recoverPending();return snapshot;})();
-    try{return await this.refreshing;}finally{this.refreshing=null;}
+    const pending=(async()=>{const snapshot=await this.request('/world');this.accept(snapshot);await this.recoverPending();return snapshot;})();
+    this.refreshing=pending;
+    try{return await pending;}finally{if(this.refreshing===pending)this.refreshing=null;}
   }
   sendIntent(intent:WorldIntent):void{
     const sequence=++this.sequence;
@@ -114,7 +118,9 @@ export class RemoteWorldGateway {
   }
   command(command:WorldCommand,id:string=crypto.randomUUID()):Promise<CommandReceipt>{
     // Persist the ID before sending. A reconnect retries precisely the same operation.
+    const session=this.token,generation=this.profileGeneration;
     const execute=async()=>{
+      if(this.token!==session||generation!==this.profileGeneration)throw new WorldRequestError('session-changed',409);
       const existing=this.storage.getItem('varendor_world_pending_v1');
       if(existing&&JSON.parse(existing).id!==id)throw Error('Предыдущая операция ожидает ответа сервера. Переподключитесь для восстановления.');
       const pending={id,command};this.storage.setItem('varendor_world_pending_v1',JSON.stringify(pending));
@@ -163,12 +169,15 @@ export class RemoteWorldGateway {
     })();
   }
   private async request(path:string,body?:unknown):Promise<any>{
+    const session=this.token,generation=this.profileGeneration;
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),12_000);
     try{
     const response=await this.fetcher(this.base+path,{signal:controller.signal,method:body===undefined?'GET':'POST',
       headers:{...(this.token?{Authorization:`Bearer ${this.token}`}:{ }),...(body===undefined?{}:{'Content-Type':'application/json'})},
       body:body===undefined?undefined:JSON.stringify(body)});
-    const result=await response.json();if(!response.ok)throw new WorldRequestError(result.error==='beta-import-disabled'?'Перенос сохранения доступен в локальной бета-сборке. Исходное сохранение сохранено.':result.error??'Сервер недоступен.',response.status);return result;
+    const result=await response.json();
+    if(this.token!==session||generation!==this.profileGeneration)throw new WorldRequestError('session-changed',409);
+    if(!response.ok)throw new WorldRequestError(result.error==='beta-import-disabled'?'Перенос сохранения доступен в локальной бета-сборке. Исходное сохранение сохранено.':result.error??'Сервер недоступен.',response.status);return result;
     }catch(error){if(controller.signal.aborted)throw Error('Сервер не ответил. Операция будет проверена после переподключения.');throw error;}finally{clearTimeout(timer);}
   }
 }

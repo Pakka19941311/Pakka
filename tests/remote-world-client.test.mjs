@@ -65,6 +65,9 @@ test('Small authoritative corrections converge; teleport/respawn positions are a
 test('Lost enhancement response is recovered with one receipt; input rejection does not disconnect a healthy stream',async()=>{
   const directory=await mkdtemp(join(tmpdir(),'varendor-client-'));
   const server=startWorldServer({database:join(directory,'world.sqlite'),collision:new CollisionWorld(),port:0,beta:true});
+  // Receipt recovery is the subject here; enhancement failure is covered by
+  // persistent-world. Do not let a real random break turn this into a flake.
+  server.world.random=()=>0;
   if(!server.server.listening)await once(server.server,'listening');
   const base=`http://127.0.0.1:${server.server.address().port}/api`;
   const storage=new MemoryStorage();storage.setItem('varendor_reborn_v03','original-local-save');
@@ -82,7 +85,7 @@ test('Lost enhancement response is recovered with one receipt; input rejection d
   let latest,connected=false,rejected='';
   gateway.onSnapshot=s=>{latest=s;};gateway.onConnection=value=>{connected=value;};gateway.onInputRejected=reason=>{rejected=reason;};
   try{
-    await gateway.create('Сетевая проверка','knight');await until(()=>connected);
+    await gateway.create('Сетевая проверка','ranger');await until(()=>connected);
     const weapon=latest.character.equipment.weapon;
     const scroll=latest.character.inventory.find(i=>i.id==='weapon_scroll');
     assert.ok(scroll,'normal weapon scroll exists in beta grant');

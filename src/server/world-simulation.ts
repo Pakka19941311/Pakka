@@ -1,6 +1,6 @@
 import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss.ts';
 import {actorGeometryV3,bodyContactReach,ACTOR_GEOMETRY_VERSION} from '../data/actor-geometry-v3.ts';
-import {monsterInInterest} from '../network/monster-interest.ts';
+import {monsterInInterest,MONSTER_INTEREST_METRES} from '../network/monster-interest.ts';
 import {monsterReleaseEffect} from '../core/monster-release-effect.ts';
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
@@ -330,7 +330,7 @@ export class WorldSimulation {
   }
 
   private prepareCharacter(name: string, classId: string): WorldCharacter {
-    if (!Object.hasOwn(CLASSES,classId) || typeof name !== 'string') throw Error('invalid-character');
+    if (typeof classId !== 'string' || !Object.hasOwn(CLASSES,classId) || typeof name !== 'string') throw Error('invalid-character');
     const cls = CLASSES[classId as ClassId];
     const starterGear = {weapon:this.item(cls.weapon),chest:this.item(cls.armor)};
     // Only new knights begin in their base clothing. Keep the original items
@@ -405,6 +405,7 @@ export class WorldSimulation {
     const self=Boolean(skill?.buff||skill?.summon);
     const target=self?undefined:this.state.monsters.find(m=>m.uid===intent.entityId&&m.alive&&sameSpace(p,m));
     if(!self&&!target)throw Error('missing-target');
+    if(this.finalWorld&&target&&p.target!==target.uid&&distance(p,target)>MONSTER_INTEREST_METRES)throw Error('target-out-of-interest');
     if(target?.canonicalMobId&&this.safe(target))throw Error('safe-target');
     if(target&&!this.lineOfSight(p,target))throw Error('target-occluded');
     if(skill&&(!p.grounded||p.mp<skill.cost))throw Error(!p.grounded?'airborne':'insufficient-resource');
@@ -571,7 +572,9 @@ export class WorldSimulation {
       p.gold-=cost[command.itemId];return;
     }
     if (command.type==='teleport') {
-      const point=(this.finalWorld?.teleports??teleportPoints)[command.destination];
+      const destinations=this.finalWorld?.teleports??teleportPoints;
+      if(typeof command.destination!=='string'||!Object.hasOwn(destinations,command.destination))throw Error('teleport-unavailable');
+      const point=destinations[command.destination];
       if (!point||!this.nearService(p,'teleport')) throw Error('teleport-unavailable');
       if (p.level<point.level) throw Error('level-required');
       if (p.gold<point.cost) throw Error('insufficient-gold');
@@ -1244,6 +1247,7 @@ export class WorldSimulation {
     }
   }
   private relocate(p:WorldCharacter,point:Position):void {
+    if(!point||![point.x,point.z].every(Number.isFinite))throw Error('invalid-arrival');
     const free=this.collisionFor(point).findNearestFree(point,.46);
     if(this.collisionFor(point).isBlocked(free,.46))throw Error('no-free-arrival');
     this.tradeSessions.delete(p.id);
@@ -1349,7 +1353,7 @@ export class WorldSimulation {
     const def=itemDef(item);return addOrStackItem(p.inventory,item,Boolean(def)&&!def.slot&&def.maxStack!==1,42,def?.maxStack??Number.MAX_SAFE_INTEGER);
   }
   private addItem(p:WorldCharacter,id:string):void {const item=this.item(id);if(this.addInventoryItem(p,item)==='full')p.lootBuffer.push(item);}
-  private item(id:string,count=1):InventoryItem {if(!Object.hasOwn(ITEMS,id))throw Error('unknown-item');return {id,uid:this.identifier(),plus:0,count};}
+  private item(id:string,count=1):InventoryItem {if(typeof id!=='string'||!Object.hasOwn(ITEMS,id))throw Error('unknown-item');if(!Number.isSafeInteger(count)||count<1)throw Error('invalid-item-count');return {id,uid:this.identifier(),plus:0,count};}
   private character(id:string):WorldCharacter {const p=this.state.characters[id];if(!p)throw Error('unknown-character');return p;}
   private event(kind:WorldEvent['kind'],actor:string,target?:string,extra:Partial<WorldEvent>={}):void {
     const entity=this.state.characters[actor]??this.state.monsters.find(m=>m.uid===actor)??this.state.summons.find(m=>m.uid===actor);
