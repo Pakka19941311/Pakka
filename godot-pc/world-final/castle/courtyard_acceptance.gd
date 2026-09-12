@@ -61,7 +61,11 @@ static func run(app: Node) -> void:
 		travelled[r.id]=0.0; gestures[r.id]=false; pauses[r.id]=false
 	# Observe the ordinary physics loop, never accelerate its clock or reposition
 	# residents. Merchant gestures and recruit attacks must actually be sampled.
-	var until: int = Time.get_ticks_msec()+40000
+	# The quarter routes are longer than the old empty courtyard routes.
+	# Observe real arrivals and chores; do not assume every job recurs in 40s.
+	var observation_start: int = Time.get_ticks_msec()
+	var until: int = observation_start+180000
+	var required_gestures: Array = ["ambient:104","ambient:105","ambient:107","ambient:108","ambient:109","ambient:110","ambient:111","ambient:113","ambient:114"]
 	while Time.get_ticks_msec()<until:
 		await app.get_tree().physics_frame
 		for r: Dictionary in ambient.residents:
@@ -71,6 +75,9 @@ static func run(app: Node) -> void:
 			finite = finite and not app.world.collision.blocked(r.position,.40) and (r.position as Vector2).is_finite()
 			gestures[r.id] = gestures[r.id] or r.action == "gesture"
 			pauses[r.id] = pauses[r.id] or (r.state == "activity" and move < .001)
+		if Time.get_ticks_msec()-observation_start>=40000 and required_gestures.all(func(id): return gestures.get(id,false)) and pauses.values().all(func(v): return v):
+			break
+	var observation_seconds: float = (Time.get_ticks_msec()-observation_start)/1000.0
 	checks.routes_no_wall_crossing = finite
 	checks.no_superspeed = max_speed < 1.05
 	checks.patrol_really_walks = travelled.get("ambient:103",0) > 12
@@ -110,5 +117,5 @@ static func run(app: Node) -> void:
 	checks.residents_grounded = ids.all(func(id): return absf(app.world.actors[id].position.y-app.world.height_at(app.world.actors[id].position.x,-app.world.actors[id].position.z))<.05)
 	checks.gate_walk_out = await go(app,Vector2(-100,-238))
 	var ok: bool = checks.values().all(func(v): return v==true)
-	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"travelMetres":travelled,"maxSpeedRatio":max_speed,"adapter":RenderingServer.get_video_adapter_name()})
+	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"travelMetres":travelled,"observedGestures":gestures,"observationSeconds":observation_seconds,"maxSpeedRatio":max_speed,"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)
