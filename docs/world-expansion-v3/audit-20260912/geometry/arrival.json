@@ -1,0 +1,156 @@
+{
+  "mapVersion": "world-final-gameplay-1-starter-v3-6eb514fed530fa796385d3fea9c65b4f014ef4b183d6d42b4046b57005e205ee",
+  "obstacles": 20064,
+  "supports": 462,
+  "teleports": [
+    {
+      "name": "Гринфолл",
+      "p": {
+        "x": -100,
+        "z": -190,
+        "spaceId": "surface",
+        "level": 1,
+        "cost": 25
+      },
+      "free": {
+        "x": -100,
+        "z": -190
+      },
+      "blocked": false,
+      "freeBlocked": false,
+      "height": 70.14,
+      "slope": 0,
+      "location": "L02",
+      "paths": []
+    },
+    {
+      "name": "Астерхолд",
+      "p": {
+        "x": -490,
+        "z": -356,
+        "spaceId": "surface",
+        "level": 1,
+        "cost": 0
+      },
+      "free": {
+        "x": -490,
+        "z": -356
+      },
+      "blocked": false,
+      "freeBlocked": false,
+      "height": 34.97043228149414,
+      "slope": 3.029361923233144,
+      "location": "L01",
+      "paths": []
+    },
+    {
+      "name": "Чёрный лес",
+      "p": {
+        "x": -310,
+        "z": 278,
+        "spaceId": "surface",
+        "level": 10,
+        "cost": 90
+      },
+      "free": {
+        "x": -310,
+        "z": 278
+      },
+      "blocked": false,
+      "freeBlocked": false,
+      "height": 107.6672592163086,
+      "slope": 25.293788862968825,
+      "location": "L03",
+      "paths": [
+        {
+          "end": {
+            "x": -300,
+            "z": 278
+          },
+          "points": 1,
+          "clear": true,
+          "ms": 3.2886000000000024,
+          "path": [
+            {
+              "x": -300,
+              "z": 278
+            }
+          ]
+        },
+        {
+          "end": {
+            "x": -320,
+            "z": 278
+          },
+          "points": 3,
+          "clear": false,
+          "ms": 28.003900000000016,
+          "path": [
+            {
+              "x": -313.05,
+              "z": 276.9
+            },
+            {
+              "x": -314.2,
+              "z": 276.9
+            },
+            {
+              "x": -320,
+              "z": 278
+            }
+          ]
+        },
+        {
+          "end": {
+            "x": -310,
+            "z": 288
+          },
+          "points": 1,
+          "clear": true,
+          "ms": 4.008399999999995,
+          "path": [
+            {
+              "x": -310,
+              "z": 288
+            }
+          ]
+        },
+        {
+          "end": {
+            "x": -310,
+            "z": 268
+          },
+          "points": 1,
+          "clear": true,
+          "ms": 4.1585999999999785,
+          "path": [
+            {
+              "x": -310,
+              "z": 268
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Вход в шахту",
+      "p": {
+        "x": 35,
+        "z": 395,
+        "spaceId": "surface",
+        "level": 10,
+        "cost": 150
+      },
+      "free": {
+        "x": 35,
+        "z": 395
+      },
+      "blocked": false,
+      "freeBlocked": false,
+      "height": 124.7126579284668,
+      "slope": 3.829270050146818,
+      "location": "L05",
+      "paths": []
+    }
+  ]
+}

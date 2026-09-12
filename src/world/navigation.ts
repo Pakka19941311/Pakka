@@ -55,7 +55,7 @@ function smoothPath(world: CollisionWorld, start: Point2, path: Point2[], actorR
   let anchor = start;
   let index = 0;
   while (index < path.length) {
-    let furthest = index;
+    let furthest = -1;
     for (let candidate = path.length - 1; candidate >= index; candidate -= 1) {
       // The reference's coarse sample can miss a rounded obstacle corner.
       // Mirror native smoothing: retain ordering but require the public .35
@@ -66,6 +66,8 @@ function smoothPath(world: CollisionWorld, start: Point2, path: Point2[], actorR
         break;
       }
     }
+    // Never fall back to an unchecked grid edge when every shortcut is blocked.
+    if (furthest < 0) return [];
     result.push(path[furthest]);
     anchor = path[furthest];
     index = furthest + 1;
@@ -85,7 +87,8 @@ export function findNavigationPath(
   const maxVisited = options.maxVisited ?? 8000;
   const start = world.findNearestFree(requestedStart, actorRadius);
   const goal = world.findNearestFree(requestedGoal, actorRadius);
-  if (segmentIsClear(world, start, goal, actorRadius, cellSize * 0.45)) return [goal];
+  if (segmentIsClear(world, start, goal, actorRadius, cellSize * 0.45)
+    && pathSegmentIsClear(world, start, goal, actorRadius)) return [goal];
 
   const minX = Math.min(start.x, goal.x) - margin;
   const minZ = Math.min(start.z, goal.z) - margin;
@@ -142,6 +145,8 @@ export function findNavigationPath(
         if (cell) path.unshift(toWorld(cell.x, cell.z));
         cursor = previous.get(cursor) ?? startKey;
       }
+      // The off-grid start connects to gridStart, not necessarily its next cell.
+      path.unshift(toWorld(gridStart.x, gridStart.z));
       return smoothPath(world, start, path, actorRadius, cellSize);
     }
     closed.add(currentKey);
@@ -155,6 +160,8 @@ export function findNavigationPath(
         if (world.isBlocked(toWorld(current.x + direction.x, current.z), actorRadius)
           || world.isBlocked(toWorld(current.x, current.z + direction.z), actorRadius)) continue;
       }
+      // Free endpoints do not imply a free edge: a trunk can fit between them.
+      if (!pathSegmentIsClear(world, toWorld(current.x, current.z), toWorld(next.x, next.z), actorRadius)) continue;
       const nextCost = currentCost + (direction.x && direction.z ? Math.SQRT2 : 1);
       if (nextCost >= (costs.get(nextKey) ?? Infinity)) continue;
       costs.set(nextKey, nextCost);
@@ -164,7 +171,8 @@ export function findNavigationPath(
       open.push({ ...next, score: nextCost + heuristic });
     }
   }
-  return segmentIsClear(world, start, goal, actorRadius, cellSize * 0.3) ? [goal] : [];
+  return segmentIsClear(world, start, goal, actorRadius, cellSize * 0.3)
+    && pathSegmentIsClear(world, start, goal, actorRadius) ? [goal] : [];
 }
 
 export function pathSegmentIsClear(world: CollisionWorld, from: Point2, to: Point2, actorRadius = 0.42): boolean {

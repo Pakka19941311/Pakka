@@ -83,13 +83,15 @@ static func _smooth(collision: VarendorCollision, start: Vector2, path: Array[Ve
 	var anchor: Vector2 = start
 	var index: int = 0
 	while index < path.size():
-		var furthest: int = index
+		var furthest: int = -1
 		for candidate: int in range(path.size() - 1, index - 1, -1):
 			# Reference's coarse sample can miss the inside of a rounded corner.
 			# Keep its ordering, but require the public .35 segment contract too.
 			if _segment_clear(collision, anchor, path[candidate], radius, cell_size * .45) and path_segment_is_clear(collision, anchor, path[candidate], radius):
 				furthest = candidate
 				break
+		# No unchecked fallback when a trunk blocks every candidate edge.
+		if furthest < 0: return []
 		anchor = path[furthest]
 		result.append({"x": anchor.x, "z": anchor.y})
 		index = furthest + 1
@@ -101,7 +103,7 @@ static func find_path(collision: VarendorCollision, requested_start: Vector2, re
 	var max_visited: int = int(options.get("maxVisited", 8000))
 	var start: Vector2 = nearest_free(collision, requested_start, radius)
 	var goal: Vector2 = nearest_free(collision, requested_goal, radius)
-	if _segment_clear(collision, start, goal, radius, cell_size * .45):
+	if _segment_clear(collision, start, goal, radius, cell_size * .45) and path_segment_is_clear(collision, start, goal, radius):
 		return [{"x": goal.x, "z": goal.y}]
 	var origin: Vector2 = start.min(goal) - Vector2.ONE * margin
 	var bounds: Vector2i = Vector2i(maxi(3, ceili((maxf(start.x, goal.x) - origin.x + margin) / cell_size)), maxi(3, ceili((maxf(start.y, goal.y) - origin.y + margin) / cell_size)))
@@ -124,6 +126,8 @@ static func find_path(collision: VarendorCollision, requested_start: Vector2, re
 			while cursor != grid_start:
 				path.push_front(_point(cursor, origin, cell_size))
 				cursor = previous.get(cursor, grid_start)
+			# Preserve the validated connection of the off-grid start.
+			path.push_front(_point(grid_start, origin, cell_size))
 			return _smooth(collision, start, path, radius, cell_size)
 		closed[current] = true
 		var current_cost: float = float(costs.get(current, INF))
@@ -139,6 +143,7 @@ static func find_path(collision: VarendorCollision, requested_start: Vector2, re
 				if dx != 0 and dz != 0:
 					if collision.blocked(_point(current + Vector2i(dx, 0), origin, cell_size), radius) or collision.blocked(_point(current + Vector2i(0, dz), origin, cell_size), radius):
 						continue
+				if not path_segment_is_clear(collision, _point(current, origin, cell_size), _point(next, origin, cell_size), radius): continue
 				var next_cost: float = current_cost + (sqrt(2.0) if dx != 0 and dz != 0 else 1.0)
 				if next_cost >= float(costs.get(next, INF)):
 					continue

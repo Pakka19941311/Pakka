@@ -27,6 +27,21 @@ static func run() -> Dictionary:
 			clear = clear and VarendorNavigation.path_segment_is_clear(collision, cursor, point, item.radius)
 			cursor = point
 		checks["navigation_segments_clear_" + str(item.name)] = clear
+	# Authored f251 forest trunk: the old A* connected free nodes through its body.
+	var forest: VarendorCollision = VarendorCollision.new()
+	forest.setup([{"kind":"circle","x":-313.80376455452387,"z":277.5780139250065,"radius":.29169115741943535}])
+	for cell_size: float in [1.15,.85]:
+		var start: Vector2 = Vector2(-310,278)
+		var goal: Vector2 = Vector2(-318,278)
+		var path: Array = VarendorNavigation.find_path(forest,start,goal,.46,{"cellSize":cell_size,"margin":24,"maxVisited":4500})
+		var clear: bool = not path.is_empty() and Vector2(path.back().x,path.back().z).distance_to(goal)<.0001
+		var cursor: Vector2 = start
+		for waypoint: Dictionary in path:
+			var point: Vector2 = Vector2(waypoint.x,waypoint.z)
+			clear = clear and VarendorNavigation.path_segment_is_clear(forest,cursor,point,.46)
+			for sample: int in range(101): clear = clear and not forest.blocked(cursor.lerp(point,float(sample)/100.0),.46)
+			cursor = point
+		checks["forest_trunk_edges_"+str(cell_size)] = clear
 	return checks
 
 func _initialize() -> void:

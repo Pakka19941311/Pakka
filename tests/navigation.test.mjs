@@ -66,3 +66,20 @@ test('server navigation preserves the browser routes and repairs its one proven 
   }
   assert.equal(repaired,1);assert.equal(unchanged,fixture.cases.length-1);
 });
+
+// Exact authored trunk beside the f251 Black Forest teleport; no user/save data.
+test('forest trunk between free A-star nodes never becomes an unchecked path edge',()=>{
+  const world=new CollisionWorld();
+  world.addCircle(-313.80376455452387,277.5780139250065,.29169115741943535);
+  const start={x:-310,z:278},goal={x:-318,z:278};
+  for(const cellSize of [1.15,.85]){
+    const path=findNavigationPath(world,start,goal,{actorRadius:.46,cellSize,margin:24,maxVisited:4500});
+    assert.ok(path.length>0);assert.deepEqual(path.at(-1),goal);
+    let a=start;for(const b of path){
+      assert.equal(pathSegmentIsClear(world,a,b,.46),true);
+      // Independent dense body samples, not only the planner's own predicate.
+      for(let i=0;i<=100;i++)assert.equal(world.isBlocked({x:a.x+(b.x-a.x)*i/100,z:a.z+(b.z-a.z)*i/100},.46),false);
+      a=b;
+    }
+  }
+});
