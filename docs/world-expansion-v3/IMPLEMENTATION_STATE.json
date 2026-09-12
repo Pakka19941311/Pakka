@@ -5,15 +5,15 @@
   "accepted": "2026-09-12: user accepted the complete v3 specification and instructed implementation",
   "branch": "work/character-art-v3",
   "baseline": "f79d8a81fa824f01fa1d35678ab7391cd17ea208",
-  "current": "P0/P1, P2 actor preparation, P3 integrated attribute/trade/crafting foundations",
+  "current": "P2 live native encounters and traversable one-house sample checkpointed66bed9d; integrate cloaks, NPC motion and authored forest/shore; full accepted master remains active",
   "stages": {
     "P0": "in_progress: accepted specification preserved; live sources, migrations and asset intake",
     "P1": "candidate_data: 48 species / 2416 reachable points / 30 routes; terrain and visual composition not yet rebuilt",
-    "P2": "in_progress: 3 new native-rendered model candidates; starter actor adapters, real combat calibration and starter quest cycle pending",
-    "P3": "in_progress: class attributes and city sales committed; rings, cloaks and native J verified and checkpointed",
+    "P2": "in_progress: first150 natural encounters/1151 actualslots,5starter quests and nativecombat; one livehouse and actualmovement, actorart/cityNPC/nature/economy still require completion",
+    "P3": "in_progress: classes,cap90,city sales,rings/J and cloak backend committed; three cloak models verified on5classes, live equip integration follows",
     "P4": "pending",
     "P5": "pending",
-    "P6": "pending",
+    "P6": "in_progress:10laterquests runtime/native implemented;115/150/160 remainpopulationgated until respective zones activate",
     "P7": "pending",
     "P8": "pending",
     "P9": "pending"
@@ -30,8 +30,8 @@
   },
   "personal_save_backup": "not_claimed: only isolated SQLite fixtures touched; real user saves unopened and unchanged",
   "release": "no new candidate yet",
-  "next_action": "Checkpoint tested accessory block; integrate level cap migration; first-five actor adapters + real damage calibration + starter quests, then playable visual P2 review. No final ZIP until end-to-end release checks.",
-  "last_updated_utc": "2026-09-12T11:38:40.776660+00:00",
+  "next_action": "Verify live3cloak equip/change/remove; finish measured guard/resident motion andsixlegbeetle; forest/shore candidate;5x10 sustained+3classhunt with actualrestocking; P2visual/economy checkpoint precedes massworldart. Remaining43species/12newminis/fullmap/P4-P9 and testedWindowsZIP are not complete.",
+  "last_updated_utc": "2026-09-12T14:21:46.981913+00:00",
   "completed_blocks": [
     {
       "commit": "bcde7b6",
@@ -52,11 +52,133 @@
       "commit": "551db7b",
       "block": "Staged canonical habitat population and routes",
       "checks": "10 tests; generator --check byte-identical; typecheck"
+    },
+    {
+      "commit": "ac4b31b",
+      "block": "Rings/cloaks/native J, lossless accessory reserve",
+      "checks": "150 scoped checks;21 native UI;13 native class/drag"
+    },
+    {
+      "commit": "6902333",
+      "block": "Legacy max-level90 normalization and original progression archive",
+      "checks": "9 scoped checks including real SQLite restart/private import"
+    },
+    {
+      "commit": "865a710",
+      "block": "Five native model candidates; art gate remains open",
+      "checks": "170 isolated actor contract checks; root rejects boar/beetle as final art"
+    },
+    {
+      "commit": "d3023d8",
+      "block": "Five starter quests,14 shared reward/shop definitions,persistent pending rewards",
+      "checks": "70 scoped checks;21 native UI/HTTP transactions; live route separate"
+    },
+    {
+      "commit": "8a03daf",
+      "block": "Staged actual-autoattack balance model",
+      "checks": "12 checks;1 TTK and21 economy gaps plus book/boss gates explicitly unresolved"
+    },
+    {
+      "commit": "0c5fb2b",
+      "block": "Opt-in P2 first150 actual monsters,combat,loot,save migration",
+      "checks": "57 tests;30 actual server fights;native4/5 completed,slimeclickfixture pending"
+    },
+    {
+      "commit": "5850bdc",
+      "block": "Staged10 later quests and legacy book entitlement",
+      "checks": "17 core tests;runtime/native integration follows"
+    },
+    {
+      "commit": "4564bfd",
+      "block": "Verified pre-migration backup in packaged launcher",
+      "checks": "5 actual SQLite/launcher checks"
+    },
+    {
+      "commit": "189b102",
+      "block": "Protected Godot script checks after user-visible startup crash",
+      "checks": "Problem script exit0,cleanlog;native exception codes recorded"
+    },
+    {
+      "commit": "d366d77",
+      "block": "P2 HTTP experience baseline1",
+      "checks": "2 HTTP regression checks;legacy20 preserved"
+    },
+    {
+      "commit": "d83739b",
+      "block": "10laterquests runtime/server/native and persistent legacy entitlement",
+      "checks": "34+1serverchecks;23nativeUI"
+    },
+    {
+      "commit": "bae7047",
+      "block": "P2 natural habitat groups and shared hunting geography",
+      "checks": "25spatial/quest checks; actual routes"
+    },
+    {
+      "commit": "7f37596",
+      "block": "Editable/reproducible city source candidates",
+      "checks": "CC0house/gate/humans prepared; liveintegration separate"
+    },
+    {
+      "commit": "e4949f0",
+      "block": "Roach canonical working basis and accessible SAartpack",
+      "checks": "35nativechecks; fourleganatomy remains OPEN"
+    },
+    {
+      "commit": "8e26a0d",
+      "block": "Back up unclaimed latequest reward UIDs",
+      "checks": "11SQLite/launcher/backup checks"
+    },
+    {
+      "commit": "2cbc8a3",
+      "block": "Calibrate P2 locomotion and actual sustained economy",
+      "checks": "60continuousfights;26scopedchecks;0deaths; economy limitations recorded"
+    },
+    {
+      "commit": "074b4cf",
+      "block": "Actual caster movement and rest comparison",
+      "checks": "20actualrangedfights;120srealrest confirmsnoHPregen;2checks"
+    },
+    {
+      "commit": "7bb2ae0",
+      "block": "Stage accessible licensed P2 art and honest playtest notes",
+      "checks": "2realfilehash/path tests"
+    },
+    {
+      "commit": "cfc6ae8",
+      "block": "Separate P2 packaging flag from Node archive argument",
+      "checks": "CLIparsefix"
+    },
+    {
+      "commit": "3d98bbf",
+      "block": "Recognizable boar adaptation and standalone SA4 source",
+      "checks": "35nativechecks; source replay; adopted1.6m/s"
+    },
+    {
+      "commit": "ae696c4",
+      "block": "Three authored wearable cloak models on fiveclasses",
+      "checks": "3GLBaudits;162nativechecks;24framesreviewed; liveequipnotyetverified"
+    },
+    {
+      "commit": "66bed9d",
+      "block": "Live P2 native encounters and traversable singlecityhouse",
+      "checks": "67nativebattlechecks;22citychecks;18camera poses;11scopedgeometry/backup/artchecks; noenginecrash"
     }
   ],
   "in_progress_checks": {
-    "rings_and_cloaks": "150 scoped server/core checks and 21 native UI/craft/merchant checks passed; final source import parsed",
-    "assets": "wolf, rat, shellbug adapted and graphically checked; five-actor real render adapters in progress",
-    "combat": "Actual monster DEF/MDEF application and old maxHP-percent book impacts require explicit integration; arithmetic estimates are not accepted balance"
+    "rings_and_cloaks": "backendcheckpointac4b31b;3Dmodelsandallclassfit ae696c4; liveworldhook+nativeequip pending",
+    "assets": "boaracceptedworkingP2; sixlegRoachadaptationinprogress; guard/residentmotionandforest/shorecandidatesinprogress",
+    "combat": "67actualnativechecksMOB01/03/04/05 passed inclrealclick/fullHPdeath/loot/stop; sustained+3fiveclasses follows. Highlevelbooks/golems/bossresponse open",
+    "starter": "fivequests/UIcommitted; actualroutes preserved,60continuousfights andQUEST102 return/claim recorded",
+    "backup": "pendingrewardUIDs and changedmapVersion covered;11targetedchecks passed; personalsavesunopened",
+    "late_quests": "d83739b committed34+1server/23nativechecks; laterpopulationgates remainintentional",
+    "population": "1151 actualslots,150naturalP2groups; full2416 remainsstageddata; noadditionalglobalactivation",
+    "city": "66bed9d onehouse/stairs/underpass/camera passed22nativechecks; sourceblend andgenerator saved; closedhouseinteriornotclaimed",
+    "nature": "forest/shore sample underdevelopment on realcoordinates; existingD13keptuntilcandidate reviewed"
+  },
+  "latest_user_correction": {
+    "issue": "Godot access violation read0x58 during direct service check-only",
+    "fix_commit": "189b102",
+    "verified": "same script via checked launcher,exit0,clean log",
+    "policy": "all subsequent engine calls via godot_run_checked.py; no direct starts"
   }
 }
