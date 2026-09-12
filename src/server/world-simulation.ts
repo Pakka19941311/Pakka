@@ -886,7 +886,12 @@ export class WorldSimulation {
     if(m.status.stun>this.state.time||this.books.value(m,'sleep')){this.cancelAttack(m.uid);this.action(m,'idle');m.combatState='idle';return;}
     let brain=this.brains.get(m.uid);
     if(!brain){brain=new MonsterAiBrain(m.home.x*.173+m.home.z*.127+m.patrolIndex*1.91);this.brains.set(m.uid,brain);}
-    const candidates=Object.values(this.state.characters).filter(p=>sameSpace(m,p)&&!p.dead&&p.activeUntil>this.state.time&&!this.safe(p)&&p.buffs.vanish<=this.state.time);
+    const leashRadius=region?.leashRadius??(boss?18:14);
+    // A provoked hero can teleport without changing space. Never navigate across
+    // the map toward a target unreachable from every legal point of this leash.
+    // Include the full ranged reach, so ordinary edge-of-territory combat stays valid.
+    const targetRadius=leashRadius+Math.max(this.monsterRange(m),this.rangedResponse(m)?.range??0,this.candidateCave(m)?CAVE_RANGED_TIMING_V3.range:0);
+    const candidates=Object.values(this.state.characters).filter(p=>sameSpace(m,p)&&distance(m.home,p)<=targetRadius&&!p.dead&&p.activeUntil>this.state.time&&!this.safe(p)&&p.buffs.vanish<=this.state.time);
     const active=this.state.pending.find(a=>a.actor===m.uid);
     // Browser acquisition was radial. Navigation resolves obstacles during
     // chase; line of sight validates the actual attack, not a new search timer.
@@ -901,7 +906,6 @@ export class WorldSimulation {
     const availableRange=counterReady?counter!.range:caveCandidate?(caveSlamReady?CAVE_RANGED_TIMING_V3.range:meleeRange):this.monsterRange(m);
     const points=this.patrolPoints(m);
     let point=points[(m.patrolStep??0)%Math.max(1,points.length)];
-    const leashRadius=region?.leashRadius??(boss?18:14);
     const canAcquire=!p2||Boolean(retained)||(region?.aggroRadius??0)>0;
     const decision=brain.update({dt,alive:true,playerSafe:false,targetAvailable:Boolean(target)&&canAcquire,targetId:target?.id,
       provoked:Boolean(m.provokedBy),playerDistance:target?distance(m,target):1000,homeDistance:distance(m,m.home),
