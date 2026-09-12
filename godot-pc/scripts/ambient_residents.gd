@@ -1,5 +1,6 @@
 class_name VarendorAmbientResidents
 extends RefCounted
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 # The six residents and their authored activities from browser 1e94a0d1.
 # This is local atmosphere, never a second mover for network-owned service NPCs.
@@ -65,7 +66,14 @@ func _navigate(resident: Dictionary, destination: Vector2, delta: float) -> bool
 	var goal_moved: bool = (resident.nav_goal as Vector2).distance_to(destination) > .7
 	if resident.nav_cooldown <= 0 and (goal_moved or resident.path.is_empty() or resident.nav_index >= resident.path.size()) and navigation_budget > 0:
 		navigation_budget -= 1
+		var cpu_path: int = CPU_TRACE.begin()
 		resident.path = VarendorNavigation.find_path(collision, resident.position, destination, .4, {"cellSize":.85,"margin":10,"maxVisited":4500})
+		CPU_TRACE.end("ambient.find_path",cpu_path)
+		if CPU_TRACE.enabled:
+			var source: Vector2 = resident.position
+			CPU_TRACE.note({"kind":"ambient_path","id":str(resident.id),"name":str(resident.name),"route_index":int(resident.waypoint_index),"route_point":resident.route[resident.waypoint_index].duplicate(true),
+				"start":[source.x,source.y],"destination":[destination.x,destination.y],"success":not resident.path.is_empty(),"path_size":resident.path.size(),"path":resident.path.duplicate(true),
+				"elapsed_ms":float(Time.get_ticks_usec()-cpu_path)/1000.0,"clock_ms":clock_ms,"goal_moved":goal_moved,"budget_left":navigation_budget})
 		resident.nav_index = 0
 		resident.nav_goal = destination
 		resident.nav_cooldown = .65 if not resident.path.is_empty() else 1.0

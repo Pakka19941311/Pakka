@@ -8,10 +8,11 @@ static var last_frame_usec: int = 0
 static var spans: Dictionary = {}
 static var counts: Dictionary = {}
 static var frames: Dictionary = {}
+static var events: Array = []
 
 static func begin_phase(name: String) -> void:
 	phase = name
-	spans = {}; counts = {}; frames = {}
+	spans = {}; counts = {}; frames = {}; events = []
 	started_usec = Time.get_ticks_usec()
 	last_frame_usec = 0
 	enabled = true
@@ -36,6 +37,11 @@ static func end(name: String, start: int) -> void:
 static func count(name: String, value: int = 1) -> void:
 	if not enabled: return
 	counts[name] = int(counts.get(name,0))+value
+
+static func note(value: Dictionary) -> void:
+	if not enabled or events.size()>=4096: return
+	value["frame"] = Engine.get_process_frames()
+	events.append(value)
 
 static func observe(world: Node) -> void:
 	if not enabled: return
@@ -77,4 +83,4 @@ static func finish_phase() -> Dictionary:
 		for row: Dictionary in rows:
 			if row.has(key): values.append(float(row[key]))
 		metrics[key] = stats(values)
-	return {"phase":phase,"wall_duration_ms":duration,"counts":counts.duplicate(),"timings":timings,"metrics":metrics,"frames":rows}
+	return {"phase":phase,"wall_duration_ms":duration,"counts":counts.duplicate(),"timings":timings,"metrics":metrics,"frames":rows,"events":events.duplicate()}
