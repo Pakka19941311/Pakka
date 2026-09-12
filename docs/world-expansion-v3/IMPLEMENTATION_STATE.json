@@ -5,7 +5,7 @@
   "accepted": "2026-09-12: user accepted the complete v3 specification and instructed implementation",
   "branch": "work/character-art-v3",
   "baseline": "f79d8a81fa824f01fa1d35678ab7391cd17ea208",
-  "current": "Protected Godot startup189b102 remains verified. Typed monster damage3f581e5 and corrected combat-feedback fixtures45c96f2 committed, packaging policyeb60a808 committed. Nature03 still has a measured forest CPU stall/render jump; runtime profiling is active. Full accepted master remains active.",
+  "current": "Protected Godot startup189b102 and CI launch8f5e070 are saved; checked runtime no longer reproduces the reported access violation. Support-height index eb0a1c5 and snapshot-copy e355777 are verified. Ranged response844bee7/native1f0ca94 is an unreleased candidate: actual33/34, ice dodge remains blocked by frame latency. Full accepted master remains active.",
   "stages": {
     "P0": "in_progress: accepted specification preserved; live sources, migrations and asset intake",
     "P1": "candidate_data: 48 species / 2416 reachable points / 30 routes; terrain and visual composition not yet rebuilt",
@@ -30,8 +30,8 @@
   },
   "personal_save_backup": "not_claimed: only isolated SQLite fixtures touched; real user saves unopened and unchanged",
   "release": "No new ZIP/export/release in this continuation; user authorization to publish work/character-art-v3 persists.",
-  "next_action": "Localize and fix measured forest CPU stall before another route acceptance; retain nature art gate. Design the missing enemy ranged response separately from completed typed damage. Full48species/2416slots/12newminis/map/castles and exact tested Windows ZIP remain unfinished.",
-  "last_updated_utc": "2026-09-12T16:24:00Z",
+  "next_action": "First resolve actual frame/input latency with precise local-render clock and capture-free response telemetry; retain nature04 and line03 failures. No more effect-only reruns or weaker dodge thresholds. P2 art and first-area acceptance, full48species/2416slots/12newminis/map/castles and exact tested Windows ZIP remain unfinished. All engine slots are clear; no engine process was left running.",
+  "last_updated_utc": "2026-09-12T17:21:36Z",
   "completed_blocks": [
     {
       "commit": "bcde7b6",
@@ -242,23 +242,69 @@
       "commit": "45c96f2",
       "block": "Repair stale corpse deadline and hit RNG test assumptions with separate miss evidence",
       "checks": "24 related combat-feedback/core checks; prior 5of7 failure retained in history"
+    },
+    {
+      "commit": "9105aad",
+      "block": "Preserve revised local nature materials and actual-world evidence",
+      "checks": "High-profile native03 42/43; forest render-step and shore art remain open, no full art acceptance"
+    },
+    {
+      "commit": "8f5e070",
+      "block": "Protect remaining CI Godot launches and keep explicit starter-v3 packaging mode",
+      "checks": "Three PowerShell workflow blocks parse; diff check; Actions not run and no exported ZIP"
+    },
+    {
+      "commit": "5651d1f",
+      "block": "Opt-in native phase profiler and forest baseline",
+      "checks": "Diagnostic6/6, no gameplay cadence changes and no FPS acceptance"
+    },
+    {
+      "commit": "2e3b546",
+      "block": "Measure ambient navigation without changing working routes",
+      "checks": "All51 paths succeed; A-star is14.5 percent of measured ambient total, not the whole stall"
+    },
+    {
+      "commit": "eb0a1c5",
+      "block": "Index immutable support plates and ramps without changing exact height equations",
+      "checks": "48188 comparisons maximum error0;7 isolated checks and51 pose checks pass. Comparativeb400ea1: destination p95 522 to221ms; whole frame gate remains open"
+    },
+    {
+      "commit": "309464a",
+      "block": "Preserve actual nature04 and audit mixed-clock measurement",
+      "checks": "42/43,75.312s, no native exception; route and camera pass, forest frame budget remains open. Existing excess compares local hero with remote clock and is not an isolated motor diagnosis"
+    },
+    {
+      "commit": "844bee7",
+      "block": "Opt-in authoritative aimed-line response for existing golems and bosses",
+      "checks": "54 related Node checks and tsc; stationary68/75/94 damage, sidestep0; remaining cooldown persists across restart, reset on respawn. Full late-zone balance not completed"
+    },
+    {
+      "commit": "e355777",
+      "block": "Remove redundant timeline and SSE tail copies while preserving ownership and ordering",
+      "checks": "28 isolated native checks pass; UTF8 partial tails and nested ownership checked. No separate FPS claim"
+    },
+    {
+      "commit": "1f0ca94",
+      "block": "Candidate native fixed-line telegraphs and one visible release impulse",
+      "checks": "32 isolated and2 Node pass; actual03 33/34,63.265s, no native exception. Geometry/pulse pass, ice sidestep arrives late even in warmed scene; not gameplay accepted or released"
     }
   ],
   "in_progress_checks": {
     "rings_and_cloaks": "backendac4b31b;3Dmodels5classfit ae696c4; livehook and20native equip checks7e19305 passed",
     "assets": "P2 boar/sixlegroach/cloaks and two NPC motion integrated. Cohort06-10 inactive source candidates only, missing rigged animal lynx and incomplete combat animations. Full48 artwork not complete.",
-    "combat": "87 native four-species pursuit/roach battle plus51 clock/ground/lifecycle checks passed. Full1151 knight upkeep corrected28.80%. Typed book damage3f581e5 implemented and checked; legacy safe ranged farming remains open until real counterattacks/defenses.",
+    "combat": "Typed damage and earlier87 native pursuit checks preserved. Legacy aimed-line server844bee7 passes54 related tests; native1f0ca94 passes32 isolated/2Node and33of34 actual checks. Fire stationary hit68 and both directed pulses verified; ice avoidance FAIL due late input after impact. Do not claim ranged gameplay gate closed; levels58/66 and broader balance still pending.",
     "starter": "fivequests/UIcommitted; actualroutes preserved,60continuousfights andQUEST102 return/claim recorded",
     "backup": "pendingrewardUIDs and changedmapVersion covered;11targetedchecks passed; personalsavesunopened",
     "late_quests": "d83739b committed34+1server/23nativechecks; laterpopulationgates remainintentional",
     "population": "1151 actual includes legacy1001 plusnew150; full2416 remains staged. P2_POPULATION_RU.md confirms zero legacy ordinary inside the expanded L02 contour. Crowding is a separate visual review, not evidence of mixed legacy/new L02 spawns; no mass activation claimed.",
     "city": "One house/stairs/underpass/camera22 native checks; two existing NPC live routes23 andfactory8 passed. Whole castle/city architecture remains unfinished.",
-    "nature": "7648404 P2 local source/collision/render adapter connected. High-profile native03 improves green foliage/ground, retains visible shore art defects. Forest render jump5.453m and p95 frame439ms fail continuity; no native exception. Hidden sample/actor geometry did not remove dominant CPU cost; phase profiler underway. candidateOnly=true."
+    "nature": "Local candidate source9105aad remains connected. Support index preserves48188 heights exactly and reduces measured cost. Actual nature04 42/43: real uphill/downhill/40m route, collision and camera pass; forest raw p95 interval263ms/max848ms, includes PNG pauses. Observer also mixes local hero and remote clock; correct diagnostics before attributing excess to motor. Shore art and overall frame gate remain open; candidateOnly=true.",
+    "performance": "No actor/player autoplay cause proven; chosen players are MANUAL. Deferred Skeleton/skin cost is not measured. P2 adapter duplicates bind/animation libraries at creation, a future bounded cold-load optimization candidate. Do not disable rigs, change simulation cadence, weaken collision, extend attack windup or remove population to manufacture a pass."
   },
   "latest_user_correction": {
     "issue": "Godot access violation read0x58 during direct service check-only",
     "fix_commit": "189b102",
-    "verified": "Same script via checked launcher exit0; later check-only stage see p2-stage-parse-nature-01 exit0 with empty error_lines; final root native pursuit06 exit0 after181.359s, no native exception. Shader cache/root cert environment warnings persist in graphical runs.",
+    "verified": "Original failing check-only script passes through checked launcher. Later main/stage compile checks exit0 with empty error_lines; native pursuit06 exit0, nature04 and line03 finish without access violation but fail separate acceptance checks. Shader-cache/root-certificate environment warnings persist. FailedCPU03 was an explicit termination after a script dependency error, not a reproduced native access violation.",
     "policy": "all subsequent engine calls via godot_run_checked.py; no direct starts"
   }
 }
