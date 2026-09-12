@@ -41,7 +41,7 @@ func pendant(at: Vector3,length_m: float,radius: float,seed_value: int,material:
 	for ring: int in range(2):
 		for i: int in range(8):
 			var j: int=(i+1)%8
-			for v: Vector3 in [rings[ring][i],rings[ring+1][i],rings[ring][j],rings[ring][j],rings[ring+1][i],rings[ring+1][j]]:
+			for v: Vector3 in [rings[ring][i],rings[ring][j],rings[ring+1][i],rings[ring][j],rings[ring+1][j],rings[ring+1][i]]:
 				surface.add_vertex(v)
 	surface.generate_normals()
 	var instance := MeshInstance3D.new();instance.mesh=surface.commit();instance.material_override=material
