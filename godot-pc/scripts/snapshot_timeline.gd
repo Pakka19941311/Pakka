@@ -92,7 +92,8 @@ func _profiled_ingest(snapshot: Dictionary) -> bool:
 		reset()
 		did_resynchronize = true
 	var owned: Dictionary = snapshot.duplicate(true)
-	var incoming_events: Array = owned.get("events", []).duplicate(true)
+	# owned already deep-copied the input; detach its owned events without another copy.
+	var incoming_events: Array = owned.get("events", [])
 	owned["events"] = []
 	latest = owned
 	_arrival_age_ms = 0.0
@@ -169,7 +170,7 @@ func _profiled_advance(delta: float) -> Dictionary:
 	frozen = clock_ms >= float(latest.time) or not _buffer_ready
 	backlog_ms = maxf(0.0, float(latest.time) + _arrival_age_ms - clock_ms - INTERPOLATION_DELAY_MS)
 	var due_events: Array = []
-	var transitions: Array = []
+	# Consumers use the final snapshot and due events; keep the legacy empty result key.
 	while true:
 		var snapshot_time: float = float(_snapshots[1].time) if _snapshots.size() > 1 else INF
 		var event_time: float = float(_events[0].at) if not _events.is_empty() else INF
@@ -183,7 +184,6 @@ func _profiled_advance(delta: float) -> Dictionary:
 			var state_changed: bool = _apply_event_state(event)
 			changed = changed or state_changed
 			due_events.append(event.duplicate(true))
-			transitions.append({"time":event_time, "event":event.duplicate(true)})
 		else:
 			_snapshots.pop_front()
 			_snapshot_entities.pop_front()
@@ -191,11 +191,9 @@ func _profiled_advance(delta: float) -> Dictionary:
 			_current_entities = _index_entities(current)
 			_source_time = float(current.time)
 			changed = true
-			transitions.append({"time":_source_time, "snapshot":current.duplicate(true)})
 	current["time"] = clock_ms
 	current["events"] = []
 	result.events = due_events
-	result.transitions = transitions
 	if changed:
 		result.snapshot = current.duplicate(true)
 	return result

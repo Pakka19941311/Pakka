@@ -165,4 +165,18 @@ static func run() -> Dictionary:
 		low_fps.advance(.25)
 		bounded_low_fps_backlog = bounded_low_fps_backlog and float(low_fps.latest.time) - low_fps.clock_ms <= 250 and low_fps.backlog_ms <= 250 and not low_fps.did_resynchronize
 	checks["timeline_healthy_four_fps_does_not_accumulate_clock_backlog"] = bounded_low_fps_backlog and low_fps.clock_ms >= 4750
+	# ingest detaches events from its already-owned snapshot. Later input writes
+	# must not mutate queued events, including nested dictionaries.
+	var ownership = Timeline.new()
+	ownership.ingest(fixture(1000.0))
+	ownership.advance(0.0)
+	var input_event: Dictionary = {"sequence":1,"kind":"hit","actor":"hero","target":"fox","targetHp":73.0,"position":{"x":90.0}}
+	var input_state: Dictionary = fixture(1200.0)
+	input_state.events = [input_event]
+	ownership.ingest(input_state)
+	var original_unchanged: bool = not input_event.has("at") and input_state.events.size() == 1
+	input_event.targetHp = 1.0
+	input_event.position.x = -900.0
+	var presented: Dictionary = ownership.advance(.2)
+	checks["timeline_detached_events_keep_nested_input_ownership"] = original_unchanged and presented.events.size() == 1 and float(presented.events[0].targetHp) == 73.0 and float(presented.events[0].position.x) == 90.0
 	return checks

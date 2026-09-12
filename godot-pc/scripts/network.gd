@@ -241,17 +241,18 @@ func _profiled_consume_stream() -> void:
 	# snapshot after a slow frame creates a backlog; all discrete events survive.
 	var latest: Dictionary = {}
 	var events: Dictionary = {}
+	var consumed: int = 0
 	while stream_scan < stream_bytes.size():
 		# Search in native PackedByteArray code, not one GDScript iteration per
 		# byte of the 35 KB snapshot. Keep the trailing LF for split delimiters.
-		var newline: int = stream_bytes.find(10, maxi(0, stream_scan - 1))
+		var newline: int = stream_bytes.find(10, maxi(consumed, stream_scan - 1))
 		if newline < 0 or newline + 1 >= stream_bytes.size():
 			stream_scan = stream_bytes.size()
 			break
 		if stream_bytes[newline + 1] == 10:
-			var packet: String = stream_bytes.slice(0, newline).get_string_from_utf8()
-			stream_bytes = stream_bytes.slice(newline + 2)
-			stream_scan = 1
+			var packet: String = stream_bytes.slice(consumed, newline).get_string_from_utf8()
+			consumed = newline + 2
+			stream_scan = consumed + 1
 			for line: String in packet.split("\n"):
 				if line.begins_with("data:"):
 					var value = JSON.parse_string(line.trim_prefix("data:").strip_edges())
@@ -267,6 +268,10 @@ func _profiled_consume_stream() -> void:
 							latest = value
 		else:
 			stream_scan = newline + 2
+	# Compact once after the burst, preserving the partial packet and its scan position.
+	if consumed > 0:
+		stream_bytes = stream_bytes.slice(consumed)
+		stream_scan = maxi(1, stream_scan - consumed)
 	if not latest.is_empty():
 		var order: Array = events.keys()
 		order.sort()
