@@ -136,13 +136,9 @@ func activate_space(id: String) -> bool:
 			# with another space's Godot navigation map.
 			nav.enabled = false
 			root.add_child(nav)
-			for room: Dictionary in spaces[id].rooms:
-				var lamp: OmniLight3D = OmniLight3D.new()
-				lamp.position = Vector3(room.center[0],5,room.center[1])
-				lamp.omni_range = maxf(room.radii[0],room.radii[1])*1.5
-				lamp.light_energy = 2
-				lamp.light_color = Color("ffbb78") if id == "mine" else Color("99b5c4")
-				root.add_child(lamp)
+			var detail: Node3D = load("res://world-final/interiors/interior_detail_p2.gd").new()
+			root.add_child(detail)
+			detail.build(interior,spaces[id])
 	active_space = id
 	var saved: Dictionary = loaded_data[id]
 	terrain = saved.terrain
