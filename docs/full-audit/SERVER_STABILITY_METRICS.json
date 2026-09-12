@@ -1,0 +1,85 @@
+{
+  "schema": 1,
+  "sourceBase": "6279a5411261496c86dde6b0b36db57ba99c6bbb",
+  "sourceHashes": {
+    "src/world/final-world.ts": "b84e551ee2398740b4ab152e253329b957644883d2e60184e4c289ae29b61e39",
+    "src/server/world-simulation.ts": "9cf76e947af551a2e84cc2779f9e8cd6d4867ef28a032ca91bfcd98ae414a99f"
+  },
+  "privateSourceSha256": "9314459bbcba0d53be30dceea62621d6ba0e17f31f4c6b90d3eea3cf7e23749b",
+  "privateDataIncluded": false,
+  "method": "One read-only SQLite copy per variant; real full 1151 population, selected connected hero, deterministic RNG0.5 and600 exact60Hz ticks. Same observation wrappers, no engine/other benchmark load. This is CPU replay, not native FPS.",
+  "replay": [
+    {
+      "variant": "baseline-f251",
+      "ticks": 600,
+      "totalMs": 8450.4472,
+      "p50Ms": 13.79569999999876,
+      "p95Ms": 20.46479999999974,
+      "p99Ms": 25.06770000000006,
+      "maxMs": 41.26850000000002,
+      "population": 1151,
+      "supportSurfaces": 462
+    },
+    {
+      "variant": "target-6279",
+      "ticks": 600,
+      "totalMs": 6407.4019,
+      "p50Ms": 11.08680000000004,
+      "p95Ms": 15.914299999999912,
+      "p99Ms": 18.34089999999992,
+      "maxMs": 23.205000000000155,
+      "population": 1151,
+      "supportSurfaces": 462
+    },
+    {
+      "variant": "support-index-candidate",
+      "ticks": 600,
+      "totalMs": 1579.6124,
+      "p50Ms": 2.506000000000313,
+      "p95Ms": 3.980000000000018,
+      "p99Ms": 4.913300000000163,
+      "maxMs": 10.034199999999942,
+      "population": 1151,
+      "supportSurfaces": 462
+    }
+  ],
+  "fullStateExactEqualAfterIndex": true,
+  "http": {
+    "packets": 279,
+    "inputAckMs": [
+      4.221000000000004,
+      16.297900000000027,
+      3.5216999999993277,
+      17.97280000000046,
+      20.01339999999982
+    ],
+    "stages": [
+      {
+        "stage": "p2-line-fire",
+        "population": 1151,
+        "snapshots": 74,
+        "maxPacketGapMs": 65.7808,
+        "hpBefore": 884,
+        "hpAfter": 816,
+        "targetHits": 1
+      },
+      {
+        "stage": "p2-line-ice-dodge",
+        "population": 1151,
+        "snapshots": 47,
+        "maxPacketGapMs": 65.28669999999966,
+        "hpBefore": 884,
+        "hpAfter": 884,
+        "targetHits": 0
+      }
+    ],
+    "maximumSnapshotGapMs": 147.52190000000007,
+    "slowAdvanceCount": 0,
+    "maxObservedSlowAdvanceMs": 0
+  },
+  "limits": [
+    "No personal state, inventory, session token or character identifier included.",
+    "Current compiled EXE replay and sustained held-input acceptance remain separate checks.",
+    "This does not establish full-world/multiplayer performance budgets."
+  ]
+}

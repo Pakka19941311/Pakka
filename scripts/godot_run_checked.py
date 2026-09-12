@@ -119,6 +119,7 @@ def main():
     parser.add_argument('--cwd', default='.')
     parser.add_argument('--timeout', type=float, default=90)
     parser.add_argument('--check-script', help='Check one res:// GDScript using the protected headless launch')
+    parser.add_argument('--qa-user-root', help='Isolated Windows QA user/cache directory; applies only to the child process')
     parser.add_argument('godot_args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
     exe, cwd, output = (Path(v).resolve() for v in (args.exe, args.cwd, args.output))
@@ -149,10 +150,22 @@ def main():
               'environment_overrides': {}, 'project_settings_changed': False,
               'log_precreated_and_writable': True, 'timeout_seconds': args.timeout,
               'visual_check': False, 'samples': []}
+    child_env = os.environ.copy()
+    if args.qa_user_root:
+        if os.name != 'nt': parser.error('--qa-user-root currently supports Windows only')
+        qa_root = Path(args.qa_user_root).resolve()
+        for key, folder in [('APPDATA', 'roaming'), ('LOCALAPPDATA', 'local')]:
+            target = qa_root / folder
+            target.mkdir(parents=True, exist_ok=True)
+            probe = target / '.checked-write-probe'
+            with probe.open('xb') as f: f.write(b'qa')
+            probe.unlink()
+            child_env[key] = str(target)
+            result['environment_overrides'][key] = str(target)
     sample = memory_sampler()
     start = time.monotonic()
     with (output / 'stdout.log').open('wb') as out, (output / 'stderr.log').open('wb') as err:
-        process = subprocess.Popen(command, cwd=cwd, stdout=out, stderr=err,
+        process = subprocess.Popen(command, cwd=cwd, stdout=out, stderr=err, env=child_env,
                                    creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
                                    start_new_session=os.name != 'nt')
         result['launcher_pid'] = process.pid

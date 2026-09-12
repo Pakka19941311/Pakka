@@ -18,6 +18,7 @@ export type SpawnSlot = SpatialPoint & {uid:string;speciesId:string;locationId:s
  behavior?:{stance:string;provocation:string;socialAggro:boolean}};
 export type FinalWorldOptions={populationMode?:P2PopulationMode};
 type Support = {kind:string;x:number;z:number;halfX:number;halfZ:number;angle:number;y:number;high?:number};
+type IndexedSupport = {source:Support;cosine:number;sine:number};
 export function inPolygon(x:number,z:number,polygon:number[][]):boolean {
   let inside=false;
   for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){
@@ -33,10 +34,26 @@ export class FinalTerrain implements TerrainSupport {
   readonly heights:Float32Array;
   readonly meta:any;
   readonly surfaces:Support[];
+  private readonly supportCells=new Map<string,IndexedSupport[]>();
+  private readonly supportCellSize=32;
   constructor(meta:any, bytes:Uint8Array,surfaces:Support[]=[]){
     this.meta=meta;this.surfaces=surfaces;
     this.heights=new Float32Array(bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength));
     if(this.heights.length!==(meta.columns+1)*(meta.rows+1))throw Error('final-height-size');
+    // Static authored supports are indexed once. Keep source order in every
+    // bucket and the exact local-space test below: this changes lookup cost,
+    // never terrain heights, ramp interpolation or collision boundaries.
+    for(const source of surfaces){
+      const cosine=Math.cos(source.angle),sine=Math.sin(source.angle),entry={source,cosine,sine};
+      const hx=Math.abs(cosine)*source.halfX+Math.abs(sine)*source.halfZ+1e-7;
+      const hz=Math.abs(sine)*source.halfX+Math.abs(cosine)*source.halfZ+1e-7;
+      for(let x=Math.floor((source.x-hx)/this.supportCellSize);x<=Math.floor((source.x+hx)/this.supportCellSize);x++){
+        for(let z=Math.floor((source.z-hz)/this.supportCellSize);z<=Math.floor((source.z+hz)/this.supportCellSize);z++){
+          const key=`${x}:${z}`,bucket=this.supportCells.get(key);
+          if(bucket)bucket.push(entry);else this.supportCells.set(key,[entry]);
+        }
+      }
+    }
   }
   heightAt(x:number,z:number):number {
     const {columns:c,rows:r,step}=this.meta,b=this.meta.bounds??[-800,-700,800,700];
@@ -47,8 +64,9 @@ export class FinalTerrain implements TerrainSupport {
   }
   supportAt(x:number,z:number):number {
     let y=this.heightAt(x,z);
-    for(const s of this.surfaces){
-      const dx=x-s.x,dz=-z-s.z,c=Math.cos(s.angle),sn=Math.sin(s.angle),lx=dx*c-dz*sn,lz=dx*sn+dz*c;
+    const supports=this.supportCells.get(`${Math.floor(x/this.supportCellSize)}:${Math.floor(-z/this.supportCellSize)}`);
+    for(const {source:s,cosine:c,sine:sn} of supports??[]){
+      const dx=x-s.x,dz=-z-s.z,lx=dx*c-dz*sn,lz=dx*sn+dz*c;
       if(Math.abs(lx)<=s.halfX&&Math.abs(lz)<=s.halfZ)y=Math.max(y,s.kind==='ramp_z'?s.high!+(s.y-s.high!)*(lz+s.halfZ)/(2*s.halfZ):s.y);
     }return y;
   }
