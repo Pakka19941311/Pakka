@@ -10,6 +10,7 @@ import { restoreWorldTopology } from './src/world/world-topology.ts';
 import { backupWorld } from './scripts/p0-backup-world.mjs';
 import { teleportProgressRecovery } from './src/core/teleport-progress-repair.ts';
 import { FinalWorld } from './src/world/final-world.ts';
+import {backupBeforeExpansion} from './src/server/expansion-backup.mjs';
 
 const root = dirname(fileURLToPath(import.meta.url));
 const readJson = path => JSON.parse(readFileSync(path, 'utf8'));
@@ -56,6 +57,15 @@ export async function startNativeBridge({ data, legacy, backups, port = 0 }) {
   let service;
   try {
     const { database, migration } = await prepareNativeData({ data, legacy, backups });
+    const runtimeConfig=existsSync(join(root,'world-runtime.json'))?readJson(join(root,'world-runtime.json')):{};
+    const populationMode=runtimeConfig.populationMode??'legacy';
+    if(!['legacy','starter-v3'].includes(populationMode))throw Error('Unsupported packaged population mode');
+    const finalWorld=existsSync(join(root,'world-final/gameplay/spawn-manifest.json'))?new FinalWorld(join(root,'world-final'),true,{populationMode}):undefined;
+    const expansionBackup=await backupBeforeExpansion(database,backups,finalWorld?.populationPlan);
+    if(expansionBackup){
+      privateJson(join(data,'world-expansion-v3-backup.json'),expansionBackup);
+      console.log('Сохранение проверено и скопировано перед обновлением. Резервная копия:',expansionBackup.filename);
+    }
     // The old launcher profile predates this process. Capture it before writing
     // a new bootstrap, and only repair the specific leaked teleport metadata.
     const oldBootstrap=join(data,'bootstrap.json');
@@ -88,10 +98,10 @@ export async function startNativeBridge({ data, legacy, backups, port = 0 }) {
         profiles.push({ id: hero.id, name: hero.name, classId: hero.classId, level: hero.level, token });
       }
     } finally { store.close(); }
-    const finalWorld=existsSync(join(root,'world-final/gameplay/spawn-manifest.json'))?new FinalWorld(join(root,'world-final')):undefined;
     const { collision, terrain } = finalWorld?finalWorld.spaces.surface:restoreWorldTopology(readJson(join(root, 'public/assets/world/world-topology.json')));
     service = startWorldServer({ database, collision, terrain, finalWorld, port, host: '127.0.0.1', beta: true });
     await once(service.server, 'listening');
+    for(const profile of profiles)profile.level=service.world.state.characters[profile.id]?.level??profile.level;
     const url = `http://127.0.0.1:${service.server.address().port}`;
     const bootstrapPath = join(data, 'bootstrap.json');
     const saveMessage = repairs.length ? 'Восстановлен подтверждённый уровень после ошибки телепорта. Предметы сохранены; исходная база скопирована в резерв.' : migration.kind === 'verified-legacy-clone'

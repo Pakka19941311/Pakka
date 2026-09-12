@@ -6,17 +6,20 @@ import { fileURLToPath } from 'node:url';
 import { serverDependencyFiles, writePackageManifest } from './package-world-windows.mjs';
 
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
-export function stageNativeServer(root, destination, {finalWorld=false}={}) {
+export function stageNativeServer(root, destination, {finalWorld=false,populationMode='legacy'}={}) {
+  if(!['legacy','starter-v3'].includes(populationMode))throw Error('Unsupported packaged population mode');
   mkdirSync(destination, { recursive: true });
   const copy = (from, to = from) => { const target = resolve(destination, to); mkdirSync(dirname(target), { recursive: true }); cpSync(resolve(root, from), target); };
   const dependencies = serverDependencyFiles(root);
   for (const file of dependencies) copy(file);
   copy('scripts/p0-backup-world.mjs');
+  copy('src/server/expansion-backup.mjs');
   copy('src/core/teleport-progress-repair.ts');
   copy('public/assets/world/world-topology.json');
   // The gameplay profile ships the authoritative collision/height data beside
   // the server; render-only GLBs stay inside the exported Godot package.
   if (finalWorld) {
+    writeFileSync(resolve(destination,'world-runtime.json'),JSON.stringify({schema:1,populationMode})+'\n');
     for (const file of ['world_layout.json','geology-D13/terrain.json','geology-D13/heightmap.f32','geography/collision.json','geography/support-surfaces.json','nature/collision-D13.json','nature/groundcover-collision-D13.json','castle/courtyard.json','interiors/spaces.json','interiors/mine.json','interiors/great_cave.json','gameplay/spawn-manifest.json']) copy('godot-pc/world-final/'+file,'world-final/'+file);
     for (const id of ['mine','great_cave']) {
       const meta=JSON.parse(readFileSync(resolve(root,`godot-pc/world-final/interiors/${id}.json`),'utf8'));
