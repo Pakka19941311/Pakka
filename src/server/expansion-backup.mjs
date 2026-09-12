@@ -21,6 +21,7 @@ export async function backupBeforeExpansion(database,backups,populationPlan,back
  if(heroes.some(p=>p.accessoryMigrationVersion!==ACCESSORY_MIGRATION_VERSION))reasons.push('accessories-v3');
  if(heroes.some(p=>p.level>MAX_LEVEL||p.level===MAX_LEVEL&&p.xp>=xpNeeded(MAX_LEVEL)))reasons.push('level-cap-90');
  if(heroes.some(p=>p.starterProgress?.version!==1))reasons.push('starter-quests-v3');
+ if(heroes.some(p=>p.progressionQuests?.version!==1))reasons.push('progression-quests-v3');
  if(populationPlan?.mode==='starter-v3'&&(state.starterPopulationVersion!==populationPlan.version||state.starterPopulationDigest!==populationPlan.digest))reasons.push('starter-population-v3');
  if(!reasons.length)return null;
  const result=await backup(database,backups);

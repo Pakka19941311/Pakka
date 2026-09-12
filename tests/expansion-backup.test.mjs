@@ -19,12 +19,12 @@ function fixture(t){
 
 test('verified SQLite backup precedes level/accessory/quest migration and includes sparse storage and reserve',async t=>{
  const f=fixture(t),p=f.hero;
- Object.assign(p,{level:100,xp:123456,hp:17,accessoryMigrationVersion:undefined,starterProgress:undefined,
+ Object.assign(p,{level:100,xp:123456,hp:17,accessoryMigrationVersion:undefined,starterProgress:undefined,progressionQuests:undefined,
   inventory:[{uid:'bag-potion',id:'potion',count:10,plus:0}],equipment:{ear2:{uid:'right-ear',id:'rift_ear_guard',count:1,plus:7}},
   storage:[null,{uid:'bank-ring',id:'rift_ring_blade',count:1,plus:5}],migrationReserve:[{uid:'reserve-material',id:'iron',count:6,plus:0}]});
  f.store.save(f.world.state);const original=f.store.load();
  const result=await backupBeforeExpansion(f.database,f.backups);
- assert.deepEqual(result.reasons,['accessories-v3','level-cap-90','starter-quests-v3']);
+ assert.deepEqual(result.reasons,['accessories-v3','level-cap-90','starter-quests-v3','progression-quests-v3']);
  assert.equal(result.report.itemCount,4);assert.equal(result.report.allTablesAndStateFieldsEqual,true);assert.deepEqual(f.store.load(),original);
  const backup=new WorldStore(result.filename);
  try{

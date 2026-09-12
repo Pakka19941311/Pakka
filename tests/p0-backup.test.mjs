@@ -19,8 +19,14 @@ function fixture(t) {
     identifier:()=>`fixture-${++serial}`,random:()=>0.5,beta:true});
   const hero=world.createCharacter('P0 synthetic fixture','knight');
   hero.gold=1234; hero.xp=17; hero.quest=2; hero.kills=4; hero.hp=99;
+  // New knights keep their original weapon in the bag. This backup fixture
+  // deliberately equips it before testing an enhancement receipt.
+  const weaponIndex=hero.inventory.findIndex(item=>item.id==='wardens_blade');
+  assert.ok(weaponIndex>=0);
+  hero.equipment.weapon=hero.inventory.splice(weaponIndex,1)[0];
   const command={type:'enhance',item:structuredClone(hero.equipment.weapon),scroll:structuredClone(hero.inventory.find(i=>i.id==='weapon_scroll'))};
   const receipt=world.command(hero.id,'p0-receipt-fixture',command);
+  assert.equal(receipt.ok,true);
   t.after(()=>store.close());
   return {dir,source,store,world,hero,command,receipt};
 }
@@ -58,6 +64,20 @@ test('duplicate item UID is reported, never silently repaired',async t=>{
   const f=fixture(t); f.hero.inventory[0].uid=f.hero.equipment.weapon.uid; f.world.checkpoint();
   await assert.rejects(backupWorld(f.source,join(f.dir,'backups')),/duplicate-item-uid/);
   assert.equal(f.store.load().characters[f.hero.id].inventory[0].uid,f.hero.equipment.weapon.uid);
+});
+
+test('unclaimed progression rewards are preserved and share the global item UID namespace',async t=>{
+  const f=fixture(t), before=inspectWorld(f.store.db);
+  f.hero.progressionQuests.quests.QUEST150={status:'reward-pending',pendingItems:[{uid:'pending-class-book',id:'book_knight_50',count:1,plus:0}]};
+  f.world.checkpoint();
+  const result=await backupWorld(f.source,join(f.dir,'backups'));
+  assert.equal(result.report.itemCount,before.itemCount+1);
+  const restored=new WorldStore(result.filename);
+  try {assert.deepEqual(restored.load().characters[f.hero.id].progressionQuests,f.hero.progressionQuests);}
+  finally {restored.close();}
+  f.hero.progressionQuests.quests.QUEST150.pendingItems[0].uid=f.hero.equipment.weapon.uid;
+  f.world.checkpoint();
+  await assert.rejects(backupWorld(f.source,join(f.dir,'backups')),/duplicate-item-uid/);
 });
 
 test('a backup cannot overwrite a previous backup or enter a Git checkout',async t=>{

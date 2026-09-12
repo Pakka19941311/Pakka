@@ -42,7 +42,10 @@ export function inspectWorld(db) {
   for (const [id, hero] of heroes) {
     if (hero.id !== id || !Array.isArray(hero.inventory) || !Array.isArray(hero.lootBuffer) || !hero.equipment)
       throw Error('invalid-character-shape');
-    for (const item of [...hero.inventory, ...Object.values(hero.equipment), ...hero.lootBuffer, ...(hero.storage??[]), ...(hero.migrationReserve??[]), ...Object.values(hero.starterProgress?.quests??{}).flatMap(q=>q?.pendingItems??[])].filter(Boolean)) {
+    const pendingRewards = [hero.starterProgress, hero.progressionQuests]
+      .flatMap(progress => Object.values(progress?.quests ?? {}))
+      .flatMap(quest => quest?.pendingItems ?? []);
+    for (const item of [...hero.inventory, ...Object.values(hero.equipment), ...hero.lootBuffer, ...(hero.storage??[]), ...(hero.migrationReserve??[]), ...pendingRewards].filter(Boolean)) {
       if (typeof item.uid !== 'string' || !item.uid || uids.has(item.uid)) throw Error('invalid-or-duplicate-item-uid');
       uids.add(item.uid); items++;
     }
