@@ -5,7 +5,7 @@ import {execFileSync} from 'node:child_process';
 import {stageNativeServer} from '../package-godot-pc.mjs';
 import {writePackageManifest} from '../package-world-windows.mjs';
 import {stageArtPacks} from '../stage-art-packs.mjs';
-const [binary,outputArg,license,nodeArchive]=process.argv.slice(2),root=process.cwd(),output=resolve(outputArg);
+const [binary,outputArg,license,nodeArchive]=process.argv.slice(2).filter(arg=>arg!=='--starter-v3'),root=process.cwd(),output=resolve(outputArg);
 const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const name='Varendor_World_Gameplay_'+commit.slice(0,12),destination=join(output,name);
 if(existsSync(destination))throw Error('Package destination already exists');
