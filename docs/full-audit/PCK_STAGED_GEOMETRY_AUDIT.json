@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "status": "PASS",
+  "failures": [],
+  "exeName": "Varendor.exe",
+  "scope": "geometry-only",
+  "skippedChecks": [
+    "full EXE SHA",
+    "all entry MD5",
+    "import/remap closure",
+    "active catalog closure"
+  ],
+  "exeBytes": 1826279064,
+  "exeSha256": null,
+  "serverDataScope": "packaged-directory",
+  "engineVersion": [
+    4,
+    6,
+    3
+  ],
+  "pckEntries": 3974,
+  "checkedEntryMd5": 0,
+  "entryMd5Failures": [],
+  "importRemaps": 0,
+  "missingImportTargets": [],
+  "activeCatalogReferences": 0,
+  "catalog": [],
+  "forbiddenEntries": [],
+  "requiredAcceptance": {
+    "scripts/stage_acceptance.gd": true,
+    "scripts/p2_pursuit_acceptance.gd": true,
+    "scripts/p2_nature_acceptance.gd": true
+  },
+  "server": {
+    "schema": 1,
+    "mapVersion": "world-final-gameplay-1-starter-v3-6eb514fed530fa796385d3fea9c65b4f014ef4b183d6d42b4046b57005e205ee",
+    "populationMode": "starter-v3",
+    "population": 1151,
+    "obstacles": 20064,
+    "supports": 462
+  },
+  "embeddedMapVersion": "world-final-gameplay-1-starter-v3-6eb514fed530fa796385d3fea9c65b4f014ef4b183d6d42b4046b57005e205ee",
+  "mapVersionEqual": true,
+  "populationEqual": true,
+  "sharedGeometryCount": 16,
+  "geometry": [
+    {
+      "path": "world-final/castle/courtyard-p2.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "a3cf7ff2ac6598eb4cb36a14a38afd4642146470a4cbbfa33ca0c1d9727c16f1",
+      "serverSha256": "a3cf7ff2ac6598eb4cb36a14a38afd4642146470a4cbbfa33ca0c1d9727c16f1",
+      "equal": true
+    },
+    {
+      "path": "world-final/castle/courtyard.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "0e2770b57522471bfe2828739735ae4beecb7678c14c38116b9e6877aa91fed6",
+      "serverSha256": "0e2770b57522471bfe2828739735ae4beecb7678c14c38116b9e6877aa91fed6",
+      "equal": true
+    },
+    {
+      "path": "world-final/gameplay/spawn-manifest.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "59b86ba9ef461e29003f13f467a83e409208a431962f3c662b8bba3f7a238698",
+      "serverSha256": "59b86ba9ef461e29003f13f467a83e409208a431962f3c662b8bba3f7a238698",
+      "equal": true
+    },
+    {
+      "path": "world-final/geography/collision.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "262e2bfd081455b1b6c28782efdf3bcd1d758d7097d76918ff8b91802d7dd53c",
+      "serverSha256": "262e2bfd081455b1b6c28782efdf3bcd1d758d7097d76918ff8b91802d7dd53c",
+      "equal": true
+    },
+    {
+      "path": "world-final/geography/support-surfaces.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "02de5a8a7d01aae79c6031477e4c445c667fb121d0ea20e1492afb2d9ad33094",
+      "serverSha256": "02de5a8a7d01aae79c6031477e4c445c667fb121d0ea20e1492afb2d9ad33094",
+      "equal": true
+    },
+    {
+      "path": "world-final/geology-D13/heightmap.f32",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "7604caa402b56c72cb1324fa1449ad8bc2d642dbc9d6151832d7b89230777d9f",
+      "serverSha256": "7604caa402b56c72cb1324fa1449ad8bc2d642dbc9d6151832d7b89230777d9f",
+      "equal": true
+    },
+    {
+      "path": "world-final/geology-D13/terrain.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "155b195021d06631756b0fb17f8370144dcd1a412fe191f011b52e42bc5658c1",
+      "serverSha256": "155b195021d06631756b0fb17f8370144dcd1a412fe191f011b52e42bc5658c1",
+      "equal": true
+    },
+    {
+      "path": "world-final/interiors/great_cave-floor.f32",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "e288585fd2381779915489507138c45f0c03e358a1997be9940247bcdfa50977",
+      "serverSha256": "e288585fd2381779915489507138c45f0c03e358a1997be9940247bcdfa50977",
+      "equal": true
+    },
+    {
+      "path": "world-final/interiors/great_cave.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "7faa63072f4b597093b1247776c95a57312e0a3c11283ffbbe682ac1dd19b6da",
+      "serverSha256": "7faa63072f4b597093b1247776c95a57312e0a3c11283ffbbe682ac1dd19b6da",
+      "equal": true
+    },
+    {
+      "path": "world-final/interiors/mine-floor.f32",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "605e82ad20e93838e53f1857095ed08792ed01fbbe2b4acfa8c2265cae4676b1",
+      "serverSha256": "605e82ad20e93838e53f1857095ed08792ed01fbbe2b4acfa8c2265cae4676b1",
+      "equal": true
+    },
+    {
+      "path": "world-final/interiors/mine.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "d2674d9ab3f74373947d7f91572f6b7db7026efc78afbadaffc70236a56dcb6d",
+      "serverSha256": "d2674d9ab3f74373947d7f91572f6b7db7026efc78afbadaffc70236a56dcb6d",
+      "equal": true
+    },
+    {
+      "path": "world-final/interiors/spaces.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "f025c1fa4440d86415d8df20c3bde09ae2bba8fe14eefe9013e3343c56a3bf0f",
+      "serverSha256": "f025c1fa4440d86415d8df20c3bde09ae2bba8fe14eefe9013e3343c56a3bf0f",
+      "equal": true
+    },
+    {
+      "path": "world-final/nature/collision-D13.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "ad72e21091bdf9fc8c105abcbf96dd18ad886bc808bf9a64862adacdca978223",
+      "serverSha256": "ad72e21091bdf9fc8c105abcbf96dd18ad886bc808bf9a64862adacdca978223",
+      "equal": true
+    },
+    {
+      "path": "world-final/nature/groundcover-collision-D13.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "589005c28283d467314cca5bd188e05b9c7723e98d7688b08338dd1b73d8d5fd",
+      "serverSha256": "589005c28283d467314cca5bd188e05b9c7723e98d7688b08338dd1b73d8d5fd",
+      "equal": true
+    },
+    {
+      "path": "world-final/nature/p2-sample-v3/collision.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "4503e27e078ee1e076550483cded1ab03e715fb9d10aa2c66f153e333cd4e896",
+      "serverSha256": "4503e27e078ee1e076550483cded1ab03e715fb9d10aa2c66f153e333cd4e896",
+      "equal": true
+    },
+    {
+      "path": "world-final/world_layout.json",
+      "pckExists": true,
+      "serverExists": true,
+      "pckSha256": "5f370c7ba9b6b2fb72b887f0f45e9c800320862f9ea5c08ef1b696bf05372906",
+      "serverSha256": "5f370c7ba9b6b2fb72b887f0f45e9c800320862f9ea5c08ef1b696bf05372906",
+      "equal": true
+    }
+  ],
+  "limits": [
+    "Resource existence and byte parity do not assess art quality or frame pacing.",
+    "Current cloak/NPC source registries select additional resources; active native dependency check remains separate."
+  ],
+  "packageBuildCommit": "32bb3320f9ecd3f66e5ae5f2661f01c1e8bb7add",
+  "exeManifestSha256": "8075f789f0829f60c0946ead64613fb2a4a560d70e00a12a795e5fc00c8cddb7",
+  "exeManifestShaMatchesFullScan": true
+}
