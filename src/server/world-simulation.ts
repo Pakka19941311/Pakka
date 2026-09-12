@@ -4,6 +4,10 @@ import {rollLootV3} from '../data/loot-v3.ts';
 import {RING_RECIPES,ACCESSORY_MIGRATION_VERSION,itemSellPrice} from '../data/accessories-v3.ts';
 import {craftRing} from '../core/ring-crafting.ts';
 import {migrateAccessories,claimMigrationItem} from '../core/accessory-migration.ts';
+import {STARTER_ITEMS,STARTER_LOCATION_ID} from '../data/starter-progression-v3.ts';
+import {initializeStarterQuests,acceptStarterQuest,claimStarterQuest,recordStarterQuestEvent,starterQuestViews} from '../core/starter-quests-v3.ts';
+import type {StarterQuestEvent} from '../core/starter-quests-v3.ts';
+import {observeStarterQuestObjectives} from '../core/starter-quest-observation.ts';
 import {normalizeProgressionV3} from '../core/progression-migration-v3.ts';
 import type {AccessoryBackup} from '../core/accessory-migration.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
@@ -112,6 +116,7 @@ export class WorldSimulation {
   private physicsEpoch: number;
   private physicsTick = 0;
   private nextEnvironmentCheck=0;
+  private nextStarterObservation=0;
   private paths = new Map<string, { goal: Position; points: Position[]; expiresAt: number }>();
   private brains = new Map<string,MonsterAiBrain>();
   private motors=new Map<string,CharacterMotor>();
@@ -175,7 +180,7 @@ export class WorldSimulation {
     }else for(const region of SPAWN_REGIONS)for(let i=0;i<region.population;i++)if(!this.state.monsters.some(m=>m.uid===`${region.id}:${i}`))this.spawnMonster(region.monsterId,spawnPointInRegion(region,i),`${region.id}:${i}`,region.id,i);
     // A process restart breaks all connections. Never renew their exposure deadline.
     for (const p of Object.values(this.state.characters)) {
-      Object.assign(p,normalizeProgressionV3(p));p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);
+      Object.assign(p,normalizeProgressionV3(p));p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));this.migrateEquipment(p);this.recalculate(p);
       p.activeUntil = Math.min(p.activeUntil, this.state.time + DISCONNECT_GRACE_MS);
       p.direction = {x:0,z:0};p.destination=null;p.target=null;p.skill=null;p.bufferedSkill=undefined;p.autoAttack=false;p.singleAttack=false;
       Object.assign(p,{...motion(this.state.time),yaw:p.yaw,action:p.dead?'death':'idle',combatState:p.dead?'dead':'idle'});
@@ -228,10 +233,11 @@ export class WorldSimulation {
     const remap=(item:InventoryItem)=>({...item,uid:this.identifier()});
     p.inventory=p.inventory.map(remap);p.lootBuffer=p.lootBuffer.map(remap);
     p.storage=p.storage?.map(item=>item?remap(item):null);p.migrationReserve=p.migrationReserve?.map(remap);p.accessoryMigrationVersion=undefined;
+    for(const quest of Object.values(p.starterProgress?.quests??{}))if(quest)quest.pendingItems=quest.pendingItems.map(remap);
     p.equipment=Object.fromEntries(Object.entries(p.equipment).map(([slot,item])=>[slot,item?remap(item):undefined]));
     const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
     p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
-    Object.assign(p,normalizeProgressionV3(p));this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
+    Object.assign(p,normalizeProgressionV3(p));this.migrateAccessories(p);Object.assign(p,initializeStarterQuests(p));this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
     const oldPosition={x:p.x,z:p.z};
     if(this.finalWorld)p.spaceId='surface';
     Object.assign(p,this.collision.findNearestFree(this.finalWorld?this.finalWorld.start:legacyTerritoryPosition(p),.46));
@@ -255,7 +261,7 @@ export class WorldSimulation {
       ...this.startPoint(), ...calculated, ...motion(this.state.time), id:this.identifier(),name:name.trim().slice(0,24)||'Странник',classId,
       level:1,xp:0,gold:320,hp:calculated.maxHp,mp:calculated.maxMp,
       inventory:[this.item('potion',6),this.item('ether',4),this.item('teleport'),...(classId==='knight'?Object.values(starterGear):[])],equipment,
-      storage:[],lootBuffer:[],migrationReserve:[],accessoryMigrationVersion:ACCESSORY_MIGRATION_VERSION,quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
+      storage:[],lootBuffer:[],migrationReserve:[],accessoryMigrationVersion:ACCESSORY_MIGRATION_VERSION,starterProgress:{version:1,quests:{}},quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
       buffs:{guard:0,vanish:0,haste:0},activeUntil:0,lastInputSequence:-1,lastInputAt:0,
       direction:{x:0,z:0},destination:null,target:null,skill:null,generation:1,
     };
@@ -283,7 +289,7 @@ export class WorldSimulation {
   }
   input(id: string, sequence: number, intent: WorldIntent): void {
     const p=this.character(id);
-    if(!intent||typeof intent!=='object'||!['direction','destination','attack','jump','cancel'].includes(intent.type))throw Error('invalid-intent');
+    if(!intent||typeof intent!=='object'||!['direction','destination','attack','jump','cancel','selectTarget'].includes(intent.type))throw Error('invalid-intent');
     if (!Number.isSafeInteger(sequence) || sequence <= p.lastInputSequence || p.dead) return;
     if (intent.type==='direction' || intent.type==='destination') {
       if (![intent.x,intent.z].every(Number.isFinite)) throw Error('invalid-position');
@@ -291,6 +297,11 @@ export class WorldSimulation {
     }
     if(intent.type==='attack'&&intent.mode!==undefined&&!['single','auto'].includes(intent.mode))throw Error('invalid-attack-mode');
     p.lastInputSequence=sequence;p.lastInputAt=this.state.time;
+    if(intent.type==='selectTarget'){
+      const target=this.state.monsters.find(m=>m.uid===intent.entityId&&m.alive&&sameSpace(p,m));
+      if(!target||distance(p,target)>60)throw Error('missing-target');if(!this.lineOfSight(p,target))throw Error('target-occluded');
+      this.starterEvent(p,{kind:'target',speciesId:target.id,entityUid:target.uid,generation:target.generation,locationId:this.starterLocation(target)});return;
+    }
     if(intent.type==='jump'){
       if(this.motor(p).requestJump()){const direction=p.direction;this.cancelControl(p,false,true);p.direction=direction;p.grounded=false;p.verticalVelocity=8.2;p.locomotionState='jump_start';this.action(p,'jump');}return;
     }
@@ -302,7 +313,11 @@ export class WorldSimulation {
     if(intent.type==='destination'){
       this.cancelControl(p,false,true);p.destination={...this.collisionFor(p).findNearestFree({x:intent.x,z:intent.z},.46),spaceId:p.spaceId};return;
     }
-    if(intent.type==='cancel'){this.cancelControl(p,true,Boolean(intent.preserveAuto));return;}
+    if(intent.type==='cancel'){
+      const hadMovement=Boolean(p.destination)||Math.hypot(p.direction.x,p.direction.z)>.01||Math.hypot(p.velocityX??0,p.velocityZ??0)>.01;
+      this.cancelControl(p,true,Boolean(intent.preserveAuto));
+      if(hadMovement)this.starterEvent(p,{kind:'movementCancelled',hadMovement:true,locationId:this.starterLocation(p)});return;
+    }
     if(intent.skill!==null)throw Error('book-required');
     if(intent.skill!==null&&(!Number.isInteger(intent.skill)||intent.skill<0||intent.skill>3))throw Error('invalid-skill');
     const skill=intent.skill===null?undefined:CLASSES[p.classId as ClassId].skills[intent.skill] as Skill;
@@ -315,6 +330,7 @@ export class WorldSimulation {
     if(skill&&p.cooldowns[intent.skill!]>this.state.time)throw Error('skill-cooldown');
     if(active&&skill)this.cancelAttack(p.id);
     if(self){this.selfSkill(p,intent.skill!,skill!);return;}
+    this.starterEvent(p,{kind:'target',speciesId:target!.id,entityUid:target!.uid,generation:target!.generation,locationId:this.starterLocation(target!)});
     if(active&&p.target!==target!.uid)this.cancelAttack(p.id);
     p.target=target!.uid;p.skill=intent.skill;p.destination=null;p.direction={x:0,z:0};p.bufferedSkill=undefined;
     if(intent.skill===null){p.autoAttack=intent.mode==='auto';p.singleAttack=!p.autoAttack;}
@@ -371,6 +387,15 @@ export class WorldSimulation {
       return;
     }
     if (p.dead) throw Error('dead');
+    if(command.type==='starterQuest'){
+      const services=this.finalWorld?.services??SERVICES,position=services['npc:elder'];if(!position)throw Error('elder-unavailable');
+      const context={npcId:'npc:elder',position,now:this.state.time,heightDifference:this.terrainFor(p).supportAt(p.x,p.z)+p.yOffset-this.terrainFor(position).supportAt(position.x,position.z),lineOfSight:(a:Position,b:Position)=>this.lineOfSight(a,b)};
+      if(command.action==='accept'){Object.assign(p,acceptStarterQuest(p,command.questId,context));return {questId:command.questId,status:starterQuestViews(p).find(q=>q.id===command.questId)!.status};}
+      if(command.action!=='claim')throw Error('invalid-quest-action');
+      if(sameSpace(p,position)&&distance(p,position)<=3.2&&this.lineOfSight(p,position))this.starterEvent(p,{kind:'service',npcId:'npc:elder',locationId:this.starterLocation(p)});
+      const oldLevel=p.level,result=claimStarterQuest(p,command.questId,context,this.identifier);Object.assign(p,result.state);
+      if(p.level>oldLevel){this.recalculate(p);p.hp=p.maxHp;p.mp=p.maxMp;}return result.outcome;
+    }
     if(command.type==='craftRing'){
       this.validateCraftPosition(p);
       const result=craftRing(p,command,this.random,this.identifier);p.inventory=result.inventory;p.gold=result.gold;return result.outcome;
@@ -447,10 +472,11 @@ export class WorldSimulation {
       p.gold-=book.price;return;
     }
     if (command.type==='buy') {
-      if(['ring_blank','cloak_defense'].includes(command.itemId)){
+      if(['ring_blank','cloak_defense'].includes(command.itemId)||Object.hasOwn(STARTER_ITEMS,command.itemId)){
         const npcId=['npc:smith','npc:asterhold:smith'].find(id=>{try{this.tradeService(p,id);return true;}catch{return false;}});
         if(!npcId)throw Error('shop-unavailable');
-        const definition=ITEMS[command.itemId as 'ring_blank'|'cloak_defense'];
+        const definition=ITEMS[command.itemId as 'ring_blank'|'cloak_defense'|keyof typeof STARTER_ITEMS];
+        if('classes' in definition&&!definition.classes.includes(p.classId))throw Error('class-restricted');
         if(p.gold<definition.buyPrice)throw Error('insufficient-gold');
         if(this.addInventoryItem(p,this.item(command.itemId))==='full')throw Error('bag-full');
         p.gold-=definition.buyPrice;return;
@@ -524,7 +550,7 @@ export class WorldSimulation {
       ...(this.state.bookAreas??[]).filter(a=>a.remaining>0).map(a=>({id:a.owner+':'+a.id,kind:'area' as const,owner:a.owner,point:a.point,radius:a.radius,expiresAt:a.nextAt+(a.remaining-1)*a.interval,effect:a.fx})),
       ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'}))
     ];
-    return structuredClone({craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
+    return structuredClone({starterQuests:starterQuestViews(character),craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
       monsters:this.state.monsters.filter(m=>sameSpace(m,character)&&(!this.finalWorld||distance(m,character)<135)).map((m):WorldMonster=>({...m,bodyRadius:this.bodyRadius(m),attackRange:this.monsterRange(m),aiState:m.alive?(this.brains.get(m.uid)?.state??'spawn'):this.state.time<(m.deathAt??0)+REFERENCE_DEATH_MS?'dead':this.state.time<(m.corpseUntil??0)?'corpse':'despawn'})),summons:this.state.summons.filter(m=>sameSpace(m,character)),events:this.events.filter(e=>e.sequence>afterEvent&&(!this.finalWorld||e.spaceId===spaceOf(character)))});
   }
@@ -614,6 +640,10 @@ export class WorldSimulation {
       actor.velocityX=dead?0:(actor.x-before.x)/dt;actor.velocityZ=dead?0:(actor.z-before.z)/dt;
     }
     for(const id of this.tradeSessions.keys())this.pruneTradeSession(this.character(id));
+    if(this.state.time>=this.nextStarterObservation){
+      this.nextStarterObservation=this.state.time+250;
+      for(const p of observers)this.observeStarterQuests(p);
+    }
   }
   private expireDeadlines(): void {
     this.books.tick();this.state.bookAreas=this.state.bookAreas?.filter(a=>a.remaining>0);this.state.bookTraps=this.state.bookTraps?.filter(t=>t.expiresAt>this.state.time);
@@ -867,6 +897,7 @@ export class WorldSimulation {
       for(const player of Object.values(this.state.characters))if(player.target===m.uid)this.cancelControl(player);
       this.state.pending=this.state.pending.filter(a=>a.target!==m.uid);
       const owner=this.state.characters[m.owner]??p;owner.kills++;if('boss' in def)owner.bossKills++;
+      this.starterEvent(owner,{kind:'kill',speciesId:m.id,entityUid:m.uid,generation:m.generation,locationId:this.finalWorld?.slotById.get(m.uid)?.locationId??this.starterLocation(m)});
       const earnedXp=Math.round(def.xp*this.xpRate);const gained=applyExperience(owner.level,owner.xp,earnedXp);owner.level=gained.level;owner.xp=gained.xp;
       if(gained.levelsGained){this.recalculate(owner);if(!owner.dead){owner.hp=owner.maxHp;owner.mp=owner.maxMp;}}
       const gold=Math.floor(def.gold[0]+this.random()*(def.gold[1]-def.gold[0]+1));owner.gold+=gold;
@@ -1053,6 +1084,36 @@ export class WorldSimulation {
     if((p.buffs.haste??0)>this.state.time){p.stats.speed*=1.5;p.stats.attackInterval!/=1.15;}
     p.stats.manaRegen=manaRegenerationPerSecond(p.classId,p.maxMp,p.stats);
     p.hp=Math.min(p.hp,p.maxHp);p.mp=Math.min(p.mp,p.maxMp);
+  }
+  private starterLocation(p:Position):string {
+    if(spaceOf(p)!=='surface')return '';
+    if(this.finalWorld)return this.finalWorld.layout.locations.find((location:any)=>inPolygon(p.x,-p.z,location.outline_xz))?.id??'';
+    // The old diagnostic territory has no canonical polygons. Its bounded Greenfall surroundings are the only fallback.
+    return Math.abs(p.x-FORT.x)<=FORT.width/2+45&&Math.abs(p.z-FORT.z)<=FORT.depth/2+45?STARTER_LOCATION_ID:'';
+  }
+  private starterEvent(p:WorldCharacter,event:StarterQuestEvent):void {
+    p.starterProgress=recordStarterQuestEvent(p,event).starterProgress;
+  }
+  private observeStarterQuests(p:WorldCharacter):void {
+    if(!p.starterProgress||!Object.values(p.starterProgress.quests).some(q=>q&&['active','ready'].includes(q.status)))return;
+    const nearby=this.activeMonsters.filter(m=>m.alive&&sameSpace(m,p)&&distance(m,p)<110);
+    const grouped=new Map<string,WorldMonster[]>();
+    for(const m of nearby){
+      if(!['spider','v3_forest_boar'].includes(m.id)||(this.finalWorld?.slotById.get(m.uid)?.locationId??this.starterLocation(m))!==STARTER_LOCATION_ID)continue;
+      const key=m.id+':'+(this.finalWorld?.slotById.get(m.uid)?.groupId??m.regionId??m.id);const group=grouped.get(key)??[];group.push(m);grouped.set(key,group);
+    }
+    const groups=[...grouped].map(([id,mobs])=>{
+      const center={x:mobs.reduce((n,m)=>n+m.home.x,0)/mobs.length,z:mobs.reduce((n,m)=>n+m.home.z,0)/mobs.length,spaceId:p.spaceId};
+      const extent=Math.max(...mobs.map(m=>distance(center,m.home))),aggro=Math.max(...mobs.map(m=>this.finalWorld?.slotById.get(m.uid)?.aggroRadius??SPAWN_REGIONS.find(r=>r.id===m.regionId)?.aggroRadius??9));
+      return {id,speciesId:mobs[0].id,center,aliveCount:mobs.length,radius:extent+aggro+5,visible:mobs.some(m=>this.lineOfSight(p,m))};
+    });
+    const inCombat=Boolean(p.target||p.autoAttack||p.singleAttack||(p.hitUntil??0)>this.state.time||
+      this.state.pending.some(a=>a.actor===p.id||a.target===p.id||a.owner===p.id)||this.state.projectiles?.some(a=>a.actor===p.id)||nearby.some(m=>m.targetId===p.id||m.provokedBy===p.id));
+    const cityServices=Object.entries(this.finalWorld?.services??SERVICES).filter(([id,point])=>['npc:elder','npc:smith','npc:alchemist','npc:shop','npc:storage'].includes(id)&&sameSpace(p,point));
+    const serviceNpcId=cityServices.find(([,point])=>distance(p,point)<=3.2&&this.lineOfSight(p,point))?.[0];
+    const cityInterior=cityServices.some(([,point])=>distance(p,point)<=12&&this.lineOfSight(p,point));
+    p.starterProgress=observeStarterQuestObjectives(p,{now:this.state.time,generation:p.generation,locationId:this.starterLocation(p),grounded:p.grounded,speed:p.stats.speed,
+      standing:Math.hypot(p.velocityX??0,p.velocityZ??0)<.05,safe:this.safe(p),cityInterior,inCombat,groups,serviceNpcId}).starterProgress;
   }
   private migrateEquipment(p:WorldCharacter):void {
     for(const [slot,item] of Object.entries(p.equipment)){if(!item)continue;const def=itemDef(item);if(def.classes&&!def.classes.includes(p.classId)){delete p.equipment[slot];if(p.inventory.length<42)p.inventory.push(item);else p.lootBuffer.push(item);}}

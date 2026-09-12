@@ -4,6 +4,9 @@ import { migrateScrollSave } from '../core/enhancement-v2.ts';
 import { compatibleEquipmentSlots } from '../core/inventory-commands.ts';
 import type { InventoryItem } from '../core/inventory-commands.ts';
 import type {ItemStatContribution} from '../core/item-progression.ts';
+import {starterQuestDefinition,starterRewardIds} from '../data/starter-progression-v3.ts';
+import type {StarterQuestId,StarterEvidence} from '../data/starter-progression-v3.ts';
+import type {StarterProgress,StarterQuestStatus} from '../core/starter-quests-v3.ts';
 import type {LegacyProgression} from '../core/progression-migration-v3.ts';
 
 const invalid = (): never => { throw Error('invalid-beta-save: original data retained'); };
@@ -58,6 +61,24 @@ export function parseBetaSave(raw: unknown) {
     if ('classes' in definition && Array.isArray(definition.classes) && !definition.classes.includes(classId)) return invalid();
     equipment[slot] = i;
   }
+  let starterProgress:StarterProgress|undefined;
+  if(player.starterProgress!==undefined){
+    const progress=record(player.starterProgress);integer(progress.version,1,1);starterProgress={version:1,quests:{}};
+    for(const [id,value] of Object.entries(record(progress.quests))){
+      let definition;try{definition=starterQuestDefinition(id);}catch{return invalid();}
+      const q=record(value),kills=integer(q.kills,0,definition.killCount),keys=q.killKeys,flags=q.evidence;
+      if(!Array.isArray(keys)||keys.length!==kills||keys.some(k=>typeof k!=='string'||!k||k.length>500)||new Set(keys).size!==keys.length||
+        !Array.isArray(flags)||flags.some(f=>!definition.evidence.includes(f))||new Set(flags).size!==flags.length||typeof q.xpGranted!=='boolean'||
+        !['active','ready','reward-pending','claimed'].includes(String(q.status)))return invalid();
+      const pendingItems=items(q.pendingItems,2),rewardIds=starterRewardIds(id,classId);
+      if(pendingItems.some(i=>i.plus!==0||i.count!==1||!rewardIds.includes(i.id as typeof rewardIds[number]))||new Set(pendingItems.map(i=>i.id)).size!==pendingItems.length)return invalid();
+      const completed=kills===definition.killCount&&definition.evidence.every(f=>flags.includes(f));
+      if((q.status==='active'||q.status==='ready')&&(q.xpGranted||pendingItems.length)||q.status==='ready'&&!completed||
+        (q.status==='claimed'||q.status==='reward-pending')&&(!q.xpGranted||!completed)||q.status==='claimed'&&pendingItems.length||q.status==='reward-pending'&&!pendingItems.length)return invalid();
+      starterProgress.quests[id as StarterQuestId]={status:q.status as StarterQuestStatus,kills,killKeys:keys as string[],evidence:flags as StarterEvidence[],acceptedAt:finite(q.acceptedAt,0,Number.MAX_SAFE_INTEGER),xpGranted:q.xpGranted,pendingItems};
+    }
+    if(progress.legacy!==undefined)starterProgress.legacy=structuredClone(record(progress.legacy));
+  }
   const migrated = migrateScrollSave({schema:integer(save.schema??1,1,2),player:{inventory},lootBuffer,
     legacyScrolls:integer(save.legacyScrolls??0,0)});
   if (save.betaScrollGrant !== undefined && save.betaScrollGrant !== BETA_SCROLL_GRANT) return invalid();
@@ -72,7 +93,7 @@ export function parseBetaSave(raw: unknown) {
   return {
     name:player.name.trim(),classId,legacyProgression,level:integer(player.level,1,100),xp:integer(player.xp,0),gold:integer(player.gold,0),
     x:finite(player.x,-158,158),z:finite(player.z,-138,138),hp,mp:finite(player.mp,0,Number.MAX_SAFE_INTEGER),
-    dead:Boolean(player.dead || hp <= 0),inventory:migrated.player.inventory,equipment,lootBuffer:migrated.lootBuffer,storage,migrationReserve,
+    dead:Boolean(player.dead || hp <= 0),inventory:migrated.player.inventory,equipment,lootBuffer:migrated.lootBuffer,storage,migrationReserve,starterProgress,
     quest:integer(save.quest??0,0,4),kills:integer(save.kills??0,0),bossKills:integer(save.bossKills??0,0),
     legacyScrolls:migrated.legacyScrolls,betaScrollGrant:save.betaScrollGrant as string|undefined,
   };

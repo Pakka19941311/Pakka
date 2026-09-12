@@ -56,6 +56,7 @@ var player_input: VarendorPlayerInput = VarendorPlayerInput.new()
 var npc_interaction: VarendorNpcInteraction = VarendorNpcInteraction.new()
 var trade_session = preload("res://scripts/trade_session.gd").new()
 var crafting = preload("res://scripts/crafting_dialog.gd").new()
+var starter_quests = preload("res://scripts/starter_quests.gd").new()
 var mouse_orbit: bool:
 	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
@@ -83,6 +84,7 @@ var loading_status: Label
 func _ready() -> void:
 	trade_session.app = self
 	crafting.app = self
+	starter_quests.app = self
 	if "--qa-scope=monsters" in OS.get_cmdline_user_args():
 		set_process(false)
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/monster_qa.tscn")
@@ -805,18 +807,7 @@ func open_npc_service(id: String) -> void:
 		return
 	id = "npc:"+kind
 	if id == "npc:elder":
-		var box: VBoxContainer = dialog(str(service.get("name","Старейшина")),Vector2i(480,240))
-		var progress: Array[String] = ["За стенами снова слышен вой. Восемь тварей — и я поверю, что ты способен пережить эту ночь.","Очищай дорогу за стенами города. Побеждено тварей: %d / 8." % mini(int(net.hero.kills),8),("Теперь отыщи Кровавого Оборотня в снежных горах." if world.final_environment != null else "Теперь отыщи Кровавого Оборотня в Чёрном лесу."),("Победи Хозяина Гнилого Леса у древнего дерева в гнилой чаще." if world.final_environment != null else "Спустись к шахте и победи Хозяина Гнилого Леса."),"Ты прошёл этот путь. Продолжай охоту и укрепляй своё снаряжение."]
-		var quest_text: Label = label(progress[clampi(int(net.hero.quest),0,4)])
-		quest_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		box.add_child(quest_text)
-		var accept: Button = button("Я очищу дорогу" if int(net.hero.quest) == 0 else "Продолжить",func():
-			if int(net.hero.quest) == 0:
-				await net.command({"type":"quest"})
-				if int(net.hero.quest) == 1: notice("Задание принято: очистить дорогу за городом")
-			if int(net.hero.quest) > 0: close_dialog())
-		accept.set_meta("npc_action","quest")
-		box.add_child(accept)
+		starter_quests.open()
 	elif id == "npc:smith":
 		inventory_panel.show()
 		refresh_inventory()
@@ -996,6 +987,7 @@ func text_focused() -> bool:
 func _process(delta: float) -> void:
 	trade_session.poll()
 	crafting.poll()
+	starter_quests.poll()
 	if not startup_complete or world == null or net == null:
 		return
 	# The frame's catch-up physics belongs to the previously held input.

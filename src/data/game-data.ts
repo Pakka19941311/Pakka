@@ -1,6 +1,7 @@
 import {CAVE_BOSS_DEFINITION} from './cave-boss.ts';
 import { BOOK_ITEMS } from './skill-books.ts';
 import {RING_ITEMS,CLOAK_ITEMS,CRAFT_MATERIAL_ITEMS} from './accessories-v3.ts';
+import {STARTER_ITEMS} from './starter-progression-v3.ts';
 // Centralized gameplay manifest. Presentation code must not invent balance values.
 export const CLASSES = {
   knight: { name:'Рыцарь', title:'Несокрушимый авангард', model:'Warrior', color:0xcda15d, resource:'Ярость', ranged:false, hp:642, mp:96, stats:{str:12,dex:6,int:2,vit:14,spi:4}, weapon:'wardens_blade', armor:'militia_plate', skills:[
@@ -85,7 +86,7 @@ export const ITEMS = {
   fire_core:{"name":"Огненное ядро","type":"material","icon":"◆","value":45,"origin":"Разлом големов"},
   ice_core:{"name":"Ледяное ядро","type":"material","icon":"◆","value":45,"origin":"Разлом големов"},
   ancient_shard:{"name":"Осколок древнего камня","type":"material","icon":"◆","value":90,"origin":"Разлом големов"},
-  ...RING_ITEMS,...CLOAK_ITEMS,...CRAFT_MATERIAL_ITEMS,
+  ...RING_ITEMS,...CLOAK_ITEMS,...CRAFT_MATERIAL_ITEMS,...STARTER_ITEMS,
 };
 
 export const MONSTERS = {

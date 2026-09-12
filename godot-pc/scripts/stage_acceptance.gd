@@ -19,6 +19,7 @@ static func run(app: Node) -> void:
 	if block in ["all","drag","ui-v3"]: await drag(app,checks)
 	if block == "ui-v3": await stats_view(app,checks)
 	if block == "craft": await preload("res://scripts/craft_acceptance.gd").run(app,checks)
+	if block == "starter": await preload("res://scripts/starter_quests_acceptance.gd").run(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)

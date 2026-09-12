@@ -40,6 +40,7 @@ var expected_map: String = ""
 var incompatible: bool = false
 var session_generation: int = 0
 var craft_recipes: Array = []
+var starter_quests: Array = []
 
 func _ready() -> void:
 	for arg: String in OS.get_cmdline_user_args():
@@ -109,6 +110,7 @@ func accept(value: Dictionary) -> void:
 		stop_input_transport()
 	hero = value.character
 	craft_recipes = value.get("craftRecipes",[])
+	starter_quests = value.get("starterQuests",[])
 	sequence = maxi(sequence, int(hero.get("lastInputSequence", 0)))
 	connected = true
 	snapshot_received.emit(value)
@@ -126,6 +128,7 @@ func end_session() -> void:
 	token = ""
 	hero = {}
 	craft_recipes = []
+	starter_quests = []
 	connected = false
 	session_busy = false
 	command_busy = false
@@ -361,6 +364,9 @@ func command(value: Dictionary, retry: bool = false) -> void:
 			var outcome = receipt.get("outcome")
 			if outcome is Dictionary and outcome.has("recipeId") and outcome.has("success"):
 				notice.emit("Крафт успешен. Кольцо добавлено в сумку." if outcome.success else "Крафт не удался. Основа, материалы и золото израсходованы.")
+			elif outcome is Dictionary and outcome.has("questId"):
+				if int(outcome.get("xpAwarded",0)) > 0: notice.emit("Поручение выполнено: +%d опыта" % int(outcome.xpAwarded))
+				if not outcome.get("pendingItemUids",[]).is_empty(): notice.emit("Награда сохранена у Роэна. Освободите место в сумке.")
 			elif outcome is Dictionary and outcome.has("success") and outcome.has("from") and outcome.has("to"):
 				notice.emit("Заточка успешна: +%d → +%d" % [outcome.from, outcome.to] if outcome.success else "Заточка не удалась. Предмет разрушен.")
 		else:

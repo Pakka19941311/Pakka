@@ -41,9 +41,10 @@ test('enhanceable gear gains integer power; ring stats ignore forbidden plus val
   }
 });
 
-test('every weapon has explicit accuracy and higher-tier boss weapons retain greater power and accuracy at every level', () => {
-  for (const [, definition] of gear.filter(([, item]) => item.slot === 'weapon')) {
-    assert.ok(Number.isInteger(definition.accuracy) && definition.accuracy > 0);
+test('legacy weapons retain explicit accuracy while exact starter stats add no invented bonus; boss tiers remain stronger', () => {
+  for (const [id, definition] of gear.filter(([, item]) => item.slot === 'weapon')) {
+    if(id.startsWith('starter_'))assert.equal(definition.accuracy??0,id==='starter_weapon_ranger'?2:0);
+    else assert.ok(Number.isInteger(definition.accuracy) && definition.accuracy > 0);
   }
   for (let plus = 0; plus <= 15; plus++) {
     const sword = itemStatContribution(ITEMS.wardens_blade, plus);

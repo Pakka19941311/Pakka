@@ -8,6 +8,7 @@ import {startWorldServer} from '../../server/http-server.mjs';
 import {FinalWorld} from '../../src/world/final-world.ts';
 import {RING_RECIPES} from '../../src/data/accessories-v3.ts';
 import {ITEMS} from '../../src/data/game-data.ts';
+import {recordStarterQuestEvent} from '../../src/core/starter-quests-v3.ts';
 const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
 const castlePreview=options.includes('--castle-preview'),castle=options.includes('--castle')||castlePreview,reportName=castle?'castle.json':'stage.json';
 mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
@@ -36,6 +37,24 @@ try{
   else if(request.stage.startsWith('trade-')){
    const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');
    world.relocate(hero,{...geography.services[id],x:geography.services[id].x+2});
+  }
+  else if(request.stage==='starter-v3'){
+   Object.assign(hero,{level:1,xp:0,gold:1000,inventory:[],equipment:{},starterProgress:{version:1,quests:{}}});world.recalculate(hero);hero.hp=hero.maxHp;
+   world.relocate(hero,{...geography.services['npc:elder'],x:geography.services['npc:elder'].x+2});
+  }
+  else if(request.stage==='starter-ready-101'){
+   // UI transaction fixture only; field/route evidence is tested separately using live movement.
+   for(let i=0;i<5;i++)Object.assign(hero,recordStarterQuestEvent(hero,{kind:'kill',speciesId:'spider',entityUid:'qa-slime-'+i,generation:1,locationId:'L02'}));
+   Object.assign(hero,recordStarterQuestEvent(hero,{kind:'inspect',checkpointId:'starter:greenfall-outskirts',locationId:'L02'}));
+  }
+  else if(request.stage==='starter-level-seven'){hero.level=7;hero.xp=0;world.recalculate(hero);}
+  else if(request.stage==='starter-ready-105'){
+   while(hero.inventory.length<41)hero.inventory.push(world.item('potion'));
+   for(let i=0;i<6;i++)Object.assign(hero,recordStarterQuestEvent(hero,{kind:'kill',speciesId:'v3_armored_beetle',entityUid:'qa-beetle-'+i,generation:1,locationId:'L02'}));
+   Object.assign(hero,recordStarterQuestEvent(hero,{kind:'cityReturn',cityId:'greenfall',safe:true,locationId:'L02'}));
+  }
+  else if(request.stage==='starter-free-cell'){
+   const index=hero.inventory.findIndex(i=>i.id==='potion');assert.ok(index>=0);hero.inventory.splice(index,1);
   }
   else if(request.stage==='craft-v3'){
    const recipe=RING_RECIPES.find(r=>r.id==='ring_str_g1');

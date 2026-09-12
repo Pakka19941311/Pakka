@@ -244,11 +244,15 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 	if kind == "smith": purchase.add_child(app.wrapped_label("Кузница: выберите свиток в сумке, затем предмет для усиления.",12))
 	if kind == "books": purchase.add_child(app.button("Книги умений · выбрать класс",app.book_ui.shop_classes))
 	var stock: Array = [] if kind == "books" else ["ring_blank","cloak_defense"] if kind == "smith" else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]
+	if kind == "smith":
+		for id: String in app.data.items:
+			var item: Dictionary = app.data.items[id]
+			if str(item.get("category","")) == "starter" and str(app.net.hero.classId) in item.get("classes",[]): stock.append(id)
 	for id: String in stock:
 		if not app.data.items.has(id): continue
 		var row: HBoxContainer = HBoxContainer.new(); row.add_theme_constant_override("separation",12); purchase.add_child(row)
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id; cell.custom_minimum_size = CELL
-		cell.artwork = app.book_ui.item_icon({"id":id}); row.add_child(cell)
+		cell.artwork = app.book_ui.item_icon({"id":id}); cell.tooltip_text = app.item_tip({"id":id,"plus":0,"count":1}); row.add_child(cell)
 		var price: int = int(app.data.items[id].get("buyPrice",{"haste":100,"potion":55,"potion_large":110,"ether":70,"teleport":130}.get(id,0)))
 		var column: VBoxContainer = VBoxContainer.new(); column.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(column)
 		column.add_child(app.label(str(app.data.items[id].name),13))

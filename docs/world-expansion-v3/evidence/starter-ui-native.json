@@ -1,0 +1,38 @@
+{
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "checks": {
+    "connected": true,
+    "starter_accept_actual_command": true,
+    "starter_active_not_claimable": true,
+    "starter_class_weapon_once": true,
+    "starter_close_does_not_accept": true,
+    "starter_five_named_quests": true,
+    "starter_fixed_xp": true,
+    "starter_full_bag_pending": true,
+    "starter_items_unique": true,
+    "starter_later_quest_independent": true,
+    "starter_level_locks": true,
+    "starter_partial_two_item_reward": true,
+    "starter_pending_no_extra_xp": true,
+    "starter_pending_xp_once": true,
+    "starter_quest_click_no_movement": true,
+    "starter_recover_pending_item": true,
+    "starter_reopen_preserves_pending": true,
+    "starter_repeat_no_reward": true,
+    "starter_reward_claimed": true,
+    "starter_smith_class_stock": true,
+    "starter_ui_completed": true
+  },
+  "ok": true,
+  "source_client": true,
+  "packaged_zip": false,
+  "personal_save_used": false,
+  "visual_inspected": true,
+  "scope": "Native starter UI and HTTP reward transactions; objective completion seeded by internal fixture, live field route acceptance separate",
+  "evidence": "work/qa/v3-starter-native-01",
+  "gdscript_errors": 0,
+  "environment_warnings": [
+    "restricted user shader cache",
+    "root certificate store"
+  ]
+}

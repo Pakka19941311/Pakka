@@ -437,9 +437,7 @@ func refresh(hero: Dictionary) -> void:
 		elif key == "manaRegen": value = "%.2f" % float(hero.stats.get("manaRegen",0))
 		elif key == "evasion": value = stat_number(hero.stats.get(key,0))
 		app.stat_values[key].text = value
-	var quests: Array = [["Голос границы","Поговорите со старостой Гринфолла."],["Кровь на дороге","Победите тварей рубежа: %d / 8" % mini(int(hero.get("kills",0)),8)],["Вой стаи","Отыщите Кровавого Оборотня в Чёрном лесу."],["Печать владыки","Спуститесь к шахте и победите Хозяина Гнилого Леса."],["Первый след","Вертикальный срез пройден. Продолжайте охоту и заточку."]]
-	var quest: Array = quests[clampi(int(hero.get("quest",0)),0,4)]
-	region_text.text = "Путь странника\n"+quest[0]+"\n"+quest[1]+"\n\nВладыки региона\n"
+	region_text.text = app.starter_quests.tracker_text()+"\n\nВладыки региона\n"
 	for monster_id: String in ["mini","big","rift_boss"]:
 		var definition: Dictionary = app.data.monsters.get(monster_id,{})
 		if definition.is_empty(): continue
