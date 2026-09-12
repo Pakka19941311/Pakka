@@ -13,8 +13,14 @@ static func create_actor(world: VarendorWorld, id: String, role: String) -> Node
 	var profile: Dictionary = PROFILES[role]
 	var model: String = "P2CityMotion" + role.capitalize()
 	world.templates[model] = load("res://world-expansion-v3/city/motion/assets/P2_" + role + "_motion.glb")
-	VarendorWorld.monster_asset_profiles()[model] = {"sourceHeight":profile.body_height,"sourceFloor":0.0,"sourceWidth":.8,"sourceDepth":.55}
+	var bounds_profiles: Dictionary = VarendorWorld.monster_asset_profiles()
+	var previous_profile: Variant = bounds_profiles.get(model)
+	bounds_profiles[model] = {"sourceHeight":profile.body_height,"sourceFloor":0.0,"sourceWidth":.8,"sourceDepth":.55}
 	var actor: Node3D = world.make_actor(id,model,float(profile.body_height),"Страж" if role == "guard" else "Житель",Color("ddc4a4"))
+	# Bounds are needed only while the actor is constructed. Do not advertise
+	# these local resident assets as generated monsters to later world instances.
+	if previous_profile == null: bounds_profiles.erase(model)
+	else: bounds_profiles[model] = previous_profile
 	var visual: Node3D = actor.get_meta("visual")
 	visual.rotation.y = PI
 	actor.set_meta("base_visual",visual.transform)

@@ -41,6 +41,16 @@ try{
    const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');
    world.relocate(hero,{...geography.services[id],x:geography.services[id].x+2});
   }
+  else if(request.stage==='p2-npc'){
+   assert.equal(geography.populationMode,'starter-v3');
+   world.relocate(hero,{x:-90,z:-203,spaceId:'surface'});
+  }
+  else if(request.stage.startsWith('p2-npc-view|')){
+   const [,x,z]=request.stage.split('|'),point={x:Number(x),z:Number(z),spaceId:'surface'};
+   assert.ok(Number.isFinite(point.x)&&Number.isFinite(point.z)&&!geography.spaces.surface.collision.isBlocked(point,.46));
+   // Observer placement only: ambient NPCs keep their actual unmodified routes.
+   world.relocate(hero,point);
+  }
   else if(request.stage==='p2-city'||request.stage==='p2-cloak'){
    if(request.stage==='p2-cloak'){
     hero.level=60;

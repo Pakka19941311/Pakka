@@ -4,6 +4,8 @@ extends Node3D
 # Art selection stays client-only: server class model still owns attack timings.
 const P2_ADAPTER = preload("res://world-expansion-v3/actors/profile_adapter.gd")
 const CLOAK_VISUAL = preload("res://scripts/cloak_visual.gd")
+const P2_NPC_MOTION = preload("res://world-expansion-v3/city/motion/npc_motion_adapter.gd")
+const P2_NPC_ROLES: Dictionary = {"ambient:103":"guard","ambient:115":"resident"}
 const KNIGHT_MODEL: String = "ForgottenKnight"
 const KNIGHT_ASSET: String = "res://assets/knight/Knight_Modular.glb"
 const KNIGHT_SOURCE_HEIGHT: float = 1.84
@@ -332,16 +334,19 @@ func setup(game: Dictionary) -> bool:
 	# their static positions. Install each first pose before it can be rendered.
 	var resident_data: Dictionary = territory
 	if final_environment != null:
-		resident_data = final_environment.read_json("castle/courtyard.json")
+		resident_data = final_environment.read_json(final_environment.courtyard_path)
 		resident_data["services"] = VarendorNpcInteraction.SERVICES
 	ambient_residents.setup(collision,resident_data)
 	for resident: Dictionary in ambient_residents.sample():
-		var actor: Node3D = make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
+		var p2_role: String = str(P2_NPC_ROLES.get(str(resident.id),"")) if final_environment != null and final_environment.courtyard_path.ends_with("courtyard-p2.json") else ""
+		var actor: Node3D = P2_NPC_MOTION.create_actor(self,str(resident.id),p2_role) if not p2_role.is_empty() else make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
+		(actor.get_meta("screen_label") as Label).text = str(resident.name)
+		(actor.get_meta("label") as Label3D).text = str(resident.name)
 		initialize_pose(actor,point(resident.x,resident.z))
 		actor.rotation.y = -float(resident.yaw) + PI
 		actor.set_meta("motion",resident)
 		actor.set_meta("pickable",false)
-		if resident.get("civilian",false):
+		if resident.get("civilian",false) and p2_role.is_empty():
 			for piece: Node in (actor.get_meta("visual") as Node3D).find_children("*","MeshInstance3D",true,false):
 				if "sword" in str(piece.name).to_lower() or "bow" in str(piece.name).to_lower() or "dagger" in str(piece.name).to_lower(): piece.hide()
 	if final_environment != null: final_environment.setup_courtyard_life()
@@ -707,6 +712,8 @@ func _process(delta: float) -> void:
 				actor.position = point(pose.x,pose.z,pose.get("yOffset",0))
 				actor.rotation.y = -float(pose.get("yaw",0)) + PI
 		var rendered_velocity: Vector3 = (actor.position-before)/maxf(.0001,delta)
+		if actor.has_meta("p2_npc_role"):
+			actor.set_meta("p2_npc_travel",float(actor.get_meta("p2_npc_travel",0.0))+Vector2(actor.position.x-before.x,actor.position.z-before.z).length())
 		if id == hero_id:
 			# Gait covers the distance actually drawn, including bounded network
 			# correction; raw motor speed used to make the feet skate during it.
@@ -722,7 +729,13 @@ func _process(delta: float) -> void:
 		var pose_delta: float = float(actor.get_meta("pose_delta", 0.0)) + (delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
 		var interval: float = 0.0 if id == hero_id or id == target_id or distance_sq < 24.0*24.0 else .1 if distance_sq < 50.0*50.0 else .5
 		if pose_delta >= interval:
-			controller.update(motion,rendered_velocity,actor_clock,pose_delta)
+			if actor.has_meta("p2_npc_role"):
+				var travelled: float = float(actor.get_meta("p2_npc_travel",0.0))
+				var npc_state: String = "walk" if travelled>.001 else "talk" if motion.get("state","")=="activity" and motion.get("activity","")=="talk" else "idle"
+				P2_NPC_MOTION.advance_actor(actor,npc_state,pose_delta,travelled)
+				actor.set_meta("p2_npc_travel",0.0)
+			else:
+				controller.update(motion,rendered_velocity,actor_clock,pose_delta)
 			if actor.has_meta("cloak_visual"):
 				actor.get_meta("cloak_visual").tick(actor_clock,motion,rendered_velocity)
 			pose_delta = 0.0
