@@ -10,8 +10,8 @@ const distance=(a,b)=>Math.hypot(a.x-b.x,a.z-b.z),round=n=>Number(n.toFixed(3));
 const potionCount=s=>s.potions.reduce((n,item)=>n+item.count,0);
 const kept=id=>['potion','potion_large','ether','haste','teleport'].includes(id)||id.startsWith('starter_')||id.startsWith('book_');
 
-export function runPlus3Case(context,recipe){
- const d=enduranceDriver(context,{...recipe,plus:3}),initial=d.snapshot();
+export function runPlus3Case(context,recipe,{driverFactory=enduranceDriver}={}){
+ const d=driverFactory(context,{...recipe,plus:3}),initial=d.snapshot();
  const referenceEquipment=structuredClone(d.p().equipment),referenceStats=structuredClone(d.p().stats);
  const ranged=['mage','ranger','necro'].includes(recipe.classId),battles=[],used=new Set(),sales=[];
  let provisioned=null,provisionPurchases=0,failure=null,recoveryFailure=null,saleRevenue=0;
