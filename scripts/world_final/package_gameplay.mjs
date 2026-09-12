@@ -19,9 +19,9 @@ cpSync('packaging/windows/RUN_VARENDOR_PC.bat',join(destination,'RUN_VARENDOR.ba
 mkdirSync(join(destination,'licenses'),{recursive:true});
 cpSync(license,join(destination,'licenses/Godot.txt'));
 for(const [from,to] of [['public/assets/licenses','assets'],['public/assets/models/monsters-glb/licenses','monsters']])cpSync(from,join(destination,'licenses',to),{recursive:true});
-for(const from of ['art/knight-v2/LICENSES.md','art/forgotten-knight/LICENSES.md','docs/assets/world-source-manifest.json','art/world-final/nature-source/pine-wood/source.json','art/world-final/materials/snow_02/source.json','art/world-final/materials/rock_wall_02/source.json','godot-pc/world-expansion-v3/actors/CREDITS.md']){const to=join(destination,'licenses',from);mkdirSync(dirname(to),{recursive:true});cpSync(from,to);}
+for(const from of ['art/knight-v2/LICENSES.md','art/forgotten-knight/LICENSES.md','art/cloaks-v3/CREDITS.md','docs/assets/world-source-manifest.json','art/world-final/nature-source/pine-wood/source.json','art/world-final/materials/snow_02/source.json','art/world-final/materials/rock_wall_02/source.json','godot-pc/world-expansion-v3/actors/CREDITS.md']){const to=join(destination,'licenses',from);mkdirSync(dirname(to),{recursive:true});cpSync(from,to);}
 const artPacks=populationMode==='starter-v3'?stageArtPacks(root,destination,JSON.parse(readFileSync('docs/world-expansion-v3/P2_STANDALONE_ART_PACKS.json','utf8'))):undefined;
-if(populationMode==='starter-v3')for(const file of ['CREDITS.md','licenses/CC0-1.0.txt']){
+if(populationMode==='starter-v3')for(const file of ['CREDITS.md','licenses/CC0-1.0.txt','motion/CREDITS.md']){
  const target=join(destination,'licenses/city',file);mkdirSync(dirname(target),{recursive:true});cpSync('godot-pc/world-expansion-v3/city/'+file,target);
 }
 const config=JSON.parse(readFileSync('packaging/windows/node-runtime.json','utf8'));
