@@ -948,6 +948,7 @@ func show_release(event: Dictionary) -> void:
 		return
 	var source: Node3D = actors[str(event.actor)]
 	var target: Node3D = actors[str(event.target)]
+	if preload("res://scripts/golem_hit_visual.gd").show(self,event,source,target): return
 	var start: Vector3 = point(source.position.x,-source.position.z,1.4)
 	var end: Vector3 = point(target.position.x,-target.position.z,1.4)
 	var colors: Dictionary = {"fire":Color("ff7736"),"ice":Color("83ddff"),"lightning":Color("d7c2ff"),"poison":Color("91d45b"),"bone":Color("cbaddd"),"drain":Color("cf6689"),"shadow":Color("a882d8"),"arrow":Color("e5d1a1"),"slash":Color("f2dfb3")}

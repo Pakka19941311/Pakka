@@ -1,6 +1,7 @@
 import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss.ts';
 import {actorGeometryV3,bodyContactReach,ACTOR_GEOMETRY_VERSION} from '../data/actor-geometry-v3.ts';
 import {monsterInInterest} from '../network/monster-interest.ts';
+import {monsterReleaseEffect} from '../core/monster-release-effect.ts';
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
 import {p2Encounter,rollP2StarterLoot,P2_BALANCE_VERSION} from '../data/p2-encounters.ts';
@@ -810,7 +811,7 @@ export class WorldSimulation {
       const amount=p.buffs.guard>this.state.time?Math.max(1,Math.round(base*.5)):base;
       this.books.attacked(p,m);
       if(this.random()<(p2?1-enemyHitChanceV3(p2.accuracy,p.stats.evasion):Math.max(0,Math.min(.75,p.stats.evasion/100)))){this.event('miss',m.uid,p.id);return;}
-      p.hp=Math.max(0,p.hp-amount);p.hitUntil=this.state.time+180;if(attack?.release!==false)this.event('release',m.uid,p.id,{effect:'slash',durationMs:0,generation:p.generation});this.event('hit',m.uid,p.id,{amount,targetHp:p.hp,targetMaxHp:p.maxHp,targetGeneration:p.generation,generation:p.generation});
+      p.hp=Math.max(0,p.hp-amount);p.hitUntil=this.state.time+180;if(attack?.release!==false)this.event('release',m.uid,p.id,{effect:monsterReleaseEffect(m.id),durationMs:0,generation:p.generation});this.event('hit',m.uid,p.id,{amount,targetHp:p.hp,targetMaxHp:p.maxHp,targetGeneration:p.generation,generation:p.generation});
       if(!p.hp){p.dead=true;p.xp=Math.max(0,p.xp-Math.floor(p.xp*.05));this.cancelControl(p);this.action(p,'death');p.combatState='dead';this.motor(p).reset();p.yOffset=0;p.verticalVelocity=0;p.grounded=true;this.event('death',p.id,undefined,{generation:p.generation,position:{x:p.x,z:p.z,yOffset:p.yOffset,yaw:p.yaw}});this.checkpoint();}
   }
   private projectileTick(projectile:Projectile):void {
