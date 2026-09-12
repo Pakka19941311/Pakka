@@ -1,4 +1,5 @@
 extends RefCounted
+const DialogLease = preload("res://scripts/dialog_lease.gd")
 
 var app: Node
 var box: VBoxContainer
@@ -20,6 +21,7 @@ func active() -> bool:
 func open() -> void:
 	if active(): app.close_dialog(); return
 	if app.net.hero.is_empty(): return
+	local_busy = false
 	app.selected_scroll = {}; app.refresh_inventory()
 	inputs = [{},{},{},{}]; sockets.clear(); details.clear(); selected = 0; signature = ""
 	box = app.dialog("Крафт колец [J]",Vector2i(580,480))
@@ -138,6 +140,7 @@ func poll() -> void:
 
 func submit() -> void:
 	if not ready(): return
+	var lease: Dictionary = DialogLease.capture(app,box)
 	var command: Dictionary = {"type":"craftRing","recipeId":recipe.id,"target":inputs[0].duplicate(true),"materials":[inputs[1].duplicate(true),inputs[2].duplicate(true),inputs[3].duplicate(true)]}
 	local_busy = true; confirm.disabled = true
 	var response: Array = []
@@ -145,6 +148,7 @@ func submit() -> void:
 	app.net.receipt_received.connect(capture)
 	await app.net.command(command)
 	if app.net.receipt_received.is_connected(capture): app.net.receipt_received.disconnect(capture)
+	if not DialogLease.current(app,lease): return
 	local_busy = false
 	if not active(): return
 	if not response.is_empty() and bool(response.back().get("ok",false)): inputs = [{},{},{},{}]

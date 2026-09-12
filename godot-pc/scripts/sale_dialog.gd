@@ -1,4 +1,5 @@
 extends RefCounted
+const DialogLease = preload("res://scripts/dialog_lease.gd")
 
 static func amount(text: String, maximum: int) -> int:
 	var value: String = text.strip_edges()
@@ -11,6 +12,7 @@ static func open(app: Node, item: Dictionary, return_to: Callable = Callable()) 
 	var maximum: int = int(item.count)
 	var unit_price: int = app.item_sell_price(item)
 	var box: VBoxContainer = app.dialog("Продать предмет",Vector2i(500,280),true)
+	var lease: Dictionary = DialogLease.capture(app,box)
 	var header: HBoxContainer = HBoxContainer.new(); box.add_child(header)
 	var icon: TextureRect = TextureRect.new(); icon.texture = app.book_ui.item_icon(item)
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE; icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
@@ -36,11 +38,11 @@ static func open(app: Node, item: Dictionary, return_to: Callable = Callable()) 
 	field.text_changed.connect(refresh)
 	confirm.pressed.connect(func():
 		var quantity: int = amount(field.text,maximum)
-		if quantity == 0 or app.net.command_busy or not is_instance_valid(box) or not app.trade_session.allowed(): return
+		if quantity == 0 or app.net.command_busy or not DialogLease.current(app,lease) or not app.trade_session.allowed(): return
 		if not app.reference_hud.has_item_version(item): error.text = "Предмет уже изменился. Откройте продажу заново."; confirm.disabled = true; return
 		confirm.disabled = true
 		await app.net.command({"type":"sell","item":item.duplicate(true),"quantity":quantity,"trade":app.trade_session.command_reference()})
-		if not is_instance_valid(box): return
+		if not DialogLease.current(app,lease): return
 		var remainder: int = 0
 		for current: Dictionary in app.net.hero.inventory:
 			if current.uid == item.uid: remainder = int(current.count)

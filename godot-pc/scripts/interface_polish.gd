@@ -1,5 +1,6 @@
 class_name VarendorInterfacePolish
 extends RefCounted
+const DialogLease = preload("res://scripts/dialog_lease.gd")
 
 const CELL: Vector2 = Vector2(44,44)
 const ICON: Vector2 = Vector2(36,36)
@@ -217,6 +218,14 @@ func open_storage() -> void:
 	clamp_panel(storage_panel); app.reference_hud.clamp_inventory()
 	refresh_storage()
 
+func close_profile_views() -> void:
+	if is_instance_valid(storage_panel):
+		storage_panel.hide()
+		storage_panel.queue_free()
+	storage_panel = null
+	storage_slots.clear()
+	storage_signature = ""
+
 func refresh_storage() -> void:
 	if not is_instance_valid(storage_panel): return
 	var items: Array = app.net.hero.get("storage",[])
@@ -232,6 +241,7 @@ func refresh_storage() -> void:
 func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 	var can_sell: bool = kind in ["smith","alchemist"] and app.trade_session.allowed()
 	var body: VBoxContainer = app.dialog(title,Vector2i(480,350),can_sell)
+	var lease: Dictionary = DialogLease.capture(app,body)
 	body.add_child(app.label("Ваше золото: %d ◈" % int(app.net.hero.gold),13))
 	var tabs: TabContainer = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -258,9 +268,9 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 		column.add_child(app.label(str(app.data.items[id].name),13))
 		var desc: Label = app.label(str(app.data.items[id].get("desc","")),11); desc.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; column.add_child(desc)
 		var buy: Button = app.button("%d ◈" % price,func():
-			if app.net.command_busy: return
+			if app.net.command_busy or not DialogLease.current(app,lease): return
 			await app.net.command({"type":"buy","itemId":id})
-			if is_instance_valid(body): shop(kind,title,0))
+			if DialogLease.current(app,lease): shop(kind,title,0))
 		buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
 	if not can_sell: return
 	var drop_area = preload("res://scripts/sale_drop.gd").new()

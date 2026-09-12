@@ -19,11 +19,15 @@ func open(id: String) -> bool:
 	if id not in SELLERS or app.net.command_busy or not app.net.pending.is_empty(): return false
 	app.close_dialog()
 	var opened_revision: int = revision
+	var opened_session: int = app.net.session_generation
 	var response: Array = []
 	var capture: Callable = func(receipt: Dictionary): response.append(receipt)
 	app.net.receipt_received.connect(capture)
 	await app.net.command({"type":"tradeOpen","npcId":id})
 	if app.net.receipt_received.is_connected(capture): app.net.receipt_received.disconnect(capture)
+	# A capture can hear a newer profile's receipt while this request finishes.
+	# It must neither open that dialog nor enqueue its token for later closing.
+	if app.net.session_generation != opened_session: return false
 	if response.is_empty() or not bool(response.back().get("ok",false)): return false
 	var outcome: Dictionary = response.back().get("outcome",{})
 	if str(outcome.get("npcId","")) != id or str(outcome.get("token","")).is_empty(): return false
@@ -37,6 +41,11 @@ func open(id: String) -> bool:
 
 func command_reference() -> Dictionary:
 	return {"npcId":session.npcId,"token":session.token} if allowed() else {}
+
+func clear_session() -> void:
+	revision += 1
+	session = {}
+	closing_tokens.clear()
 
 func close() -> void:
 	revision += 1

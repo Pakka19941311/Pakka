@@ -82,12 +82,12 @@ static func run() -> Dictionary:
 	client.intent({"type":"attack", "entityId":"fox", "skill":null})
 	var queued_sequences: Array[int] = []
 	for entry: Dictionary in client.input_queue: queued_sequences.append(int(entry.sequence))
-	checks["network_worker_preserves_all_turns_heartbeats_and_neutral"] = queued_sequences == [1,2,3,4,5,6,7,8,9,10,11] and client.input_queue[1].value.z == 1 and client.input_queue[3].value.x == -1 and client.input_queue[7].value.z == -1 and client.input_queue[9].value == {"type":"direction","x":0.0,"z":0.0}
+	checks["network_reservation_preserves_prediction_for_turns_heartbeats_and_neutral"] = queued_sequences == [1,2,3,4,5,6,7,8,9,10,11] and client.input_queue[1].value.z == 1 and client.input_queue[3].value.x == -1 and client.input_queue[7].value.z == -1 and client.input_queue[9].value == {"type":"direction","x":0.0,"z":0.0}
 	checks["network_each_prediction_receives_unique_reserved_id_first"] = reserved == [1,2,3,4,5,6,7,8,9,10,11] and not reservation_was_first.has(false)
 	for reply: int in range(11): client.respond()
 	var sent_sequences: Array[int] = []
 	for request: Dictionary in client.requests: sent_sequences.append(int(request.payload.sequence))
-	checks["network_worker_dispatch_keeps_turn_jump_release_attack_order"] = sent_sequences == [1,2,3,4,5,6,7,8,9,10,11] and not client.input_busy and client.input_queue.is_empty()
+	checks["network_uncoalesced_test_transport_keeps_reserved_action_order"] = sent_sequences == [1,2,3,4,5,6,7,8,9,10,11] and not client.input_busy and client.input_queue.is_empty()
 	checks["network_queued_intents_are_copied_from_mutable_caller_data"] = client.requests[3].payload.intent.x == -1.0
 	client.end_session()
 	client.intent({"type":"jump"})

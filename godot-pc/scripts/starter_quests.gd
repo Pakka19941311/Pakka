@@ -1,4 +1,5 @@
 extends RefCounted
+const DialogLease = preload("res://scripts/dialog_lease.gd")
 
 var app: Node
 var box: VBoxContainer
@@ -12,6 +13,7 @@ func active() -> bool:
 
 func open() -> void:
 	if app.net.hero.is_empty(): return
+	local_busy = false
 	box = app.dialog("Роэн · Дороги Гринфолла",Vector2i(590,500))
 	box.add_child(app.button("Дальние поручения · уровни 10–40",func(): app.progression_quests.open("npc:elder")))
 	box.add_child(app.wrapped_label("За стенами каждый участок требует внимания. Выберите поручение по силам. Награда подходит вашему классу; получить её можно здесь, у Роэна.",13))
@@ -65,8 +67,10 @@ func update_buttons() -> void:
 
 func submit(quest_id: String, action: String) -> void:
 	if local_busy or app.net.command_busy or not app.net.pending.is_empty() or not app.net.connected: return
+	var lease: Dictionary = DialogLease.capture(app,box)
 	local_busy = true; update_buttons()
 	await app.net.command({"type":"starterQuest","questId":quest_id,"action":action})
+	if not DialogLease.current(app,lease): return
 	local_busy = false
 	if active(): refresh()
 

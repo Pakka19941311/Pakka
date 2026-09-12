@@ -1,5 +1,6 @@
 class_name VarendorBookUI
 extends RefCounted
+const DialogLease = preload("res://scripts/dialog_lease.gd")
 
 var app: Node
 var merchant_name: String = "Торговец Эдрик"
@@ -103,6 +104,7 @@ func click(screen: Vector2) -> bool:
 func catalogue(shop: bool = false, class_id: String = "") -> void:
 	if class_id.is_empty(): class_id = str(app.net.hero.get("classId","knight"))
 	var body: VBoxContainer = app.dialog(("Книготорговец · " if shop else "Мои книги · ")+str(app.data.classes[class_id].name),Vector2i(610,490))
+	var lease: Dictionary = DialogLease.capture(app,body)
 	app.active_dialog.set_meta("nonmodal",not shop)
 	body.add_child(app.label("Книги умений для выбранного класса.\nПеретащите купленную книгу из сумки на панель.",12))
 	for level: int in [10,20,30,40,50,60]:
@@ -112,7 +114,10 @@ func catalogue(shop: bool = false, class_id: String = "") -> void:
 		var cell: VarendorQuickSlot = VarendorQuickSlot.new(); cell.owner_ui = app; cell.custom_action = id if owns(id) else ""; cell.artwork = icon(id); cell.usable = owns(id) or shop; cell.tooltip_text = tooltip(id); row.add_child(cell)
 		var text: Label = app.label("%d+  %s\n%s" % [level,b.name,b.description],12); text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART; text.size_flags_horizontal = Control.SIZE_EXPAND_FILL; row.add_child(text)
 		if shop and int(b.price)>0:
-			var buy: Button = app.button("%d золота" % int(b.price),func(): await app.net.command({"type":"buy","itemId":id}); catalogue(true,class_id))
+			var buy: Button = app.button("%d золота" % int(b.price),func():
+				if not DialogLease.current(app,lease): return
+				await app.net.command({"type":"buy","itemId":id})
+				if DialogLease.current(app,lease): catalogue(true,class_id))
 			buy.disabled = owns(id) or class_id != str(app.net.hero.classId); row.add_child(buy)
 		elif not owns(id): row.add_child(app.label("Задание" if level>=50 else "Не куплена",11))
 	if shop: body.add_child(app.button("Все классы",shop_classes))
@@ -126,6 +131,7 @@ func shop_classes() -> void:
 
 func quest_menu() -> void:
 	var body: VBoxContainer = app.dialog("Арден · Книги высших умений",Vector2i(540,330))
+	var lease: Dictionary = DialogLease.capture(app,body)
 	body.add_child(app.wrapped_label("Новые испытания класса выдаёт Северин в Гринфолле. Прежнее право на книгу сохранено; готовую награду можно забрать и здесь.",13))
 	for quest: Dictionary in app.net.progression_quests:
 		if str(quest.giverId) != "npc:books": continue
@@ -133,7 +139,10 @@ func quest_menu() -> void:
 		body.add_child(app.wrapped_label("%d+ · %s" % [int(quest.level),str(quest.title)],14))
 		if state in ["ready","pending"]:
 			var level: int = int(quest.level)
-			body.add_child(app.button("Забрать сохранённую награду",func(): await app.net.command({"type":"bookQuest","level":level}); quest_menu()))
+			body.add_child(app.button("Забрать сохранённую награду",func():
+				if not DialogLease.current(app,lease): return
+				await app.net.command({"type":"bookQuest","level":level})
+				if DialogLease.current(app,lease): quest_menu()))
 		else: body.add_child(app.wrapped_label("Награда получена" if state == "claimed" else "Подробности испытания — у Северина",12))
 
 static func buff_time(milliseconds: float) -> String:
@@ -171,6 +180,15 @@ func refresh_effects(hero: Dictionary, row: HBoxContainer) -> void:
 			var caption: String = {"haste":"Стремительность · бег +50%, атака +15%","guard":"Защита","vanish":"Невидимость"}.get(str(effect.id),"")
 			if caption.is_empty(): caption = tooltip(effect.id)
 			effect_cells[effect.id].get_parent().tooltip_text = caption+"\nОсталось: "+remaining
+
+func clear_session() -> void:
+	targeting_book = ""
+	last_book_press = 0
+	loot_generation += 1
+	if is_instance_valid(loot_panel):
+		loot_panel.hide()
+		loot_panel.queue_free()
+	loot_panel = null
 
 func position_loot() -> void:
 	if not is_instance_valid(loot_panel): return

@@ -20,11 +20,24 @@ func start(url: String, bearer: String) -> Error:
 	_token = bearer
 	return _thread.start(_run)
 
-func enqueue(entry: Dictionary) -> void:
+func enqueue(entry: Dictionary) -> Array[int]:
+	var superseded: Array[int] = []
 	_mutex.lock()
+	# Direction is a held state, not an action that must be replayed later.
+	# Retain only its newest UNSENT state. An already dispatched request and
+	# attack/jump/cancel/destination entries are immutable ordering barriers.
+	# The mutex also fences the worker's pop: never retire an in-flight input.
+	while not _queue.is_empty() and can_supersede_direction(_queue[-1], entry):
+		superseded.append(int(_queue.pop_back().sequence))
 	_queue.append(entry.duplicate(true))
 	_mutex.unlock()
-	_wake.post()
+	# Replacing a queued entry reuses that entry's existing wake permit.
+	# Posting for every camera sample otherwise leaves thousands of empty wakes.
+	if superseded.is_empty(): _wake.post()
+	return superseded
+
+static func can_supersede_direction(older: Dictionary, newer: Dictionary) -> bool:
+	return str(older.get("value",{}).get("type","")) == "direction" and str(newer.get("value",{}).get("type","")) == "direction" and int(older.get("session",-1)) == int(newer.get("session",-2)) and int(older.get("payload",{}).get("generation",-1)) == int(newer.get("payload",{}).get("generation",-2)) and int(older.get("sequence",0)) < int(newer.get("sequence",0))
 
 func stop() -> void:
 	_mutex.lock()

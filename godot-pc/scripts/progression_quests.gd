@@ -1,4 +1,5 @@
 extends RefCounted
+const DialogLease = preload("res://scripts/dialog_lease.gd")
 
 var app: Node
 var box: VBoxContainer
@@ -14,6 +15,7 @@ func active() -> bool:
 
 func open(npc_id: String = "npc:elder") -> void:
 	if app.net.hero.is_empty(): return
+	local_busy = false
 	giver_id = npc_id
 	box = app.dialog("Роэн · Дальние поручения" if giver_id == "npc:elder" else "Северин · Знание класса",Vector2i(610,510))
 	box.add_child(app.wrapped_label("Опыт указан для каждого поручения. Награда, которой не хватило места в сумке, сохраняется до получения.",13))
@@ -89,9 +91,12 @@ func update_buttons() -> void:
 
 func submit(quest_id: String, action: String) -> void:
 	if local_busy or app.net.command_busy or not app.net.pending.is_empty() or not app.net.connected: return
+	var lease: Dictionary = DialogLease.capture(app,box)
 	var command: Dictionary = {"type":"progressionQuest","questId":quest_id,"action":action}
 	if action == "claim" and not str(selections.get(quest_id,"")).is_empty(): command.rewardChoice = str(selections[quest_id])
-	local_busy = true; update_buttons(); await app.net.command(command); local_busy = false
+	local_busy = true; update_buttons(); await app.net.command(command)
+	if not DialogLease.current(app,lease): return
+	local_busy = false
 	if active(): refresh()
 
 func poll() -> void:

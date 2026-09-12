@@ -524,6 +524,7 @@ func refresh_inventory_state() -> void:
 	for slot: VarendorItemSlot in app.equipment_slots.values(): slot.queue_redraw()
 
 func has_item_version(reference: Dictionary) -> bool:
+	if app.net.hero.is_empty() or reference.is_empty(): return false
 	for item in app.net.hero.inventory + app.net.hero.equipment.values() + app.net.hero.get("storage",[]):
 		if item is Dictionary and str(item.get("uid","")) == str(reference.get("uid","")):
 			return item.id == reference.id and item.plus == reference.plus and item.count == reference.count

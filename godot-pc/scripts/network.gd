@@ -38,6 +38,7 @@ var stream_progress_ms: int = Time.get_ticks_msec()
 var stream_fragment_ms: int = -1
 var input_queue: Array = []
 var input_busy: bool = false
+var superseded_direction_count: int = 0
 var input_transport: InputTransport
 var expected_content: String = ""
 var expected_map: String = ""
@@ -342,8 +343,8 @@ func stream_failed(reason: String = "unspecified") -> void:
 
 func intent(value: Dictionary) -> void:
 	if not connected: return
-	# Reserve the acknowledgement ID before local prediction. All distinct
-	# inputs retain order, including camera-relative steering and release.
+	# Reserve before prediction. Discrete actions retain their order; the worker
+	# coalesces only obsolete unsent held directions under its queue mutex.
 	sequence += 1
 	var entry: Dictionary = {"value":value.duplicate(true),"sequence":sequence,"session":session_generation,
 		"payload":{"sequence":sequence,"generation":hero.get("generation",0),"intent":value.duplicate(true)}}
@@ -361,7 +362,14 @@ func dispatch_input(entry: Dictionary) -> void:
 			input_transport = null
 			input_completed(entry, {"error":"Не удалось запустить соединение ввода"})
 			return
-	input_transport.enqueue(entry)
+	var superseded: Array[int] = input_transport.enqueue(entry)
+	if not superseded.is_empty():
+		# Retire the matching network bookkeeping too. Prediction/history retain
+		# what was actually shown and reconcile against the newest executed ACK.
+		input_queue = input_queue.filter(func(pending_input: Dictionary):
+			return not (int(pending_input.session) == int(entry.session) and int(pending_input.payload.generation) == int(entry.payload.generation) and superseded.has(int(pending_input.sequence))))
+		superseded_direction_count += superseded.size()
+	input_busy = not input_queue.is_empty()
 
 func input_completed(entry: Dictionary, response: Dictionary) -> void:
 	# A response queued before a profile change/teleport cannot clear newer

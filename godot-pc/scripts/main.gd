@@ -834,13 +834,15 @@ func open_npc_service(id: String) -> void:
 		notice("Бран: дважды нажмите свиток, затем один раз — предмет. Свитки добываются с монстров.")
 	elif id == "npc:teleport":
 		var box: VBoxContainer = dialog(str(service.get("name","Переход")), Vector2i(480, 320))
+		var lease: Dictionary = preload("res://scripts/dialog_lease.gd").capture(self,box)
 		box.add_child(label("Переход в столицу бесплатен."))
 		for destination: String in ["Астерхолд", "Гринфолл", "Чёрный лес", "Вход в шахту"]:
 			var price: Array = {"Астерхолд":[0,1],"Гринфолл":[25,1],"Чёрный лес":[90,10],"Вход в шахту":[150,10]}[destination]
 			var travel: Button = button(destination + " · %d золота · ур. %d" % [price[0],price[1]], func():
+				if not preload("res://scripts/dialog_lease.gd").current(self,lease): return
 				var before_generation: int = int(net.hero.generation)
 				await net.command({"type":"teleport","destination":destination})
-				if int(net.hero.generation) != before_generation: close_dialog())
+				if preload("res://scripts/dialog_lease.gd").current(self,lease,true) and int(net.hero.get("generation",-1)) != before_generation: close_dialog())
 			travel.set_meta("npc_action","teleport:"+destination)
 			box.add_child(travel)
 
@@ -1181,6 +1183,11 @@ func can_enhance(item: Dictionary) -> bool:
 func switch_profile() -> void:
 	release_orbit(false)
 	save_preferences()
+	close_dialog()
+	trade_session.clear_session()
+	polish.close_profile_views()
+	book_ui.clear_session()
+	reference_hud.hide_tooltip()
 	var previous_token: String = net.token
 	net.end_session()
 	if not previous_token.is_empty():
