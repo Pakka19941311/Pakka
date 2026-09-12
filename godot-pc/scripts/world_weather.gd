@@ -55,7 +55,7 @@ func _process(delta: float) -> void:
 		return
 	world.sun_light.visible = true
 	world.world_environment.background_mode = Environment.BG_SKY
-	world.world_environment.fog_enabled = true
+	world.world_environment.fog_enabled = world.fog_enabled
 	var env: Dictionary = qa_override if not qa_override.is_empty() else world.current_snapshot.get("environment",{})
 	if env.is_empty(): env = {"hour":9.0,"daylight":1.0,"night":false,"fullMoon":false,"weather":"sun","clouds":.18}
 	current = env

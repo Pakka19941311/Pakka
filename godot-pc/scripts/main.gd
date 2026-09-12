@@ -699,7 +699,7 @@ func apply_settings() -> void:
 	if world.sun_light != null:
 		world.sun_light.shadow_enabled = bool(game_settings.get("shadows", true))
 		world.sun_light.directional_shadow_max_distance = [35.0, 60.0, 90.0][clampi(int(game_settings.get("quality", 2)), 0, 2)]
-		world.world_environment.fog_enabled = bool(game_settings.get("fog", true))
+		world.fog_enabled = bool(game_settings.get("fog", true))
 	if world.camera != null:
 		world.camera.far = [150.0, 240.0, 360.0][clampi(int(game_settings.get("distance", 2)), 0, 2)]
 		for mesh: GeometryInstance3D in world.decorations:

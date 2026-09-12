@@ -79,6 +79,7 @@ var sun_light: DirectionalLight3D
 var weather: VarendorWorldWeather
 var world_environment: Environment
 var show_names: bool = true
+var fog_enabled: bool = true
 var decorations: Array[GeometryInstance3D] = []
 signal loot_received(message: String)
 signal snapshot_presented(snapshot: Dictionary)

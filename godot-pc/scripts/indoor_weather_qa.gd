@@ -53,6 +53,36 @@ func run() -> void:
 	weather._process(1.0/60.0)
 	checks.return_to_surface_restores_weather = weather.rain.emitting and weather.rain.is_visible_in_tree() and world.sun_light.visible
 	checks.particle_lifetime_and_coordinates_preserved = is_equal_approx(weather.rain.lifetime,2.2) and not weather.rain.local_coords
+	# Exercise the actual Low profile and the preference retained while indoors.
+	var settings: Dictionary = {}
+	preload("res://scripts/graphics_profile.gd").apply(settings,0)
+	world.fog_enabled = bool(settings.get("fog",true))
+	weather._process(1.0/60.0)
+	checks.low_keeps_surface_fog_off = not world.fog_enabled and not world.world_environment.fog_enabled
+	courtyard.tavern.inside = true
+	weather._process(1.0/60.0)
+	checks.low_keeps_tavern_fog_off = not world.fog_enabled and not world.world_environment.fog_enabled
+	courtyard.tavern.inside = false
+	for _frame: int in range(4): weather._process(1.0/60.0)
+	checks.low_stays_off_after_exit_and_weather_updates = not world.fog_enabled and not world.world_environment.fog_enabled
+	courtyard.tavern.inside = true
+	world.fog_enabled = true
+	weather._process(1.0/60.0)
+	checks.enabling_fog_indoors_retains_preference_but_stays_hidden = world.fog_enabled and not world.world_environment.fog_enabled
+	courtyard.tavern.inside = false
+	weather._process(1.0/60.0)
+	checks.enabled_fog_restores_outdoors = world.fog_enabled and world.world_environment.fog_enabled
+	courtyard.tavern.inside = true
+	weather._process(1.0/60.0)
+	checks.reentering_tavern_hides_enabled_fog_without_erasing_preference = world.fog_enabled and not world.world_environment.fog_enabled
+	courtyard.tavern.inside = false
+	geography.active_space = "great_cave"
+	weather._process(1.0/60.0)
+	checks.cave_hides_fog_without_erasing_preference = world.fog_enabled and not world.world_environment.fog_enabled
+	geography.active_space = "surface"
+	weather._process(1.0/60.0)
+	checks.enabled_fog_restores_after_cave = world.fog_enabled and world.world_environment.fog_enabled
+	checks.fog_settings_do_not_mutate_server_weather = world.current_snapshot.environment == environment and weather.current == environment and weather.qa_override.is_empty()
 	var ok: bool = checks.values().all(func(value): return value == true)
 	print("INDOOR_WEATHER_QA ",JSON.stringify({"ok":ok,"checks":checks,"scope":"isolated production weather visibility; no city route or image claim"}))
 	world.queue_free()
