@@ -104,5 +104,5 @@ static func run(app: Node) -> void:
 		checks.quarter_walkable = await Court.go(app,Vector2(point.x,point.z),25000) and checks.quarter_walkable
 		checks.crowd_stays_on_free_ground = app.world.ambient_residents.residents.all(func(r): return not app.world.collision.blocked(r.position,.40)) and checks.crowd_stays_on_free_ground
 	var ok: bool = checks.values().all(func(v): return v==true)
-	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"review_only":true,"game_exported":false,"adapter":RenderingServer.get_video_adapter_name()})
+	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"scope":"castle-quarter","packaged_binary":"--qa-packaged" in OS.get_cmdline_user_args(),"adapter":RenderingServer.get_video_adapter_name()})
 	app.get_tree().quit(0 if ok else 2)

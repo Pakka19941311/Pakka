@@ -42,7 +42,7 @@ try{
  },100);
  const bootstrap=join(output,'bootstrap.json');writeFileSync(bootstrap,JSON.stringify({server_url,profiles:[{id:p.id,token:session.token,name:p.name,classId:p.classId,level:p.level}]}));
  const mode=packageArg?['--packaged','--cwd',dirname(resolve(binary))]:['--project','godot-pc'];
- const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),...mode,'--output',join(output,'native'),'--timeout','360','--',...options.filter(x=>x==='--headless'),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,reportName)}`,`--qa-scope=${castlePreview?'castle-preview':castle?'castle':'stage'}`,...options.filter(x=>x.startsWith('--block='))];
+ const args=['-X','utf8','scripts/godot_run_checked.py','--exe',resolve(binary),...mode,'--output',join(output,'native'),'--timeout','360','--',...options.filter(x=>x==='--headless'),'--audio-driver','Dummy','--',`--bootstrap=${bootstrap}`,`--qa=${join(output,reportName)}`,`--qa-scope=${castlePreview?'castle-preview':castle?'castle':'stage'}`,...(packageArg?['--qa-packaged']:[]),...options.filter(x=>x.startsWith('--block='))];
  const process=spawn(globalThis.process.env.PYTHON??'python',args,{stdio:'inherit',windowsHide:true});const [code]=await once(process,'exit');assert.equal(code,0);
  const report=JSON.parse(readFileSync(join(output,reportName),'utf8'));assert.equal(report.ok,true,JSON.stringify(report.checks));
  assert.ok(!/SCRIPT ERROR:|Parse Error:/.test(readFileSync(join(output,'native/engine.log'),'utf8')));
