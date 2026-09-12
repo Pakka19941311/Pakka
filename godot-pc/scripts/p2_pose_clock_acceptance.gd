@@ -36,7 +36,8 @@ func run() -> void:
 					rates_valid = rates_valid and not actor.get_meta("p2_gait_contract_violation")
 					elapsed=0.0
 			var expected: float = fposmod(distance/float(controller.profile.gait.run)/controller.clip_length(controller.gait_clip),1.0)
-			checks[str(rate)+"_"+str(rig_interval)+"_path_phase"] = absf(controller.gait_phase-expected)<.0001
+			# Phase is circular: 0.99999999 and 0 are the same cycle boundary.
+			checks[str(rate)+"_"+str(rig_interval)+"_path_phase"] = absf(wrapf(controller.gait_phase-expected,-.5,.5))<.0001
 			checks[str(rate)+"_"+str(rig_interval)+"_source_rate"] = rates_valid
 			motion.push(Vector3.ZERO,0.0)
 			checks[str(rate)+"_"+str(rig_interval)+"_frozen"] = motion.consume().is_zero_approx()

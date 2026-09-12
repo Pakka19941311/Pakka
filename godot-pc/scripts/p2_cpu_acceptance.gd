@@ -8,15 +8,16 @@ static func interval(app: Node, milliseconds: int) -> void:
 		await app.get_tree().process_frame
 
 static func run(app: Node, checks: Dictionary) -> void:
-	checks.cpu_profile_native = DisplayServer.get_name()!="headless" and app.world.final_environment!=null
-	if not checks.cpu_profile_native: return
+	var native: bool = DisplayServer.get_name()!="headless"
+	checks.cpu_profile_scene = app.world.final_environment!=null
+	if not checks.cpu_profile_scene: return
 	var previous_settings: Dictionary = app.game_settings.duplicate(true)
 	var previous_interaction: bool = app.qa_interaction
 	app.qa_interaction = false
 	app.game_settings.merge({"quality":2,"distance":2,"vegetation":2,"render_scale":2,"shadows":true,"msaa":2},true)
 	app.apply_settings()
 	app.close_dialog(); app.inventory_panel.hide()
-	var report: Dictionary = {"schema":1,"diagnostic_only":true,"native_render":true,"phases":[],
+	var report: Dictionary = {"schema":1,"diagnostic_only":true,"native_render":native,"phases":[],
 		"method":"Inclusive CPU timers; nested spans must not be summed. Each frame has CPU spans plus previous engine frame metrics. One existing hero-only forest fixture, no monster/clock/geometry edits. No vertex audit or render visibility changes.",
 		"settings":app.game_settings.duplicate(true),"adapter":RenderingServer.get_video_adapter_name()}
 	Trace.begin_phase("fixture")

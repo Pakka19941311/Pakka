@@ -6,7 +6,6 @@ const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 const P2_ADAPTER = preload("res://world-expansion-v3/actors/profile_adapter.gd")
 const CLOAK_VISUAL = preload("res://scripts/cloak_visual.gd")
 const P2_NPC_MOTION = preload("res://world-expansion-v3/city/motion/npc_motion_adapter.gd")
-const P2_NPC_ROLES: Dictionary = {"ambient:103":"guard","ambient:115":"resident"}
 const KNIGHT_MODEL: String = "ForgottenKnight"
 const KNIGHT_ASSET: String = "res://assets/knight/Knight_Modular.glb"
 const KNIGHT_SOURCE_HEIGHT: float = 1.84
@@ -325,7 +324,10 @@ func setup(game: Dictionary) -> bool:
 	arrival_marker.visible = false
 	for id: String in VarendorNpcInteraction.SERVICES:
 		var npc: Dictionary = VarendorNpcInteraction.SERVICES[id]
-		var actor: Node3D = make_actor(id, npc.model, 2.05, npc.name, Color("e2c382"))
+		var p2_mode: bool = final_environment != null and final_environment.courtyard_path.ends_with("courtyard-p2.json")
+		var actor: Node3D = P2_NPC_MOTION.create_actor(self,id,P2_NPC_MOTION.role_for(id,npc)) if p2_mode else make_actor(id, npc.model, 2.05, npc.name, Color("e2c382"))
+		(actor.get_meta("screen_label") as Label).text = str(npc.name)
+		(actor.get_meta("label") as Label3D).text = str(npc.name)
 		# The approved client placed service actors outside nearby stalls/signs.
 		# Keep their server service anchor, but never spawn a body inside props.
 		var free: Vector2 = collision.nearest_free(Vector2(npc.x,npc.z))
@@ -348,7 +350,7 @@ func setup(game: Dictionary) -> bool:
 		resident_data["services"] = VarendorNpcInteraction.SERVICES
 	ambient_residents.setup(collision,resident_data)
 	for resident: Dictionary in ambient_residents.sample():
-		var p2_role: String = str(P2_NPC_ROLES.get(str(resident.id),"")) if final_environment != null and final_environment.courtyard_path.ends_with("courtyard-p2.json") else ""
+		var p2_role: String = P2_NPC_MOTION.role_for(str(resident.id),resident) if final_environment != null and final_environment.courtyard_path.ends_with("courtyard-p2.json") else ""
 		var actor: Node3D = P2_NPC_MOTION.create_actor(self,str(resident.id),p2_role) if not p2_role.is_empty() else make_actor(str(resident.id),str(resident.model),float(resident.targetHeight),str(resident.name),Color("d4c7af"))
 		(actor.get_meta("screen_label") as Label).text = str(resident.name)
 		(actor.get_meta("label") as Label3D).text = str(resident.name)
@@ -420,22 +422,23 @@ static func actor_asset_path(model: String) -> String:
 
 func monster_definition(monster: Dictionary) -> Dictionary:
 	var definition: Dictionary = data.monsters.get(str(monster.id),{}).duplicate(true)
-	var canonical: String = str(monster.get("canonicalMobId",""))
+	var canonical: String = P2_ADAPTER.visual_profile_for(monster,definition)
 	if canonical in ["MOB-01","MOB-02","MOB-03","MOB-04","MOB-05"]:
 		var profile: Dictionary = P2_ADAPTER.profiles()[canonical]
 		definition.model = str(profile.model); definition.visualModel = str(profile.model); definition.visualHeight = float(profile.height)
-		definition.name = str(monster.get("name",{"MOB-01":"Теневой слизень","MOB-02":"Пепельный гончий","MOB-03":"Полевая крыса","MOB-04":"Лесной кабан","MOB-05":"Панцирный жук"}[canonical]))
+		definition.name = str(monster.get("name",definition.get("name",profile.title)))
 	definition.level = int(monster.get("level",definition.get("level",1)))
 	definition.hp = float(monster.get("maxHp",definition.get("hp",1)))
+	if monster.has("visualHeight"): definition.visualHeight=float(monster.visualHeight)
 	return definition
 
-func make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
+func make_actor(id: String, model: String, size: float, title: String, color: Color, initialize_controller: bool = true) -> Node3D:
 	var cpu_create: int = CPU_TRACE.begin() if not actors.has(id) else 0
-	var result: Node3D = _profiled_make_actor(id,model,size,title,color)
+	var result: Node3D = _profiled_make_actor(id,model,size,title,color,initialize_controller)
 	CPU_TRACE.end("actor.create",cpu_create)
 	return result
 
-func _profiled_make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
+func _profiled_make_actor(id: String, model: String, size: float, title: String, color: Color, initialize_controller: bool = true) -> Node3D:
 	if actors.has(id):
 		var existing: Node3D = actors[id]
 		(existing.get_meta("screen_label") as Label).text = title
@@ -514,9 +517,10 @@ func _profiled_make_actor(id: String, model: String, size: float, title: String,
 		root.set_meta("pick_size", Vector3(.82, size, .68))
 		var equipment: VarendorKnightEquipment = VarendorKnightEquipment.new()
 		equipment.bind(root, visual, data.get("items", {}))
-	var controller: VarendorAnimationController = VarendorAnimationController.new()
-	controller.prefer_run = id == hero_id or model == "Fox"
-	controller.bind(root)
+	if initialize_controller:
+		var controller: VarendorAnimationController = VarendorAnimationController.new()
+		controller.prefer_run = id == hero_id or model == "Fox"
+		controller.bind(root)
 	root.set_meta("motion", {})
 	actors[id] = root
 	return root
@@ -584,7 +588,7 @@ func _profiled_apply_snapshot(snapshot: Dictionary) -> void:
 		var id: String = str(monster.uid)
 		keep[id] = true
 		var def: Dictionary = monster_definition(monster)
-		var canonical: String = str(monster.get("canonicalMobId",""))
+		var canonical: String = P2_ADAPTER.visual_profile_for(monster,def)
 		var actor: Node3D
 		if canonical in ["MOB-01","MOB-02","MOB-03","MOB-04","MOB-05"] and not actors.has(id):
 			actor = P2_ADAPTER.create_actor(self,id,canonical)
@@ -779,7 +783,8 @@ func _profiled_process(delta: float) -> void:
 		var distance_sq: float = actor.position.distance_squared_to(hero_position)
 		var pose_delta: float = float(actor.get_meta("pose_delta", 0.0)) + (delta if id == hero_id or ambient_poses.has(id) else presentation_dt)
 		var interval: float = 0.0 if id == hero_id or id == target_id or distance_sq < 24.0*24.0 else .1 if distance_sq < 50.0*50.0 else .5
-		if bool(actor.get_meta("pose_dirty",false)) or (pose_delta >= interval and (not remote_clock or pose_delta > .000001)):
+		var sample_due: bool = interval==0.0 or actor_clock>=float(actor.get_meta("pose_sample_after",0.0)) or interval<float(actor.get_meta("pose_sample_interval",interval))
+		if bool(actor.get_meta("pose_dirty",false)) or (sample_due and (not remote_clock or pose_delta > .000001)):
 			var cpu_rig: int = CPU_TRACE.begin()
 			CPU_TRACE.count("rig_near" if interval==0.0 else "rig_middle" if interval==.1 else "rig_far")
 			if not actor.visible: CPU_TRACE.count("rig_hidden")
@@ -800,6 +805,8 @@ func _profiled_process(delta: float) -> void:
 				actor.get_meta("cloak_visual").tick(actor_clock,motion,rendered_velocity)
 			CPU_TRACE.end("rig.total",cpu_rig)
 			pose_delta = 0.0
+			actor.set_meta("pose_sample_after",preload("res://scripts/pose_sample_schedule.gd").next_sample_ms(actor_clock,interval,id))
+			actor.set_meta("pose_sample_interval",interval)
 			actor.set_meta("pose_dirty",false)
 		actor.set_meta("pose_delta",pose_delta)
 		actor.visible = not controller.corpse_complete and (id == hero_id or distance_sq < 85.0*85.0)
