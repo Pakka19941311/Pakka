@@ -32,7 +32,7 @@ export type WorldCharacter = Position & WorldMotion & {
 };
 export type WorldMonster = Position & WorldMotion & {
   canonicalMobId?:string;level?:number;maxHp?:number;name?:string;balanceVersion?:string;
-  bookEffects?:BookEffect[];bookDots?:BookDot[];returnFromTaunt?:boolean;nextSlamAt?:number;
+  bookEffects?:BookEffect[];bookDots?:BookDot[];returnFromTaunt?:boolean;nextSlamAt?:number;nextCounterAt?:number;
   uid: string; id: string; home: Position; regionId?: string; patrolIndex: number; patrolStep?:number;
   hp: number; alive: boolean; respawnAt: number; attackReadyAt: number; generation: number;
   phase: number; status: { slow: number; stun: number; dot: number; nextDot: number; dotOwner?: string };
@@ -46,6 +46,7 @@ export type WorldEvent = {
   bookId?:string; actor: string; target?: string; skill?: number | null; amount?: number; critical?: boolean; generation?: number; impactAt?:number; endsAt?:number; readyAt?:number; effect?:string; durationMs?:number; reason?:string;
   position?:Position & {yOffset:number;yaw:number};
   origin?: Position & {y:number}; destination?:Position & {y:number}; actorGeneration?:number; targetHp?:number; targetMaxHp?:number; targetGeneration?:number;
+  attackKind?:'aimed-line';halfWidth?:number;
   gold?: number; xp?: number; items?: string[];
 };
 export type WorldSnapshot = {
@@ -53,7 +54,7 @@ export type WorldSnapshot = {
   starterQuests?:StarterQuestView[];
   craftRecipes?:RingRecipe[];
   spaceId?:SpaceId;worldRevision?:string;populationCapacity?:number;
-  groundEffects?:Array<{id:string;kind:'trap'|'area'|'slam';owner:string;point:Position;radius:number;expiresAt:number;effect:string}>;
+  groundEffects?:Array<{id:string;kind:'trap'|'area'|'slam'|'line';owner:string;point:Position;radius:number;expiresAt:number;effect:string;endPoint?:Position;halfWidth?:number}>;
   environment?: import("../world/world-cycle.ts").WorldCycleSnapshot; chat?: WorldChatMessage[];
   contentVersion?: string; mapVersion?: string;
   protocol: typeof WORLD_PROTOCOL; time: number; revision: number; character: WorldCharacter;

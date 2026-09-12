@@ -2,6 +2,7 @@ import {CAVE_BOSS_ID,CAVE_BOSS_UID,CAVE_BOSS_RESPAWN_MS} from '../data/cave-boss
 import { worldCycleAt, rollNightDrops, PHASE_MS, HASTE_DURATION_MS, STORAGE_CAPACITY } from '../world/world-cycle.ts';
 import {rollLootV3} from '../data/loot-v3.ts';
 import {p2Encounter,rollP2StarterLoot,P2_BALANCE_VERSION} from '../data/p2-encounters.ts';
+import {rangedResponseV3,CAVE_RANGED_TIMING_V3} from '../data/ranged-response-v3.ts';
 import {resolveHeroDamageV3,enemyHitChanceV3} from '../core/encounter-combat-v3.ts';
 import {resolveTypedMonsterDamage,PHYSICAL_DAMAGE,legacyStatusDotChannel} from '../core/monster-damage.ts';
 import type {MonsterDamagePacket,MonsterDamageDefense} from '../core/monster-damage.ts';
@@ -59,6 +60,7 @@ type ItemId = keyof typeof ITEMS;
 type MonsterId = keyof typeof MONSTERS;
 type Skill = { cost: number; cd: number; mul?: number; fx: string; buff?: string; summon?: boolean; chain?: number; chainRadius?: number; chainFalloff?: number; aoe?: number; stun?: number; slow?: number; dot?: number; knock?: number; leech?: number };
 type PendingAttack = {
+  counter?:{origin:Position&{y:number};endPoint:Position&{y:number};halfWidth:number;multiplier:number;type:EncounterDamageTypeV3;element:EncounterElementV3};
   slam?:Position;actor:string; target:string; generation:number; actorGeneration?:number;
   hitAt:number; endsAt?:number; skill:number|null; monster:boolean; summon?:boolean; owner?:string; released?:boolean;
   damage?:number; critical?:boolean; accuracy?:number; resourcePaid?:boolean;
@@ -190,8 +192,13 @@ export class WorldSimulation {
     if (this.state.schema !== 1) throw Error('unsupported-world-schema');
     // The cave timer advances only while the game process runs. Other existing
     // clocks retain their own lifecycle; a restart preserves this remaining delay.
-    if(loaded)for(const m of this.state.monsters)if(m.uid===CAVE_BOSS_UID&&!m.alive)
-      m.respawnAt+=Math.max(0,options.now-this.state.time);
+    if(loaded)for(const m of this.state.monsters){
+      const closedTime=Math.max(0,options.now-this.state.time);
+      if(m.uid===CAVE_BOSS_UID&&!m.alive)m.respawnAt+=closedTime;
+      // An unfinished aimed-line is cancelled below. Its remaining cooldown is
+      // game time, so closing the process cannot reroll an immediate response.
+      if(m.nextCounterAt!==undefined&&m.nextCounterAt>this.state.time)m.nextCounterAt+=closedTime;
+    }
     if(this.finalWorld)this.migrateFinalWorld();
     else if(loaded)migrateTerritory(this.state,this.collision,this.mapContentVersion);
     if(this.finalWorld)this.reconcileStarterPopulation();
@@ -213,7 +220,7 @@ export class WorldSimulation {
     }
     // Process restarts cancel unfinished windups; already released projectiles
     // remain server-owned and retain their generation checks.
-    this.state.pending=this.state.pending.filter(a=>a.monster&&a.actor!==CAVE_BOSS_UID);
+    this.state.pending=this.state.pending.filter(a=>a.monster&&a.actor!==CAVE_BOSS_UID&&!a.counter);
     this.advance(options.now);
     this.store.save(this.state);
   }
@@ -599,7 +606,11 @@ export class WorldSimulation {
     const groundEffects:NonNullable<WorldSnapshot['groundEffects']>=[
       ...(this.state.bookTraps??[]).filter(t=>t.expiresAt>this.state.time).map(t=>({id:t.id,kind:'trap' as const,owner:t.owner,point:t.point,radius:1.4,expiresAt:t.expiresAt,effect:'trap'})),
       ...(this.state.bookAreas??[]).filter(a=>a.remaining>0).map(a=>({id:a.owner+':'+a.id,kind:'area' as const,owner:a.owner,point:a.point,radius:a.radius,expiresAt:a.nextAt+(a.remaining-1)*a.interval,effect:a.fx})),
-      ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'}))
+      ...this.state.pending.filter(a=>a.slam&&!a.released).map(a=>({id:a.actor+':slam',kind:'slam' as const,owner:a.actor,point:a.slam!,radius:4,expiresAt:a.hitAt,effect:'fire'})),
+      ...this.state.pending.filter(a=>a.counter&&!a.released).map(a=>({id:`${a.actor}:counter:${a.actorGeneration}:${a.hitAt}`,kind:'line' as const,owner:a.actor,
+        point:{x:a.counter!.origin.x,z:a.counter!.origin.z,spaceId:a.counter!.origin.spaceId},
+        endPoint:{x:a.counter!.endPoint.x,z:a.counter!.endPoint.z,spaceId:a.counter!.endPoint.spaceId},
+        radius:a.counter!.halfWidth,halfWidth:a.counter!.halfWidth,expiresAt:a.hitAt,effect:a.counter!.element}))
     ];
     return structuredClone({progressionQuests:this.progressionViews(character),starterQuests:starterQuestViews(character),craftRecipes:RING_RECIPES,groundEffects:groundEffects.filter(e=>sameSpace(e.point,character)),worldRevision:this.finalWorld?.revision,spaceId:spaceOf(character),populationCapacity:this.finalWorld?.slots.length,protocol:WORLD_PROTOCOL,contentVersion:CONTENT_VERSION,mapVersion:this.mapContentVersion,time:this.state.time,revision:this.state.revision,environment:worldCycleAt(this.state.time,this.state.cycleEpoch!),chat:this.state.chat,character:{...character,bodyRadius:this.bodyRadius(character),attackRange:this.books.range(character),navigationPath:character.destination||character.combatState==='approach'?this.paths.get(character.id)?.points??[]:[]},
       heroes:Object.values(this.state.characters).filter(p=>p.activeUntil>this.state.time&&sameSpace(p,character)&&(!this.finalWorld||distance(p,character)<140)).map(p=>({spaceId:p.spaceId,id:p.id,name:p.name,classId:p.classId,level:p.level,x:p.x,z:p.z,hp:p.hp,maxHp:p.maxHp,dead:p.dead,equipment:p.equipment,autoAttack:p.autoAttack,attackReadyAt:p.attackReadyAt,target:p.target,generation:p.generation,yOffset:p.yOffset,grounded:p.grounded,yaw:p.yaw,action:p.action,actionStartedAt:p.actionStartedAt,actionEndsAt:p.actionEndsAt,velocityX:p.velocityX,velocityZ:p.velocityZ,verticalVelocity:p.verticalVelocity,locomotionState:p.locomotionState,combatState:p.combatState,hitAt:p.hitAt,hitUntil:p.hitUntil,bodyRadius:this.bodyRadius(p),attackRange:this.books.range(p)})),
@@ -708,7 +719,7 @@ export class WorldSimulation {
     for(const p of Object.values(this.state.characters))if(p.buffs.haste&&p.buffs.haste<=this.state.time){p.buffs.haste=0;this.recalculate(p);}
     for(const m of this.state.monsters) if(m.nightIndex===undefined&&!m.temporaryOwner&&!m.alive&&m.respawnAt<=this.state.time){
       Object.assign(m,{...motion(this.state.time),...m.home,hp:monsterDef(m).hp,alive:true,attackReadyAt:this.state.time+(250+this.random()*550),phase:1,generation:m.generation+1,status:{slow:0,stun:0,dot:0,nextDot:0},owner:undefined});
-      m.bookEffects=[];m.bookDots=[];m.returnFromTaunt=false;m.provokedBy=undefined;m.targetId=null;m.deathAt=undefined;m.corpseUntil=undefined;this.paths.delete(m.uid);
+      m.bookEffects=[];m.bookDots=[];m.returnFromTaunt=false;m.provokedBy=undefined;m.targetId=null;m.deathAt=undefined;m.corpseUntil=undefined;m.nextCounterAt=undefined;this.paths.delete(m.uid);
       m.patrolStep=Math.floor(this.random()*Math.max(1,this.patrolPoints(m).length));
       const brain=this.brains.get(m.uid)??new MonsterAiBrain();
       brain.reset(m.home.x*.173+m.home.z*.127+m.generation);this.brains.set(m.uid,brain);
@@ -746,6 +757,7 @@ export class WorldSimulation {
   private validAttack(a:PendingAttack):boolean {
     if(a.summon){const s=this.state.summons.find(s=>s.uid===a.actor),p=this.state.characters[a.owner??''];return Boolean(s&&s.expiresAt>this.state.time&&p&&!p.dead&&p.activeUntil>this.state.time&&p.generation===a.actorGeneration&&this.state.monsters.some(m=>m.uid===a.target&&m.alive&&m.generation===a.generation));}
     if(a.monster){const m=this.state.monsters.find(m=>m.uid===a.actor&&m.alive);const p=this.state.characters[a.target];
+      if(a.counter&&(!m||!this.rangedResponse(m)||this.safe(m)||distance(m,m.home)>this.monsterLeash(m)||['return','leash'].includes(this.brains.get(m.uid)?.state??'')))return false;
       return Boolean(m&&p&&sameSpace(m,p)&&!p.dead&&p.generation===a.generation&&m.generation===(a.actorGeneration??m.generation)&&p.activeUntil>this.state.time&&!this.safe(p)&&p.buffs.vanish<=this.state.time&&m.status.stun<=this.state.time);}
     const p=this.state.characters[a.actor];const target=this.state.monsters.find(m=>m.uid===a.target&&m.alive&&m.generation===a.generation);
     return Boolean(p&&!p.dead&&p.activeUntil>this.state.time&&p.generation===(a.actorGeneration??p.generation)&&target&&sameSpace(p,target)&&p.target===target.uid&&
@@ -757,8 +769,17 @@ export class WorldSimulation {
       this.event('release',s.uid,m.uid,{effect:'slash',durationMs:0,generation:m.generation});this.applyTypedMonsterDamage(m,p,{...PHYSICAL_DAMAGE,raw:a.damage!,source:'summon',critical:false});return;}
     if(a.monster){
       const m=this.state.monsters.find(m=>m.uid===a.actor&&m.alive)!;const p=this.state.characters[a.target];
+      if(a.counter){
+        if(!this.validAttack(a))return;const c=a.counter;m.combatState='recovery';
+        this.event('release',m.uid,p.id,{effect:c.element,attackKind:'aimed-line',halfWidth:c.halfWidth,origin:c.origin,destination:c.endPoint,
+          durationMs:0,generation:p.generation,actorGeneration:m.generation});
+        if(!this.counterContains(c,p)||!this.lineOfSight(m,p))return;
+        const end={...p,y:this.terrainFor(p).supportAt(p.x,p.z)+1.3325};
+        if(!this.collisionFor(m).hasLineOfSight(c.origin,end,.04))return;
+        this.monsterHit(m,p,c.multiplier,{type:c.type,release:false});return;
+      }
       if(a.slam){for(const victim of Object.values(this.state.characters).filter(v=>sameSpace(m,v)&&!v.dead&&v.activeUntil>this.state.time&&!this.safe(v)&&distance(v,a.slam!)<=4&&this.lineOfSight(m,v)))this.monsterHit(m,victim,1.4);return;}
-      if(distance(m,p)>=this.monsterRange(m)+.25||!this.lineOfSight(m,p)||!facingTarget(m.yaw,m,p))return;
+      if(distance(m,p)>=(this.candidateCave(m)?this.monsterMeleeRange(m):this.monsterRange(m))+.25||!this.lineOfSight(m,p)||!facingTarget(m.yaw,m,p))return;
       m.combatState='recovery';
       this.monsterHit(m,p);return;
     }
@@ -778,15 +799,15 @@ export class WorldSimulation {
     if(!cls.ranged||effect==='lightning'||effect==='slash')this.strike(strike);
     else{this.state.projectiles!.push({...strike,origin,point:{...origin},startedAt:this.state.time,endsAt:this.state.time+280});}
   }
-  private monsterHit(m:WorldMonster,p:WorldCharacter,multiplier=1):void {
+  private monsterHit(m:WorldMonster,p:WorldCharacter,multiplier=1,attack?:{type:EncounterDamageTypeV3;release:boolean}):void {
       if(this.safe(p)||(m.canonicalMobId&&this.safe(m)))return;
       const p2=p2Encounter(m);
-      const base=p2?resolveHeroDamageV3(p2.atk*multiplier,p2.type,p.stats):Math.max(1,Math.round(monsterDef(m).atk*multiplier*(m.id==='rift_boss'?1:1+(m.phase-1)*.32)-p.stats.def*.2));
+      const base=attack?resolveHeroDamageV3(monsterDef(m).atk*multiplier,attack.type,p.stats):p2?resolveHeroDamageV3(p2.atk*multiplier,p2.type,p.stats):Math.max(1,Math.round(monsterDef(m).atk*multiplier*(m.id==='rift_boss'?1:1+(m.phase-1)*.32)-p.stats.def*.2));
 
       const amount=p.buffs.guard>this.state.time?Math.max(1,Math.round(base*.5)):base;
       this.books.attacked(p,m);
       if(this.random()<(p2?1-enemyHitChanceV3(p2.accuracy,p.stats.evasion):Math.max(0,Math.min(.75,p.stats.evasion/100)))){this.event('miss',m.uid,p.id);return;}
-      p.hp=Math.max(0,p.hp-amount);p.hitUntil=this.state.time+180;this.event('release',m.uid,p.id,{effect:'slash',durationMs:0,generation:p.generation});this.event('hit',m.uid,p.id,{amount,targetHp:p.hp,targetMaxHp:p.maxHp,targetGeneration:p.generation,generation:p.generation});
+      p.hp=Math.max(0,p.hp-amount);p.hitUntil=this.state.time+180;if(attack?.release!==false)this.event('release',m.uid,p.id,{effect:'slash',durationMs:0,generation:p.generation});this.event('hit',m.uid,p.id,{amount,targetHp:p.hp,targetMaxHp:p.maxHp,targetGeneration:p.generation,generation:p.generation});
       if(!p.hp){p.dead=true;p.xp=Math.max(0,p.xp-Math.floor(p.xp*.05));this.cancelControl(p);this.action(p,'death');p.combatState='dead';this.motor(p).reset();p.yOffset=0;p.verticalVelocity=0;p.grounded=true;this.event('death',p.id,undefined,{generation:p.generation,position:{x:p.x,z:p.z,yOffset:p.yOffset,yaw:p.yaw}});this.checkpoint();}
   }
   private projectileTick(projectile:Projectile):void {
@@ -851,6 +872,10 @@ export class WorldSimulation {
     const retained=taunt?.owner??m.provokedBy??brain.targetId??active?.target;
     const target=retained?candidates.find(p=>p.id===retained):(p2?candidates.filter(p=>this.lineOfSight(m,p)):candidates).sort((a,b)=>distance(m,a)-distance(m,b))[0];
     const visible=Boolean(target&&this.lineOfSight(m,target));
+    const counter=this.rangedResponse(m),caveCandidate=this.candidateCave(m),meleeRange=this.monsterMeleeRange(m);
+    const counterReady=Boolean(counter&&visible&&target&&distance(m,target)>meleeRange&&(m.nextCounterAt??0)<=this.state.time&&m.attackReadyAt<=this.state.time);
+    const caveSlamReady=caveCandidate&&(m.nextSlamAt??0)<=this.state.time;
+    const availableRange=counterReady?counter!.range:caveCandidate?(caveSlamReady?CAVE_RANGED_TIMING_V3.range:meleeRange):this.monsterRange(m);
     const points=this.patrolPoints(m);
     let point=points[(m.patrolStep??0)%Math.max(1,points.length)];
     const leashRadius=region?.leashRadius??(boss?18:14);
@@ -858,7 +883,7 @@ export class WorldSimulation {
     const decision=brain.update({dt,alive:true,playerSafe:false,targetAvailable:Boolean(target)&&canAcquire,targetId:target?.id,
       provoked:Boolean(m.provokedBy),playerDistance:target?distance(m,target):1000,homeDistance:distance(m,m.home),
       atPatrolPoint:!point||distance(m,point)<.55,aggroRadius:region?.aggroRadius??(boss?11:9),
-      leashRadius,attackRange:this.monsterRange(m)});
+      leashRadius,attackRange:availableRange});
     m.targetId=decision.targetId;m.combatState='idle';
     if(decision.changed&&decision.intent==='return'&&['fire_golem','ice_golem','rift_boss',CAVE_BOSS_ID].includes(m.id)){
       this.cancelAttack(m.uid);m.hp=def.hp;m.phase=1;m.owner=undefined;m.bookDots=[];m.bookEffects=[];m.nextSlamAt=undefined;
@@ -876,7 +901,8 @@ export class WorldSimulation {
     if(active){
       if(this.validAttack(active)&&distance(m,m.home)<leashRadius){
         m.combatState=active.released?'recovery':'windup';
-        if(target)m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),9,dt);return;
+        const aim=active.counter?.endPoint??target;
+        if(aim)m.yaw=smoothAngle(m.yaw,Math.atan2(aim.x-m.x,aim.z-m.z),9,dt);return;
       }
       this.cancelAttack(m.uid);
     }
@@ -888,8 +914,9 @@ export class WorldSimulation {
         // extra facing wait before the animation. Contact still checks facing.
         m.combatState='face';this.action(m,'idle');m.yaw=smoothAngle(m.yaw,Math.atan2(target.x-m.x,target.z-m.z),9,dt);
         if(m.attackReadyAt<=this.state.time){
+          if(counterReady&&counter){this.beginRangedResponse(m,target,counter);return;}
           m.attackReadyAt=this.state.time+(p2?p2.attackInterval*1000:m.id==='fire_golem'?2500:m.id==='ice_golem'?2800:[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?2400:(boss?1450:2050)/rage)/(1-this.books.value(m,'attackSlow')/100);
-          const slam=m.id===CAVE_BOSS_ID||m.id==='rift_boss'&&(m.nextSlamAt??0)<=this.state.time;
+          const slam=caveCandidate?caveSlamReady:m.id===CAVE_BOSS_ID||m.id==='rift_boss'&&(m.nextSlamAt??0)<=this.state.time;
           const slamPoint=m.id===CAVE_BOSS_ID?{x:target.x,z:target.z,spaceId:m.spaceId}:{x:m.x,z:m.z,spaceId:m.spaceId};
           if(slam)m.nextSlamAt=this.state.time+9000;
           const custom=p2?{duration:(p2.windup+p2.recovery)*1000,windup:p2.windup*1000}:m.id==='fire_golem'?{duration:1500,windup:900}:m.id==='ice_golem'?{duration:1700,windup:1100}:[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?{duration:slam?1900:1600,windup:slam?1400:1000}:null;
@@ -1134,6 +1161,37 @@ export class WorldSimulation {
     if(!this.collisionFor(a).hasLineOfSight(start,end,.04))return false;
     const length=Math.hypot(start.x-end.x,start.y-end.y,start.z-end.z);
     for(let d=.4;d<length;d+=.4){const t=d/length;const x=start.x+(end.x-start.x)*t,z=start.z+(end.z-start.z)*t,y=start.y+(end.y-start.y)*t;if(y<terrain.heightAt(x,z)+.06)return false;}return true;
+  }
+  private rangedResponse(m:WorldMonster){return this.finalWorld?.populationMode==='starter-v3'?rangedResponseV3(m.id,m.canonicalMobId):null;}
+  private candidateCave(m:WorldMonster):boolean{return this.finalWorld?.populationMode==='starter-v3'&&m.id===CAVE_BOSS_ID;}
+  private monsterMeleeRange(m:WorldMonster):number{return Math.max(1.65,this.bodyRadius(m)+.64);}
+  private monsterLeash(m:WorldMonster):number{return (this.finalWorld?.slotById.get(m.uid)??SPAWN_REGIONS.find(r=>r.id===m.regionId))?.leashRadius??('boss' in monsterDef(m)?18:14);}
+  private counterContains(c:NonNullable<PendingAttack['counter']>,p:Position):boolean {
+    if(!sameSpace(c.origin,p))return false;
+    const dx=c.endPoint.x-c.origin.x,dz=c.endPoint.z-c.origin.z,lengthSq=dx*dx+dz*dz;
+    const t=Math.max(0,Math.min(1,((p.x-c.origin.x)*dx+(p.z-c.origin.z)*dz)/Math.max(.000001,lengthSq)));
+    return Math.hypot(p.x-c.origin.x-dx*t,p.z-c.origin.z-dz*t)<=c.halfWidth+this.bodyRadius(p);
+  }
+  private beginRangedResponse(m:WorldMonster,p:WorldCharacter,profile:NonNullable<ReturnType<typeof rangedResponseV3>>):void {
+    const terrain=this.terrainFor(m),distanceToTarget=Math.max(.001,distance(m,p));
+    // Match the existing server LOS eye heights; native receives these exact endpoints.
+    const origin={spaceId:m.spaceId,x:m.x,z:m.z,y:terrain.supportAt(m.x,m.z)+1.235};
+    const scale=profile.range/distanceToTarget;
+    const intended={spaceId:m.spaceId,x:origin.x+(p.x-m.x)*scale,z:origin.z+(p.z-m.z)*scale,
+      y:origin.y+(terrain.supportAt(p.x,p.z)+1.3325-origin.y)*scale};
+    const length=Math.hypot(intended.x-origin.x,intended.z-origin.z,intended.y-origin.y);
+    let fraction=Math.min(1,Math.max(0,this.collisionFor(m).obstructionDistance(origin,intended,.04)-.001)/Math.max(.001,length));
+    for(let d=.2;d<profile.range*fraction;d+=.2){const t=d/profile.range;
+      if(origin.y+(intended.y-origin.y)*t<terrain.heightAt(origin.x+(intended.x-origin.x)*t,origin.z+(intended.z-origin.z)*t)+.06){fraction=Math.max(0,(d-.2)/profile.range);break;}}
+    const endPoint={spaceId:m.spaceId,x:origin.x+(intended.x-origin.x)*fraction,z:origin.z+(intended.z-origin.z)*fraction,y:origin.y+(intended.y-origin.y)*fraction};
+    const hitAt=this.tickDeadline(profile.windup*1000),endsAt=this.tickDeadline((profile.windup+profile.recovery)*1000);
+    const counter={origin,endPoint,halfWidth:profile.halfWidth,multiplier:profile.multiplier,type:profile.type,element:profile.element};
+    m.nextCounterAt=this.state.time+profile.cooldown*1000/(1-this.books.value(m,'attackSlow')/100);
+    m.attackReadyAt=Math.max(m.attackReadyAt,endsAt);
+    this.state.pending.push({actor:m.uid,target:p.id,generation:p.generation,actorGeneration:m.generation,hitAt,endsAt,skill:null,monster:true,counter});
+    this.paths.delete(m.uid);this.action(m,'attack',endsAt);m.combatState='windup';m.hitAt=hitAt;
+    this.event('attack',m.uid,p.id,{impactAt:hitAt,endsAt,generation:p.generation,actorGeneration:m.generation,effect:profile.element,
+      attackKind:'aimed-line',halfWidth:profile.halfWidth,origin,destination:endPoint,durationMs:profile.windup*1000});
   }
   private monsterRadius(m:WorldMonster):number{if(m.canonicalMobId)return m.bodyRadius??.46;return [CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.5:m.id.includes('golem')?1:m.id==='big'?1.2:m.id==='mini'?.9:.42;}
   private bodyRadius(actor:Position):number {if('canonicalMobId' in actor&&actor.canonicalMobId)return (actor as WorldMonster).bodyRadius??.46;const m=('uid' in actor&&'id' in actor&&Object.hasOwn(MONSTERS,String(actor.id)))?actor as WorldMonster:undefined;return m?[CAVE_BOSS_ID,'rift_boss'].includes(m.id)?1.65:m.id.includes('golem')?1.05:m.id==='big'?1.4:m.id==='mini'?2.05:m.id==='wolf'?1.615:.46:.46;}

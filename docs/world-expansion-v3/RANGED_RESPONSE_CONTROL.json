@@ -1,0 +1,2002 @@
+{
+  "schema": 1,
+  "stage": "starter-v3-ranged-candidate",
+  "sourceHashes": {
+    "src/server/world-simulation.ts": "5eb07077a6887826a785015bd1606de4817b0596aac3b7da6083c9aceed2f508",
+    "src/network/world-protocol.ts": "04beae81a563935e7ead2b99928f8f03f061773847828e933757364aba47ac6f",
+    "src/data/ranged-response-v3.ts": "77606443815f9bc0defa574382664427f953698c77360dd7159725870f3579a9",
+    "scripts/world_expansion_v3/ranged-response-control.mjs": "05077f12caf85c8fa015fb984a70f0cc528f5e81dd2297a481264ee720234033"
+  },
+  "sourcesChangedDuringRun": false,
+  "stationary": [
+    {
+      "speciesId": "fire_golem",
+      "classId": "ranger",
+      "level": 15,
+      "targetUid": "wf:volcano:fire_golem:000",
+      "population": 1,
+      "initial": {
+        "hp": 884,
+        "mp": 369,
+        "targetHp": 650
+      },
+      "hpBeforeImpact": 884,
+      "expectedUnchangedBeforeImpact": 884,
+      "finalHp": 816,
+      "attack": {
+        "actor": "wf:volcano:fire_golem:000",
+        "target": "p2-test-3",
+        "generation": 1,
+        "actorGeneration": 1,
+        "hitAt": 2700,
+        "endsAt": 4300,
+        "skill": null,
+        "monster": true,
+        "counter": {
+          "origin": {
+            "spaceId": "surface",
+            "x": 439.280375,
+            "z": 519.119,
+            "y": 254.5713770332337
+          },
+          "endPoint": {
+            "spaceId": "surface",
+            "x": 455.27937744537087,
+            "z": 519.119,
+            "y": 253.45044851339605
+          },
+          "halfWidth": 0.9,
+          "multiplier": 1.2,
+          "type": "magic",
+          "element": "fire"
+        },
+        "released": true
+      },
+      "ground": {
+        "id": "wf:volcano:fire_golem:000:counter:1:2700",
+        "kind": "line",
+        "owner": "wf:volcano:fire_golem:000",
+        "point": {
+          "x": 439.280375,
+          "z": 519.119,
+          "spaceId": "surface"
+        },
+        "endPoint": {
+          "x": 455.27937744537087,
+          "z": 519.119,
+          "spaceId": "surface"
+        },
+        "radius": 0.9,
+        "halfWidth": 0.9,
+        "expiresAt": 2700,
+        "effect": "fire"
+      },
+      "hits": [
+        {
+          "kind": "hit",
+          "actor": "wf:volcano:fire_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "amount": 68,
+          "targetHp": 816,
+          "targetMaxHp": 884,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 2700,
+          "sequence": 7
+        }
+      ],
+      "releases": [
+        {
+          "kind": "release",
+          "actor": "wf:volcano:fire_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "effect": "fire",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": 439.280375,
+            "z": 519.119,
+            "y": 254.5713770332337
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": 455.27937744537087,
+            "z": 519.119,
+            "y": 253.45044851339605
+          },
+          "durationMs": 0,
+          "generation": 1,
+          "actorGeneration": 1,
+          "at": 2700,
+          "sequence": 6
+        }
+      ],
+      "events": [
+        {
+          "kind": "attack",
+          "actor": "p2-test-3",
+          "target": "wf:volcano:fire_golem:000",
+          "spaceId": "surface",
+          "skill": null,
+          "generation": 1,
+          "impactAt": 1316.6666666666667,
+          "endsAt": 1650,
+          "readyAt": 1994.6478760138118,
+          "actorGeneration": 1,
+          "at": 1016.6666666666666,
+          "sequence": 1
+        },
+        {
+          "kind": "release",
+          "actor": "p2-test-3",
+          "target": "wf:volcano:fire_golem:000",
+          "spaceId": "surface",
+          "skill": null,
+          "generation": 1,
+          "actorGeneration": 1,
+          "effect": "arrow",
+          "durationMs": 280,
+          "origin": {
+            "spaceId": "surface",
+            "x": 448.921,
+            "z": 519.119,
+            "y": 253.96343170166014
+          },
+          "destination": {
+            "x": 438.811625,
+            "z": 519.119,
+            "y": 254.7280078830719
+          },
+          "at": 1316.6666666666667,
+          "sequence": 2
+        },
+        {
+          "kind": "attack",
+          "actor": "wf:volcano:fire_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "impactAt": 2700,
+          "endsAt": 4300,
+          "generation": 1,
+          "actorGeneration": 1,
+          "effect": "fire",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": 439.280375,
+            "z": 519.119,
+            "y": 254.5713770332337
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": 455.27937744537087,
+            "z": 519.119,
+            "y": 253.45044851339605
+          },
+          "durationMs": 1200,
+          "at": 1500,
+          "sequence": 3
+        },
+        {
+          "kind": "hit",
+          "actor": "p2-test-3",
+          "target": "wf:volcano:fire_golem:000",
+          "spaceId": "surface",
+          "amount": 25,
+          "critical": false,
+          "targetHp": 625,
+          "targetMaxHp": 650,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 1600,
+          "sequence": 5
+        },
+        {
+          "kind": "release",
+          "actor": "wf:volcano:fire_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "effect": "fire",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": 439.280375,
+            "z": 519.119,
+            "y": 254.5713770332337
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": 455.27937744537087,
+            "z": 519.119,
+            "y": 253.45044851339605
+          },
+          "durationMs": 0,
+          "generation": 1,
+          "actorGeneration": 1,
+          "at": 2700,
+          "sequence": 6
+        },
+        {
+          "kind": "hit",
+          "actor": "wf:volcano:fire_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "amount": 68,
+          "targetHp": 816,
+          "targetMaxHp": 884,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 2700,
+          "sequence": 7
+        }
+      ],
+      "method": "One initial reference+3 fixture on real terrain; original full-HP target, isolated. Legal single attack or one owned book, cancel and wait. No runtime HP/stat/AI substitutions."
+    },
+    {
+      "speciesId": "ice_golem",
+      "classId": "ranger",
+      "level": 15,
+      "targetUid": "wf:snow:ice_golem:000",
+      "population": 1,
+      "initial": {
+        "hp": 884,
+        "mp": 369,
+        "targetHp": 750
+      },
+      "hpBeforeImpact": 884,
+      "expectedUnchangedBeforeImpact": 884,
+      "finalHp": 809,
+      "attack": {
+        "actor": "wf:snow:ice_golem:000",
+        "target": "p2-test-3",
+        "generation": 1,
+        "actorGeneration": 1,
+        "hitAt": 2700,
+        "endsAt": 4300,
+        "skill": null,
+        "monster": true,
+        "counter": {
+          "origin": {
+            "spaceId": "surface",
+            "x": -499.9317209957759,
+            "z": 365.8302282855105,
+            "y": 182.12153270534498
+          },
+          "endPoint": {
+            "spaceId": "surface",
+            "x": -486.6290369351486,
+            "z": 374.71879760181247,
+            "y": 183.15623141069867
+          },
+          "halfWidth": 0.9,
+          "multiplier": 1.2,
+          "type": "magic",
+          "element": "ice"
+        },
+        "released": true
+      },
+      "ground": {
+        "id": "wf:snow:ice_golem:000:counter:1:2700",
+        "kind": "line",
+        "owner": "wf:snow:ice_golem:000",
+        "point": {
+          "x": -499.9317209957759,
+          "z": 365.8302282855105,
+          "spaceId": "surface"
+        },
+        "endPoint": {
+          "x": -486.6290369351486,
+          "z": 374.71879760181247,
+          "spaceId": "surface"
+        },
+        "radius": 0.9,
+        "halfWidth": 0.9,
+        "expiresAt": 2700,
+        "effect": "ice"
+      },
+      "hits": [
+        {
+          "kind": "hit",
+          "actor": "wf:snow:ice_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "amount": 75,
+          "targetHp": 809,
+          "targetMaxHp": 884,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 2700,
+          "sequence": 7
+        }
+      ],
+      "releases": [
+        {
+          "kind": "release",
+          "actor": "wf:snow:ice_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "effect": "ice",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": -499.9317209957759,
+            "z": 365.8302282855105,
+            "y": 182.12153270534498
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": -486.6290369351486,
+            "z": 374.71879760181247,
+            "y": 183.15623141069867
+          },
+          "durationMs": 0,
+          "generation": 1,
+          "actorGeneration": 1,
+          "at": 2700,
+          "sequence": 6
+        }
+      ],
+      "events": [
+        {
+          "kind": "attack",
+          "actor": "p2-test-3",
+          "target": "wf:snow:ice_golem:000",
+          "spaceId": "surface",
+          "skill": null,
+          "generation": 1,
+          "impactAt": 1316.6666666666667,
+          "endsAt": 1650,
+          "readyAt": 1994.6478760138118,
+          "actorGeneration": 1,
+          "at": 1016.6666666666666,
+          "sequence": 1
+        },
+        {
+          "kind": "release",
+          "actor": "p2-test-3",
+          "target": "wf:snow:ice_golem:000",
+          "spaceId": "surface",
+          "skill": null,
+          "generation": 1,
+          "actorGeneration": 1,
+          "effect": "arrow",
+          "durationMs": 280,
+          "origin": {
+            "spaceId": "surface",
+            "x": -491.915834264672,
+            "z": 371.1862725632156,
+            "y": 182.81251797983055
+          },
+          "destination": {
+            "x": -500.32147237654283,
+            "z": 365.5698047387826,
+            "y": 182.1601630699221
+          },
+          "at": 1316.6666666666667,
+          "sequence": 2
+        },
+        {
+          "kind": "attack",
+          "actor": "wf:snow:ice_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "impactAt": 2700,
+          "endsAt": 4300,
+          "generation": 1,
+          "actorGeneration": 1,
+          "effect": "ice",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": -499.9317209957759,
+            "z": 365.8302282855105,
+            "y": 182.12153270534498
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": -486.6290369351486,
+            "z": 374.71879760181247,
+            "y": 183.15623141069867
+          },
+          "durationMs": 1200,
+          "at": 1500,
+          "sequence": 3
+        },
+        {
+          "kind": "hit",
+          "actor": "p2-test-3",
+          "target": "wf:snow:ice_golem:000",
+          "spaceId": "surface",
+          "amount": 25,
+          "critical": false,
+          "targetHp": 725,
+          "targetMaxHp": 750,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 1600,
+          "sequence": 5
+        },
+        {
+          "kind": "release",
+          "actor": "wf:snow:ice_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "effect": "ice",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": -499.9317209957759,
+            "z": 365.8302282855105,
+            "y": 182.12153270534498
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": -486.6290369351486,
+            "z": 374.71879760181247,
+            "y": 183.15623141069867
+          },
+          "durationMs": 0,
+          "generation": 1,
+          "actorGeneration": 1,
+          "at": 2700,
+          "sequence": 6
+        },
+        {
+          "kind": "hit",
+          "actor": "wf:snow:ice_golem:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "amount": 75,
+          "targetHp": 809,
+          "targetMaxHp": 884,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 2700,
+          "sequence": 7
+        }
+      ],
+      "method": "One initial reference+3 fixture on real terrain; original full-HP target, isolated. Legal single attack or one owned book, cancel and wait. No runtime HP/stat/AI substitutions."
+    },
+    {
+      "speciesId": "rift_boss",
+      "classId": "necro",
+      "level": 40,
+      "targetUid": "wf:volcano:rift_boss:000",
+      "population": 1,
+      "initial": {
+        "hp": 1466,
+        "mp": 1208,
+        "targetHp": 9000
+      },
+      "hpBeforeImpact": 1466,
+      "expectedUnchangedBeforeImpact": 1466,
+      "finalHp": 1372,
+      "attack": {
+        "actor": "wf:volcano:rift_boss:000",
+        "target": "p2-test-3",
+        "generation": 1,
+        "actorGeneration": 1,
+        "hitAt": 2700,
+        "endsAt": 4300,
+        "skill": null,
+        "monster": true,
+        "counter": {
+          "origin": {
+            "spaceId": "surface",
+            "x": 546.7163333333325,
+            "z": 489.907,
+            "y": 217.32334761810307
+          },
+          "endPoint": {
+            "spaceId": "surface",
+            "x": 562.7153333337445,
+            "z": 489.907,
+            "y": 217.3378718989402
+          },
+          "halfWidth": 0.9,
+          "multiplier": 1.2,
+          "type": "magic",
+          "element": "fire"
+        },
+        "released": true
+      },
+      "ground": {
+        "id": "wf:volcano:rift_boss:000:counter:1:2700",
+        "kind": "line",
+        "owner": "wf:volcano:rift_boss:000",
+        "point": {
+          "x": 546.7163333333325,
+          "z": 489.907,
+          "spaceId": "surface"
+        },
+        "endPoint": {
+          "x": 562.7153333337445,
+          "z": 489.907,
+          "spaceId": "surface"
+        },
+        "radius": 0.9,
+        "halfWidth": 0.9,
+        "expiresAt": 2700,
+        "effect": "fire"
+      },
+      "hits": [
+        {
+          "kind": "hit",
+          "actor": "wf:volcano:rift_boss:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "amount": 94,
+          "targetHp": 1372,
+          "targetMaxHp": 1466,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 2700,
+          "sequence": 6
+        }
+      ],
+      "releases": [
+        {
+          "kind": "release",
+          "actor": "wf:volcano:rift_boss:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "effect": "fire",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": 546.7163333333325,
+            "z": 489.907,
+            "y": 217.32334761810307
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": 562.7153333337445,
+            "z": 489.907,
+            "y": 217.3378718989402
+          },
+          "durationMs": 0,
+          "generation": 1,
+          "actorGeneration": 1,
+          "at": 2700,
+          "sequence": 5
+        }
+      ],
+      "events": [
+        {
+          "kind": "buff",
+          "actor": "p2-test-3",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "bookId": "book_necro_40",
+          "effect": "summon",
+          "durationMs": 115000,
+          "at": 1000,
+          "sequence": 2
+        },
+        {
+          "kind": "attack",
+          "actor": "wf:volcano:rift_boss:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "impactAt": 2700,
+          "endsAt": 4300,
+          "generation": 1,
+          "actorGeneration": 1,
+          "effect": "fire",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": 546.7163333333325,
+            "z": 489.907,
+            "y": 217.32334761810307
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": 562.7153333337445,
+            "z": 489.907,
+            "y": 217.3378718989402
+          },
+          "durationMs": 1200,
+          "at": 1500,
+          "sequence": 4
+        },
+        {
+          "kind": "release",
+          "actor": "wf:volcano:rift_boss:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "effect": "fire",
+          "attackKind": "aimed-line",
+          "halfWidth": 0.9,
+          "origin": {
+            "spaceId": "surface",
+            "x": 546.7163333333325,
+            "z": 489.907,
+            "y": 217.32334761810307
+          },
+          "destination": {
+            "spaceId": "surface",
+            "x": 562.7153333337445,
+            "z": 489.907,
+            "y": 217.3378718989402
+          },
+          "durationMs": 0,
+          "generation": 1,
+          "actorGeneration": 1,
+          "at": 2700,
+          "sequence": 5
+        },
+        {
+          "kind": "hit",
+          "actor": "wf:volcano:rift_boss:000",
+          "target": "p2-test-3",
+          "spaceId": "surface",
+          "amount": 94,
+          "targetHp": 1372,
+          "targetMaxHp": 1466,
+          "targetGeneration": 1,
+          "generation": 1,
+          "at": 2700,
+          "sequence": 6
+        }
+      ],
+      "method": "One initial reference+3 fixture on real terrain; original full-HP target, isolated. Legal single attack or one owned book, cancel and wait. No runtime HP/stat/AI substitutions."
+    }
+  ],
+  "sidestep": {
+    "targetUid": "wf:volcano:fire_golem:000",
+    "hpBefore": 884,
+    "hpAfter": 884,
+    "moved": 3.423,
+    "endpoint": {
+      "spaceId": "surface",
+      "x": 455.27937744537087,
+      "z": 519.119,
+      "y": 253.45044851339605
+    },
+    "fixedEndpoint": {
+      "spaceId": "surface",
+      "x": 455.27937744537087,
+      "z": 519.119,
+      "y": 253.45044851339605
+    },
+    "hero": {
+      "x": 448.921,
+      "z": 522.5423931270503
+    },
+    "hits": [],
+    "release": {
+      "kind": "release",
+      "actor": "wf:volcano:fire_golem:000",
+      "target": "p2-test-3",
+      "spaceId": "surface",
+      "effect": "fire",
+      "attackKind": "aimed-line",
+      "halfWidth": 0.9,
+      "origin": {
+        "spaceId": "surface",
+        "x": 439.280375,
+        "z": 519.119,
+        "y": 254.5713770332337
+      },
+      "destination": {
+        "spaceId": "surface",
+        "x": 455.27937744537087,
+        "z": 519.119,
+        "y": 253.45044851339605
+      },
+      "durationMs": 0,
+      "generation": 1,
+      "actorGeneration": 1,
+      "at": 2700,
+      "sequence": 6
+    },
+    "method": "Real destination across the fixed telegraphed line; no forced position after initial setup."
+  },
+  "circle": {
+    "classId": "necro",
+    "level": 40,
+    "targetId": "rift_boss",
+    "bookId": "book_necro_40",
+    "targetUid": "wf:volcano:rift_boss:000",
+    "legacyDefinition": {
+      "visualModel": "RiftWarden",
+      "visualHeight": 5.1,
+      "name": "Страж раскалённого разлома",
+      "model": "RiftWarden",
+      "level": 25,
+      "hp": 9000,
+      "atk": 90,
+      "xp": 9000,
+      "gold": [
+        1400,
+        2000
+      ],
+      "tint": 16750142,
+      "scale": 2.3,
+      "boss": "big",
+      "drops": []
+    },
+    "population": 1,
+    "equipment": {
+      "weapon": {
+        "id": "mourn_grimoire",
+        "plus": 3,
+        "uid": "audit:mourn_grimoire",
+        "count": 1
+      },
+      "chest": {
+        "id": "bone_raiment",
+        "plus": 3,
+        "uid": "audit:bone_raiment",
+        "count": 1
+      },
+      "head": {
+        "id": "fallen_helm",
+        "plus": 3,
+        "uid": "audit:fallen_helm",
+        "count": 1
+      },
+      "gloves": {
+        "id": "wolf_gloves",
+        "plus": 3,
+        "uid": "audit:wolf_gloves",
+        "count": 1
+      },
+      "boots": {
+        "id": "grave_boots",
+        "plus": 3,
+        "uid": "audit:grave_boots",
+        "count": 1
+      },
+      "belt": {
+        "id": "ash_belt",
+        "plus": 3,
+        "uid": "audit:ash_belt",
+        "count": 1
+      }
+    },
+    "stats": {
+      "str": 14,
+      "dex": 21,
+      "int": 24,
+      "vit": 12,
+      "spi": 22,
+      "atkMin": 22,
+      "atkMax": 29,
+      "matk": 36,
+      "def": 84,
+      "mdef": 69,
+      "crit": 9.68,
+      "accuracy": 89,
+      "physicalAccuracy": 89,
+      "magicAccuracy": 90,
+      "attackInterval": 1.384889522451889,
+      "evasion": 9.450000000000001,
+      "speed": 6.6339999999999995,
+      "manaRegen": 28.976
+    },
+    "initial": {
+      "hp": 1466,
+      "mp": 1208,
+      "gold": 320,
+      "targetHp": 9000
+    },
+    "final": {
+      "hp": 1466,
+      "mp": 1208,
+      "gold": 2020,
+      "targetHp": 0
+    },
+    "killed": true,
+    "heroDead": false,
+    "failure": null,
+    "ttk": 34.7,
+    "targetHpResets": 0,
+    "walkMetres": 181.492,
+    "cast": {
+      "id": "audit-cmd-1",
+      "ok": true,
+      "at": 1000
+    },
+    "enemyAttacks": 5,
+    "damageTaken": 0,
+    "damageDealt": 9180,
+    "incomingHits": [],
+    "outgoingHits": [
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 8730,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 2633.3333333333335,
+        "sequence": 7
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 8460,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 3633.3333333333335,
+        "sequence": 11
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 8190,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 4633.333333333334,
+        "sequence": 14
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 7920,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 5633.333333333334,
+        "sequence": 17
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 7650,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 6633.333333333334,
+        "sequence": 20
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 7380,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 7633.333333333334,
+        "sequence": 23
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 7110,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 8633.333333333334,
+        "sequence": 27
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 6840,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 9633.333333333334,
+        "sequence": 30
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 6570,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 10633.333333333334,
+        "sequence": 34
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 6300,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 11633.333333333334,
+        "sequence": 37
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 6030,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 12650,
+        "sequence": 40
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 5760,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 13650,
+        "sequence": 43
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 5490,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 14650.000000000002,
+        "sequence": 46
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 5220,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 15650.000000000002,
+        "sequence": 50
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 4950,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 16650,
+        "sequence": 53
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 4680,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 17650,
+        "sequence": 57
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 4410,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 18666.666666666668,
+        "sequence": 60
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 4140,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 19666.666666666668,
+        "sequence": 64
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 3870,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 20683.333333333336,
+        "sequence": 67
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 3600,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 21683.333333333336,
+        "sequence": 70
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 3330,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 22683.333333333336,
+        "sequence": 74
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 3060,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 23683.333333333336,
+        "sequence": 77
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 2790,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 24683.333333333336,
+        "sequence": 81
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 2520,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 25683.333333333336,
+        "sequence": 84
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 2250,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 26683.333333333336,
+        "sequence": 87
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 1980,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 27683.333333333336,
+        "sequence": 90
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 1710,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 28683.333333333336,
+        "sequence": 93
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 1440,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 29683.333333333336,
+        "sequence": 97
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 1170,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 30683.333333333336,
+        "sequence": 100
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 900,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 31683.333333333336,
+        "sequence": 104
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 630,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 32700.000000000004,
+        "sequence": 107
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 360,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 33700,
+        "sequence": 110
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 90,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 34700,
+        "sequence": 113
+      },
+      {
+        "kind": "hit",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "amount": 270,
+        "critical": false,
+        "targetHp": 0,
+        "targetMaxHp": 9000,
+        "targetGeneration": 1,
+        "generation": 1,
+        "at": 35700,
+        "sequence": 116
+      }
+    ],
+    "loot": [
+      {
+        "kind": "loot",
+        "actor": "p2-test-3",
+        "target": "wf:volcano:rift_boss:000",
+        "spaceId": "surface",
+        "gold": 1700,
+        "xp": 9000,
+        "items": [
+          "warden_daggers",
+          "warden_shade",
+          "rift_coat",
+          "ancient_shard",
+          "ancient_shard",
+          "ancient_shard",
+          "fire_core",
+          "fire_core",
+          "fire_core",
+          "fire_core",
+          "ice_core",
+          "ice_core",
+          "ice_core",
+          "ice_core",
+          "potion",
+          "potion",
+          "potion",
+          "ether",
+          "ether",
+          "ether",
+          "weapon_scroll",
+          "armor_scroll",
+          "armor_scroll_improved",
+          "mat_12"
+        ],
+        "at": 35700,
+        "sequence": 118
+      }
+    ],
+    "trace": [
+      {
+        "at": 1200,
+        "x": 556.798,
+        "z": 489.907,
+        "heroHp": 1466,
+        "targetHp": 9000,
+        "targetDistance": 10.62,
+        "homeDistance": 0.38,
+        "los": true
+      },
+      {
+        "at": 1700,
+        "x": 556.494,
+        "z": 492.912,
+        "heroHp": 1466,
+        "targetHp": 9000,
+        "targetDistance": 10.229,
+        "homeDistance": 0.918,
+        "los": true
+      },
+      {
+        "at": 2300,
+        "x": 556.226,
+        "z": 495.552,
+        "heroHp": 1466,
+        "targetHp": 9000,
+        "targetDistance": 11.059,
+        "homeDistance": 0.918,
+        "los": true
+      },
+      {
+        "at": 2800,
+        "x": 554.199,
+        "z": 497.791,
+        "heroHp": 1466,
+        "targetHp": 8730,
+        "targetDistance": 10.87,
+        "homeDistance": 0.918,
+        "los": true
+      },
+      {
+        "at": 3400,
+        "x": 552.418,
+        "z": 499.758,
+        "heroHp": 1466,
+        "targetHp": 8730,
+        "targetDistance": 11.382,
+        "homeDistance": 0.918,
+        "los": true
+      },
+      {
+        "at": 3900,
+        "x": 549.582,
+        "z": 500.795,
+        "heroHp": 1466,
+        "targetHp": 8460,
+        "targetDistance": 11.259,
+        "homeDistance": 0.918,
+        "los": true
+      },
+      {
+        "at": 4500,
+        "x": 547.089,
+        "z": 501.706,
+        "heroHp": 1466,
+        "targetHp": 8460,
+        "targetDistance": 11.33,
+        "homeDistance": 1.047,
+        "los": true
+      },
+      {
+        "at": 5000,
+        "x": 544.095,
+        "z": 501.307,
+        "heroHp": 1466,
+        "targetHp": 8190,
+        "targetDistance": 10.094,
+        "homeDistance": 1.905,
+        "los": true
+      },
+      {
+        "at": 5600,
+        "x": 541.465,
+        "z": 500.957,
+        "heroHp": 1466,
+        "targetHp": 8190,
+        "targetDistance": 9.404,
+        "homeDistance": 3.099,
+        "los": true
+      },
+      {
+        "at": 6100,
+        "x": 539.262,
+        "z": 498.891,
+        "heroHp": 1466,
+        "targetHp": 7920,
+        "targetDistance": 8.165,
+        "homeDistance": 4.051,
+        "los": true
+      },
+      {
+        "at": 6600,
+        "x": 536.842,
+        "z": 496.623,
+        "heroHp": 1466,
+        "targetHp": 7920,
+        "targetDistance": 8.246,
+        "homeDistance": 4.844,
+        "los": true
+      },
+      {
+        "at": 7200,
+        "x": 534.906,
+        "z": 494.808,
+        "heroHp": 1466,
+        "targetHp": 7650,
+        "targetDistance": 8.608,
+        "homeDistance": 5.594,
+        "los": true
+      },
+      {
+        "at": 7700.000000000001,
+        "x": 534.798,
+        "z": 491.789,
+        "heroHp": 1466,
+        "targetHp": 7380,
+        "targetDistance": 8.169,
+        "homeDistance": 6.097,
+        "los": true
+      },
+      {
+        "at": 8300,
+        "x": 534.656,
+        "z": 487.812,
+        "heroHp": 1466,
+        "targetHp": 7380,
+        "targetDistance": 9.184,
+        "homeDistance": 6.567,
+        "los": true
+      },
+      {
+        "at": 8800,
+        "x": 534.584,
+        "z": 485.823,
+        "heroHp": 1466,
+        "targetHp": 7110,
+        "targetDistance": 10.318,
+        "homeDistance": 6.603,
+        "los": true
+      },
+      {
+        "at": 9300,
+        "x": 536.669,
+        "z": 483.638,
+        "heroHp": 1466,
+        "targetHp": 7110,
+        "targetDistance": 11.238,
+        "homeDistance": 6.603,
+        "los": true
+      },
+      {
+        "at": 9900,
+        "x": 538.501,
+        "z": 481.718,
+        "heroHp": 1466,
+        "targetHp": 6840,
+        "targetDistance": 12.601,
+        "homeDistance": 6.603,
+        "los": true
+      },
+      {
+        "at": 10400,
+        "x": 536.449,
+        "z": 483.933,
+        "heroHp": 1466,
+        "targetHp": 6840,
+        "targetDistance": 11.046,
+        "homeDistance": 6.603,
+        "los": true
+      },
+      {
+        "at": 11000,
+        "x": 534.645,
+        "z": 485.88,
+        "heroHp": 1466,
+        "targetHp": 6570,
+        "targetDistance": 10.236,
+        "homeDistance": 6.603,
+        "los": true
+      },
+      {
+        "at": 11500,
+        "x": 536.698,
+        "z": 483.665,
+        "heroHp": 1466,
+        "targetHp": 6570,
+        "targetDistance": 10.73,
+        "homeDistance": 6.514,
+        "los": true
+      },
+      {
+        "at": 12100,
+        "x": 538.502,
+        "z": 481.719,
+        "heroHp": 1466,
+        "targetHp": 6300,
+        "targetDistance": 10.774,
+        "homeDistance": 6.336,
+        "los": true
+      },
+      {
+        "at": 12600,
+        "x": 541.391,
+        "z": 480.839,
+        "heroHp": 1466,
+        "targetHp": 6300,
+        "targetDistance": 10.497,
+        "homeDistance": 6.132,
+        "los": true
+      },
+      {
+        "at": 13100,
+        "x": 543.295,
+        "z": 480.259,
+        "heroHp": 1466,
+        "targetHp": 6030,
+        "targetDistance": 10.325,
+        "homeDistance": 5.802,
+        "los": true
+      },
+      {
+        "at": 13600,
+        "x": 546.315,
+        "z": 480.265,
+        "heroHp": 1466,
+        "targetHp": 6030,
+        "targetDistance": 10.5,
+        "homeDistance": 5.502,
+        "los": true
+      },
+      {
+        "at": 14100.000000000002,
+        "x": 548.306,
+        "z": 480.268,
+        "heroHp": 1466,
+        "targetHp": 5760,
+        "targetDistance": 10.591,
+        "homeDistance": 5.195,
+        "los": true
+      },
+      {
+        "at": 14600.000000000002,
+        "x": 550.943,
+        "z": 481.74,
+        "heroHp": 1466,
+        "targetHp": 5760,
+        "targetDistance": 10.568,
+        "homeDistance": 4.861,
+        "los": true
+      },
+      {
+        "at": 15100.000000000002,
+        "x": 552.682,
+        "z": 482.709,
+        "heroHp": 1466,
+        "targetHp": 5490,
+        "targetDistance": 10.533,
+        "homeDistance": 4.528,
+        "los": true
+      },
+      {
+        "at": 15600.000000000002,
+        "x": 553.913,
+        "z": 485.467,
+        "heroHp": 1466,
+        "targetHp": 5490,
+        "targetDistance": 10.247,
+        "homeDistance": 4.314,
+        "los": true
+      },
+      {
+        "at": 16100.000000000002,
+        "x": 555.265,
+        "z": 488.496,
+        "heroHp": 1466,
+        "targetHp": 5220,
+        "targetDistance": 11.813,
+        "homeDistance": 4.314,
+        "los": true
+      },
+      {
+        "at": 16700,
+        "x": 555.571,
+        "z": 487.407,
+        "heroHp": 1466,
+        "targetHp": 4950,
+        "targetDistance": 11.949,
+        "homeDistance": 4.314,
+        "los": true
+      },
+      {
+        "at": 17200,
+        "x": 555.639,
+        "z": 484.092,
+        "heroHp": 1466,
+        "targetHp": 4950,
+        "targetDistance": 12.126,
+        "homeDistance": 4.314,
+        "los": true
+      },
+      {
+        "at": 17700,
+        "x": 555.849,
+        "z": 484.447,
+        "heroHp": 1466,
+        "targetHp": 4680,
+        "targetDistance": 12.279,
+        "homeDistance": 4.314,
+        "los": true
+      },
+      {
+        "at": 18200,
+        "x": 556.476,
+        "z": 487.697,
+        "heroHp": 1466,
+        "targetHp": 4680,
+        "targetDistance": 12.882,
+        "homeDistance": 4.314,
+        "los": true
+      },
+      {
+        "at": 18700,
+        "x": 556.587,
+        "z": 489.386,
+        "heroHp": 1466,
+        "targetHp": 4410,
+        "targetDistance": 12.352,
+        "homeDistance": 3.783,
+        "los": true
+      },
+      {
+        "at": 19200,
+        "x": 555.466,
+        "z": 492.461,
+        "heroHp": 1466,
+        "targetHp": 4410,
+        "targetDistance": 11.319,
+        "homeDistance": 3.259,
+        "los": true
+      },
+      {
+        "at": 19700,
+        "x": 554.825,
+        "z": 494.074,
+        "heroHp": 1466,
+        "targetHp": 4140,
+        "targetDistance": 10.577,
+        "homeDistance": 2.92,
+        "los": true
+      },
+      {
+        "at": 20200,
+        "x": 553.34,
+        "z": 496.99,
+        "heroHp": 1466,
+        "targetHp": 4140,
+        "targetDistance": 10.666,
+        "homeDistance": 2.784,
+        "los": true
+      },
+      {
+        "at": 20700,
+        "x": 552.406,
+        "z": 498.415,
+        "heroHp": 1466,
+        "targetHp": 3870,
+        "targetDistance": 10.325,
+        "homeDistance": 2.745,
+        "los": true
+      },
+      {
+        "at": 21200,
+        "x": 549.765,
+        "z": 500.348,
+        "heroHp": 1466,
+        "targetHp": 3870,
+        "targetDistance": 10.377,
+        "homeDistance": 2.982,
+        "los": true
+      },
+      {
+        "at": 21700,
+        "x": 548.16,
+        "z": 501.523,
+        "heroHp": 1466,
+        "targetHp": 3600,
+        "targetDistance": 10.38,
+        "homeDistance": 3.415,
+        "los": true
+      },
+      {
+        "at": 22200,
+        "x": 545.187,
+        "z": 500.991,
+        "heroHp": 1466,
+        "targetHp": 3600,
+        "targetDistance": 9.387,
+        "homeDistance": 3.935,
+        "los": true
+      },
+      {
+        "at": 22700,
+        "x": 541.922,
+        "z": 500.405,
+        "heroHp": 1466,
+        "targetHp": 3330,
+        "targetDistance": 9.993,
+        "homeDistance": 4.158,
+        "los": true
+      },
+      {
+        "at": 23300,
+        "x": 539.31,
+        "z": 499.937,
+        "heroHp": 1466,
+        "targetHp": 3330,
+        "targetDistance": 11.613,
+        "homeDistance": 4.158,
+        "los": true
+      },
+      {
+        "at": 23800,
+        "x": 537.649,
+        "z": 497.414,
+        "heroHp": 1466,
+        "targetHp": 3060,
+        "targetDistance": 11.821,
+        "homeDistance": 4.158,
+        "los": true
+      },
+      {
+        "at": 24400,
+        "x": 536.19,
+        "z": 495.198,
+        "heroHp": 1466,
+        "targetHp": 3060,
+        "targetDistance": 12.612,
+        "homeDistance": 4.158,
+        "los": true
+      },
+      {
+        "at": 24900,
+        "x": 535.976,
+        "z": 492.185,
+        "heroHp": 1466,
+        "targetHp": 2790,
+        "targetDistance": 12.653,
+        "homeDistance": 4.158,
+        "los": true
+      },
+      {
+        "at": 25400,
+        "x": 535.835,
+        "z": 490.2,
+        "heroHp": 1466,
+        "targetHp": 2790,
+        "targetDistance": 12.83,
+        "homeDistance": 3.966,
+        "los": true
+      },
+      {
+        "at": 25900,
+        "x": 535.71,
+        "z": 493.218,
+        "heroHp": 1466,
+        "targetHp": 2520,
+        "targetDistance": 11.514,
+        "homeDistance": 3.106,
+        "los": true
+      },
+      {
+        "at": 26500,
+        "x": 535.601,
+        "z": 495.869,
+        "heroHp": 1466,
+        "targetHp": 2520,
+        "targetDistance": 10.657,
+        "homeDistance": 2.856,
+        "los": true
+      },
+      {
+        "at": 27000.000000000004,
+        "x": 535.133,
+        "z": 492.885,
+        "heroHp": 1466,
+        "targetHp": 2250,
+        "targetDistance": 9.506,
+        "homeDistance": 3.323,
+        "los": true
+      },
+      {
+        "at": 27500.000000000004,
+        "x": 534.62,
+        "z": 489.608,
+        "heroHp": 1466,
+        "targetHp": 2250,
+        "targetDistance": 9.505,
+        "homeDistance": 3.896,
+        "los": true
+      },
+      {
+        "at": 28100.000000000004,
+        "x": 534.209,
+        "z": 486.987,
+        "heroHp": 1466,
+        "targetHp": 1980,
+        "targetDistance": 9.717,
+        "homeDistance": 4.499,
+        "los": true
+      },
+      {
+        "at": 28600.000000000004,
+        "x": 536,
+        "z": 484.555,
+        "heroHp": 1466,
+        "targetHp": 1980,
+        "targetDistance": 8.975,
+        "homeDistance": 4.975,
+        "los": true
+      },
+      {
+        "at": 29100.000000000004,
+        "x": 537.966,
+        "z": 481.883,
+        "heroHp": 1466,
+        "targetHp": 1710,
+        "targetDistance": 9.373,
+        "homeDistance": 5.385,
+        "los": true
+      },
+      {
+        "at": 29700.000000000004,
+        "x": 539.54,
+        "z": 479.746,
+        "heroHp": 1466,
+        "targetHp": 1440,
+        "targetDistance": 10.333,
+        "homeDistance": 5.571,
+        "los": true
+      },
+      {
+        "at": 30200.000000000004,
+        "x": 542.424,
+        "z": 478.852,
+        "heroHp": 1466,
+        "targetHp": 1440,
+        "targetDistance": 11.417,
+        "homeDistance": 5.571,
+        "los": true
+      },
+      {
+        "at": 30800.000000000004,
+        "x": 544.959,
+        "z": 478.066,
+        "heroHp": 1466,
+        "targetHp": 1170,
+        "targetDistance": 12.89,
+        "homeDistance": 5.571,
+        "los": true
+      },
+      {
+        "at": 31300.000000000004,
+        "x": 542.085,
+        "z": 478.994,
+        "heroHp": 1466,
+        "targetHp": 1170,
+        "targetDistance": 11.217,
+        "homeDistance": 5.571,
+        "los": true
+      },
+      {
+        "at": 31900.000000000004,
+        "x": 539.56,
+        "z": 479.809,
+        "heroHp": 1466,
+        "targetHp": 900,
+        "targetDistance": 10.269,
+        "homeDistance": 5.571,
+        "los": true
+      },
+      {
+        "at": 32400.000000000004,
+        "x": 542.434,
+        "z": 478.882,
+        "heroHp": 1466,
+        "targetHp": 900,
+        "targetDistance": 11.152,
+        "homeDistance": 5.534,
+        "los": true
+      },
+      {
+        "at": 33000,
+        "x": 544.959,
+        "z": 478.067,
+        "heroHp": 1466,
+        "targetHp": 630,
+        "targetDistance": 11.27,
+        "homeDistance": 5.494,
+        "los": true
+      },
+      {
+        "at": 33500,
+        "x": 547.815,
+        "z": 479.052,
+        "heroHp": 1466,
+        "targetHp": 630,
+        "targetDistance": 10.737,
+        "homeDistance": 5.466,
+        "los": true
+      },
+      {
+        "at": 34100,
+        "x": 550.323,
+        "z": 479.917,
+        "heroHp": 1466,
+        "targetHp": 360,
+        "targetDistance": 10.547,
+        "homeDistance": 5.347,
+        "los": true
+      },
+      {
+        "at": 34600,
+        "x": 552.669,
+        "z": 481.82,
+        "heroHp": 1466,
+        "targetHp": 360,
+        "targetDistance": 10.512,
+        "homeDistance": 5.262,
+        "los": true
+      },
+      {
+        "at": 35100,
+        "x": 554.214,
+        "z": 483.073,
+        "heroHp": 1466,
+        "targetHp": 90,
+        "targetDistance": 10.497,
+        "homeDistance": 5.18,
+        "los": true
+      },
+      {
+        "at": 35600,
+        "x": 555.521,
+        "z": 485.796,
+        "heroHp": 1466,
+        "targetHp": 90,
+        "targetDistance": 10.482,
+        "homeDistance": 5.072,
+        "los": true
+      }
+    ],
+    "method": "One synthetic level/current-reference-equipment+3 and initial standing fixture; actual legacy full-HP target at its original home, isolated population. Then ordinary single-attack/destination/cancel or one owned class book plus movement; no resource/HP resets, no edited combat definitions or saves. Server-only."
+  },
+  "historicalSha256": "f8352067648fc83055e716172e8f8503b40c5731604d01a6b131905ff8b135d5",
+  "limits": [
+    "Native telegraph/animation not tested here.",
+    "Legacy mode and monster stats/loot unchanged.",
+    "Sidestep is valid play; circle survival does not invalidate aimed-line."
+  ]
+}
