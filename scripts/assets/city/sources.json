@@ -1,0 +1,62 @@
+{
+  "blender": "4.2.3",
+  "mpfb_version": "2.0.17 FROM_SOURCE",
+  "mpfb_commit": "437dd513888a92399d1d3200d2e80859fae55abc",
+  "sources": [
+    {
+      "id": "city-p2/housepack",
+      "url": "https://opengameart.org/sites/default/files/75519_House1Upload_blend.zip",
+      "page": "https://opengameart.org/content/medieval-house-pack",
+      "license": "CC0-1.0",
+      "cache_file": "city-p2/housepack/75519_House1Upload_blend.zip",
+      "sha256": "d7b53c94eb77fbba5e57360bbc8ac9889eff85340bf1e9a92d851e58b88cee0d",
+      "bytes": 5947310,
+      "extract_to": "city-p2/housepack/extracted"
+    },
+    {
+      "id": "city-p2/gatehouse",
+      "url": "https://opengameart.org/sites/default/files/76122_GateHouse2Upload_blend.zip",
+      "page": "https://opengameart.org/content/medieval-gatehouse",
+      "license": "CC0-1.0",
+      "cache_file": "city-p2/gatehouse/76122_GateHouse2Upload_blend.zip",
+      "sha256": "55ca154ba147434061d5a7407f981a3ba654dcae7d3e871538c2e5d06ceba438",
+      "bytes": 5481649,
+      "extract_to": "city-p2/gatehouse/extracted"
+    },
+    {
+      "id": "city-p2/suits02",
+      "url": "https://files2.makehumancommunity.org/asset_packs/suits02/suits02_cc0.zip",
+      "page": "https://static.makehumancommunity.org/assets/assetpacks/suits02.html",
+      "license": "CC0-1.0",
+      "cache_file": "city-p2/suits02/suits02.zip",
+      "sha256": "437f4d7ab92b698c1fb1047e7d62b22c11f195b2473e936118661dc8e6b7eb7a",
+      "bytes": 192511027,
+      "extract_to": "city-p2/suits02/extracted"
+    },
+    {
+      "id": "A03",
+      "url": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "page": "https://static.makehumancommunity.org/assets/assetpacks/makehuman_system_assets.html",
+      "license": "CC0-1.0",
+      "cache_file": "A03/makehuman_system_assets_cc0.zip",
+      "sha256": "b542127a8e25547c7c29c19f2d1d2adb9a664c80396ecd694095dbc8028a0107",
+      "bytes": 280737770,
+      "extract_to": "A03/extracted"
+    },
+    {
+      "id": "MPFB2",
+      "url": "https://codeload.github.com/makehumancommunity/mpfb2/zip/refs/heads/master",
+      "pinned_commit": "437dd513888a92399d1d3200d2e80859fae55abc",
+      "pinned_commit_url": "https://github.com/makehumancommunity/mpfb2/tree/437dd513888a92399d1d3200d2e80859fae55abc",
+      "cache_file": "city-p2/mpfb/mpfb2-master.zip",
+      "sha256": "e82923cd5a8b5fe2587605419a6d9bdd3c3757fcdb11248e14137d868b3d82b9",
+      "bytes": 44656319,
+      "extract_to": "city-p2/mpfb/extracted",
+      "required_directory_name": "mpfb2-master",
+      "tool_license": "GPL; executable tool only; generated core/selected clothing artCC0",
+      "note": "ZIP comment pins source tree. Pinned-commit archive has a different ZIP digest/root name; use recorded archive or independently verify its tree and normalize directory name."
+    }
+  ],
+  "existing_repo_source": "public/assets/models/realism/wooden_crate_01; Poly HavenCC0",
+  "source_archive_policy": "Sources stay in external intake. Do not publish the entire source cache or GPL tool inside game art."
+}

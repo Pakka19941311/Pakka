@@ -1,0 +1,35 @@
+{
+	"captures": [
+		"01-street-overview.png",
+		"02-gate-eye-level.png",
+		"03-house-eye-level.png",
+		"04-guard.png",
+		"05-resident.png"
+	],
+	"checks": {
+		"P2CityGuard_idle_changes_bones": true,
+		"P2CityGuard_idle_present": true,
+		"P2CityGuard_rig_present": true,
+		"P2CityResident_idle_changes_bones": true,
+		"P2CityResident_idle_present": true,
+		"P2CityResident_rig_present": true,
+		"source_gate_loaded": true,
+		"source_house_loaded": true,
+		"two_native_factory_actors": true
+	},
+	"godot": {
+		"build": "official",
+		"hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+		"hex": 263683,
+		"major": 4,
+		"minor": 6,
+		"patch": 3,
+		"status": "stable",
+		"string": "4.6.3-stable (official)",
+		"timestamp": 0
+	},
+	"live_world_modified": false,
+	"native_render": true,
+	"note": "Actors have authored idle only; no completed route, pathfinding, trading or guard combat is claimed. Camera controls are free inspection, not player collision movement.",
+	"status": "visual candidate; bounded street sample"
+}

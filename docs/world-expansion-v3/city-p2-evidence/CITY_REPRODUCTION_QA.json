@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "method": "All3public generators executed against verified original intake in fresh output; published GLBs untouched.",
+  "blender": "4.2.3",
+  "models": [
+    {
+      "name": "P2_crate.glb",
+      "bytes": 2276684,
+      "published_sha256": "baab63d5b08dd8c3411daa8ea960494a358589979d817e9de7003fadb2ae67c3",
+      "reproduced_sha256": "baab63d5b08dd8c3411daa8ea960494a358589979d817e9de7003fadb2ae67c3",
+      "identical_bytes": true
+    },
+    {
+      "name": "P2_gatehouse.glb",
+      "bytes": 1662392,
+      "published_sha256": "0dd567d41189a662126728b109c1a2de039bf5c9e7872017571a5b3074e7d851",
+      "reproduced_sha256": "0dd567d41189a662126728b109c1a2de039bf5c9e7872017571a5b3074e7d851",
+      "identical_bytes": true
+    },
+    {
+      "name": "P2_guard.glb",
+      "bytes": 7735296,
+      "published_sha256": "154d8c48c71baa6bfcd20f96779a0d503c9f84d9d604354d99bf397bdda6c6aa",
+      "reproduced_sha256": "154d8c48c71baa6bfcd20f96779a0d503c9f84d9d604354d99bf397bdda6c6aa",
+      "identical_bytes": true
+    },
+    {
+      "name": "P2_housepack.glb",
+      "bytes": 5442940,
+      "published_sha256": "3b194cf46421694bf46a296fe04f4900edaddbb69770c20aa99f51ee15fc6e91",
+      "reproduced_sha256": "3b194cf46421694bf46a296fe04f4900edaddbb69770c20aa99f51ee15fc6e91",
+      "identical_bytes": true
+    },
+    {
+      "name": "P2_resident.glb",
+      "bytes": 12635968,
+      "published_sha256": "87aa0590589b5ebd0cb55959d26830891fd9d3521aaaf87036b617187adad8d7",
+      "reproduced_sha256": "87aa0590589b5ebd0cb55959d26830891fd9d3521aaaf87036b617187adad8d7",
+      "identical_bytes": true
+    }
+  ],
+  "generator_hashes": {
+    "scripts/assets/city/prepare_arch.py": "b19b7f37e58a1f7100e5bcd02913b27cc6c478989f3ad6d6bb08af6af3753276",
+    "scripts/assets/city/prepare_npc.py": "b0a42d6fd9887e5004bc8ab88e44acec0c557ad04099e6c91d975872ece96835",
+    "scripts/assets/city/prepare_props.py": "0cc589d267a5a2e1ac181e255ef07f4cc2a9680eec3241ade874955e0adeb755",
+    "scripts/assets/city/verify_sources.py": "12d050574b176f444f29011347a5572e8753acdd0a64b8fc96b7b687cba19ca9"
+  },
+  "notes": [
+    "Original legacy architecture files print missing external texture autopack messages while opening; their packed textures are present and the regenerated GLBs are byte-identical.",
+    "Initial props report writer shadowed the output directory variable. Fixed to prop_reports; repeated export and report succeeded.",
+    "Windows Blender extension cache write permission warning remains outside generated art."
+  ],
+  "godot_retested": false,
+  "reason": "Published artifacts unchanged; earlier native city evidence remains applicable."
+}
