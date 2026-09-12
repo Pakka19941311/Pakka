@@ -11,6 +11,7 @@ signal receipt_received(receipt: Dictionary)
 signal intent_reserved(value: Dictionary, input_sequence: int)
 signal intent_submitted(value: Dictionary)
 signal intent_rejected(value: Dictionary, input_sequence: int, error: String)
+signal stream_disconnected(reason: String, diagnostic: Dictionary)
 
 var server_url: String = "http://127.0.0.1:4185"
 var token: String = ""
@@ -33,6 +34,8 @@ var stream_bytes: PackedByteArray = PackedByteArray()
 var stream_scan: int = 1
 var retry_in: float = 0.0
 var silence: float = 0.0
+var stream_progress_ms: int = Time.get_ticks_msec()
+var stream_fragment_ms: int = -1
 var input_queue: Array = []
 var input_busy: bool = false
 var input_transport: InputTransport
@@ -191,43 +194,80 @@ func _process(delta: float) -> void:
 	if token.is_empty() or session_busy or incompatible:
 		return
 	retry_in -= delta
-	silence += delta
 	if retry_in > 0:
 		return
+	var previous_status: int = stream.get_status()
+	var available_before_poll: int = stream_available_bytes()
 	stream.poll()
+	if stream.get_status() != previous_status or stream_available_bytes() < available_before_poll:
+		record_stream_progress()
 	match stream.get_status():
 		HTTPClient.STATUS_DISCONNECTED:
 			var address: String = server_url.trim_prefix("http://").trim_prefix("https://").trim_suffix("/")
 			var host: String = address.get_slice(":", 0)
 			var port: int = int(address.get_slice(":", 1)) if ":" in address else (443 if server_url.begins_with("https://") else 80)
 			stream.connect_to_host(host, port, TLSOptions.client() if server_url.begins_with("https://") else null)
+			record_stream_progress()
 		HTTPClient.STATUS_CONNECTED:
 			if not stream_requested:
 				stream_requested = true
 				stream.request(HTTPClient.METHOD_GET, "/api/stream?after=" + str(event_cursor), ["Authorization: Bearer " + token, "Accept: text/event-stream"])
+				record_stream_progress()
 			elif stream.has_response():
-				stream_failed()
+				stream_failed("unexpected-connected-response")
 		HTTPClient.STATUS_BODY:
 			if stream.get_response_code() == 401:
 				end_session()
 				notice.emit("Доступ к герою истёк. Откройте «Герои» и повторите вход.")
 				return
 			if stream.get_response_code() != 200:
-				stream_failed()
+				stream_failed("http-status-"+str(stream.get_response_code()))
 				return
+			var read_bytes: int = 0
 			for index: int in range(64):
+				var available_before: int = stream_available_bytes()
 				var chunk: PackedByteArray = stream.read_response_body_chunk()
-				if chunk.is_empty():
+				var available_after: int = stream_available_bytes()
+				# Chunked HTTP may consume a partial HTTP chunk yet return no body.
+				# Account for socket progress, not just a completed SSE/JSON packet.
+				if not chunk.is_empty() or available_after < available_before:
+					record_stream_progress(true)
+				if not chunk.is_empty():
+					stream_bytes.append_array(chunk)
+					read_bytes += chunk.size()
+				if stream.get_status() != HTTPClient.STATUS_BODY or read_bytes >= 1048576:
 					break
-				stream_bytes.append_array(chunk)
-				if stream_bytes.size() > 4194304:
-					stream_failed()
-					return
+				if chunk.is_empty() and available_after == 0:
+					break
 			consume_stream()
+			if stream_bytes.size() > 4194304:
+				stream_failed("sse-buffer-limit")
+				return
 		HTTPClient.STATUS_CANT_RESOLVE, HTTPClient.STATUS_CANT_CONNECT, HTTPClient.STATUS_CONNECTION_ERROR, HTTPClient.STATUS_TLS_HANDSHAKE_ERROR:
-			stream_failed()
-	if silence > 5.0:
-		stream_failed()
+			stream_failed("http-client-status-"+str(stream.get_status()))
+	check_stream_deadline(Time.get_ticks_msec())
+
+func check_stream_deadline(now_ms: int) -> void:
+	if stream_fragment_ms >= 0 and now_ms - stream_fragment_ms > 5000:
+		stream_failed("sse-incomplete-packet")
+	elif stream_silence_expired(now_ms):
+		stream_failed("sse-silence")
+
+func stream_available_bytes() -> int:
+	var peer: StreamPeer = stream.get_connection()
+	return 0 if peer == null else peer.get_available_bytes()
+
+func record_stream_progress(body: bool = false) -> void:
+	stream_progress_ms = Time.get_ticks_msec()
+	silence = 0.0
+	if body and stream_fragment_ms < 0:
+		stream_fragment_ms = stream_progress_ms
+
+func stream_silence_expired(now_ms: int) -> bool:
+	# Render delta includes time before the last network progress in that frame.
+	# A transport deadline must use the monotonic time of actual I/O instead.
+	silence = maxf(0.0, float(now_ms - stream_progress_ms) / 1000.0)
+	return silence > 5.0
 
 func consume_stream() -> void:
 	var cpu_stream: int = CPU_TRACE.begin()
@@ -258,11 +298,12 @@ func _profiled_consume_stream() -> void:
 					var value = JSON.parse_string(line.trim_prefix("data:").strip_edges())
 					CPU_TRACE.count("sse_packets")
 					if value is Dictionary:
-						silence = 0
+						record_stream_progress()
+						stream_fragment_ms = -1
 						for event: Dictionary in value.get("events", []):
 							events[int(event.sequence)] = event
 						if events.size() > 2048:
-							stream_failed()
+							stream_failed("sse-event-limit")
 							return
 						if latest.is_empty() or int(value.get("revision", 0)) > int(latest.get("revision", 0)) or (int(value.get("revision", 0)) == int(latest.get("revision", 0)) and float(value.get("time", 0)) >= float(latest.get("time", 0))):
 							latest = value
@@ -272,6 +313,8 @@ func _profiled_consume_stream() -> void:
 	if consumed > 0:
 		stream_bytes = stream_bytes.slice(consumed)
 		stream_scan = maxi(1, stream_scan - consumed)
+	if not stream_bytes.is_empty() and stream_fragment_ms < 0:
+		stream_fragment_ms = Time.get_ticks_msec()
 	if not latest.is_empty():
 		var order: Array = events.keys()
 		order.sort()
@@ -283,9 +326,11 @@ func close_stream() -> void:
 	stream_requested = false
 	stream_bytes.clear()
 	stream_scan = 1
-	silence = 0
+	stream_fragment_ms = -1
+	record_stream_progress()
 
-func stream_failed() -> void:
+func stream_failed(reason: String = "unspecified") -> void:
+	stream_disconnected.emit(reason,{"wall_ms":Time.get_ticks_msec(),"buffer_bytes":stream_bytes.size(),"silence_seconds":silence,"http_status":stream.get_status(),"pending_input_count":input_queue.size(),"sequence":sequence,"generation":hero.get("generation",-1)})
 	stop_input_transport()
 	close_stream()
 	retry_in = 1.0
@@ -331,7 +376,7 @@ func input_completed(entry: Dictionary, response: Dictionary) -> void:
 	if response.has("error"):
 		intent_rejected.emit(entry.value.duplicate(true),int(entry.sequence),str(response.error))
 		notice.emit(str(response.error))
-		if response.get("transport_error", false): stream_failed()
+		if response.get("transport_error", false): stream_failed("input-transport-error")
 
 func stop_input_transport() -> void:
 	if input_transport != null:
