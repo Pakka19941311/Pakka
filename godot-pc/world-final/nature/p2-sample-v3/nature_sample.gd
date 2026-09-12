@@ -48,7 +48,14 @@ func bind_local_shore_water() -> void:
 	shore_water.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	var material: ShaderMaterial=ShaderMaterial.new();material.shader=load(ROOT+"shore_water.gdshader")
 	var b: Array=data.regions.shore;material.set_shader_parameter("bounds",Vector4(b[0],b[1],b[2],b[3]))
-	var a: Array=data.qaWaterPolygon[0];var end: Array=data.qaWaterPolygon[-1]
+	var polyline: Array = data.get("qaShorePolyline",[data.qaWaterPolygon[0],data.qaWaterPolygon[-1]])
+	var points: PackedVector2Array = PackedVector2Array()
+	for i in range(8):
+		var point: Array = polyline[mini(i,polyline.size()-1)]
+		points.append(Vector2(float(point[0]),float(point[1])))
+	material.set_shader_parameter("shore_points",points)
+	material.set_shader_parameter("shore_point_count",mini(8,polyline.size()))
+	var a: Array=polyline[0];var end: Array=polyline[-1]
 	material.set_shader_parameter("shore_a",Vector2(a[0],a[1]));material.set_shader_parameter("shore_b",Vector2(end[0],end[1]))
 	material.set_shader_parameter("sediment",load(ROOT+str(data.textures.mud.path)))
 	shore_water.material_override=material

@@ -1,0 +1,79 @@
+{
+  "ok": true,
+  "checks": {
+    "all_changed_render_vertices_equal_authoritative_height": true,
+    "irregular_boundary_140_points": true,
+    "three_actual_islets": true,
+    "LAKE_ISLET_REEDS_walkable_above_water": true,
+    "LAKE_ISLET_STONE_walkable_above_water": true,
+    "LAKE_ISLET_PINE_walkable_above_water": true,
+    "water_blocked_130_-105": true,
+    "water_blocked_270_-110": true,
+    "water_blocked_175_-175": true,
+    "water_blocked_305_-30": true,
+    "new_pier_from_existing_road_endpoints_free": true,
+    "new_pier_from_existing_road_route_found": true,
+    "new_pier_from_existing_road_segment_0_0": true,
+    "new_pier_from_existing_road_segment_0_1": true,
+    "new_pier_from_existing_road_segment_0_2": true,
+    "new_pier_from_existing_road_segment_0_3": true,
+    "retained_east_pier_endpoints_free": true,
+    "retained_east_pier_route_found": true,
+    "retained_east_pier_segment_1_0": true,
+    "pier_center_and_offset_99.15": true,
+    "pier_center_and_offset_100": true,
+    "pier_center_and_offset_100.85": true
+  },
+  "renderVerticesCompared": 67600,
+  "maximumHeightError": 0,
+  "mapVersion": "world-final-gameplay-1-starter-v3-bb8e5b31cad360c725f59fbb33213849318e6b28efe5f10935a390c3243b4e1e",
+  "routes": [
+    {
+      "id": "new_pier_from_existing_road",
+      "start": {
+        "x": 190,
+        "z": -145
+      },
+      "goal": {
+        "x": 100,
+        "z": 30
+      },
+      "path": [
+        {
+          "x": 119.05,
+          "z": -16.700000000000017
+        },
+        {
+          "x": 119.05,
+          "z": -6.350000000000023
+        },
+        {
+          "x": 100.65,
+          "z": 8.599999999999994
+        },
+        {
+          "x": 100,
+          "z": 30
+        }
+      ]
+    },
+    {
+      "id": "retained_east_pier",
+      "start": {
+        "x": 380,
+        "z": -25
+      },
+      "goal": {
+        "x": 326,
+        "z": -25
+      },
+      "path": [
+        {
+          "x": 326,
+          "z": -25
+        }
+      ]
+    }
+  ],
+  "limitations": "Isolated geometry and authoritative navigation; no claim of full gameplay frame-rate acceptance."
+}

@@ -78,6 +78,16 @@ func activate_space(id: String) -> bool:
 			if landmarks == null:
 				push_error("Missing final architecture")
 				return false
+			var lake_surface: MeshInstance3D = landmarks.find_child("Lake_Level_40m",true,false) as MeshInstance3D
+			if lake_surface != null:
+				var water_material: ShaderMaterial = ShaderMaterial.new()
+				water_material.shader = load(ROOT+"materials/lake_water_p2.gdshader")
+				lake_surface.material_override = water_material
+			var new_pier: MeshInstance3D = landmarks.find_child("P2_LAKE_WEST_PIER",true,false) as MeshInstance3D
+			if new_pier != null:
+				var timber_material: ShaderMaterial = ShaderMaterial.new()
+				timber_material.shader = load(ROOT+"materials/pier_wood_p2.gdshader")
+				new_pier.material_override = timber_material
 			for old_id: String in read_json(courtyard_path).get("tavern",{}).get("replacesLandmarks",[]):
 				var old_building: Node3D = landmarks.find_child(old_id,true,false)
 				if old_building != null: old_building.hide()

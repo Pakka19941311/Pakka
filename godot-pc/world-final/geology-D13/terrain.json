@@ -1730,7 +1730,7 @@
       "glb": "chunks/cell_12_10.glb"
     }
   ],
-  "status": "D13 relaxed ridge candidate; main game and D11 nature unmodified",
+  "status": "Active D13 with P2 organic lake and shared collision grid; native baseline master preserved.",
   "native_source": "art/world-final/Varendor_Geology_D-13.blend",
   "landmarks": "landmarks.glb",
   "architecture_revision": "C09",
@@ -1779,5 +1779,107 @@
     "cell_10_04",
     "cell_11_04"
   ],
-  "native_sha256": "86b7e8f8a810220d41fc2beb09381a175cc8e4b02ba3163b0b9b70c7741a3714"
+  "native_sha256": "86b7e8f8a810220d41fc2beb09381a175cc8e4b02ba3163b0b9b70c7741a3714",
+  "sha256": "7604caa402b56c72cb1324fa1449ad8bc2d642dbc9d6151832d7b89230777d9f",
+  "p2_lake_revision": "organic-shore-islets-v3",
+  "p2_source_generator": "scripts/world_final/author_lake_p2.py",
+  "p2_changed_chunks": [
+    {
+      "id": "cell_06_03",
+      "glb": "chunks/cell_06_03.glb",
+      "sha256": "7c5a0dd3849cd4d8caefa4d3e43dc41156c9c4e3d108936486c6436e32007d01",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_07_03",
+      "glb": "chunks/cell_07_03.glb",
+      "sha256": "d05adc1adb2d24694786bbecbbab728e868b56b4fa28c1cf9ee039d29e90cd5d",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_08_03",
+      "glb": "chunks/cell_08_03.glb",
+      "sha256": "8938f2d68c9884494345d2afdfe5d2c14864fddf81551c99f2792906d0bfa947",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_09_03",
+      "glb": "chunks/cell_09_03.glb",
+      "sha256": "0b90e1d09f6e1712e5e80c600fe3c547941b344027a462b6baba5253315e7b6f",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_05_04",
+      "glb": "chunks/cell_05_04.glb",
+      "sha256": "ca17292e8554454592a8dba34d6d174ebc37907910f5bd5cf55fb65ab6acb33f",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_06_04",
+      "glb": "chunks/cell_06_04.glb",
+      "sha256": "1d70e5c935387de5210b5bd1b5e100b38dd4ff1cb4ee1f197702b8ebbf1b2f77",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_07_04",
+      "glb": "chunks/cell_07_04.glb",
+      "sha256": "f8dbce963762267705b2723a0b295813f3d729712f1ae341ab676f0a8c78b6f1",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_08_04",
+      "glb": "chunks/cell_08_04.glb",
+      "sha256": "2b6bc1cc4e0562f63c5401738a6c5518e69e293bd868cea3c2c594de5695ea14",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_09_04",
+      "glb": "chunks/cell_09_04.glb",
+      "sha256": "216cb64147498a603236971ab9f7b2901ddb2f7eb641e05dd5efeb5877cc9009",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_05_05",
+      "glb": "chunks/cell_05_05.glb",
+      "sha256": "47e57e01faac91bab34fc7fe8b7420980b1f706a100667b3beba99eef5b69b2a",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_06_05",
+      "glb": "chunks/cell_06_05.glb",
+      "sha256": "77c0158fb862e505a3bd1bcf4b9276f2afc4907331f3e904c7d1bbe1e63f8948",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_07_05",
+      "glb": "chunks/cell_07_05.glb",
+      "sha256": "dc599efdcfb16312ca337ba8549ddf778ff2a27e222139633bde408337fef2ba",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_08_05",
+      "glb": "chunks/cell_08_05.glb",
+      "sha256": "17c64991b1c097cf49f9e30f8a25eb374bd69cfa2de70ce431d13effdd9bf1b4",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_09_05",
+      "glb": "chunks/cell_09_05.glb",
+      "sha256": "9b2796aa979f6bb6077810ae54fca2c0d7886666871a70638d1265f7cf4b7522",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_08_06",
+      "glb": "chunks/cell_08_06.glb",
+      "sha256": "aae695360abfcc6690e8d23deff979deca324a3f09a9fc938dd687fadf16dbb6",
+      "vertices": 4225
+    },
+    {
+      "id": "cell_09_06",
+      "glb": "chunks/cell_09_06.glb",
+      "sha256": "2ea65f76d2cd257e5b3a8518a0c7a0ed7355dae5f86eb41cc998c1072f7d6972",
+      "vertices": 4225
+    }
+  ],
+  "native_source_scope": "Preserved D13 baseline Blender master. The P2 lake edit is reproducible from scripts/world_final/author_lake_p2.py and art/terrain-lake-p2-v3/baseline-inputs.zip."
 }

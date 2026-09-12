@@ -32,6 +32,7 @@ const P2_CREDITS=[
   ...['CREDITS.md','licenses/CC0-1.0.txt','motion/CREDITS.md'].map(file=>({
     source:'godot-pc/world-expansion-v3/city/'+file,destination:'licenses/city/'+file})),
   {source:'art/p2-nature-sample-v3/CREDITS.md',destination:'licenses/nature/CREDITS.md'},
+  {source:'art/terrain-lake-p2-v3/CREDITS.md',destination:'licenses/terrain-lake/CREDITS.md'},
   {source:'godot-pc/world-expansion-v3/city/licenses/CC0-1.0.txt',destination:'licenses/nature/CC0-1.0.txt'},
 ];
 

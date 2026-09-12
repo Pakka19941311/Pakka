@@ -28,7 +28,7 @@ test('canonical share-alike model cannot ship without its matching pack',()=>{
 });
 test('active actor, cloak, NPC and nature notices are readable outside the PCK',t=>{
   const out=temporary(t),result=stageGameplayCredits('.',out,{p2:true});
-  assert.equal(result.files,13);
+  assert.equal(result.files,14);
   for(const [source,target] of [
     ['godot-pc/world-expansion-v3/actors/CREDITS.md','licenses/godot-pc/world-expansion-v3/actors/CREDITS.md'],
     ['art/cloaks-v3/CREDITS.md','licenses/art/cloaks-v3/CREDITS.md'],
@@ -36,6 +36,7 @@ test('active actor, cloak, NPC and nature notices are readable outside the PCK',
     ['godot-pc/world-expansion-v3/city/CREDITS.md','licenses/city/CREDITS.md'],
     ['godot-pc/world-expansion-v3/city/motion/CREDITS.md','licenses/city/motion/CREDITS.md'],
     ['art/p2-nature-sample-v3/CREDITS.md','licenses/nature/CREDITS.md'],
+    ['art/terrain-lake-p2-v3/CREDITS.md','licenses/terrain-lake/CREDITS.md'],
     ['godot-pc/world-expansion-v3/city/licenses/CC0-1.0.txt','licenses/nature/CC0-1.0.txt'],
   ])assert.deepEqual(readFileSync(join(out,target)),readFileSync(source));
 });
