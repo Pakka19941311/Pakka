@@ -1,0 +1,395 @@
+Godot Engine v4.6.3.stable.official.7d41c59c4 - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Unrecognized output string "misc2" in mapping:
+030000008a2e0000dd10000000000000,Hand Held Legend GC Ultimate,a:b0,b:b2,back:b17,dpdown:b5,dpleft:b6,dpright:b7,dpup:b4,guide:b18,leftshoulder:b10,leftstick:b8,lefttrigger:a3,leftx:a0,lefty:a1,misc1:b19,misc2:b24,paddle1:b13,paddle2:b12,rightshoulder:b11,rightstick:b9,righttrigger:a4,rightx:a2,righty:a5,start:b16,x:b1,y:b3,platform:Windows,
+Unrecognized output string "misc2" in mapping:
+030000000d0f00000202000000000000,Horipad O Nintendo Switch 2 Controller,a:b1,b:b0,back:b8,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b4,leftstick:b10,lefttrigger:b6,leftx:a0,lefty:a1,misc1:b13,misc2:b14,rightshoulder:b5,rightstick:b11,righttrigger:b7,rightx:a2,righty:a3,start:b9,x:b3,y:b2,platform:Windows,
+Unrecognized output string "misc2" in mapping:
+030000000d0f00009601000000000000,Horipad Steam,a:b0,b:b1,back:b10,dpdown:h0.4,dpleft:h0.8,dpright:h0.2,dpup:h0.1,guide:b12,leftshoulder:b6,leftstick:b13,lefttrigger:b8,leftx:a0,lefty:a1,misc2:b2,paddle1:b5,paddle2:b15,paddle3:b18,paddle4:b19,rightshoulder:b7,rightstick:b14,righttrigger:b9,rightx:a3,righty:a4,start:b11,x:b3,y:b4,platform:Windows,
+Unrecognized output string "misc2" in mapping:
+030000007e0500006920000000000000,Nintendo Switch 2 Pro Controller,a:b0,b:b1,back:b14,dpdown:b8,dpleft:b10,dpright:b9,dpup:b11,guide:b16,leftshoulder:b12,leftstick:b15,lefttrigger:b13,leftx:a0,lefty:a1~,misc1:b17,misc2:b20,paddle1:b18,paddle2:b19,rightshoulder:b4,rightstick:b7,righttrigger:b5,rightx:a2,righty:a3~,start:b6,x:b2,y:b3,platform:Windows,
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+CORE API HASH: 2475187701
+EDITOR API HASH: 3867286884
+SceneTreeFTI: traversal method DEFAULT
+Loading resource: C:/Users/ttonn/Documents/Codex/2026-09-11/varendor-world-gameplay/work/tools/editor_data/editor_settings-4.6.tres
+EditorSettings: Load OK!
+EditorTheme: Generating new theme for the config '3810048042'.
+EditorTheme: Generating new icons.
+EditorTheme: Generating new fonts.
+EditorTheme: Generating new styles.
+Loading resource: C:/Users/ttonn/Documents/Codex/2026-09-11/varendor-world-gameplay/work/tools/editor_data/cache/editor_doc_cache-4.6.res
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2570)
+Loaded builtin CA certificates
+ERROR: Could not open 'user://' directory: 'user://'.
+   at: _get_and_create_snapshot_storage_dir (modules/objectdb_profiler/editor/objectdb_profiler_panel.cpp:154)
+[   0% ] first_scan_filesystem | Started Инициализация проекта (5 steps)
+[   0% ] first_scan_filesystem | Сканирование структуры файлов…
+[  16% ] first_scan_filesystem | Загрузка глобальных имен классов…
+[  33% ] first_scan_filesystem | Проверка GDExtensions…
+[  50% ] first_scan_filesystem | Создание скриптов автозагрузки…
+[  66% ] first_scan_filesystem | Инициализация плагинов…
+[  83% ] first_scan_filesystem | Начало сканирование файлов…
+[ DONE ] first_scan_filesystem
+
+[   0% ] update_scripts_classes | Started Регистрация глобальных классов… (3 steps)
+[   0% ] update_scripts_classes | 
+[  25% ] update_scripts_classes | 
+[  50% ] update_scripts_classes | 
+[ DONE ] update_scripts_classes
+
+[   0% ] _update_scan_actions | Started Сканирование действий… (2 steps)
+[   0% ] _update_scan_actions | V3RoachSixLeg.glb
+[  33% ] _update_scan_actions | P2_guard_motion.glb
+[ DONE ] _update_scan_actions
+
+[   0% ] reimport | Started Импорт или повторный импорт ассетов (15 steps)
+[   0% ] reimport | Подготовка файлов к повторному импорту…
+[   6% ] reimport | Подготовка файлов к повторному импорту…
+[  12% ] reimport | Подготовка файлов к повторному импорту…
+[  18% ] reimport | Подготовка файлов к повторному импорту…
+[  25% ] reimport | Подготовка файлов к повторному импорту…
+[  31% ] reimport | Подготовка файлов к повторному импорту…
+[  37% ] reimport | Подготовка файлов к повторному импорту…
+[  43% ] reimport | Подготовка файлов к повторному импорту…
+[  50% ] reimport | Подготовка файлов к повторному импорту…
+[  56% ] reimport | Подготовка файлов к повторному импорту…
+[  62% ] reimport | Подготовка файлов к повторному импорту…
+[  68% ] reimport | Подготовка файлов к повторному импорту…
+[  75% ] reimport | Подготовка файлов к повторному импорту…
+[  81% ] reimport | Подготовка файлов к повторному импорту…
+[  87% ] reimport | Подготовка файлов к повторному импорту…
+[   0% ] reimport | Выполнение предимпортных операций…
+[   0% ] preload_reimporting_scene | Started Подготовка сцен к перезагрузке (1 steps)
+[   0% ] preload_reimporting_scene | Анализ сцены [пусто]
+[  50% ] preload_reimporting_scene | Подготовка завершена.
+[ DONE ] preload_reimporting_scene
+
+[   0% ] reimport | P2_guard_motion_young_lightskinned_male_diffuse.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_eyebrow001.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_brown_eye.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_TUNIC_Viking.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Emissive.jpg
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Normal.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_Metallic-sword_mat_Roughness.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_BootsViking.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Metallic-top_armor_mat_Roughness.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_BaseColor.jpg
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_PantsViking.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_young_lightskinned_male_diffuse.png
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_BaseColor.jpg
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_eyebrow001.png" import took 414 ms.
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_Normal.png
+[   6% ] reimport | P2_guard_motion_eyebrow001.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_brown_eye.png" import took 858 ms.
+[  12% ] reimport | P2_guard_motion_brown_eye.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_PantsViking.png" import took 948 ms.
+[  18% ] reimport | P2_guard_motion_BootsViking.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_young_lightskinned_male_diffuse.png" import took 1013 ms.
+[  25% ] reimport | P2_guard_motion_PantsViking.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_BootsViking.png" import took 1102 ms.
+[  31% ] reimport | P2_guard_motion_TUNIC_Viking.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_TUNIC_Viking.png" import took 1113 ms.
+[  37% ] reimport | P2_guard_motion_top_armor_mat_BaseColor.jpg
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Emissive.jpg" import took 1466 ms.
+[  43% ] reimport | P2_guard_motion_top_armor_mat_Metallic-top_armor_mat_Roughness.png
+[  43% ] reimport | P2_guard_motion_top_armor_mat_Metallic-top_armor_mat_Roughness.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_BaseColor.jpg" import took 3266 ms.
+[  50% ] reimport | P2_guard_motion_top_armor_mat_Emissive.jpg
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_BaseColor.jpg" import took 3282 ms.
+[  56% ] reimport | P2_guard_motion_top_armor_mat_Normal.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_Metallic-sword_mat_Roughness.png" import took 4105 ms.
+[  62% ] reimport | P2_guard_motion_sword_mat_BaseColor.jpg
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Metallic-top_armor_mat_Roughness.png" import took 4492 ms.
+[  68% ] reimport | P2_guard_motion_sword_mat_Metallic-sword_mat_Roughness.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_Normal.png" import took 4486 ms.
+[  75% ] reimport | P2_guard_motion_sword_mat_Normal.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Normal.png" import took 5645 ms.
+[  81% ] reimport | V3RoachSixLeg.glb
+EditorFileSystem: Importing file: res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb
+[   0% ] import | Started Импортировать сцену (104 steps)
+[   0% ] import | Импорт сцены…
+glTF: Total buffers: 1
+glTF: Total buffer views: 1185
+glTF: Total accessors: 1183
+EditorFileSystem: Importing file: res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg_RoachNormal.png
+EditorFileSystem: "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg_RoachNormal.png" import took 1042 ms.
+Loading resource: res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg_RoachNormal.png
+Loading resource: res://.godot/imported/V3RoachSixLeg_RoachNormal.png-c9fa6c978f9e0f17626c6804c10b4bab.ctex
+EditorFileSystem: Importing file: res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg_Roach.png
+EditorFileSystem: "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg_Roach.png" import took 1152 ms.
+Loading resource: res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg_Roach.png
+Loading resource: res://.godot/imported/V3RoachSixLeg_Roach.png-13924220612061ebd7e85dbd24a81ad2.ctex
+glTF: Total images: 2
+Total materials: 2
+glTF: Total skins: 1
+glTF: Parsing mesh: 0
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Total meshes: 1
+glTF: Total animations '6'.
+glTF: Converting spatial: V3RoachCandidate_Origin
+glTF: Converting spatial: Armature
+glTF: Creating mesh for: Roach
+LOD Generation: Triangles 3800, vertices 2822 (merged 2822), deformable
+  LOD 1: 1900 triangles, error 0.01987791247666 (step error 0.01987791247666)
+  LOD 2: 950 triangles, error 0.03991773724556 (step error 0.03991773724556)
+  LOD 3: 474 triangles, error 0.08367924392223 (step error 0.08367924392223)
+  LOD 4: 236 triangles, error 0.1722250431776 (step error 0.1722250431776)
+  LOD 5: 102 triangles, error 0.59865874052048 (step error 0.59865874052048)
+  LOD stop: got 84 triangles when asking for 51
+LOD Generation: Triangles 664, vertices 336 (merged 336), deformable
+  LOD 1: 332 triangles, error 0.02520448900759 (step error 0.02520448900759)
+  LOD 2: 166 triangles, error 0.06398118287325 (step error 0.06398118287325)
+  LOD 3: 82 triangles, error 0.1094806343317 (step error 0.1094806343317)
+  LOD 4: 40 triangles, error 0.19479571282864 (step error 0.19479571282864)
+  LOD 5: 20 triangles, error 0.29219356179237 (step error 0.28242346644402)
+  LOD 6: 10 triangles, error 0.43829035758972 (step error 0.27724766731262)
+  LOD 7: 4 triangles, error 0.65743553638458 (step error 0.31136566400528)
+[   1% ] import | Запуск пользовательского скрипта…
+[  99% ] import | Сохранение…
+Saving scene to: res://.godot/imported/V3RoachSixLeg.glb-c13fc7e56399e55cab98aae3213816f7.scn
+[ DONE ] import
+
+EditorFileSystem: "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb" import took 2756 ms.
+[  87% ] reimport | P2_guard_motion.glb
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion.glb
+[   0% ] import | Started Импортировать сцену (104 steps)
+[   0% ] import | Импорт сцены…
+glTF: Total buffers: 1
+glTF: Total buffer views: 879
+glTF: Total accessors: 866
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_young_lightskinned_male_diffuse.png
+Loading resource: res://.godot/imported/P2_guard_motion_young_lightskinned_male_diffuse.png-51ac3f5e641902cd4f94286ce78eefd1.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_eyebrow001.png
+Loading resource: res://.godot/imported/P2_guard_motion_eyebrow001.png-a90affd919097468b4f75dfb06ca9ee6.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_brown_eye.png
+Loading resource: res://.godot/imported/P2_guard_motion_brown_eye.png-f7ed62ee8c301eb2fbeefbfbaf2c40d4.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_BootsViking.png
+Loading resource: res://.godot/imported/P2_guard_motion_BootsViking.png-fef038d23b701aea2b36941ea7944b3f.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_PantsViking.png
+Loading resource: res://.godot/imported/P2_guard_motion_PantsViking.png-2ea006a7e66f2cae17263a89a9c2a96e.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_TUNIC_Viking.png
+Loading resource: res://.godot/imported/P2_guard_motion_TUNIC_Viking.png-96bf90943b9496dc117ae23b6f9ce835.ctex
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Emissive.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Emissive.png" import took 1288 ms.
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Emissive.png
+Loading resource: res://.godot/imported/P2_guard_motion_top_armor_mat_Emissive.png-3a66825d2f266662ffa325c1d841c1a1.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Normal.png
+Loading resource: res://.godot/imported/P2_guard_motion_top_armor_mat_Normal.png-7e4fa4c72d520069595df97f9a7082ae.ctex
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_BaseColor.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_BaseColor.png" import took 2710 ms.
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_BaseColor.png
+Loading resource: res://.godot/imported/P2_guard_motion_top_armor_mat_BaseColor.png-f7a232ed8eb718c723d36831d8667f47.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_top_armor_mat_Metallic-top_armor_mat_Roughness.png
+Loading resource: res://.godot/imported/P2_guard_motion_top_armor_mat_Metallic-top_armor_mat_Roughness.png-8844cb00b6bd11eeca7a0cb8cb1b39f7.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_Normal.png
+Loading resource: res://.godot/imported/P2_guard_motion_sword_mat_Normal.png-fb7cbaaff24a5d6402854c89005a3445.ctex
+EditorFileSystem: Importing file: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_BaseColor.png
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_BaseColor.png" import took 2955 ms.
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_BaseColor.png
+Loading resource: res://.godot/imported/P2_guard_motion_sword_mat_BaseColor.png-b86bed5d4aa5fc4e34f7e0e27b60deb0.ctex
+Loading resource: res://world-expansion-v3/city/motion/assets/P2_guard_motion_sword_mat_Metallic-sword_mat_Roughness.png
+Loading resource: res://.godot/imported/P2_guard_motion_sword_mat_Metallic-sword_mat_Roughness.png-3f5d7aea1b756cb20a580882624dba50.ctex
+glTF: Total images: 13
+Total materials: 9
+glTF: Total skins: 1
+glTF: Parsing mesh: 0
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 1
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 2
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 3
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 4
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 5
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 6
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 7
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 8
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 9
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Parsing mesh: 10
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+WARNING: glTF import: Buffer view byte stride should be declared for vertex attributes. Assuming packed data and reading anyway.
+glTF: Total meshes: 11
+glTF: Total animations '5'.
+glTF: Converting spatial: P2_guard
+glTF: Converting spatial: Human_rig
+glTF: Creating mesh for: Human
+glTF: Creating mesh for: Human_eyebrow001
+glTF: Creating mesh for: Human_low-poly
+glTF: Creating mesh for: Human_rehmanpolanski_viking_boots
+glTF: Creating mesh for: Human_rehmanpolanski_viking_pants
+glTF: Creating mesh for: Human_rehmanpolanski_viking_tunic
+glTF: Creating mesh for: P2_guard_helmet
+glTF: Creating mesh for: P2_guard_scabbard
+glTF: Creating mesh for: P2_guard_strap_0
+glTF: Creating mesh for: P2_guard_strap_1
+glTF: Creating mesh for: P2_guard_sword
+LOD Generation: Triangles 16070, vertices 8761 (merged 8761), deformable
+  LOD 1: 8034 triangles, error 0.00201121321879 (step error 0.00201121321879)
+  LOD 2: 4016 triangles, error 0.00413404405117 (step error 0.00413404405117)
+  LOD 3: 2008 triangles, error 0.00756097398698 (step error 0.00756097398698)
+  LOD 4: 1004 triangles, error 0.01591696403921 (step error 0.01591696403921)
+  LOD 5: 502 triangles, error 0.03329367935658 (step error 0.03329367935658)
+  LOD 6: 248 triangles, error 0.09758919477463 (step error 0.09758919477463)
+  LOD 7: 94 triangles, error 0.54211163520813 (step error 0.54211163520813)
+  LOD stop: got 88 triangles when asking for 47
+LOD Generation: Triangles 192, vertices 124 (merged 124), deformable
+  LOD 1: 96 triangles, error 0.01364105567336 (step error 0.01364105567336)
+  LOD 2: 48 triangles, error 0.14079384505749 (step error 0.14079384505749)
+  LOD stop: got 48 triangles when asking for 24
+LOD Generation: Triangles 172, vertices 96 (merged 96), deformable
+  LOD 1: 86 triangles, error 0.03340854868293 (step error 0.03340854868293)
+  LOD 2: 42 triangles, error 0.07596542686224 (step error 0.07596542686224)
+  LOD 3: 20 triangles, error 0.13995125889778 (step error 0.13995125889778)
+  LOD 4: 12 triangles, error 0.41895893216133 (step error 0.41895893216133)
+  LOD stop: got 12 triangles when asking for 6
+LOD Generation: Triangles 6320, vertices 3530 (merged 3530), deformable
+  LOD 1: 3160 triangles, error 0.0123352445662 (step error 0.0123352445662)
+  LOD 2: 1580 triangles, error 0.02528337202966 (step error 0.02528337202966)
+  LOD 3: 790 triangles, error 0.05953956022859 (step error 0.05953956022859)
+  LOD 4: 370 triangles, error 0.11217828840017 (step error 0.11217828840017)
+  LOD 5: 182 triangles, error 0.19821313023567 (step error 0.19821313023567)
+  LOD 6: 90 triangles, error 0.60571575164795 (step error 0.60571575164795)
+  LOD 7: 56 triangles, error 0.90857362747192 (step error 0.87757581472397)
+  LOD stop: got 52 triangles when asking for 28
+LOD Generation: Triangles 2544, vertices 1380 (merged 1380), deformable
+  LOD 1: 1272 triangles, error 0.01171081699431 (step error 0.01171081699431)
+  LOD 2: 636 triangles, error 0.01895956136286 (step error 0.01895956136286)
+  LOD 3: 318 triangles, error 0.04260007664561 (step error 0.04260007664561)
+  LOD 4: 158 triangles, error 0.12032318860292 (step error 0.12032318860292)
+  LOD 5: 94 triangles, error 0.87977135181427 (step error 0.87977135181427)
+  LOD stop: got 86 triangles when asking for 47
+LOD Generation: Triangles 6568, vertices 3776 (merged 3776), deformable
+  LOD 1: 3284 triangles, error 0.00872607901692 (step error 0.00872607901692)
+  LOD 2: 1642 triangles, error 0.01788539998233 (step error 0.01788539998233)
+  LOD 3: 820 triangles, error 0.0454027466476 (step error 0.0454027466476)
+  LOD 4: 410 triangles, error 0.10249751061201 (step error 0.10249751061201)
+  LOD 5: 204 triangles, error 0.36653226613998 (step error 0.36653226613998)
+  LOD stop: got 174 triangles when asking for 102
+LOD Generation: Triangles 3382, vertices 2454 (merged 2438), deformable
+  LOD 1: 1690 triangles, error 0.01604290306568 (step error 0.01604290306568)
+  LOD 2: 844 triangles, error 0.0356515981257 (step error 0.0356515981257)
+  LOD 3: 422 triangles, error 0.1534698754549 (step error 0.1534698754549)
+  LOD 4: 111 triangles, error 0.59095752239227 (step error 0.59095752239227)
+  LOD stop: got 109 triangles when asking for 55
+LOD Generation: Triangles 44, vertices 76 (merged 68), deformable
+  LOD stop: got 36 triangles when asking for 22
+LOD Generation: Triangles 2, vertices 4 (merged 4), deformable
+LOD Generation: Triangles 2, vertices 4 (merged 4), deformable
+LOD Generation: Triangles 1784, vertices 1186 (merged 1186), deformable
+  LOD 1: 892 triangles, error 0.00506989238784 (step error 0.00506989238784)
+  LOD 2: 446 triangles, error 0.01127600483596 (step error 0.01127600483596)
+  LOD 3: 222 triangles, error 0.02592688240111 (step error 0.02592688240111)
+  LOD 4: 110 triangles, error 0.03889032453299 (step error 0.0373571254313)
+  LOD 5: 12 triangles, error 0.13452853262424 (step error 0.13452853262424)
+  LOD stop: got 12 triangles when asking for 6
+[   1% ] import | Запуск пользовательского скрипта…
+[  99% ] import | Сохранение…
+Saving scene to: res://.godot/imported/P2_guard_motion.glb-6fba24ec9eb08af1151b09df9c26e2fe.scn
+[ DONE ] import
+
+EditorFileSystem: "res://world-expansion-v3/city/motion/assets/P2_guard_motion.glb" import took 11435 ms.
+[  93% ] reimport | Завершение импорта активов…
+[ DONE ] reimport
+
+[   0% ] reimport | Started Импорт или повторный импорт ассетов (15 steps)
+[   0% ] reimport | Выполнение операций после реимпорта…
+[ DONE ] reimport
+
+[   0% ] loading_editor_layout | Started Загрузка редактора (5 steps)
+[   0% ] loading_editor_layout | Загрузка макета редактора…
+[  16% ] loading_editor_layout | Загрузка док-панели…
+[ DONE ] loading_editor_layout
+
+Loading resource: res://main.tscn
+Loading resource: res://scripts/main.gd
+Loading resource: res://scripts/territory_wind.gdshader
+Loading resource: res://scripts/territory_sky.gdshader
+Loading resource: res://assets/icons/potion_large.svg
+Loading resource: res://.godot/imported/potion_large.svg-f410b205e6021cba1cee12ffa8fc5d52.ctex
+Loading resource: res://assets/icons/haste.svg
+Loading resource: res://.godot/imported/haste.svg-25145bce45727f09a163302c0b086228.ctex
+Loading resource: res://ui/titan/plate.svg
+Loading resource: res://.godot/imported/plate.svg-39fd0c5c43106122b482bb6e8feb4d75.ctex
+Loading resource: res://ui/titan/button.svg
+Loading resource: res://.godot/imported/button.svg-8dad3e78aa924697161d02702e01d3d9.ctex
+Loading resource: res://ui/titan/toggle-on.svg
+Loading resource: res://.godot/imported/toggle-on.svg-de360196ee2bb4d57e28718bd5b53d1c.ctex
+Loading resource: res://ui/titan/toggle-off.svg
+Loading resource: res://.godot/imported/toggle-off.svg-b3ee81275a9c753add918115efe4a394.ctex
+Loading resource: res://scripts/polish_sky.gdshader
+Script docs haven't been properly loaded or regenerated, so don't save them to disk.
+EditorSettings: Save OK!

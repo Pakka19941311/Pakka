@@ -1,0 +1,78 @@
+{
+  "status": "six-leg anatomy candidate; ground/stride/native unverified",
+  "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka\\godot-pc\\world-expansion-v3\\actors\\alternatives\\roach\\V3RoachCandidate.glb",
+  "source_sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
+  "sha256": "c482207e1ebdac9661571e2487e5ff018157dc3b96d94178b92ca26e1204e7d7",
+  "new_chains": [
+    {
+      "side": "L",
+      "old": [
+        "ArmRootL",
+        "ArmL",
+        "ForearmFrontL",
+        "ClawFrontL"
+      ],
+      "new": [
+        "MiddleRootL",
+        "MiddleUpperL",
+        "MiddleLowerL",
+        "MiddleClawL"
+      ],
+      "mapping": {
+        "ArmRootL": "MiddleRootL",
+        "ArmL": "MiddleUpperL",
+        "ForearmFrontL": "MiddleLowerL",
+        "ClawFrontL": "MiddleClawL"
+      },
+      "scale": 0.85,
+      "contact": "MiddleContactL",
+      "source_contact": "ClawFrontLH",
+      "geometry": {
+        "vertices": 263,
+        "polygons": 398,
+        "selection": "all face vertices have>=40% source front-chain influence; remainder mapped to middle root"
+      }
+    },
+    {
+      "side": "R",
+      "old": [
+        "ArmRootR",
+        "ArmR",
+        "ForearmFrontR",
+        "ClawFrontR"
+      ],
+      "new": [
+        "MiddleRootR",
+        "MiddleUpperR",
+        "MiddleLowerR",
+        "MiddleClawR"
+      ],
+      "mapping": {
+        "ArmRootR": "MiddleRootR",
+        "ArmR": "MiddleUpperR",
+        "ForearmFrontR": "MiddleLowerR",
+        "ClawFrontR": "MiddleClawR"
+      },
+      "scale": 0.85,
+      "contact": "MiddleContactR",
+      "source_contact": "ClawFrontRH",
+      "geometry": {
+        "vertices": 263,
+        "polygons": 398,
+        "selection": "all face vertices have>=40% source front-chain influence; remainder mapped to middle root"
+      }
+    }
+  ],
+  "added_art": "Two skinned middle legs, each with root/upper/lower/claw and contact marker; two curved volumetric mandibles attached to animated jaw bones.",
+  "action_policy": "Middle root follows parent-relative body transformation; authored middle foot stance55% cycle, stroke0.3331m, swing height0.07m; left/right phases0.25/0.75; IK baked into physical joints. Source bones untouched.",
+  "ik_max_endpoint_error_m": {
+    "attack": 3.0619982761196075e-07,
+    "death": 2.9839552036674004e-07,
+    "hit": 2.0369897140199575e-07,
+    "idle": 2.9760375464557445e-07,
+    "run": 3.250118974177564e-07,
+    "walk": 5.102185934929611e-07
+  },
+  "corpse_ground_max_lift_m": 0.013483405113220215,
+  "material_policy": "Original image/UV/normal retained; standard GLTF baseColorFactor(.60,.46,.31) added after exporter, which otherwise drops a linked socket default."
+}

@@ -490,16 +490,16 @@
   },
   "MOB-05": {
     "mob_id": "MOB-05",
-    "model": "V3RoachCandidate",
-    "title": "Панцирное существо · Roach",
-    "asset_path": "res://world-expansion-v3/actors/alternatives/roach/V3RoachCandidate.glb",
+    "model": "V3RoachSixLeg",
+    "title": "Панцирник",
+    "asset_path": "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb",
     "height": 0.45,
     "native_bounds": {
-      "name": "V3RoachCandidate",
+      "name": "V3RoachSixLeg",
       "targetHeight": 0.45,
       "sourceHeight": 0.45,
       "sourceFloor": 0.0,
-      "sourceWidth": 0.4635014235973358,
+      "sourceWidth": 0.521308,
       "sourceDepth": 0.636389285326004
     },
     "pick_size": [
@@ -528,7 +528,7 @@
       "walk": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints.",
       "run": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints."
     },
-    "status": "temporary_P2_development_basis; final_art_gates_open",
+    "status": "working_P2_six_leg_candidate; native_passed; visual_basis_accepted",
     "clip_provenance": [
       {
         "clip": "idle",
@@ -596,16 +596,38 @@
     "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
     "license": "CC-BY-SA-3.0",
     "author": "Danimal; original model Atmostatic",
-    "sha256": "9ee26e78d565d55a7304657d7c02436c56c4bf8dc6a82105eedccbb06fd50d16",
-    "ground_min_dense": -0.00035944581031799316,
+    "sha256": "c482207e1ebdac9661571e2487e5ff018157dc3b96d94178b92ca26e1204e7d7",
+    "ground_min_dense": -0.0008222758769989014,
     "floor_clearance_guards": {},
     "proposed_p2_movement_speed": 1.6,
     "maximum_supported_speed": 1.7135283,
-    "visual_acceptance_note": "Accepted by project integration review as the MOB-05 basis at1.6m/s; this is not final art or acceptance of all live gameplay.",
+    "visual_acceptance_note": "Integration review accepted six readable limbs and chitin silhouette subject to native checks. Native checks have passed; this remains the working P2 stage, not final acceptance of every asset.",
     "open_art_gates": {
-      "six_animated_supporting_legs": "OPEN: source currently has4legs; add rigged moving middle pair or replace basis after boar work. Source54bones alone does not meet six-leg requirement.",
-      "mandibles_organic_chitin": "OPEN: verify visible mandibles and organic chitin after geometry adaptation; source jaw/texture existence does not equal final art acceptance.",
-      "live_pursuit": "OPEN: native centered velocity sampling is not live server pursuit on terrain."
+      "six_animated_supporting_legs": "CLOSED: six weighted joint groups, articulated stance/swing and contact checks passed",
+      "mandibles_organic_chitin": "CLOSED for working P2 basis: curved weighted jaws, darker rough horn and retained textured chitin accepted by integration review",
+      "live_pursuit": "OPEN for this new six-leg version; prior four-leg live result is historical",
+      "final_art_quality": "OPEN beyond the accepted working P2 basis"
+    },
+    "new_anatomy": {
+      "middle_chains": [
+        "MiddleUpperL",
+        "MiddleLowerL",
+        "MiddleClawL",
+        "MiddleUpperR",
+        "MiddleLowerR",
+        "MiddleClawR"
+      ],
+      "contact_markers": [
+        "MiddleContactL",
+        "MiddleContactR"
+      ],
+      "independent_root_joints": [
+        "MiddleRootL",
+        "MiddleRootR"
+      ],
+      "actual_weighted_geometry": true,
+      "mandibles": "Two curved volume meshes weighted to JawL and JawR",
+      "middle_gait": "Authored stance55%, stroke0.3331m, swing70mm, left/right phase0.25/0.75; three-joint IK baked; no runtime IK dependency"
     }
   }
 }

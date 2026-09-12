@@ -1,0 +1,144 @@
+{
+  "MOB-05": {
+    "mob_id": "MOB-05",
+    "model": "V3RoachSixLeg",
+    "title": "Панцирник",
+    "asset_path": "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb",
+    "height": 0.45,
+    "native_bounds": {
+      "name": "V3RoachSixLeg",
+      "targetHeight": 0.45,
+      "sourceHeight": 0.45,
+      "sourceFloor": 0.0,
+      "sourceWidth": 0.521308,
+      "sourceDepth": 0.636389285326004
+    },
+    "pick_size": [
+      0.75,
+      0.45,
+      0.75
+    ],
+    "body_radius_proposed": 0.3,
+    "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+    "hit_point": [
+      0.0,
+      0.2475,
+      0.0
+    ],
+    "native_visual_yaw_offset_radians": 3.141592653589793,
+    "attack_contact": 0.42,
+    "qa_attack_duration_ms": 1400,
+    "qa_server_contact_fraction": 0.5,
+    "maximum_attack_rate": 1.5,
+    "maximum_gait_rate": 1.65,
+    "gait": {
+      "walk": 0.605793,
+      "run": 1.038502
+    },
+    "gait_provenance": {
+      "walk": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints.",
+      "run": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints."
+    },
+    "status": "working_P2_six_leg_candidate; native_passed; visual_basis_accepted",
+    "clip_provenance": [
+      {
+        "clip": "idle",
+        "source_action": "ArmatureAction.002_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          100.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          10.0,
+          50.0
+        ],
+        "duration_factor": 0.6,
+        "kind": "source_nla_cycle_window",
+        "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee."
+      },
+      {
+        "clip": "run",
+        "source_action": "Walk_Armature",
+        "source_frame_window_at_24fps": [
+          10.0,
+          50.0
+        ],
+        "duration_factor": 0.35,
+        "kind": "source_nla_cycle_window",
+        "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee."
+      },
+      {
+        "clip": "attack",
+        "source_action": "ArmatureAction.001_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          29.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "death",
+        "source_action": "ArmatureAction.009_Armature",
+        "source_frame_window_at_24fps": [
+          0.0,
+          44.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "hit",
+        "kind": "authored_local_rig_action",
+        "description": "local spine/head recoil",
+        "frames": [
+          0,
+          8
+        ],
+        "fps": 24
+      }
+    ],
+    "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+    "license": "CC-BY-SA-3.0",
+    "author": "Danimal; original model Atmostatic",
+    "sha256": "c482207e1ebdac9661571e2487e5ff018157dc3b96d94178b92ca26e1204e7d7",
+    "ground_min_dense": -0.0008222758769989014,
+    "floor_clearance_guards": {},
+    "proposed_p2_movement_speed": 1.6,
+    "maximum_supported_speed": 1.7135283,
+    "visual_acceptance_note": "Integration review accepted six readable limbs and chitin silhouette subject to native checks. Native checks have passed; this remains the working P2 stage, not final acceptance of every asset.",
+    "open_art_gates": {
+      "six_animated_supporting_legs": "CLOSED: six weighted joint groups, articulated stance/swing and contact checks passed",
+      "mandibles_organic_chitin": "CLOSED for working P2 basis: curved weighted jaws, darker rough horn and retained textured chitin accepted by integration review",
+      "live_pursuit": "OPEN for this new six-leg version; prior four-leg live result is historical",
+      "final_art_quality": "OPEN beyond the accepted working P2 basis"
+    },
+    "new_anatomy": {
+      "middle_chains": [
+        "MiddleUpperL",
+        "MiddleLowerL",
+        "MiddleClawL",
+        "MiddleUpperR",
+        "MiddleLowerR",
+        "MiddleClawR"
+      ],
+      "contact_markers": [
+        "MiddleContactL",
+        "MiddleContactR"
+      ],
+      "independent_root_joints": [
+        "MiddleRootL",
+        "MiddleRootR"
+      ],
+      "actual_weighted_geometry": true,
+      "mandibles": "Two curved volume meshes weighted to JawL and JawR",
+      "middle_gait": "Authored stance55%, stroke0.3331m, swing70mm, left/right phase0.25/0.75; three-joint IK baked; no runtime IK dependency"
+    }
+  }
+}

@@ -1,0 +1,903 @@
+{
+  "event_ledger": [
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-05",
+      "at": 2000,
+      "endsAt": 3400.0,
+      "impactAt": 2700.0,
+      "kind": "attack",
+      "sequence": 1,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-05",
+      "amount": 10,
+      "at": 2700.0,
+      "kind": "hit",
+      "sequence": 2,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-05",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 3
+    }
+  ],
+  "godot": {
+    "build": "official",
+    "hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+    "hex": 263683,
+    "major": 4,
+    "minor": 6,
+    "patch": 3,
+    "status": "stable",
+    "string": "4.6.3-stable (official)",
+    "timestamp": 0
+  },
+  "live_server_tested": false,
+  "models": {
+    "MOB-05": {
+      "attack_skinned_bounds": "[P: (-0.344143, 0.000471, -0.321158), S: (0.639604, 0.558687, 0.546061)]",
+      "captures": [
+        "MOB-05_idle.png",
+        "MOB-05_attack.png",
+        "MOB-05_death.png"
+      ],
+      "checks": {
+        "JawL_animates_mandible": true,
+        "JawR_animates_mandible": true,
+        "MiddleClawL_has_real_skin_weights": true,
+        "MiddleClawR_has_real_skin_weights": true,
+        "MiddleContactL_articulated_stroke_and_lift": true,
+        "MiddleContactR_articulated_stroke_and_lift": true,
+        "MiddleLowerL_has_real_skin_weights": true,
+        "MiddleLowerR_has_real_skin_weights": true,
+        "MiddleUpperL_has_real_skin_weights": true,
+        "MiddleUpperR_has_real_skin_weights": true,
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "middle_feet_lift_without_floor_penetration": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "proposed_pursuit1_6_rate_supported": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 1.21666669845581,
+          "poses_change": true
+        },
+        "death": {
+          "length": 1.83333337306976,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.333333343267441,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 4.16666650772095,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.583333313465118,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 1.0,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.444156, -0.0, -0.2947), S: (0.783122, 0.311536, 0.694727)]",
+      "idle_skinned_bounds": "[P: (-0.260654, -0.000006, -0.243433), S: (0.521308, 0.428458, 0.6383)]",
+      "idle_to_run_contact_samples": [
+        {
+          "MiddleContactL": [
+            -0.261846214532852,
+            0.000710815191268921,
+            0.0136496163904667
+          ],
+          "MiddleContactR": [
+            0.261110365390778,
+            0.0147642195224762,
+            -0.0115947127342224
+          ],
+          "frame": 0
+        },
+        {
+          "MiddleContactL": [
+            -0.26441901922226,
+            -0.0023672878742218,
+            0.0378370396792889
+          ],
+          "MiddleContactR": [
+            0.262147188186646,
+            0.0203821659088135,
+            -0.0386651307344437
+          ],
+          "frame": 1
+        },
+        {
+          "MiddleContactL": [
+            -0.266234278678894,
+            -0.0045846700668335,
+            0.0729958340525627
+          ],
+          "MiddleContactR": [
+            0.263318359851837,
+            0.0190959274768829,
+            -0.0761948227882385
+          ],
+          "frame": 2
+        },
+        {
+          "MiddleContactL": [
+            -0.265145599842072,
+            -0.0033305287361145,
+            0.120410062372684
+          ],
+          "MiddleContactR": [
+            0.26291412115097,
+            0.010513573884964,
+            -0.115760833024979
+          ],
+          "frame": 3
+        },
+        {
+          "MiddleContactL": [
+            -0.260267406702042,
+            0.00263258814811707,
+            0.173192709684372
+          ],
+          "MiddleContactR": [
+            0.260078519582748,
+            0.00566238164901733,
+            -0.125446557998657
+          ],
+          "frame": 4
+        },
+        {
+          "MiddleContactL": [
+            -0.260375559329987,
+            0.013080507516861,
+            0.183277010917664
+          ],
+          "MiddleContactR": [
+            0.260212779045105,
+            0.00267243385314941,
+            -0.102844521403313
+          ],
+          "frame": 5
+        },
+        {
+          "MiddleContactL": [
+            -0.260858952999115,
+            0.0291213095188141,
+            0.174452304840088
+          ],
+          "MiddleContactR": [
+            0.260206699371338,
+            0.00271216034889221,
+            -0.0761023461818695
+          ],
+          "frame": 6
+        },
+        {
+          "MiddleContactL": [
+            -0.260219246149063,
+            0.0484104156494141,
+            0.150563359260559
+          ],
+          "MiddleContactR": [
+            0.260036021471024,
+            0.00292015075683594,
+            -0.0494435504078865
+          ],
+          "frame": 7
+        },
+        {
+          "MiddleContactL": [
+            -0.26091867685318,
+            0.0612325370311737,
+            0.110243946313858
+          ],
+          "MiddleContactR": [
+            0.260159432888031,
+            0.00278663635253906,
+            -0.0227638408541679
+          ],
+          "frame": 8
+        },
+        {
+          "MiddleContactL": [
+            -0.262118875980377,
+            0.0688463896512985,
+            0.0641104951500893
+          ],
+          "MiddleContactR": [
+            0.260253310203552,
+            0.00294572114944458,
+            0.00388085842132568
+          ],
+          "frame": 9
+        },
+        {
+          "MiddleContactL": [
+            -0.262335330247879,
+            0.0713527351617813,
+            0.0149073712527752
+          ],
+          "MiddleContactR": [
+            0.260223269462585,
+            0.00301805138587952,
+            0.0304668471217155
+          ],
+          "frame": 10
+        },
+        {
+          "MiddleContactL": [
+            -0.260834544897079,
+            0.0676005929708481,
+            -0.0348458811640739
+          ],
+          "MiddleContactR": [
+            0.260090559720993,
+            0.00283125042915344,
+            0.0571471080183983
+          ],
+          "frame": 11
+        },
+        {
+          "MiddleContactL": [
+            -0.260794103145599,
+            0.0565822720527649,
+            -0.0789299458265305
+          ],
+          "MiddleContactR": [
+            0.260086268186569,
+            0.00251716375350952,
+            0.0838132053613663
+          ],
+          "frame": 12
+        },
+        {
+          "MiddleContactL": [
+            -0.261217892169952,
+            0.0403563976287842,
+            -0.112102538347244
+          ],
+          "MiddleContactR": [
+            0.260181427001953,
+            0.00205376744270325,
+            0.110425710678101
+          ],
+          "frame": 13
+        },
+        {
+          "MiddleContactL": [
+            -0.260663777589798,
+            0.0211973190307617,
+            -0.13278691470623
+          ],
+          "MiddleContactR": [
+            0.260215759277344,
+            0.00179380178451538,
+            0.137037873268127
+          ],
+          "frame": 14
+        },
+        {
+          "MiddleContactL": [
+            -0.260314106941223,
+            0.00476175546646118,
+            -0.135563045740128
+          ],
+          "MiddleContactR": [
+            0.260250180959702,
+            0.0018312931060791,
+            0.163684636354446
+          ],
+          "frame": 15
+        },
+        {
+          "MiddleContactL": [
+            -0.260591149330139,
+            0.00269109010696411,
+            -0.112271502614021
+          ],
+          "MiddleContactR": [
+            0.260047227144241,
+            0.00206533074378967,
+            0.190466284751892
+          ],
+          "frame": 16
+        },
+        {
+          "MiddleContactL": [
+            -0.260585129261017,
+            0.00245314836502075,
+            -0.085955485701561
+          ],
+          "MiddleContactR": [
+            0.260659128427505,
+            0.022721529006958,
+            0.181314438581467
+          ],
+          "frame": 17
+        },
+        {
+          "MiddleContactL": [
+            -0.260716110467911,
+            0.0023714005947113,
+            -0.0590366274118423
+          ],
+          "MiddleContactR": [
+            0.261456608772278,
+            0.0419895052909851,
+            0.158200562000275
+          ],
+          "frame": 18
+        },
+        {
+          "MiddleContactL": [
+            -0.260652959346771,
+            0.002431720495224,
+            -0.032204307615757
+          ],
+          "MiddleContactR": [
+            0.26091730594635,
+            0.05698561668396,
+            0.125048503279686
+          ],
+          "frame": 19
+        },
+        {
+          "MiddleContactL": [
+            -0.260068893432617,
+            0.00292247533798218,
+            -0.00567381829023361
+          ],
+          "MiddleContactR": [
+            0.260114789009094,
+            0.0684806555509567,
+            0.0825793817639351
+          ],
+          "frame": 20
+        },
+        {
+          "MiddleContactL": [
+            -0.260479420423508,
+            0.00248634815216064,
+            0.0210301168262959
+          ],
+          "MiddleContactR": [
+            0.26151630282402,
+            0.0711862593889236,
+            0.0327816382050514
+          ],
+          "frame": 21
+        },
+        {
+          "MiddleContactL": [
+            -0.260160088539124,
+            0.00271084904670715,
+            0.0476074889302254
+          ],
+          "MiddleContactR": [
+            0.260502725839615,
+            0.0700391530990601,
+            -0.017511785030365
+          ],
+          "frame": 22
+        },
+        {
+          "MiddleContactL": [
+            -0.260228097438812,
+            0.00260376930236816,
+            0.0742747411131859
+          ],
+          "MiddleContactR": [
+            0.260724872350693,
+            0.0611916780471802,
+            -0.0638815760612488
+          ],
+          "frame": 23
+        },
+        {
+          "MiddleContactL": [
+            -0.260316461324692,
+            0.00233420729637146,
+            0.100835755467415
+          ],
+          "MiddleContactR": [
+            0.261099249124527,
+            0.0469037592411041,
+            -0.100827634334564
+          ],
+          "frame": 24
+        },
+        {
+          "MiddleContactL": [
+            -0.260313957929611,
+            0.00239765644073486,
+            0.127376779913902
+          ],
+          "MiddleContactR": [
+            0.260641932487488,
+            0.0291135311126709,
+            -0.126717314124107
+          ],
+          "frame": 25
+        },
+        {
+          "MiddleContactL": [
+            -0.260189175605774,
+            0.00272521376609802,
+            0.154117435216904
+          ],
+          "MiddleContactR": [
+            0.260057270526886,
+            0.0114679932594299,
+            -0.136345252394676
+          ],
+          "frame": 26
+        },
+        {
+          "MiddleContactL": [
+            -0.260072201490402,
+            0.00290042161941528,
+            0.180878072977066
+          ],
+          "MiddleContactR": [
+            0.260020852088928,
+            0.00353875756263733,
+            -0.121069625020027
+          ],
+          "frame": 27
+        },
+        {
+          "MiddleContactL": [
+            -0.260307997465134,
+            0.0176059007644653,
+            0.183593928813934
+          ],
+          "MiddleContactR": [
+            0.260174870491028,
+            0.00273230671882629,
+            -0.0952886343002319
+          ],
+          "frame": 28
+        },
+        {
+          "MiddleContactL": [
+            -0.261101424694061,
+            0.0342231094837189,
+            0.167196422815323
+          ],
+          "MiddleContactR": [
+            0.260263532400131,
+            0.00262501835823059,
+            -0.0685580968856812
+          ],
+          "frame": 29
+        },
+        {
+          "MiddleContactL": [
+            -0.261168360710144,
+            0.0514655113220215,
+            0.138650625944138
+          ],
+          "MiddleContactR": [
+            0.260194838047028,
+            0.00276347994804382,
+            -0.0418855249881744
+          ],
+          "frame": 30
+        },
+        {
+          "MiddleContactL": [
+            -0.260208487510681,
+            0.0653271079063416,
+            0.0994168370962143
+          ],
+          "MiddleContactR": [
+            0.260024785995483,
+            0.00292453169822693,
+            -0.0152488648891449
+          ],
+          "frame": 31
+        },
+        {
+          "MiddleContactL": [
+            -0.261411339044571,
+            0.0708910524845123,
+            0.0503097325563431
+          ],
+          "MiddleContactR": [
+            0.260168999433517,
+            0.00310888886451721,
+            0.0114182941615582
+          ],
+          "frame": 32
+        },
+        {
+          "MiddleContactL": [
+            -0.262537986040115,
+            0.0704852640628815,
+            0.000600598752498627
+          ],
+          "MiddleContactR": [
+            0.260241985321045,
+            0.00292521715164185,
+            0.0380022265017033
+          ],
+          "frame": 33
+        },
+        {
+          "MiddleContactL": [
+            -0.261790335178375,
+            0.0643929690122604,
+            -0.0474176108837128
+          ],
+          "MiddleContactR": [
+            0.260194271802902,
+            0.00260224938392639,
+            0.0646373406052589
+          ],
+          "frame": 34
+        },
+        {
+          "MiddleContactL": [
+            -0.260509967803955,
+            0.052731454372406,
+            -0.0896832644939423
+          ],
+          "MiddleContactR": [
+            0.260077089071274,
+            0.00241318345069885,
+            0.0913497507572174
+          ],
+          "frame": 35
+        }
+      ],
+      "middle_contact_samples": [
+        {
+          "MiddleContactL": [
+            -0.260000109672546,
+            0.00299978256225586,
+            0.00985914468765259
+          ],
+          "MiddleContactR": [
+            0.25999990105629,
+            0.071936696767807,
+            0.0539211444556713
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.260208040475845,
+            0.00253605842590332,
+            0.085475891828537
+          ],
+          "MiddleContactR": [
+            0.260725200176239,
+            0.0559575259685516,
+            -0.0807659029960632
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.260311990976334,
+            0.00256624817848206,
+            0.161023780703545
+          ],
+          "MiddleContactR": [
+            0.260093420743942,
+            0.00927430391311646,
+            -0.132391721010208
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.261085987091064,
+            0.0361815989017487,
+            0.164732187986374
+          ],
+          "MiddleContactR": [
+            0.260259360074997,
+            0.00262647867202759,
+            -0.0658334791660309
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.261623799800873,
+            0.0704405307769775,
+            0.0531397312879562
+          ],
+          "MiddleContactR": [
+            0.260194361209869,
+            0.00306817889213562,
+            0.00986745953559875
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.26046758890152,
+            0.0559118092060089,
+            -0.0817079842090607
+          ],
+          "MiddleContactR": [
+            0.260050773620605,
+            0.00254487991333008,
+            0.0855413228273392
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.260208964347839,
+            0.00507307052612305,
+            -0.137725234031677
+          ],
+          "MiddleContactR": [
+            0.260171324014664,
+            0.00193372368812561,
+            0.161166876554489
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.260615020990372,
+            0.00245806574821472,
+            -0.0658795386552811
+          ],
+          "MiddleContactR": [
+            0.261268496513367,
+            0.0374000370502472,
+            0.16571307182312
+          ]
+        },
+        {
+          "MiddleContactL": [
+            -0.260000169277191,
+            0.0029996931552887,
+            0.00985926017165184
+          ],
+          "MiddleContactR": [
+            0.259999960660934,
+            0.0719366371631622,
+            0.0539209954440594
+          ]
+        }
+      ],
+      "middle_joint_weight_counts": {
+        "ArmL": 102,
+        "ArmR": 96,
+        "ClawBackL": 112,
+        "ClawBackR": 112,
+        "ClawFrontL": 115,
+        "ClawFrontR": 115,
+        "ForeLegL": 104,
+        "ForeLegR": 104,
+        "ForearmFrontL": 103,
+        "ForearmFrontR": 103,
+        "Head": 347,
+        "JawL": 314,
+        "JawR": 314,
+        "LegL": 95,
+        "LegR": 95,
+        "MiddleClawL": 115,
+        "MiddleClawR": 115,
+        "MiddleLowerL": 103,
+        "MiddleLowerR": 103,
+        "MiddleRootL": 1,
+        "MiddleUpperL": 102,
+        "MiddleUpperR": 96,
+        "Shoulder": 256,
+        "SpineHigh": 161,
+        "SpineLow": 134,
+        "Tail": 30,
+        "Tail2": 32,
+        "Tail3": 45,
+        "TailEnd": 55,
+        "Tongue": 8,
+        "Tongue2": 8,
+        "Tongue3": 8,
+        "Tongue4": 9,
+        "TongueEnd": 1
+      },
+      "ok": true,
+      "profile": {
+        "asset_path": "res://world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb",
+        "attack_contact": 0.42,
+        "author": "Danimal; original model Atmostatic",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.3,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ArmatureAction.002_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              100.0
+            ]
+          },
+          {
+            "clip": "walk",
+            "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee.",
+            "duration_factor": 0.6,
+            "kind": "source_nla_cycle_window",
+            "source_action": "Walk_Armature",
+            "source_frame_window_at_24fps": [
+              10.0,
+              50.0
+            ]
+          },
+          {
+            "clip": "run",
+            "description": "Original Walk action frames10..50, original NLA scale0.6 for Walk or0.35 for Flee.",
+            "duration_factor": 0.35,
+            "kind": "source_nla_cycle_window",
+            "source_action": "Walk_Armature",
+            "source_frame_window_at_24fps": [
+              10.0,
+              50.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ArmatureAction.001_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              29.0
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "ArmatureAction.009_Armature",
+            "source_frame_window_at_24fps": [
+              0.0,
+              44.0
+            ]
+          },
+          {
+            "clip": "hit",
+            "description": "local spine/head recoil",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              8.0
+            ],
+            "kind": "authored_local_rig_action"
+          }
+        ],
+        "floor_clearance_guards": {
+
+        },
+        "gait": {
+          "run": 1.038502,
+          "walk": 0.605793
+        },
+        "gait_provenance": {
+          "run": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints.",
+          "walk": "Measured from exported original foot contact controller heads ClawFrontLH/RH and ClawBackLL/RL, sampled at 241 phases; backward world Y velocity when within 12 mm of each foot minimum. Imported GLTF bone tails are NOT anatomical endpoints."
+        },
+        "ground_min_dense": -0.00035944581031799,
+        "height": 0.45,
+        "hit_point": [
+          0.0,
+          0.2475,
+          0.0
+        ],
+        "license": "CC-BY-SA-3.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "maximum_supported_speed": 1.7135283,
+        "mob_id": "MOB-05",
+        "model": "V3RoachSixLeg",
+        "native_bounds": {
+          "name": "V3RoachSixLeg",
+          "sourceDepth": 0.636389285326004,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.45,
+          "sourceWidth": 0.6,
+          "targetHeight": 0.45
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "new_anatomy": {
+          "actual_weighted_geometry": true,
+          "contact_markers": [
+            "MiddleContactL",
+            "MiddleContactR"
+          ],
+          "independent_root_joints": [
+            "MiddleRootL",
+            "MiddleRootR"
+          ],
+          "mandibles": "Two curved volume meshes weighted to JawL and JawR",
+          "middle_chains": [
+            "MiddleUpperL",
+            "MiddleLowerL",
+            "MiddleClawL",
+            "MiddleUpperR",
+            "MiddleLowerR",
+            "MiddleClawR"
+          ],
+          "middle_gait": "Authored stance55%, stroke0.3331m, swing70mm, left/right phase0.25/0.75; three-joint IK baked; no runtime IK dependency"
+        },
+        "open_art_gates": {
+          "live_pursuit": "OPEN",
+          "native_six_leg_contact": "PENDING",
+          "visual_review": "PENDING"
+        },
+        "pick_size": [
+          0.75,
+          0.45,
+          0.75
+        ],
+        "proposed_p2_movement_speed": 1.6,
+        "qa_attack_duration_ms": 1400.0,
+        "qa_server_contact_fraction": 0.5,
+        "sha256": "c482207e1ebdac9661571e2487e5ff018157dc3b96d94178b92ca26e1204e7d7",
+        "source_url": "https://opengameart.org/content/roach-game-ready-and-animated",
+        "status": "six_leg_candidate; native_and_visual_gate_pending",
+        "title": "Панцирник",
+        "visual_acceptance_note": "Separate six-leg anatomy candidate; earlier four-leg basis acceptance does not automatically accept this adaptation."
+      },
+      "proposed_pursuit_contract": {
+        "applied_rate": 1.54068073421318,
+        "clip": "run",
+        "kind": "gait",
+        "maximum_rate": 1.65,
+        "maximum_supported_speed": 1.7135283,
+        "mob_id": "MOB-05",
+        "rendered_speed": 1.60000002384186,
+        "requested_rate": 1.54068073421318,
+        "source_stride_speed": 1.038502
+      }
+    }
+  },
+  "native_controller": "VarendorAnimationController subclass",
+  "native_factory": "VarendorWorld.make_actor",
+  "native_render": true,
+  "ok": true
+}

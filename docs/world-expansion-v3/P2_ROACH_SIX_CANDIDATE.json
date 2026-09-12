@@ -1,0 +1,41 @@
+{
+  "mob_id": "MOB-05",
+  "model": "V3RoachSixLeg",
+  "canonical_changed": true,
+  "sha256": "c482207e1ebdac9661571e2487e5ff018157dc3b96d94178b92ca26e1204e7d7",
+  "native_passed": 46,
+  "native_total": 46,
+  "qa": "roach-six-evidence/ROACH_SIX_NATIVE_QA.json",
+  "initial_qa_failure": {
+    "passed": 43,
+    "total": 46,
+    "reason": "Settled contact test sampled native80ms death-to-run crossfade, not the settled run clip; explicit warm-up added; renderer and model unchanged for rerun.",
+    "evidence": "roach-six-evidence/initial-check/ROACH_SIX_NATIVE_QA.json"
+  },
+  "middle_joint_weight_counts": {
+    "MiddleClawL": 115,
+    "MiddleClawR": 115,
+    "MiddleLowerL": 103,
+    "MiddleLowerR": 103,
+    "MiddleRootL": 1,
+    "MiddleUpperL": 102,
+    "MiddleUpperR": 96
+  },
+  "source_bone_count": 54,
+  "adapted_bone_count": 64,
+  "middle_stance_fraction": 0.55,
+  "middle_stroke_m": 0.3331,
+  "middle_swing_height_m": 0.07,
+  "gait": {
+    "walk": 0.605793,
+    "run": 1.038502
+  },
+  "p2_speed_mps": 1.6,
+  "live_server_tested": false,
+  "visual_basis_accepted": true,
+  "final_art_all_assets_accepted": false,
+  "idle_to_run_transition_observation": {
+    "minimum_middle_contact_y_m": -0.0045846700668335,
+    "scope": "Observed during standard80ms blend; settled-cycle floor checks use3mm tolerance. This short transition is retained as a measured limitation, not hidden by geometry changes."
+  }
+}

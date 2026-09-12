@@ -30,5 +30,13 @@
   },
   "license": "CC-BY-SA-4.0",
   "art_review": "Accepted as working P2 replacement; source fur512px and simple limb silhouette remain documented; final art and live pursuit are separate gates.",
-  "log_limits": "Wrapper preserved root certificate/user shader-cache environment errors; no parse error, crash or teardown leak."
+  "log_limits": "Wrapper preserved root certificate/user shader-cache environment errors; no parse error, crash or teardown leak.",
+  "live_combat_followup": {
+    "source": "live-p2-evidence/battles-checks.json",
+    "checks_passed": 16,
+    "checks_total": 16,
+    "performed_by": "integration/root",
+    "scope": "Actual client/server LMB pick and existing autoattack chord, full HP to death, loot, action clock and stop checks; fight began within3m",
+    "long_pursuit_tested": false
+  }
 }
