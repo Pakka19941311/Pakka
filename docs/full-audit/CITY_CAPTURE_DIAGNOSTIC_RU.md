@@ -17,4 +17,6 @@
 
 `scripts/world_final/stage_qa.mjs` передаёт явно заданный `--qa-user-root=<каталог>` в checked wrapper до разделителя аргументов Godot. Это изолирует data/cache дочернего процесса и не меняет настройки движка, bootstrap, сервер или 360-секундный внешний timeout. Старые пользовательские save и shader cache этим запуском не затрагиваются.
 
-Статус: source diagnostics подготовлены; исходный timeout остаётся открытым до повторного прохождения всего маршрута точным скомпилированным EXE с новым helper и записи фаз. Отсутствие ошибки парсинга само по себе не закрывает этот сценарий.
+Проверки исходника: `node --check scripts/world_final/stage_qa.mjs` PASS. Checked Godot parse `res://scripts/p2_city_acceptance.gd` (включает helper и upgrade preload) в `work/qa/audit-city-parse-01`: exit 0, 0,844 с, `clean_error_log=true`, `error_lines=[]`, без timeout.
+
+Статус: source diagnostics сохранены в `827708f`; исходный timeout остаётся открытым до повторного прохождения всего маршрута точным скомпилированным EXE с новым helper и записи фаз. Отсутствие ошибки парсинга само по себе не закрывает этот сценарий.
