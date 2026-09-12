@@ -4,6 +4,7 @@ import { migrateScrollSave } from '../core/enhancement-v2.ts';
 import { compatibleEquipmentSlots } from '../core/inventory-commands.ts';
 import type { InventoryItem } from '../core/inventory-commands.ts';
 import type {ItemStatContribution} from '../core/item-progression.ts';
+import type {LegacyProgression} from '../core/progression-migration-v3.ts';
 
 const invalid = (): never => { throw Error('invalid-beta-save: original data retained'); };
 function record(value: unknown): Record<string, unknown> {
@@ -61,9 +62,15 @@ export function parseBetaSave(raw: unknown) {
     legacyScrolls:integer(save.legacyScrolls??0,0)});
   if (save.betaScrollGrant !== undefined && save.betaScrollGrant !== BETA_SCROLL_GRANT) return invalid();
   if (player.dead !== undefined && typeof player.dead !== 'boolean') return invalid();
+  let legacyProgression:LegacyProgression|undefined;
+  if(player.legacyProgression!==undefined){
+    const old=record(player.legacyProgression);
+    if(old.version!==3||old.reason!=='level-cap-90')return invalid();
+    legacyProgression={version:3,reason:'level-cap-90',originalLevel:integer(old.originalLevel,90,100),originalXp:integer(old.originalXp,0)};
+  }
   const hp = finite(player.hp,0,Number.MAX_SAFE_INTEGER);
   return {
-    name:player.name.trim(),classId,level:integer(player.level,1,100),xp:integer(player.xp,0),gold:integer(player.gold,0),
+    name:player.name.trim(),classId,legacyProgression,level:integer(player.level,1,100),xp:integer(player.xp,0),gold:integer(player.gold,0),
     x:finite(player.x,-158,158),z:finite(player.z,-138,138),hp,mp:finite(player.mp,0,Number.MAX_SAFE_INTEGER),
     dead:Boolean(player.dead || hp <= 0),inventory:migrated.player.inventory,equipment,lootBuffer:migrated.lootBuffer,storage,migrationReserve,
     quest:integer(save.quest??0,0,4),kills:integer(save.kills??0,0),bossKills:integer(save.bossKills??0,0),

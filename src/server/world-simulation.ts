@@ -4,6 +4,7 @@ import {rollLootV3} from '../data/loot-v3.ts';
 import {RING_RECIPES,ACCESSORY_MIGRATION_VERSION,itemSellPrice} from '../data/accessories-v3.ts';
 import {craftRing} from '../core/ring-crafting.ts';
 import {migrateAccessories,claimMigrationItem} from '../core/accessory-migration.ts';
+import {normalizeProgressionV3} from '../core/progression-migration-v3.ts';
 import type {AccessoryBackup} from '../core/accessory-migration.ts';
 import {SKILL_BOOKS} from '../data/skill-books.ts';
 import {BookSystem} from './book-system.ts';
@@ -174,7 +175,7 @@ export class WorldSimulation {
     }else for(const region of SPAWN_REGIONS)for(let i=0;i<region.population;i++)if(!this.state.monsters.some(m=>m.uid===`${region.id}:${i}`))this.spawnMonster(region.monsterId,spawnPointInRegion(region,i),`${region.id}:${i}`,region.id,i);
     // A process restart breaks all connections. Never renew their exposure deadline.
     for (const p of Object.values(this.state.characters)) {
-      p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);
+      Object.assign(p,normalizeProgressionV3(p));p.storage??=[];p.buffs.haste??=0;this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);
       p.activeUntil = Math.min(p.activeUntil, this.state.time + DISCONNECT_GRACE_MS);
       p.direction = {x:0,z:0};p.destination=null;p.target=null;p.skill=null;p.bufferedSkill=undefined;p.autoAttack=false;p.singleAttack=false;
       Object.assign(p,{...motion(this.state.time),yaw:p.yaw,action:p.dead?'death':'idle',combatState:p.dead?'dead':'idle'});
@@ -230,7 +231,7 @@ export class WorldSimulation {
     p.equipment=Object.fromEntries(Object.entries(p.equipment).map(([slot,item])=>[slot,item?remap(item):undefined]));
     const granted=grantBetaScrolls({player:p,lootBuffer:p.lootBuffer,betaScrollGrant:p.betaScrollGrant},id=>this.item(id));
     p={...granted.player,lootBuffer:granted.lootBuffer,betaScrollGrant:granted.betaScrollGrant};
-    this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
+    Object.assign(p,normalizeProgressionV3(p));this.migrateAccessories(p);this.migrateEquipment(p);this.recalculate(p);if(p.dead){p.hp=0;p.action='death';}
     const oldPosition={x:p.x,z:p.z};
     if(this.finalWorld)p.spaceId='surface';
     Object.assign(p,this.collision.findNearestFree(this.finalWorld?this.finalWorld.start:legacyTerritoryPosition(p),.46));

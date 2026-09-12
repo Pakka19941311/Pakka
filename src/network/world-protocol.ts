@@ -5,6 +5,7 @@ import type { MonsterAiState } from '../world/monster-ai.ts';
 import type { LocomotionState } from '../controls/character-motor.ts';
 import type { EquipmentCombatStats } from '../core/equipment-stats.ts';
 import type {RingRecipe} from '../data/accessories-v3.ts';
+import type {LegacyProgression} from '../core/progression-migration-v3.ts';
 
 export const WORLD_PROTOCOL = 1;
 export const DISCONNECT_GRACE_MS = 30_000;
@@ -16,7 +17,7 @@ export type WorldCharacter = Position & WorldMotion & {
   hp: number; mp: number; maxHp: number; maxMp: number; stats: EquipmentCombatStats;
   bookEffects?:BookEffect[]; bookCooldowns?:Record<string,number>; bookCastReadyAt?:number; bookQuests?:Record<string,'active'|'ready'|'claimed'>;
   storage?: Array<InventoryItem|null>;
-  migrationReserve?:InventoryItem[];accessoryMigrationVersion?:number;
+  migrationReserve?:InventoryItem[];accessoryMigrationVersion?:number;legacyProgression?:LegacyProgression;
   inventory: InventoryItem[]; equipment: Record<string, InventoryItem | undefined>;
   lootBuffer: InventoryItem[]; betaScrollGrant?: string; legacyScrolls?: number; quest: number; kills: number; bossKills: number;
   dead: boolean; cooldowns: number[]; attackReadyAt: number; buffs: { guard: number; vanish: number; haste?:number };
