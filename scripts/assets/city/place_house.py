@@ -24,6 +24,14 @@ for ob in [*old.children_recursive,old]:bpy.data.objects.remove(ob,do_unlink=Tru
 data['obstacles']=[o for o in data['obstacles'] if not o['id'].startswith('courtyard:'+NAME+':')]
 data['props']=[p for p in data['props'] if p['id']!=NAME]
 
+# The city expansion driver shares this exact legacy-preserving baseline.
+# A plain invocation still reproduces the original single-house checkpoint.
+for extra_name in globals().get('P2_EXTRA_REPLACEMENTS',[]):
+ extra=bpy.data.objects.get(extra_name)
+ if extra:
+  for ob in [*extra.children_recursive,extra]:bpy.data.objects.remove(ob,do_unlink=True)
+ data['obstacles']=[o for o in data['obstacles'] if not o['id'].startswith('courtyard:'+extra_name+':')]
+
 # Batch unchanged source pieces exactly as the legacy exporter does. Their
 # names are retained because tavern camera hiding depends on district names.
 groups=defaultdict(list)
@@ -107,6 +115,7 @@ data['p2City']={'version':1,'replaces':[NAME],'houseSourceSha256':hashlib.sha256
  'position_server':[-79,-211],'floor_y':70.14,'source_sink':.4793,'yaw':math.pi,'step_supports':supports,
  'scope':'one residential facade and accessible exterior stair; no new shop or interior'}
 data['id']='greenfall-courtyard-p2'
+if globals().get('P2_FINISH_CITY'):P2_FINISH_CITY(globals())
 (OUT/'courtyard-p2.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
 
 # A full editable project is derived deterministically from the saved master

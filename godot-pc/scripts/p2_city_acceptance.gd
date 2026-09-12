@@ -54,4 +54,5 @@ static func run(app: Node, checks: Dictionary) -> void:
 	await Keys.wait_ms(app.get_tree(),350)
 	checks.city_stop = stopped.distance_to(Vector2(app.net.hero.x,app.net.hero.z))<.03
 	await Wait.capture(app,"p2-city-stair-bottom")
+	await preload("res://scripts/p2_city_upgrade_acceptance.gd").run(app,checks)
 	print("P2_CITY_LIVE ",JSON.stringify(checks))

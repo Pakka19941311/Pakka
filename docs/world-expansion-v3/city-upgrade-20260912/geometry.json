@@ -1,0 +1,342 @@
+{
+  "buildings": [
+    {
+      "id": "House_of_herbs",
+      "root": "P2_House_House_of_herbs",
+      "source": "P2_housepack",
+      "position": [
+        -130,
+        -164
+      ],
+      "scale_xy": 0.72,
+      "scale_height": 1,
+      "yaw": 0,
+      "palette": "sage",
+      "bounds": [
+        [
+          -135.93846130371094,
+          -167.07290649414062,
+          69.66069030761719
+        ],
+        [
+          -124.0615234375,
+          -160.92709350585938,
+          81.93550872802734
+        ]
+      ],
+      "passageCenter": [
+        -130.18,
+        -164.0
+      ],
+      "obstaclePrefix": "courtyard:city-v3:House_of_herbs:",
+      "stairs": {
+        "min": [
+          -126.04666442871094,
+          -166.00448913574218
+        ],
+        "max": [
+          -123.88628845214843,
+          -161.76243286132814
+        ]
+      },
+      "obstacles": 379,
+      "supports": 22,
+      "drawSurfaces": 12,
+      "rawObstacles": 542
+    },
+    {
+      "id": "Merchant_guild",
+      "root": "P2_House_Merchant_guild",
+      "source": "P2_housepack",
+      "position": [
+        -132,
+        -141
+      ],
+      "scale_xy": 0.86,
+      "scale_height": 1,
+      "yaw": 1.5707963267948966,
+      "palette": "ochre",
+      "bounds": [
+        [
+          -135.67041015625,
+          -148.09317016601562,
+          69.66069030761719
+        ],
+        [
+          -128.32958984375,
+          -133.90682983398438,
+          81.93550872802734
+        ]
+      ],
+      "passageCenter": [
+        -132.0,
+        -141.215
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Merchant_guild:",
+      "stairs": {
+        "min": [
+          -134.58514709472655,
+          -136.19046325683593
+        ],
+        "max": [
+          -129.69324951171876,
+          -133.78500061035157
+        ]
+      },
+      "obstacles": 382,
+      "supports": 22,
+      "drawSurfaces": 12,
+      "rawObstacles": 542
+    },
+    {
+      "id": "Guildhall_east",
+      "root": "P2_House_Guildhall_east",
+      "source": "P2_housepack",
+      "position": [
+        -80,
+        -138
+      ],
+      "scale_xy": 1,
+      "scale_height": 1,
+      "yaw": -1.5707963267948966,
+      "palette": "cream",
+      "bounds": [
+        [
+          -84.26791381835938,
+          -146.2478790283203,
+          69.66069030761719
+        ],
+        [
+          -75.7320785522461,
+          -129.75213623046875,
+          81.93550872802734
+        ]
+      ],
+      "passageCenter": [
+        -80.0,
+        -137.75
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Guildhall_east:",
+      "stairs": {
+        "min": [
+          -82.60900421142578,
+          -146.31627197265624
+        ],
+        "max": [
+          -77.06726531982422,
+          -143.66575317382814
+        ]
+      },
+      "obstacles": 383,
+      "supports": 22,
+      "drawSurfaces": 12,
+      "rawObstacles": 542
+    },
+    {
+      "id": "Podkova_alehouse",
+      "root": "P2_House_Podkova_alehouse",
+      "source": "P2_housepack",
+      "position": [
+        -60,
+        -209
+      ],
+      "scale_xy": 0.86,
+      "scale_height": 1,
+      "yaw": 3.141592653589793,
+      "palette": "warm",
+      "bounds": [
+        [
+          -67.09317016601562,
+          -212.67041015625,
+          69.66069030761719
+        ],
+        [
+          -52.906829833984375,
+          -205.32958984375,
+          81.93550872802734
+        ]
+      ],
+      "passageCenter": [
+        -59.785,
+        -209.0
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Podkova_alehouse:",
+      "stairs": {
+        "min": [
+          -67.21499176025391,
+          -211.58514709472655
+        ],
+        "max": [
+          -64.80954437255859,
+          -206.69324951171876
+        ]
+      },
+      "obstacles": 380,
+      "supports": 22,
+      "drawSurfaces": 12,
+      "rawObstacles": 542
+    },
+    {
+      "id": "Leatherworkers_house",
+      "root": "P2_House_Leatherworkers_house",
+      "source": "P2_housepack",
+      "position": [
+        -35,
+        -202
+      ],
+      "scale_xy": 0.9,
+      "scale_height": 1,
+      "yaw": -1.5707963267948966,
+      "palette": "sage",
+      "bounds": [
+        [
+          -38.841129302978516,
+          -209.423095703125,
+          69.66069030761719
+        ],
+        [
+          -31.15887451171875,
+          -194.57691955566406,
+          81.93550872802734
+        ]
+      ],
+      "passageCenter": [
+        -35.0,
+        -201.775
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Leatherworkers_house:",
+      "stairs": {
+        "min": [
+          -37.393103790283206,
+          -209.52965087890624
+        ],
+        "max": [
+          -32.31553726196289,
+          -207.05418090820314
+        ]
+      },
+      "obstacles": 380,
+      "supports": 22,
+      "drawSurfaces": 12,
+      "rawObstacles": 542
+    },
+    {
+      "id": "Coopers_house",
+      "root": "P2_House_Coopers_house",
+      "source": "P2_housepack",
+      "position": [
+        -32,
+        -177
+      ],
+      "scale_xy": 0.82,
+      "scale_height": 1,
+      "yaw": 3.141592653589793,
+      "palette": "ochre",
+      "bounds": [
+        [
+          -38.76325607299805,
+          -180.49969482421875,
+          69.66069030761719
+        ],
+        [
+          -25.236745834350586,
+          -173.50030517578125,
+          81.93550872802734
+        ]
+      ],
+      "passageCenter": [
+        -31.795,
+        -177.0
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Coopers_house:",
+      "stairs": {
+        "min": [
+          -38.90034408569336,
+          -179.4858428955078
+        ],
+        "max": [
+          -36.564911651611325,
+          -174.7796142578125
+        ]
+      },
+      "obstacles": 381,
+      "supports": 22,
+      "drawSurfaces": 12,
+      "rawObstacles": 542
+    },
+    {
+      "id": "Citadel_west_hall",
+      "root": "P2_Guardhouse_Citadel_west_hall",
+      "source": "P2_gatehouse",
+      "position": [
+        -136,
+        -110
+      ],
+      "scale": 1,
+      "yaw": 3.141592653589793,
+      "bounds": [
+        [
+          -150.53973388671875,
+          -118.99090576171875,
+          70.13999938964844
+        ],
+        [
+          -121.46025848388672,
+          -101.00910949707031,
+          85.83992004394531
+        ]
+      ],
+      "passageCenter": [
+        -136,
+        -110
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Citadel_west_hall:",
+      "obstacles": 1881,
+      "supports": 144,
+      "drawSurfaces": 8,
+      "rawObstacles": 4526
+    },
+    {
+      "id": "Citadel_east_hall",
+      "root": "P2_Guardhouse_Citadel_east_hall",
+      "source": "P2_gatehouse",
+      "position": [
+        -66,
+        -107
+      ],
+      "scale": 1,
+      "yaw": 3.141592653589793,
+      "bounds": [
+        [
+          -80.53974151611328,
+          -115.99090576171875,
+          70.13999938964844
+        ],
+        [
+          -51.46025848388672,
+          -98.00910949707031,
+          85.83992004394531
+        ]
+      ],
+      "passageCenter": [
+        -66,
+        -107
+      ],
+      "obstaclePrefix": "courtyard:city-v3:Citadel_east_hall:",
+      "obstacles": 1885,
+      "supports": 144,
+      "drawSurfaces": 8,
+      "rawObstacles": 4526
+    }
+  ],
+  "preserved": {
+    "residents": "04761800152a215cb5c7afa801b10826793dee1ab3341ee2a83925437cc62876",
+    "residentLooks": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "wildlife": "ae96d81f114e4c99b06a6e26459c75111b9e3db6dbae8ec754ff4c71c0abd057",
+    "signs": "d9da5f512c49ae3ee5884399f8a876f130fd27958e68c02847c969a87c4e3e53",
+    "tavern": "7c95206182746700beca76e0da2113ddd33e1b496b316732bec11ca987483b35",
+    "quarter": "1c885b5f69b3ec53c72b0a480ea458a422b04219cde0ddfa26c0eb7d207e9f41"
+  },
+  "obstacles": 7100,
+  "supports": 444
+}
