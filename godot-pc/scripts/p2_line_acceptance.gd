@@ -6,7 +6,10 @@ const Fixture = preload("res://world-final/gameplay_acceptance.gd")
 static func run(app: Node,checks: Dictionary) -> void:
 	var old_settings: Dictionary=app.game_settings.duplicate(true)
 	var old_interaction: bool=app.qa_interaction
-	app.qa_interaction=false;app.game_settings.quality=2;app.apply_settings()
+	app.qa_interaction=false
+	var low_profile: bool="--qa-graphics=low" in OS.get_cmdline_user_args()
+	preload("res://scripts/graphics_profile.gd").apply(app.game_settings,0 if low_profile else 2)
+	app.apply_settings()
 	app.close_dialog();app.inventory_panel.hide()
 	var report: Array=[]
 	for stage: String in ["p2-line-fire","p2-line-ice-dodge"]:
@@ -145,5 +148,5 @@ static func run(app: Node,checks: Dictionary) -> void:
 		disconnect_network.call()
 		await app.net.intent({"type":"cancel"})
 		await Wait.capture(app,stage+"-after")
-	app.net.save_private_json(app.qa_path.get_base_dir().path_join("p2-line-live.json"),{"scope":"Real initial fixture + authoritative single attacks and movement. No forced target HP, clock or positions during combat.","cases":report})
+	app.net.save_private_json(app.qa_path.get_base_dir().path_join("p2-line-live.json"),{"scope":"Real initial fixture + authoritative single attacks and movement. No forced target HP, clock or positions during combat.","graphics":"low" if low_profile else "high","cases":report})
 	app.game_settings=old_settings;app.qa_interaction=old_interaction;app.apply_settings()
