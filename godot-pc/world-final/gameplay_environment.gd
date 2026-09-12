@@ -19,9 +19,12 @@ var courtyard: Node3D
 var castle_mesh: Node3D
 var courtyard_path: String = "castle/courtyard.json"
 var p2_house_cutaway: RefCounted
+var nature_sample: Node3D
+var p2_nature_enabled: bool=false
 
 func setup(value: VarendorWorld) -> bool:
 	world = value
+	p2_nature_enabled = world.data.get("populationMode","") == "starter-v3"
 	courtyard_path = "castle/courtyard-p2.json" if world.data.get("populationMode","") == "starter-v3" else "castle/courtyard.json"
 	layout = read_json("world_layout.json")
 	location_overrides = world.data.get("locationOverrides",[])
@@ -101,6 +104,14 @@ func activate_space(id: String) -> bool:
 			root.add_child(groundcover)
 			await groundcover.build()
 			for path: String in ["nature/collision-D13.json","nature/groundcover-collision-D13.json"]: obstacles.append_array(read_json(path).obstacles)
+			if p2_nature_enabled:
+				world.loading_progress.emit("Обустройство начальной охоты…")
+				nature_sample = load(ROOT+"nature/p2-sample-v3/nature_sample.gd").new()
+				root.add_child(nature_sample)
+				nature_sample.build(groundcover)
+				nature_sample.bind_focus(nature)
+				world.decorations.append_array(nature_sample.small_decorations)
+				obstacles.append_array(read_json("nature/p2-sample-v3/collision.json").obstacles)
 		else:
 			var interior: Node3D = await load_scene("interiors/"+id+".glb",root)
 			if interior == null:

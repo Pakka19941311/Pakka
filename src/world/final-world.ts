@@ -98,6 +98,7 @@ export class FinalWorld {
   readonly mapVersion:string;
   readonly populationMode:P2PopulationMode;
   readonly courtyardPath:string;
+  readonly natureSamplePath:string|null;
   readonly populationPlan:P2PopulationPlan;
   readonly teleports:Record<string,SpatialPoint&{level:number;cost:number}>={
     'Гринфолл':{...this.start,level:1,cost:25},'Астерхолд':{x:-490,z:-356,spaceId:'surface',level:1,cost:0},
@@ -109,6 +110,7 @@ export class FinalWorld {
     const json=(p:string)=>JSON.parse(readFileSync(resolve(root,p),'utf8'));
     this.layout=json('world_layout.json');
     this.courtyardPath=this.populationMode==='starter-v3'?'castle/courtyard-p2.json':'castle/courtyard.json';
+    this.natureSamplePath=this.populationMode==='starter-v3'?'nature/p2-sample-v3/collision.json':null;
     const courtyard=json(this.courtyardPath);
     const replaced=new Set(courtyard.tavern?.replacesLandmarks??[]);
     const digest=createHash('sha256');
@@ -120,7 +122,8 @@ export class FinalWorld {
       const bytes=readFileSync(resolve(root,id==='surface'?'geology-D13/heightmap.f32':`interiors/${meta.floor}`));digest.update(bytes);
       const supports=id==='surface'?[...json('geography/support-surfaces.json').surfaces,...(courtyard.supportSurfaces??[])]:[];
       const terrain=new FinalTerrain(meta,bytes,supports),collision=new FinalCollision();
-      const obstacles:Obstacle[]=id==='surface'?['geography/collision.json','nature/collision-D13.json','nature/groundcover-collision-D13.json',this.courtyardPath].flatMap(p=>json(p).obstacles).filter(o=>!replaced.has(o.landmark)):meta.obstacles;
+      const surfaceLayers=['geography/collision.json','nature/collision-D13.json','nature/groundcover-collision-D13.json',this.courtyardPath,...(this.natureSamplePath?[this.natureSamplePath]:[])];
+      const obstacles:Obstacle[]=id==='surface'?surfaceLayers.flatMap(p=>json(p).obstacles).filter(o=>!replaced.has(o.landmark)):meta.obstacles;
       digest.update(JSON.stringify({obstacles,supports}));
       for(const o of obstacles){
         if(o.kind==='circle')collision.addCircle(o.x,o.z,o.radius,o.bottom,o.top);
