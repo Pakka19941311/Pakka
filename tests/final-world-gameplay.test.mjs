@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {resolve,join,sep} from 'node:path';
 import {pathToFileURL} from 'node:url';
+import {tmpdir} from 'node:os';
 import {stageNativeServer} from '../scripts/package-godot-pc.mjs';
 import {CAVE_BOSS_UID} from '../src/data/cave-boss.ts';
 import {FinalWorld} from '../src/world/final-world.ts';
@@ -76,7 +77,7 @@ test('final runtime preserves the approved base population and adds one cave bos
 });
 
 test('portable server contains complete final geography and restores the same permanent identities',async()=>{
- const parent=resolve('..'),temp=mkdtempSync(join(parent,'.final-world-bridge-')),stage=join(temp,'application');
+ const parent=resolve(tmpdir()),temp=mkdtempSync(join(parent,'varendor-final-world-bridge-')),stage=join(temp,'application');
  let bridge;
  try{
   stageNativeServer(resolve('.'),stage,{finalWorld:true});
