@@ -201,6 +201,7 @@ func _process(delta: float) -> void:
 	stream.poll()
 	if stream.get_status() != previous_status or stream_available_bytes() < available_before_poll:
 		record_stream_progress()
+	var io_observed_ms: int = Time.get_ticks_msec()
 	match stream.get_status():
 		HTTPClient.STATUS_DISCONNECTED:
 			var address: String = server_url.trim_prefix("http://").trim_prefix("https://").trim_suffix("/")
@@ -239,13 +240,14 @@ func _process(delta: float) -> void:
 					break
 				if chunk.is_empty() and available_after == 0:
 					break
+			io_observed_ms = Time.get_ticks_msec() # Before synchronous snapshot/UI callbacks.
 			consume_stream()
 			if stream_bytes.size() > 4194304:
 				stream_failed("sse-buffer-limit")
 				return
 		HTTPClient.STATUS_CANT_RESOLVE, HTTPClient.STATUS_CANT_CONNECT, HTTPClient.STATUS_CONNECTION_ERROR, HTTPClient.STATUS_TLS_HANDSHAKE_ERROR:
 			stream_failed("http-client-status-"+str(stream.get_status()))
-	check_stream_deadline(Time.get_ticks_msec())
+	check_stream_deadline(io_observed_ms)
 
 func check_stream_deadline(now_ms: int) -> void:
 	if stream_fragment_ms >= 0 and now_ms - stream_fragment_ms > 5000:

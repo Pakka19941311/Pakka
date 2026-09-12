@@ -52,6 +52,20 @@ func run() -> void:
 	await pump()
 	checks.burst_latest_snapshot_once = snapshots.size() == 2 and net.last_revision == 3
 	checks.burst_discrete_events_retained = snapshots.size() == 2 and snapshots[1].events.size() == 2 and snapshots[1].events[0].sequence == 2 and snapshots[1].events[1].sequence == 3
+	# Real synchronous consumer stall. The next socket poll, not time spent
+	# inside the consumer, must decide whether new server bytes are available.
+	var stall: Callable = func(value: Dictionary):
+		if int(value.revision) == 4: OS.delay_msec(5100)
+	net.snapshot_received.connect(stall)
+	var fourth: String = packet(4)
+	peer.put_data(("%x\r\n" % fourth.to_utf8_buffer().size()+fourth+"\r\n").to_utf8_buffer())
+	await pump(1)
+	checks.synchronous_callback_not_network_silence = net.connected and net.last_revision == 4 and failures.is_empty()
+	net.snapshot_received.disconnect(stall)
+	var fifth: String = packet(5)
+	peer.put_data(("%x\r\n" % fifth.to_utf8_buffer().size()+fifth+"\r\n").to_utf8_buffer())
+	await pump()
+	checks.next_poll_consumes_waiting_packet = net.connected and net.last_revision == 5 and failures.is_empty()
 	var now_ms: int = Time.get_ticks_msec()
 	net.stream_progress_ms = now_ms-5000
 	checks.exact_five_seconds_not_expired = not net.stream_silence_expired(now_ms)
