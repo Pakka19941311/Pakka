@@ -2,6 +2,7 @@ extends RefCounted
 ## Actual world counter. Needs the opt-in stage server and line fixture hook.
 const Wait = preload("res://scripts/content_acceptance.gd")
 const Fixture = preload("res://world-final/gameplay_acceptance.gd")
+const CPU_TRACE = preload("res://scripts/p2_cpu_trace.gd")
 
 static func run(app: Node,checks: Dictionary) -> void:
 	var old_settings: Dictionary=app.game_settings.duplicate(true)
@@ -13,6 +14,7 @@ static func run(app: Node,checks: Dictionary) -> void:
 	app.close_dialog();app.inventory_panel.hide()
 	var report: Array=[]
 	for stage: String in ["p2-line-fire","p2-line-ice-dodge"]:
+		CPU_TRACE.begin_phase(stage)
 		var prefix: String=stage.replace("-","_")+"_"
 		# Existing aggro can detect the initial hero before fixture acknowledgement.
 		# Observe from before placement; never miss that legitimate first windup.
@@ -46,6 +48,7 @@ static func run(app: Node,checks: Dictionary) -> void:
 		var fixture: Dictionary=await Fixture.fixture(app,stage)
 		checks[prefix+"fixture"] = not fixture.is_empty() and not fixture.has("error")
 		if not checks[prefix+"fixture"]:
+			report.append({"stage":stage,"blocked":"fixture","cpu_trace":CPU_TRACE.finish_phase()})
 			app.world.event_presented.disconnect(listener);disconnect_network.call();continue
 		checks[prefix+"population_unchanged"] = fixture.populationBefore==fixture.populationAfter
 		timings.fixture_ack=Time.get_ticks_msec()
@@ -60,7 +63,7 @@ static func run(app: Node,checks: Dictionary) -> void:
 		timings.warm_end=Time.get_ticks_msec()
 		checks[prefix+"connected_before_input"]=await Wait.until(app,func():return app.net.connected and int(app.net.hero.get("generation",-1))==int(fixture.generation),7000)
 		if not checks[prefix+"connected_before_input"]:
-			report.append({"stage":stage,"fixture":fixture,"timings":timings,"input_trace":input_trace,"shown":false,"blocked":"not-connected-before-input"})
+			report.append({"stage":stage,"fixture":fixture,"timings":timings,"input_trace":input_trace,"shown":false,"blocked":"not-connected-before-input","cpu_trace":CPU_TRACE.finish_phase()})
 			app.world.event_presented.disconnect(listener);disconnect_network.call();continue
 		var observation: Dictionary={"pulse_seen":false,"fixed_release":{},"pulse_ids":{},"draws":0}
 		var draw_observer: Callable=func():
@@ -83,7 +86,7 @@ static func run(app: Node,checks: Dictionary) -> void:
 		checks[prefix+"real_windup_visible"] = shown
 		timings.windup_seen=Time.get_ticks_msec();timings.windup_seen_server=float(app.world.timeline.latest.time);timings.windup_seen_presentation=app.world.timeline.clock_ms
 		if not shown:
-			report.append({"stage":stage,"fixture":fixture,"timings":timings,"events":events,"input_trace":input_trace,"pending_ack_sequences":pending_acks.keys(),"shown":false,"connected":app.net.connected,"hero":app.net.hero.duplicate(true),"target":app.world.current_snapshot.get("monsters",[]).filter(func(m):return m.uid==fixture.targetUid),"input_queue":app.net.input_queue.duplicate(true)})
+			report.append({"stage":stage,"fixture":fixture,"timings":timings,"events":events,"input_trace":input_trace,"pending_ack_sequences":pending_acks.keys(),"shown":false,"connected":app.net.connected,"hero":app.net.hero.duplicate(true),"target":app.world.current_snapshot.get("monsters",[]).filter(func(m):return m.uid==fixture.targetUid),"input_queue":app.net.input_queue.duplicate(true),"cpu_trace":CPU_TRACE.finish_phase()})
 			RenderingServer.frame_post_draw.disconnect(draw_observer);app.world.event_presented.disconnect(listener);disconnect_network.call();continue
 		var id: String=""
 		for key: String in layer.telegraphs:
@@ -144,7 +147,7 @@ static func run(app: Node,checks: Dictionary) -> void:
 			checks[prefix+"sidestep_avoids_real_damage"] = hits.is_empty() and final_hp==initial_hp
 		else:checks[prefix+"stationary_receives_one_real_hit"] = hits.size()==1 and is_equal_approx(initial_hp-final_hp,float(hits[0].amount))
 		checks[prefix+"hero_survived"] = not bool(app.net.hero.dead)
-		report.append({"fixture":fixture,"timings":timings,"input_trace":input_trace,"pending_ack_sequences":pending_acks.keys(),"events":events.filter(func(e):return e.get("actor","")==fixture.targetUid),"frames":frames,"frame_trace":frame_trace,"draws":observation.draws,"initial_hp":initial_hp,"final_hp":final_hp,"moved":moved,"pulse_seen":observation.pulse_seen,"pulse_count":observation.pulse_ids.size()})
+		report.append({"fixture":fixture,"timings":timings,"input_trace":input_trace,"pending_ack_sequences":pending_acks.keys(),"events":events.filter(func(e):return e.get("actor","")==fixture.targetUid),"frames":frames,"frame_trace":frame_trace,"draws":observation.draws,"initial_hp":initial_hp,"final_hp":final_hp,"moved":moved,"pulse_seen":observation.pulse_seen,"pulse_count":observation.pulse_ids.size(),"cpu_trace":CPU_TRACE.finish_phase()})
 		disconnect_network.call()
 		await app.net.intent({"type":"cancel"})
 		await Wait.capture(app,stage+"-after")
