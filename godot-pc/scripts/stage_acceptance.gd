@@ -236,18 +236,28 @@ static func cave(app: Node, checks: Dictionary) -> void:
 	checks.cave_safe_floor = not app.world.collision.blocked(entry) and app.world.hero_position.y>app.world.height_at(entry.x,entry.y)-.2
 	checks.cave_has_monsters_and_one_boss = app.world.current_snapshot.monsters.filter(func(m): return m.uid==BOSS).size()==1 and app.world.current_snapshot.monsters.any(func(m): return m.uid!=BOSS and m.alive)
 	await Wait.capture(app,"cave-inside")
+	# Observe presentation before approaching: the first slam can precede our hit.
+	var slam_observation: Dictionary = {"seen":false}
+	var observe_slam: Callable = func(snapshot: Dictionary):
+		for effect: Dictionary in snapshot.get("groundEffects",[]):
+			if effect.get("owner","")==BOSS and effect.get("kind","")=="slam":
+				slam_observation.seen = true
+	app.world.snapshot_presented.connect(observe_slam)
 	app.net.intent({"type":"destination","x":20,"z":86})
 	checks.cave_walk_to_hall = await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(Vector2(20,86))<.7,45000)
 	var actor: Node3D = app.world.actors.get(BOSS)
 	checks.cave_boss_rendered = is_instance_valid(actor) and actor.visible
-	if not is_instance_valid(actor): return
+	if not is_instance_valid(actor):
+		app.world.snapshot_presented.disconnect(observe_slam)
+		return
 	var gold: int = int(app.net.hero.gold)
 	var position: Vector2 = app.world.camera.unproject_position(actor.position+Vector3.UP*2.5)
 	Mouse.mouse(app,position)
 	checks.cave_boss_targetable = await Wait.until(app,func(): return app.world.target_id == BOSS,1500)
 	app.activate("attack")
 	checks.cave_boss_takes_damage = await Wait.until(app,func(): return app.world.current_snapshot.monsters.any(func(m): return m.uid==BOSS and m.hp<14400),20000)
-	checks.cave_boss_aoe = await Wait.until(app,func(): return app.world.current_snapshot.get("groundEffects",[]).any(func(e): return e.owner==BOSS and e.kind=="slam"),8000)
+	checks.cave_boss_aoe = await Wait.until(app,func(): return bool(slam_observation.seen),8000)
+	app.world.snapshot_presented.disconnect(observe_slam)
 	await Wait.capture(app,"cave-boss-fight")
 	await Mouse.fixture(app,"cave-finish")
 	app.activate("attack")

@@ -22,3 +22,33 @@ test('snapshot interest leaves persistent population, timer and reward state int
  const visible=sim.state.monsters.filter(m=>m.spaceId===p.spaceId&&Math.hypot(m.x-p.x,m.z-p.z)<85);
  for(const m of visible)assert.ok(a.monsters.some(n=>n.uid===m.uid));
 });
+
+test('bounded interiors include distant residents but never cross space boundaries',()=>{
+ for(const spaceId of ['mine','great_cave']) {
+  const hero={id:'h',x:0,z:0,spaceId,target:'m'};
+  assert.equal(monsterInInterest({uid:'m',x:300,z:0,spaceId},hero),true);
+  assert.equal(monsterInInterest({uid:'m',x:0,z:0,spaceId:'surface',targetId:'h'},hero),false);
+ }
+});
+
+test('cave entrance and reentry retain the one boss, corpse and respawn state',()=>{
+ const sim=makeP2Simulation(),p=sim.createCharacter('Cave interest','knight');
+ Object.assign(p,{spaceId:'great_cave',x:0,z:-6});
+ const boss=sim.state.monsters.find(m=>m.uid==='wf:great_cave:cave_boss:000');
+ assert.ok(boss);
+ assert.ok(Math.hypot(boss.x-p.x,boss.z-p.z)>100);
+ const expected=sim.state.monsters.filter(m=>m.spaceId==='great_cave');
+ assert.equal(expected.length,111);
+ assert.equal(sim.snapshot(p.id).monsters.length,111);
+ Object.assign(boss,{alive:false,hp:0,respawnAt:sim.state.time+60000});
+ const before=JSON.stringify(sim.state.monsters),time=sim.state.time;
+ p.spaceId='surface';
+ assert.equal(sim.snapshot(p.id).monsters.some(m=>m.uid===boss.uid),false);
+ p.spaceId='great_cave';
+ const returned=sim.snapshot(p.id).monsters.filter(m=>m.uid===boss.uid);
+ assert.equal(returned.length,1);
+ assert.equal(returned[0].alive,false);
+ assert.equal(JSON.stringify(sim.state.monsters),before);
+ assert.equal(sim.state.time,time);
+ assert.equal(sim.snapshot(p.id).populationCapacity,1151);
+});
