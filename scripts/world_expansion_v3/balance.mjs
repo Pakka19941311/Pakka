@@ -10,6 +10,7 @@ import {classCombatProfile,attackDamageType,accuracyForDamage,xpNeeded} from '..
 import {resolveAttackAccuracy} from '../../src/core/attack-accuracy.ts';
 import {resolveMonsterDamageV3,resolveHeroDamageV3,enemyHitChanceV3} from '../../src/core/encounter-combat-v3.ts';
 import {MOBS_V3,MINI_BOSSES_V3} from '../../src/data/world-expansion-v3.ts';
+import {P2_MOVEMENT_V3} from '../../src/data/p2-encounters.ts';
 import {STARTER_ITEMS_V3,REFERENCE_GEAR_FIXTURES_V3,CASTER_PHYSICAL_WEAPON_PROPOSALS_V3,
  POTIONS_BALANCE_V3,BALANCE_BANDS_V3,ENCOUNTER_BALANCE_V3,baseEncounterStatsV3,baseGoldV3,baseXpV3,
  encounterV3,miniEncounterV3,lootProfileV3,FIRST_HUNTING_BEHAVIORS_V3,FIRST_HUNTING_GENERATOR_GATES_V3} from '../../src/data/encounter-balance-v3.ts';
@@ -249,8 +250,8 @@ export function generateBalance(){
  curveStatus:'candidate, NOT live-balanced',nativeCombatValidated:false};
  const source=['src/core/game-rules.ts','src/core/equipment-stats.ts','src/core/attack-accuracy.ts','src/core/item-progression.ts',
  'src/core/encounter-combat-v3.ts','src/data/game-data.ts','src/data/starter-progression-v3.ts','src/data/encounter-balance-v3.ts','src/data/world-expansion-v3.ts',
- 'src/server/world-simulation.ts','src/data/skill-books.ts','src/server/book-system.ts','scripts/world_expansion_v3/balance.mjs'].map(path=>({path,sha256:hash(path)}));
- return {schema:1,contract:ENCOUNTER_BALANCE_V3,source,summary,
+ 'src/server/world-simulation.ts','src/data/skill-books.ts','src/server/book-system.ts','src/data/p2-encounters.ts','scripts/world_expansion_v3/balance.mjs'].map(path=>({path,sha256:hash(path)}));
+ return {schema:1,contract:ENCOUNTER_BALANCE_V3,source,summary,limitedRuntimeMovement:P2_MOVEMENT_V3,
   baseline:Array.from({length:90},(_,i)=>({level:i+1,...baseEncounterStatsV3(i+1),xp:baseXpV3(i+1),gold:baseGoldV3(i+1)})),
   assumptions:{notRuntime:true,damage:'live accuracy and class/equipment formulas; proposed DEF/MDEF helper vs current mode',
    skillModel:'permitted auto-attacks only; old CLASSES.skills rejected by live intent. Books are separate.',noLevelPenalty:true,
@@ -261,7 +262,8 @@ export function generateBalance(){
 }
 export function renderBalanceReport(result){
  const report=['# Баланс V3 — расчётный кандидат\n',
- '**Это арифметический анализ, не пройденный игровой баланс.** Все новые определения отключены от runtime.\n',
+ '**Это арифметический анализ, не пройденный баланс всей карты.** Первые пять подключены отдельно в ограниченном P2; остальные профили остаются кандидатами.\n',
+ 'P2 locomotion override `'+result.limitedRuntimeMovement.version+'`: слизень1.5, крыса1.9, жук1.6м/с; гончий4.7, кабан без изменения. HP/ATK/DEF не пересчитаны. Таблицы ниже сохраняют оценочную контактную модель; реальное преследование и серии боя измеряются отдельно.\n',
  '## Контрольные числа\n','```json',JSON.stringify(result.summary,null,2),'```\n',
  'Таблица ниже: обычная базовая цель, соответствующий уровень, +3; активная контактная модель. Значения вне целевых диапазонов остаются видимыми.\n',
  '| L | HP / ATK / DEF | Рыцарь TTK | Маг | Рейнджер | Ассасин | Некро | Максимум расходов / золото |',

@@ -1,0 +1,777 @@
+{
+  "schema": 1,
+  "movement": {
+    "version": "p2-locomotion-v3-2",
+    "scope": "canonical-first-five-only",
+    "metresPerSecond": {
+      "MOB-01": 1.5,
+      "MOB-03": 1.9,
+      "MOB-05": 1.6
+    },
+    "preserved": {
+      "MOB-02": 4.7,
+      "MOB-04": "existing-style-speed-until-new-asset-measurement"
+    }
+  },
+  "sourceHashes": [
+    {
+      "path": "scripts/world_expansion_v3/p2-pursuit.mjs",
+      "sha256": "42c528a45046ba3e850750d1f95ff1b46e008a86a6568dd7fbc38972f3320a4e"
+    },
+    {
+      "path": "scripts/world_expansion_v3/p2-endurance.mjs",
+      "sha256": "9dbc571401588c56a8a94d83023c9045629fca365b9a4271172632920d1e43e1"
+    },
+    {
+      "path": "src/data/p2-encounters.ts",
+      "sha256": "4d57c1dafcc27d33d6ee905de087c3f7dfddbeeb2d842644c6440fa8398ac416"
+    },
+    {
+      "path": "src/server/world-simulation.ts",
+      "sha256": "e30016091c85ae3406d9bcef82f240205c934eef8fa5f37572e0eaf97b1761cb"
+    }
+  ],
+  "sourcesChangedDuringRun": false,
+  "cases": [
+    {
+      "ok": true,
+      "mobId": "MOB-01",
+      "level": 2,
+      "uid": "wv3:L02-A:MOB-01:009",
+      "definitionSpeed": 1.5,
+      "locomotionVersion": "p2-locomotion-v3-2",
+      "beforeHit": {
+        "hp": 183,
+        "targetId": null,
+        "provokedBy": null
+      },
+      "hpAfterHit": 164,
+      "provokedBy": "p2-test-3",
+      "heroId": "p2-test-3",
+      "remainingHp": 164,
+      "peakSpeed": 1.5000000000007485,
+      "maximumHomeDistance": 11.974796920918452,
+      "returnedHome": true,
+      "targetReleased": true,
+      "playerDamageTaken": 0,
+      "population": 1151,
+      "standing": {
+        "x": -238.476,
+        "z": -210.767,
+        "spaceId": "surface"
+      },
+      "retreat": {
+        "x": -218.476,
+        "z": -210.767,
+        "spaceId": "surface"
+      },
+      "trace": [
+        {
+          "at": 34900,
+          "x": -243.75110157367664,
+          "z": -210.7791355475078,
+          "hp": 164,
+          "homeDistance": 0.7249999999995884,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 35400,
+          "x": -243.00117136069736,
+          "z": -210.78921601473354,
+          "hp": 164,
+          "homeDistance": 1.4749959547801912,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 35900,
+          "x": -242.251207432468,
+          "z": -210.7961118259084,
+          "hp": 164,
+          "homeDistance": 2.2249830262169144,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 36400,
+          "x": -241.5012152555267,
+          "z": -210.79948763855842,
+          "hp": 164,
+          "homeDistance": 2.974962138012893,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 36900,
+          "x": -240.75121621419902,
+          "z": -210.8006868082555,
+          "hp": 164,
+          "homeDistance": 3.7249361138167627,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 37400,
+          "x": -240.00121644108373,
+          "z": -210.80090600637612,
+          "hp": 164,
+          "homeDistance": 4.474912012142334,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 37900,
+          "x": -239.25121668086769,
+          "z": -210.8004560536054,
+          "hp": 164,
+          "homeDistance": 5.224890433244139,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 38400,
+          "x": -238.5012172658636,
+          "z": -210.7995273701249,
+          "hp": 164,
+          "homeDistance": 5.974871274759117,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 38900,
+          "x": -237.7512182305352,
+          "z": -210.798324454081,
+          "hp": 164,
+          "homeDistance": 6.724854724702219,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 39400,
+          "x": -237.00121919520677,
+          "z": -210.79712153803712,
+          "hp": 164,
+          "homeDistance": 7.474841495761566,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 39900,
+          "x": -236.25122015987836,
+          "z": -210.79591862199322,
+          "hp": 164,
+          "homeDistance": 8.224830679422487,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 40400,
+          "x": -235.50122112454994,
+          "z": -210.79471570594933,
+          "hp": 164,
+          "homeDistance": 8.97482167085123,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 40900,
+          "x": -234.75122208922153,
+          "z": -210.79351278990544,
+          "hp": 164,
+          "homeDistance": 9.724814051795203,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 41400,
+          "x": -234.0012230538931,
+          "z": -210.79230987386154,
+          "hp": 164,
+          "homeDistance": 10.474807523788071,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 41900,
+          "x": -233.2512240185647,
+          "z": -210.79110695781765,
+          "hp": 164,
+          "homeDistance": 11.224801868132106,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 42400,
+          "x": -232.50122498323628,
+          "z": -210.78990404177375,
+          "hp": 164,
+          "homeDistance": 11.974796920918452,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 42900,
+          "x": -233.0812239127116,
+          "z": -210.78862806632708,
+          "hp": 164,
+          "homeDistance": 11.394796613046342,
+          "targetId": null
+        },
+        {
+          "at": 43400,
+          "x": -233.75622269681577,
+          "z": -210.78734687235163,
+          "hp": 164,
+          "homeDistance": 10.719796613046269,
+          "targetId": null
+        },
+        {
+          "at": 43900,
+          "x": -234.43122148091993,
+          "z": -210.7860656783762,
+          "hp": 164,
+          "homeDistance": 10.044796613046197,
+          "targetId": null
+        },
+        {
+          "at": 44400,
+          "x": -235.1062202650241,
+          "z": -210.78478448440075,
+          "hp": 164,
+          "homeDistance": 9.369796613046123,
+          "targetId": null
+        },
+        {
+          "at": 44900,
+          "x": -235.78121904912825,
+          "z": -210.7835032904253,
+          "hp": 164,
+          "homeDistance": 8.694796613046048,
+          "targetId": null
+        },
+        {
+          "at": 45400,
+          "x": -236.45621783323242,
+          "z": -210.78222209644986,
+          "hp": 164,
+          "homeDistance": 8.019796613045974,
+          "targetId": null
+        },
+        {
+          "at": 45900,
+          "x": -237.13121661733658,
+          "z": -210.7809409024744,
+          "hp": 164,
+          "homeDistance": 7.344796613045901,
+          "targetId": null
+        },
+        {
+          "at": 46400,
+          "x": -237.80621540144074,
+          "z": -210.77965970849897,
+          "hp": 164,
+          "homeDistance": 6.669796613045828,
+          "targetId": null
+        },
+        {
+          "at": 46900,
+          "x": -238.4812141855449,
+          "z": -210.77837851452352,
+          "hp": 164,
+          "homeDistance": 5.994796613045755,
+          "targetId": null
+        },
+        {
+          "at": 47400,
+          "x": -239.15621296964906,
+          "z": -210.77709732054808,
+          "hp": 164,
+          "homeDistance": 5.31979661304568,
+          "targetId": null
+        },
+        {
+          "at": 47900,
+          "x": -239.83121175375322,
+          "z": -210.77581612657264,
+          "hp": 164,
+          "homeDistance": 4.6447966130456075,
+          "targetId": null
+        },
+        {
+          "at": 48400,
+          "x": -240.50621053785738,
+          "z": -210.7745349325972,
+          "hp": 164,
+          "homeDistance": 3.9697966130455336,
+          "targetId": null
+        },
+        {
+          "at": 48900,
+          "x": -241.18120932196155,
+          "z": -210.77325373862175,
+          "hp": 164,
+          "homeDistance": 3.29479661304546,
+          "targetId": null
+        },
+        {
+          "at": 49400,
+          "x": -241.8562081060657,
+          "z": -210.77197254464653,
+          "hp": 164,
+          "homeDistance": 2.6197966130453874,
+          "targetId": null
+        },
+        {
+          "at": 49900,
+          "x": -242.53120689016987,
+          "z": -210.7706913506715,
+          "hp": 164,
+          "homeDistance": 1.9447966130453145,
+          "targetId": null
+        },
+        {
+          "at": 50400,
+          "x": -243.20620567427403,
+          "z": -210.7694101566965,
+          "hp": 164,
+          "homeDistance": 1.2697966130452418,
+          "targetId": null
+        },
+        {
+          "at": 50900,
+          "x": -243.8812044583782,
+          "z": -210.76812896272148,
+          "hp": 164,
+          "homeDistance": 0.5947966130451691,
+          "targetId": null
+        }
+      ],
+      "method": "Real mage single hit, then real destination movement and waiting through pursue/leash/return. No position/HP injection after initial reference setup; no continuous damage or special invulnerability."
+    },
+    {
+      "ok": true,
+      "mobId": "MOB-03",
+      "level": 2,
+      "uid": "wv3:L02-A:MOB-03:009",
+      "definitionSpeed": 1.9,
+      "locomotionVersion": "p2-locomotion-v3-2",
+      "beforeHit": {
+        "hp": 165,
+        "targetId": null,
+        "provokedBy": null
+      },
+      "hpAfterHit": 146,
+      "provokedBy": "p2-test-3",
+      "heroId": "p2-test-3",
+      "remainingHp": 146,
+      "peakSpeed": 1.900000000001067,
+      "maximumHomeDistance": 9.947992417486327,
+      "returnedHome": true,
+      "targetReleased": true,
+      "playerDamageTaken": 0,
+      "population": 1151,
+      "standing": {
+        "x": -259.974,
+        "z": -201.302,
+        "spaceId": "surface"
+      },
+      "retreat": {
+        "x": -239.974,
+        "z": -201.302,
+        "spaceId": "surface"
+      },
+      "trace": [
+        {
+          "at": 41200,
+          "x": -265.02425111290114,
+          "z": -201.3238415076003,
+          "hp": 146,
+          "homeDistance": 0.9499999999998717,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 41700,
+          "x": -264.0744151143151,
+          "z": -201.3412530561243,
+          "hp": 146,
+          "homeDistance": 1.8999904053277514,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 42200,
+          "x": -263.1249762629917,
+          "z": -201.36975660906546,
+          "hp": 146,
+          "homeDistance": 2.849829330347465,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 42700,
+          "x": -262.17608937631155,
+          "z": -201.41496951668242,
+          "hp": 146,
+          "homeDistance": 3.799590401243923,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 43200,
+          "x": -261.2263046811995,
+          "z": -201.43519407923404,
+          "hp": 146,
+          "homeDistance": 4.749563296020278,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 43700,
+          "x": -260.2763615621667,
+          "z": -201.4438222430845,
+          "hp": 146,
+          "homeDistance": 5.6994032421744745,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 44200,
+          "x": -259.326372501704,
+          "z": -201.4452079457637,
+          "hp": 146,
+          "homeDistance": 6.649169863361218,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 44700,
+          "x": -258.37638138792533,
+          "z": -201.44143572683421,
+          "hp": 146,
+          "homeDistance": 7.59889800539927,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 45200,
+          "x": -257.4264074026818,
+          "z": -201.43440526745368,
+          "hp": 146,
+          "homeDistance": 8.548618038290085,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 45700,
+          "x": -256.4764334174382,
+          "z": -201.42737480807315,
+          "hp": 146,
+          "homeDistance": 9.498394065982604,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 46200,
+          "x": -256.36874940917284,
+          "z": -201.4214934742396,
+          "hp": 146,
+          "homeDistance": 9.605993837337772,
+          "targetId": null
+        },
+        {
+          "at": 46700,
+          "x": -257.22368325508415,
+          "z": -201.4108577272041,
+          "hp": 146,
+          "homeDistance": 8.750993837337933,
+          "targetId": null
+        },
+        {
+          "at": 47200,
+          "x": -258.0786171009955,
+          "z": -201.400221980169,
+          "hp": 146,
+          "homeDistance": 7.895993837338102,
+          "targetId": null
+        },
+        {
+          "at": 47700,
+          "x": -258.9335509469068,
+          "z": -201.3895862331339,
+          "hp": 146,
+          "homeDistance": 7.04099383733827,
+          "targetId": null
+        },
+        {
+          "at": 48200,
+          "x": -259.7884847928181,
+          "z": -201.37895048609883,
+          "hp": 146,
+          "homeDistance": 6.185993837338438,
+          "targetId": null
+        },
+        {
+          "at": 48700,
+          "x": -260.64341863872943,
+          "z": -201.36831473906375,
+          "hp": 146,
+          "homeDistance": 5.330993837338606,
+          "targetId": null
+        },
+        {
+          "at": 49200,
+          "x": -261.49835248464075,
+          "z": -201.35767899202867,
+          "hp": 146,
+          "homeDistance": 4.475993837338774,
+          "targetId": null
+        },
+        {
+          "at": 49700,
+          "x": -262.35328633055207,
+          "z": -201.34704324499359,
+          "hp": 146,
+          "homeDistance": 3.620993837338942,
+          "targetId": null
+        },
+        {
+          "at": 50200,
+          "x": -263.2082201764634,
+          "z": -201.3364074979585,
+          "hp": 146,
+          "homeDistance": 2.7659938373391104,
+          "targetId": null
+        },
+        {
+          "at": 50700,
+          "x": -264.0631540223747,
+          "z": -201.32577175092342,
+          "hp": 146,
+          "homeDistance": 1.9109938373392783,
+          "targetId": null
+        },
+        {
+          "at": 51200,
+          "x": -264.918087868286,
+          "z": -201.31513600388834,
+          "hp": 146,
+          "homeDistance": 1.0559938373394462,
+          "targetId": null
+        }
+      ],
+      "method": "Real mage single hit, then real destination movement and waiting through pursue/leash/return. No position/HP injection after initial reference setup; no continuous damage or special invulnerability."
+    },
+    {
+      "ok": true,
+      "mobId": "MOB-05",
+      "level": 8,
+      "uid": "wv3:L02-C:MOB-05:009",
+      "definitionSpeed": 1.6,
+      "locomotionVersion": "p2-locomotion-v3-2",
+      "beforeHit": {
+        "hp": 202,
+        "targetId": null,
+        "provokedBy": null
+      },
+      "hpAfterHit": 183,
+      "provokedBy": "p2-test-3",
+      "heroId": "p2-test-3",
+      "remainingHp": 183,
+      "peakSpeed": 1.6000000000005454,
+      "maximumHomeDistance": 9.952286570746985,
+      "returnedHome": true,
+      "targetReleased": true,
+      "playerDamageTaken": 0,
+      "population": 1151,
+      "standing": {
+        "x": -235.75356857405234,
+        "z": -81.20412004174742,
+        "spaceId": "surface"
+      },
+      "retreat": {
+        "x": -247.92879715422674,
+        "z": -97.07118684757211,
+        "spaceId": "surface"
+      },
+      "trace": [
+        {
+          "at": 54900.00000000001,
+          "x": -232.56549225567758,
+          "z": -77.12783091637733,
+          "hp": 183,
+          "homeDistance": 0.8266666666667474,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 55400.00000000001,
+          "x": -233.02288897233043,
+          "z": -77.78415005047084,
+          "hp": 183,
+          "homeDistance": 1.6266165605579763,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 55900.00000000001,
+          "x": -233.49055641612048,
+          "z": -78.4331323474463,
+          "hp": 183,
+          "homeDistance": 2.426420105678082,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 56400.00000000001,
+          "x": -233.96880234386137,
+          "z": -79.07443774998873,
+          "hp": 183,
+          "homeDistance": 3.2261259045951385,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 56900.00000000001,
+          "x": -234.4528885813701,
+          "z": -79.71135259096377,
+          "hp": 183,
+          "homeDistance": 4.025788475920801,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 57400.00000000001,
+          "x": -234.93988641357893,
+          "z": -80.34604182616731,
+          "hp": 183,
+          "homeDistance": 4.825474741656217,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 57900.00000000001,
+          "x": -235.4285856068474,
+          "z": -80.97942271533513,
+          "hp": 183,
+          "homeDistance": 5.625200901094636,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 58400.00000000001,
+          "x": -235.91851643136127,
+          "z": -81.61185251525929,
+          "hp": 183,
+          "homeDistance": 6.424961581455953,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 58900.00000000001,
+          "x": -236.4092767981589,
+          "z": -82.24363907920356,
+          "hp": 183,
+          "homeDistance": 7.224753450366284,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 59400.00000000001,
+          "x": -236.90003716495656,
+          "z": -82.87542564314784,
+          "hp": 183,
+          "homeDistance": 8.024586812663554,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 59900.00000000001,
+          "x": -237.3907975317542,
+          "z": -83.50721220709211,
+          "hp": 183,
+          "homeDistance": 8.824450385682262,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 60400.00000000001,
+          "x": -237.88155789855185,
+          "z": -84.13899877103638,
+          "hp": 183,
+          "homeDistance": 9.624336637127858,
+          "targetId": "p2-test-3"
+        },
+        {
+          "at": 60900.00000000001,
+          "x": -237.91052989228137,
+          "z": -84.16719864772425,
+          "hp": 183,
+          "homeDistance": 9.664286570746983,
+          "targetId": null
+        },
+        {
+          "at": 61400.00000000001,
+          "x": -237.47771351294278,
+          "z": -83.5918118371557,
+          "hp": 183,
+          "homeDistance": 8.944286570746975,
+          "targetId": null
+        },
+        {
+          "at": 61900.00000000001,
+          "x": -237.0448971336042,
+          "z": -83.01642502658716,
+          "hp": 183,
+          "homeDistance": 8.224286570746969,
+          "targetId": null
+        },
+        {
+          "at": 62400.00000000001,
+          "x": -236.6120807542656,
+          "z": -82.44103821601861,
+          "hp": 183,
+          "homeDistance": 7.504286570746963,
+          "targetId": null
+        },
+        {
+          "at": 62900.00000000001,
+          "x": -236.17926437492702,
+          "z": -81.86565140545007,
+          "hp": 183,
+          "homeDistance": 6.784286570746956,
+          "targetId": null
+        },
+        {
+          "at": 63400.00000000001,
+          "x": -235.74644799558843,
+          "z": -81.29026459488152,
+          "hp": 183,
+          "homeDistance": 6.06428657074695,
+          "targetId": null
+        },
+        {
+          "at": 63900.00000000001,
+          "x": -235.31363161624984,
+          "z": -80.71487778431297,
+          "hp": 183,
+          "homeDistance": 5.344286570746943,
+          "targetId": null
+        },
+        {
+          "at": 64400.00000000001,
+          "x": -234.88081523691125,
+          "z": -80.1394909737446,
+          "hp": 183,
+          "homeDistance": 4.624286570747073,
+          "targetId": null
+        },
+        {
+          "at": 64900.00000000001,
+          "x": -234.44799885757266,
+          "z": -79.56410416317648,
+          "hp": 183,
+          "homeDistance": 3.904286570747407,
+          "targetId": null
+        },
+        {
+          "at": 65400.00000000001,
+          "x": -234.01518247823407,
+          "z": -78.98871735260836,
+          "hp": 183,
+          "homeDistance": 3.1842865707477417,
+          "targetId": null
+        },
+        {
+          "at": 65900,
+          "x": -233.58236609889548,
+          "z": -78.41333054204024,
+          "hp": 183,
+          "homeDistance": 2.4642865707480754,
+          "targetId": null
+        },
+        {
+          "at": 66400,
+          "x": -233.1495497195569,
+          "z": -77.83794373147212,
+          "hp": 183,
+          "homeDistance": 1.74428657074841,
+          "targetId": null
+        },
+        {
+          "at": 66900,
+          "x": -232.716733340218,
+          "z": -77.262556920904,
+          "hp": 183,
+          "homeDistance": 1.0242865707485733,
+          "targetId": null
+        }
+      ],
+      "method": "Real mage single hit, then real destination movement and waiting through pursue/leash/return. No position/HP injection after initial reference setup; no continuous damage or special invulnerability."
+    }
+  ]
+}

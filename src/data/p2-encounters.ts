@@ -5,12 +5,20 @@ import {rollAccessoryLoot} from './accessory-loot-v3.ts';
 import type {LootStack} from './loot-v3.ts';
 
 export const P2_BALANCE_VERSION=ENCOUNTER_BALANCE_V3.revision;
+/** Accepted P2 locomotion override, calibrated to the measured model cycles.
+ * Damage, health, defense, legacy species and the full-map candidate stay unchanged.
+ */
+export const P2_MOVEMENT_V3={version:'p2-locomotion-v3-2',scope:'canonical-first-five-only',
+ metresPerSecond:{'MOB-01':1.5,'MOB-03':1.9,'MOB-05':1.6},
+ preserved:{'MOB-02':4.7,'MOB-04':'existing-style-speed-until-new-asset-measurement'}} as const;
 const models:Record<string,string>={'MOB-01':'V3StarterSlime','MOB-02':'V3StarterWolf','MOB-03':'V3StarterRat','MOB-04':'V3StarterBoar','MOB-05':'V3StarterBeetle'};
 const cache=new Map<string,ReturnType<typeof build>>();
 function build(canonicalMobId:string,level:number){
  if(!Object.hasOwn(models,canonicalMobId))throw Error('unsupported-p2-combat-identity');
  const e=encounterV3(canonicalMobId,level),name=MOBS_V3.find(m=>m.id===canonicalMobId)!.name;
- return {...e,name,model:models[canonicalMobId],goldMean:e.gold,gold:[Math.floor(e.gold*.9),Math.ceil(e.gold*1.1)] as const,
+ const speed=P2_MOVEMENT_V3.metresPerSecond[canonicalMobId as keyof typeof P2_MOVEMENT_V3.metresPerSecond]??e.movementSpeed;
+ return {...e,name,model:models[canonicalMobId],movementSpeed:speed,locomotionVersion:P2_MOVEMENT_V3.version,
+  locomotionOverride:Object.hasOwn(P2_MOVEMENT_V3.metresPerSecond,canonicalMobId),goldMean:e.gold,gold:[Math.floor(e.gold*.9),Math.ceil(e.gold*1.1)] as const,
   runtimeEnabled:true,balanceVersion:P2_BALANCE_VERSION};
 }
 /** Only the explicit canonical marker selects these definitions. Legacy wolf

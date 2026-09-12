@@ -836,7 +836,8 @@ export class WorldSimulation {
     const def=monsterDef(m),p2=p2Encounter(m),radius=this.monsterRadius(m),boss='boss' in def;
     if(m.status.dot>this.state.time&&this.random()<dt){const p=this.state.characters[m.status.dotOwner??''];if(p)this.damage(m,Math.max(2,Math.round(p.stats.matk*.08)),p,false);m.status.nextDot=this.state.time;}
     if(!m.alive)return;
-    if(m.returnFromTaunt){this.cancelAttack(m.uid);if(distance(m,m.home)>.6)this.walk(m,m.home,monsterMovementSpeed(boss)*dt,radius,m.uid,dt);else m.returnFromTaunt=false;return;}
+    const ambientSpeed=p2?.locomotionOverride?p2.movementSpeed:monsterMovementSpeed(boss);
+    if(m.returnFromTaunt){this.cancelAttack(m.uid);if(distance(m,m.home)>.6)this.walk(m,m.home,ambientSpeed*dt,radius,m.uid,dt);else m.returnFromTaunt=false;return;}
     if(m.status.stun>this.state.time||this.books.value(m,'sleep')){this.cancelAttack(m.uid);this.action(m,'idle');m.combatState='idle';return;}
     let brain=this.brains.get(m.uid);
     if(!brain){brain=new MonsterAiBrain(m.home.x*.173+m.home.z*.127+m.patrolIndex*1.91);this.brains.set(m.uid,brain);}
@@ -898,9 +899,9 @@ export class WorldSimulation {
         }
       }
     }else if(decision.intent==='return'){
-      this.cancelAttack(m.uid);this.walk(m,m.home,monsterMovementSpeed(boss)*dt*.9,radius,m.uid,dt);
+      this.cancelAttack(m.uid);this.walk(m,m.home,ambientSpeed*dt*.9,radius,m.uid,dt);
     }else if(decision.intent==='patrol'&&point){
-      this.walk(m,point,monsterMovementSpeed(boss)*dt*.46,radius,m.uid,dt);
+      this.walk(m,point,ambientSpeed*dt*.46,radius,m.uid,dt);
     }else{this.paths.delete(m.uid);this.action(m,'idle');}
   }
   private patrolPoints(m:WorldMonster):Position[] {

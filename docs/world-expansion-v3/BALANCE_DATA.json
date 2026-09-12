@@ -51,19 +51,23 @@
     },
     {
       "path": "src/server/world-simulation.ts",
-      "sha256": "7b52375646559486b80123db08de582fc8b620c24685a2644bbd0951313dd46b"
+      "sha256": "e30016091c85ae3406d9bcef82f240205c934eef8fa5f37572e0eaf97b1761cb"
     },
     {
       "path": "src/data/skill-books.ts",
-      "sha256": "66b7a4dbfbf7d12ea8aa5580ab1236912a0646a82989d69887a55e802cca94c6"
+      "sha256": "91dc6fc6c0c92da9666e660bc4c026ab7a350417d483bf6711cab1b4259974ca"
     },
     {
       "path": "src/server/book-system.ts",
       "sha256": "fb33e655fe26b15451734126c111d71e7765062cce5f9347aeddd52ac5afdb74"
     },
     {
+      "path": "src/data/p2-encounters.ts",
+      "sha256": "4d57c1dafcc27d33d6ee905de087c3f7dfddbeeb2d842644c6440fa8398ac416"
+    },
+    {
       "path": "scripts/world_expansion_v3/balance.mjs",
-      "sha256": "8388501fb4b65ca5d24ead00978f24db3ab120bd9b737c161fa64d85caf01480"
+      "sha256": "ba03f426674e8b0491cc3ab846f1c57d4d58000e4141b770ea546f3a5912135d"
     }
   ],
   "summary": {
@@ -87,6 +91,19 @@
     "existingBookBossGate": "UNRESOLVED: necro40 percent-max-HP / mage40 direct damage; accepted books unchanged",
     "curveStatus": "candidate, NOT live-balanced",
     "nativeCombatValidated": false
+  },
+  "limitedRuntimeMovement": {
+    "version": "p2-locomotion-v3-2",
+    "scope": "canonical-first-five-only",
+    "metresPerSecond": {
+      "MOB-01": 1.5,
+      "MOB-03": 1.9,
+      "MOB-05": 1.6
+    },
+    "preserved": {
+      "MOB-02": 4.7,
+      "MOB-04": "existing-style-speed-until-new-asset-measurement"
+    }
   },
   "baseline": [
     {
