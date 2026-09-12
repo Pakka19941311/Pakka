@@ -4,14 +4,17 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {p2Encounter} from '../src/data/p2-encounters.ts';
 const report=JSON.parse(readFileSync('docs/world-expansion-v3/P2_PLUS3_ECONOMY.json'));
+const history=JSON.parse(readFileSync('docs/world-expansion-v3/P2_EVIDENCE_HISTORY.json'));
 const count=s=>s.potions.reduce((n,item)=>n+item.count,0);
 
-test('five actual +3 series use current combat sources and all 1151 entities',()=>{
+test('historical five actual +3 series retain original fingerprints and all 1151 entities',()=>{
+ assert.equal(history.status,'historical');
+ assert.equal(createHash('sha256').update(readFileSync('docs/world-expansion-v3/P2_PLUS3_ECONOMY.json')).digest('hex'),history.records.find(r=>r.file==='P2_PLUS3_ECONOMY.json').sha256);
  assert.equal(report.sourcesChangedDuringRun,false);assert.equal(report.cases.length,5);
  assert.deepEqual(new Set(report.cases.map(c=>c.classId)),new Set(['knight','mage','ranger','assassin','necro']));
  // Client art/yaw changes do not require repeating server combat evidence.
  for(const source of report.sourceHashes.filter(s=>['src/core/game-rules.ts','src/core/equipment-stats.ts','src/data/p2-encounters.ts','src/data/starter-progression-v3.ts'].includes(s.path)))
-  assert.equal(createHash('sha256').update(readFileSync(source.path)).digest('hex'),source.sha256,source.path);
+  assert.equal(createHash('sha256').update(readFileSync(history.archives.find(a=>a.path===source.path)?.archive??source.path)).digest('hex'),source.sha256,source.path);
  for(const c of report.cases){
   assert.equal(c.failure,null);assert.equal(c.recoveryFailure,null);assert.equal(c.population,1151);assert.equal(c.deaths,0);
   assert.equal(c.plus,3);assert.equal(Object.keys(c.referenceEquipment).length,6);

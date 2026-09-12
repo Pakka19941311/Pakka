@@ -6,6 +6,7 @@ import {p2Encounter,P2_MOVEMENT_V3} from '../src/data/p2-encounters.ts';
 import {encounterV3} from '../src/data/encounter-balance-v3.ts';
 import {enduranceLedger} from '../scripts/world_expansion_v3/p2-endurance-report.mjs';
 const report=JSON.parse(readFileSync('docs/world-expansion-v3/P2_ENDURANCE.json'));
+const history=JSON.parse(readFileSync('docs/world-expansion-v3/P2_EVIDENCE_HISTORY.json'));
 test('accepted locomotion is canonical-only and does not rebalance combat statistics',()=>{
  // The subsequently accepted boar model calibrated MOB-04 to 1.6 m/s;
  // ENDURANCE.json remains the historical pre-boar comparison, not a rerun.
@@ -13,17 +14,20 @@ test('accepted locomotion is canonical-only and does not rebalance combat statis
  for(const [id,level,speed,override]of [['MOB-01',2,1.5,true],['MOB-03',2,1.9,true],['MOB-05',8,1.6,true],['MOB-02',5,4.7,false],['MOB-04',5,1.6,true]]){
   const e=p2Encounter({canonicalMobId:id,level}),base=encounterV3(id,level);
   assert.equal(e.movementSpeed,speed);assert.equal(e.locomotionOverride,override);
-  for(const key of ['hp','atk','def','mdef','accuracy','attackRange','attackInterval','xp'])assert.deepEqual(e[key],base[key],id+':'+key);
+  for(const key of ['hp','atk','def','mdef','accuracy','attackRange','xp'])assert.deepEqual(e[key],base[key],id+':'+key);
+  assert.equal(e.attackInterval,base.attackInterval+(e.cadenceOverride?1:0));
   assert.equal(e.goldMean,base.gold);
  }
 });
 test('sixty full-health actual battles retain resources across each ten-fight series',()=>{
+ assert.equal(history.status,'historical');
+ assert.equal(createHash('sha256').update(readFileSync('docs/world-expansion-v3/P2_ENDURANCE.json')).digest('hex'),history.records.find(r=>r.file==='P2_ENDURANCE.json').sha256);
  assert.equal(report.sourcesChangedDuringRun,false);assert.equal(report.cases.length,6);
  assert.deepEqual(new Set(report.cases.map(c=>c.classId)),new Set(['knight','mage','ranger','assassin','necro']));
  // The report predates a documented return/patrol fix and city asset switch.
  // Check unchanged balance inputs, not a false claim of rerunning later geometry.
  for(const s of report.sourceHashes.filter(s=>['src/core/game-rules.ts','src/core/equipment-stats.ts','scripts/world_expansion_v3/p2-combat-smoke.mjs'].includes(s.path)))
-  assert.equal(createHash('sha256').update(readFileSync(s.path)).digest('hex'),s.sha256,s.path);
+  assert.equal(createHash('sha256').update(readFileSync(history.archives.find(a=>a.path===s.path)?.archive??s.path)).digest('hex'),s.sha256,s.path);
  for(const c of report.cases){
   assert.equal(c.population,1151);assert.equal(c.failure,null);assert.equal(c.recoveryFailure,null);assert.equal(c.deaths,0);
   assert.equal(c.battles.length,10);assert.equal(new Set(c.battles.map(b=>b.uid)).size,10);assert.equal(c.initial.gold,320);

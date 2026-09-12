@@ -14,7 +14,7 @@ test('experimental profile scope is two weak species level1-2 and restores even 
  withExperimentalCadence(candidate,()=>keys.forEach((k,i)=>{
   const p=structuredClone(p2Encounter(k));
   const applies=['MOB-01','MOB-03'].includes(k.canonicalMobId)&&k.level<=2;
-  assert.equal(p.attackInterval,before[i].attackInterval+(applies?1:0));
+  assert.equal(p.attackInterval,applies?(k.canonicalMobId==='MOB-01'?candidate.slime:candidate.rat):before[i].attackInterval);
   p.attackInterval=before[i].attackInterval;assert.deepEqual(p,before[i],'HP, damage, windup, recovery, movement and loot unchanged');
  }));
  assert.throws(()=>withExperimentalCadence(candidate,()=>{throw Error('fixture-abort');}),/fixture-abort/);

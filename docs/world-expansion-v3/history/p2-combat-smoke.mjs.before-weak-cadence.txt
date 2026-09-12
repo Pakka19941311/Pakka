@@ -31,13 +31,12 @@ export function stepP2(simulation,milliseconds){
  while(simulation.state.time<end-.001){for(const hero of Object.values(simulation.state.characters))simulation.heartbeat(hero.id);
   simulation.advance(Math.min(end,simulation.state.time+100));}
 }
-export function runP2Battle({geography=makeP2Geography(),classId,mobId,plus=0,level,naturalPopulation=false,maxSeconds=90}={}){
+export function runP2Battle({geography=makeP2Geography(),classId,mobId,plus=0,naturalPopulation=false,maxSeconds=90}={}){
  const simulation=makeP2Simulation({geography}),hero=simulation.createCharacter('P2 '+classId,classId);
  const wolves=simulation.state.monsters.filter(m=>m.canonicalMobId==='MOB-02');
  const candidates=simulation.state.monsters.filter(m=>m.canonicalMobId===mobId);
- const midpoint=level??{"MOB-01":2,"MOB-02":7,"MOB-03":2,"MOB-04":4,"MOB-05":8}[mobId];
+ const midpoint={"MOB-01":2,"MOB-02":7,"MOB-03":2,"MOB-04":4,"MOB-05":8}[mobId];
  const preferred=candidates.filter(m=>m.level===midpoint);
- if(level!==undefined&&!preferred.length)throw Error('No authored target at requested level');
  const targets=(preferred.length?preferred:candidates).sort((a,b)=>{
   const gap=m=>Math.min(...wolves.filter(w=>w.uid!==m.uid).map(w=>Math.hypot(w.x-m.x,w.z-m.z)));
   return gap(b)-gap(a)||a.uid.localeCompare(b.uid);

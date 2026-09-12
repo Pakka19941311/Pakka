@@ -4,12 +4,7 @@ import {encounterV3,ENCOUNTER_BALANCE_V3,lootProfileV3} from './encounter-balanc
 import {rollAccessoryLoot} from './accessory-loot-v3.ts';
 import type {LootStack} from './loot-v3.ts';
 
-/** Accepted local upkeep correction: pause between weak starter attacks only.
- * The attack clip, windup/recovery, first response, damage and loot stay unchanged.
- */
-export const P2_WEAK_CADENCE_V3={version:'p2-weak-cadence-v1',mobIds:['MOB-01','MOB-03'],
- levelBand:[1,2],additionalSeconds:1} as const;
-export const P2_BALANCE_VERSION=ENCOUNTER_BALANCE_V3.revision+'+'+P2_WEAK_CADENCE_V3.version;
+export const P2_BALANCE_VERSION=ENCOUNTER_BALANCE_V3.revision;
 /** Accepted P2 locomotion override, calibrated to the measured model cycles.
  * Damage, health, defense, legacy species and the full-map candidate stay unchanged.
  */
@@ -22,11 +17,7 @@ function build(canonicalMobId:string,level:number){
  if(!Object.hasOwn(models,canonicalMobId))throw Error('unsupported-p2-combat-identity');
  const e=encounterV3(canonicalMobId,level),name=MOBS_V3.find(m=>m.id===canonicalMobId)!.name;
  const speed=P2_MOVEMENT_V3.metresPerSecond[canonicalMobId as keyof typeof P2_MOVEMENT_V3.metresPerSecond]??e.movementSpeed;
- const cadenceOverride=P2_WEAK_CADENCE_V3.mobIds.some(id=>id===canonicalMobId)&&
-  level>=P2_WEAK_CADENCE_V3.levelBand[0]&&level<=P2_WEAK_CADENCE_V3.levelBand[1];
  return {...e,name,model:models[canonicalMobId],movementSpeed:speed,locomotionVersion:P2_MOVEMENT_V3.version,
-  attackInterval:e.attackInterval+(cadenceOverride?P2_WEAK_CADENCE_V3.additionalSeconds:0),
-  cadenceOverride,cadenceVersion:cadenceOverride?P2_WEAK_CADENCE_V3.version:null,
   locomotionOverride:Object.hasOwn(P2_MOVEMENT_V3.metresPerSecond,canonicalMobId),goldMean:e.gold,gold:[Math.floor(e.gold*.9),Math.ceil(e.gold*1.1)] as const,
   runtimeEnabled:true,balanceVersion:P2_BALANCE_VERSION};
 }

@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "status": "historical",
+  "reason": "Accepted p2-weak-cadence-v1 supersedes only MOB01/03 level1-2 intervals; stored actual traces and original source fingerprints are immutable historical evidence, not reruns.",
+  "records": [
+    {
+      "file": "P2_PLUS3_ECONOMY.json",
+      "checkpoint": "aee1a60",
+      "sha256": "799ca95cb9285c93bdab30fe5fc97ab6bf48e57c5edd75cee9772371f6bd17cc"
+    },
+    {
+      "file": "P2_ENDURANCE.json",
+      "checkpoint": "2cbc8a3",
+      "sha256": "532793913e814e05a87fc141935ad376dc25d6cd8784dc210d66b70b4cdc2a1a"
+    }
+  ],
+  "archives": [
+    {
+      "path": "src/data/p2-encounters.ts",
+      "archive": "docs/world-expansion-v3/history/p2-encounters.ts.before-weak-cadence.txt",
+      "sha256": "845a896668e30a8f4c1a4eebda91f693313e44b2e75192b4e52a3ad57e58ef37"
+    },
+    {
+      "path": "scripts/world_expansion_v3/p2-combat-smoke.mjs",
+      "archive": "docs/world-expansion-v3/history/p2-combat-smoke.mjs.before-weak-cadence.txt",
+      "sha256": "ce618466ed1ae3cd38252b3c6cf813dd68efa110b21646c23f3a09561044edba"
+    }
+  ]
+}
