@@ -45,6 +45,7 @@ func _process(delta: float) -> void:
 	world.world_environment.reflected_light_source = Environment.REFLECTION_SOURCE_BG
 	if world.final_environment != null and world.final_environment.active_space != "surface":
 		rain.emitting = false
+		rain.visible = false
 		world.sun_light.visible = false
 		world.world_environment.background_mode = Environment.BG_COLOR
 		world.world_environment.background_color = Color("101419")
@@ -88,5 +89,8 @@ func _process(delta: float) -> void:
 		world.world_environment.reflected_light_source = Environment.REFLECTION_SOURCE_DISABLED
 		world.world_environment.fog_enabled = false
 	rain.position = world.hero_position+Vector3(0,14,0)
+	# Stopping emission leaves already spawned world-space drops alive for 2.2s.
+	# Hide that residual precipitation immediately beneath a physical roof.
+	rain.visible = not in_tavern
 	rain.emitting = raining and not in_tavern
 	last_weather = str(env.get("weather","sun"))

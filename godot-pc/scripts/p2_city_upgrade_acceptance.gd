@@ -28,6 +28,9 @@ static func run(app: Node, checks: Dictionary) -> void:
 	checks.upgrade_tavern_lane = await walk(app,Vector2(-138,-180))
 	checks.upgrade_tavern_entry = await walk(app,Vector2(-139,-199))
 	checks.upgrade_tavern_inside = await walk(app,Vector2(-147,-199))
+	checks.upgrade_indoor_precipitation_hidden = await Wait.until(app,func(): return app.world.final_environment.courtyard.tavern.inside and not app.world.weather.rain.emitting and not app.world.weather.rain.is_visible_in_tree(),1000)
 	app.world.camera_distance = 8
 	checks.p2_city_upgrade_tavern_capture = await Capture.capture(app,"p2-city-upgrade-tavern")
+	checks.upgrade_tavern_exit = await walk(app,Vector2(-139,-199))
+	checks.upgrade_outdoor_precipitation_restored = await Wait.until(app,func(): return not app.world.final_environment.courtyard.tavern.inside and app.world.weather.rain.is_visible_in_tree() and app.world.weather.rain.emitting == (str(app.world.weather.current.get("weather","sun")) == "rain"),1000)
 	checks.upgrade_city_alive = not bool(app.net.hero.dead)

@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "baselineCase": "deadline-packaged-city-01",
+  "candidatePackage": "Varendor_World_Gameplay_32bb3320f9ec",
+  "candidateBuildCommit": "32bb3320f9ecd3f66e5ae5f2661f01c1e8bb7add",
+  "evidenceDirectory": "work/qa/audit-native-city-01",
+  "compiledExe": true,
+  "nativeRender": true,
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "elapsedSeconds": 93.968,
+  "exitCode": 0,
+  "timeout": false,
+  "crash": false,
+  "cleanErrorLog": true,
+  "checksPassed": 42,
+  "checksTotal": 42,
+  "checks": {
+    "city_alive": true,
+    "city_camera_clear_at_wall": true,
+    "city_camera_recovers_after_rotation": true,
+    "city_canopy_restored": true,
+    "city_fixture": true,
+    "city_frontage": true,
+    "city_ground_return": true,
+    "city_hero_clear_of_hud_after_rotation": true,
+    "city_hero_in_frame_at_wall": true,
+    "city_leave_stair_approach": true,
+    "city_p2_source": true,
+    "city_real_height_gain": true,
+    "city_stair_approach": true,
+    "city_stair_canopy_cutaway": true,
+    "city_stairs_down": true,
+    "city_stairs_up": true,
+    "city_stop": true,
+    "city_underpass": true,
+    "city_underpass_return": true,
+    "connected": true,
+    "house_loaded": true,
+    "native_city_render": true,
+    "p2_city_stair_bottom_capture": true,
+    "p2_city_stair_clear_view_capture": true,
+    "p2_city_stair_top_capture": true,
+    "p2_city_street_capture": true,
+    "p2_city_upgrade_guardhouse_capture": true,
+    "p2_city_upgrade_market_capture": true,
+    "p2_city_upgrade_tavern_capture": true,
+    "upgrade_citadel_street": true,
+    "upgrade_city_alive": true,
+    "upgrade_city_version": true,
+    "upgrade_eight_buildings": true,
+    "upgrade_eight_roots_loaded": true,
+    "upgrade_guard_approach": true,
+    "upgrade_guard_arch_entry": true,
+    "upgrade_guard_arch_passage": true,
+    "upgrade_guard_arch_return": true,
+    "upgrade_market_route": true,
+    "upgrade_tavern_entry": true,
+    "upgrade_tavern_inside": true,
+    "upgrade_tavern_lane": true
+  },
+  "graphics": {
+    "requestedArgument": "--qa-graphics=low",
+    "fullLowProfileVerified": false,
+    "note": "City does not consume qa-graphics; existing functional stage QA settings apply. This is not a full Low graphics or FPS acceptance."
+  },
+  "captures": [
+    {
+      "name": "p2-city-stair-bottom",
+      "phase": "complete",
+      "drawWaitMs": 18,
+      "readbackMs": 8,
+      "pngSaveMs": 597,
+      "totalMs": 623,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 1991637,
+        "sha256": "33a5ac68eb14126cbc59e6a433021f12bd5915d840f64c7b78bb31bec3a154d6"
+      },
+      "visuallyReviewed": true
+    },
+    {
+      "name": "p2-city-stair-clear-view",
+      "phase": "complete",
+      "drawWaitMs": 71,
+      "readbackMs": 7,
+      "pngSaveMs": 518,
+      "totalMs": 596,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 1775483,
+        "sha256": "2bc6995d109b330f19a992ece9e98dfc282871edc5e8509713175d03187e66bc"
+      },
+      "visuallyReviewed": true
+    },
+    {
+      "name": "p2-city-stair-top",
+      "phase": "complete",
+      "drawWaitMs": 41,
+      "readbackMs": 6,
+      "pngSaveMs": 555,
+      "totalMs": 602,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 2027156,
+        "sha256": "546dbd5a5528c65aa218a583efaf6d5d84bc402f5b613173e02278104393c1a9"
+      },
+      "visuallyReviewed": true
+    },
+    {
+      "name": "p2-city-street",
+      "phase": "complete",
+      "drawWaitMs": 22,
+      "readbackMs": 9,
+      "pngSaveMs": 646,
+      "totalMs": 677,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 2047610,
+        "sha256": "51f85af7c920dbede4ee27f572a07baa8465b94410c6af910f4a8300bbded28e"
+      },
+      "visuallyReviewed": true
+    },
+    {
+      "name": "p2-city-upgrade-guardhouse",
+      "phase": "complete",
+      "drawWaitMs": 17,
+      "readbackMs": 6,
+      "pngSaveMs": 601,
+      "totalMs": 624,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 1789028,
+        "sha256": "f07992be1a25bef34cf2af6b9668a87152d7dc26d649d96959c4fa1a817f84a4"
+      },
+      "visuallyReviewed": true
+    },
+    {
+      "name": "p2-city-upgrade-market",
+      "phase": "complete",
+      "drawWaitMs": 17,
+      "readbackMs": 6,
+      "pngSaveMs": 560,
+      "totalMs": 583,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 2145269,
+        "sha256": "ad0f7e91f86a93855b085b90dba13d4e724d166cb664fd7b051416fa27ccfdcd"
+      },
+      "visuallyReviewed": true
+    },
+    {
+      "name": "p2-city-upgrade-tavern",
+      "phase": "complete",
+      "drawWaitMs": 29,
+      "readbackMs": 9,
+      "pngSaveMs": 502,
+      "totalMs": 540,
+      "png": {
+        "width": 1600,
+        "height": 900,
+        "bytes": 1769711,
+        "sha256": "92f4a20ad971d643e6a24bd26bb802bf7292acb892bbd9a76556e12c28ed55b4"
+      },
+      "visuallyReviewed": true
+    }
+  ],
+  "visualFindings": [
+    "Hero and geometry are visible in all seven images; the guardhouse, arch route and tavern completed.",
+    "Stair camera is close and partly places the lower body behind HUD.",
+    "Rain streaks remain visible inside the tavern in this candidate. This separate residual-particle defect is being fixed and requires a new compiled check."
+  ],
+  "limits": [
+    "One clean synthetic save and one complete city traversal; not an endurance soak.",
+    "Original capture timeout no longer reproduced here; this does not independently prove a GPU crash root cause.",
+    "No user save or bootstrap/session tokens are included."
+  ]
+}

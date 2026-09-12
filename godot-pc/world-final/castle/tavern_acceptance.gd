@@ -68,7 +68,7 @@ static func run(app: Node) -> void:
 	checks.inside_cutaway = court.tavern.inside and not court.tavern.parts.roof.is_empty() and court.tavern.parts.roof.all(func(p): return p.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY)
 	app.world.weather.qa_override.weather = "rain"
 	await Keys.wait_ms(app.get_tree(),150)
-	checks.rain_stays_outside = not app.world.weather.rain.emitting
+	checks.rain_stays_outside = not app.world.weather.rain.emitting and not app.world.weather.rain.is_visible_in_tree()
 	app.world.weather.qa_override.weather = "sun"
 	checks.walls_still_solid = app.world.collision.blocked(Vector2(-142.5,-206))
 	var eye: Vector3 = app.world.point(-145,-206,1.2)
@@ -93,7 +93,7 @@ static func run(app: Node) -> void:
 	checks.roof_restored = not court.tavern.inside and court.tavern.parts.roof.all(func(p): return p.cast_shadow==GeometryInstance3D.SHADOW_CASTING_SETTING_ON) and app.world.collision.camera_ignored_ids.is_empty()
 	app.world.weather.qa_override.weather = "rain"
 	await Keys.wait_ms(app.get_tree(),150)
-	checks.outdoor_weather_restored = app.world.weather.rain.emitting and app.world.world_environment.reflected_light_source == Environment.REFLECTION_SOURCE_BG
+	checks.outdoor_weather_restored = app.world.weather.rain.emitting and app.world.weather.rain.is_visible_in_tree() and app.world.world_environment.reflected_light_source == Environment.REFLECTION_SOURCE_BG
 	app.world.weather.qa_override.weather = "sun"
 	checks.door_reenter = await Court.go(app,Vector2(-147,-199))
 	checks.no_resident_duplicates = app.world.actors.keys().filter(func(id): return str(id).begins_with("ambient:")).size()==39
