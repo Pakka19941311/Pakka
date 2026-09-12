@@ -1,0 +1,4372 @@
+{
+  "normalization": {
+    "mob_id": "MOB-04",
+    "model": "V3BoarCandidate",
+    "path": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka\\godot-pc\\world-expansion-v3\\actors\\alternatives\\boar\\V3BoarCandidate.glb",
+    "sha256": "523cfc1b7e5e091400ca7391a8a07a8aa045fb50020472049365e35f1617df94",
+    "bytes": 969844,
+    "source": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04-boar-enemies\\anatomy.glb",
+    "source_sha256": "d2823c575bcc099120c9a52ea06c2397f8f2836d99ff818202d5fcde151c10ec",
+    "author": "Danimal; original boar Myname; credit Clint Bellanger",
+    "license": "CC-BY-SA-4.0",
+    "source_url": "https://opengameart.org/content/boar-enemies",
+    "target_height": 0.8,
+    "source_normalization_factor": 0.7201555790016934,
+    "axis": "GLB +Y up / -Z forward; native adapter rotates visual PI to match actor yaw=-serverYaw+PI",
+    "idle_bounds_blender": {
+      "min": [
+        -0.21244461834430695,
+        -0.6938278079032898,
+        4.656612873077393e-10
+      ],
+      "max": [
+        0.21247729659080505,
+        0.6561778783798218,
+        0.800000011920929
+      ]
+    },
+    "clips": [
+      {
+        "clip": "idle",
+        "source_action": "Idle_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          2.0,
+          8.0
+        ],
+        "duration_factor": 12.0,
+        "kind": "derived_timing"
+      },
+      {
+        "clip": "walk",
+        "source_action": "Walk_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          4.0,
+          44.0
+        ],
+        "duration_factor": 0.75,
+        "kind": "derived_timing",
+        "description": "Derived slower timing of the same source trot; not a separately authored source walk."
+      },
+      {
+        "clip": "run",
+        "source_action": "Walk_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          4.0,
+          44.0
+        ],
+        "duration_factor": 0.45,
+        "kind": "source_nla_timing",
+        "description": "Source Walk action at original Walk NLA scale0.45; a trot, not an independent gallop action."
+      },
+      {
+        "clip": "attack",
+        "source_action": "Attack_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          26.0,
+          34.0
+        ],
+        "duration_factor": 3.0,
+        "kind": "derived_timing"
+      },
+      {
+        "clip": "death",
+        "source_action": "Die_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          34.0,
+          56.0
+        ],
+        "duration_factor": 1.0,
+        "kind": "source_clip"
+      },
+      {
+        "clip": "idle",
+        "kind": "authored_loop_closure",
+        "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop."
+      },
+      {
+        "clip": "walk",
+        "kind": "authored_loop_closure",
+        "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop."
+      },
+      {
+        "clip": "run",
+        "kind": "authored_loop_closure",
+        "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop."
+      },
+      {
+        "clip": "hit",
+        "kind": "authored_local_rig_action",
+        "description": "local spine/head recoil",
+        "frames": [
+          0,
+          8
+        ],
+        "fps": 24
+      }
+    ],
+    "texture_sizes": [
+      {
+        "name": "nowa textura pras",
+        "original": [
+          512,
+          512
+        ],
+        "exported": [
+          512,
+          512
+        ]
+      }
+    ],
+    "ground_corrections": [
+      {
+        "clip": "idle",
+        "max_upward_source_units": 0.0,
+        "frames_checked": 181
+      },
+      {
+        "clip": "walk",
+        "max_upward_source_units": 0.07184738386422396,
+        "frames_checked": 76
+      },
+      {
+        "clip": "run",
+        "max_upward_source_units": 0.07152352202683687,
+        "frames_checked": 46
+      },
+      {
+        "clip": "attack",
+        "max_upward_source_units": 0.01893716398626566,
+        "frames_checked": 61
+      },
+      {
+        "clip": "death",
+        "max_upward_source_units": 0.04035270679742098,
+        "frames_checked": 56
+      },
+      {
+        "clip": "hit",
+        "max_upward_source_units": 0.0,
+        "frames_checked": 21
+      }
+    ],
+    "dense_floor_samples": [
+      {
+        "clip": "idle",
+        "phase": 0.0,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.016666666666666666,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.03333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.05,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.06666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.08333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.1,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.11666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.13333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.15,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.16666666666666666,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.18333333333333332,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.2,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.21666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.23333333333333334,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.25,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.26666666666666666,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.2833333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.3,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.31666666666666665,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.3333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.35,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.36666666666666664,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.38333333333333336,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.4,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.4166666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.43333333333333335,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.45,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.4666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.48333333333333334,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5166666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.55,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.5833333333333334,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6166666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.65,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6666666666666666,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.6833333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7166666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.75,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.7833333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8166666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8333333333333334,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.85,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.8833333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9166666666666666,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9333333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.95,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9666666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 0.9833333333333333,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "idle",
+        "phase": 1.0,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.0,
+        "floor": 0.0018906844779849052,
+        "height": 0.8071404099464417,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.016666666666666666,
+        "floor": 0.001872688764706254,
+        "height": 0.807341992855072,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.03333333333333333,
+        "floor": 0.0018671411089599133,
+        "height": 0.8072571754455566,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.05,
+        "floor": 0.0025095611345022917,
+        "height": 0.8075259923934937,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.06666666666666667,
+        "floor": 0.0018906854093074799,
+        "height": 0.8101097345352173,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.08333333333333333,
+        "floor": 0.001815308816730976,
+        "height": 0.8119946718215942,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.1,
+        "floor": 0.0028519388288259506,
+        "height": 0.8137367367744446,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.11666666666666667,
+        "floor": 0.0016331039369106293,
+        "height": 0.8164312839508057,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.13333333333333333,
+        "floor": 0.0018906863406300545,
+        "height": 0.8163390755653381,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.15,
+        "floor": 0.0021525900810956955,
+        "height": 0.8121330142021179,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.16666666666666666,
+        "floor": 0.0019079272169619799,
+        "height": 0.8072326183319092,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.18333333333333332,
+        "floor": 0.0018191535491496325,
+        "height": 0.8052157759666443,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.2,
+        "floor": 0.0018906844779849052,
+        "height": 0.8050214648246765,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.21666666666666667,
+        "floor": 0.0018167467787861824,
+        "height": 0.8103222846984863,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.23333333333333334,
+        "floor": 0.001790100708603859,
+        "height": 0.8144481778144836,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.25,
+        "floor": 0.002286504954099655,
+        "height": 0.8178389668464661,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.26666666666666666,
+        "floor": 0.0018906835466623306,
+        "height": 0.8216066956520081,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.2833333333333333,
+        "floor": 0.001710476353764534,
+        "height": 0.8229584693908691,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.3,
+        "floor": 0.0026096161454916,
+        "height": 0.8225432634353638,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.31666666666666665,
+        "floor": 0.0016392190009355545,
+        "height": 0.8217084407806396,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.3333333333333333,
+        "floor": 0.0018906844779849052,
+        "height": 0.8178942203521729,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.35,
+        "floor": 0.0017370795831084251,
+        "height": 0.816523015499115,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.36666666666666664,
+        "floor": 0.0010372893884778023,
+        "height": 0.8164548277854919,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.38333333333333336,
+        "floor": 0.001729489304125309,
+        "height": 0.8072642683982849,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.4,
+        "floor": 0.0018906844779849052,
+        "height": 0.8066074848175049,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.4166666666666667,
+        "floor": 0.001857877243310213,
+        "height": 0.8098869323730469,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.43333333333333335,
+        "floor": 0.0018760105594992638,
+        "height": 0.8135062456130981,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.45,
+        "floor": 0.000499999150633812,
+        "height": 0.815360426902771,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.4666666666666667,
+        "floor": 0.0018906798213720322,
+        "height": 0.8179123997688293,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.48333333333333334,
+        "floor": 0.0018840059638023376,
+        "height": 0.8215218782424927,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5,
+        "floor": 0.0011748243123292923,
+        "height": 0.8243188261985779,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5166666666666667,
+        "floor": 0.001843474805355072,
+        "height": 0.8246389627456665,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5333333333333333,
+        "floor": 0.0018906835466623306,
+        "height": 0.8235555291175842,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.55,
+        "floor": 0.0022997260093688965,
+        "height": 0.8221030831336975,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5666666666666667,
+        "floor": 0.0017835460603237152,
+        "height": 0.8218997716903687,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.5833333333333334,
+        "floor": 0.0018964316695928574,
+        "height": 0.8209827542304993,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6,
+        "floor": 0.0018906835466623306,
+        "height": 0.8230456113815308,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6166666666666667,
+        "floor": 0.0017654430121183395,
+        "height": 0.8313994407653809,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6333333333333333,
+        "floor": 0.0017189346253871918,
+        "height": 0.8379260897636414,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.65,
+        "floor": 0.002041604369878769,
+        "height": 0.8426706790924072,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6666666666666666,
+        "floor": 0.0018906891345977783,
+        "height": 0.8469921350479126,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.6833333333333333,
+        "floor": 0.001811061054468155,
+        "height": 0.8500596284866333,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7,
+        "floor": 0.002122681587934494,
+        "height": 0.8521806001663208,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7166666666666667,
+        "floor": 0.0017205439507961273,
+        "height": 0.8534682393074036,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7333333333333333,
+        "floor": 0.0018906854093074799,
+        "height": 0.8525300621986389,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.75,
+        "floor": 0.0017503835260868073,
+        "height": 0.848827600479126,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7666666666666667,
+        "floor": 0.0017888695001602173,
+        "height": 0.8431462049484253,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.7833333333333333,
+        "floor": 0.0018170662224292755,
+        "height": 0.8362002968788147,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8,
+        "floor": 0.001890687271952629,
+        "height": 0.82823246717453,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8166666666666667,
+        "floor": 0.0031741391867399216,
+        "height": 0.8253585696220398,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8333333333333334,
+        "floor": 0.001353967934846878,
+        "height": 0.830581784248352,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.85,
+        "floor": 0.0014790408313274384,
+        "height": 0.8368671536445618,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8666666666666667,
+        "floor": 0.0018906816840171814,
+        "height": 0.8358166813850403,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.8833333333333333,
+        "floor": 0.001444995403289795,
+        "height": 0.8249692320823669,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9,
+        "floor": 0.0059310500510036945,
+        "height": 0.8111807107925415,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9166666666666666,
+        "floor": 0.0018906849436461926,
+        "height": 0.8071402907371521,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9333333333333333,
+        "floor": 0.0018906849436461926,
+        "height": 0.8071402907371521,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.95,
+        "floor": 0.0018907708581537008,
+        "height": 0.8071402907371521,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9666666666666667,
+        "floor": 0.0018907273188233376,
+        "height": 0.8071404099464417,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 0.9833333333333333,
+        "floor": 0.001890641637146473,
+        "height": 0.8071402311325073,
+        "finite": true
+      },
+      {
+        "clip": "walk",
+        "phase": 1.0,
+        "floor": 0.0018906844779849052,
+        "height": 0.8071404099464417,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.0,
+        "floor": 0.0028599402867257595,
+        "height": 0.8081096410751343,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.016666666666666666,
+        "floor": 0.002809901023283601,
+        "height": 0.8082792162895203,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.03333333333333333,
+        "floor": 0.0027944801840931177,
+        "height": 0.8081845045089722,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.05,
+        "floor": 0.003778259502723813,
+        "height": 0.8087947368621826,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.06666666666666667,
+        "floor": 0.002859940752387047,
+        "height": 0.8110790252685547,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.08333333333333333,
+        "floor": 0.002650812268257141,
+        "height": 0.8128302097320557,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.1,
+        "floor": 0.00422921497374773,
+        "height": 0.8151139616966248,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.11666666666666667,
+        "floor": 0.002139473333954811,
+        "height": 0.8169376254081726,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.13333333333333333,
+        "floor": 0.0028599416837096214,
+        "height": 0.8173083066940308,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.15,
+        "floor": 0.002968401648104191,
+        "height": 0.8129488229751587,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.16666666666666666,
+        "floor": 0.003543165745213628,
+        "height": 0.808867871761322,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.18333333333333332,
+        "floor": 0.0027812730986624956,
+        "height": 0.8061778545379639,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.2,
+        "floor": 0.0028599402867257595,
+        "height": 0.8059906959533691,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.21666666666666667,
+        "floor": 0.002657894045114517,
+        "height": 0.8111634254455566,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.23333333333333334,
+        "floor": 0.0025803307071328163,
+        "height": 0.8152384161949158,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.25,
+        "floor": 0.0032834261655807495,
+        "height": 0.8188359141349792,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.26666666666666666,
+        "floor": 0.002859940752387047,
+        "height": 0.8225759267807007,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.2833333333333333,
+        "floor": 0.002400672063231468,
+        "height": 0.8236486315727234,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.3,
+        "floor": 0.0037410706281661987,
+        "height": 0.823674738407135,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.31666666666666665,
+        "floor": 0.002154305577278137,
+        "height": 0.8222235441207886,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.3333333333333333,
+        "floor": 0.002859940752387047,
+        "height": 0.8188634514808655,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.35,
+        "floor": 0.004093927331268787,
+        "height": 0.8188798427581787,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.36666666666666664,
+        "floor": 0.0005000000819563866,
+        "height": 0.8159175515174866,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.38333333333333336,
+        "floor": 0.0060716839507222176,
+        "height": 0.8116064667701721,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.4,
+        "floor": 0.002859940519556403,
+        "height": 0.8075767159461975,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.4166666666666667,
+        "floor": 0.002973716240376234,
+        "height": 0.811002790927887,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.43333333333333335,
+        "floor": 0.0027931183576583862,
+        "height": 0.8144233226776123,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.45,
+        "floor": 0.0023864349350333214,
+        "height": 0.8172468543052673,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.4666666666666667,
+        "floor": 0.0028599370270967484,
+        "height": 0.8188816905021667,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.48333333333333334,
+        "floor": 0.002841988578438759,
+        "height": 0.8224798440933228,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5,
+        "floor": 0.0016258470714092255,
+        "height": 0.8247698545455933,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5166666666666667,
+        "floor": 0.002731131389737129,
+        "height": 0.8255265951156616,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5333333333333333,
+        "floor": 0.002859940752387047,
+        "height": 0.8245247602462769,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.55,
+        "floor": 0.0035185012966394424,
+        "height": 0.8233218789100647,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5666666666666667,
+        "floor": 0.002561628818511963,
+        "height": 0.8226778507232666,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.5833333333333334,
+        "floor": 0.0037434492260217667,
+        "height": 0.8228297829627991,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6,
+        "floor": 0.002859940752387047,
+        "height": 0.8240148425102234,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6166666666666667,
+        "floor": 0.002560902386903763,
+        "height": 0.8321949243545532,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6333333333333333,
+        "floor": 0.0023820698261260986,
+        "height": 0.8385891914367676,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.65,
+        "floor": 0.0030539706349372864,
+        "height": 0.8436830639839172,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6666666666666666,
+        "floor": 0.002859942615032196,
+        "height": 0.8479613661766052,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.6833333333333333,
+        "floor": 0.0026362761855125427,
+        "height": 0.8508848547935486,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7,
+        "floor": 0.003055885434150696,
+        "height": 0.8531137704849243,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7166666666666667,
+        "floor": 0.002403154969215393,
+        "height": 0.8541508913040161,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7333333333333333,
+        "floor": 0.0028599463403224945,
+        "height": 0.8534992933273315,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.75,
+        "floor": 0.002463463693857193,
+        "height": 0.849540650844574,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7666666666666667,
+        "floor": 0.002592720091342926,
+        "height": 0.8439500331878662,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.7833333333333333,
+        "floor": 0.0026765428483486176,
+        "height": 0.837059736251831,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8,
+        "floor": 0.0028599388897418976,
+        "height": 0.8292017579078674,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8166666666666667,
+        "floor": 0.003254856914281845,
+        "height": 0.8254393339157104,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8333333333333334,
+        "floor": 0.001394139602780342,
+        "height": 0.8306219577789307,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.85,
+        "floor": 0.0016023553907871246,
+        "height": 0.836990475654602,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8666666666666667,
+        "floor": 0.0028599388897418976,
+        "height": 0.8367859125137329,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.8833333333333333,
+        "floor": 0.001386711373925209,
+        "height": 0.8249109387397766,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9,
+        "floor": 0.009281379170715809,
+        "height": 0.8145310282707214,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9166666666666666,
+        "floor": 0.002859940053895116,
+        "height": 0.8081095814704895,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9333333333333333,
+        "floor": 0.002859940053895116,
+        "height": 0.8081095814704895,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.95,
+        "floor": 0.0028600585646927357,
+        "height": 0.8081095814704895,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9666666666666667,
+        "floor": 0.0028600473888218403,
+        "height": 0.808109700679779,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 0.9833333333333333,
+        "floor": 0.0028599733486771584,
+        "height": 0.8081095814704895,
+        "finite": true
+      },
+      {
+        "clip": "run",
+        "phase": 1.0,
+        "floor": 0.0028599402867257595,
+        "height": 0.8081096410751343,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.0,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.016666666666666666,
+        "floor": 0.0,
+        "height": 0.8010464906692505,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.03333333333333333,
+        "floor": -5.820766091346741e-11,
+        "height": 0.8020753264427185,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.05,
+        "floor": 0.0,
+        "height": 0.8030859231948853,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.06666666666666667,
+        "floor": 0.0,
+        "height": 0.8040782809257507,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.08333333333333333,
+        "floor": -2.3283064365386963e-10,
+        "height": 0.8050523400306702,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.1,
+        "floor": -4.656612873077393e-10,
+        "height": 0.8060076832771301,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.11666666666666667,
+        "floor": -4.656612873077393e-10,
+        "height": 0.8069446682929993,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.13333333333333333,
+        "floor": 0.0,
+        "height": 0.8078627586364746,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.15,
+        "floor": 0.0,
+        "height": 0.8087623119354248,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.16666666666666666,
+        "floor": 0.0,
+        "height": 0.8096429109573364,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.18333333333333332,
+        "floor": 0.0,
+        "height": 0.8105047345161438,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.2,
+        "floor": 0.0,
+        "height": 0.8113475441932678,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.21666666666666667,
+        "floor": 0.0,
+        "height": 0.8121713399887085,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.23333333333333334,
+        "floor": 0.0,
+        "height": 0.812976062297821,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.25,
+        "floor": -1.862645149230957e-09,
+        "height": 0.8137615919113159,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.26666666666666666,
+        "floor": 9.313225746154785e-10,
+        "height": 0.8132860064506531,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.2833333333333333,
+        "floor": -9.313225746154785e-10,
+        "height": 0.8127773404121399,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.3,
+        "floor": -9.313225746154785e-10,
+        "height": 0.8123045563697815,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.31666666666666665,
+        "floor": -9.313225746154785e-10,
+        "height": 0.8121931552886963,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.3333333333333333,
+        "floor": 9.313225746154785e-10,
+        "height": 0.8120435476303101,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.35,
+        "floor": 0.0,
+        "height": 0.8118561506271362,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.36666666666666664,
+        "floor": 4.656612873077393e-10,
+        "height": 0.8116303086280823,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.38333333333333336,
+        "floor": -4.656612873077393e-10,
+        "height": 0.8113663196563721,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.4,
+        "floor": -4.656612873077393e-10,
+        "height": 0.8112677931785583,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.4166666666666667,
+        "floor": 4.656612873077393e-10,
+        "height": 0.8111687898635864,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.43333333333333335,
+        "floor": -9.313225746154785e-10,
+        "height": 0.8110313415527344,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.45,
+        "floor": -2.3283064365386963e-10,
+        "height": 0.8108550906181335,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.4666666666666667,
+        "floor": -2.3283064365386963e-10,
+        "height": 0.8106404542922974,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.48333333333333334,
+        "floor": -1.1641532182693481e-09,
+        "height": 0.8103870153427124,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5,
+        "floor": -5.820766091346741e-11,
+        "height": 0.8100951313972473,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8114064335823059,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8153491616249084,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.55,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8192993402481079,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8232235908508301,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.5833333333333334,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8271212577819824,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8383899927139282,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.854234516620636,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8671395778656006,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.65,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8770058155059814,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6666666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8844666481018066,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.6833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8891413807868958,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8911034464836121,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8907036781311035,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8886029124259949,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.75,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8843929171562195,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8822410702705383,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.7833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8794376850128174,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8758725523948669,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8716186881065369,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8333333333333334,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8669803738594055,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.85,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8615252375602722,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8553882837295532,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.8833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8484530448913574,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8406797647476196,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9166666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8320698738098145,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8229185938835144,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.95,
+        "floor": 5.834735929965973e-07,
+        "height": 0.813122570514679,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8060455322265625,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 0.9833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8025693893432617,
+        "finite": true
+      },
+      {
+        "clip": "attack",
+        "phase": 1.0,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.0,
+        "floor": 0.0022008917294442654,
+        "height": 0.8022009134292603,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.016666666666666666,
+        "floor": 0.002199957612901926,
+        "height": 0.8074805736541748,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.03333333333333333,
+        "floor": 0.0021993787959218025,
+        "height": 0.8144396543502808,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.05,
+        "floor": 0.002198765752837062,
+        "height": 0.8302934765815735,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.06666666666666667,
+        "floor": 0.0021983443293720484,
+        "height": 0.8456069231033325,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.08333333333333333,
+        "floor": 0.00219809846021235,
+        "height": 0.8603683710098267,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.1,
+        "floor": 0.002162447664886713,
+        "height": 0.884784460067749,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.11666666666666667,
+        "floor": 0.002163221128284931,
+        "height": 0.915741503238678,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.13333333333333333,
+        "floor": 0.002166152000427246,
+        "height": 0.9442479014396667,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.15,
+        "floor": 0.0021714139729738235,
+        "height": 0.9704436659812927,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.16666666666666666,
+        "floor": 0.0021788887679576874,
+        "height": 0.9944098591804504,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.18333333333333332,
+        "floor": 0.0021526049822568893,
+        "height": 1.017164945602417,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.2,
+        "floor": 0.0022008921951055527,
+        "height": 1.0452381372451782,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.21666666666666667,
+        "floor": 0.0021517686545848846,
+        "height": 1.0698084831237793,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.23333333333333334,
+        "floor": 0.002111181616783142,
+        "height": 1.0913350582122803,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.25,
+        "floor": 0.0020799729973077774,
+        "height": 1.1091506481170654,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.26666666666666666,
+        "floor": 0.0020580943673849106,
+        "height": 1.1371805667877197,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.2833333333333333,
+        "floor": 0.0018990375101566315,
+        "height": 1.1293597221374512,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.3,
+        "floor": 0.0018421374261379242,
+        "height": 1.101043462753296,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.31666666666666665,
+        "floor": 0.001851394772529602,
+        "height": 1.079792857170105,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.3333333333333333,
+        "floor": 0.0018846523016691208,
+        "height": 1.0546303987503052,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.35,
+        "floor": 0.0019402559846639633,
+        "height": 1.0257052183151245,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.36666666666666664,
+        "floor": 0.0020432481542229652,
+        "height": 0.9934557676315308,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.38333333333333336,
+        "floor": 0.0021147746592760086,
+        "height": 0.9572232365608215,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.4,
+        "floor": 0.0022008917294442654,
+        "height": 0.9178041815757751,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.4166666666666667,
+        "floor": 0.002117062918841839,
+        "height": 0.875190794467926,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.43333333333333335,
+        "floor": 0.0020924657583236694,
+        "height": 0.8299140334129333,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.45,
+        "floor": 0.008127412758767605,
+        "height": 0.8042822480201721,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.4666666666666667,
+        "floor": 0.0004999996162950993,
+        "height": 0.7629541754722595,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.48333333333333334,
+        "floor": 0.000512310303747654,
+        "height": 0.7035421133041382,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5,
+        "floor": 0.0007969997823238373,
+        "height": 0.6304175853729248,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5166666666666667,
+        "floor": 0.0011747605167329311,
+        "height": 0.5455611348152161,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5333333333333333,
+        "floor": 0.012085774913430214,
+        "height": 0.4618600606918335,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.55,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5666666666666667,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.5833333333333334,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6166666666666667,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6333333333333333,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.65,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6666666666666666,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.6833333333333333,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7166666666666667,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7333333333333333,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.75,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7666666666666667,
+        "floor": 0.002200891263782978,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.7833333333333333,
+        "floor": 0.0022008875384926796,
+        "height": 0.42712414264678955,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8166666666666667,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8333333333333334,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.85,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8666666666666667,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.8833333333333333,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9166666666666666,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9333333333333333,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.95,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9666666666666667,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 0.9833333333333333,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "death",
+        "phase": 1.0,
+        "floor": 0.0022008903324604034,
+        "height": 0.42712411284446716,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.0,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.016666666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8014938831329346,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.03333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8029842376708984,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.05,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8044707179069519,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.06666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8059535622596741,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.08333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.807489812374115,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.1,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8091669678688049,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.11666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8108401894569397,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.13333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8123825788497925,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.15,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8138344287872314,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.16666666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8154203295707703,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.18333333333333332,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8170031309127808,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.2,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8185830116271973,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.21666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8201599717140198,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.23333333333333334,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8218541145324707,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.25,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8246685862541199,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.26666666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8265504837036133,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.2833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8284332752227783,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.3,
+        "floor": 5.834735929965973e-07,
+        "height": 0.830316960811615,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.31666666666666665,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8322014808654785,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.3333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8340871334075928,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.35,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8359735012054443,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.36666666666666664,
+        "floor": 5.834735929965973e-07,
+        "height": 0.837860643863678,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.38333333333333336,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8391361236572266,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.4,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8397992849349976,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.4166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8404624462127686,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.43333333333333335,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8411257266998291,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.45,
+        "floor": 5.834735929965973e-07,
+        "height": 0.841789186000824,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.4666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8424526453018188,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.48333333333333334,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8431162238121033,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8437799215316772,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8431162238121033,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8424526453018188,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.55,
+        "floor": 5.834735929965973e-07,
+        "height": 0.841789186000824,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8411257266998291,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.5833333333333334,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8404624462127686,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8397992849349976,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8391361236572266,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8378607034683228,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.65,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8359735012054443,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6666666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8340871334075928,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.6833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8322014808654785,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7,
+        "floor": 5.834735929965973e-07,
+        "height": 0.830316960811615,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8284332752227783,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8265504837036133,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.75,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8246685862541199,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8218541145324707,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.7833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8201599717140198,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8185830116271973,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8166666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8170031309127808,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8333333333333334,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8154203295707703,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.85,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8138344287872314,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8123825788497925,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.8833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8108401894569397,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8091669678688049,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9166666666666666,
+        "floor": 5.834735929965973e-07,
+        "height": 0.807489812374115,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9333333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8059535622596741,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.95,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8044707179069519,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9666666666666667,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8029842376708984,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 0.9833333333333333,
+        "floor": 5.834735929965973e-07,
+        "height": 0.8014938831329346,
+        "finite": true
+      },
+      {
+        "clip": "hit",
+        "phase": 1.0,
+        "floor": 4.656612873077393e-10,
+        "height": 0.800000011920929,
+        "finite": true
+      }
+    ],
+    "gait_measurements": {
+      "walk": {
+        "measured_stance_speed_mps": 0.7034025192260742,
+        "stance_segments": 68,
+        "method": "median backward displacement of selected low-quarter support bone heads; visual calibration still required"
+      },
+      "run": {
+        "measured_stance_speed_mps": 1.1723363399505615,
+        "stance_segments": 68,
+        "method": "median backward displacement of selected low-quarter support bone heads; visual calibration still required"
+      }
+    },
+    "clip_lengths_seconds": {
+      "idle": 3.0,
+      "walk": 1.25,
+      "run": 0.75,
+      "attack": 1.0,
+      "death": 0.9166666666666666,
+      "hit": 0.3333333333333333
+    },
+    "status": "P2 visual candidate; no gameplay art acceptance",
+    "residual_clearance_guards_meters": {
+      "walk": 0.0018906843960285187,
+      "run": 0.0028599406704306603,
+      "death": 0.002200891647487879
+    }
+  },
+  "anatomy": {
+    "source": "prepared.blend",
+    "output": "anatomy.glb",
+    "sha256": "d2823c575bcc099120c9a52ea06c2397f8f2836d99ff818202d5fcde151c10ec",
+    "removed": "source sail-like separated mane surface",
+    "authored_parts": [
+      {
+        "name": "Bristle_00_-2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_00_-1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_00_0",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_00_1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_00_2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_01_-2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_01_-1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_01_0",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_01_1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_01_2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_02_-2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_02_-1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_02_0",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_02_1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_02_2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_03_-2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_03_-1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_03_0",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_03_1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_03_2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_04_-2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_04_-1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_04_0",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_04_1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_04_2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_05_-2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_05_-1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_05_0",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_05_1",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_05_2",
+        "bound_to": "neck",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_06_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_06_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_06_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_06_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_06_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_07_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_07_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_07_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_07_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_07_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_08_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_08_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_08_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_08_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_08_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_09_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_09_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_09_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_09_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_09_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_10_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_10_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_10_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_10_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_10_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_11_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_11_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_11_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_11_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_11_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_12_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_12_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_12_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_12_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_12_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_13_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_13_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_13_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_13_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_13_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_14_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_14_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_14_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_14_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_14_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_15_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_15_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_15_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_15_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_15_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_16_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_16_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_16_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_16_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_16_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_17_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_17_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_17_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_17_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_17_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_18_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_18_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_18_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_18_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_18_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_19_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_19_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_19_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_19_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_19_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_20_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_20_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_20_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_20_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_20_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_21_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_21_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_21_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_21_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_21_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_22_-2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_22_-1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_22_0",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_22_1",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_22_2",
+        "bound_to": "ribs",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_23_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_23_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_23_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_23_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_23_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_24_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_24_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_24_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_24_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_24_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_25_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_25_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_25_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_25_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_25_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_26_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_26_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_26_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_26_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_26_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_27_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_27_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_27_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_27_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_27_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_28_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_28_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_28_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_28_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_28_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_29_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_29_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_29_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_29_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_29_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_30_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_30_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_30_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_30_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_30_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_31_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_31_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_31_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_31_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_31_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_32_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_32_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_32_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_32_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_32_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_33_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_33_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_33_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_33_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_33_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_34_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_34_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_34_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_34_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_34_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_35_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_35_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_35_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_35_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_35_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_36_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_36_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_36_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_36_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_36_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_37_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_37_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_37_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_37_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_37_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_38_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_38_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_38_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_38_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_38_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_39_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_39_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_39_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_39_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_39_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_40_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_40_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_40_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_40_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_40_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_41_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_41_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_41_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_41_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_41_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_42_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_42_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_42_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_42_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_42_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_43_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_43_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_43_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_43_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_43_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_44_-2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_44_-1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_44_0",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_44_1",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_44_2",
+        "bound_to": "spine",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_45_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_45_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_45_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_45_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_45_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_46_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_46_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_46_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_46_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_46_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_47_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_47_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_47_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_47_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_47_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_48_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_48_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_48_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_48_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_48_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_49_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_49_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_49_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_49_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_49_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_50_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_50_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_50_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_50_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_50_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_51_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_51_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_51_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_51_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_51_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_52_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_52_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_52_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_52_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_52_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_53_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_53_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_53_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_53_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_53_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_54_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_54_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_54_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_54_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_54_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_55_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_55_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_55_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_55_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_55_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_56_-2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_56_-1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_56_0",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_56_1",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "Bristle_56_2",
+        "bound_to": "hips",
+        "vertices": 5
+      },
+      {
+        "name": "ClovenHoof_hand.L-1",
+        "bound_to": "hand.L",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_hand.L1",
+        "bound_to": "hand.L",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_hand.R-1",
+        "bound_to": "hand.R",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_hand.R1",
+        "bound_to": "hand.R",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_toe.L-1",
+        "bound_to": "toe.L",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_toe.L1",
+        "bound_to": "toe.L",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_toe.R-1",
+        "bound_to": "toe.R",
+        "vertices": 80
+      },
+      {
+        "name": "ClovenHoof_toe.R1",
+        "bound_to": "toe.R",
+        "vertices": 80
+      },
+      {
+        "name": "ThickEar_-1",
+        "bound_to": "head",
+        "vertices": 16
+      },
+      {
+        "name": "ThickEar_1",
+        "bound_to": "head",
+        "vertices": 16
+      },
+      {
+        "name": "Eye_-1",
+        "bound_to": "head",
+        "vertices": 84
+      },
+      {
+        "name": "Eye_1",
+        "bound_to": "head",
+        "vertices": 84
+      }
+    ],
+    "skin_policy": "New art bound to existing head, hoof and spine bones in bind space; source rig retained; nonbone UV group removed and true weights normalized.",
+    "source_body_subdivision_retained": 2,
+    "preview_bounds": [
+      [
+        -0.2950095236301422,
+        -0.9745627045631409,
+        0.0024998774752020836
+      ],
+      [
+        0.2950313985347748,
+        0.9000396728515625,
+        1.113370418548584
+      ]
+    ],
+    "no_rider_no_armor": true,
+    "status": "anatomy candidate; gait not measured yet"
+  },
+  "stride_summary": {
+    "walk": {
+      "median": 0.7088584899902344,
+      "per_foot": {
+        "ContactFrontL": {
+          "floor": 0.004614063538610935,
+          "max_height": 0.06883412599563599,
+          "stance_samples": 34,
+          "median": 1.3695316314697266,
+          "min_speed": 0.06864738464355469,
+          "max_speed": 1.6788330674171448
+        },
+        "ContactFrontR": {
+          "floor": 0.004348165821284056,
+          "max_height": 0.05561591684818268,
+          "stance_samples": 77,
+          "median": 0.7141571044921875,
+          "min_speed": 0.01490020751953125,
+          "max_speed": 1.8917198181152344
+        },
+        "ContactBackL": {
+          "floor": 0.005306762643158436,
+          "max_height": 0.08395016938447952,
+          "stance_samples": 49,
+          "median": 0.7079372406005859,
+          "min_speed": 0.3848533630371094,
+          "max_speed": 1.4582405090332031
+        },
+        "ContactBackR": {
+          "floor": 0.011977837421000004,
+          "max_height": 0.1316397339105606,
+          "stance_samples": 41,
+          "median": 0.6148738861083984,
+          "min_speed": 0.0105743408203125,
+          "max_speed": 1.1660785675048828
+        }
+      },
+      "duration": 1.25,
+      "method": "241 phases, original source anatomical contact markers, within 12mm of each marker minimum height; backward world Y motion; no runtime root translation"
+    },
+    "run": {
+      "median": 1.181192398071289,
+      "per_foot": {
+        "ContactFrontL": {
+          "floor": 0.006500499323010445,
+          "max_height": 0.06996559351682663,
+          "stance_samples": 33,
+          "median": 2.328319549560547,
+          "min_speed": 0.11816978454589844,
+          "max_speed": 2.7980539202690125
+        },
+        "ContactFrontR": {
+          "floor": 0.005209146998822689,
+          "max_height": 0.057502374053001404,
+          "stance_samples": 76,
+          "median": 1.1900949478149414,
+          "min_speed": 0.02483367919921875,
+          "max_speed": 3.1528663635253906
+        },
+        "ContactBackL": {
+          "floor": 0.006276017986238003,
+          "max_height": 0.08583660423755646,
+          "stance_samples": 49,
+          "median": 1.1798858642578125,
+          "min_speed": 0.6414222717285156,
+          "max_speed": 2.430400848388672
+        },
+        "ContactBackR": {
+          "floor": 0.012428860180079937,
+          "max_height": 0.13301700353622437,
+          "stance_samples": 43,
+          "median": 1.0227775573730469,
+          "min_speed": 0.012369155883789062,
+          "max_speed": 1.9434642791748047
+        }
+      },
+      "duration": 0.75,
+      "method": "241 phases, original source anatomical contact markers, within 12mm of each marker minimum height; backward world Y motion; no runtime root translation"
+    }
+  },
+  "source_receipt": {
+    "id": "MOB-04-boar-enemies",
+    "title": "Boar enemies",
+    "author": "Danimal; Myname; Clint Bellanger",
+    "page": "https://opengameart.org/content/boar-enemies",
+    "url": "https://opengameart.org/sites/default/files/boar.7z",
+    "filename": "boar.7z",
+    "license": "CC-BY-SA-4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.en",
+    "acquired_utc": "2026-09-12T12:50:56.009393+00:00",
+    "status": "acquired_source",
+    "page_receipt": {
+      "url": "https://opengameart.org/content/boar-enemies",
+      "final_url": "https://opengameart.org/content/boar-enemies",
+      "http_status": 200,
+      "bytes": 26077,
+      "sha256": "a54c4a35ff11fd8806a0e68977bd0265893415034f34f1809d1157baf400bc8e",
+      "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04-boar-enemies\\source-page.html",
+      "content_type": "text/html; charset=utf-8"
+    },
+    "license_receipt": {
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.en",
+      "final_url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.en",
+      "http_status": 200,
+      "bytes": 51859,
+      "sha256": "a7dbad04e9a44a69a06d2ea5f20cceccb163091550591ed41ac610f112789246",
+      "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04-boar-enemies\\license.html",
+      "content_type": "text/html"
+    },
+    "source_receipt": {
+      "url": "https://opengameart.org/sites/default/files/boar.7z",
+      "final_url": "https://opengameart.org/sites/default/files/boar.7z",
+      "http_status": 200,
+      "bytes": 1224793,
+      "sha256": "5183039c6097e860e6d5b611ca79c70ea135d91602ca4e213aede7442b9a8364",
+      "file": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-11\\varendor-world-gameplay\\work\\asset-intake-v3\\MOB-04-boar-enemies\\boar.7z",
+      "content_type": "application/x-7z-compressed"
+    }
+  },
+  "publication": "Separate CC-BY-SA-4.0 adapted artwork pack required; independent game code is not relicensed."
+}

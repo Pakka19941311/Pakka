@@ -1,0 +1,277 @@
+{
+  "event_ledger": [
+    {
+      "actionStartedAt": 2000,
+      "actor": "p2:MOB-04",
+      "at": 2000,
+      "endsAt": 2800.0,
+      "impactAt": 2336.0,
+      "kind": "attack",
+      "sequence": 1,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-04",
+      "amount": 10,
+      "at": 2336.0,
+      "kind": "hit",
+      "sequence": 2,
+      "target": "qa:receiver"
+    },
+    {
+      "actor": "p2:MOB-04",
+      "at": 4000,
+      "corpseUntil": 8000,
+      "deathAt": 4000,
+      "kind": "death",
+      "sequence": 3
+    }
+  ],
+  "godot": {
+    "build": "official",
+    "hash": "7d41c59c457bd5a245092b4e7eb2d833e3b3f8c3",
+    "hex": 263683,
+    "major": 4,
+    "minor": 6,
+    "patch": 3,
+    "status": "stable",
+    "string": "4.6.3-stable (official)",
+    "timestamp": 0
+  },
+  "live_server_tested": false,
+  "models": {
+    "MOB-04": {
+      "attack_skinned_bounds": "[P: (-0.212438, -0.000029, -0.476085), S: (0.424909, 0.811151, 1.169903)]",
+      "captures": [
+        "MOB-04_idle.png",
+        "MOB-04_attack.png",
+        "MOB-04_death.png"
+      ],
+      "checks": {
+        "attack_changes_pose": true,
+        "attack_exists": true,
+        "authoritative_radius_wins": true,
+        "contact_matches_authoritative_impact": true,
+        "controller_is_native_subclass": true,
+        "corpse_expires_on_server_clock": true,
+        "corpse_stays_near_authoritative_root": true,
+        "created_through_native_factory": true,
+        "dead_actor_not_pickable": true,
+        "death_changes_pose": true,
+        "death_exists": true,
+        "death_pose_holds": true,
+        "four_server_yaws_face_correctly": true,
+        "hit_changes_pose": true,
+        "hit_exists": true,
+        "hit_point_inside_actor_height": true,
+        "hit_uses_source_duration": true,
+        "idle_changes_pose": true,
+        "idle_exists": true,
+        "native_attack_duration_within_rate_cap": true,
+        "native_corpse_settles_on_floor": true,
+        "native_idle_feet_on_floor": true,
+        "native_ray_picker_selects_actor": true,
+        "native_spacing_does_not_cross_body": true,
+        "one_server_hit_no_renderer_damage": true,
+        "proposed_pursuit1_6_rate_supported": true,
+        "run_changes_pose": true,
+        "run_exists": true,
+        "run_rate_bounded": true,
+        "run_stops_immediately": true,
+        "server_damage_destination_preserved": true,
+        "walk_changes_pose": true,
+        "walk_exists": true,
+        "walk_rate_bounded": true,
+        "walk_stops_immediately": true
+      },
+      "clips": {
+        "attack": {
+          "length": 1.0,
+          "poses_change": true
+        },
+        "death": {
+          "length": 0.916666686534882,
+          "poses_change": true
+        },
+        "hit": {
+          "length": 0.333333343267441,
+          "poses_change": true
+        },
+        "idle": {
+          "length": 3.0,
+          "poses_change": true
+        },
+        "run": {
+          "length": 0.75,
+          "poses_change": true
+        },
+        "walk": {
+          "length": 1.25,
+          "poses_change": true
+        }
+      },
+      "death_skinned_bounds": "[P: (-0.269147, 0.002201, -0.741856), S: (0.915524, 0.424911, 1.500715)]",
+      "idle_skinned_bounds": "[P: (-0.212438, 0.000001, -0.671604), S: (0.424909, 0.799999, 1.365421)]",
+      "ok": true,
+      "profile": {
+        "art_changes": [
+          "Source unarmoured boar only; all rider meshes and rigs removed.",
+          "Source tall mane removed; short layered mesh bristles bound to existing spine bones.",
+          "Eight cloven hoof halves bound to four existing foot joints.",
+          "Two thick cupped ears and small eyes bound to the existing head.",
+          "Source cheek flap topology closed and UV boundary retained."
+        ],
+        "asset_path": "res://world-expansion-v3/actors/alternatives/boar/V3BoarCandidate.glb",
+        "attack_contact": 0.42,
+        "author": "Danimal; original boar Myname; credit Clint Bellanger",
+        "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
+        "body_radius_proposed": 0.48,
+        "clip_provenance": [
+          {
+            "clip": "idle",
+            "duration_factor": 12.0,
+            "kind": "derived_timing",
+            "source_action": "Idle_Boar skeleton",
+            "source_frame_window_at_24fps": [
+              2.0,
+              8.0
+            ]
+          },
+          {
+            "clip": "walk",
+            "description": "Derived slower timing of the same source trot; not a separately authored source walk.",
+            "duration_factor": 0.75,
+            "kind": "derived_timing",
+            "source_action": "Walk_Boar skeleton",
+            "source_frame_window_at_24fps": [
+              4.0,
+              44.0
+            ]
+          },
+          {
+            "clip": "run",
+            "description": "Source Walk action at original Walk NLA scale0.45; a trot, not an independent gallop action.",
+            "duration_factor": 0.45,
+            "kind": "source_nla_timing",
+            "source_action": "Walk_Boar skeleton",
+            "source_frame_window_at_24fps": [
+              4.0,
+              44.0
+            ]
+          },
+          {
+            "clip": "attack",
+            "duration_factor": 3.0,
+            "kind": "derived_timing",
+            "source_action": "Attack_Boar skeleton",
+            "source_frame_window_at_24fps": [
+              26.0,
+              34.0
+            ]
+          },
+          {
+            "clip": "death",
+            "duration_factor": 1.0,
+            "kind": "source_clip",
+            "source_action": "Die_Boar skeleton",
+            "source_frame_window_at_24fps": [
+              34.0,
+              56.0
+            ]
+          },
+          {
+            "clip": "idle",
+            "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop.",
+            "kind": "authored_loop_closure"
+          },
+          {
+            "clip": "walk",
+            "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop.",
+            "kind": "authored_loop_closure"
+          },
+          {
+            "clip": "run",
+            "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop.",
+            "kind": "authored_loop_closure"
+          },
+          {
+            "clip": "hit",
+            "description": "local spine/head recoil",
+            "fps": 24.0,
+            "frames": [
+              0.0,
+              8.0
+            ],
+            "kind": "authored_local_rig_action"
+          }
+        ],
+        "floor_clearance_guards": {
+          "death": 0.00220089164748787,
+          "run": 0.00285994067043066,
+          "walk": 0.00189068439602851
+        },
+        "gait": {
+          "run": 1.181192,
+          "walk": 0.708858
+        },
+        "gait_provenance": {
+          "run": "241 phases, original source anatomical contact markers, within 12mm of each marker minimum height; backward world Y motion; no runtime root translation",
+          "walk": "241 phases, original source anatomical contact markers, within 12mm of each marker minimum height; backward world Y motion; no runtime root translation"
+        },
+        "ground_min_dense": -0.00000000186264514923096,
+        "height": 0.8,
+        "hit_point": [
+          0.0,
+          0.44,
+          0.0
+        ],
+        "license": "CC-BY-SA-4.0",
+        "maximum_attack_rate": 1.5,
+        "maximum_gait_rate": 1.65,
+        "maximum_supported_speed": 1.9489668,
+        "mob_id": "MOB-04",
+        "model": "V3BoarCandidate",
+        "native_bounds": {
+          "name": "V3BoarCandidate",
+          "sourceDepth": 1.35000568628311,
+          "sourceFloor": 0.0,
+          "sourceHeight": 0.8,
+          "sourceWidth": 0.424921914935112,
+          "targetHeight": 0.8
+        },
+        "native_visual_yaw_offset_radians": 3.14159265358979,
+        "open_gates": [
+          "Native skin/floor/contact/rate checks and game-scale visual review.",
+          "Live pursuit on server terrain at the adopted speed; 241-phase median is an estimate, not a no-slip guarantee."
+        ],
+        "pick_size": [
+          0.75,
+          0.8,
+          1.35000568628311
+        ],
+        "proposed_p2_movement_speed": 1.6,
+        "qa_attack_duration_ms": 800.0,
+        "qa_server_contact_fraction": 0.42,
+        "sha256": "523cfc1b7e5e091400ca7391a8a07a8aa045fb50020472049365e35f1617df94",
+        "source_url": "https://opengameart.org/content/boar-enemies",
+        "status": "visual_candidate; native_QA_pending; not_canonical",
+        "title": "Дикий кабан"
+      },
+      "proposed_pursuit_contract": {
+        "applied_rate": 1.35456388448437,
+        "clip": "run",
+        "kind": "gait",
+        "maximum_rate": 1.65,
+        "maximum_supported_speed": 1.9489668,
+        "mob_id": "MOB-04",
+        "rendered_speed": 1.60000002384186,
+        "requested_rate": 1.35456388448437,
+        "source_stride_speed": 1.181192
+      }
+    }
+  },
+  "native_controller": "VarendorAnimationController subclass",
+  "native_factory": "VarendorWorld.make_actor",
+  "native_render": true,
+  "ok": true
+}

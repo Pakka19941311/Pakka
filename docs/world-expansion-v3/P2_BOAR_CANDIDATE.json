@@ -1,0 +1,34 @@
+{
+  "mob_id": "MOB-04",
+  "candidate_profile": "godot-pc/world-expansion-v3/actors/alternatives/boar/profile.json",
+  "canonical_changed": true,
+  "sha256": "523cfc1b7e5e091400ca7391a8a07a8aa045fb50020472049365e35f1617df94",
+  "native_checks_passed": 35,
+  "native_checks_total": 35,
+  "native_test": "boar-p2-evidence/BOAR_NATIVE_QA.json",
+  "live_server_tested": false,
+  "proposed_movement_speed": 1.6,
+  "gait": {
+    "walk": 0.708858,
+    "run": 1.181192
+  },
+  "requested_run_rate": 1.3545638642997921,
+  "maximum_rate": 1.65,
+  "loop_endpoint_errors_m": {
+    "walk": {
+      "ContactFrontL": 0.0,
+      "ContactFrontR": 0.0,
+      "ContactBackL": 0.0,
+      "ContactBackR": 0.0
+    },
+    "run": {
+      "ContactFrontL": 0.0,
+      "ContactFrontR": 0.0,
+      "ContactBackL": 0.0,
+      "ContactBackR": 0.0
+    }
+  },
+  "license": "CC-BY-SA-4.0",
+  "art_review": "Accepted as working P2 replacement; source fur512px and simple limb silhouette remain documented; final art and live pursuit are separate gates.",
+  "log_limits": "Wrapper preserved root certificate/user shader-cache environment errors; no parse error, crash or teardown leak."
+}

@@ -345,22 +345,22 @@
   },
   "MOB-04": {
     "mob_id": "MOB-04",
-    "model": "V3StarterBoar",
+    "model": "V3BoarCandidate",
     "title": "Дикий кабан",
-    "asset_path": "res://world-expansion-v3/actors/models/V3StarterBoar.glb",
+    "asset_path": "res://world-expansion-v3/actors/alternatives/boar/V3BoarCandidate.glb",
     "height": 0.8,
     "native_bounds": {
-      "name": "V3StarterBoar",
+      "name": "V3BoarCandidate",
       "targetHeight": 0.8,
       "sourceHeight": 0.8,
       "sourceFloor": 0.0,
-      "sourceWidth": 0.47398294508457184,
-      "sourceDepth": 1.2664215564727783
+      "sourceWidth": 0.424921914935112,
+      "sourceDepth": 1.3500056862831116
     },
     "pick_size": [
       0.75,
       0.8,
-      1.2664215564727783
+      1.3500056862831116
     ],
     "body_radius_proposed": 0.48,
     "body_radius_policy": "authoritative snapshot bodyRadius overrides this staged value; no server change",
@@ -376,54 +376,81 @@
     "maximum_attack_rate": 1.5,
     "maximum_gait_rate": 1.65,
     "gait": {
-      "walk": 0.26399,
-      "run": 0.36666
+      "walk": 0.708858,
+      "run": 1.181192
     },
     "gait_provenance": {
-      "walk": "measured support-bone estimate; visual calibration pending",
-      "run": "measured support-bone estimate; visual calibration pending"
+      "walk": "241 phases, original source anatomical contact markers, within 12mm of each marker minimum height; backward world Y motion; no runtime root translation",
+      "run": "241 phases, original source anatomical contact markers, within 12mm of each marker minimum height; backward world Y motion; no runtime root translation"
     },
-    "status": "visual_candidate",
+    "status": "working_P2_candidate; basis_accepted; final_art_and_live_gate_open",
     "clip_provenance": [
       {
-        "clip": "walk",
-        "source_action": "walk_boar_armature",
+        "clip": "idle",
+        "source_action": "Idle_Boar skeleton",
         "source_frame_window_at_24fps": [
-          0.0,
-          40.0
+          2.0,
+          8.0
         ],
-        "duration_factor": 1.0,
-        "kind": "source_clip"
-      },
-      {
-        "clip": "run",
-        "source_action": "walk_boar_armature",
-        "source_frame_window_at_24fps": [
-          0.0,
-          40.0
-        ],
-        "duration_factor": 0.72,
+        "duration_factor": 12.0,
         "kind": "derived_timing"
       },
       {
-        "clip": "attack",
-        "source_action": "attack_boar_armature",
+        "clip": "walk",
+        "source_action": "Walk_Boar skeleton",
         "source_frame_window_at_24fps": [
-          0.0,
-          19.0
+          4.0,
+          44.0
+        ],
+        "duration_factor": 0.75,
+        "kind": "derived_timing",
+        "description": "Derived slower timing of the same source trot; not a separately authored source walk."
+      },
+      {
+        "clip": "run",
+        "source_action": "Walk_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          4.0,
+          44.0
+        ],
+        "duration_factor": 0.45,
+        "kind": "source_nla_timing",
+        "description": "Source Walk action at original Walk NLA scale0.45; a trot, not an independent gallop action."
+      },
+      {
+        "clip": "attack",
+        "source_action": "Attack_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          26.0,
+          34.0
+        ],
+        "duration_factor": 3.0,
+        "kind": "derived_timing"
+      },
+      {
+        "clip": "death",
+        "source_action": "Die_Boar skeleton",
+        "source_frame_window_at_24fps": [
+          34.0,
+          56.0
         ],
         "duration_factor": 1.0,
         "kind": "source_clip"
       },
       {
         "clip": "idle",
-        "kind": "authored_local_rig_action",
-        "description": "gentle breath",
-        "frames": [
-          0,
-          48
-        ],
-        "fps": 24
+        "kind": "authored_loop_closure",
+        "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop."
+      },
+      {
+        "clip": "walk",
+        "kind": "authored_loop_closure",
+        "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop."
+      },
+      {
+        "clip": "run",
+        "kind": "authored_loop_closure",
+        "description": "Distribute source end/start transform residual smoothly over the cycle. The original right-foot trot seam was about7cm at game scale; retained source pose timing is now a closed derived loop."
       },
       {
         "clip": "hit",
@@ -434,24 +461,32 @@
           8
         ],
         "fps": 24
-      },
-      {
-        "clip": "death",
-        "kind": "authored_local_rig_action",
-        "description": "authored roll and settle on existing ROOT rig; floor correction baked",
-        "frames": [
-          0,
-          28
-        ],
-        "fps": 24
       }
     ],
-    "source_url": "https://opengameart.org/content/boar",
-    "license": "CC0-1.0",
-    "author": "Teh_Bucket",
-    "sha256": "453a9e8d6119484a26c25cabf5a580b2cb7b1999ab3c1d889f03e6441426ac5b",
-    "ground_min_dense": -0.0001703500747680664,
-    "floor_clearance_guards": {}
+    "source_url": "https://opengameart.org/content/boar-enemies",
+    "license": "CC-BY-SA-4.0",
+    "author": "Danimal; original boar Myname; credit Clint Bellanger",
+    "sha256": "523cfc1b7e5e091400ca7391a8a07a8aa045fb50020472049365e35f1617df94",
+    "ground_min_dense": -1.862645149230957e-09,
+    "floor_clearance_guards": {
+      "walk": 0.0018906843960285187,
+      "run": 0.0028599406704306603,
+      "death": 0.002200891647487879
+    },
+    "proposed_p2_movement_speed": 1.6,
+    "maximum_supported_speed": 1.9489668,
+    "art_changes": [
+      "Source unarmoured boar only; all rider meshes and rigs removed.",
+      "Source tall mane removed; short layered mesh bristles bound to existing spine bones.",
+      "Eight cloven hoof halves bound to four existing foot joints.",
+      "Two thick cupped ears and small eyes bound to the existing head.",
+      "Source cheek flap topology closed and UV boundary retained."
+    ],
+    "open_gates": [
+      "Game-scale art review of fur, ear silhouette and actual locomotion.",
+      "Live pursuit on server terrain at adopted1.6m/s; isolated translation is not a live network test."
+    ],
+    "visual_acceptance_note": "Project integration review accepted this unarmoured boar as replacement for the prior P2 candidate at1.6m/s, after Blender anatomy and native run review. This is not final quality acceptance for all assets."
   },
   "MOB-05": {
     "mob_id": "MOB-05",

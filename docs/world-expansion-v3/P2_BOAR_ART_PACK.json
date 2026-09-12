@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "packs": [
+    {
+      "id": "boar",
+      "mob_id": "MOB-04",
+      "status": "canonical working P2 candidate; include when packaging this model",
+      "destination_directory": "art/boar-cc-by-sa-4.0",
+      "license": "CC-BY-SA-4.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "source_url": "https://opengameart.org/content/boar-enemies",
+      "authors": [
+        "Danimal",
+        "Myname",
+        "Clint Bellanger"
+      ],
+      "changes_notice": "CREDITS.md",
+      "files": [
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/boar/V3BoarCandidate.glb",
+          "destination": "V3BoarCandidate.glb",
+          "bytes": 969844,
+          "sha256": "523cfc1b7e5e091400ca7391a8a07a8aa045fb50020472049365e35f1617df94",
+          "kind": "adapted_art"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/boar/V3BoarCandidate_nowa textura pras.jpg",
+          "destination": "V3BoarCandidate_nowa textura pras.jpg",
+          "bytes": 71626,
+          "sha256": "a20a04ffd2a7b5febc78a8776ad75f57e53abb0ec878c5ef2341972afb46e9e8",
+          "kind": "adapted_art"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/boar/CREDITS.md",
+          "destination": "CREDITS.md",
+          "bytes": 1837,
+          "sha256": "6782812c6fd43f9e1ad7540b450299fabfe57167caffa32ce4079d0bba68dd88",
+          "kind": "license_or_credit"
+        },
+        {
+          "source": "godot-pc/world-expansion-v3/actors/alternatives/boar/CC-BY-SA-4.0-legalcode.html",
+          "destination": "CC-BY-SA-4.0-legalcode.html",
+          "bytes": 51859,
+          "sha256": "a7dbad04e9a44a69a06d2ea5f20cceccb163091550591ed41ac610f112789246",
+          "kind": "license_or_credit"
+        }
+      ],
+      "separate_accessible_files_required": true,
+      "files_in_pck_do_not_replace_this_copy": true,
+      "independent_game_code_relicensed": false
+    }
+  ]
+}
