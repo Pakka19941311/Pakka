@@ -2,6 +2,7 @@ import {readFileSync,writeFileSync,readdirSync} from 'node:fs';
 import {FinalWorld} from '../../src/world/final-world.ts';
 import {CONTENT_VERSION} from '../../src/server/content-manifest.ts';
 import {P2_LOCATION_OVERRIDES} from '../../src/data/p2-habitat-layout.ts';
+import {updateGameplayExportFilters} from './gameplay-export-policy.mjs';
 const p2=process.argv.includes('--starter-v3');
 const world=new FinalWorld(undefined,true,p2?{populationMode:'starter-v3'}:{});
 const path='godot-pc/generated/game.json',game=JSON.parse(readFileSync(path,'utf8'));
@@ -13,5 +14,5 @@ writeFileSync('godot-pc/world-final/gameplay/services.json',JSON.stringify(world
 const raw=[];
 for(const folder of ['world-final','world-expansion-v3','generated','data','tests'])for(const file of readdirSync('godot-pc/'+folder,{recursive:true}))if(/\.(json|f32)$/.test(file))raw.push(folder+'/'+file.replaceAll('\\','/'));
 const presets='godot-pc/export_presets.cfg';
-writeFileSync(presets,readFileSync(presets,'utf8').replace(/include_filter="[^"]*"/g,'include_filter="'+raw.sort().join(',')+'"'));
+writeFileSync(presets,updateGameplayExportFilters(readFileSync(presets,'utf8'),raw));
 console.log(JSON.stringify({revision:world.revision,mapVersion:world.mapVersion,permanent:world.slots.length}));

@@ -1,10 +1,10 @@
 import {cpSync,mkdirSync,readFileSync,writeFileSync,existsSync} from 'node:fs';
-import {resolve,join,dirname} from 'node:path';
+import {resolve,join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {stageNativeServer} from '../package-godot-pc.mjs';
 import {writePackageManifest} from '../package-world-windows.mjs';
-import {stageArtPacks} from '../stage-art-packs.mjs';
+import {stageArtPacks,selectProfileArtPacks,stageGameplayCredits} from '../stage-art-packs.mjs';
 const [binary,outputArg,license,nodeArchive]=process.argv.slice(2).filter(arg=>arg!=='--starter-v3'),root=process.cwd(),output=resolve(outputArg);
 const commit=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const name='Varendor_World_Gameplay_'+commit.slice(0,12),destination=join(output,name);
@@ -19,11 +19,10 @@ cpSync('packaging/windows/RUN_VARENDOR_PC.bat',join(destination,'RUN_VARENDOR.ba
 mkdirSync(join(destination,'licenses'),{recursive:true});
 cpSync(license,join(destination,'licenses/Godot.txt'));
 for(const [from,to] of [['public/assets/licenses','assets'],['public/assets/models/monsters-glb/licenses','monsters']])cpSync(from,join(destination,'licenses',to),{recursive:true});
-for(const from of ['art/knight-v2/LICENSES.md','art/forgotten-knight/LICENSES.md','art/cloaks-v3/CREDITS.md','docs/assets/world-source-manifest.json','art/world-final/nature-source/pine-wood/source.json','art/world-final/materials/snow_02/source.json','art/world-final/materials/rock_wall_02/source.json','godot-pc/world-expansion-v3/actors/CREDITS.md']){const to=join(destination,'licenses',from);mkdirSync(dirname(to),{recursive:true});cpSync(from,to);}
-const artPacks=populationMode==='starter-v3'?stageArtPacks(root,destination,JSON.parse(readFileSync('docs/world-expansion-v3/P2_STANDALONE_ART_PACKS.json','utf8'))):undefined;
-if(populationMode==='starter-v3')for(const file of ['CREDITS.md','licenses/CC0-1.0.txt','motion/CREDITS.md']){
- const target=join(destination,'licenses/city',file);mkdirSync(dirname(target),{recursive:true});cpSync('godot-pc/world-expansion-v3/city/'+file,target);
-}
+stageGameplayCredits(root,destination,{p2:populationMode==='starter-v3'});
+const artPacks=populationMode==='starter-v3'?stageArtPacks(root,destination,selectProfileArtPacks(
+ JSON.parse(readFileSync('docs/world-expansion-v3/P2_STANDALONE_ART_PACKS.json','utf8')),
+ JSON.parse(readFileSync('godot-pc/world-expansion-v3/actors/profiles.json','utf8')))):undefined;
 const config=JSON.parse(readFileSync('packaging/windows/node-runtime.json','utf8'));
 let bytes;if(nodeArchive)bytes=readFileSync(nodeArchive);else{const r=await fetch(config.url,{signal:AbortSignal.timeout(180000)});if(!r.ok)throw Error('Node download '+r.status);bytes=Buffer.from(await r.arrayBuffer());}
 if(createHash('sha256').update(bytes).digest('hex')!==config.sha256)throw Error('Node runtime checksum differs');
