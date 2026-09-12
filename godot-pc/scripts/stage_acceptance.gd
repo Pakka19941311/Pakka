@@ -35,7 +35,7 @@ static func run(app: Node) -> void:
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)
-	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"adapter":RenderingServer.get_video_adapter_name()})
+	app.net.save_private_json(app.qa_path,{"ok":ok,"checks":checks,"adapter":RenderingServer.get_video_adapter_name(),"packaged_binary":"--qa-packaged" in OS.get_cmdline_user_args(),"native_render":DisplayServer.get_name()!="headless","block":block})
 	app.get_tree().quit(0 if ok else 2)
 
 static func sale(app: Node, checks: Dictionary) -> void:

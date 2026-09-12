@@ -4,6 +4,7 @@ import hashlib,json,sys,zipfile
 meta=Path(sys.argv[1]);data=json.loads(meta.read_text('utf-8'))
 report=json.loads(Path(sys.argv[2]).read_text('utf-8'))
 assert report['ok'] is True,'Native gameplay checks failed'
+assert report.get('packaged_binary') is True,'Acceptance must use the exact packaged EXE and server'
 if len(sys.argv)>3:
     castle=json.loads(Path(sys.argv[3]).read_text('utf-8'))
     assert castle['ok'] is True and castle['checks']['return_without_duplicates'],'Castle courtyard acceptance failed'
@@ -24,5 +25,6 @@ with (meta.parent/'release-notes.md').open('a',encoding='utf-8') as f:
         f.write('\nДвор замка: поставляемый EXE отдельно проверен на Windows — вход/выход через ворота, маршруты жителей, торговые и учебные анимации, услуги Эльзы, скрытие в пещере и возвращение без дубликатов.\n')
     if len(sys.argv)>4:
         f.write('\nЗамковый квартал: готовый Windows EXE проверен на проход по улицам, вход/выход/повторный вход в таверну, покупку книги, восстановление крыши и погоды, вечерние фонари и отсутствие дубликатов жителей.\n')
-    f.write('\nПоставляемый EXE и переносимый сервер прошли целевые проверки этапа в Actions на Windows без графического окна. Сценарии: продажа количества, перенос, зелья, автобег R, вход/бой/добыча/выход/повторный вход. Графический тест боя использует уменьшение остатка HP только в изолированной тестовой базе после первого настоящего попадания; это проверка функций, не окончательная оценка сложности босса.\n')
+    mode='с графическим окном' if report.get('native_render') else 'без графического окна'
+    f.write('\nПоставляемый EXE и переносимый сервер прошли целевые проверки на Windows '+mode+'. Проверенный блок: '+report.get('block','stage')+'. Бой с боссом в функциональном сценарии использует уменьшение остатка HP только в изолированной тестовой базе после первого настоящего попадания; это проверка функций, не окончательная оценка сложности босса.\n')
 print(json.dumps({'zip':str(archive),'sha256':sha,'bytes':archive.stat().st_size}))
