@@ -6,6 +6,7 @@ import {P2_STAGED_POPULATION_META} from '../src/data/p2-starter-population-v3.ts
 import {STARTER_QUESTS} from '../src/data/starter-progression-v3.ts';
 import {p2Encounter} from '../src/data/p2-encounters.ts';
 const report=JSON.parse(readFileSync('docs/world-expansion-v3/P2_QUEST_ROUTES.json','utf8'));
+const history=JSON.parse(readFileSync('docs/world-expansion-v3/P2_EVIDENCE_HISTORY.json','utf8'));
 test('historical real quest routes retain population provenance and unchanged objective inputs',()=>{
  assert.equal(report.populationVersion,P2_STAGED_POPULATION_META.version);assert.equal(report.digest,P2_STAGED_POPULATION_META.digest);
  assert.equal(report.results.length,3);assert.ok(report.results.every(r=>r.ok));
@@ -17,7 +18,8 @@ test('historical real quest routes retain population provenance and unchanged ob
  for(const source of report.sourceHashes){
   assert.match(source.sha256,/^[a-f0-9]{64}$/);
   if(['src/server/world-simulation.ts','src/world/final-world.ts'].includes(source.path))continue;
-  assert.equal(createHash('sha256').update(readFileSync(source.path)).digest('hex'),source.sha256,source.path);
+  const archive=history.archives.find(a=>a.path===source.path);
+  assert.equal(createHash('sha256').update(readFileSync(archive?.archive??source.path)).digest('hex'),source.sha256,source.path);
  }
 });
 test('all four objectives were claimed after real deaths and continuous walking, with level fixtures disclosed',()=>{
