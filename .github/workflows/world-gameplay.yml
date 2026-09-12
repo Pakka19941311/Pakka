@@ -1,4 +1,4 @@
-name: Varendor final-world gameplay test
+name: Varendor gameplay and stability source audit
 
 on:
   push:
@@ -13,6 +13,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  source-audit:
+    if: ${{ contains(github.event.head_commit.message, '[source-audit]') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install locked source dependencies
+        run: npm ci
+      - name: Restore tracked payload and prepare authoritative source inputs
+        run: |
+          mkdir -p qa-artifacts/source-audit
+          python scripts/world_final/materialize_payload.py > qa-artifacts/source-audit/materialize.json
+          node --experimental-strip-types scripts/godot-pc-data.mjs > qa-artifacts/source-audit/generated-data.json
+          node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs --starter-v3 > qa-artifacts/source-audit/prepared-world.json
+      - name: Gate dependency security, full Node suite and TypeScript/Vite build
+        run: |
+          npm audit --audit-level=high --json > qa-artifacts/source-audit/dependency-audit.json
+          npm test 2>&1 | tee qa-artifacts/source-audit/node-tests.log
+          npm run build 2>&1 | tee qa-artifacts/source-audit/build.log
+          echo 'Source audit passed: full Node suite, TypeScript/Vite build and dependency security. Native graphical acceptance is recorded separately.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stability-source-audit
+          path: qa-artifacts/source-audit
   native-build:
     if: ${{ contains(github.event.head_commit.message, '[world-gameplay]') }}
     runs-on: ubuntu-24.04
@@ -89,7 +126,7 @@ jobs:
         run: |
           python scripts/world_final/materialize_payload.py
           node --experimental-strip-types scripts/world_final/prepare_gameplay.mjs --starter-v3
-          node --experimental-strip-types --test tests/final-world-gameplay.test.mjs tests/monster-ai.test.mjs tests/monster-lifecycle.test.mjs tests/knight-equipment-integration.test.mjs tests/teleport-launcher.test.mjs tests/stage-cave.test.mjs tests/stage-potions.test.mjs tests/castle-courtyard.test.mjs tests/castle-tavern.test.mjs tests/castle-quarter.test.mjs tests/ambient-npc.test.mjs
+          npm test
       - name: Import and export the gameplay client
         timeout-minutes: 25
         run: |
@@ -153,7 +190,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           node scripts/world_final/package_gameplay.mjs qa-artifacts/gameplay-build/Varendor.exe qa-artifacts/gameplay-release qa-artifacts/gameplay-build/Godot-LICENSE.txt --starter-v3
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Verify shipped Windows EXE and portable server
+      - name: Verify shipped Windows EXE and portable server in headless mode
         env:
           PYTHON: python
         run: |
@@ -186,7 +223,7 @@ jobs:
           $gameZip = Join-Path $PWD ('qa-artifacts/gameplay-release/' + $gameResult.name + '.zip')
           $gameHash = (Get-FileHash -LiteralPath $gameZip -Algorithm SHA256).Hash.ToLower()
           $gameTag = 'world-gameplay-' + $env:GITHUB_SHA.Substring(0,12)
-          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — Гринфолл, игровой этап P2' --notes-file qa-artifacts/gameplay-release/release-notes.md
+          gh release create $gameTag $gameZip ($gameZip + '.sha256') --repo $env:GITHUB_REPOSITORY --target $env:GITHUB_SHA --prerelease --latest=false --title 'VARENDOR — аудит стабильности, игровой этап P2' --notes-file qa-artifacts/gameplay-release/release-notes.md
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $gameRelease = gh api ('repos/' + $env:GITHUB_REPOSITORY + '/releases/tags/' + $gameTag) | ConvertFrom-Json
           $gameAsset = $gameRelease.assets | Where-Object name -eq ($gameResult.name + '.zip')
