@@ -4,6 +4,7 @@ extends Node3D
 const ROOT: String = "res://world-final/"
 var world: VarendorWorld
 var layout: Dictionary
+var location_overrides: Array = []
 var spaces: Dictionary = {}
 var active_space: String = ""
 var terrain: Dictionary
@@ -16,10 +17,14 @@ var roots: Dictionary = {}
 var loaded_data: Dictionary = {}
 var courtyard: Node3D
 var castle_mesh: Node3D
+var courtyard_path: String = "castle/courtyard.json"
+var p2_house_cutaway: RefCounted
 
 func setup(value: VarendorWorld) -> bool:
 	world = value
+	courtyard_path = "castle/courtyard-p2.json" if world.data.get("populationMode","") == "starter-v3" else "castle/courtyard.json"
 	layout = read_json("world_layout.json")
+	location_overrides = world.data.get("locationOverrides",[])
 	for item: Dictionary in read_json("interiors/spaces.json").spaces: spaces[item.id] = item
 	return await activate_space("surface")
 
@@ -46,10 +51,10 @@ func activate_space(id: String) -> bool:
 		var meta: Dictionary = read_json("geology-D13/terrain.json" if id == "surface" else "interiors/"+id+".json")
 		var raw: PackedFloat32Array = FileAccess.get_file_as_bytes(ROOT+("geology-D13/heightmap.f32" if id == "surface" else "interiors/"+str(meta.floor))).to_float32_array()
 		var support: Array = read_json("geography/support-surfaces.json").surfaces if id == "surface" else []
-		if id == "surface": support.append_array(read_json("castle/courtyard.json").get("supportSurfaces",[]))
+		if id == "surface": support.append_array(read_json(courtyard_path).get("supportSurfaces",[]))
 		var obstacles: Array = read_json("geography/collision.json").obstacles if id == "surface" else meta.obstacles
 		if id == "surface":
-			var replaced: Array = read_json("castle/courtyard.json").get("tavern",{}).get("replacesLandmarks",[])
+			var replaced: Array = read_json(courtyard_path).get("tavern",{}).get("replacesLandmarks",[])
 			obstacles = obstacles.filter(func(o: Dictionary): return not o.get("landmark","") in replaced)
 		loaded_data[id] = {"terrain":meta,"heights":raw,"supports":support,"obstacles":obstacles}
 		if id == "surface":
@@ -69,17 +74,17 @@ func activate_space(id: String) -> bool:
 			if landmarks == null:
 				push_error("Missing final architecture")
 				return false
-			for old_id: String in read_json("castle/courtyard.json").get("tavern",{}).get("replacesLandmarks",[]):
+			for old_id: String in read_json(courtyard_path).get("tavern",{}).get("replacesLandmarks",[]):
 				var old_building: Node3D = landmarks.find_child(old_id,true,false)
 				if old_building != null: old_building.hide()
 			world.loading_progress.emit("Обустройство двора Гринфолла…")
-			var courtyard_mesh: Node3D = await load_scene("castle/courtyard.glb",root)
+			var courtyard_mesh: Node3D = await load_scene(courtyard_path.replace(".json",".glb"),root)
 			if courtyard_mesh == null: return false
 			castle_mesh = courtyard_mesh
 			for mesh: MeshInstance3D in courtyard_mesh.find_children("*","MeshInstance3D",true,false):
 				mesh.visibility_range_end = 430 if "citadel" in str(mesh.name) or "tower_roofs" in str(mesh.name) else 210
 				mesh.visibility_range_end_margin = 12
-			obstacles.append_array(read_json("castle/courtyard.json").obstacles)
+			obstacles.append_array(read_json(courtyard_path).obstacles)
 			world.loading_progress.emit("Загрузка леса и растительности…")
 			nature = load(ROOT+"nature/nature_layer.gd").new()
 			nature.authored_revision = "D13"
@@ -137,7 +142,10 @@ func setup_courtyard_life() -> void:
 	if courtyard != null: return
 	courtyard = load("res://world-final/castle/courtyard_life.gd").new()
 	roots.surface.add_child(courtyard)
-	courtyard.setup(world,read_json("castle/courtyard.json"))
+	courtyard.setup(world,read_json(courtyard_path))
+	if courtyard_path.ends_with("courtyard-p2.json"):
+		p2_house_cutaway = preload("res://world-final/castle/p2_house_cutaway.gd").new()
+		p2_house_cutaway.setup(world,castle_mesh,read_json(courtyard_path).obstacles)
 
 func height_at(x: float,z: float,with_support: bool = true) -> float:
 	var b: Array = terrain.get("bounds",[-800,-700,800,700])
@@ -213,6 +221,8 @@ func walkable(p: Vector2,radius: float = .46) -> bool:
 func location_name(p: Vector2) -> String:
 	if active_space == "mine": return "Шахта"
 	if active_space == "great_cave": return "Большая пещера"
+	for location: Dictionary in location_overrides:
+		if polygon_has(p.x,-p.y,location.outline_xz): return str(location.name)
 	for location: Dictionary in layout.locations:
 		if polygon_has(p.x,-p.y,location.outline_xz): return location.name_ru
 	return "Варендор"

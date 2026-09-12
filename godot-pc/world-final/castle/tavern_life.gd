@@ -42,7 +42,10 @@ func before_camera() -> void:
 	var next: String = ",".join(hidden)
 	if next == mask: return
 	mask = next
-	world.collision.camera_ignored_ids.clear()
+	# Other local cutaways own their own keys. Leaving the tavern must not
+	# restore a different building's obstructing canopy by clearing everything.
+	for id: String in world.collision.camera_ignored_ids.keys():
+		if id.begins_with("courtyard:Tavern_"): world.collision.camera_ignored_ids.erase(id)
 	for side: String in parts:
 		for part: MeshInstance3D in parts[side]:
 			# Keep the physical roof's shadow when it is cut away for the camera.

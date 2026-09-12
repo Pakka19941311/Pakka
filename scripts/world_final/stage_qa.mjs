@@ -9,10 +9,12 @@ import {FinalWorld} from '../../src/world/final-world.ts';
 import {RING_RECIPES} from '../../src/data/accessories-v3.ts';
 import {ITEMS} from '../../src/data/game-data.ts';
 import {recordStarterQuestEvent} from '../../src/core/starter-quests-v3.ts';
+import {STARTER_ITEMS} from '../../src/data/starter-progression-v3.ts';
+import {p2Encounter} from '../../src/data/p2-encounters.ts';
 const [binary,out,...options]=process.argv.slice(2),output=resolve(out),packageArg=options.find(x=>x.startsWith('--package='));
 const castlePreview=options.includes('--castle-preview'),castle=options.includes('--castle')||castlePreview,reportName=castle?'castle.json':'stage.json';
 mkdirSync(output,{recursive:true});assert.ok(!existsSync(join(output,reportName)),'Use fresh QA output');
-const geography=new FinalWorld();let bridge,fixtureTimer;
+const geography=new FinalWorld(undefined,true,options.includes('--starter-v3')?{populationMode:'starter-v3'}:{});let bridge,fixtureTimer;
 if(packageArg){const {startNativeBridge}=await import(pathToFileURL(join(resolve(packageArg.slice(10)),'launch-native.mjs')));bridge=await startNativeBridge({data:join(output,'save'),backups:join(output,'backups')});}
 const service=bridge?.service??startWorldServer({database:join(output,'world.sqlite'),finalWorld:geography,collision:geography.spaces.surface.collision,terrain:geography.spaces.surface.terrain,port:0,beta:true});
 try{
@@ -29,6 +31,7 @@ try{
   const file=join(output,'fixture-request.json');if(!existsSync(file))return;
   const request=JSON.parse(readFileSync(file,'utf8'));if(request.stage===handled)return;handled=request.stage;
   const hero=world.state.characters[p.id],boss=world.state.monsters.find(m=>m.id==='cave_boss');
+  let extra={};
   if(castle&&request.stage.startsWith('castle-')){
    const positions={entry:[-100,-238],market:[-118,-205],training:[-52,-149],well:[-116,-161],supply:[-68,-192],return:[-100,-190],overview:[-100,-150],interior:[0,-4],tavern:[-137,-199],citadel:[-100,-147],fair:[-113,-204],alehouse:[-74,-194]};
    const key=request.stage.slice(7),point=positions[key];assert.ok(point,'unknown courtyard QA point');
@@ -37,6 +40,33 @@ try{
   else if(request.stage.startsWith('trade-')){
    const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');
    world.relocate(hero,{...geography.services[id],x:geography.services[id].x+2});
+  }
+  else if(request.stage==='p2-city'){
+   for(const id of ['starter_weapon_knight','starter_chest_knight','starter_head','starter_gloves','starter_boots','starter_belt'])hero.equipment[STARTER_ITEMS[id].slot]=world.item(id);
+   world.recalculate(hero);hero.hp=hero.maxHp;
+   assert.equal(geography.populationMode,'starter-v3');world.relocate(hero,{x:-90,z:-203,spaceId:'surface'});
+  }
+  else if(request.stage.startsWith('p2-combat-MOB-')){
+   assert.equal(geography.populationMode,'starter-v3');
+   const mobId=request.stage.slice('p2-combat-'.length),wolves=world.state.monsters.filter(m=>m.alive&&m.canonicalMobId==='MOB-02');
+   const candidates=world.state.monsters.filter(m=>m.alive&&m.canonicalMobId===mobId).sort((a,b)=>a.level-b.level||a.uid.localeCompare(b.uid));
+   let target,standing;
+   for(const m of candidates){
+    for(let i=0;i<32;i++){
+     const point={x:m.x+Math.cos(i*Math.PI/16)*3,z:m.z+Math.sin(i*Math.PI/16)*3,spaceId:'surface'};
+     if(geography.safe(point)||geography.spaces.surface.collision.isBlocked(point,.46)||!world.lineOfSight(point,m))continue;
+     if(mobId!=='MOB-02'&&wolves.some(w=>Math.hypot(point.x-w.x,point.z-w.z)<9))continue;
+     target=m;standing=point;break;
+    }if(target)break;
+   }
+   assert.ok(target,'No native combat standing point');
+   Object.assign(hero,{level:target.level,xp:0,inventory:[],lootBuffer:[],buffs:{},equipment:Object.fromEntries(
+    ['starter_weapon_'+hero.classId,'starter_chest_'+hero.classId,'starter_head','starter_gloves','starter_boots','starter_belt']
+     .map(id=>[STARTER_ITEMS[id].slot,world.item(id)]))});
+   world.recalculate(hero);hero.hp=hero.maxHp;hero.mp=hero.maxMp;
+   world.relocate(hero,{...standing});
+   extra={target:target.uid,mobId,level:target.level,maxHp:p2Encounter(target).hp,kills:hero.kills,gold:hero.gold,
+    population:world.state.monsters.length,monsterHpBefore:target.hp};
   }
   else if(request.stage==='starter-v3'){
    Object.assign(hero,{level:1,xp:0,gold:1000,inventory:[],equipment:{},starterProgress:{version:1,quests:{}}});world.recalculate(hero);hero.hp=hero.maxHp;
@@ -71,7 +101,7 @@ try{
    if(!boss?.alive||boss.hp>=14400)throw Error('native boss has not taken a real hit');
    boss.hp=Math.min(boss.hp,120);hero.hp=hero.maxHp;
   }else throw Error('unknown-stage-fixture:'+request.stage);
-  world.checkpoint();writeFileSync(join(output,'fixture-ready.json'),JSON.stringify({stage:request.stage,generation:hero.generation}));
+  world.checkpoint();writeFileSync(join(output,'fixture-ready.json'),JSON.stringify({stage:request.stage,generation:hero.generation,...extra}));
  },100);
  const bootstrap=join(output,'bootstrap.json');writeFileSync(bootstrap,JSON.stringify({server_url,profiles:[{id:p.id,token:session.token,name:p.name,classId:p.classId,level:p.level}]}));
  const mode=packageArg?['--packaged','--cwd',dirname(resolve(binary))]:['--project','godot-pc'];

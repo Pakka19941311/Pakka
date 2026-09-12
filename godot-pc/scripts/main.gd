@@ -355,8 +355,8 @@ func present_snapshot(snapshot: Dictionary) -> void:
 		for monster: Dictionary in snapshot.get("monsters", []):
 			if str(monster.uid) == world.target_id:
 				target_panel.show()
-				target_text.text = data.monsters[monster.id].name + " · %d ур." % int(data.monsters[monster.id].level)
-				target_hp.max_value = float(data.monsters[monster.id].hp)
+				target_text.text = str(world.monster_definition(monster).name) + " · %d ур." % int(world.monster_definition(monster).level)
+				target_hp.max_value = float(world.monster_definition(monster).hp)
 				target_hp.value = maxf(0, float(monster.hp))
 				target_state.text = "%d / %d ОЗ · " % [monster.hp, target_hp.max_value] + ("Побеждён" if not monster.alive else "Атака" if hero.action == "attack" else "Подход" if hero.action == "walk" else "Цель выбрана")
 				break

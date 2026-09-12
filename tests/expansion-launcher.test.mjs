@@ -25,7 +25,7 @@ test('staged Windows launcher verifies the original save before P2 migration and
   await bridge.close();bridge=null;
   const sourceDb=new DatabaseSync(join(options.data,'world.sqlite'),{readOnly:true});let source;
   try{source=JSON.parse(sourceDb.prepare('SELECT state FROM world WHERE id=1').get().state);}finally{sourceDb.close();}
-  writeFileSync(join(stage,'world-runtime.json'),JSON.stringify({schema:1,populationMode:'starter-v3'}));
+  stageNativeServer(resolve('.'),stage,{finalWorld:true,populationMode:'starter-v3'});
   bridge=await startNativeBridge(options);
   const upgraded=bridge.service.world.state.characters[id];
   assert.equal(upgraded.level,90);assert.equal(upgraded.hp,17);assert.equal(upgraded.equipment.ear2,undefined);

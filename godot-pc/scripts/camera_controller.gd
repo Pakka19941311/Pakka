@@ -204,8 +204,21 @@ func update_pose(delta: float, hero_position: Vector3, _jump_offset: float = 0.0
 	var radius: float = maxf(OBSTRUCTION_MINIMUM, minf(smoothed_distance, permitted))
 	collision_limited = radius < smoothed_distance - .01
 	actual_distance = radius if radius < actual_distance else lerpf(actual_distance, radius, 1.0 - exp(-OBSTRUCTION_RESPONSE * dt))
-	_camera.position = follow_position + direction * actual_distance
-	_camera.look_at(follow_position)
+	# In a narrow passage the shortened orbit may be smaller than LOOK_AHEAD.
+	# Keeping the full forward offset then puts the camera ahead of the hero,
+	# facing away from them. Reduce only that offset while obstruction-limited;
+	# the normal orbit, sensitivity and shoulder direction remain identical.
+	var visible_ahead: float = LOOK_AHEAD*clampf((actual_distance-2.7)/(MIN_ZOOM-2.7),0.0,1.0)
+	var focus: Vector3 = follow_position-forward*(LOOK_AHEAD-visible_ahead)
+	var camera_position: Vector3 = focus+direction*actual_distance
+	var body_focus: Vector3 = Vector3(hero_position.x,floor_y+1.25,hero_position.z)
+	if _collision != null and visible_ahead < LOOK_AHEAD:
+		var distance_to_camera: float = body_focus.distance_to(camera_position)
+		var clearance: float = _collision.ray_distance(body_focus,camera_position,CAMERA_RADIUS,true)
+		if clearance < distance_to_camera:
+			camera_position = body_focus.lerp(camera_position,maxf(0.0,clearance-.02)/maxf(.001,distance_to_camera))
+	_camera.position = camera_position
+	_camera.look_at(focus)
 
 func _obstruction_distance(hero_position: Vector3, floor_y: float, wanted_camera: Vector3) -> float:
 	# Reference main.ts probes from the body (not the 2.15m look-ahead target)

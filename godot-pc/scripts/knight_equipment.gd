@@ -19,6 +19,9 @@ const LEGACY_MODELS: Dictionary = {
 	"militia_plate": "armor_chest", "dead_king_plate": "armor_chest",
 	"wolf_gloves": "armor_gloves", "grave_boots": "armor_boots",
 	"ash_belt": "armor_belt", "wardens_blade": "sword", "executioner": "sword",
+	"starter_weapon_knight": "sword", "starter_chest_knight": "armor_chest",
+	"starter_head": "helmet_open", "starter_gloves": "armor_gloves",
+	"starter_boots": "armor_boots", "starter_belt": "armor_belt",
 }
 
 static var _manifest_cache: Dictionary = {}

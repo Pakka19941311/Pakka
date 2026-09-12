@@ -1,0 +1,113 @@
+{
+  "command": [
+    "C:/Users/ttonn/Documents/Codex/2026-09-11/varendor-world-gameplay/work/tools/Godot_v4.6.3-stable_win64_console.exe",
+    "--path",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc",
+    "--log-file",
+    "C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/work/qa/p2-camera-contract-01/engine.log",
+    "--verbose",
+    "--headless",
+    "--script",
+    "res://scripts/p2_camera_contract.gd"
+  ],
+  "windows_command_line": "C:/Users/ttonn/Documents/Codex/2026-09-11/varendor-world-gameplay/work/tools/Godot_v4.6.3-stable_win64_console.exe --path C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/godot-pc --log-file C:/Users/ttonn/Documents/Codex/2026-09-09/github-plugin-github-openai-curated-remote/work/Pakka/work/qa/p2-camera-contract-01/engine.log --verbose --headless --script res://scripts/p2_camera_contract.gd",
+  "cwd": "C:\\Users\\ttonn\\Documents\\Codex\\2026-09-09\\github-plugin-github-openai-curated-remote\\work\\Pakka",
+  "utc_start": "2026-09-12T13:57:18.885025+00:00",
+  "environment_overrides": {},
+  "project_settings_changed": false,
+  "log_precreated_and_writable": true,
+  "timeout_seconds": 30.0,
+  "visual_check": false,
+  "samples": [
+    {
+      "system": {
+        "load_percent": 41,
+        "physical_total": 34046353408,
+        "physical_available": 20075126784,
+        "commit_limit": 36193837056,
+        "commit_available": 15252742144,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074464768,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 22820,
+          "parent_pid": 4004,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 2699264,
+          "peak_working_set": 2699264,
+          "private_bytes": 475136,
+          "peak_pagefile": 475136
+        },
+        {
+          "pid": 23044,
+          "parent_pid": 22820,
+          "exe": "conhost.exe",
+          "working_set": 6676480,
+          "peak_working_set": 6676480,
+          "private_bytes": 1089536,
+          "peak_pagefile": 1089536
+        }
+      ],
+      "elapsed_s": 0.015
+    },
+    {
+      "system": {
+        "load_percent": 41,
+        "physical_total": 34046353408,
+        "physical_available": 20015177728,
+        "commit_limit": 36193837056,
+        "commit_available": 15214936064,
+        "virtual_total": 140737488224256,
+        "virtual_available": 140733074464768,
+        "extended_available": 0
+      },
+      "processes": [
+        {
+          "pid": 22820,
+          "parent_pid": 4004,
+          "exe": "Godot_v4.6.3-stable_win64_console.exe",
+          "working_set": 6701056,
+          "peak_working_set": 6701056,
+          "private_bytes": 1335296,
+          "peak_pagefile": 1335296
+        },
+        {
+          "pid": 23044,
+          "parent_pid": 22820,
+          "exe": "conhost.exe",
+          "working_set": 8224768,
+          "peak_working_set": 8228864,
+          "private_bytes": 1286144,
+          "peak_pagefile": 1286144
+        },
+        {
+          "pid": 1540,
+          "parent_pid": 22820,
+          "exe": "Godot_v4.6.3-stable_win64.exe",
+          "working_set": 73486336,
+          "peak_working_set": 73486336,
+          "private_bytes": 34328576,
+          "peak_pagefile": 34328576
+        }
+      ],
+      "elapsed_s": 0.218
+    }
+  ],
+  "launcher_pid": 22820,
+  "timed_out": false,
+  "exit_code": 0,
+  "elapsed_s": 0.421,
+  "error_lines": [
+    "ERROR: Failed to read the root certificate store.",
+    "ERROR: Failed to read the root certificate store."
+  ],
+  "clean_error_log": false,
+  "native_exception_code": null,
+  "crash_detected": false,
+  "operation_completed": true,
+  "peak_process_working_set_bytes": 73486336,
+  "peak_process_private_bytes": 34328576,
+  "minimum_available_physical_bytes": 20015177728
+}

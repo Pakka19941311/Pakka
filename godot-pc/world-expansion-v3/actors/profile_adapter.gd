@@ -3,9 +3,11 @@ extends RefCounted
 
 const CONTROLLER = preload("res://world-expansion-v3/actors/profile_animation_controller.gd")
 const PROFILE_PATH: String = "res://world-expansion-v3/actors/profiles.json"
+static var cached_profiles: Dictionary = {}
 
 static func profiles() -> Dictionary:
-	return JSON.parse_string(FileAccess.get_file_as_string(PROFILE_PATH))
+	if cached_profiles.is_empty(): cached_profiles = JSON.parse_string(FileAccess.get_file_as_string(PROFILE_PATH))
+	return cached_profiles
 
 static func create_actor(world: VarendorWorld, id: String, mob_id: String) -> Node3D:
 	var profile: Dictionary = profiles()[mob_id]

@@ -35,7 +35,7 @@ func reconcile(snapshot: Dictionary) -> void:
 		return
 	selected_generation = next_generation
 	var hero: Dictionary = snapshot.character
-	current = {"id":selected_id,"generation":next_generation,"name":world.data.monsters[entity.id].name,"hp":entity.hp,"alive":true,"distance":Vector2(hero.x-entity.x,hero.z-entity.z).length(),"attackRange":hero.get("attackRange",2.6),"combatState":hero.get("combatState","idle"),"entity":entity}
+	current = {"id":selected_id,"generation":next_generation,"name":world.monster_definition(entity).name,"hp":entity.hp,"alive":true,"distance":Vector2(hero.x-entity.x,hero.z-entity.z).length(),"attackRange":hero.get("attackRange",2.6),"combatState":hero.get("combatState","idle"),"entity":entity}
 
 func pick(screen: Vector2) -> String:
 	if not is_instance_valid(world.camera) or world.space_loading: return ""

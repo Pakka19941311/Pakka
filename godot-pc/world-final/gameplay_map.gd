@@ -20,6 +20,12 @@ static func draw_map(view: Control) -> void:
 	var project: Callable = func(x: float,z: float) -> Vector2: return view.map_rect.get_center()+(Vector2(x,z)-center)*scale+(view.pan if full else Vector2.ZERO)
 	view.draw_rect(view.map_rect,Color("333d38"))
 	if scene.active_space == "surface":
+		# Hunting administration is drawn under the unchanged town/road layers.
+		# It does not enlarge their protected area or collision boundaries.
+		for location: Dictionary in scene.location_overrides:
+			var hunting_polygon: PackedVector2Array = PackedVector2Array()
+			for p: Array in location.outline_xz: hunting_polygon.append(project.call(p[0],p[1]))
+			view.draw_colored_polygon(hunting_polygon,Color("53613c"))
 		for location: Dictionary in scene.layout.locations:
 			var polygon: PackedVector2Array = PackedVector2Array()
 			for p: Array in location.outline_xz: polygon.append(project.call(p[0],p[1]))

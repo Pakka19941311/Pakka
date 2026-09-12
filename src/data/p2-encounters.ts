@@ -8,9 +8,9 @@ export const P2_BALANCE_VERSION=ENCOUNTER_BALANCE_V3.revision;
 /** Accepted P2 locomotion override, calibrated to the measured model cycles.
  * Damage, health, defense, legacy species and the full-map candidate stay unchanged.
  */
-export const P2_MOVEMENT_V3={version:'p2-locomotion-v3-2',scope:'canonical-first-five-only',
- metresPerSecond:{'MOB-01':1.5,'MOB-03':1.9,'MOB-05':1.6},
- preserved:{'MOB-02':4.7,'MOB-04':'existing-style-speed-until-new-asset-measurement'}} as const;
+export const P2_MOVEMENT_V3={version:'p2-locomotion-v3-3',scope:'canonical-first-five-only',
+ metresPerSecond:{'MOB-01':1.5,'MOB-03':1.9,'MOB-04':1.6,'MOB-05':1.6},
+ preserved:{'MOB-02':4.7}} as const;
 const models:Record<string,string>={'MOB-01':'V3StarterSlime','MOB-02':'V3StarterWolf','MOB-03':'V3StarterRat','MOB-04':'V3StarterBoar','MOB-05':'V3StarterBeetle'};
 const cache=new Map<string,ReturnType<typeof build>>();
 function build(canonicalMobId:string,level:number){

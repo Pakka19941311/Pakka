@@ -20,6 +20,8 @@ static func run(app: Node) -> void:
 	if block == "ui-v3": await stats_view(app,checks)
 	if block == "craft": await preload("res://scripts/craft_acceptance.gd").run(app,checks)
 	if block == "starter": await preload("res://scripts/starter_quests_acceptance.gd").run(app,checks)
+	if block == "p2" or block.begins_with("p2:"): await preload("res://scripts/p2_population_acceptance.gd").run(app,checks)
+	if block == "p2-city": await preload("res://scripts/p2_city_acceptance.gd").run(app,checks)
 	if block in ["all","autorun"]: await autorun(app,checks)
 	if block in ["all","cave"]: await cave(app,checks)
 	var ok: bool = checks.values().all(func(v): return v == true)

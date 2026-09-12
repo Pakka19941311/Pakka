@@ -61,7 +61,7 @@ export async function startNativeBridge({ data, legacy, backups, port = 0 }) {
     const populationMode=runtimeConfig.populationMode??'legacy';
     if(!['legacy','starter-v3'].includes(populationMode))throw Error('Unsupported packaged population mode');
     const finalWorld=existsSync(join(root,'world-final/gameplay/spawn-manifest.json'))?new FinalWorld(join(root,'world-final'),true,{populationMode}):undefined;
-    const expansionBackup=await backupBeforeExpansion(database,backups,finalWorld?.populationPlan);
+    const expansionBackup=await backupBeforeExpansion(database,backups,finalWorld?{...finalWorld.populationPlan,mapVersion:finalWorld.mapVersion}:undefined);
     if(expansionBackup){
       privateJson(join(data,'world-expansion-v3-backup.json'),expansionBackup);
       console.log('Сохранение проверено и скопировано перед обновлением. Резервная копия:',expansionBackup.filename);

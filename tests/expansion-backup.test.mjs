@@ -54,3 +54,14 @@ test('each new population digest requires a verified copy even when character mi
  assert.deepEqual((await backupBeforeExpansion(f.database,f.backups,{...plan,digest:'layout-b'})).reasons,['starter-population-v3']);
  assert.equal(await backupBeforeExpansion(join(f.directory,'new-world.sqlite'),f.backups,plan),null);
 });
+
+test('changed P2 geometry is backed up independently of unchanged population',async t=>{
+ const f=fixture(t),plan={mode:'starter-v3',version:'p2-1',digest:'layout-a',mapVersion:'new-house'};
+ Object.assign(f.world.state,{starterPopulationVersion:plan.version,starterPopulationDigest:plan.digest,mapVersion:'old-house'});f.store.save(f.world.state);
+ const result=await backupBeforeExpansion(f.database,f.backups,plan);
+ assert.deepEqual(result.reasons,['world-geometry-v3']);
+ const original=new WorldStore(result.filename);
+ try{assert.equal(original.load().mapVersion,'old-house');}finally{original.close();}
+ f.world.state.mapVersion=plan.mapVersion;f.store.save(f.world.state);
+ assert.equal(await backupBeforeExpansion(f.database,f.backups,plan),null);
+});

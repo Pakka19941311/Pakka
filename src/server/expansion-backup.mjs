@@ -23,6 +23,7 @@ export async function backupBeforeExpansion(database,backups,populationPlan,back
  if(heroes.some(p=>p.starterProgress?.version!==1))reasons.push('starter-quests-v3');
  if(heroes.some(p=>p.progressionQuests?.version!==1))reasons.push('progression-quests-v3');
  if(populationPlan?.mode==='starter-v3'&&(state.starterPopulationVersion!==populationPlan.version||state.starterPopulationDigest!==populationPlan.digest))reasons.push('starter-population-v3');
+ if(populationPlan?.mode==='starter-v3'&&populationPlan.mapVersion&&state.mapVersion!==populationPlan.mapVersion)reasons.push('world-geometry-v3');
  if(!reasons.length)return null;
  const result=await backup(database,backups);
  if(!result?.report?.allTablesAndStateFieldsEqual||result.report.integrity!=='ok'||!existsSync(result.filename))throw Error('expansion-backup-not-verified');

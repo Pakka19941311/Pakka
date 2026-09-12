@@ -2,6 +2,7 @@ class_name VarendorWorld
 extends Node3D
 
 # Art selection stays client-only: server class model still owns attack timings.
+const P2_ADAPTER = preload("res://world-expansion-v3/actors/profile_adapter.gd")
 const KNIGHT_MODEL: String = "ForgottenKnight"
 const KNIGHT_ASSET: String = "res://assets/knight/Knight_Modular.glb"
 const KNIGHT_SOURCE_HEIGHT: float = 1.84
@@ -401,6 +402,17 @@ static func actor_asset_path(model: String) -> String:
 	if model == KNIGHT_MODEL: return KNIGHT_ASSET
 	return "res://generated/actors/" + model + (".gltf" if model in ["Warrior", "Wizard", "Ranger", "Rogue", "Monk"] else ".glb")
 
+func monster_definition(monster: Dictionary) -> Dictionary:
+	var definition: Dictionary = data.monsters.get(str(monster.id),{}).duplicate(true)
+	var canonical: String = str(monster.get("canonicalMobId",""))
+	if canonical in ["MOB-01","MOB-02","MOB-03","MOB-04","MOB-05"]:
+		var profile: Dictionary = P2_ADAPTER.profiles()[canonical]
+		definition.model = str(profile.model); definition.visualModel = str(profile.model); definition.visualHeight = float(profile.height)
+		definition.name = str(monster.get("name",{"MOB-01":"Теневой слизень","MOB-02":"Пепельный гончий","MOB-03":"Полевая крыса","MOB-04":"Лесной кабан","MOB-05":"Панцирный жук"}[canonical]))
+	definition.level = int(monster.get("level",definition.get("level",1)))
+	definition.hp = float(monster.get("maxHp",definition.get("hp",1)))
+	return definition
+
 func make_actor(id: String, model: String, size: float, title: String, color: Color) -> Node3D:
 	if actors.has(id):
 		var existing: Node3D = actors[id]
@@ -539,8 +551,16 @@ func apply_snapshot(snapshot: Dictionary) -> void:
 			continue
 		var id: String = str(monster.uid)
 		keep[id] = true
-		var def: Dictionary = data.monsters[monster.id]
-		var actor: Node3D = make_actor(id, str(def.get("visualModel",def.model)), float(def.get("visualHeight",2.05 * float(def.get("scale", 1)))), def.name + " · %d" % int(def.level), Color("e0a6a0"))
+		var def: Dictionary = monster_definition(monster)
+		var canonical: String = str(monster.get("canonicalMobId",""))
+		var actor: Node3D
+		if canonical in ["MOB-01","MOB-02","MOB-03","MOB-04","MOB-05"] and not actors.has(id):
+			actor = P2_ADAPTER.create_actor(self,id,canonical)
+		else:
+			actor = make_actor(id,str(def.get("visualModel",def.model)),float(def.get("visualHeight",2.05 * float(def.get("scale",1)))),str(def.name),Color("e0a6a0"))
+		var title: String = str(def.name)+" · %d" % int(def.level)
+		(actor.get_meta("screen_label") as Label).text = title
+		(actor.get_meta("label") as Label3D).text = title
 		if str(monster.id) == "night_zombie" and str(def.get("visualModel","")) != "Zombie" and not actor.has_meta("undead_tint"):
 			for mesh: MeshInstance3D in actor.find_children("*","MeshInstance3D",true,false):
 				if mesh.mesh == null: continue
@@ -705,6 +725,8 @@ func _process(delta: float) -> void:
 		(actor.get_meta("label") as Label3D).hide()
 	if final_environment != null and final_environment.courtyard != null and final_environment.courtyard.tavern != null:
 		final_environment.courtyard.tavern.before_camera()
+	if final_environment != null and final_environment.p2_house_cutaway != null:
+		final_environment.p2_house_cutaway.before_camera()
 	camera_controller.update_pose(delta,hero_position,jump_offset)
 	update_nameplates()
 	target_ring.visible = actors.has(target_id) and actors[target_id].visible and actors[target_id].get_meta("pickable", false)
