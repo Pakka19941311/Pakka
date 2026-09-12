@@ -7,7 +7,7 @@ import argparse,hashlib,json,zipfile,tarfile,lzma
 ROOT=Path(__file__).resolve().parents[2]
 PAYLOAD=ROOT/'art/world-final/payload'
 
-def package(label=None,solid=False):
+def package(label=None,solid=False,only_paths=None):
     geo=ROOT/'godot-pc/world-final/geography'
     interiors=ROOT/'godot-pc/world-final/interiors'
     nature=ROOT/'godot-pc/world-final/nature'
@@ -20,6 +20,14 @@ def package(label=None,solid=False):
                   *nature.rglob('*.glb'),*nature.glob('*.json'),
                   *nature_source.rglob('*.bin'),*nature_source.rglob('*.glb'),*candidates,
                   *sorted((ROOT/'art/world-final').glob('*.blend'))])
+    if only_paths is not None:
+        # A bounded release delta can be recorded without rescanning every
+        # historical Blender master. Explicit paths still stay inside the repo.
+        assert isinstance(only_paths,list) and only_paths, 'Nonempty JSON path list required'
+        assert all(isinstance(name,str) and not Path(name).is_absolute() for name in only_paths)
+        files=sorted({(ROOT/name).resolve() for name in only_paths})
+        assert all(path.is_relative_to(ROOT.resolve()) and path.is_file() for path in files), 'Payload source outside repository or missing'
+        assert all(path.suffix.lower() in ('.glb','.f32','.npz','.json','.blend','.tres') for path in files), 'Unexpected payload file type'
     manifest_path=ROOT/'art/world-final/payload-manifest.json'
     previous=json.loads(manifest_path.read_text('utf-8')) if manifest_path.exists() else None
     layers=(previous['layers'] if previous['schema']==2 else [{k:previous[k] for k in ('archive_sha256','parts','files')}]) if previous else []
@@ -67,5 +75,5 @@ def package(label=None,solid=False):
     print(json.dumps({'changed_files':len(files),'parts_added':len(parts),'archive_bytes':archive.stat().st_size,'layers':len(layers)}),flush=True)
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('--label');parser.add_argument('--solid',action='store_true')
-    args=parser.parse_args();package(args.label,args.solid)
+    parser=argparse.ArgumentParser();parser.add_argument('--label');parser.add_argument('--solid',action='store_true');parser.add_argument('--paths-file',type=Path)
+    args=parser.parse_args();package(args.label,args.solid,json.loads(args.paths_file.read_text('utf-8')) if args.paths_file else None)

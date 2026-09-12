@@ -6217,6 +6217,145 @@
           "sha256": "7fee87f3abee65f91731a1594b35fb399dcf66d1fad49556234d1f469ca519ef"
         }
       ]
+    },
+    {
+      "revision": "p2-terrain-lake-20260912",
+      "format": "zip",
+      "archive_sha256": "a807a5b5f8a59ac7f99c476e2ce6f8ff5f5afb55fa9bebde3732f333e2194f44",
+      "parts": [
+        {
+          "path": "art/world-final/payload/world-p2-terrain-lake-20260912-12.part000",
+          "bytes": 3145728,
+          "sha256": "fb46e6ae1c98b2e55b11c801ab9be18ba34604df190c75e3f5b501797dfaff78"
+        },
+        {
+          "path": "art/world-final/payload/world-p2-terrain-lake-20260912-12.part001",
+          "bytes": 3145728,
+          "sha256": "e94060fbd403f9cc7fc39619f06fc56417964af33e3075d55a9b86277172b656"
+        },
+        {
+          "path": "art/world-final/payload/world-p2-terrain-lake-20260912-12.part002",
+          "bytes": 3145728,
+          "sha256": "490f3f9ea7739ae443c4e657aefb1b91bcbb59c63fa9ca78e723329fb4279bc6"
+        },
+        {
+          "path": "art/world-final/payload/world-p2-terrain-lake-20260912-12.part003",
+          "bytes": 3145728,
+          "sha256": "27344cfa1ef1a899e1f9c6e45c66ef00e12fa344d3b60bcacfb3e925c5a1782f"
+        },
+        {
+          "path": "art/world-final/payload/world-p2-terrain-lake-20260912-12.part004",
+          "bytes": 3023065,
+          "sha256": "fb8fd57cc58825c724e77cb67002697e553d38c457f201edb869268d83f8e55a"
+        }
+      ],
+      "files": [
+        {
+          "path": "godot-pc/world-final/geography/landmarks.glb",
+          "bytes": 14568176,
+          "sha256": "78d2408b4107265581b01067901af487b96464dda8d89ad05583b80aaf1fd7bb"
+        },
+        {
+          "path": "godot-pc/world-final/geography/support-surfaces.json",
+          "bytes": 3305,
+          "sha256": "02de5a8a7d01aae79c6031477e4c445c667fb121d0ea20e1492afb2d9ad33094"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_05_04.glb",
+          "bytes": 253480,
+          "sha256": "ca17292e8554454592a8dba34d6d174ebc37907910f5bd5cf55fb65ab6acb33f"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_05_05.glb",
+          "bytes": 253480,
+          "sha256": "47e57e01faac91bab34fc7fe8b7420980b1f706a100667b3beba99eef5b69b2a"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_06_03.glb",
+          "bytes": 253480,
+          "sha256": "7c5a0dd3849cd4d8caefa4d3e43dc41156c9c4e3d108936486c6436e32007d01"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_06_04.glb",
+          "bytes": 253468,
+          "sha256": "1d70e5c935387de5210b5bd1b5e100b38dd4ff1cb4ee1f197702b8ebbf1b2f77"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_06_05.glb",
+          "bytes": 253480,
+          "sha256": "77c0158fb862e505a3bd1bcf4b9276f2afc4907331f3e904c7d1bbe1e63f8948"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_07_03.glb",
+          "bytes": 253468,
+          "sha256": "d05adc1adb2d24694786bbecbbab728e868b56b4fa28c1cf9ee039d29e90cd5d"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_07_04.glb",
+          "bytes": 253452,
+          "sha256": "f8dbce963762267705b2723a0b295813f3d729712f1ae341ab676f0a8c78b6f1"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_07_05.glb",
+          "bytes": 253464,
+          "sha256": "dc599efdcfb16312ca337ba8549ddf778ff2a27e222139633bde408337fef2ba"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_08_03.glb",
+          "bytes": 253468,
+          "sha256": "8938f2d68c9884494345d2afdfe5d2c14864fddf81551c99f2792906d0bfa947"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_08_04.glb",
+          "bytes": 253456,
+          "sha256": "2b6bc1cc4e0562f63c5401738a6c5518e69e293bd868cea3c2c594de5695ea14"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_08_05.glb",
+          "bytes": 253464,
+          "sha256": "17c64991b1c097cf49f9e30f8a25eb374bd69cfa2de70ce431d13effdd9bf1b4"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_08_06.glb",
+          "bytes": 253480,
+          "sha256": "aae695360abfcc6690e8d23deff979deca324a3f09a9fc938dd687fadf16dbb6"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_09_03.glb",
+          "bytes": 253484,
+          "sha256": "0b90e1d09f6e1712e5e80c600fe3c547941b344027a462b6baba5253315e7b6f"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_09_04.glb",
+          "bytes": 253468,
+          "sha256": "216cb64147498a603236971ab9f7b2901ddb2f7eb641e05dd5efeb5877cc9009"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_09_05.glb",
+          "bytes": 253464,
+          "sha256": "9b2796aa979f6bb6077810ae54fca2c0d7886666871a70638d1265f7cf4b7522"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/chunks/cell_09_06.glb",
+          "bytes": 253464,
+          "sha256": "2ea65f76d2cd257e5b3a8518a0c7a0ed7355dae5f86eb41cc998c1072f7d6972"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/heightmap.f32",
+          "bytes": 2246004,
+          "sha256": "7604caa402b56c72cb1324fa1449ad8bc2d642dbc9d6151832d7b89230777d9f"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/terrain-data.npz",
+          "bytes": 2185335,
+          "sha256": "2fc0977508b65aa095663c61b3a049c8ab2a76faeabd50672a17772ce26b82f0"
+        },
+        {
+          "path": "godot-pc/world-final/geology-D13/terrain.json",
+          "bytes": 38772,
+          "sha256": "155b195021d06631756b0fb17f8370144dcd1a412fe191f011b52e42bc5658c1"
+        }
+      ]
     }
   ],
   "files": [
@@ -7372,13 +7511,13 @@
     },
     {
       "path": "godot-pc/world-final/geography/landmarks.glb",
-      "bytes": 14495172,
-      "sha256": "d1ba1d8a97b753b05156d6fa18b4bdff252af9f97ec58df9abbed89dabdcb47e"
+      "bytes": 14568176,
+      "sha256": "78d2408b4107265581b01067901af487b96464dda8d89ad05583b80aaf1fd7bb"
     },
     {
       "path": "godot-pc/world-final/geography/support-surfaces.json",
-      "bytes": 2756,
-      "sha256": "9b6bdf0ae9bfc5b37e47aafe3ceb53d12bbcc942b8f059fa28db7a11eee99600"
+      "bytes": 3305,
+      "sha256": "02de5a8a7d01aae79c6031477e4c445c667fb121d0ea20e1492afb2d9ad33094"
     },
     {
       "path": "godot-pc/world-final/geography/terrain-data.npz",
@@ -8417,13 +8556,13 @@
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_05_04.glb",
-      "bytes": 253472,
-      "sha256": "baa47f322428e0e5ba5c5b4244291f2b4219d2bc6f8ef58eb8aafa3a320cc447"
+      "bytes": 253480,
+      "sha256": "ca17292e8554454592a8dba34d6d174ebc37907910f5bd5cf55fb65ab6acb33f"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_05_05.glb",
-      "bytes": 253472,
-      "sha256": "34fa20550fea843769950160d9f50a75ec8f14a46d532c13a15c0a0485e78483"
+      "bytes": 253480,
+      "sha256": "47e57e01faac91bab34fc7fe8b7420980b1f706a100667b3beba99eef5b69b2a"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_05_06.glb",
@@ -8467,18 +8606,18 @@
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_06_03.glb",
-      "bytes": 253472,
-      "sha256": "5dff24fdb7dd2e6ae627735c2cd330413b26f486e6d24d9aaedc49b115251a96"
+      "bytes": 253480,
+      "sha256": "7c5a0dd3849cd4d8caefa4d3e43dc41156c9c4e3d108936486c6436e32007d01"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_06_04.glb",
-      "bytes": 253456,
-      "sha256": "cbed7159bfd3ff5224db90343f06eb55a833120e2bc78d7ae74acf2f4b75eba1"
+      "bytes": 253468,
+      "sha256": "1d70e5c935387de5210b5bd1b5e100b38dd4ff1cb4ee1f197702b8ebbf1b2f77"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_06_05.glb",
-      "bytes": 253472,
-      "sha256": "ad8bac4d7368d8c7366a0adc9379c122411008d1cdc2d26bf9732ab0bc2ea72f"
+      "bytes": 253480,
+      "sha256": "77c0158fb862e505a3bd1bcf4b9276f2afc4907331f3e904c7d1bbe1e63f8948"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_06_06.glb",
@@ -8522,18 +8661,18 @@
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_07_03.glb",
-      "bytes": 253456,
-      "sha256": "02d848e15f430620e320677198336a02197cf51c5c4938d5ec55238042f29fff"
+      "bytes": 253468,
+      "sha256": "d05adc1adb2d24694786bbecbbab728e868b56b4fa28c1cf9ee039d29e90cd5d"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_07_04.glb",
-      "bytes": 253456,
-      "sha256": "a0fb3bc888c7e92fd191182024582050335b51e847e527d495c052e812f2db93"
+      "bytes": 253452,
+      "sha256": "f8dbce963762267705b2723a0b295813f3d729712f1ae341ab676f0a8c78b6f1"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_07_05.glb",
-      "bytes": 253456,
-      "sha256": "392c667f4457be0fc5822efd7ac0c82e2c238963e6a8457a60bdfafb40188fc9"
+      "bytes": 253464,
+      "sha256": "dc599efdcfb16312ca337ba8549ddf778ff2a27e222139633bde408337fef2ba"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_07_06.glb",
@@ -8577,23 +8716,23 @@
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_08_03.glb",
-      "bytes": 253460,
-      "sha256": "bdf3b9e543d42de197262a1b1a0206e4e1492609370cff703dffbbacbda9265d"
+      "bytes": 253468,
+      "sha256": "8938f2d68c9884494345d2afdfe5d2c14864fddf81551c99f2792906d0bfa947"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_08_04.glb",
-      "bytes": 253460,
-      "sha256": "9fef89e46dfbec6ee62021022ff239d332f04772b0cbc8f66e10473bff0f68e0"
+      "bytes": 253456,
+      "sha256": "2b6bc1cc4e0562f63c5401738a6c5518e69e293bd868cea3c2c594de5695ea14"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_08_05.glb",
-      "bytes": 253456,
-      "sha256": "902f2c6062f709dd6ba29ffa8ad028242d63230d688534799fae97298e28ac3c"
+      "bytes": 253464,
+      "sha256": "17c64991b1c097cf49f9e30f8a25eb374bd69cfa2de70ce431d13effdd9bf1b4"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_08_06.glb",
-      "bytes": 253472,
-      "sha256": "01597bdc9aa9562123ff10afa1d2b379b29cbec6cd3369c3c63d72cf8ee15edb"
+      "bytes": 253480,
+      "sha256": "aae695360abfcc6690e8d23deff979deca324a3f09a9fc938dd687fadf16dbb6"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_08_07.glb",
@@ -8632,23 +8771,23 @@
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_09_03.glb",
-      "bytes": 253476,
-      "sha256": "0b43e7eef13e1e19d9a883a6d3acd22f1e2fac656e288adec64b13d18c8461b4"
+      "bytes": 253484,
+      "sha256": "0b90e1d09f6e1712e5e80c600fe3c547941b344027a462b6baba5253315e7b6f"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_09_04.glb",
-      "bytes": 253456,
-      "sha256": "9fea0b8db763da90f2ed383fdbb5b1072ed3a70955626f45c210b3c2b8d7820d"
+      "bytes": 253468,
+      "sha256": "216cb64147498a603236971ab9f7b2901ddb2f7eb641e05dd5efeb5877cc9009"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_09_05.glb",
-      "bytes": 253456,
-      "sha256": "81a104d745069cdc97bdf93c84a733c11788a4036d0b0c1aa74387f8b6389ce5"
+      "bytes": 253464,
+      "sha256": "9b2796aa979f6bb6077810ae54fca2c0d7886666871a70638d1265f7cf4b7522"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_09_06.glb",
-      "bytes": 253456,
-      "sha256": "0ef90e78e70df96ed0cf7ed98f5e04ff018efdbf5cd00a74eaf0698f581c0181"
+      "bytes": 253464,
+      "sha256": "2ea65f76d2cd257e5b3a8518a0c7a0ed7355dae5f86eb41cc998c1072f7d6972"
     },
     {
       "path": "godot-pc/world-final/geology-D13/chunks/cell_09_07.glb",
@@ -8838,17 +8977,17 @@
     {
       "path": "godot-pc/world-final/geology-D13/heightmap.f32",
       "bytes": 2246004,
-      "sha256": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e"
+      "sha256": "7604caa402b56c72cb1324fa1449ad8bc2d642dbc9d6151832d7b89230777d9f"
     },
     {
       "path": "godot-pc/world-final/geology-D13/terrain-data.npz",
-      "bytes": 2173074,
-      "sha256": "8bb4f4abc506e5bb1054f3e84f573893cb3187b120e88d1f86ea9763a107a62b"
+      "bytes": 2185335,
+      "sha256": "2fc0977508b65aa095663c61b3a049c8ab2a76faeabd50672a17772ce26b82f0"
     },
     {
       "path": "godot-pc/world-final/geology-D13/terrain.json",
-      "bytes": 35283,
-      "sha256": "fb2a6cfb889ba913bc9a399fcc249a25086b74857d876426266b8737ca4b916f"
+      "bytes": 38772,
+      "sha256": "155b195021d06631756b0fb17f8370144dcd1a412fe191f011b52e42bc5658c1"
     },
     {
       "path": "godot-pc/world-final/interiors/great_cave-floor.f32",

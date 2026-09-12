@@ -5,6 +5,7 @@ export const EXCLUDED_ACTOR_PREFIXES = Object.freeze([
   'world-expansion-v3/actors/alternatives/roach/',
   'world-expansion-v3/actors/models/V3StarterBoar',
   'world-expansion-v3/actors/models/V3StarterBeetle',
+  'world-expansion-v3/actors/models/V3StarterSlime',
 ]);
 
 export function isExcludedActorPath(path) {

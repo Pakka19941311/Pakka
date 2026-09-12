@@ -1,0 +1,73 @@
+{
+  "schema": 1,
+  "new_layer": "p2-terrain-lake-20260912",
+  "files": 21,
+  "parts": 5,
+  "archive_bytes": 15605977,
+  "archive_sha256": "a807a5b5f8a59ac7f99c476e2ce6f8ff5f5afb55fa9bebde3732f333e2194f44",
+  "every_new_member_matches_current_bytes": true,
+  "all21_tracked_new_versions_recognized": true,
+  "active_assets": [
+    {
+      "role": "actor:MOB-01",
+      "path": "godot-pc/world-expansion-v3/actors/production/V3FacelessSlime.glb",
+      "tracked": true,
+      "payload": false,
+      "sha256": "3c901fd070562c9afaa457e5b43cc2c5f5f09ef230ced993b18b621ed456b572"
+    },
+    {
+      "role": "actor:MOB-02",
+      "path": "godot-pc/world-expansion-v3/actors/models/V3StarterWolf.glb",
+      "tracked": true,
+      "payload": false,
+      "sha256": "aad9a3def876a41b5ee6f9c41cc3d4e804805b39428fc5fadaadee7c285a3ee4"
+    },
+    {
+      "role": "actor:MOB-03",
+      "path": "godot-pc/world-expansion-v3/actors/models/V3StarterRat.glb",
+      "tracked": true,
+      "payload": false,
+      "sha256": "af60c2a559ea43473d2084e164daa65f611004a270ccb5310b7ee4a8f56b35be"
+    },
+    {
+      "role": "actor:MOB-04",
+      "path": "godot-pc/world-expansion-v3/actors/alternatives/boar/V3BoarCandidate.glb",
+      "tracked": true,
+      "payload": false,
+      "sha256": "523cfc1b7e5e091400ca7391a8a07a8aa045fb50020472049365e35f1617df94"
+    },
+    {
+      "role": "actor:MOB-05",
+      "path": "godot-pc/world-expansion-v3/actors/alternatives/roach-six/V3RoachSixLeg.glb",
+      "tracked": true,
+      "payload": false,
+      "sha256": "c482207e1ebdac9661571e2487e5ff018157dc3b96d94178b92ca26e1204e7d7"
+    },
+    {
+      "role": "city-runtime",
+      "path": "godot-pc/world-final/castle/courtyard-p2.glb",
+      "tracked": true,
+      "payload": false,
+      "sha256": "48ea02019d035a6ae76c4c5e187cf916c6a553a252a5c5ef14615e27aa14c8f4"
+    },
+    {
+      "role": "city-data",
+      "path": "godot-pc/world-final/castle/courtyard-p2.json",
+      "tracked": true,
+      "payload": false,
+      "sha256": "a3cf7ff2ac6598eb4cb36a14a38afd4642146470a4cbbfa33ca0c1d9727c16f1"
+    },
+    {
+      "role": "city-source",
+      "path": "art/world-final/Greenfall_Courtyard_P2.blend",
+      "tracked": true,
+      "payload": false,
+      "sha256": "c5234275e4cccaf4d4e2b925c17dfaf6c77001f3a4a584702105b34e3cd31d6e"
+    }
+  ],
+  "external_image_dependencies": [],
+  "ignored_runtime_outside_git_and_payload": 0,
+  "full_restore_run": false,
+  "reason": "All historical bytes were left untouched; bounded audit verified new layer and previously checked929 local final files. No Godot/export/prepare executed.",
+  "export_tests": "2/2 PASS; original V3StarterSlime excluded, canonical V3FacelessSlime retained"
+}
