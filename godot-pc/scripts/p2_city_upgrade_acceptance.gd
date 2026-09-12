@@ -15,7 +15,7 @@ static func run(app: Node, checks: Dictionary) -> void:
 		if app.world.final_environment.castle_mesh.find_child(str(row.root),true,false) != null: loaded += 1
 	checks.upgrade_eight_roots_loaded = loaded == 8
 	app.world.camera_distance = 14
-	app.world.camera_yaw = PI
+	app.world.camera_yaw = 0.0
 	checks.upgrade_market_route = await walk(app,Vector2(-100,-198))
 	await Wait.capture(app,"p2-city-upgrade-market")
 	checks.upgrade_citadel_street = await walk(app,Vector2(-100,-145))
