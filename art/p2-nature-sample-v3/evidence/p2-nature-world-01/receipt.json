@@ -1,0 +1,35 @@
+{
+  "name": "p2-nature-world-01",
+  "source": "work/qa/p2-nature-world-01",
+  "diagnosticOnly": false,
+  "passed": 34,
+  "total": 37,
+  "failed": [
+    "nature_approach_continuous",
+    "nature_downhill_continuous",
+    "nature_uphill_continuous"
+  ],
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "engine": {
+    "utcStart": "2026-09-12T15:59:03.100604+00:00",
+    "seconds": 66.219,
+    "exit": 2,
+    "crash": false,
+    "timedOut": false,
+    "errorLines": [
+      "ERROR: Can't create shader cache folder, no shader caching will happen: user://",
+      "ERROR: Failed to read the root certificate store.",
+      "ERROR: Can't create shader cache folder, no shader caching will happen: user://",
+      "ERROR: Failed to read the root certificate store."
+    ],
+    "peakWorkingSet": 2075168768,
+    "peakPrivateBytes": 5470937088
+  },
+  "files": [
+    {
+      "file": "stage.json",
+      "bytes": 1378,
+      "sha256": "e8e47448c9aff5d26896bc1d4ec328e3db55a0c38c0289c3efe322f6fc1c12f0"
+    }
+  ]
+}

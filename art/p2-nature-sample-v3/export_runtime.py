@@ -81,6 +81,8 @@ bpy.data.orphans_purge(do_recursive=True);bpy.context.preferences.filepaths.save
 manifest['masterSha256']=sha(master);manifest['masterBytes']=master.stat().st_size;manifest['qaHeroExternal']='godot-pc/assets/knight/Knight_Modular.glb';manifest['runtimeExports']=exports
 (OUT/'candidate-placements.json').write_text(json.dumps(manifest,indent=2)+'\n')
 runtime={'schema':1,'candidateOnly':True,'coordinates':'Godot X,Y,Z; server Z=-GodotZ','sourceMaster':master.relative_to(ROOT).as_posix(),'sourceMasterSha256':sha(master),'regions':{k:v['bounds']for k,v in snapshot['regions'].items()},'chunks':exports,'textures':textures,'collision':'collision.json','baselineGrassReplacement':True,'heightFieldChanged':False,'waterExported':False,'heroExported':False,'groundOffsetM':.008,'qaShots':manifest['shots'],'qaWaterPolygon':snapshot['water']['lake']['polygon'],'nativeAcceptance':'pending'}
+runtime['materialSources']=['nature_sample.gd','leaf.gdshader','grass.gdshader','ground_overlay.gdshader','shore_water.gdshader']
+runtime['actualWorldReview']={'status':'pending after re-export; earlier evidence is historical','report':'art/p2-nature-sample-v3/ACTUAL_WORLD_REVIEW_RU.md'}
 (RUNTIME/'manifest.json').write_text(json.dumps(runtime,indent=2)+'\n')
 print('RUNTIME_EXPORT '+json.dumps({'chunks':len(exports),'bytes':sum(e['bytes']for e in exports),'masterBytes':master.stat().st_size,'heroExported':False,'obstacles':len(collision['obstacles'])}),flush=True)
 import runpy

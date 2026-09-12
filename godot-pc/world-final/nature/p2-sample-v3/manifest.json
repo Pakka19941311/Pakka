@@ -793,7 +793,15 @@
     ]
   ],
   "knownVisualIssues": [
-    "alder/shrub leaves appear too pale in native",
-    "grass shading remains too uniform"
-  ]
+    "thin straight yellow shoreline remains before bright cyan distant lake",
+    "full-world forest frame stutter and rendered hero jump remain unresolved"
+  ],
+  "materialSources": ["nature_sample.gd","leaf.gdshader","grass.gdshader","ground_overlay.gdshader","shore_water.gdshader"],
+  "actualWorldReview": {
+    "report": "art/p2-nature-sample-v3/ACTUAL_WORLD_REVIEW_RU.md",
+    "run": "p2-nature-world-03",
+    "checks": "42/43; forest render-step guard failed",
+    "artGate": "OPEN; reviewed forest materials improved, shoreline still unfinished",
+    "runtimeGate": "OPEN; CPU/clock investigation continues separately"
+  }
 }

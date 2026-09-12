@@ -1,0 +1,48 @@
+{
+  "name": "p2-nature-world-03",
+  "source": "work/qa/p2-nature-world-03",
+  "diagnosticOnly": false,
+  "passed": 42,
+  "total": 43,
+  "failed": [
+    "nature_forest_render_step_bound"
+  ],
+  "adapter": "NVIDIA GeForce RTX 3070 Laptop GPU",
+  "engine": {
+    "utcStart": "2026-09-12T16:09:44.836066+00:00",
+    "seconds": 70.234,
+    "exit": 2,
+    "crash": false,
+    "timedOut": false,
+    "errorLines": [
+      "ERROR: Can't create shader cache folder, no shader caching will happen: user://",
+      "ERROR: Failed to read the root certificate store.",
+      "ERROR: Can't create shader cache folder, no shader caching will happen: user://",
+      "ERROR: Failed to read the root certificate store."
+    ],
+    "peakWorkingSet": 2099081216,
+    "peakPrivateBytes": 5543469056
+  },
+  "files": [
+    {
+      "file": "stage.json",
+      "bytes": 1646,
+      "sha256": "921568cf39147385be6cd7dc22a0330b1694406814f5f8a7437a02b919c24d2d"
+    },
+    {
+      "file": "p2-nature-world-trace.json",
+      "bytes": 78799,
+      "sha256": "19cd558789d3ee3d38fc35b8867ab5e9879b07dcd7e66f2c02b73c0b472cf25d"
+    },
+    {
+      "file": "p2-nature-forest-world.png",
+      "bytes": 2904542,
+      "sha256": "b05c8927f070da66bc2d9ea12f501a627f7f084c426b910e4a50f91ee5cdfaf1"
+    },
+    {
+      "file": "p2-nature-shore-world.png",
+      "bytes": 1564056,
+      "sha256": "43a85d2bfb968f0b0a46bf23e4bb9bc1a1ef7d0006c7f4b32487e58d869037ca"
+    }
+  ]
+}

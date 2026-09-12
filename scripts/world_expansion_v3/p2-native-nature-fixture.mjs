@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {findNavigationPath,pathSegmentIsClear} from '../../src/world/navigation.ts';
+import {STARTER_ITEMS} from '../../src/data/starter-progression-v3.ts';
 
 const prepared=new WeakMap();
 const hash=value=>createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -32,6 +33,8 @@ export function prepareNativeNatureFixture(world,geography,hero,stage){
   const value={...goal,height:surface.terrain.heightAt(goal.x,goal.z),route};from=goal;return value;
  });
  const populationBefore=hash(world.state.monsters),clockBefore=world.state.time;
+ const equipmentIds=['starter_weapon_'+hero.classId,'starter_chest_'+hero.classId,'starter_head','starter_gloves','starter_boots','starter_belt'];
+ hero.equipment=Object.fromEntries(equipmentIds.map(id=>[STARTER_ITEMS[id].slot,world.item(id)]));
  world.recalculate(hero);hero.dead=false;hero.hp=hero.maxHp;hero.mp=hero.maxMp;
  world.relocate(hero,{...site.standing,spaceId:'surface'});
  assert.equal(hash(world.state.monsters),populationBefore,'nature-fixture-mutated-monsters');
@@ -39,7 +42,7 @@ export function prepareNativeNatureFixture(world,geography,hero,stage){
  const result={stage,region:site.region,standing:{...site.standing},height:surface.terrain.heightAt(site.standing.x,site.standing.z),
   yaw:site.yaw,pitch:site.pitch,distance:10.5,goals,minimumContinuousMetres:site.minimumContinuousMetres,
   generation:hero.generation,population:world.state.monsters.length,populationBefore,populationAfter:populationBefore,
-  mapVersion:geography.mapVersion,clockBefore,heroId:hero.id,
+  mapVersion:geography.mapVersion,clockBefore,heroId:hero.id,heroLevel:hero.level,equipmentIds,
   method:'One initial hero-only placement per site; ordinary destination intents thereafter. Existing monsters, terrain, lighting and clock remain live.'};
  receipts.set(key,result);prepared.set(world,receipts);return structuredClone(result);
 }

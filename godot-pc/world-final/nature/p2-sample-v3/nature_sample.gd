@@ -7,6 +7,7 @@ var built: bool=false
 var small_decorations: Array[GeometryInstance3D]=[]
 var nature_meshes: Array[MeshInstance3D]=[]
 var focus_bound: bool=false
+var shore_water: MeshInstance3D
 
 func build(existing_groundcover: Node=null) -> void:
 	if built:return
@@ -30,10 +31,27 @@ func build(existing_groundcover: Node=null) -> void:
 				var material: ShaderMaterial=ShaderMaterial.new();material.shader=load(ROOT+"grass.gdshader");mesh.material_override=material;mesh.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 				small_decorations.append(mesh)
 			else:nature_meshes.append(mesh)
-			# Spatial chunks cull independently. These are LOD0 candidate assets;
+			# Spatial chunks cull independently. These use the existing LOD1 meshes;
 			# do not claim a measured production LOD or performance gain.
 	if existing_groundcover!=null:replace_local_grass(existing_groundcover)
+	bind_local_shore_water()
 	built=true
+
+func bind_local_shore_water() -> void:
+	# Reuse the exact production lake geometry; only a narrow local material
+	# band renders above it. Original mesh/material, level and collision stay.
+	var lake: MeshInstance3D=get_parent().find_child("Lake_Level_40m",true,false) as MeshInstance3D
+	if lake==null:return # Standalone reference QA has no production lake.
+	shore_water=MeshInstance3D.new();shore_water.name="P2N_LocalShoreWater"
+	shore_water.mesh=lake.mesh;add_child(shore_water)
+	shore_water.global_transform=lake.global_transform;shore_water.position.y+=.008
+	shore_water.cast_shadow=GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var material: ShaderMaterial=ShaderMaterial.new();material.shader=load(ROOT+"shore_water.gdshader")
+	var b: Array=data.regions.shore;material.set_shader_parameter("bounds",Vector4(b[0],b[1],b[2],b[3]))
+	var a: Array=data.qaWaterPolygon[0];var end: Array=data.qaWaterPolygon[-1]
+	material.set_shader_parameter("shore_a",Vector2(a[0],a[1]));material.set_shader_parameter("shore_b",Vector2(end[0],end[1]))
+	material.set_shader_parameter("sediment",load(ROOT+str(data.textures.mud.path)))
+	shore_water.material_override=material
 
 func bind_focus(reference_layer: Node) -> void:
 	if focus_bound:return
@@ -51,6 +69,13 @@ func bind_focus(reference_layer: Node) -> void:
 			if foliage and material is ShaderMaterial:
 				material.set_shader_parameter("lod_enabled",false)
 				if "pine_tree_01_twig" in source.resource_name:material.set_shader_parameter("base_color",Color(.70,.96,.72))
+				if "shrub_04" in source.resource_name:
+					# Scan leaves were nearly white in the actual world. Preserve
+					# UV/alpha/focus, use a local matte green surface only for them.
+					material.shader=load(ROOT+"leaf.gdshader")
+					material.set_shader_parameter("base_color",source.albedo_color*Color(.56,.73,.34))
+					material.set_shader_parameter("use_rough",false)
+					material.set_shader_parameter("roughness_value",.94)
 			else:
 				focused.surface_set_material(index,source)
 				reference_layer.focus_materials.erase(material)
