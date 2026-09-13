@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {mkdirSync,readFileSync,writeFileSync,existsSync} from 'node:fs';
+import {mkdirSync,readFileSync,writeFileSync,existsSync,renameSync} from 'node:fs';
 import {resolve,join,dirname} from 'node:path';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
@@ -130,7 +130,12 @@ try{
    if(!boss?.alive||boss.hp>=14400)throw Error('native boss has not taken a real hit');
    boss.hp=Math.min(boss.hp,120);hero.hp=hero.maxHp;
   }else throw Error('unknown-stage-fixture:'+request.stage);
-  world.checkpoint();writeFileSync(join(output,'fixture-ready.json'),JSON.stringify({stage:request.stage,generation:hero.generation,...extra}));
+  world.checkpoint();
+  // Godot polls this file concurrently. Publish the complete fixture in one
+  // rename so it cannot read an empty/truncated JSON document mid-write.
+  const ready=join(output,'fixture-ready.json');
+  writeFileSync(ready+'.tmp',JSON.stringify({stage:request.stage,generation:hero.generation,...extra}));
+  renameSync(ready+'.tmp',ready);
  },100);
  const bootstrap=join(output,'bootstrap.json');writeFileSync(bootstrap,JSON.stringify({server_url,profiles:[{id:p.id,token:session.token,name:p.name,classId:p.classId,level:p.level}]}));
  const mode=packageArg?['--packaged','--cwd',dirname(resolve(binary))]:['--project','godot-pc'];
