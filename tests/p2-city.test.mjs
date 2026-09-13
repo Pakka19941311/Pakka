@@ -9,7 +9,9 @@ const collision=world.spaces.surface.collision,terrain=world.spaces.surface.terr
 
 test('one house replacement retains services, residents, tavern and legacy population',()=>{
  assert.deepEqual(world.services,old.services);
- for(const key of ['residents','wildlife','tavern','signs'])assert.deepEqual(layout[key],legacy[key]);
+ for(const key of ['residents','wildlife','signs'])assert.deepEqual(layout[key],legacy[key]);
+ assert.deepEqual({...layout.tavern,replacesLandmarks:legacy.tavern.replacesLandmarks},legacy.tavern);
+ assert.deepEqual(layout.tavern.replacesLandmarks,[...legacy.tavern.replacesLandmarks,'FORT']);
  assert.ok(!layout.props.some(p=>p.id==='Gate_exchange_house'));
  assert.equal(layout.props.filter(p=>p.id==='P2_Gate_exchange_house').length,1);
  assert.equal(world.slots.length,1151);assert.equal(old.slots.length,1001);

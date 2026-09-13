@@ -152,6 +152,8 @@ export class FinalWorld {
       const bounds=id==='surface'?[-796,-696,796,696]:[meta.bounds[0]+1,-meta.bounds[3]+1,meta.bounds[2]-1,-meta.bounds[1]-1];
       const space:FinalSpace={id,terrain,collision,bounds,definition};this.spaces[id]=space;
       collision.walkable=(p,r)=>this.walkable(space,p,r);
+      collision.transitZones=id==='surface'?(courtyard.fortressV3?.transitZones??[]):[];
+      digest.update(JSON.stringify(collision.transitZones));
     }
     // Preserve service IDs, catalogues and names. Only authored anchors move.
     const placements:Record<string,number[]>={shop:[-111,190],elder:[-100,180],smith:[-135,188],teleport:[-86,191],alchemist:[-125,180],storage:[-75,189]};

@@ -5,11 +5,13 @@ extends RefCounted
 # src/world/collision-world.ts; decorative overhead arches do not stop walking.
 const RADIUS: float = .46
 var cells: Dictionary = {}
+var transit_zones: Array = []
 var walkability: Callable
 var camera_ignored_ids: Dictionary = {}
 
 func setup(obstacles: Array) -> void:
 	cells.clear()
+	transit_zones.clear()
 	camera_ignored_ids.clear()
 	for obstacle: Dictionary in obstacles:
 		var ext: Vector2 = Vector2.ONE * float(obstacle.get("radius", 0))

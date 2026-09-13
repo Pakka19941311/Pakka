@@ -276,7 +276,7 @@ func segment_clear(start: Vector2, goal: Vector2) -> bool:
 
 func plan_path(goal: Vector2, force: bool = false) -> void:
 	if force or (navigation_cooldown <= 0 and (navigation_goal.distance_to(goal) > .7 or navigation_path.is_empty())):
-		navigation_path = VarendorNavigation.find_path(collision, position_value, goal, radius, {"cellSize":.85,"margin":24,"maxVisited":4500})
+		navigation_path = VarendorNavigation.find_player_path(collision, position_value, goal, radius, {"cellSize":.85,"margin":24,"maxVisited":4500})
 		navigation_goal = goal
 		navigation_cooldown = .18 if not navigation_path.is_empty() else 1.0
 

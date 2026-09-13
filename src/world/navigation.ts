@@ -178,3 +178,28 @@ export function findNavigationPath(
 export function pathSegmentIsClear(world: CollisionWorld, from: Point2, to: Point2, actorRadius = 0.42): boolean {
   return segmentIsClear(world, from, to, actorRadius, 0.35);
 }
+
+/** Route through authored gates without widening every monster A* search. */
+export function findPlayerNavigationPath(world: CollisionWorld, start: Point2, goal: Point2, options: NavigationOptions = {}): Point2[] {
+  const inside = (p: Point2, polygon: number[][]): boolean => {
+    let result = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const a = polygon[i], b = polygon[j];
+      if ((a[1] > p.z) !== (b[1] > p.z) && p.x < (b[0] - a[0]) * (p.z - a[1]) / (b[1] - a[1]) + a[0]) result = !result;
+    }
+    return result;
+  };
+  const zones = world.transitZones ?? [], exits: Point2[] = [], entries: Point2[] = [];
+  for (const zone of zones) if (inside(start, zone.polygon) && !inside(goal, zone.polygon)) exits.push(...zone.exit);
+  for (const zone of [...zones].reverse()) if (!inside(start, zone.polygon) && inside(goal, zone.polygon)) entries.push(...[...zone.exit].reverse());
+  const targets = [...exits, ...entries, goal], result: Point2[] = [];
+  let from = start;
+  for (let i = 0; i < targets.length; i++) {
+    // Skip redundant waypoints only across a checked, actually walkable segment.
+    for (let j = targets.length - 1; j > i; j--) if (pathSegmentIsClear(world, from, targets[j], options.actorRadius ?? .46)) { i = j; break; }
+    const path = findNavigationPath(world, from, targets[i], options);
+    if (!path.length) return [];
+    result.push(...path); from = path.at(-1)!;
+  }
+  return result;
+}

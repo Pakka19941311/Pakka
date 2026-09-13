@@ -11,7 +11,7 @@
   "heights": "heightmap.f32",
   "min_height": 0.5,
   "max_height": 349.59393310546875,
-  "height_sha256": "2d7e1806aa2411e1a8d39a565d6e4aa64ba5fbcb6ed2b9563d9976cd0d51ef0e",
+  "height_sha256": "f95eebce154ed6339a9c98a4c34d9d76bf41b072c09589e155ce3acd4fe48773",
   "chunks": [
     {
       "id": "cell_00_00",
@@ -1780,7 +1780,7 @@
     "cell_11_04"
   ],
   "native_sha256": "86b7e8f8a810220d41fc2beb09381a175cc8e4b02ba3163b0b9b70c7741a3714",
-  "sha256": "7604caa402b56c72cb1324fa1449ad8bc2d642dbc9d6151832d7b89230777d9f",
+  "sha256": "f95eebce154ed6339a9c98a4c34d9d76bf41b072c09589e155ce3acd4fe48773",
   "p2_lake_revision": "organic-shore-islets-v3",
   "p2_source_generator": "scripts/world_final/author_lake_p2.py",
   "p2_changed_chunks": [
@@ -1881,5 +1881,55 @@
       "vertices": 4225
     }
   ],
-  "native_source_scope": "Preserved D13 baseline Blender master. The P2 lake edit is reproducible from scripts/world_final/author_lake_p2.py and art/terrain-lake-p2-v3/baseline-inputs.zip."
+  "native_source_scope": "Preserved D13 baseline Blender master. The P2 lake edit is reproducible from scripts/world_final/author_lake_p2.py and art/terrain-lake-p2-v3/baseline-inputs.zip.",
+  "fortress_v3": {
+    "generator": "scripts/assets/city/fortress-v3/author_hill.py",
+    "footprint_server": [
+      -190,
+      -235,
+      -10,
+      -70
+    ],
+    "changed_vertices": 697,
+    "changed_chunks": [
+      {
+        "id": "cell_04_06",
+        "glb": "chunks/cell_04_06.glb",
+        "sha256": "9e27f49238742d548648e8e50cb8858ea1cb4be867f543db0a60740d90e78a5b",
+        "vertices": 4225
+      },
+      {
+        "id": "cell_05_06",
+        "glb": "chunks/cell_05_06.glb",
+        "sha256": "a25e726ba7b91480e163592427ab870805ad4b3bf397b23278dbb204ac349dc0",
+        "vertices": 4225
+      },
+      {
+        "id": "cell_06_06",
+        "glb": "chunks/cell_06_06.glb",
+        "sha256": "9f94163ef4f850ec1e6c738badd0ff7943970045003ac89ff85e26c783fea9da",
+        "vertices": 4225
+      },
+      {
+        "id": "cell_04_07",
+        "glb": "chunks/cell_04_07.glb",
+        "sha256": "f35a31ea74f44866d441d1dc6636161f3016ea655e507e1ce63e7dafed730ad4",
+        "vertices": 4225
+      },
+      {
+        "id": "cell_05_07",
+        "glb": "chunks/cell_05_07.glb",
+        "sha256": "dfe35509babdca52011c12cd1a128c150323c8a8f86594c7a936d3e43d935834",
+        "vertices": 4225
+      },
+      {
+        "id": "cell_06_07",
+        "glb": "chunks/cell_06_07.glb",
+        "sha256": "7a00a82bd4fc7952498ebd1111e9eeedba22b5b9c33cb16ba708d81066b99243",
+        "vertices": 4225
+      }
+    ],
+    "road_vertices_changed": 0,
+    "maximum_lowering_m": 2.8000030517578125
+  }
 }

@@ -99,6 +99,10 @@ func activate_space(id: String) -> bool:
 			for mesh: MeshInstance3D in courtyard_mesh.find_children("*","MeshInstance3D",true,false):
 				mesh.visibility_range_end = 430 if "citadel" in str(mesh.name) or "tower_roofs" in str(mesh.name) else 210
 				mesh.visibility_range_end_margin = 12
+			if read_json(courtyard_path).has("fortressV3"):
+				var fortress = preload("res://world-final/castle/fortress_visuals.gd").new()
+				fortress.apply(courtyard_mesh)
+				fortress.free()
 			obstacles.append_array(read_json(courtyard_path).obstacles)
 			world.loading_progress.emit("Загрузка леса и растительности…")
 			nature = load(ROOT+"nature/nature_layer.gd").new()
@@ -148,6 +152,7 @@ func activate_space(id: String) -> bool:
 	definition = spaces.get(id,{})
 	bounds = [-796,-696,796,696] if id == "surface" else [terrain.bounds[0]+1,-terrain.bounds[3]+1,terrain.bounds[2]-1,-terrain.bounds[1]-1]
 	world.collision.setup(saved.obstacles)
+	world.collision.transit_zones = read_json(courtyard_path).get("fortressV3",{}).get("transitZones",[]) if id == "surface" else []
 	world.collision.walkability = walkable
 	world.player_motion.bounds_min = Vector2(bounds[0],bounds[1])
 	world.player_motion.bounds_max = Vector2(bounds[2],bounds[3])

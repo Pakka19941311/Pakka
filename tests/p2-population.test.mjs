@@ -112,7 +112,8 @@ test('selection retires only explicitly labelled L02 ordinary, preserving bosses
 
 test('first low-level quests have sufficient targets and connected approaches outside hound perception',()=>{
  const manifest=JSON.parse(readFileSync('docs/world-expansion-v3/P2_POPULATION.json','utf8'));
- const wolves=staged.filter(s=>s.canonicalMobId==='MOB-02'),reserved=manifest.firstQuestSafety.routes;
+ const wolves=staged.filter(s=>s.canonicalMobId==='MOB-02'),reserved=JSON.parse(readFileSync('docs/world-expansion-v3/FORTRESS_ACCESS_PATHS.json','utf8')).routes;
+ assert.deepEqual(reserved.map(r=>r.uid),manifest.firstQuestSafety.routes.map(r=>r.uid));
  assert.equal(reserved.length,18);
  assert.equal(reserved.filter(r=>p2.slotById.get(r.uid).canonicalMobId==='MOB-01').length,10);
  assert.equal(reserved.filter(r=>p2.slotById.get(r.uid).canonicalMobId==='MOB-03').length,8);

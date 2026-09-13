@@ -151,3 +151,40 @@ static func find_path(collision: VarendorCollision, requested_start: Vector2, re
 				previous[next] = current
 				open.push({"cell": next, "score": next_cost + Vector2(grid_goal - next).length()})
 	return [{"x": goal.x, "z": goal.y}] if _segment_clear(collision, start, goal, radius, cell_size * .3) else []
+
+static func _inside_transit(point: Vector2, polygon: Array) -> bool:
+	var result: bool = false
+	var j: int = polygon.size() - 1
+	for i: int in range(polygon.size()):
+		var a: Array = polygon[i]
+		var b: Array = polygon[j]
+		if (a[1] > point.y) != (b[1] > point.y) and point.x < (b[0] - a[0]) * (point.y - a[1]) / (b[1] - a[1]) + a[0]: result = not result
+		j = i
+	return result
+
+static func find_player_path(collision: VarendorCollision, start: Vector2, goal: Vector2, radius: float = .46, options: Dictionary = {}) -> Array:
+	var targets: Array = []
+	for zone: Dictionary in collision.transit_zones:
+		if _inside_transit(start, zone.polygon) and not _inside_transit(goal, zone.polygon): targets.append_array(zone.exit)
+	var reversed_zones: Array = collision.transit_zones.duplicate()
+	reversed_zones.reverse()
+	for zone: Dictionary in reversed_zones:
+		if not _inside_transit(start, zone.polygon) and _inside_transit(goal, zone.polygon):
+			var entry: Array = zone.exit.duplicate()
+			entry.reverse()
+			targets.append_array(entry)
+	targets.append({"x":goal.x,"z":goal.y})
+	var result: Array = []
+	var from: Vector2 = start
+	var i: int = 0
+	while i < targets.size():
+		for j: int in range(targets.size() - 1, i, -1):
+			if path_segment_is_clear(collision, from, Vector2(targets[j].x,targets[j].z), radius):
+				i = j
+				break
+		var path: Array = find_path(collision, from, Vector2(targets[i].x,targets[i].z), radius, options)
+		if path.is_empty(): return []
+		result.append_array(path)
+		from = Vector2(path[-1].x,path[-1].z)
+		i += 1
+	return result

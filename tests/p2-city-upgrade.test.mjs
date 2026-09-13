@@ -9,7 +9,11 @@ const w=new FinalWorld(undefined,true,{populationMode:'starter-v3'}),c=w.spaces.
 
 test('eight source-derived buildings preserve all city service and activity identities',()=>{
  assert.equal(data.p2City.version,2);assert.equal(data.p2City.buildings.length,8);
- for(const k of ['residents','residentLooks','wildlife','signs','tavern','quarter'])assert.deepEqual(data[k],legacy[k]);
+ for(const k of ['residents','residentLooks','wildlife','signs'])assert.deepEqual(data[k],legacy[k]);
+ assert.deepEqual({...data.tavern,replacesLandmarks:legacy.tavern.replacesLandmarks},legacy.tavern);
+ assert.deepEqual(data.tavern.replacesLandmarks,[...legacy.tavern.replacesLandmarks,'FORT']);
+ assert.deepEqual({...data.quarter,streets:data.quarter.streets.slice(0,legacy.quarter.streets.length)},legacy.quarter);
+ assert.deepEqual(data.quarter.streets.slice(legacy.quarter.streets.length).map(s=>s.name),data.fortressV3.addedStreetIds);
  assert.deepEqual(w.services,new FinalWorld().services);
  for(const b of data.p2City.buildings){assert.ok(data.props.some(p=>p.id===b.id));assert.ok(b.drawSurfaces<20);assert.ok(b.obstacles>0);}
  assert.equal(w.slots.length,1151);

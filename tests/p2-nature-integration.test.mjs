@@ -9,7 +9,10 @@ const json=p=>JSON.parse(readFileSync(p,'utf8')),hash=value=>createHash('sha256'
 const before=json('art/p2-nature-sample-v3/integration-baseline.json').worlds;
 const legacy=new FinalWorld(),p2=new FinalWorld(undefined,true,{populationMode:'starter-v3'});
 const obstacles=json('godot-pc/world-final/nature/p2-sample-v3/collision.json').obstacles;
-const routes=json('docs/world-expansion-v3/P2_QUEST_ROUTES.json').results;
+// Preserve the old 659-segment report as historical evidence. The rebuilt walls
+// require a fresh real-command route through the gate, with the same quest goals.
+const currentRoutes=json('docs/world-expansion-v3/FORTRESS_QUEST_ROUTES.json');
+const routes=currentRoutes.results;
 
 test('nature integration preserves both populations and services on the shared accepted lake geography',()=>{
  // The retained integration baseline predates the separately accepted lake.
@@ -51,12 +54,15 @@ test('all 150 real P2 spawn positions remain free with the integrated collision'
  for(const s of slots)assert.equal(p2.spaces.surface.collision.isBlocked(s,Math.max(.46,s.bodyRadius??0)),false,s.uid);
 });
 
-test('all 659 actual quest trace segments and the 5m passage remain open',()=>{
+test('all physics-tick rebuilt-fortress quest trace segments and the 5m passage remain open',()=>{
+ assert.equal(routes.length,3);assert.ok(routes.every(r=>r.ok&&!r.fixtureCompletion));
+ assert.equal(currentRoutes.mapVersion,p2.mapVersion);
  let count=0;
  for(const route of routes)for(let i=1;i<route.movementTrace.length;i++){
   assert.equal(pathSegmentIsClear(p2.spaces.surface.collision,route.movementTrace[i-1],route.movementTrace[i],.46),true,route.name+' segment '+i);count++;
  }
- assert.equal(count,659);
+ assert.equal(count,currentRoutes.movementSegments);assert.ok(count>30000);
+ assert.equal(currentRoutes.traceIntervalMs,1000/60);
  assert.equal(pathSegmentIsClear(p2.spaces.surface.collision,{x:-263,z:-228},{x:-263,z:-180},2.5),true);
  assert.equal(p2.spaces.surface.collision.isBlocked({x:-263,z:-204},4.5),false);
 });

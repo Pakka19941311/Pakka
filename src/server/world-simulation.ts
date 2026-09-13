@@ -46,7 +46,7 @@ import { resolveAttackAccuracy } from '../core/attack-accuracy.ts';
 import { CollisionWorld } from '../world/collision-world.ts';
 import { SPAWN_REGIONS, spawnPointInRegion, patrolRouteInRegion } from '../world/spawn-regions.ts';
 import { CONTENT_VERSION, mapVersion } from './content-manifest.ts';
-import { findNavigationPath } from '../world/navigation.ts';
+import { findNavigationPath, findPlayerNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
 import type {FinalWorld, TerrainSupport} from '../world/final-world.ts';
 import {inPolygon} from '../world/final-world.ts';
@@ -345,7 +345,7 @@ export class WorldSimulation {
     const calculated = calculateEquipmentStats(classId,cls.stats,1,equipment,itemDef);
     let p: WorldCharacter = {
       ...this.startPoint(), ...calculated, ...motion(this.state.time), id:this.identifier(),name:name.trim().slice(0,24)||'Странник',classId,
-      level:1,xp:0,gold:320,hp:calculated.maxHp,mp:calculated.maxMp,
+      level:1,xp:0,gold:320,hp:calculated.maxHp,mp:calculated.maxMp,lootMode:'ground',
       inventory:[this.item('potion',6),this.item('ether',4),this.item('teleport'),...(classId==='knight'?Object.values(starterGear):[])],equipment,
       storage:[],lootBuffer:[],migrationReserve:[],accessoryMigrationVersion:ACCESSORY_MIGRATION_VERSION,starterProgress:{version:1,quests:{}},progressionQuests:{version:1,quests:{},legacy:{}},quest:0,kills:0,bossKills:0,dead:false,cooldowns:[0,0,0,0],attackReadyAt:0,
       buffs:{guard:0,vanish:0,haste:0},activeUntil:0,lastInputSequence:-1,lastInputAt:0,
@@ -1161,7 +1161,7 @@ export class WorldSimulation {
     }
     candidates.sort((a,b)=>distance(p,a)-distance(p,b));
     for(const goal of candidates){
-      const points=findNavigationPath(this.collisionFor(p),p,goal,{actorRadius:.46,cellSize:.85,margin:24,maxVisited:4500});
+      const points=findPlayerNavigationPath(this.collisionFor(p),p,goal,{actorRadius:.46,cellSize:.85,margin:24,maxVisited:4500});
       if(!points.length)continue;
       // Navigation knows terrain, while live actor spacing is resolved each tick.
       // Reject routes through the monster instead of walking against its body.
@@ -1184,7 +1184,7 @@ export class WorldSimulation {
     const player=Boolean(this.state.characters[key]);
     let path=this.paths.get(key);
     if(!path||(path.expiresAt<=this.state.time&&(distance(path.goal,goal)>.7||!path.points.length))){
-      const points=findNavigationPath(this.collisionFor(actor),actor,goal,{actorRadius:radius,cellSize:.85,margin:player?24:10,maxVisited:4500});
+      const points=(player?findPlayerNavigationPath:findNavigationPath)(this.collisionFor(actor),actor,goal,{actorRadius:radius,cellSize:.85,margin:player?24:10,maxVisited:4500});
       path={goal:{...goal},points,expiresAt:this.state.time+(points.length?(player?180:650):1000)};this.paths.set(key,path);
     }
     // Combat destinations can be close to the body-clearance limit. Do not

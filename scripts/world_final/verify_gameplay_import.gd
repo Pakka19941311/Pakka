@@ -63,6 +63,11 @@ func verify_active_p2() -> void:
 	var courtyard_json: String = "res://world-final/castle/courtyard-p2.json"
 	read_manifest(courtyard_json)
 	verify_scene(courtyard_json.replace(".json", ".glb"))
+	for file: String in DirAccess.get_files_at("res://world-final/castle"):
+		if file.begins_with("courtyard") and file.get_extension() in ["jpg","jpeg","png","webp"]:
+			var texture: Texture2D = load("res://world-final/castle/"+file)
+			checked += 1
+			if texture == null or not texture.get_image().has_mipmaps(): failures.append("city mipmaps: "+file)
 	verify_directory("res://world-expansion-v3/city/motion/assets")
 	verify_directory("res://world-expansion-v3/city/production")
 	var nature_root: String = "res://world-final/nature/p2-sample-v3/"

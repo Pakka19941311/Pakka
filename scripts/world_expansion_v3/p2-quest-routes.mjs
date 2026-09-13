@@ -28,9 +28,10 @@ function makeDriver(context,{level=1,reference=false}={}){
  const sim=makeP2Simulation({geography:context.geography}),initial=sim.createCharacter('Маршрут P2','knight'),id=initial.id;
  if(reference)equipP2Reference(sim,initial,level);let sequence=0,command=0,walked=0,maxMovementStep=0;
  const log=[],movementTrace=[{at:sim.state.time,x:initial.x,z:initial.z}],p=()=>sim.state.characters[id],input=intent=>sim.input(id,++sequence,intent);
+ if(context.traceEveryPhysicsTick){const originalTick=sim.tick.bind(sim);sim.tick=dt=>{originalTick(dt);movementTrace.push({at:sim.state.time,x:p().x,z:p().z});};}
  const send=payload=>{const receipt=sim.command(id,'route-command-'+(++command),payload);if(!receipt.ok)throw Error(receipt.reason);return receipt;};
  const tick=ms=>{const old={x:p().x,z:p().z};stepP2(sim,ms);const moved=distance(old,p());walked+=moved;maxMovementStep=Math.max(maxMovementStep,moved);
-  if(sim.state.time-movementTrace.at(-1).at>=1000)movementTrace.push({at:sim.state.time,x:Number(p().x.toFixed(3)),z:Number(p().z.toFixed(3))});
+  if(!context.traceEveryPhysicsTick&&sim.state.time-movementTrace.at(-1).at>=1000)movementTrace.push({at:sim.state.time,x:Number(p().x.toFixed(3)),z:Number(p().z.toFixed(3))});
   if(p().dead)throw Error('route-hero-died');};
  const walkSegment=(goal,observe)=>{
   input({type:'destination',x:goal.x,z:goal.z});let remaining=30000;
@@ -120,8 +121,8 @@ function runBeetles(context){
  return {scenario:'level7-starter-reference-real-city-return',initialLevel:7,finalLevel:d.p().level,walkedMetres:Number(d.walked.toFixed(2)),seconds:(d.sim.state.time-1000)/1000,
   beforeReturn,quests:{'QUEST-105':reward},combat:d.log,movementTrace:d.movementTrace,maxMovementStep:d.maxMovementStep,heroHp:d.p().hp,population:d.sim.state.monsters.length,fixtureCompletion:false,fixtureLevel:true};
 }
-export function runQuestRoutes({only}={}){
- const context=makeRouteContext(),results=[];
+export function runQuestRoutes({only,traceEveryPhysicsTick=false}={}){
+ const context=makeRouteContext(),results=[];context.traceEveryPhysicsTick=traceEveryPhysicsTick;
  for(const [name,run]of [['QUEST-101+103',runFirstPair],['QUEST-104',runBoar],['QUEST-105',runBeetles]]){
   if(only&&name!==only)continue;
   try{const result=run(context);results.push({name,ok:true,...result});console.log(JSON.stringify({name,ok:true,walkedMetres:result.walkedMetres,seconds:result.seconds}));}

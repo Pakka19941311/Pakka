@@ -23,7 +23,11 @@ function boxOverlap(point: Point2, actorRadius: number, obstacle: BoxObstacle): 
   return Math.hypot(localX - closestX, localZ - closestZ) < actorRadius;
 }
 
+export type TransitZone = { polygon: number[][]; exit: Point2[] };
+
 export class CollisionWorld {
+  // Nested authored areas, innermost first. Used only by player wayfinding.
+  transitZones: TransitZone[] = [];
   private readonly obstacles: Obstacle[] = [];
   private readonly cells = new Map<string, Obstacle[]>();
   private readonly cellSize = 8;
@@ -31,6 +35,7 @@ export class CollisionWorld {
   private readonly segmentCandidates = new Set<Obstacle>();
 
   clear(): void {
+    this.transitZones = [];
     this.obstacles.length = 0;
     this.cells.clear();
     this.candidateChecks = 0;
