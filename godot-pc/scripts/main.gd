@@ -452,7 +452,7 @@ func refresh_quick() -> void:
 		slot.remaining = 0
 		slot.quantity = 0
 		slot.usable = not net.hero.get("dead", false)
-		if action in ["potion", "potion_large", "ether", "teleport", "haste"] and not hero.is_empty():
+		if str(data.items.get(action,{}).get("type","")) == "consumable" and not hero.is_empty():
 			for item: Dictionary in hero.inventory:
 				if item.id == action:
 					slot.quantity += int(item.count)
@@ -503,7 +503,7 @@ func load_preferences(id: String) -> void:
 				continue
 			var action: String = str(values[index].get("action", ""))
 			var key: String = str(values[index].get("key", ""))
-			if action.begins_with("item:") or data.books.has(action) or action in ["", "attack", "potion", "potion_large", "ether", "teleport", "haste"]:
+			if action.begins_with("item:") or data.books.has(action) or action in ["", "attack"] or str(data.items.get(action,{}).get("type","")) == "consumable":
 				quick[index].action = action
 			quick[index].key = key if key in data.quickKeys and key not in used else ""
 			if not quick[index].key.is_empty():
@@ -565,7 +565,9 @@ func dialog(title: String, size: Vector2i = Vector2i(480, 270), preserve_trade: 
 
 func assign_dialog(index: int) -> void:
 	var box: VBoxContainer = dialog("Назначение ячейки " + str(index + 1))
-	var actions: Array = ["", "attack", "potion", "potion_large", "ether", "teleport", "haste"]
+	var actions: Array = ["", "attack"]
+	for id: String in data.items:
+		if str(data.items[id].get("type","")) == "consumable": actions.append(id)
 	for id: String in data.books:
 		if book_ui.owns(id): actions.append(id)
 	var action_select: OptionButton = OptionButton.new()
@@ -865,7 +867,7 @@ func activate(action: String) -> void:
 				selected_item = {"kind":"bag","item":item.duplicate()}; use_selected(); return
 		notice("Предмет недоступен в сумке")
 		return
-	if action in ["potion", "potion_large", "ether", "teleport", "haste"]:
+	if str(data.items.get(action,{}).get("type","")) == "consumable":
 		for item: Dictionary in net.hero.inventory:
 			if item.id == action:
 				net.command({"type":"use","item":item.duplicate()})

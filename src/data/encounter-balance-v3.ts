@@ -16,9 +16,9 @@ export const BALANCE_BANDS_V3=[
 export const POTIONS_BALANCE_V3=[
  {id:'potion',level:1,heal:37,price:55,status:'live'},
  {id:'potion_large',level:1,heal:70,price:110,status:'live'},
- {id:'v3_potion_concentrate',level:25,heal:220,price:330,status:'fixture-not-live'},
- {id:'v3_potion_elixir',level:50,heal:600,price:900,status:'fixture-not-live'},
- {id:'v3_potion_supreme',level:75,heal:1400,price:2100,status:'fixture-not-live'},
+ {id:'v3_potion_concentrate',level:25,heal:220,price:330,status:'live'},
+ {id:'v3_potion_elixir',level:50,heal:600,price:900,status:'live'},
+ {id:'v3_potion_supreme',level:75,heal:1400,price:2100,status:'live'},
 ] as const;
 /** The quest/shop catalogue owns the values; this view only marks its role in
  * analysis. Physical caster proposals remain separate until explicitly applied. */

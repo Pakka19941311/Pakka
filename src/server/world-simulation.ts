@@ -46,6 +46,7 @@ import { resolveAttackAccuracy } from '../core/attack-accuracy.ts';
 import { CollisionWorld } from '../world/collision-world.ts';
 import { SPAWN_REGIONS, spawnPointInRegion, patrolRouteInRegion } from '../world/spawn-regions.ts';
 import { CONTENT_VERSION, mapVersion } from './content-manifest.ts';
+import {LATE_HEALING_POTIONS} from '../data/healing-potions-v3.ts';
 import { findNavigationPath, findPlayerNavigationPath } from '../world/navigation.ts';
 import { TerrainSurface } from '../world/terrain-surface.ts';
 import type {FinalWorld, TerrainSupport} from '../world/final-world.ts';
@@ -532,7 +533,9 @@ export class WorldSimulation {
     if (command.type==='use') {
       const item=p.inventory.find(i=>i.uid===command.item.uid);
       if (!item || item.id!==command.item.id || item.plus!==command.item.plus || item.count!==command.item.count) throw Error('stale-item');
-      const healing=(itemDef(item) as {heal?:number}).heal;
+      const definition=itemDef(item);
+      if(p.level<(definition.requiredLevel??1))throw Error('level-required');
+      const healing=(definition as {heal?:number}).heal;
       if (healing) {if(p.hp>=p.maxHp)throw Error('health-full');p.hp=Math.min(p.maxHp,p.hp+healing);}
       else if(item.id==='ether' && p.mp<p.maxMp) p.mp=Math.min(p.maxMp,p.mp+Math.round(p.maxMp*.45));
       else if(item.id==='haste'){p.buffs.haste=this.state.time+HASTE_DURATION_MS;this.recalculate(p);this.event('buff',p.id);}
@@ -574,9 +577,10 @@ export class WorldSimulation {
         if(this.addInventoryItem(p,this.item(command.itemId))==='full')throw Error('bag-full');
         p.gold-=definition.buyPrice;return;
       }
-      const cost: Record<string,number>={potion:55,potion_large:110,ether:70,teleport:130,haste:100};
-      const atShop=this.nearService(p,'shop'),atAlchemist=command.itemId==='haste'&&this.nearService(p,'alchemist');
+      const cost: Record<string,number>={potion:55,potion_large:110,ether:70,teleport:130,haste:100,...Object.fromEntries(Object.entries(LATE_HEALING_POTIONS).map(([id,item])=>[id,item.buyPrice]))};
+      const atShop=this.nearService(p,'shop'),atAlchemist=(command.itemId==='haste'||Object.hasOwn(LATE_HEALING_POTIONS,command.itemId))&&this.nearService(p,'alchemist');
       if (!Object.hasOwn(cost,command.itemId) || !(atShop||atAlchemist)) throw Error('shop-unavailable');
+      if(p.level<((ITEMS[command.itemId as ItemId] as {requiredLevel?:number}).requiredLevel??1))throw Error('level-required');
       if (p.gold<cost[command.itemId]) throw Error('insufficient-gold');
       const item=this.item(command.itemId);
       if(addOrStackItem(p.inventory,item,!('slot' in itemDef(item)))==='full')throw Error('bag-full');

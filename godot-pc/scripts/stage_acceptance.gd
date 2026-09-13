@@ -23,6 +23,7 @@ static func run(app: Node) -> void:
 		return
 	if block in ["all","sale"]: await sale(app,checks)
 	if block in ["all","potions"]: await potions(app,checks)
+	if block == "late-healing": await preload("res://scripts/late_healing_acceptance.gd").run(app,checks)
 	if block in ["all","drag","ui-v3"]: await drag(app,checks)
 	if block == "ui-v3": await stats_view(app,checks)
 	if block == "craft": await preload("res://scripts/craft_acceptance.gd").run(app,checks)

@@ -254,6 +254,9 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 	if kind == "smith": purchase.add_child(app.wrapped_label("Кузница: выберите свиток в сумке, затем предмет для усиления.",12))
 	if kind == "books": purchase.add_child(app.button("Книги умений · выбрать класс",app.book_ui.shop_classes))
 	var stock: Array = [] if kind == "books" else ["ring_blank","cloak_defense"] if kind == "smith" else ["haste"] if kind == "alchemist" else ["potion","potion_large","haste","ether","teleport"]
+	if kind in ["shop","alchemist"]:
+		for id: String in app.data.items:
+			if id.begins_with("v3_potion_"): stock.append(id)
 	if kind == "smith":
 		for id: String in app.data.items:
 			var item: Dictionary = app.data.items[id]
@@ -271,6 +274,9 @@ func shop(kind: String, title: String, selected_tab: int = 0) -> void:
 			if app.net.command_busy or not DialogLease.current(app,lease): return
 			await app.net.command({"type":"buy","itemId":id})
 			if DialogLease.current(app,lease): shop(kind,title,0))
+		var required: int = int(app.data.items[id].get("requiredLevel",1))
+		buy.disabled = int(app.net.hero.get("level",1)) < required
+		if buy.disabled: buy.text = "С уровня %d" % required
 		buy.set_meta("npc_action","buy:"+id); row.add_child(buy)
 	if not can_sell: return
 	var drop_area = preload("res://scripts/sale_drop.gd").new()

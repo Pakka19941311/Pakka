@@ -8,6 +8,7 @@ import {startWorldServer} from '../../server/http-server.mjs';
 import {FinalWorld} from '../../src/world/final-world.ts';
 import {RING_RECIPES} from '../../src/data/accessories-v3.ts';
 import {ITEMS} from '../../src/data/game-data.ts';
+import {LATE_HEALING_POTIONS} from '../../src/data/healing-potions-v3.ts';
 import {recordStarterQuestEvent} from '../../src/core/starter-quests-v3.ts';
 import {STARTER_ITEMS} from '../../src/data/starter-progression-v3.ts';
 import {p2Encounter} from '../../src/data/p2-encounters.ts';
@@ -39,6 +40,12 @@ try{
    const positions={entry:[-100,-238],market:[-118,-205],training:[-52,-149],well:[-116,-161],supply:[-68,-192],return:[-100,-190],overview:[-100,-150],interior:[0,-4],tavern:[-137,-199],citadel:[-100,-147],fair:[-113,-204],alehouse:[-74,-194]};
    const key=request.stage.slice(7),point=positions[key];assert.ok(point,'unknown courtyard QA point');
    world.relocate(hero,{x:point[0],z:point[1],spaceId:key==='interior'?'great_cave':'surface'});
+  }
+  else if(request.stage.startsWith('late-healing|')){
+   const itemId=request.stage.split('|')[1],definition=LATE_HEALING_POTIONS[itemId];assert.ok(definition);
+   hero.level=definition.requiredLevel;world.recalculate(hero);hero.hp=hero.maxHp-definition.heal-5;hero.gold=200000;
+   hero.inventory=hero.inventory.filter(i=>!Object.hasOwn(LATE_HEALING_POTIONS,i.id));
+   world.relocate(hero,{...geography.services['npc:shop'],x:geography.services['npc:shop'].x+2});
   }
   else if(request.stage.startsWith('trade-')){
    const id={'trade-smith':'npc:smith','trade-elza':'npc:shop','trade-alchemist':'npc:alchemist'}[request.stage];assert.ok(id,'unknown trade QA point');

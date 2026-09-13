@@ -34,6 +34,7 @@ func owns(id: String) -> bool:
 
 func item_icon(item: Dictionary) -> Texture2D:
 	var id: String = str(item.get("id",""))
+	if id.begins_with("v3_potion_"): return load("res://assets/icons/"+id+".svg")
 	if id == "potion_large": return preload("res://assets/icons/potion_large.svg")
 	if id.begins_with("book_") or id == "haste": return icon(id)
 	if app.data.get("itemIcons",{}).has(id):
