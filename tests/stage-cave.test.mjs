@@ -57,12 +57,18 @@ test('boss ranged telegraph damages nearby heroes, respects walls and returns wh
  w.relocate(p,{x:245,z:272,spaceId:'surface'});w.relocate(q,{x:245,z:272,spaceId:'surface'});
  advance(w,18000);assert.equal(b.spaceId,'great_cave');assert.ok(Math.hypot(b.x-b.home.x,b.z-b.home.z)<.7);assert.equal(b.targetId,null);assert.equal(b.hp,MONSTERS.cave_boss.hp);
 });
-test('boss death pays once; cave reentry/reload keep remaining game-time respawn',()=>{
+test('boss death drops one chest; pickup pays once; reentry/reload keep game-time respawn',()=>{
  const {w,p,boss,store,options}=fixture(),b=boss();
  w.relocate(p,{x:b.x+5,z:b.z,spaceId:'great_cave'});
- const gold=p.gold;w.damage(b,1e9,p,false);assert.equal(p.gold,gold+100000);
- const inventory=JSON.stringify(p.inventory);w.damage(b,1e9,p,false);assert.equal(p.gold,gold+100000);assert.equal(JSON.stringify(p.inventory),inventory);
+ const gold=p.gold;w.damage(b,1e9,p,false);assert.equal(p.gold,gold);
+ const chest=Object.values(w.state.groundLoot).find(l=>l.sourceUid===b.uid);assert.ok(chest);assert.equal(chest.gold,100000);
+ const contents=structuredClone(chest);w.damage(b,1e9,p,false);assert.deepEqual(w.state.groundLoot[chest.id],contents);
  assert.equal(w.events.filter(e=>e.kind==='loot'&&e.target===b.uid).length,1);
+ w.relocate(p,{x:chest.x,z:chest.z,spaceId:'great_cave'});w.heartbeat(p.id);
+ const pickupId='cave-pickup-once';assert.equal(w.command(p.id,pickupId,{type:'pickup',lootId:chest.id}).ok,true);
+ const inventory=JSON.stringify(p.inventory);assert.equal(p.gold,gold+100000);
+ assert.equal(w.command(p.id,pickupId,{type:'pickup',lootId:chest.id}).ok,true);
+ assert.equal(p.gold,gold+100000);assert.equal(JSON.stringify(p.inventory),inventory);
  assert.equal(b.respawnAt-b.deathAt,CAVE_BOSS_RESPAWN_MS);
  w.relocate(p,{x:0,z:-6,spaceId:'great_cave'});assert.equal(command(w,p,{type:'portal',destination:'great_cave'}).ok,true);
  w.relocate(p,{x:245,z:278,spaceId:'surface'});assert.equal(command(w,p,{type:'portal',destination:'great_cave'}).ok,true);assert.equal(b.alive,false);

@@ -468,8 +468,8 @@ func refresh_consumables() -> void:
 		var quantity: int = 0
 		for item: Dictionary in display_hero().get("inventory",[]):
 			if item.id == action: quantity += int(item.count)
-		var code: int = int(app.game_settings.get("bindings",{}).get(action,KEY_Q if action == "potion" else KEY_E))
-		var key: String = OS.get_keycode_string(code)
+		var code: int = int(app.game_settings.get("bindings",{}).get(action,KEY_Q if action == "potion" else 0))
+		var key: String = OS.get_keycode_string(code) if code != 0 else ""
 		potion_buttons[action].key_label = key
 		potion_buttons[action].quantity = quantity
 		potion_buttons[action].usable = not app.net.hero.get("dead",true) and quantity > 0
@@ -743,7 +743,7 @@ static func timer_text(seconds: float) -> String:
 func combat_event(event: Dictionary) -> void:
 	if str(event.get("actor","")) != app.world.hero_id and str(event.get("target","")) != app.world.hero_id: return
 	var kind: String = str(event.get("kind",""))
-	if kind == "loot" and str(event.actor) == app.world.hero_id: app.book_ui.show_loot(event)
+	if kind == "loot" and str(event.actor) == app.world.hero_id and event.get("lootState","") != "dropped": app.book_ui.show_loot(event)
 	if kind not in ["hit","miss","death"]: return
 	var incoming: bool = str(event.get("target","")) == app.world.hero_id
 	var other: String = str(event.get("actor","")) if incoming else str(event.get("target",""))

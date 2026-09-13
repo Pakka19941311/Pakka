@@ -264,7 +264,16 @@ static func cave(app: Node, checks: Dictionary) -> void:
 	await Wait.capture(app,"cave-boss-fight")
 	await Mouse.fixture(app,"cave-finish")
 	app.activate("attack")
-	checks.cave_boss_death_loot = await Wait.until(app,func(): return int(app.net.hero.gold)==gold+100000 and app.world.current_snapshot.monsters.any(func(m): return m.uid==BOSS and not m.alive),15000)
+	checks.cave_boss_death_chest = await Wait.until(app,func(): return app.world.current_snapshot.monsters.any(func(m): return m.uid==BOSS and not m.alive) and app.world.current_snapshot.get("groundLoot",[]).any(func(l): return int(l.gold)==100000),15000)
+	checks.cave_gold_waits_for_pickup = int(app.net.hero.gold)==gold
+	if not checks.cave_boss_death_chest:
+		app.net.save_private_json(app.qa_path.get_base_dir().path_join("cave-loot-diagnostic.json"),{"bosses":app.world.current_snapshot.monsters.filter(func(m): return m.uid==BOSS),"loot":app.world.current_snapshot.get("groundLoot",[]),"hero_position":{"x":app.net.hero.x,"z":app.net.hero.z},"space":app.net.hero.get("spaceId","")})
+	if checks.cave_boss_death_chest:
+		var chest: Dictionary = app.world.current_snapshot.groundLoot.filter(func(l): return int(l.gold)==100000)[0]
+		app.net.intent({"type":"destination","x":chest.x,"z":chest.z})
+		checks.cave_chest_reachable = await Wait.until(app,func(): return app.ground_loot.nearest_id==str(chest.id),12000)
+		key(app,KEY_E)
+	checks.cave_boss_death_loot = await Wait.until(app,func(): return int(app.net.hero.gold)==gold+100000,3000)
 	await Wait.capture(app,"cave-boss-loot")
 	app.net.intent({"type":"destination","x":0,"z":-6})
 	checks.cave_walk_to_exit = await Wait.until(app,func(): return Vector2(app.net.hero.x,app.net.hero.z).distance_to(Vector2(0,-6))<.7,45000)

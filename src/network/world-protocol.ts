@@ -1,4 +1,5 @@
 import type {SpaceId} from '../world/world-space.ts';
+import type {LootMode,GroundLootView} from '../core/ground-loot.ts';
 import type {BookEffect,BookDot} from '../server/book-system.ts';
 import type { InventoryItem, ItemReference } from '../core/inventory-commands.ts';
 import type { MonsterAiState } from '../world/monster-ai.ts';
@@ -16,6 +17,7 @@ export type TradeSession = {npcId:string;token:string;spaceId:SpaceId;generation
 export type WorldMotion = { yOffset:number; grounded:boolean; yaw:number; action:'idle'|'walk'|'jump'|'attack'|'death'; actionStartedAt:number; actionEndsAt:number; velocityX?:number; velocityZ?:number; verticalVelocity?:number; locomotionState?:LocomotionState; combatState?:'idle'|'approach'|'face'|'windup'|'recovery'|'dead'; hitAt?:number; hitUntil?:number; bodyRadius?:number; attackRange?:number };
 export type WorldCharacter = Position & WorldMotion & {
   id: string; name: string; classId: string; level: number; xp: number; gold: number;
+  lootMode?:LootMode;
   hp: number; mp: number; maxHp: number; maxMp: number; stats: EquipmentCombatStats;
   bookEffects?:BookEffect[]; bookCooldowns?:Record<string,number>; bookCastReadyAt?:number; bookQuests?:Record<string,'active'|'ready'|'claimed'>;
   storage?: Array<InventoryItem|null>;
@@ -49,8 +51,10 @@ export type WorldEvent = {
   origin?: Position & {y:number}; destination?:Position & {y:number}; actorGeneration?:number; targetHp?:number; targetMaxHp?:number; targetGeneration?:number;
   attackKind?:'aimed-line';halfWidth?:number;
   gold?: number; xp?: number; items?: string[];
+  lootId?:string; lootState?:'dropped'|'picked';
 };
 export type WorldSnapshot = {
+  groundLoot?:GroundLootView[];
   progressionQuests?:ProgressionQuestView[];
   starterQuests?:StarterQuestView[];
   craftRecipes?:RingRecipe[];
@@ -64,6 +68,8 @@ export type WorldSnapshot = {
 };
 // The wire format contains intentions only. Damage, prices, dice and rewards are server-owned.
 export type WorldCommand =
+  | {type:'pickup';lootId?:string}
+  | {type:'lootMode';mode:LootMode}
   | {type:'progressionQuest';questId:string;action:'accept'|'claim';rewardChoice?:string}
   | {type:'starterQuest';questId:string;action:'accept'|'claim'}
   | {type:'craftRing';recipeId:string;target:ItemReference;materials:ItemReference[]}

@@ -59,6 +59,7 @@ var trade_session = preload("res://scripts/trade_session.gd").new()
 var crafting = preload("res://scripts/crafting_dialog.gd").new()
 var starter_quests = preload("res://scripts/starter_quests.gd").new()
 var progression_quests = preload("res://scripts/progression_quests.gd").new()
+var ground_loot = preload("res://scripts/ground_loot.gd").new()
 var mouse_orbit: bool:
 	get: return world.camera_controller.captured if world != null else false
 var mouse_sensitivity: float = 1.0
@@ -68,7 +69,7 @@ var inventory_footer: Label
 var inventory_drag: bool = false
 var inventory_drag_offset: Vector2
 var game_settings: Dictionary = {}
-const DEFAULT_BINDINGS: Dictionary = {"move_forward":KEY_W,"move_back":KEY_S,"move_left":KEY_A,"move_right":KEY_D,"potion":KEY_Q,"ether":KEY_E,"jump":KEY_SPACE,"interact":KEY_F}
+const DEFAULT_BINDINGS: Dictionary = {"move_forward":KEY_W,"move_back":KEY_S,"move_left":KEY_A,"move_right":KEY_D,"potion":KEY_Q,"ether":0,"jump":KEY_SPACE,"interact":KEY_F}
 const BINDING_NAMES: Dictionary = {"move_forward":"Вперёд","move_back":"Назад","move_left":"Влево","move_right":"Вправо","potion":"Зелье здоровья","ether":"Зелье ресурса","jump":"Прыжок","interact":"Взаимодействие"}
 var rebinding_action: String = ""
 var binding_message: Label
@@ -101,7 +102,7 @@ func _ready() -> void:
 	get_viewport().gui_embed_subwindows = true
 	configure_input()
 	data = JSON.parse_string(FileAccess.get_file_as_string("res://generated/game.json"))
-	data.quickKeys = data.quickKeys.filter(func(k): return not str(k).ends_with("KeyR") and not str(k).ends_with("KeyJ"))
+	data.quickKeys = data.quickKeys.filter(func(k): return not str(k).ends_with("KeyR") and not str(k).ends_with("KeyJ") and not str(k).ends_with("KeyE"))
 	quick = data.quickDefaults.duplicate(true)
 	net = VarendorNetwork.new()
 	add_child(net)
@@ -143,6 +144,8 @@ func _ready() -> void:
 	net.intent_submitted.connect(world.submit_intent)
 	net.intent_rejected.connect(world.reject_intent)
 	world.loot_received.connect(notice)
+	world.add_child(ground_loot)
+	ground_loot.setup(self)
 	net.receipt_received.connect(func(_receipt: Dictionary):
 		selected_scroll = {}
 		selected_item = {}
@@ -510,6 +513,10 @@ func load_preferences(id: String) -> void:
 	world.camera_distance = clampf(float(preferences.get("camera_distance",10.5)) if reference_camera else 10.5,5.5,18)
 	preferences["camera_reference"] = "1e94a0d1"
 	game_settings = preferences.get("settings", {}).duplicate(true)
+	var saved_bindings: Dictionary = game_settings.get("bindings",{}).duplicate()
+	for action: String in saved_bindings:
+		if int(saved_bindings[action]) == KEY_E: saved_bindings[action] = DEFAULT_BINDINGS.get(action,0)
+	game_settings["bindings"] = saved_bindings
 	preload("res://scripts/graphics_profile.gd").migrate(game_settings)
 	for key: String in ["display","resolution","ui_scale"]: game_settings[key] = polish.startup_display.get(key,1)
 	configure_input()
@@ -595,6 +602,7 @@ func controls_dialog() -> void:
 		tabs.add_child(page)
 		match title:
 			"Игра":
+				ground_loot.add_mode_setting(page)
 				setting_toggle(page, "Имена над персонажами", "names", true)
 				setting_toggle(page, "Панель быстрого доступа", "quick_visible", true)
 				setting_choice(page, "Масштаб интерфейса", "ui_scale", ["80%", "100%", "125%", "150%"], 1)
@@ -610,7 +618,7 @@ func controls_dialog() -> void:
 				setting_choice(page, "Декоративная растительность", "vegetation", ["24 м", "45 м", "80 м"], 2)
 				setting_choice(page, "Разрешение 3D", "render_scale", ["50%", "75%", "100%"], 2)
 			"Управление":
-				page.add_child(wrapped_label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. R — автобег (фиксированная клавиша), N — навыки.\nWASD / стрелки — движение, Q / E — зелья, Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
+				page.add_child(wrapped_label("ЛКМ — идти / один удар. ЛКМ + ПКМ, затем отпустить — автоатака.\nПКМ — камера. Колесо — масштаб. R — автобег, N — навыки.\nWASD / стрелки — движение, Q — здоровье, E — подобрать добычу. Зелье маны — нажатием на панели. Пробел — прыжок.\nЛКМ и перенос ячейки — настройка панели. M — карта на ходу.", 15))
 				setting_toggle(page, "Инвертировать камеру по вертикали", "invert_y", false)
 				page.add_child(label("Чувствительность мыши"))
 				var slider: HSlider = HSlider.new()
@@ -622,11 +630,11 @@ func controls_dialog() -> void:
 				slider.value_changed.connect(func(value: float): game_settings["sensitivity"] = value; apply_settings(); save_preferences())
 				var keys: GridContainer = GridContainer.new()
 				keys.columns = 2
-				page.add_child(label("R — автобег · J — крафт колец",13))
+				page.add_child(label("R — автобег · J — крафт колец · E — добыча",13))
 				page.add_child(keys)
 				for action: String in DEFAULT_BINDINGS:
 					var code: int = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
-					keys.add_child(button(str(BINDING_NAMES[action]) + " · " + OS.get_keycode_string(code), func():
+					keys.add_child(button(str(BINDING_NAMES[action]) + " · " + (OS.get_keycode_string(code) if code != 0 else "Без клавиши"), func():
 						var prompt: VBoxContainer = dialog("Клавиша: " + str(BINDING_NAMES[action]), Vector2i(500, 190))
 						rebinding_action = action
 						binding_message = label("Нажмите одну клавишу. Esc — отмена.", 15)
@@ -729,8 +737,8 @@ func configure_input() -> void:
 		InputMap.action_erase_events(action)
 		var event: InputEventKey = InputEventKey.new()
 		event.physical_keycode = int(game_settings.get("bindings", {}).get(action, DEFAULT_BINDINGS[action]))
-		if event.physical_keycode in [KEY_R,KEY_J]: event.physical_keycode = DEFAULT_BINDINGS[action]
-		InputMap.action_add_event(action, event)
+		if event.physical_keycode in [KEY_R,KEY_J,KEY_E]: event.physical_keycode = DEFAULT_BINDINGS[action]
+		if event.physical_keycode != 0: InputMap.action_add_event(action, event)
 		if action in ["move_forward","move_back","move_left","move_right"] and event.physical_keycode == DEFAULT_BINDINGS[action]:
 			var arrow: InputEventKey = InputEventKey.new()
 			arrow.physical_keycode = {"move_forward":KEY_UP,"move_back":KEY_DOWN,"move_left":KEY_LEFT,"move_right":KEY_RIGHT}[action]
@@ -738,8 +746,8 @@ func configure_input() -> void:
 
 func assign_movement_binding(event: InputEventKey) -> void:
 	var key: int = event.physical_keycode
-	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_R, KEY_J, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
-		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, R / M, Enter и 1–8 заняты интерфейсом."
+	if event.shift_pressed or event.ctrl_pressed or event.alt_pressed or event.meta_pressed or key in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_I, KEY_C, KEY_TAB, KEY_R, KEY_J, KEY_E, KEY_N, KEY_M, KEY_ENTER] or (key >= KEY_1 and key <= KEY_8):
+		binding_message.text = "Выберите одну клавишу без модификаторов.\nI / C / Tab, R / J / E / M, Enter и 1–8 заняты интерфейсом."
 		return
 	var bindings: Dictionary = game_settings.get("bindings", {}).duplicate()
 	for action: String in DEFAULT_BINDINGS:
@@ -1101,6 +1109,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			return
 		if text_focused():
 			return
+		if event.physical_keycode == KEY_E:
+			if not is_instance_valid(active_dialog) and not event.ctrl_pressed and not event.alt_pressed and not event.meta_pressed and not event.shift_pressed:
+				ground_loot.pickup()
+			get_viewport().set_input_as_handled()
+			return
 		# Services and nearby world entrances own F before an assignable slot.
 		var portal_nearby: bool = world.final_environment != null and not world.space_loading and not world.final_environment.portal_near(Vector2(world.hero_position.x,-world.hero_position.z)).is_empty()
 		if event.is_action_pressed("interact") and (VarendorNpcInteraction.SERVICES.has(world.target_id) or portal_nearby):
@@ -1109,7 +1122,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var key: String = ""
 		if event.physical_keycode >= KEY_1 and event.physical_keycode <= KEY_8:
 			key = "Digit" + str(event.physical_keycode - KEY_0)
-		elif event.physical_keycode in [KEY_Q, KEY_E, KEY_F, KEY_T, KEY_G]:
+		elif event.physical_keycode in [KEY_Q, KEY_F, KEY_T, KEY_G]:
 			key = "Key" + OS.get_keycode_string(event.physical_keycode)
 		if event.shift_pressed:
 			key = "Shift+" + key

@@ -665,11 +665,16 @@ func present_event(event: Dictionary) -> void:
 		var names: Array = []
 		for item_id: String in event.get("items", []):
 			names.append(str(data.items.get(item_id, {}).get("name", item_id)))
-		var message: String = "+%d серебра · +%d опыта" % [event.get("gold", 0), event.get("xp", 0)]
-		if not names.is_empty():
-			message += "\n" + ", ".join(names)
-		loot_received.emit("Добыча: " + message)
-		play_sound("coin", hero_position)
+		if event.get("lootState","") == "dropped":
+			var message: String = "+%d опыта" % int(event.get("xp",0))
+			if event.has("lootId"): message += " · Добыча на земле [E]"
+			loot_received.emit(message)
+		else:
+			var message: String = "+%d золота" % int(event.get("gold", 0))
+			if int(event.get("xp",0)) > 0: message += " · +%d опыта" % int(event.xp)
+			if not names.is_empty(): message += "\n" + ", ".join(names)
+			loot_received.emit("Подобрано: " + message)
+			play_sound("coin", hero_position)
 	if event.get("kind") in ["hit", "miss"] and actors.has(str(event.get("target", ""))):
 		var target: Node3D = actors[str(event.target)]
 		(target.get_meta("animation_controller") as VarendorAnimationController).on_event(event,float(current_snapshot.get("time",0)))

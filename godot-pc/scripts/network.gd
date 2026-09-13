@@ -441,7 +441,11 @@ func command(value: Dictionary, retry: bool = false) -> void:
 			elif outcome is Dictionary and outcome.has("success") and outcome.has("from") and outcome.has("to"):
 				notice.emit("Заточка успешна: +%d → +%d" % [outcome.from, outcome.to] if outcome.success else "Заточка не удалась. Предмет разрушен.")
 		else:
-			notice.emit(str(receipt.get("reason", "Действие недоступно")))
+			var reason: String = str(receipt.get("reason", "Действие недоступно"))
+			var loot_messages: Dictionary = {"loot-missing":"Рядом нет доступной добычи.",
+				"loot-unreachable":"Подойдите ближе к добыче. Нельзя подбирать сквозь препятствия.",
+				"loot-invalid-mode":"Не удалось изменить режим подбора.","bag-full":"В сумке нет места. Остаток добычи сохранён."}
+			notice.emit(str(loot_messages.get(reason,reason)))
 		pending = {}
 		save_private_json(pending_path(), {})
 		accept(response.snapshot)
